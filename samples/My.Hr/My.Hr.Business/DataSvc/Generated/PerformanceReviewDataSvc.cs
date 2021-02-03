@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -84,8 +84,8 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Created").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Created").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -100,8 +100,8 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Updated").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Updated").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -115,12 +115,12 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"My.Hr.PerformanceReview.{id}", "Deleted", id).ConfigureAwait(false);
+                await _evtPub.Publish($"My.Hr.PerformanceReview.{id}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<PerformanceReview>(new UniqueKey(id));
             });
         }
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore
 #nullable restore

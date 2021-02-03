@@ -3,6 +3,7 @@
 using Beef.Reflection;
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -35,12 +36,12 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             // Do not validate where the compare to property has an error.
             var ctx = Beef.Check.NotNull(context, nameof(context));
             if (ctx.Parent.HasError(_compareTo))
-                return;
+                return Task.CompletedTask;
 
             // Convert type and compare values.
             try
@@ -48,6 +49,8 @@ namespace Beef.Validation.Rules
                 var compareToValue = (TProperty)(object)_compareTo.GetValue(context.Parent.Value)!;
                 if (!Compare(ctx.Value!, compareToValue))
                     CreateErrorMessage(context, _compareToText ?? _compareTo.Text);
+
+                return Task.CompletedTask;
             }
             catch (InvalidCastException icex)
             {

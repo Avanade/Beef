@@ -15,7 +15,7 @@ namespace Beef.RefData
     /// This is required as <b>Entity</b> classes should contain no implementation specific logic, such as database access, etc. This enables the <b>ReferenceData</b> access logic to be seperated from
     /// the implementation. This ensures that the <b>ReferenceData</b> follows the same pattern of using <c>Manager</c>, <c>DataSvc</c> and <c>Data</c> layering for the implementation logic.
     /// <para>This also enables there to be multiple implementations; for example the loading and caching could be different on the external consumer channel versus the internal application tier.</para> 
-    /// <para>The <see cref="Register"/> enables overridding of the <c>provider</c> where the default <see cref="ExecutionContext.ServiceProvider"/> (i.e. dependency injection) is not configured.</para>
+    /// <para>The <see cref="Register"/> enables overriding of the <c>provider</c> where the default <see cref="ExecutionContext.ServiceProvider"/> (i.e. dependency injection) is not configured.</para>
     /// </remarks>
     public sealed class ReferenceDataManager : IReferenceDataProvider
     {

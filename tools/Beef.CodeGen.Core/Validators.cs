@@ -12,32 +12,6 @@ using System.Reflection;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// Validates either existence of file or embedded resource.
-    /// </summary>
-    public class FileResourceValidator : IOptionValidator
-    {
-        /// <summary>
-        /// Performs the validation.
-        /// </summary>
-        /// <param name="option">The <see cref="CommandOption"/>.</param>
-        /// <param name="context">The <see cref="ValidationContext"/>.</param>
-        /// <returns>The <see cref="ValidationResult"/>.</returns>
-        public ValidationResult GetValidationResult(CommandOption option, ValidationContext context)
-        {
-            if (option == null)
-                throw new ArgumentNullException(nameof(option));
-
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            if (option.Value() != null && !File.Exists(option.Value()) && ResourceManager.GetScriptContentAsync(option.Value()!).GetAwaiter().GetResult() == null)
-                return new ValidationResult($"The file or embedded resource '{option.Value()}' does not exist.");
-
-            return ValidationResult.Success;
-        }
-    }
-
-    /// <summary>
     /// Validate the Params to ensure format is correct and values are not duplicated.
     /// </summary>
     public class ParamsValidator : IOptionValidator
@@ -62,7 +36,7 @@ namespace Beef.CodeGen
             {
                 string[] parts = CodeGenConsole.CreateKeyValueParts(p!);
                 if (parts.Length != 2)
-                    return new ValidationResult($"The parameter '{p}' is not valid; must be formatted as Name=value.");
+                    return new ValidationResult($"The parameter '{p}' is not valid; must be formatted as Name=Value.");
 
                 if (pd.ContainsKey(parts[0]))
                     return new ValidationResult($"The parameter '{p}' is not valid; name has been specified more than once.");
@@ -110,9 +84,7 @@ namespace Beef.CodeGen
                 {
                     Assemblies.Add(Assembly.Load(name!));
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception ex)
-#pragma warning restore CA1031
                 {
                     return new ValidationResult($"The specified assembly '{name}' is invalid: {ex.Message}");
                 }

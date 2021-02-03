@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,13 @@ using Beef.Entities;
 using Beef.Events;
 {{/if}}
 {{#if RequiresData}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Data;
+using {{Root.NamespaceBusiness}}.Data;
 {{/if}}
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifeq Root.EntityUsing 'Business' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -35,14 +35,14 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
+namespace {{Root.NamespaceBusiness}}.DataSvc
 {
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} data repository services.
     /// </summary>
     public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}}
     {
-{{#each DataSvcConstructorParameters}}
+{{#each DataSvcCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -50,24 +50,31 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
 {{/each}}
 {{#if DataSvcExtensions}}
         #region Extensions
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
   {{#each DataSvcAutoOperations}}
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
   {{/each}}
 
-        #pragma warning restore CS0649
         #endregion
 
 {{/if}}
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}DataSvc"/> class.
         /// </summary>
-{{#each DataSvcConstructorParameters}}
+{{#each DataSvcCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower DataSvcConstructor}} {{Name}}DataSvc({{#each DataSvcConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each DataSvcConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+        {{lower DataSvcCtor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle DataSvcCtorParameters.Count 3}}
+            { {{#each DataSvcCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+{{else}}
+        {
+  {{#each DataSvcCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}DataSvcCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}DataSvcCtor(); // Enables additional functionality to be added to the constructor.
 {{#each DataSvcOperations}}
@@ -97,17 +104,21 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
       {{/ifeq}}
     {{/if}}         
                 {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
+    {{#if Parent.DataSvcExtensions}}
+                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+    {{/if}}
     {{#if EventPublish}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
-                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}Async({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).ConfigureAwait(false);
+                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).SendAsync().ConfigureAwait(false);
         {{/each}}
       {{else}}
         {{#ifeq Events.Count 0}}
+                await _evtPub.SendAsync().ConfigureAwait(false);
         {{else}}
-                await _evtPub.PublishAsync(
+                await _evtPub.Publish(
           {{#each Events}}
-                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).ConfigureAwait(false);{{else}},{{/if}}
+                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).SendAsync().ConfigureAwait(false);{{else}},{{/if}}
             {{#if @last}}
 
             {{/if}}
@@ -119,15 +130,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
       {{#ifeq Type 'Delete'}}
                 _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
       {{else}}
-                _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}__result.UniqueKey{{/ifeq}}, __result);
+                _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}(__result as IUniqueKey).UniqueKey{{/ifeq}}, __result);
       {{/ifeq}}
-    {{/if}}         
-    {{#if Parent.DataSvcExtensions}}
-                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
-    {{/if}}
-      {{#if HasReturnValue}}
+    {{/if}}   
+    {{#if HasReturnValue}}
                 return __result;
-      {{/if}}
+    {{/if}}
             }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
         }
   {{/if}}
@@ -135,5 +143,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore
 #nullable restore

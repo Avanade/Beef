@@ -1,18 +1,20 @@
 CREATE PROCEDURE [Hr].[spEmployeeDelete]
-   @EmployeeId AS UNIQUEIDENTIFIER
+  @EmployeeId AS UNIQUEIDENTIFIER
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost. 
    */
- 
+
+  SET NOCOUNT ON;
+
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
     -- Delete the record.
-    DELETE FROM [Hr].[Employee]
-      WHERE [EmployeeId] = @EmployeeId
+    DELETE [e] FROM [Hr].[Employee] AS [e]
+      WHERE [e].[EmployeeId] = @EmployeeId
 
     -- Execute additional statements.
     DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId

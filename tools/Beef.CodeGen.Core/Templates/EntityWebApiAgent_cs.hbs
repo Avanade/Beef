@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
+namespace {{Root.NamespaceCommon}}.Agents
 {
     /// <summary>
     /// Defines the {{{EntityNameSeeComments}}} Web API agent.
@@ -53,8 +53,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public {{Name}}Agent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs"/>.</param>
+        public {{Name}}Agent(I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs args) : base(args) { }
 {{#each WebApiAgentOperations}}
 
         /// <summary>
@@ -86,16 +86,16 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
             PatchAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Beef.Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
-            DeleteAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{/if}}requestOptions: requestOptions,
+            DeleteAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq ValueLessParameters.Count 0}}
                 args: Array.Empty<WebApiArg>());
   {{else}}
-                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
+                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{#ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
   {{/ifeq}}
 {{/each}}
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

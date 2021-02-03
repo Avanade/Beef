@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Generators;
 using Beef.Data.Database;
+using HandlebarsDotNet;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -28,37 +30,16 @@ namespace Beef.Database.Core.Sql
         /// Register the database.
         /// </summary>
         /// <param name="db">The <see cref="DatabaseBase"/>.</param>
-        /// <param name="refDataSchema">The reference data schema.</param>
-        public static async Task RegisterDatabaseAsync(DatabaseBase db, string? refDataSchema = null)
+        public static async Task RegisterDatabaseAsync(DatabaseBase db)
         {
             if (DbTables == null)
-                DbTables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
-
-            RefDataSchema = refDataSchema;
+                DbTables = await DbTable.LoadTablesAndColumnsAsync(db, false).ConfigureAwait(false);
         }
-
-        /// <summary>
-        /// Registers the database tables.
-        /// </summary>
-        /// <param name="tables">The tables.</param>
-        /// <param name="refDataSchema">The reference data schema.</param>
-        public static void RegisterDatabase(List<Table> tables, string? refDataSchema = null)
-        {
-            if (DbTables == null)
-                DbTables = tables;
-
-            RefDataSchema = refDataSchema;
-        }
-
-        /// <summary>
-        /// Gets the reference data schema.
-        /// </summary>
-        public static string? RefDataSchema { get; private set; }
 
         /// <summary>
         /// Gets the registered database tables.
         /// </summary>
-        public static List<Table>? DbTables { get; private set; }
+        public static List<DbTable>? DbTables { get; private set; }
 
         /// <summary>
         /// Reads and parses the YAML <see cref="string"/>.
@@ -99,10 +80,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="json">The JSON <see cref="string"/>.</param>
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
-        public static SqlDataUpdater ReadJson(string json)
-        {
-            return new SqlDataUpdater(JObject.Parse(json));
-        }
+        public static SqlDataUpdater ReadJson(string json) => new SqlDataUpdater(JObject.Parse(json));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlDataUpdater"/> class.
@@ -219,64 +197,25 @@ namespace Beef.Database.Core.Sql
         }
 
         /// <summary>
-        /// Writes the configuration as XML in preparation for code generation.
-        /// </summary>
-        /// <returns>The <see cref="XElement"/>.</returns>
-        public XElement CreateXml()
-        {
-            var xgc = new XElement("CodeGeneration");
-
-            foreach (var t in Tables)
-            {
-                var xt = new XElement("Table",
-                    new XAttribute("Name", t.Name),
-                    new XAttribute("Schema", t.Schema),
-                    new XAttribute("Alias", t.DbTable.Alias),
-                    new XAttribute("IsMerge", t.IsMerge),
-                    new XAttribute("IsRefData", t.IsRefData));
-
-                // Add the columns configuration (used/referenced).
-                foreach (var col in t.Columns)
-                {
-                    col.Value.CreateXml(xt);
-                }
-
-                // Add the actual rows and columns.
-                foreach (var r in t.Rows)
-                {
-                    var xr = new XElement("Row");
-
-                    foreach (var c in r.Columns)
-                    {
-                        var xc = new XElement("Col",
-                            new XAttribute("Name", c.Value.Name),
-                            new XAttribute("Value", c.Value.ToSqlValue()),
-                            new XAttribute("UseForeignKeyQueryForId", c.Value.UseForeignKeyQueryForId));
-
-                        xr.Add(xc);
-                    }
-
-                    xt.Add(xr);
-                }
-
-                xgc.Add(xt);
-            }
-
-            return xgc;
-        }
-
-        /// <summary>
         /// Generates the SQL.
         /// </summary>
         /// <param name="codeGen">The code generation action to execute.</param>
-        public async Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
+        public Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
         {
             if (codeGen == null)
                 throw new ArgumentNullException(nameof(codeGen));
 
-            var cg = CodeGenerator.Create(CreateXml());
-            cg.CodeGenerated += (o, e) => codeGen(e);
-            await cg.GenerateAsync(XElement.Load(typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.xml"))).ConfigureAwait(false);
+            using var st = typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.hbs");
+            using var tr = new StreamReader(st!);
+            HandlebarsHelpers.RegisterHelpers();
+            var hb = Handlebars.Compile(tr.ReadToEnd());
+
+            foreach (var t in Tables)
+            {
+                codeGen(new CodeGeneratorEventArgs { Content = hb.Invoke(t), OutputFileName = $"{t.Schema}.{t.Name} SQL" });
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

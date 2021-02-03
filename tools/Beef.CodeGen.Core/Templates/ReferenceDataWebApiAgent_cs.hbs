@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.WebApi;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
+namespace {{Root.NamespaceCommon}}.Agents
 {
     /// <summary>
     /// Defines the <b>ReferenceData</b> Web API agent.
@@ -52,8 +52,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public ReferenceDataAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs"/>.</param>
+        public ReferenceDataAgent(I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs args) : base(args) { }
 
 {{#each RefDataEntities}}
         /// <summary>
@@ -84,5 +84,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

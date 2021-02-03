@@ -1,10 +1,13 @@
 ﻿using Beef.Test.NUnit;
+using Beef.Validation;
+using Company.AppName.Business;
 using Company.AppName.Business.Validation;
 using Company.AppName.Common.Agents;
 using Company.AppName.Common.Entities;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace Company.AppName.Test.Validators
 {
@@ -20,19 +23,20 @@ namespace Company.AppName.Test.Validators
         }
 
         [Test, TestSetUp]
-        public void A110_Validation_Empty()
+        public async Task A110_Validation_Empty()
         {
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .ExpectMessages(
                     "First Name is required.",
                     "Last Name is required.",
                     "Gender is required.",
                     "Birthday is required.")
-                .Run(() => PersonValidator.Default.Validate(new Person()));
+                .CreateAndRunAsync<IValidator<Person>, Person>(new Person());
         }
 
         [Test, TestSetUp]
-        public void A120_Validation_Invalid()
+        public async Task A120_Validation_Invalid()
         {
             var p = new Person
             {
@@ -42,18 +46,19 @@ namespace Company.AppName.Test.Validators
                 Birthday = DateTime.UtcNow.AddDays(1)
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .ExpectMessages(
                     "First Name must not exceed 100 characters in length.",
                     "Last Name must not exceed 100 characters in length.",
                     "Gender is invalid.",
                     "Birthday must be less than or equal to Today.")
-                .Run(() => PersonValidator.Default.Validate(p));
+                .CreateAndRunAsync<IValidator<Person>, Person>(p);
         }
 
         [Test, TestSetUp]
-        public void A130_Validation_OK()
+        public async Task A130_Validation_OK()
         {
             var p = new Person
             {
@@ -63,9 +68,10 @@ namespace Company.AppName.Test.Validators
                 Birthday = DateTime.UtcNow.AddYears(-18)
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
-                .Run(() => PersonValidator.Default.Validate(p));
+                .CreateAndRunAsync<IValidator<Person>, Person>(p);
         }
     }
 }

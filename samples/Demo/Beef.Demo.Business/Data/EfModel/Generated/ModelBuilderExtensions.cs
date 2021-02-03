@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,4 +31,5 @@ namespace Beef.Demo.Business.Data.EfModel
     }
 }
 
+#pragma warning restore
 #nullable restore

@@ -20,7 +20,7 @@ namespace Beef.Test.NUnit.Tests
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="WebApiAgentResult{TValue}.Value"/> <see cref="Type"/>.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public class AgentTest<TStartup, TAgent, TValue> : AgentTestBase<TStartup> where TStartup : class where TAgent : WebApiAgentBase
     {
         private readonly ComparisonConfig _comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
@@ -205,7 +205,7 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        /// <returns>The <see cref="AgentTest{TStartup, TAgent}"/> instance to support fluent/chaining usage.</returns>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public AgentTest<TStartup, TAgent, TValue> ExpectEvent(string template, string action)
         {
             SetExpectEvent(template, action);
@@ -221,7 +221,7 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
         /// <param name="eventValue">The <see cref="EventData{T}"/> value.</param>
         /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
-        /// <returns>The <see cref="AgentTest{TStartup, TAgent}"/> instance to support fluent/chaining usage.</returns>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public AgentTest<TStartup, TAgent, TValue> ExpectEvent<T>(string template, string action, T eventValue, params string[] membersToIgnore)
         {
             SetExpectEvent<T>(false, template, action, eventValue, membersToIgnore);
@@ -245,9 +245,20 @@ namespace Beef.Test.NUnit.Tests
         /// <summary>
         /// Verifies that no events were published.
         /// </summary>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent}"/> instance to support fluent/chaining usage.</returns>
         public AgentTest<TStartup, TAgent, TValue> ExpectNoEvents()
         {
             SetExpectNoEvents();
+            return this;
+        }
+
+        /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTest<TStartup, TAgent, TValue> IgnorePublishSendEventMismatch()
+        {
+            SetIgnorePublishSendEventMismatch();
             return this;
         }
 

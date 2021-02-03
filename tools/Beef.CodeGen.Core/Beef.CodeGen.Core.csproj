@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.1.12</Version>
+    <Version>4.1.13</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -25,6 +25,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef codegen</PackageTags>
     <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,26 +36,54 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
+    <None Remove="Scripts\DatabaseCdc.xml" />
+    <None Remove="Scripts\DatabaseCdcDacpac.xml" />
+    <None Remove="Scripts\DatabaseCdcOutbox.xml" />
+    <None Remove="Scripts\DatabaseCdcTracking.xml" />
+    <None Remove="Scripts\DatabaseWithCdc.xml" />
+    <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
+    <None Remove="Templates\DbCdcBackgroundService_cs.hb" />
+    <None Remove="Templates\DbCdcDataSce_cs.hb" />
+    <None Remove="Templates\DbCdcData_cs.hb" />
+    <None Remove="Templates\DbCdcEntity_cs.hb" />
+    <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
+    <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
+    <None Remove="Templates\DbCdcTrackingUdt_sql.hb" />
+    <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
+    <None Remove="Templates\DbEfModel_cs.hbs" />
+    <None Remove="Templates\DbSpTableCreate_sql.hbs" />
+    <None Remove="Templates\DbSpTableDelete_sql.hbs" />
+    <None Remove="Templates\DbSpTableGetColl_sql.hbs" />
+    <None Remove="Templates\DbSpTableGet_sql.hbs" />
+    <None Remove="Templates\DbSpTableMerge_sql.hbs" />
+    <None Remove="Templates\DbSpTableUpdate_sql.hbs" />
+    <None Remove="Templates\DbSpTableUpsert_sql.hbs" />
+    <None Remove="Templates\DbTvpTable_cs.hbs" />
+    <None Remove="Templates\DbUdtTableList_sql.hbs" />
+    <None Remove="Templates\DbVwQuery_sql.hbs" />
+    <None Remove="Templates\DbVwTable_sql.hbs" />
     <None Remove="Templates\EntityDataSvc_cs.hbs" />
     <None Remove="Templates\EntityData_cs.hbs" />
     <None Remove="Templates\EntityGrpcAgent_cs.hbs" />
     <None Remove="Templates\EntityGrpcService_cs.hbs" />
+    <None Remove="Templates\EntityIDataSvc_cs.hbs" />
+    <None Remove="Templates\EntityIData_cs.hbs" />
+    <None Remove="Templates\EntityIManager_cs.hbs" />
     <None Remove="Templates\EntityManager_cs.hbs" />
+    <None Remove="Templates\EntityWebApiAgentArgs_cs.hbs" />
     <None Remove="Templates\EntityWebApiAgent_cs.hbs" />
     <None Remove="Templates\EntityWebApiController_cs.hbs" />
     <None Remove="Templates\Entity_cs.hbs" />
     <None Remove="Templates\GrpcTransformers_cs.hbs" />
     <None Remove="Templates\Grpc_proto.hbs" />
-    <None Remove="Templates\IEntityDataSvc_cs.hbs" />
-    <None Remove="Templates\IEntityData_cs.hbs" />
-    <None Remove="Templates\IEntityManager_cs.hbs" />
-    <None Remove="Templates\IReferenceDataDataSvc_cs.hbs" />
-    <None Remove="Templates\IReferenceDataData_cs.hbs" />
-    <None Remove="Templates\IReferenceData_cs.hbs" />
     <None Remove="Templates\Model_cs.hbs" />
     <None Remove="Templates\ReferenceDataDataSvc_cs.hbs" />
     <None Remove="Templates\ReferenceDataData_cs.hbs" />
+    <None Remove="Templates\ReferenceDataIDataSvc_cs.hbs" />
+    <None Remove="Templates\ReferenceDataIData_cs.hbs" />
+    <None Remove="Templates\ReferenceDataI_cs.hbs" />
     <None Remove="Templates\ReferenceDataProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgent_cs.hbs" />
@@ -63,6 +92,7 @@
     <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsData_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
+    <None Remove="Templates\ServiceCollectionExtensionsValidation_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +102,12 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
     <EmbeddedResource Include="Scripts\Database.xml" />
     <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
     <EmbeddedResource Include="Scripts\DataModelOnly.xml" />
@@ -79,18 +115,28 @@
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
-    <EmbeddedResource Include="Templates\DbEfModelBuilderExtensions_cs.xml" />
-    <EmbeddedResource Include="Templates\DbTvpTable_cs.xml" />
-    <EmbeddedResource Include="Templates\DbEfTableModel_cs.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableCreate_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableDelete_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableGetByArgs_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableGet_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableMerge_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableUpdate_sql.xml" />
-    <EmbeddedResource Include="Templates\DbSpTableUpsert_sql.xml" />
-    <EmbeddedResource Include="Templates\DbUdtTableList_sql.xml" />
-    <EmbeddedResource Include="Templates\DbVwTable_sql.xml" />
+    <EmbeddedResource Include="Templates\DbCdcBackgroundService_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
+    <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
+    <EmbeddedResource Include="Templates\DbCdcEntity_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcOutboxTableCreate_sql.hb" />
+    <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />
+    <EmbeddedResource Include="Templates\DbCdcSpExecuteOutbox_sql.hb" />
+    <EmbeddedResource Include="Templates\DbVwQuery_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbVwTable_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbTvpTable_cs.hbs" />
+    <EmbeddedResource Include="Templates\DbUdtTableList_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableMerge_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableUpsert_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableUpdate_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableGetColl_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableCreate_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbSpTableGet_sql.hbs" />
     <EmbeddedResource Include="Templates\EntityData_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.hbs" />
@@ -100,33 +146,31 @@
     <EmbeddedResource Include="Templates\Entity_cs.hbs" />
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.hbs" />
     <EmbeddedResource Include="Templates\Grpc_proto.hbs" />
-    <EmbeddedResource Include="Templates\IEntityData_cs.hbs" />
-    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityIData_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityIDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityManager_cs.hbs" />
-    <EmbeddedResource Include="Templates\IEntityManager_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityIManager_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataData_cs.hbs" />
-    <EmbeddedResource Include="Templates\IReferenceDataData_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataIData_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.hbs" />
-    <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataIDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\Model_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiController_cs.hbs" />
-    <EmbeddedResource Include="Templates\IReferenceData_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataI_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityWebApiAgentArgs_cs.hbs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsValidation_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="1.10.1" />
+    <PackageReference Include="Handlebars.Net" Version="2.0.3" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
   </ItemGroup>
 

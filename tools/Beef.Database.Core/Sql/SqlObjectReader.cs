@@ -20,13 +20,13 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the list of supported object types and their application order.
         /// </summary>
-        private readonly List<Tuple<string, int>> SupportedObjectTypes = new List<Tuple<string, int>>()
+        private readonly List<(string Type, int Order)> _supportedObjectTypes = new List<(string, int)>
         {
-            new Tuple<string, int>("TYPE", 1),
-            new Tuple<string, int>("FUNCTION", 2),
-            new Tuple<string, int>("VIEW", 3),
-            new Tuple<string, int>("PROCEDURE", 4),
-            new Tuple<string, int>("PROC", 5)
+            ("TYPE", 1),
+            ("FUNCTION", 2),
+            ("VIEW", 3),
+            ("PROCEDURE", 4),
+            ("PROC", 5)
         };
 
         /// <summary>
@@ -77,10 +77,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="tr">The SQL <see cref="TextReader"/>.</param>
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
-        public static SqlObjectReader Read(TextReader tr)
-        {
-            return new SqlObjectReader(tr);
-        }
+        public static SqlObjectReader Read(TextReader tr) => new SqlObjectReader(tr);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlObjectReader"/> class.
@@ -94,7 +91,8 @@ namespace Beef.Database.Core.Sql
                 return;
 
             Type = SqlObjectType!.Value!;
-            Order = SupportedObjectTypes.Where(x => string.Compare(x.Item1, Type, StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Item2).Single();
+            var sot = _supportedObjectTypes.Where(x => string.Compare(x.Type, Type, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
+            Order = sot.Type == null ? -1 : sot.Order;
 
             var parts = SqlObjectName!.Value!.Split('.');
             if (parts.Length == 1)
@@ -130,6 +128,11 @@ namespace Beef.Database.Core.Sql
                     continue;
 
                 var ci = txt.IndexOf("--", StringComparison.InvariantCulture);
+                if (ci >= 0)
+                    txt = txt.Substring(0, ci - 1).TrimEnd();
+
+                // Remove function component.
+                ci = txt.IndexOf("(", StringComparison.InvariantCulture);
                 if (ci >= 0)
                     txt = txt.Substring(0, ci - 1).TrimEnd();
 
@@ -202,7 +205,8 @@ namespace Beef.Database.Core.Sql
             if (SqlObjectType == null)
                 return -1;
 
-            return SupportedObjectTypes.Where(x => string.Compare(x.Item1, SqlObjectType.Value, StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Item2).SingleOrDefault();
+            var sot = _supportedObjectTypes.Where(x => string.Compare(x.Item1, SqlObjectType.Value, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
+            return sot.Type == null ? -1 : sot.Order;
         }
 
         /// <summary>

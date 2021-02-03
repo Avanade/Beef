@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -47,14 +47,14 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
+namespace {{Root.NamespaceBusiness}}.Data
 {
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
-{{#each RefData.DataConstructorParameters}}
+{{#each RefData.DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -63,11 +63,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
-{{#each RefData.DataConstructorParameters}}
+{{#each RefData.DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        public ReferenceDataData({{#each RefData.DataConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+        public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
 
         partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -118,12 +118,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
         public static EfDbMapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}> {{Name}}Mapper => EfDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>()
             .HasProperty(s => s.Id, d => d.{{Name}}Id)
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, => p.{{ifne DataOperationTypes 'Any'}}SetOperationTypes(OperationTypes.{{DataOperationTypes}}{{/ifne}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
+            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, => p.{{#ifne DataOperationTypes 'Any'}}SetOperationTypes(OperationTypes.{{DataOperationTypes}}{{/ifne}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
           {{/each}}
             .AddStandardProperties();
     {{/unless}}
   {{/ifeq}}
-    {{#ifeq AutoImplement 'Cosmos'}}
+  {{#ifeq AutoImplement 'Cosmos'}}
     {{#unless CosmosCustomMapper}}
 
         /// <summary>
@@ -131,14 +131,14 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
         /// </summary>
         public static CosmosDbMapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}> {{Name}}Mapper => CosmosDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>()
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{/if}}{{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
+            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
           {{/each}}
             .AddStandardProperties();
     {{/unless}}
-  {{/ifeq}}  
+  {{/ifeq}}
 {{/each}}
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

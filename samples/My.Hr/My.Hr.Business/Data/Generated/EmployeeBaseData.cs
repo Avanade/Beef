@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -25,14 +25,12 @@ namespace My.Hr.Business.Data
     /// <summary>
     /// Provides the <see cref="EmployeeBase"/> data access.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class EmployeeBaseData
     {
 
         /// <summary>
         /// Provides the <see cref="EmployeeBase"/> property and database column mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<EmployeeBase, DbMapper>
         {
             /// <summary>
@@ -59,7 +57,6 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Provides the <see cref="EmployeeBase"/> and Entity Framework <see cref="EfModel.Employee"/> property mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<EmployeeBase, EfModel.Employee, EfMapper>
         {
             /// <summary>
@@ -84,5 +81,5 @@ namespace My.Hr.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

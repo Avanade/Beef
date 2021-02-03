@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -30,12 +30,12 @@ namespace Beef.Demo.Business.DataSvc
         private readonly IRequestCache _cache;
 
         #region Extensions
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private Func<Person, Task>? _createOnAfterAsync;
         private Func<Guid, Task>? _deleteOnAfterAsync;
         private Func<Person?, Guid, Task>? _getOnAfterAsync;
         private Func<Person, Task>? _updateOnAfterAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
         private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
         private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
@@ -49,12 +49,12 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
+        private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Func<Person, Task>? _createWithEfOnAfterAsync;
         private Func<Person, Task>? _updateWithEfOnAfterAsync;
         private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
 
-        #pragma warning restore CS0649
         #endregion
 
         /// <summary>
@@ -78,11 +78,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Create").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
-                _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            });
+                await _evtPub.Publish($"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
+                _cache.Remove<Person>(new UniqueKey(id));
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -130,9 +130,26 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
+                return __result;
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> UpdateWithRollbackAsync(Person value)
+        {
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
+            {
+                var __result = await _data.UpdateWithRollbackAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -209,13 +226,13 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
-                await _evtPub.PublishAsync(
-                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
-                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{toId}", "MergeTo", fromId, toId)).ConfigureAwait(false);
-
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
+                await _evtPub.Publish(
+                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
+                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{toId}", "MergeTo", fromId, toId)).SendAsync().ConfigureAwait(false);
+
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -227,7 +244,8 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
-            });
+                await _evtPub.SendAsync().ConfigureAwait(false);
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -258,8 +276,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetNoArgsAsync().ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -278,8 +296,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetDetailAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -294,11 +312,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -323,6 +341,14 @@ namespace Beef.Demo.Business.DataSvc
                 return __result;
             });
         }
+
+        /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> EventPublishNoSendAsync(Person value)
+            => DataSvcInvoker.Current.InvokeAsync(this, () => EventPublishNoSendOnImplementationAsync(value), new BusinessInvokerArgs { IncludeTransactionScope = true });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -353,6 +379,21 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        public Task<string?> InvokeApiViaAgentAsync(Guid id)
+        {
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
+            {
+                var __result = await _data.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+                if (_invokeApiViaAgentOnAfterAsync != null) await _invokeApiViaAgentOnAfterAsync(__result, id).ConfigureAwait(false);
+                return __result;
+            });
+        }
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -366,8 +407,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetWithEfAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -382,8 +423,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -398,11 +439,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -414,13 +455,13 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
-                _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
-            });
+                await _evtPub.Publish($"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
+                _cache.Remove<Person>(new UniqueKey(id));
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore
 #nullable restore

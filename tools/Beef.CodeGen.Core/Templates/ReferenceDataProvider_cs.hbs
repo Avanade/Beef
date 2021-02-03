@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Beef;
 using Beef.RefData;
-using {{Root.Company}}.{{Root.AppName}}.Business.DataSvc;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceBusiness}}.DataSvc;
+using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
@@ -20,7 +20,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business
+namespace {{Root.NamespaceBusiness}}
 {
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
@@ -85,5 +85,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

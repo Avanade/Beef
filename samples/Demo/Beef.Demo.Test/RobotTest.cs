@@ -103,10 +103,6 @@ namespace Beef.Demo.Test
             AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetAsync(3.ToGuid(), new WebApi.WebApiRequestOptions { ETag = v.ETag }));
-                //.Run((a) => new RobotAgent(a.Client, (r) =>
-                //{
-                //    r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + v.ETag + "\""));
-                //}).GetAsync(3.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -115,10 +111,6 @@ namespace Beef.Demo.Test
             AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid(), new WebApi.WebApiRequestOptions { ETag = "ABCDEFG" }));
-                //.Run((a) => new RobotAgent(a.Client, (r) =>
-                //{
-                //    r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"ABCDEFG\""));
-                //}).GetAsync(3.ToGuid()));
         }
 
         #endregion

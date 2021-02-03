@@ -3,15 +3,19 @@
 using Beef.Entities;
 using Beef.Test.NUnit.Tests;
 using Beef.Validation;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Manages the testing of a validator outside of an API execution context with integrated mocking of services as required. 
+    /// Manages the testing of a validator with integrated mocking of services as required.
     /// </summary>
-    /// <remarks><see cref="TestSetUp.SetDefaultLocalReferenceData"/> is required to enable the reference data to function correctly.</remarks>
+    /// <remarks><see cref="TestSetUp.SetDefaultLocalReferenceData"/> is required to enable the reference data to function correctly. Where a <see cref="ExecutionContext.ServiceProvider"/> is 
+    /// currently available this will be used versus creating new, minimizing the new to maintain (duplicate) the <see cref="ConfigureServices(Action{IServiceCollection})"/> logic.</remarks>
+    [System.Diagnostics.DebuggerStepThrough]
     public sealed class ValidationTester : TesterBase
     {
         private readonly string? _username;
@@ -42,10 +46,30 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        private ValidationTester(string? username = null, object? args = null) : base(true)
+        private ValidationTester(string? username = null, object? args = null) : base(configureLocalRefData: true, inheritServiceCollection: true)
         {
             _username = username;
             _args = args;
+        }
+
+        /// <summary>
+        /// Provides the opportunity to configure the services.
+        /// </summary>
+        /// <param name="serviceCollection">The <see cref="IServiceCollection"/> action.</param>
+        public ValidationTester ConfigureServices(Action<IServiceCollection> serviceCollection)
+        {
+            ConfigureLocalServices(Check.NotNull(serviceCollection, nameof(serviceCollection)));
+            return this;
+        }
+
+        /// <summary>
+        /// Provides the opportunity to configure the services.
+        /// </summary>
+        /// <param name="serviceCollection">The <see cref="IServiceCollection"/> function.</param>
+        public ValidationTester ConfigureServices(Func<IServiceCollection, IServiceCollection> serviceCollection)
+        {
+            ConfigureLocalServices(sc => Check.NotNull(serviceCollection, nameof(serviceCollection))(sc));
+            return this;
         }
 
         /// <summary>
@@ -55,7 +79,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddSingletonService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceSingleton<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceSingleton(mockInstance));
             return this;
         }
 
@@ -66,7 +90,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddSingletonService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceSingleton<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceSingleton(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 
@@ -77,7 +101,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddScopedService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceScoped<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceScoped(mockInstance));
             return this;
         }
 
@@ -88,7 +112,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddScopedService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceScoped<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceScoped(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 
@@ -99,7 +123,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddTransientService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceTransient<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceTransient(mockInstance));
             return this;
         }
 
@@ -110,7 +134,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddTransientService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceTransient<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceTransient(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 
@@ -177,21 +201,61 @@ namespace Beef.Test.NUnit
         private bool IsExpectingError => _expectedErrorType.HasValue || _expectedErrorMessage != null || _expectedMessages != null;
 
         /// <summary>
-        /// Runs the <paramref name="func"/> checking against the expected outcomes.
+        /// Creates (instantiates) the <typeparamref name="TValidator"/> using Dependency Injection (DI) and validates the <typeparamref name="TEntity"/> <paramref name="value"/>.
         /// </summary>
-        /// <param name="func">The function to execute.</param>
-        /// <returns>The resulting <see cref="IValidationContextBase"/> where applicable; otherwise, <c>null</c>.</returns>
-        public IValidationContextBase? Run(Func<IValidationContextBase> func)
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValidator">The validator <see cref="Type"/> to instantiate.</typeparam>
+        /// <param name="value">The <typeparamref name="TEntity"/> value.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public IValidationContext? CreateAndRun<TValidator, TEntity>(TEntity? value) where TEntity : class where TValidator : class, IValidator<TEntity>
+            => Task.Run(() => CreateAndRunAsync<TValidator, TEntity>(value)).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Creates (instantiates) the <typeparamref name="TValidator"/> using Dependency Injection (DI) and validates asynchronously the <typeparamref name="TEntity"/> <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValidator">The validator <see cref="Type"/> to instantiate.</typeparam>
+        /// <param name="value">The <typeparamref name="TEntity"/> value.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public async Task<IValidationContext?> CreateAndRunAsync<TValidator, TEntity>(TEntity? value) where TEntity : class where TValidator : class, IValidator<TEntity>
         {
             PrepareExecutionContext(_username, _args);
             ExecutionContext.Current.OperationType = _operationType;
 
+            var v = ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!;
+            return await RunInternalAsync(async () => await v.ValidateAsync(value!, null!).ConfigureAwait(false)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContext"/> response against the expected outcomes.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public IValidationContext? Run(Func<Task<IValidationContext>> func) => Task.Run(() => RunAsync(func)).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> asynchronously checking the <see cref="IValidationContext"/> response against the expected outcomes.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public async Task<IValidationContext?> RunAsync(Func<Task<IValidationContext>> func)
+        {
+            PrepareExecutionContext(_username, _args);
+            ExecutionContext.Current.OperationType = _operationType;
+            return await RunInternalAsync(func).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContext"/> response against the expected outcomes (internal logic)
+        /// </summary>
+        private async Task<IValidationContext?> RunInternalAsync(Func<Task<IValidationContext>> func)
+        {
             if (IsExpectingError && !_expectedErrorType.HasValue)
                 _expectedErrorType = ErrorType.ValidationError;
 
             try
             {
-                var vc = Check.NotNull(func, nameof(func))();
+                var vc = await Check.NotNull(func, nameof(func))().ConfigureAwait(false);
                 if (vc == null)
                     Assert.Fail("The validation function returned a null IValidationContext result.");
 
@@ -214,7 +278,7 @@ namespace Beef.Test.NUnit
                 }
 
                 if (_expectedMessages != null)
-                    ExpectValidationException.CompareExpectedVsActual(_expectedMessages, vc!.Messages);
+                    CompareExpectedVsActualMessages(_expectedMessages, vc!.Messages);
 
                 return vc;
             }
@@ -234,11 +298,55 @@ namespace Beef.Test.NUnit
 
                     errorTypeOK = true;
                     if (_expectedMessages != null)
-                        ExpectValidationException.CompareExpectedVsActual(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
+                        CompareExpectedVsActualMessages(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
                 }
 
                 if (IsExpectingError && errorTypeOK)
                     return null;
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Runs the <paramref name="func"/> checking the <b>thrown</b> <see cref="ValidationException"/> against the expected outcomes.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        public async Task RunAsync(Func<Task> func)
+        {
+            PrepareExecutionContext(_username, _args);
+            ExecutionContext.Current.OperationType = _operationType;
+
+            if (IsExpectingError && !_expectedErrorType.HasValue)
+                _expectedErrorType = ErrorType.ValidationError;
+
+            try
+            {
+                await Check.NotNull(func, nameof(func))().ConfigureAwait(false);
+                if (IsExpectingError)
+                    Assert.Fail("The function completed successfully; expected a ValidationException.");
+            }
+            catch (AssertionException) { throw; }
+            catch (Exception ex)
+            {
+                bool errorTypeOK = false;
+                if (ex is IBusinessException ibex)
+                {
+                    LogStatus(ibex.ErrorType, ex.Message, ex is ValidationException vex ? vex.Messages : null);
+
+                    if (_expectedErrorType.HasValue && _expectedErrorType != ibex.ErrorType)
+                        Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{ibex.ErrorType}'.");
+
+                    if (_expectedErrorMessage != null && _expectedErrorMessage != ex.Message)
+                        Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{ex.Message}'.");
+
+                    errorTypeOK = true;
+                    if (_expectedMessages != null)
+                        CompareExpectedVsActualMessages(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
+                }
+
+                if (IsExpectingError && errorTypeOK)
+                    return;
 
                 throw;
             }

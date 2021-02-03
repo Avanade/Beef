@@ -1,0 +1,1157 @@
+{
+  "title": "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "title": "The name of the `Schema` where the `Table` is defined in the database."
+    },
+    "columnNameIsDeleted": {
+      "type": "string",
+      "title": "The column name for the `IsDeleted` capability.",
+      "description": "Defaults to `IsDeleted`."
+    },
+    "columnNameTenantId": {
+      "type": "string",
+      "title": "The column name for the `TenantId` capability.",
+      "description": "Defaults to `TenantId`."
+    },
+    "columnNameOrgUnitId": {
+      "type": "string",
+      "title": "The column name for the `OrgUnitId` capability.",
+      "description": "Defaults to `OrgUnitId`."
+    },
+    "columnNameRowVersion": {
+      "type": "string",
+      "title": "The column name for the `RowVersion` capability.",
+      "description": "Defaults to `RowVersion`."
+    },
+    "columnNameCreatedBy": {
+      "type": "string",
+      "title": "The column name for the `CreatedBy` capability.",
+      "description": "Defaults to `CreatedBy`."
+    },
+    "columnNameCreatedDate": {
+      "type": "string",
+      "title": "The column name for the `CreatedDate` capability.",
+      "description": "Defaults to `CreatedDate`."
+    },
+    "columnNameUpdatedBy": {
+      "type": "string",
+      "title": "The column name for the `UpdatedBy` capability.",
+      "description": "Defaults to `UpdatedBy`."
+    },
+    "columnNameUpdatedDate": {
+      "type": "string",
+      "title": "The column name for the `UpdatedDate` capability.",
+      "description": "Defaults to `UpdatedDate`."
+    },
+    "columnNameDeletedBy": {
+      "type": "string",
+      "title": "The column name for the `DeletedBy` capability.",
+      "description": "Defaults to `UpdatedBy`."
+    },
+    "columnNameDeletedDate": {
+      "type": "string",
+      "title": "The column name for the `DeletedDate` capability.",
+      "description": "Defaults to `UpdatedDate`."
+    },
+    "orgUnitJoinSql": {
+      "type": "string",
+      "title": "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
+      "description": "Defaults to `[Sec].[fnGetUserOrgUnits]()`."
+    },
+    "checkUserPermissionSql": {
+      "type": "string",
+      "title": "The SQL stored procedure that is to be used for `Permission` verification.",
+      "description": "Defaults to `[Sec].[spCheckUserHasPermission]`."
+    },
+    "getUserPermissionSql": {
+      "type": "string",
+      "title": "The SQL function that is to be used for `Permission` verification.",
+      "description": "Defaults to `[Sec].[fnGetUserHasPermission]`."
+    },
+    "cdcSchema": {
+      "type": "string",
+      "title": "The schema name for the generated `CDC`-related database artefacts.",
+      "description": "Defaults to `Cdc` (literal)."
+    },
+    "cdcAuditTableName": {
+      "type": "string",
+      "title": "The table name for the `Cdc`-Tracking.",
+      "description": "Defaults to `CdcTracking` (literal)."
+    },
+    "eventSubjectRoot": {
+      "type": "string",
+      "title": "The root for the event name by prepending to all event subject names.",
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s)."
+    },
+    "eventActionFormat": {
+      "type": "string",
+      "title": "The formatting for the Action when an Event is published.",
+      "description": "Defaults to `None` (no formatting required).",
+      "enum": [
+        "None",
+        "UpperCase",
+        "PastTense",
+        "PastTenseUpperCase"
+      ]
+    },
+    "jsonSerializer": {
+      "type": "string",
+      "title": "The JSON Serializer to use for JSON property attribution.",
+      "description": "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).",
+      "enum": [
+        "None",
+        "Newtonsoft"
+      ]
+    },
+    "pluralizeCollectionProperties": {
+      "type": "boolean",
+      "title": "Indicates whether the .NET collection properties should be pluralized."
+    },
+    "pathBase": {
+      "type": "string",
+      "title": "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
+    },
+    "pathDatabaseSchema": {
+      "type": "string",
+      "title": "The path (directory) for the Schema Database-related artefacts.",
+      "description": "Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`."
+    },
+    "pathDatabaseMigrations": {
+      "type": "string",
+      "title": "The path (directory) for the Schema Database-related artefacts.",
+      "description": "Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`."
+    },
+    "pathBusiness": {
+      "type": "string",
+      "title": "The path (directory) for the Business-related (.NET) artefacts.",
+      "description": "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`."
+    },
+    "pathCdc": {
+      "type": "string",
+      "title": "The path (directory) for the CDC-related (.NET) artefacts.",
+      "description": "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+    },
+    "namespaceBase": {
+      "type": "string",
+      "title": "The base Namespace (root) for the .NET artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
+    },
+    "namespaceCommon": {
+      "type": "string",
+      "title": "The Namespace (root) for the Common-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`."
+    },
+    "namespaceBusiness": {
+      "type": "string",
+      "title": "The Namespace (root) for the Business-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`."
+    },
+    "namespaceCdc": {
+      "type": "string",
+      "title": "The Namespace (root) for the CDC-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+    },
+    "tables": {
+      "type": "array",
+      "title": "The corresponding `Table` collection.",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "The name of the `Table` in the database."
+            },
+            "schema": {
+              "type": "string",
+              "title": "The name of the `Schema` where the `Table` is defined in the database.",
+              "description": "Defaults to `CodeGeneration.Schema`."
+            },
+            "alias": {
+              "type": "string",
+              "title": "The `Schema.Table` alias name.",
+              "description": "Will automatically default where not specified."
+            },
+            "includeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be included in the underlying generated output.",
+              "description": "Where not specified this indicates that all `Columns` are to be included.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the underlying generated output.",
+              "description": "Where not specified this indicates no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "get": {
+              "type": "boolean",
+              "title": "Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "getAll": {
+              "type": "boolean",
+              "title": "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.",
+              "description": "The `GetAllOrderBy` is used to specify the `GetAll` query sort order."
+            },
+            "getAllOrderBy": {
+              "type": "array",
+              "title": "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
+              "description": "This relates to the `GetAll` selection.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "create": {
+              "type": "boolean",
+              "title": "Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "update": {
+              "type": "boolean",
+              "title": "Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "upsert": {
+              "type": "boolean",
+              "title": "Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "delete": {
+              "type": "boolean",
+              "title": "Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "merge": {
+              "type": "boolean",
+              "title": "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
+              "description": "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function."
+            },
+            "efModel": {
+              "type": "boolean",
+              "title": "Indicates whether an `Entity Framework` .NET (C#) model is to be generated."
+            },
+            "efModelName": {
+              "type": "string",
+              "title": "The .NET (C#) EntityFramework (EF) model name.",
+              "description": "Defaults to `Name`."
+            },
+            "udt": {
+              "type": "boolean",
+              "title": "Indicates whether a `User Defined Table (UDT)` type should be created."
+            },
+            "udtExcludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
+              "description": "Where not specified this indicates that no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "tvp": {
+              "type": "string",
+              "title": "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`."
+            },
+            "permission": {
+              "type": "string",
+              "title": "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure)."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
+            },
+            "columnNameTenantId": {
+              "type": "string",
+              "title": "The column name for the `TenantId` capability.",
+              "description": "Defaults to `CodeGeneration.TenantId`."
+            },
+            "columnNameOrgUnitId": {
+              "type": "string",
+              "title": "The column name for the `OrgUnitId` capability.",
+              "description": "Defaults to `CodeGeneration.OrgUnitId`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `CodeGeneration.RowVersion`."
+            },
+            "columnNameCreatedBy": {
+              "type": "string",
+              "title": "The column name for the `CreatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedBy`."
+            },
+            "columnNameCreatedDate": {
+              "type": "string",
+              "title": "The column name for the `CreatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedDate`."
+            },
+            "columnNameUpdatedBy": {
+              "type": "string",
+              "title": "The column name for the `UpdatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameUpdatedDate": {
+              "type": "string",
+              "title": "The column name for the `UpdatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "columnNameDeletedBy": {
+              "type": "string",
+              "title": "The column name for the `DeletedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameDeletedDate": {
+              "type": "string",
+              "title": "The column name for the `DeletedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "storedProcedures": {
+              "type": "array",
+              "title": "The corresponding `StoredProcedure` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc.",
+                      "description": "See `StoredProcedureName` for the actual name used in the database."
+                    },
+                    "type": {
+                      "type": "string",
+                      "title": "The stored procedure operation type.",
+                      "description": "Defaults to `GetColl`.",
+                      "enum": [
+                        "Get",
+                        "GetColl",
+                        "Create",
+                        "Update",
+                        "Upsert",
+                        "Delete",
+                        "Merge"
+                      ]
+                    },
+                    "paging": {
+                      "type": "boolean",
+                      "title": "Indicates whether standardized paging support should be added.",
+                      "description": "This only applies where the stored procedure operation `Type` is `GetColl`."
+                    },
+                    "storedProcedureName": {
+                      "type": "string",
+                      "title": "The `StoredProcedure` name in the database.",
+                      "description": "Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`."
+                    },
+                    "reselectStatement": {
+                      "type": "string",
+                      "title": "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
+                      "description": "Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s)."
+                    },
+                    "intoTempTable": {
+                      "type": "boolean",
+                      "title": "Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.",
+                      "description": "A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`."
+                    },
+                    "withHints": {
+                      "type": "string",
+                      "title": "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`."
+                    },
+                    "mergeOverrideIdentityColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+                      "description": "This is used to override the default behaviour of using the primary key column(s).",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "permission": {
+                      "type": "string",
+                      "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "includeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).",
+                      "description": "Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).",
+                      "description": "Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "parameters": {
+                      "type": "array",
+                      "title": "The corresponding `Parameter` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The parameter name (without the `@` prefix)."
+                            },
+                            "column": {
+                              "type": "string",
+                              "title": "The corresponding column name; used to infer characteristics.",
+                              "description": "Defaults to `Name`."
+                            },
+                            "sqlType": {
+                              "type": "string",
+                              "title": "The SQL type definition (overrides inherited Column definition) including length/precision/scale."
+                            },
+                            "nullable": {
+                              "type": "boolean",
+                              "title": "Indicates whether the parameter is nullable.",
+                              "description": "Note that when the parameter value is `NULL` it will not be included in the query."
+                            },
+                            "treatColumnNullAs": {
+                              "type": "boolean",
+                              "title": "Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`."
+                            },
+                            "collection": {
+                              "type": "boolean",
+                              "title": "Indicates whether the parameter is a collection (one or more values to be included `IN` the query)."
+                            },
+                            "operator": {
+                              "type": "string",
+                              "title": "The where clause equality operator",
+                              "description": "Defaults to `EQ`.",
+                              "enum": [
+                                "EQ",
+                                "NE",
+                                "LT",
+                                "LE",
+                                "GT",
+                                "GE",
+                                "LIKE"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    "where": {
+                      "type": "array",
+                      "title": "The corresponding `Where` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "statement": {
+                              "type": "string",
+                              "title": "The where statement (TSQL)."
+                            }
+                          },
+                          "required": [
+                            "statement"
+                          ]
+                        }
+                      ]
+                    },
+                    "orderby": {
+                      "type": "array",
+                      "title": "The corresponding `OrderBy` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The name of the `Column` to order by."
+                            },
+                            "order": {
+                              "type": "string",
+                              "title": "The corresponding sort order.",
+                              "description": "Defaults to `Ascending`.",
+                              "enum": [
+                                "Ascending",
+                                "Descending"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    "execute": {
+                      "type": "array",
+                      "title": "The corresponding `Execute` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "statement": {
+                              "type": "string",
+                              "title": "The additional TSQL statement."
+                            },
+                            "location": {
+                              "type": "string",
+                              "title": "The location of the statement in relation to the underlying primary stored procedure statement.",
+                              "description": "Defaults to `After`.",
+                              "enum": [
+                                "Before",
+                                "After"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "statement"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "queries": {
+      "type": "array",
+      "title": "The corresponding `Query` collection.",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "The name of the primary table of the query."
+            },
+            "schema": {
+              "type": "string",
+              "title": "The schema name of the primary table of the view.",
+              "description": "Defaults to `CodeGeneration.dbo`."
+            },
+            "alias": {
+              "type": "string",
+              "title": "The `Schema.Table` alias name.",
+              "description": "Will automatically default where not specified."
+            },
+            "includeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be included in the underlying generated output.",
+              "description": "Where not specified this indicates that all `Columns` are to be included.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the underlying generated output.",
+              "description": "Where not specified this indicates no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "aliasColumns": {
+              "type": "array",
+              "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
+              "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "view": {
+              "type": "boolean",
+              "title": "Indicates whether a `View` is to be generated."
+            },
+            "viewName": {
+              "type": "string",
+              "title": "The `View` name.",
+              "description": "Defaults to `vw` + `Name`; e.g. `vwTableName`."
+            },
+            "viewSchema": {
+              "type": "string",
+              "title": "The schema name for the `View`.",
+              "description": "Defaults to `Schema`."
+            },
+            "permission": {
+              "type": "string",
+              "title": "The permission to be used for security permission checking.",
+              "description": "The suffix is optional, and where not specified will default to `.READ`."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
+            },
+            "columnNameTenantId": {
+              "type": "string",
+              "title": "The column name for the `TenantId` capability.",
+              "description": "Defaults to `CodeGeneration.TenantId`."
+            },
+            "columnNameOrgUnitId": {
+              "type": "string",
+              "title": "The column name for the `OrgUnitId` capability.",
+              "description": "Defaults to `CodeGeneration.OrgUnitId`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `CodeGeneration.RowVersion`."
+            },
+            "columnNameCreatedBy": {
+              "type": "string",
+              "title": "The column name for the `CreatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedBy`."
+            },
+            "columnNameCreatedDate": {
+              "type": "string",
+              "title": "The column name for the `CreatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedDate`."
+            },
+            "columnNameUpdatedBy": {
+              "type": "string",
+              "title": "The column name for the `UpdatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameUpdatedDate": {
+              "type": "string",
+              "title": "The column name for the `UpdatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "columnNameDeletedBy": {
+              "type": "string",
+              "title": "The column name for the `DeletedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameDeletedDate": {
+              "type": "string",
+              "title": "The column name for the `DeletedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "joins": {
+              "type": "array",
+              "title": "The corresponding `Join` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the table to join."
+                    },
+                    "schema": {
+                      "type": "string",
+                      "title": "The schema name of the table to join.",
+                      "description": "Defaults to `Table.Schema`; i.e. same schema."
+                    },
+                    "alias": {
+                      "type": "string",
+                      "title": "The `Schema.Table` alias name.",
+                      "description": "Will automatically default where not specified."
+                    },
+                    "type": {
+                      "type": "string",
+                      "title": "The SQL join type.",
+                      "description": "Defaults to `Inner`.",
+                      "enum": [
+                        "Inner",
+                        "Left",
+                        "Right",
+                        "Full"
+                      ]
+                    },
+                    "includeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be included in the underlying generated output.",
+                      "description": "Where not specified this indicates that all `Columns` are to be included.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be excluded from the underlying generated output.",
+                      "description": "Where not specified this indicates no `Columns` are to be excluded.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "aliasColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming.",
+                      "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "columnNameIsDeleted": {
+                      "type": "string",
+                      "title": "The column name for the `IsDeleted` capability.",
+                      "description": "Defaults to `CodeGeneration.IsDeleted`."
+                    },
+                    "columnNameTenantId": {
+                      "type": "string",
+                      "title": "The column name for the `TenantId` capability.",
+                      "description": "Defaults to `CodeGeneration.TenantId`."
+                    },
+                    "columnNameOrgUnitId": {
+                      "type": "string",
+                      "title": "The column name for the `OrgUnitId` capability.",
+                      "description": "Defaults to `CodeGeneration.OrgUnitId`."
+                    },
+                    "columnNameRowVersion": {
+                      "type": "string",
+                      "title": "The column name for the `RowVersion` capability.",
+                      "description": "Defaults to `CodeGeneration.RowVersion`."
+                    },
+                    "columnNameCreatedBy": {
+                      "type": "string",
+                      "title": "The column name for the `CreatedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.CreatedBy`."
+                    },
+                    "columnNameCreatedDate": {
+                      "type": "string",
+                      "title": "The column name for the `CreatedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.CreatedDate`."
+                    },
+                    "columnNameUpdatedBy": {
+                      "type": "string",
+                      "title": "The column name for the `UpdatedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedBy`."
+                    },
+                    "columnNameUpdatedDate": {
+                      "type": "string",
+                      "title": "The column name for the `UpdatedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedDate`."
+                    },
+                    "columnNameDeletedBy": {
+                      "type": "string",
+                      "title": "The column name for the `DeletedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedBy`."
+                    },
+                    "columnNameDeletedDate": {
+                      "type": "string",
+                      "title": "The column name for the `DeletedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedDate`."
+                    },
+                    "on": {
+                      "type": "array",
+                      "title": "The corresponding `JoinOn` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The name of the join column (from the `Join` table)."
+                            },
+                            "toSchema": {
+                              "type": "string",
+                              "title": "The name of the other join to table schema.",
+                              "description": "Defaults to `Table.Schema`; i.e. same schema. See also `ToTable` and `ToColumn` as these all relate."
+                            },
+                            "toTable": {
+                              "type": "string",
+                              "title": "The name of the other join to table.",
+                              "description": "Defaults to `Table.Name`; i.e. primary table. See also `ToSchema` and `ToColumn` as these all relate."
+                            },
+                            "toColumn": {
+                              "type": "string",
+                              "title": "The name of the other join to column.",
+                              "description": "Defaults to `Name`; i.e. assumes same name. See also `ToSchema` and `ToTable` as these all relate."
+                            },
+                            "toStatement": {
+                              "type": "string",
+                              "title": "The fully qualified name (`Alias.Name`) of the other column being joined to or other valid SQL (e.g. function) bypassing the corresponding `Schema`, `Table` and `Column` logic."
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "order": {
+              "type": "array",
+              "title": "The corresponding `Order` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the `Column` to order by.",
+                      "description": "See also `Schema` and `Table` as these all relate."
+                    },
+                    "schema": {
+                      "type": "string",
+                      "title": "The name of order by table schema. See also `Name` and `Column` as these all relate.",
+                      "description": "Defaults to `Query.Schema`."
+                    },
+                    "table": {
+                      "type": "string",
+                      "title": "The name of the order by table.",
+                      "description": "Defaults to `Table.Name`; i.e. primary table. See also `Schema` and `Column` as these all relate."
+                    },
+                    "order": {
+                      "type": "string",
+                      "title": "The corresponding sort order.",
+                      "description": "Defaults to `Ascending`.",
+                      "enum": [
+                        "Ascending",
+                        "Descending"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "where": {
+              "type": "array",
+              "title": "The corresponding `Where` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "statement": {
+                      "type": "string",
+                      "title": "The where TSQL statement."
+                    }
+                  },
+                  "required": [
+                    "statement"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "cdc": {
+      "type": "array",
+      "title": "The corresponding `Cdc` collection.",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "The name of the primary table."
+            },
+            "schema": {
+              "type": "string",
+              "title": "The schema name of the primary table.",
+              "description": "Defaults to `dbo`."
+            },
+            "alias": {
+              "type": "string",
+              "title": "The `Schema.Table` alias name.",
+              "description": "Will automatically default where not specified."
+            },
+            "includeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be included in the underlying generated output.",
+              "description": "Where not specified this indicates that all `Columns` are to be included.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the underlying generated output.",
+              "description": "Where not specified this indicates no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "aliasColumns": {
+              "type": "array",
+              "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
+              "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "storedProcedureName": {
+              "type": "string",
+              "title": "The `CDC` get outbox data stored procedure name.",
+              "description": "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`."
+            },
+            "cdcSchema": {
+              "type": "string",
+              "title": "The schema name for the generated `CDC`-related database artefacts.",
+              "description": "Defaults to `CodeGeneration.CdcSchema`."
+            },
+            "outboxTableName": {
+              "type": "string",
+              "title": "The corresponding `CDC` Outbox table name.",
+              "description": "Defaults to `Name` + `Outbox` (literal)."
+            },
+            "modelName": {
+              "type": "string",
+              "title": "The .NET model name.",
+              "description": "Defaults to `Name`."
+            },
+            "dataConstructor": {
+              "type": "string",
+              "title": "The access modifier for the generated CDC `Data` constructor.",
+              "description": "Defaults to `Public`.",
+              "enum": [
+                "Public",
+                "Private",
+                "Protected"
+              ]
+            },
+            "dataCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "databaseName": {
+              "type": "string",
+              "title": "The .NET database interface name.",
+              "description": "Defaults to `IDatabase`."
+            },
+            "eventSubject": {
+              "type": "string",
+              "title": "The event subject.",
+              "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `CodeGeneration.RowVersion`."
+            },
+            "joins": {
+              "type": "array",
+              "title": "The corresponding `Join` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The unique name."
+                    },
+                    "schema": {
+                      "type": "string",
+                      "title": "The schema name of the table to join.",
+                      "description": "Defaults to `Table.Schema`; i.e. same schema."
+                    },
+                    "tableName": {
+                      "type": "string",
+                      "title": "The name of the table to join.",
+                      "description": "Defaults to `Name`. This is used to specify the actual underlying database table name (where the `Name` has been changed to enable uniqueness)."
+                    },
+                    "alias": {
+                      "type": "string",
+                      "title": "The `Schema.Table` alias name.",
+                      "description": "Will automatically default where not specified."
+                    },
+                    "joinTo": {
+                      "type": "string",
+                      "title": "The name of the table to join to (must be previously specified).",
+                      "description": "Defaults to `Parent.Name`."
+                    },
+                    "joinToSchema": {
+                      "type": "string",
+                      "title": "The schema name of the table to join to.",
+                      "description": "Defaults to `Parent.Schema`."
+                    },
+                    "joinCardinality": {
+                      "type": "string",
+                      "title": "The join cardinality being whether there is a One-to-Many or One-to-One relationship.",
+                      "description": "Defaults to `OneToMany`. This represents the Parent (`JoinTo`) to child (_this_) relationship.",
+                      "enum": [
+                        "OneToMany",
+                        "OneToOne"
+                      ]
+                    },
+                    "includeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be included in the underlying generated output.",
+                      "description": "Where not specified this indicates that all `Columns` are to be included.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be excluded from the underlying generated output.",
+                      "description": "Where not specified this indicates no `Columns` are to be excluded.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "aliasColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming.",
+                      "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "title": "The SQL join type.",
+                      "description": "Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.",
+                      "enum": [
+                        "Cdc",
+                        "Inner",
+                        "Left",
+                        "Right",
+                        "Full"
+                      ]
+                    },
+                    "modelName": {
+                      "type": "string",
+                      "title": "The .NET model name.",
+                      "description": "Defaults to `Name`."
+                    },
+                    "propertyName": {
+                      "type": "string",
+                      "title": "The .NET property name.",
+                      "description": "Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`."
+                    },
+                    "on": {
+                      "type": "array",
+                      "title": "The corresponding `JoinOn` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The name of the join column (from the `Join` table)."
+                            },
+                            "toColumn": {
+                              "type": "string",
+                              "title": "The name of the join to column.",
+                              "description": "Defaults to `Name`; i.e. assumes same name."
+                            },
+                            "toStatement": {
+                              "type": "string",
+                              "title": "The SQL statement for the join on bypassing the corresponding `Column` specification."
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema"
+  ]
+}

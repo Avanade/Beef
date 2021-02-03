@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Work History entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class WorkHistory : EntityBase, IEquatable<WorkHistory>
+    public partial class WorkHistory : EntityBase, IUniqueKey, IEquatable<WorkHistory>
     {
         #region Privates
 
@@ -81,16 +80,11 @@ namespace Beef.Demo.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="WorkHistory"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Name) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Name) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -102,7 +96,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Name"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Name);
+        public UniqueKey UniqueKey => CreateUniqueKey(Name);
 
         #endregion
 
@@ -259,7 +253,6 @@ namespace Beef.Demo.Common.Entities
     /// <summary>
     /// Represents the <see cref="WorkHistory"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class WorkHistoryCollection : EntityBaseCollection<WorkHistory>
     {
         /// <summary>
@@ -292,6 +285,5 @@ namespace Beef.Demo.Common.Entities
     #endregion  
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

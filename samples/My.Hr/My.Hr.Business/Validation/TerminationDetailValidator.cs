@@ -6,7 +6,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="TerminationDetail"/> validator.
     /// </summary>
-    public class TerminationDetailValidator : Validator<TerminationDetail, TerminationDetailValidator>
+    public class TerminationDetailValidator : Validator<TerminationDetail>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TerminationDetailValidator"/> class.

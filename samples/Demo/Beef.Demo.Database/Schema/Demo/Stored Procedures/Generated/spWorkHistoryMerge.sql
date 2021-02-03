@@ -1,49 +1,49 @@
 CREATE PROCEDURE [Demo].[spWorkHistoryMerge]
-   @PersonId AS UNIQUEIDENTIFIER
-  ,@List AS [Demo].[udtWorkHistoryList] READONLY
+  @PersonId AS UNIQUEIDENTIFIER,
+  @List AS [Demo].[udtWorkHistoryList] READONLY
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost. 
    */
- 
+
   SET NOCOUNT ON;
-  
+
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
     -- Merge the records.
-    MERGE INTO [Demo].[WorkHistory] WITH (HOLDLOCK) AS [t]
-      USING @List as [s]
-        ON ([t].[Name] = [s].[Name]
-        AND [t].[PersonId] = @PersonId)
+    MERGE INTO [Demo].[WorkHistory] WITH (HOLDLOCK) AS [wh]
+      USING @List AS [list]
+        ON ([wh].[Name] = [List].[Name]
+        AND [wh].[PersonId] = @PersonId)
       WHEN MATCHED AND EXISTS
-          (SELECT [s].[Name], [s].[StartDate], [s].[EndDate]
-           EXCEPT
-           SELECT [t].[Name], [t].[StartDate], [t].[EndDate])
+         (SELECT [list].[Name], [list].[StartDate], [list].[EndDate]
+          EXCEPT
+          SELECT [wh].[Name], [wh].[StartDate], [wh].[EndDate])
         THEN UPDATE SET
-           [t].[Name] = [s].[Name]
-          ,[t].[StartDate] = [s].[StartDate]
-          ,[t].[EndDate] = [s].[EndDate]
+          [wh].[PersonId] = @PersonId,
+          [wh].[Name] = [list].[Name],
+          [wh].[StartDate] = [list].[StartDate],
+          [wh].[EndDate] = [list].[EndDate]
       WHEN NOT MATCHED BY TARGET
         THEN INSERT (
-           [PersonId]
-          ,[Name]
-          ,[StartDate]
-          ,[EndDate]
-        )
-        VALUES (
-          @PersonId
-         ,[s].[Name]
-         ,[s].[StartDate]
-         ,[s].[EndDate]
+          [PersonId],
+          [Name],
+          [StartDate],
+          [EndDate]
+        ) VALUES (
+          @PersonId,
+          [list].[Name],
+          [list].[StartDate],
+          [list].[EndDate]
         )
       WHEN NOT MATCHED BY SOURCE
-        AND [t].[PersonId] = @PersonId
+        AND [wh].[PersonId] = @PersonId
         THEN DELETE;
-
-    -- Commit the transaction.
+  
+  -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY
   BEGIN CATCH

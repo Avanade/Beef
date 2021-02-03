@@ -1,11 +1,14 @@
-﻿using Beef.Demo.Common.Agents;
+﻿using Beef.Demo.Business;
+using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Demo.Functions;
 using Beef.Demo.Functions.Subscribers;
 using Beef.Events;
 using Beef.Events.Subscribe;
 using Beef.Test.NUnit;
+using Moq;
 using NUnit.Framework;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -15,7 +18,6 @@ namespace Beef.Demo.Test
     public class SubscribersTest : UsingAgentTesterServer<Api.Startup>
     {
         private readonly RobotTest _robotTest = new RobotTest();
-        private readonly EventSubscriberTester<Startup> _subscriberTester = EventSubscriberTester.Create<Startup>();
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();
@@ -24,67 +26,79 @@ namespace Beef.Demo.Test
         public async Task OneTimeTearDown() => await _robotTest.OneTimeTearDown();
 
         [Test, TestSetUp]
-        public void A110_PowerSourceChangeSubscriber_NoUpdated()
+        public async Task A110_PowerSourceChangeSubscriber_NoUpdated()
         {
-            var r = AgentTester.Test<RobotAgent, Robot>()
+            var r = (await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetAsync(1.ToGuid())).Value;
+                .RunAsync(a => a.GetAsync(1.ToGuid()))).Value;
 
-            _subscriberTester.Test<PowerSourceChangeSubscriber>()
+            await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectNoEvents()
-                .Run(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
 
-            AgentTester.Test<RobotAgent, Robot>()
+            await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => r)
-                .Run(a => a.GetAsync(1.ToGuid()));
+                .RunAsync(a => a.GetAsync(1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void A120_PowerSourceChangeSubscriber_Updated()
+        public async Task A120_PowerSourceChangeSubscriber_Updated()
         {
-            var r = AgentTester.Test<RobotAgent, Robot>()
+            var r = (await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetAsync(1.ToGuid())).Value;
+                .RunAsync(a => a.GetAsync(1.ToGuid()))).Value;
 
             r.PowerSourceSid = "N";
 
-            _subscriberTester.Test<PowerSourceChangeSubscriber>()
+            await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectEvent($"Demo.Robot.{r.Id}", "Update")
-                .Run(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
 
-            AgentTester.Test<RobotAgent, Robot>()
+            await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectChangeLogUpdated("*")
+                .IgnoreChangeLog()
                 .ExpectETag(r.ETag)
                 .ExpectValue(_ => r)
-                .Run(a => a.GetAsync(1.ToGuid()));
+                .RunAsync(a => a.GetAsync(1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void A130_PowerSourceChangeSubscriber_NotFound()
+        public async Task A130_PowerSourceChangeSubscriber_NotFound()
         {
-            _subscriberTester.Test<PowerSourceChangeSubscriber>()
+            await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.DataNotFound)
-                .Run(EventData.CreateValueEvent("N", $"Demo.Robot.{404.ToGuid()}", "PowerSourceChange", 404.ToGuid()));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.{404.ToGuid()}", "PowerSourceChange", 404.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void A140_PowerSourceChangeSubscriber_InvalidData_Key()
+        public async Task A140_PowerSourceChangeSubscriber_InvalidData_Key()
         {
-            _subscriberTester.Test<PowerSourceChangeSubscriber>()
+            await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.InvalidData)
-                .Run(EventData.CreateValueEvent("N", $"Demo.Robot.Xyz", "PowerSourceChange", "Xyz"));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.Xyz", "PowerSourceChange", "Xyz"));
         }
 
         [Test, TestSetUp]
-        public void A150_PowerSourceChangeSubscriber_InvalidData_Value()
+        public async Task A150_PowerSourceChangeSubscriber_InvalidData_Value()
         {
-            _subscriberTester.Test<PowerSourceChangeSubscriber>()
+            await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.InvalidData)
-                .Run(EventData.CreateValueEvent("!", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("!", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
+        }
+
+        [Test]
+        public async Task A160_PowerSourceChangeSubscriber_ManagerFailure()
+        {
+            var rm = new Mock<IRobotManager>();
+            rm.Setup(x => x.GetAsync(1.ToGuid())).Throws(new InvalidOperationException("Get method failed!"));
+
+            await EventSubscriberTester.Create<Startup>()
+                .ExpectUnhandledException<InvalidOperationException>("*")
+                .AddScopedService(rm.Object)
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
         }
     }
 }

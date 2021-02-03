@@ -2,6 +2,20 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.13
+- *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been deprecated (removed).
+- *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
+- *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
+- *Enhancement:* To simplify testing of _Agents_ with the recent introduction of dependency injection (DI) a new code-gen global setting `AppBasedAgentArgs="true"` has been added. This will result in a new `{{Company}}.{{AppName}}.Common.Agents.I{{AppName}}WebApiAgentArgs` and `{{Company}}.{{AppName}}.Common.Agents.{{AppName}}WebApiAgentArgs` classes created; all _Agents_ will then use this for the constructor versus the default `IWebApiAgentArgs`. These new generated artefacts can then be addressed directly to simplify DI for both general usage and testing.
+- *Fixed:* A return type of `string` will always be treated as nullable. This is because the `Cleaner.Clean` (based on settings) could override the return value with `null`.
+- *Enhancement:* The code-gen `Scripts` XML files support a new `Inherits` attribute to enable references to one or more other `Scripts` files. This allows referencing to remove the need to duplicate setting across multiple files.
+- *Enhancement:* The code-gen has been updated to enable [personalization of code-generation](./README.md#personalization-andor-overriding); to either override an existing template or execute entirely new templates; including the ability to access additive configuration.
+- *Enhancement:* Added new configuration and templates to support Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capability. Additionally, [`Beef.Data.Database.Cdc`](./../../src/Beef.Data.Database.Cdc/README.md) has been added to support; this documentation also describes its usage.
+- *Enhancment:* To simplify the addition of additional constructor parameters for DI the following `Entity` configuration can be specified `DataCtorParams`, `DataSvcCtorParams`, `ManagerCtorParams` and `WebApiCtorParams`. This is a comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. "here the `Type` matches an already inferred value it will be ignored.
+- *Enhancement*: Added new `Property.IdentifierGenerator` to specify the `Type` (via dependency injection) to generate the identifier value on `Create` (within `XxxManager`).
+- *Enhancement*: Added new `CodeGeneration.EventTransaction` and `Entity.EventTransaction` as a shorthand to set the `Operation.DataSvcTransaction` whereever an event is being published; this will rollback any updates where the event publish fails (only functional where the data source supports `System.TransactionScope`). 
+- *Enhancement*: Code-gen for all c# code will simply use `#pragma warning disable` with no list (disables all) versus specifiying list; minimizes need to keep updated as more warnings are potentially added.
+
 ## v4.1.12
 - *Fixed:* Issue [93](https://github.com/Avanade/Beef/issues/93) fixed. The `XxxServiceCollectionExtensions.cs` classes were errantly being generated where there are no corresponding operations that would require.
 
@@ -34,7 +48,7 @@ Represents the **NuGet** versions.
 - *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. `WebApiAuthorize` attribute was honouring previous override sideeffect. Changed attribute configuration from a `bool` to a `string`. Code-gen will output the supplied value as-is. XML boolean values are automatically converted. _Note:_ the XML Schema and corresponding documentation have not been updated; this will occur during a future release.
 
 ## v4.1.2
-- *Enhancement:* The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. All the _entity_ and _reference date_ related code-generation templates (and related) have been ported. The _database_ related code-generation is still using the legacy custom.
+- *Enhancement:* The first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. All the _entity_ and _reference date_ related code-generation templates (and related) have been ported. The _database_ related code-generation is still using the legacy custom.
 - *Enhancement:* The `CodeGen` namespace from `Beef.Core` has been moved relocated. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`).
 - *Fixed:* Issue [71](https://github.com/Avanade/Beef/issues/71) has been resolved. A runtime error will now correctly result in a return code of `-1`.
 
@@ -152,7 +166,7 @@ Represents the **NuGet** versions.
 - *Fixed:* Consolidated the `/ref` and `/ref/codes` endpoints into `/ref`. Supports list of names as per previous, as well as the new specified entity+code, within the query string.
 
 ## v2.1.18
-- *Added:* Reference data updated to support multiple run-time providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created. The underlying code-gen templates have been updated to enable.
+- *Added:* Reference data updated to support multiple runtime providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created. The underlying code-gen templates have been updated to enable.
 - *Fixed:* Code-gen for the database where `IsDeleted` is used will perform `ISNULL(IsDeleted, 0) = 0` to check for null or zero as not-deleted.
 
 ## v2.1.17

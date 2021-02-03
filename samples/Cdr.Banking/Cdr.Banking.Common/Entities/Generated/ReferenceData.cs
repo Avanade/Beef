@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Threading.Tasks;
@@ -46,7 +46,6 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Logical for type")]
         public abstract IReferenceDataCollection this[Type type] { get; }
 
         /// <summary>
@@ -93,5 +92,5 @@ namespace Cdr.Banking.Common.Entities
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

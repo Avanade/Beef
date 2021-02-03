@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Beef.Data.Database;
 using System;
 using System.Collections.Generic;
@@ -36,11 +36,8 @@ namespace Beef.Database.Core.Sql
             Schema = schema;
             Name = name;
 
-            if (SqlDataUpdater.RefDataSchema != null)
-                IsRefData = Schema == SqlDataUpdater.RefDataSchema;
-            else
-                // Will attempt to infer by checking for specified columns.
-                IsRefData = DbTable.Columns.Any(x => x.Name == "Code") && DbTable.Columns.Any(x => x.Name == "Text") && DbTable.Columns.Any(x => x.Name == "IsActive") && DbTable.Columns.Any(x => x.Name == "SortOrder");
+            // Will attempt to infer by checking for specified columns.
+            IsRefData = DbTable.Columns.Any(x => x.Name == "Code") && DbTable.Columns.Any(x => x.Name == "Text") && DbTable.Columns.Any(x => x.Name == "IsActive") && DbTable.Columns.Any(x => x.Name == "SortOrder");
         }
 
         /// <summary>
@@ -54,9 +51,9 @@ namespace Beef.Database.Core.Sql
         public string Name { get; private set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="Table"/>.
+        /// Gets or sets the database <see cref="CodeGen.DbModels.DbTable"/>.
         /// </summary>
-        public Table DbTable { get; private set; }
+        public DbTable DbTable { get; private set; }
 
         /// <summary>
         /// Indicates whether the table is reference data.
@@ -71,7 +68,17 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public Dictionary<string, Column> Columns { get; } = new Dictionary<string, Column>();
+        public List<DbColumn> Columns { get; } = new List<DbColumn>();
+
+        /// <summary>
+        /// Gets the merge match columns.
+        /// </summary>
+        public List<DbColumn> MergeMatchColumns => Columns.Where(x => !x.IsAudit).ToList();
+
+        /// <summary>
+        /// Gets the primary key columns.
+        /// </summary>
+        public List<DbColumn> PrimaryKeyColumns => Columns.Where(x => x.IsPrimaryKey).ToList();
 
         /// <summary>
         /// Gets the rows.
@@ -87,9 +94,9 @@ namespace Beef.Database.Core.Sql
             if (row == null)
                 throw new ArgumentNullException(nameof(row));
 
-            foreach (var c in row.Columns.Where(x => x.Value != null && !string.IsNullOrEmpty(x.Value.Name)))
+            foreach (var c in row.Columns)
             {
-                AddColumn(c.Value.Name!);
+                AddColumn(c.Name!);
             }
 
             Rows.Add(row);
@@ -100,8 +107,12 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         private void AddColumn(string name)
         {
-            if (!Columns.ContainsKey(name))
-                Columns.Add(name, DbTable.Columns.Where(x => x.Name == name).SingleOrDefault());
+            var column = DbTable.Columns.Where(x => x.Name == name).SingleOrDefault();
+            if (column == null)
+                return;
+
+            if (!Columns.Any(x => x.Name == name))
+                Columns.Add(column);
         }
 
         /// <summary>
@@ -133,7 +144,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         private void AddColumnWhereNotSpecified(SqlDataRow row, bool when, string name, object value)
         {
-            if (when && !row.Columns.ContainsKey(name))
+            if (when && !row.Columns.Any(x => x.Name == name))
             {
                 AddColumn(name);
                 row.AddColumn(name, value);

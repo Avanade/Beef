@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -55,6 +55,15 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Patches an existing <see cref="Person"/>.
@@ -175,6 +184,14 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, List<string>? names, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> EventPublishNoSendAsync(Person value, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
@@ -189,6 +206,14 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<string?>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -242,8 +267,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public PersonAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public PersonAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
@@ -284,6 +309,17 @@ namespace Beef.Demo.Common.Agents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
             PutAsync<Person>("api/v1/persons/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
+            PutAsync<Person>("api/v1/persons/withRollback/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -433,6 +469,16 @@ namespace Beef.Demo.Common.Agents
                 args: new WebApiArg[] { new WebApiArg<string?>("name", name), new WebApiArg<List<string>?>("names", names) });
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> EventPublishNoSendAsync(Person value, WebApiRequestOptions? requestOptions = null) =>
+            PutAsync<Person>("api/v1/persons/publishnosend", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
@@ -451,6 +497,16 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null) =>
             PostAsync("api/v1/persons/error", requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<string?>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            PostAsync<string?>("api/v1/persons/invokeApi", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -507,5 +563,5 @@ namespace Beef.Demo.Common.Agents
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

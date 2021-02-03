@@ -28,6 +28,16 @@ namespace Beef.Data.Database
         public static string UpdatedByName { get; set; } = "UpdatedBy";
 
         /// <summary>
+        /// Gets or sets the <b>DeletedDate</b> name.
+        /// </summary>
+        public static string DeletedDateName { get; set; } = "DeletedDate";
+
+        /// <summary>
+        /// Gets or sets the <b>DeletedBy</b> name.
+        /// </summary>
+        public static string DeletedByName { get; set; } = "DeletedBy";
+
+        /// <summary>
         /// Gets or sets the <b>ReselectRecord</b> name.
         /// </summary>
         public static string ReselectRecordName { get; set; } = "ReselectRecord";

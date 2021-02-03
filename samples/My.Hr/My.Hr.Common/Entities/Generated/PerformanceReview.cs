@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace My.Hr.Common.Entities
     /// Represents the Performance Review entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PerformanceReview : EntityBase, IGuidIdentifier, IETag, IChangeLog, IEquatable<PerformanceReview>
+    public partial class PerformanceReview : EntityBase, IGuidIdentifier, IUniqueKey, IETag, IChangeLog, IEquatable<PerformanceReview>
     {
         #region Privates
 
@@ -33,7 +32,7 @@ namespace My.Hr.Common.Entities
         private string? _outcomeText;
         private string? _reviewer;
         private string? _notes;
-        private string? _eTag;
+        private string? _etag;
         private ChangeLog? _changeLog;
 
         #endregion
@@ -130,8 +129,8 @@ namespace My.Hr.Common.Entities
         [Display(Name="ETag")]
         public string? ETag
         {
-            get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
+            get => _etag;
+            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
         }
 
         /// <summary>
@@ -171,16 +170,11 @@ namespace My.Hr.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="PerformanceReview"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -192,7 +186,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Id);
+        public UniqueKey UniqueKey => CreateUniqueKey(Id);
 
         #endregion
 
@@ -370,7 +364,6 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the <see cref="PerformanceReview"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PerformanceReviewCollection : EntityBaseCollection<PerformanceReview>
     {
         /// <summary>
@@ -404,7 +397,6 @@ namespace My.Hr.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="PerformanceReviewCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="PerformanceReviewCollection"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator PerformanceReviewCollection(PerformanceReviewCollectionResult result) => result?.Result!;
     }
 
@@ -415,7 +407,6 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the <see cref="PerformanceReview"/> collection result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class PerformanceReviewCollectionResult : EntityCollectionResult<PerformanceReviewCollection, PerformanceReview>
     {
         /// <summary>
@@ -451,6 +442,5 @@ namespace My.Hr.Common.Entities
     #endregion
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

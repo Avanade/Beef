@@ -3,6 +3,7 @@
 using Beef.Validation;
 using NUnit.Framework;
 using Beef.Entities;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -10,9 +11,9 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class CustomRuleTest
     {
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
-            var v1 = "Abc".Validate().Custom(x => x.CreateErrorMessage("Test")).Run();
+            var v1 = await "Abc".Validate().Custom(x => x.CreateErrorMessage("Test")).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Test", v1.Messages[0].Text);

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,5 +27,5 @@ namespace My.Hr.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

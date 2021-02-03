@@ -61,12 +61,10 @@ namespace Beef.Entities
                 _paging = new PagingResult(paging);
         }
 
-#pragma warning disable CA2227 // Collection properties should be read only; by-design, this Result is absolutely intended to be changed/set.
         /// <summary>
         /// Gets or sets the result.
         /// </summary>
         public TColl Result
-#pragma warning restore CA2227
         {
             get { return _result ??= new TColl(); }
             set { SetValue(ref _result, value ?? throw new ArgumentNullException(nameof(value)), false, false, ResultProperty); }
@@ -92,9 +90,7 @@ namespace Beef.Entities
         /// </summary>
         ICollection? IEntityCollectionResult.Collection
         {
-#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
-#pragma warning restore CA1033
         }
 
         /// <summary>
@@ -102,9 +98,7 @@ namespace Beef.Entities
         /// </summary>
         ICollection<TEntity>? IEntityCollectionResult<TEntity>.Collection
         {
-#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
-#pragma warning restore CA1033
         }
 
         /// <summary>

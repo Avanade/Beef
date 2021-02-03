@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
@@ -95,8 +96,7 @@ namespace Beef.Reflection
             public bool ProbeForJsonRefDataSidProperties;
         }
 
-        private static readonly Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
-        private static readonly object _lock = new object();
+        private static readonly ConcurrentDictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new ConcurrentDictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
 
         private readonly Func<TEntity, TProperty> _func;
 
@@ -115,51 +115,42 @@ namespace Beef.Reflection
 
             var me = (MemberExpression)propertyExpression.Body;
 
-            // Check cache and reuse as this is an expensive operation.
+            // Check cache and reuse as this is a *really* expensive operation.
             var key = new ExpressionKey { Type = me.Member.DeclaringType, Name = me.Member.Name, ProbeForJsonRefDataSidProperties = probeForJsonRefDataSidProperties };
-            if (_expressions.ContainsKey(key))
-                return _expressions[key];
-
-            if (me.Member.MemberType != MemberTypes.Property)
-                throw new InvalidOperationException("Expression results in a Member that is not a Property.");
-
-            if (!me.Member.DeclaringType.GetTypeInfo().IsAssignableFrom(typeof(TEntity).GetTypeInfo()))
-                throw new InvalidOperationException("Expression results in a Member for a different Entity class.");
-
-            string name = me.Member.Name;
-
-            // Either get the friendly text from a corresponding DisplayTextAttribute or split the PascalCase member name into friendlier sentence case text.
-            DisplayAttribute ca = me.Member.GetCustomAttribute<DisplayAttribute>(true);
-
-            // Get the JSON property name.
-            JsonPropertyAttribute jpa = me.Member.GetCustomAttribute<JsonPropertyAttribute>(true);
-            if (jpa == null && probeForJsonRefDataSidProperties)
+            return _expressions.GetOrAdd(key, _ =>
             {
-                // Probe corresponding Sid or Sids properties for value (using the standardised naming convention).
-                var pi = me.Member.DeclaringType.GetProperty($"{name}Sid");
-                if (pi == null)
-                    pi = me.Member.DeclaringType.GetProperty($"{name}Sids");
+                if (me.Member.MemberType != MemberTypes.Property)
+                    throw new InvalidOperationException("Expression results in a Member that is not a Property.");
 
-                if (pi != null)
-                    jpa = pi.GetCustomAttribute<JsonPropertyAttribute>(true);
-            }
+                if (!me.Member.DeclaringType.GetTypeInfo().IsAssignableFrom(typeof(TEntity).GetTypeInfo()))
+                    throw new InvalidOperationException("Expression results in a Member for a different Entity class.");
 
-            // Create expression (with compilation also).
-            var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca == null ? StringConversion.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
-            {
-                JsonPropertyAttribute = jpa
-            };
+                string name = me.Member.Name;
 
-            // Recheck cache and use/update accordingly.
-            lock (_lock)
-            {
-                if (_expressions.ContainsKey(key))
-                    return _expressions[key];
+                // Either get the friendly text from a corresponding DisplayTextAttribute or split the PascalCase member name into friendlier sentence case text.
+                DisplayAttribute ca = me.Member.GetCustomAttribute<DisplayAttribute>(true);
 
-                _expressions.Add(key, pe);
-            }
+                // Get the JSON property name.
+                JsonPropertyAttribute jpa = me.Member.GetCustomAttribute<JsonPropertyAttribute>(true);
+                if (jpa == null && probeForJsonRefDataSidProperties)
+                {
+                    // Probe corresponding Sid or Sids properties for value (using the standardised naming convention).
+                    var pi = me.Member.DeclaringType.GetProperty($"{name}Sid");
+                    if (pi == null)
+                        pi = me.Member.DeclaringType.GetProperty($"{name}Sids");
 
-            return pe;
+                    if (pi != null)
+                        jpa = pi.GetCustomAttribute<JsonPropertyAttribute>(true);
+                }
+
+                // Create expression (with compilation also).
+                var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca == null ? StringConversion.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
+                {
+                    JsonPropertyAttribute = jpa
+                };
+
+                return pe;
+            });
         }
 
         /// <summary>

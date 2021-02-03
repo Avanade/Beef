@@ -3,11 +3,12 @@
 using Beef.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
     /// <summary>
-    /// Represents the result of a <see cref="MultiValidator"/> <see cref="MultiValidator.Run(bool)"/>.
+    /// Represents the result of a <see cref="MultiValidator"/> <see cref="MultiValidator.RunAsync(bool)"/>.
     /// </summary>
     public class MultiValidatorResult
     {
@@ -70,11 +71,11 @@ namespace Beef.Validation
     }
 
     /// <summary>
-    /// Enables multiple validations to be performed (<see cref="Run"/>) resulting in a single result.
+    /// Enables multiple validations to be performed (<see cref="RunAsync"/>) resulting in a single result.
     /// </summary>
     public class MultiValidator
     {
-        private readonly List<Func<MessageItemCollection>> _validators = new List<Func<MessageItemCollection>>();
+        private readonly List<Func<Task<MessageItemCollection>>> _validators = new List<Func<Task<MessageItemCollection>>>();
 
         /// <summary>
         /// Creates a new <see cref="MultiValidator"/> instance.
@@ -93,7 +94,7 @@ namespace Beef.Validation
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
         public MultiValidator Add<T>(ValueValidator<T> validator)
         {
-            _validators.Add(() => validator.Run().Messages);
+            _validators.Add(async () => (await validator.RunAsync().ConfigureAwait(false)).Messages);
             return this;
         }
 
@@ -105,7 +106,7 @@ namespace Beef.Validation
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
         public MultiValidator Add<T>(PropertyRuleBase<ValidationValue<T>, T> validator)
         {
-            _validators.Add(() => validator.Run().Messages);
+            _validators.Add(async () => (await validator.RunAsync().ConfigureAwait(false)).Messages);
             return this;
         }
 
@@ -120,7 +121,7 @@ namespace Beef.Validation
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
         public MultiValidator Add<TEntity, TValidator>(ValidatorBase<TEntity> validator, TEntity value, ValidationArgs args) where TEntity : class where TValidator : ValidatorBase<TEntity>
         {
-            _validators.Add(() => validator.Validate(value, args).Messages);
+            _validators.Add(async () => (await validator.ValidateAsync(value, args).ConfigureAwait(false)).Messages);
             return this;
         }
 
@@ -134,7 +135,7 @@ namespace Beef.Validation
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
         public MultiValidator Add<TEntity, TValidator>(ValidatorBase<TEntity> validator, TEntity value) where TEntity : class where TValidator : ValidatorBase<TEntity>
         {
-            _validators.Add(() => validator.Validate(value).Messages);
+            _validators.Add(async () => (await validator.ValidateAsync(value).ConfigureAwait(false)).Messages);
             return this;
         }
 
@@ -145,7 +146,7 @@ namespace Beef.Validation
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
         public MultiValidator Add(MultiValidator validator)
         {
-            _validators.Add(() => validator.Run().Messages);
+            _validators.Add(async () => (await validator.RunAsync().ConfigureAwait(false)).Messages);
             return this;
         }
 
@@ -154,13 +155,13 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>The <see cref="MultiValidatorResult"/>.</returns>
-        public MultiValidatorResult Run(bool throwOnError = false)
+        public async Task<MultiValidatorResult> RunAsync(bool throwOnError = false)
         {
             var res = new MultiValidatorResult();
 
             foreach (var v in _validators)
             {
-                var msgs = v.Invoke();
+                var msgs = await v.Invoke().ConfigureAwait(false);
                 if (msgs != null && msgs.Count > 0)
                     res.Messages.AddRange(msgs);
             }
@@ -176,7 +177,6 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="action">The custom action.</param>
         /// <returns>The (this) <see cref="MultiValidator"/>.</returns>
-        /// <remarks>Caliing more than once will override the existing value.</remarks>
         public MultiValidator Additional(Action<MultiValidator> action)
         {
             action?.Invoke(this);

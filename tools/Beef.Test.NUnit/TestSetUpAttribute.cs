@@ -13,10 +13,8 @@ namespace Beef.Test.NUnit
     /// Sets up the test by <see cref="ExecutionContext.Reset()">resetting</see> the <see cref="ExecutionContext"/> to ensure <c>null</c>; then orchestrates whether the 
     /// <see cref="TestSetUp.RegisterSetUp(Func{int, object?, bool})">registered setup</see> is required to be invoked for the test.
     /// </summary>
-    //[DebuggerStepThrough()]
-#pragma warning disable CA1813 // Avoid unsealed attributes; by-design, needs to be inherited from.
+    [System.Diagnostics.DebuggerStepThrough]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
-#pragma warning restore CA1813
     {
         private static readonly AsyncLocal<string> _username = new AsyncLocal<string>();
         private static readonly AsyncLocal<object?> _args = new AsyncLocal<object?>();

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config;
-using Beef.CodeGen.Config.Entity;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -29,22 +29,56 @@ namespace Beef.CodeGen.Converters
         public StringWriter Writer { get; private set; }
 
         /// <summary>
+        /// Gets or sets the level in the hierarchy.
+        /// </summary>
+        public int Level { get; set; }
+
+        /// <summary>
         /// Gets or sets the number of indent characters.
         /// </summary>
         public int Indent { get; set; } = -2;
+
+        /// <summary>
+        /// Indicates whether there were attributes written on the current line.
+        /// </summary>
+        public bool HasAttributes { get; set; }
+
+        /// <summary>
+        /// Gets the list of unknown attribute names.
+        /// </summary>
+        public List<string> UnknownAttributes { get; } = new List<string>();
+
+        /// <summary>
+        /// Writes the close squiggly bracket accounting for a needed space if an attribute has proceeded it.
+        /// </summary>
+        public void WriteClosingSquigglyBracket()
+        {
+            if (HasAttributes)
+            {
+                HasAttributes = false;
+                Writer.Write(" ");
+            }
+
+            Writer.Write("}");
+        }
     }
 
     /// <summary>
     /// XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    public static class XmlToYamlConverter
+    internal abstract class XmlToYamlConverter
     {
         /// <summary>
-        /// Converts an existing <b>Entity XML</b> document into the equivlent new YAML format.
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected abstract ConfigType ConfigType { get; }
+
+        /// <summary>
+        /// Converts an existing XML document into the equivlent new YAML format.
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
-        /// <returns>The new YAML formatted <see cref="string"/>.</returns>
-        public static string ConvertEntityXmlToYaml(XDocument xml)
+        /// <returns>The corresponding YAML and the list of unknown attributes.</returns>
+        internal (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -53,82 +87,97 @@ namespace Beef.CodeGen.Converters
                 throw new ArgumentException("Root element must be named 'CodeGeneration'.", nameof(xml));
 
             var sb = new StringBuilder();
+            List<string> unknownAttributes;
             using (var sw = new StringWriter(sb))
             {
-                var (entity, type, _) = GetConfigInfo(xml.Root.Name.LocalName);
-                WriteElement(new YamlFormatArgs(sw), xml.Root, entity, type);
+                var (entity, type, _) = GetEntityConfigInfo(xml.Root.Name.LocalName);
+                var yfa = new YamlFormatArgs(sw);
+                WriteElement(yfa, xml.Root, ConfigType, entity, type);
+                unknownAttributes = yfa.UnknownAttributes;
             }
 
-            return sb.ToString();
+            return (sb.ToString(), unknownAttributes);
         }
 
         /// <summary>
         /// Gets the configuration for a given XML element.
         /// </summary>
-        private static (ConfigurationEntity entity, Type type, string name) GetConfigInfo(string? name) => name switch
-        {
-            "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(Config.Entity.CodeGenConfig), ""),
-            "Entity" => (ConfigurationEntity.Entity, typeof(EntityConfig), "entities"),
-            "Property" => (ConfigurationEntity.Property, typeof(PropertyConfig), "properties"),
-            "Operation" => (ConfigurationEntity.Operation, typeof(OperationConfig), "operations"),
-            "Parameter" => (ConfigurationEntity.Parameter, typeof(ParameterConfig), "parameters"),
-            "Const" => (ConfigurationEntity.Const, typeof(ConstConfig), "consts"),
-            _ => (ConfigurationEntity.None, typeof(object), ""),
-        };
+        protected abstract (ConfigurationEntity entity, Type type, string name) GetEntityConfigInfo(string? name);
 
         /// <summary>
         /// Writes the XML element as YAML.
         /// </summary>
-        private static void WriteElement(YamlFormatArgs args, XElement xml, ConfigurationEntity entity, Type type)
+        private void WriteElement(YamlFormatArgs args, XElement xml, ConfigType ct, ConfigurationEntity entity, Type type)
         {
             WriteComments(args, xml);
 
-            if (args.Indent == 0)
+            args.Indent += 2;
+            if (args.Indent == 2)
                 args.Writer.Write("- { ");
             else if (args.Indent > 0)
-                args.Writer.Write($"{new string(' ', args.Indent)}  {{ ");
+                args.Writer.Write($"{new string(' ', args.Indent)}{{ ");
 
-            args.Indent += 2;
-
-            WriteAttributes(args, entity, type, xml);
+            WriteAttributes(args, ct, entity, type, xml);
 
             // Group by element name, then process as a collection.
-            foreach (var grp in xml.Elements().GroupBy(x => x.Name).Select(g => new { g.Key, Children = xml.Elements(g.Key) }))
+            int i = 0;
+            var coll = xml.Elements().GroupBy(x => x.Name).Select(g => new { g.Key, Children = xml.Elements(g.Key) });
+            foreach (var grp in coll)
             {
-                var info = GetConfigInfo(grp.Key.LocalName);
+                var info = GetEntityConfigInfo(grp.Key.LocalName);
                 if (info.entity == ConfigurationEntity.None)
                     return;
 
                 if (args.Indent > 0)
-                    args.Writer.Write(", ");
+                {
+                    args.Writer.WriteLine(",");
+                    args.Indent += 2;
+                    args.Writer.Write($"{new string(' ', args.Indent)}{info.name}:");
+                }
+                else
+                    args.Writer.Write($"{info.name}:");
 
-                args.Writer.Write($"{info.name}:");
                 if (args.Indent > 0)
                     args.Writer.Write(" [");
 
                 args.Writer.WriteLine();
-                int i = 0;
+                int j = 0;
 
                 foreach (var child in grp.Children)
                 {
-                    if (i++ > 0)
+                    if (j++ > 0)
                     {
-                        args.Writer.Write(" }");
+                        args.WriteClosingSquigglyBracket();
                         if (args.Indent > 0)
                             args.Writer.Write(",");
 
                         args.Writer.WriteLine();
                     }
 
-                    if (args.Indent == 0 && !xml.Equals(xml.Document.Root.Elements().First()))
+                    if (args.Indent == 0 && !child.Equals(xml.Document.Root.Elements().First()))
                         args.Writer.WriteLine();
 
-                    WriteElement(args, child, info.entity, info.type);
+                    args.Level++;
+                    WriteElement(args, child, ct, info.entity, info.type);
+                    args.Level--;
                 }
 
-                args.Writer.WriteLine(" }");
+                args.WriteClosingSquigglyBracket();
+                args.Writer.WriteLine();
+
                 if (args.Indent > 0)
+                {
                     args.Writer.Write($"{new string(' ', args.Indent)}]");
+                    args.Indent -= 2;
+                }
+
+                i++;
+                if (i == coll.Count())
+                {
+                    args.Writer.WriteLine();
+                    if (args.Indent > 0)
+                        args.Writer.Write($"{new string(' ', args.Indent)}");
+                }
             }
 
             args.Indent -= 2;
@@ -156,30 +205,37 @@ namespace Beef.CodeGen.Converters
         /// <summary>
         /// Writes the XML attribues as YAML.
         /// </summary>
-        private static void WriteAttributes(YamlFormatArgs args, ConfigurationEntity ce, Type type, XElement xml)
+        private static void WriteAttributes(YamlFormatArgs args, ConfigType ct, ConfigurationEntity ce, Type type, XElement xml)
         {
             var needsComma = false;
 
             foreach (var att in xml.Attributes())
             {
-                var jname = XmlJsonRename.GetJsonName(ce, att.Name.LocalName);
+                var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
                 var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
-                if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
+                var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
+                if (val == null)
                     continue;
+
+                if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
+                {
+                    jname = att.Name.LocalName;
+                    args.UnknownAttributes.Add($"{xml.Name.LocalName}.{jname} = {val}");
+                }
 
                 if (needsComma)
                     args.Writer.Write(", ");
 
-                var val = XmlJsonRename.GetJsonValue(ce, att.Name.LocalName, att.Value);
-                if (val == null)
-                    continue;
+                if (!(val.StartsWith("[", StringComparison.OrdinalIgnoreCase) && val.EndsWith("]", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
+                        val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
 
-                if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"' }) >= 0)
-                    val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+                    if (string.Compare(val, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        val = $"'{val}'";
+                }
 
-                if (string.Compare(val, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
-                    val = $"'{val}'";
-
+                args.HasAttributes = true;
                 args.Writer.Write($"{jname}: {val}");
 
                 if (args.Indent > 0)
@@ -188,5 +244,64 @@ namespace Beef.CodeGen.Converters
                     args.Writer.WriteLine();
             }
         }
+    }
+
+    /// <summary>
+    /// Entity XML to YAML converter. Generates an opinionated terse YAML format.
+    /// </summary>
+    internal class EntityXmlToYamlConverter : XmlToYamlConverter
+    {
+        /// <summary>
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected override ConfigType ConfigType => ConfigType.Entity;
+
+        /// <summary>
+        /// Gets the configuration for a given XML element.
+        /// </summary>
+        protected override (ConfigurationEntity entity, Type type, string name) GetEntityConfigInfo(string? name) => name switch
+        {
+            "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(Config.Entity.CodeGenConfig), ""),
+            "Entity" => (ConfigurationEntity.Entity, typeof(Config.Entity.EntityConfig), "entities"),
+            "Property" => (ConfigurationEntity.Property, typeof(Config.Entity.PropertyConfig), "properties"),
+            "Operation" => (ConfigurationEntity.Operation, typeof(Config.Entity.OperationConfig), "operations"),
+            "Parameter" => (ConfigurationEntity.Parameter, typeof(Config.Entity.ParameterConfig), "parameters"),
+            "Const" => (ConfigurationEntity.Const, typeof(Config.Entity.ConstConfig), "consts"),
+            _ => (ConfigurationEntity.None, typeof(object), ""),
+        };
+    }
+
+    /// <summary>
+    /// Database XML to YAML converter. Generates an opinionated terse YAML format.
+    /// </summary>
+    internal class DatabaseXmlToYamlConverter : XmlToYamlConverter
+    {
+        /// <summary>
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected override ConfigType ConfigType => ConfigType.Database;
+
+        /// <summary>
+        /// Gets the configuration for a given XML element.
+        /// </summary>
+        protected override (ConfigurationEntity entity, Type type, string name) GetEntityConfigInfo(string? name) => name switch
+        {
+            "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(Config.Database.CodeGenConfig), ""),
+            "Table" => (ConfigurationEntity.Table, typeof(Config.Database.TableConfig), "tables"),
+            "Query" => (ConfigurationEntity.Query, typeof(Config.Database.QueryConfig), "queries"),
+            "QueryJoin" => (ConfigurationEntity.QueryJoin, typeof(Config.Database.QueryJoinConfig), "joins"),
+            "QueryJoinOn" => (ConfigurationEntity.QueryJoinOn, typeof(Config.Database.QueryJoinOnConfig), "on"),
+            "QueryOrder" => (ConfigurationEntity.QueryOrder, typeof(Config.Database.QueryOrderConfig), "order"),
+            "QueryWhere" => (ConfigurationEntity.QueryWhere, typeof(Config.Database.QueryWhereConfig), "where"),
+            "Cdc" => (ConfigurationEntity.Cdc, typeof(Config.Database.CdcConfig), "cdc"),
+            "CdcJoin" => (ConfigurationEntity.CdcJoin, typeof(Config.Database.CdcJoinConfig), "joins"),
+            "CdcJoinOn" => (ConfigurationEntity.CdcJoinOn, typeof(Config.Database.CdcJoinOnConfig), "on"),
+            "StoredProcedure" => (ConfigurationEntity.StoredProcedure, typeof(Config.Database.StoredProcedureConfig), "storedProcedures"),
+            "Parameter" => (ConfigurationEntity.Parameter, typeof(Config.Database.ParameterConfig), "parameters"),
+            "OrderBy" => (ConfigurationEntity.OrderBy, typeof(Config.Database.OrderByConfig), "orderby"),
+            "Where" => (ConfigurationEntity.Where, typeof(Config.Database.WhereConfig), "where"),
+            "Execute" => (ConfigurationEntity.Execute, typeof(Config.Database.ExecuteConfig), "execute"),
+            _ => (ConfigurationEntity.None, typeof(object), ""),
+        };
     }
 }

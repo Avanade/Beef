@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -24,18 +24,11 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Provides the <see cref="Contact"/> data access.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class ContactData : IContactData
     {
         private readonly IEfDb _ef;
 
-        #region Extensions
-        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
-
         private Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
-
-        #pragma warning restore CS0649, IDE0044
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactData"/> class.
@@ -119,7 +112,6 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> property mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<Contact, EfModel.Contact, EfMapper>
         {
             /// <summary>
@@ -139,5 +131,5 @@ namespace Beef.Demo.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

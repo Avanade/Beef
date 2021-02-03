@@ -253,6 +253,16 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        /// <returns>The <see cref="GrpcAgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
+        public GrpcAgentTest<TStartup, TAgent, TValue> IgnorePublishSendEventMismatch()
+        {
+            SetIgnorePublishSendEventMismatch();
+            return this;
+        }
+
+        /// <summary>
         /// Runs the <paramref name="func"/> with an automatically instantiated <typeparamref name="TAgent"/> checking against the expected outcomes.
         /// </summary>
         /// <param name="func">The function to execute.</param>

@@ -62,6 +62,7 @@ namespace Beef.Demo.Api
 
             // Add the generated entity services for dependency injection requirements.
             services.AddGeneratedManagerServices()
+                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 
@@ -71,6 +72,15 @@ namespace Beef.Demo.Api
                 services.AddBeefEventHubEventPublisher(ehcs);
             else
                 services.AddBeefNullEventPublisher();
+
+            // Add identifier generator services.
+            services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
+                    .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
+
+            // Add custom services; in this instance to allow it to call itself for testing purposes.
+            services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));
+            services.AddScoped<Common.Agents.IDemoWebApiAgentArgs>(sp => new Common.Agents.DemoWebApiAgentArgs(sp.GetService<System.Net.Http.IHttpClientFactory>().CreateClient("demo")));
+            services.AddScoped<Common.Agents.IPersonAgent, Common.Agents.PersonAgent>();
 
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();

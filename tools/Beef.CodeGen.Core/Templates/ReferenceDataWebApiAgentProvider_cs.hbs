@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -15,12 +15,12 @@ using Beef.RefData.Caching;
 using Beef.WebApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
+namespace {{Root.NamespaceCommon}}.Agents
 {
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding Web API agent.
@@ -132,5 +132,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

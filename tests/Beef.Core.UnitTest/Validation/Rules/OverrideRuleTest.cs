@@ -12,7 +12,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public void Validate_Value()
         {
-            Assert.Throws<InvalidOperationException>(() => 123.Validate().Override(456).Run());
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await 123.Validate().Override(456).RunAsync());
         }
     }
 }

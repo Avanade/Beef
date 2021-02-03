@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -28,7 +29,7 @@ namespace Beef.Validation
         /// Validates an entity given a <see cref="ValidationContext{TEntity}"/>.
         /// </summary>
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/></param>
-        public void Validate(ValidationContext<TEntity> context)
+        public async Task ValidateAsync(ValidationContext<TEntity> context)
         {
             // Check the condition before continuing to validate the underlying rules.
             if (!Predicate(context))
@@ -37,7 +38,7 @@ namespace Beef.Validation
             // Validate each of the property rules.
             foreach (var rule in Rules)
             {
-                rule.Validate(context);
+                await rule.ValidateAsync(context).ConfigureAwait(false);
             }
         }
     }

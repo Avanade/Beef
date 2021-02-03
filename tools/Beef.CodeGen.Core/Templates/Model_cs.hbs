@@ -4,8 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 {{! ===== Using ===== }}
 using System;
@@ -30,13 +29,13 @@ using {{Root.UsingNamespace3}};
   {{/if}}
   {{#ifeq Root.EntityUsing 'Common' 'All'}}
     {{#ifeq EntityScope 'Business'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
     {{/ifeq}}
   {{/ifeq}}
 {{/unless}}
 
 {{! ===== Class ===== }}
-namespace {{Root.Company}}.{{Root.AppName}}.{{#if Root.IsDataModel}}Business.Data.Model{{else}}{{Root.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}{{/if}}
+namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
 {
     /// <summary>
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
@@ -56,7 +55,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{#if Root.IsDataModel}}Business.Dat
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+        [JsonProperty("{{JsonDataModelName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#unless IsDataModel}}
@@ -84,6 +83,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{#if Root.IsDataModel}}Business.Dat
 {{/if}}
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

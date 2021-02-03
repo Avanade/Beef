@@ -69,7 +69,7 @@ namespace Beef.Data.Cosmos.UnitTest
             var v = new Person1 { Id = id, Name = "Michelle", Birthday = new DateTime(1979, 08, 12), Salary = 181000m };
             v = await _db.Persons1.CreateAsync(v);
             Assert.IsNotNull(v);
-            Assert.AreNotEqual(id, v.Id);
+            Assert.AreEqual(id, v.Id);
             Assert.AreEqual("Michelle", v.Name);
             Assert.AreEqual(new DateTime(1979, 08, 12), v.Birthday);
             Assert.AreEqual(181000m, v.Salary);
@@ -87,7 +87,7 @@ namespace Beef.Data.Cosmos.UnitTest
             v = await _db.Persons2.CreateAsync(v);
 
             Assert.IsNotNull(v);
-            Assert.AreNotEqual(id, v.Id);
+            Assert.AreEqual(id, v.Id);
             Assert.AreEqual("Michelle", v.Name);
             Assert.AreEqual(new DateTime(1979, 08, 12), v.Birthday);
             Assert.AreEqual(181000m, v.Salary);
@@ -110,7 +110,7 @@ namespace Beef.Data.Cosmos.UnitTest
             v = await _db.Persons3.CreateAsync(v);
 
             Assert.IsNotNull(v);
-            Assert.AreNotEqual(id, v.Id);
+            Assert.AreEqual(id, v.Id);
             Assert.AreEqual("Michelle", v.Name);
             Assert.AreEqual(new DateTime(1979, 08, 12), v.Birthday);
             Assert.AreEqual(181000m, v.Salary);

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -20,7 +21,7 @@ namespace Beef.Validation
         /// Validates an entity given a <see cref="ValidationContext{TEntity}"/>.
         /// </summary>
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/></param>
-        void Validate(ValidationContext<TEntity> context);
+        Task ValidateAsync(ValidationContext<TEntity> context);
     }
 
     /// <summary>
@@ -37,7 +38,7 @@ namespace Beef.Validation
         /// Initializes a new instance of the <see cref="PropertyRuleBase{TEntity, TProperty}"/> class.
         /// </summary>
         /// <param name="name">The property name.</param>
-        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="StringConversion.ToSentenceCase(string)"/>).</param>
+        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="StringConversion.ToSentenceCase(string, bool)"/>).</param>
         /// <param name="jsonName">The JSON property name (defaults to <paramref name="name"/>).</param>
         protected PropertyRuleBase(string name, LText? text = null, string? jsonName = null)
         {
@@ -91,7 +92,7 @@ namespace Beef.Validation
         /// Runs the configured clauses and rules.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        protected void Invoke(PropertyContext<TEntity, TProperty> context)
+        protected async Task InvokeAsync(PropertyContext<TEntity, TProperty> context)
         {
             Check.NotNull(context, nameof(context));
 
@@ -106,7 +107,7 @@ namespace Beef.Validation
             foreach (var rule in _rules)
             {
                 if (rule.Check(context))
-                    rule.Validate(context);
+                    await rule.ValidateAsync(context).ConfigureAwait(false);
 
                 // Stop validating after an error.
                 if (context.HasError)
@@ -119,7 +120,7 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public abstract ValueValidatorResult<TEntity, TProperty> Run(bool throwOnError = false);
+        public abstract Task<ValueValidatorResult<TEntity, TProperty>> RunAsync(bool throwOnError = false);
 
         /// <summary>
         /// Adds a <see cref="WhenClause{TEntity, TProperty}"/> to this <see cref="PropertyRule{TEntity, TProperty}"/> where the <typeparamref name="TEntity"/> <paramref name="predicate"/> must be <c>true</c> for the rule to be validated.
@@ -249,7 +250,7 @@ namespace Beef.Validation
         /// Validates an entity given a <see cref="ValidationContext{TEntity}"/>.
         /// </summary>
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/>.</param>
-        public void Validate(ValidationContext<TEntity> context)
+        public async Task ValidateAsync(ValidationContext<TEntity> context)
         {
             Check.NotNull(context, nameof(context));
 
@@ -269,7 +270,7 @@ namespace Beef.Validation
             var ctx = new PropertyContext<TEntity, TProperty>(context, value, this.Name, this.JsonName, this.Text);
 
             // Run the rules.
-            Invoke(ctx);
+            await InvokeAsync(ctx).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -298,7 +299,7 @@ namespace Beef.Validation
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        void IValueRule<TEntity, TProperty>.Validate(PropertyContext<TEntity, TProperty> context)
+        Task IValueRule<TEntity, TProperty>.ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             // All good, nothing to see here ;-)
             throw new NotSupportedException("A property value validation should not occur directly on a PropertyRule.");
@@ -314,13 +315,13 @@ namespace Beef.Validation
         }
 
         /// <summary>
-        /// The <b>Run</b> method is not supported; use <see cref="Validate(ValidationContext{TEntity})"/> instead.
+        /// The <b>Run</b> method is not supported; use <see cref="ValidateAsync(ValidationContext{TEntity})"/> instead.
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public override ValueValidatorResult<TEntity, TProperty> Run(bool throwOnError = false)
+        public override Task<ValueValidatorResult<TEntity, TProperty>> RunAsync(bool throwOnError = false)
         {
-            throw new NotSupportedException("The Run method is not supported for a PropertyRule<TEntity, TProperty>.");
+            throw new NotSupportedException("The RunAsync method is not supported for a PropertyRule<TEntity, TProperty>.");
         }
     }
 }

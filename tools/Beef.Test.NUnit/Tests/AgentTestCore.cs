@@ -16,15 +16,16 @@ namespace Beef.Test.NUnit.Tests
     /// Provides the core <b>Agent</b> test capabilities.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    //[DebuggerStepThrough()]
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class AgentTestCore<TStartup> where TStartup : class
     {
         internal HttpStatusCode? _expectedStatusCode;
         internal ErrorType? _expectedErrorType;
         internal string? _expectedErrorMessage;
         internal MessageItemCollection? _expectedMessages;
-        internal readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
-        internal bool _expectedNonePublished;
+        internal readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedSent = new List<(ExpectedEvent, bool)>();
+        internal bool _expectedNoneSent;
+        internal bool _ignoreEventMismatch;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTestCore{TStartup}"/> class using the specified details.
@@ -126,7 +127,7 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
         protected void SetExpectEvent(string template, string action)
         {
-            _expectedPublished.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
+            _expectedSent.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
         }
 
         /// <summary>
@@ -143,16 +144,18 @@ namespace Beef.Test.NUnit.Tests
         {
             var ee = new ExpectedEvent(new EventData<T> { Subject = template, Action = action, Value = eventValue });
             ee.MembersToIgnore.AddRange(membersToIgnore);
-            _expectedPublished.Add((ee, useReturnedValue));
+            _expectedSent.Add((ee, useReturnedValue));
         }
 
         /// <summary>
         /// Verifies that no events were published.
         /// </summary>
-        protected void SetExpectNoEvents()
-        {
-            _expectedNonePublished = true;
-        }
+        protected void SetExpectNoEvents() =>_expectedNoneSent = true;
+
+        /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        protected void SetIgnorePublishSendEventMismatch() => _ignoreEventMismatch = true;
 
         /// <summary>
         /// Check the published events to make sure they are valid.
@@ -160,17 +163,20 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="eventNeedingValueUpdateAction">Action that will be called where the value needs to be updated.</param>
         protected void PublishedEventsCheck(Action<ExpectedEvent>? eventNeedingValueUpdateAction = null)
         {
-            if (_expectedPublished.Count > 0)
+            if (_expectedSent.Count > 0)
             {
-                foreach (var ee in _expectedPublished.Where((v) => v.useReturnedValue).Select((v) => v.expectedEvent))
+                foreach (var ee in _expectedSent.Where((v) => v.useReturnedValue).Select((v) => v.expectedEvent))
                 {
                     eventNeedingValueUpdateAction?.Invoke(ee);
                 }
 
-                ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());
+                ExpectEvent.AreSent(_expectedSent.Select((v) => v.expectedEvent).ToList());
             }
-            else if (_expectedNonePublished)
-                ExpectEvent.NonePublished();
+            else if (_expectedNoneSent)
+                ExpectEvent.NoneSent();
+
+            if (!_ignoreEventMismatch)
+                ExpectEvent.PublishedVersusSent();
 
             ExpectEventPublisher.Remove();
         }
@@ -179,6 +185,12 @@ namespace Beef.Test.NUnit.Tests
         /// Creates an <see cref="IWebApiAgentArgs"/> instance using the <see cref="TesterBase.LocalServiceProvider"/>.
         /// </summary>
         /// <returns>An <see cref="IWebApiAgentArgs"/> instance.</returns>
-        public IWebApiAgentArgs CreateAgentArgs() => AgentTesterBase.LocalServiceProvider.GetService<IWebApiAgentArgs>() ?? throw new InvalidOperationException("An instance of IWebApiAgentArgs was unable to be created.");
+        public IWebApiAgentArgs CreateAgentArgs(Type type)
+        {
+            if (AgentTesterBase.LocalServiceProvider.GetService(type ?? throw new ArgumentNullException(nameof(type))) is IWebApiAgentArgs args)
+                return args;
+
+            return AgentTesterBase.LocalServiceProvider.GetService<IWebApiAgentArgs>() ?? throw new InvalidOperationException($"An instance of {type.Name} was unable to be created.");
+        }
     }
 }

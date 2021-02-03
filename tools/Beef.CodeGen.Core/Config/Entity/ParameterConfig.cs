@@ -10,16 +10,29 @@ namespace Beef.CodeGen.Config.Entity
     /// <summary>
     /// Represents the <b>Parameter</b> code-generation configuration.
     /// </summary>
-    [ClassSchema("Parameter", Title = "The **Parameter** is used to define an Operation's Parameter and its charateristics.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    [CategorySchema("Parameter", Title = "Provides the **Parameter** configuration.")]
-    [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
-    [CategorySchema("Manager", Title = "Provides the generic **Manager-layer** configuration.")]
-    [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
-    [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
-    [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
+    [ClassSchema("Parameter", Title = "'Parameter' object (entity-driven)",
+        Description = "The `Parameter` object defines an `Operation` parameter and its charateristics.", 
+        ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
+``` yaml
+parameters: [
+  { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
+]
+```")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("Property", Title = "Provides the _Property_ reference configuration.")]
+    [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
+    [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
+    [CategorySchema("Data", Title = "Provides the _data_ configuration.")]
+    [CategorySchema("WebApi", Title = "Provides the _Web API_ configuration.")]
+    [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, OperationConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Parameter", Name);
+
         #region Key
 
         /// <summary>
@@ -30,12 +43,36 @@ namespace Beef.CodeGen.Config.Entity
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the overridding text for use in comments.
+        /// Gets or sets the overriding text for use in comments.
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The overriding text for use in comments.",
             Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
         public string? Text { get; set; }
+
+        /// <summary>
+        /// Gets or sets the .NET <see cref="Type"/>.
+        /// </summary>
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The .NET `Type`.", IsImportant = true,
+            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data " +
+            "using statement is used. Shortcut: Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
+        public string? Type { get; set; }
+
+        /// <summary>
+        /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
+        /// </summary>
+        [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
+        public bool? Nullable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the C# code to default the value.
+        /// </summary>
+        [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The C# code to default the value.",
+            Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
+        public string? Default { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding private name.
@@ -53,40 +90,16 @@ namespace Beef.CodeGen.Config.Entity
             Description = "Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.")]
         public string? ArgumentName { get; set; }
 
+        #endregion
+
+        #region Property
+
         /// <summary>
         /// Gets or sets the `Property.Name` within the parent `Entity` to copy (set) the configuration/characteristics from where not already defined.
         /// </summary>
         [JsonProperty("property", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `Property.Name` within the parent `Entity` to copy (set) the configuration/characteristics from where not already defined.")]
+        [PropertySchema("Property", Title = "The `Property.Name` within the parent `Entity` to copy (set) the configuration/characteristics from where not already defined.")]
         public string? Property { get; set; }
-
-        #endregion
-
-        #region Parameter
-
-        /// <summary>
-        /// Gets or sets the .NET <see cref="Type"/>.
-        /// </summary>
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The .NET `Type`.", IsImportant = true,
-            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data " +
-            "using statement is used. Shortcut: Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
-        public string? Type { get; set; }
-
-        /// <summary>
-        /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
-        /// </summary>
-        [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
-        public bool? Nullable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the C# code to default the value.
-        /// </summary>
-        [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The C# code to default the value.",
-            Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
-        public string? Default { get; set; }
 
         #endregion
 
@@ -96,7 +109,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
+        [PropertySchema("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
             Description = "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.")]
         public string? RefDataType { get; set; }
 
@@ -104,7 +117,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates that the Reference Data property is to be a serializable list (ReferenceDataSidList). 
         /// </summary>
         [JsonProperty("refDataList", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`).",
+        [PropertySchema("RefData", Title = "Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`).",
             Description = "This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.")]
         public bool? RefDataList { get; set; }
 
@@ -118,6 +131,14 @@ namespace Beef.CodeGen.Config.Entity
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true)]
         public string? Validator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
+        /// </summary>
+        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
+            Description = "Defaults to `IValidator<{Type}>` where the `{Type}` is `Type`.")]
+        public string? IValidator { get; set; }
 
         /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
@@ -166,12 +187,11 @@ namespace Beef.CodeGen.Config.Entity
 
         #region WebApi
 
-
         /// <summary>
         /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
         /// </summary>
         [JsonProperty("webApiFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = new string[] { "FromQuery", "FromBody", "FromRoute", "FromEntityProperties" },
+        [PropertySchema("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = new string[] { "FromQuery", "FromBody", "FromRoute", "FromEntityProperties" },
             Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
         public string? WebApiFrom { get; set; }
 
@@ -183,7 +203,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the underlying gRPC data type.
         /// </summary>
         [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Grpc", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        [PropertySchema("gRPC", Title = "The underlying gRPC data type; will be inferred where not specified.")]
         public string? GrpcType { get; set; }
 
         #endregion
@@ -201,8 +221,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" ? CodeGenerator.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
-            : CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
+            ? ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            : ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the computed declared parameter type.
@@ -249,7 +270,12 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
+            var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Property);
+            if (Property != null && pc == null)
+                throw new CodeGenException(this, nameof(Property), $"Specified Property '{Property}' not found in Entity.");
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
             if (Type!.EndsWith("?", StringComparison.InvariantCulture))
@@ -259,17 +285,17 @@ namespace Beef.CodeGen.Config.Entity
             }
 
             RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            Text = ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
 
                 if (RelatedEntity != null)
                 {
                     if (RelatedEntity.EntityScope == null || RelatedEntity.EntityScope == "Common")
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Common.Entities." + Type)})";
                     else
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Business.Entities." + Type)})";
                 }
 
                 return StringConversion.ToSentenceCase(Name);
@@ -277,9 +303,10 @@ namespace Beef.CodeGen.Config.Entity
 
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
-            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
+            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
+            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidator<{Type}>" : null);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
@@ -289,7 +316,7 @@ namespace Beef.CodeGen.Config.Entity
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
 
             GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
-            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
             GrpcConverter = Type switch
             {
                 "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DateTimeToTimestamp",

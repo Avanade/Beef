@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,17 @@ namespace Beef.Database.Core
     /// <remarks>An environment variable named '<see cref="Company"/><see cref="AppName"/>ConnectionString' overrides any passed (default) <see cref="ConnectionString"/>.</remarks>
     public class DatabaseConsoleWrapper
     {
+        private readonly List<Assembly> _assemblies = new List<Assembly>();
+        private readonly List<string> _schemaOrder = new List<string>();
+        private string _outDir = "./..";
+        private string _script = "Database.xml";
+        private DatabaseExecutorCommand _supports = DatabaseExecutorCommand.All;
+
         /// <summary>
         /// Gets the command line template.
         /// </summary>
         public static string CommandLineTemplate { get; set; }
-            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{Company}}.{{AppName}}.Database.xml -s Database.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{ConfigFile}} -s {{Script}} -o {{OutDir}} -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets the command line assembly portion template.
@@ -29,62 +36,34 @@ namespace Beef.Database.Core
         /// <summary>
         /// Creates a new instance of the <see cref="DatabaseConsoleWrapper"/> class.
         /// </summary>
-        /// <param name="assemblies">The assemblies containing the embedded resources.</param>
         /// <param name="connectionString">The default connection string.</param>
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
-        /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
-        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
+        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, bool useBeefDbo = true)
         {
-            return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="DatabaseConsoleWrapper"/> class defaulting to <see cref="Assembly.GetEntryAssembly"/>.
-        /// </summary>
-        /// <param name="connectionString">The default connection string.</param>
-        /// <param name="company">The company name.</param>
-        /// <param name="appName">The application/domain name.</param>
-        /// <param name="outDir">The output path/directory.</param>
-        /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
-        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
-        /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
-        {
-            return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
+            return new DatabaseConsoleWrapper(connectionString, company, appName, useBeefDbo).Assemblies(Assembly.GetEntryAssembly()!);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseConsoleWrapper"/> class.
         /// </summary>
-        /// <param name="assemblies">The assemblies containing the embedded resources.</param>
         /// <param name="connectionString">The default connection string.</param>
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
-        /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
-        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
-        private DatabaseConsoleWrapper(Assembly[] assemblies, string connectionString, string company, string appName, string outDir, bool useBeefDbo = true, string? refDataSchemaName = null)
+        private DatabaseConsoleWrapper(string connectionString, string company, string appName, bool useBeefDbo = true)
         {
             ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
             Company = Check.NotEmpty(company, nameof(company));
             AppName = Check.NotEmpty(appName, nameof(appName));
-            OutDir = Check.NotEmpty(outDir, nameof(outDir));
-            RefDataSchemaName = refDataSchemaName;
-            if (assemblies == null)
-                assemblies = Array.Empty<Assembly>();
 
             if (useBeefDbo)
             {
-                var a = new List<Assembly> { typeof(DatabaseConsoleWrapper).Assembly };
-                a.AddRange(assemblies);
-                Assemblies.AddRange(a);
+                _assemblies.Add(typeof(DatabaseConsoleWrapper).Assembly);
+                _schemaOrder.Add("dbo");
             }
-            else
-                Assemblies.AddRange(assemblies);
 
             OverrideConnectionString();
         }
@@ -105,11 +84,6 @@ namespace Beef.Database.Core
         public string ConnectionString { get; private set; }
 
         /// <summary>
-        /// Gets the assemblies containing the embedded resources.
-        /// </summary>
-        public List<Assembly> Assemblies { get; private set; } = new List<Assembly>();
-
-        /// <summary>
         /// Gets the company name.
         /// </summary>
         public string Company { get; private set; }
@@ -120,14 +94,59 @@ namespace Beef.Database.Core
         public string AppName { get; private set; }
 
         /// <summary>
-        /// Gets the output path/directory.
+        /// Adds the <paramref name="assemblies"/> containing the embedded resources.
         /// </summary>
-        public string OutDir { get; private set; }
+        /// <param name="assemblies">The assemblies containing the embedded resources.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsoleWrapper Assemblies(params Assembly[] assemblies)
+        {
+            _assemblies.AddRange(assemblies);
+            return this;
+        }
 
         /// <summary>
-        /// Gets the reference data schema name.
+        /// Sets (overrides) the output <paramref name="path"/>/directory (defaults to <c>./..</c>).
         /// </summary>
-        public string? RefDataSchemaName { get; private set; }
+        /// <param name="path">The output path/directory.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsoleWrapper OutputDirectory(string path)
+        {
+            _outDir = Check.NotEmpty(path, nameof(path));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name (defaults to <c>Database.Xml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsoleWrapper DatabaseScript(string script)
+        {
+            _script = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the supported <see cref="DatabaseExecutorCommand"/> (defaults to <see cref="DatabaseExecutorCommand.All"/>.
+        /// </summary>
+        /// <param name="command">The supported <see cref="DatabaseExecutorCommand"/>.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsoleWrapper Supports(DatabaseExecutorCommand command)
+        {
+            _supports = command;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="schemas"/> to the schema order.
+        /// </summary>
+        /// <param name="schemas">The schema names to add.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsoleWrapper SchemaOrder(params string[] schemas)
+        {
+            _schemaOrder.AddRange(schemas);
+            return this;
+        }
 
         /// <summary>
         /// Executes the underlying <see cref="DatabaseConsole"/> using the database tooling arguments.
@@ -143,30 +162,45 @@ namespace Beef.Database.Core
             };
 
             var cmd = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
+            var sn = app.Argument("parameters", "Additional parameters used by the ScriptNew command.", multipleValues: true);
             var cs = app.Option("-cs|--connectionstring", "Override the database connection string.", CommandOptionType.SingleValue);
             var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
-            var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
-            var cr = app.Option("-createref|--scriptnew-create-ref-table", "ScriptNew: use create reference data '[schema.]table' template.", CommandOptionType.SingleValue);
-            var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
+            var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
+            var evn = app.Option("-evn|--environmentVariableName", "Override the default environment variable name for the connection string.", CommandOptionType.SingleValue);
+            var ps = app.Option("-p|--param", "Name=Value pair.", CommandOptionType.MultipleValue).Accepts(v => v.Use(new ParamsValidator()));
+            var so = app.Option("-s|--script", "Override the script resource name.", CommandOptionType.SingleValue);
 
             app.OnExecuteAsync(async (_) =>
             {
+                if (x2y.HasValue())
+                {
+                    if (cmd.ParsedValue != DatabaseExecutorCommand.CodeGen)
+                        throw new CommandParsingException(app, $"Command '{cmd.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
+
+                    DatabaseConsole.WriteMasthead();
+                    return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName)).ConfigureAwait(false);
+                }
+
+                var script = so.HasValue() ? so.Value() : _script;
                 var sb = new StringBuilder();
                 if (eo.HasValue())
-                    sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, Assembly.GetEntryAssembly()?.FullName!));
+                    sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, Assembly.GetEntryAssembly()?.FullName!, script!));
                 else
-                    Assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, a.FullName!)));
+                    _assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, a.FullName!, script!)));
 
-                var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value!, cs.Value() ?? ConnectionString, sb.ToString());
-                if (ct.HasValue())
-                    rargs += GetTableSchemaParams("Create", ct.Value()!);
-                else if (cr.HasValue())
-                    rargs += GetTableSchemaParams("CreateRef", cr.Value()!);
-                else if (at.HasValue())
-                    rargs += GetTableSchemaParams("Alter", at.Value()!);
+                var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value!, cs.Value() ?? ConnectionString, sb.ToString(), script!);
 
-                if (!string.IsNullOrEmpty(RefDataSchemaName))
-                    rargs += $" -rs {RefDataSchemaName}";
+                for (int i = 0; i < sn.Values.Count; i++)
+                {
+                    rargs += $" -p Param{i}={sn.Values[i]}";
+                }
+
+                foreach (var p in ps.Values)
+                {
+                    rargs += $" -p {p}";
+                }
+
+                _schemaOrder.ForEach(so => rargs += $" -so {so}");
 
                 return await DatabaseConsole.Create().RunAsync(rargs).ConfigureAwait(false);
             });
@@ -183,33 +217,19 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Get the table and schema paramaters from the argument.
-        /// </summary>
-        private string GetTableSchemaParams(string action, string arg)
-        {
-            if (string.IsNullOrEmpty(arg))
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
-
-            var parts = arg.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 1)
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table={parts[0]}";
-            else if (parts.Length == 2)
-                return $" -p ScriptNew={action} -p Schema={parts[0]} -p Table={parts[1]}";
-            else
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
-        }
-
-        /// <summary>
         /// Replace the moustache placeholders.
         /// </summary>
-        private string ReplaceMoustache(string text, string command, string connectionString, string assembly)
+        private string ReplaceMoustache(string text, string command, string connectionString, string assembly, string script)
         {
             text = text.Replace("{{Command}}", command, StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{ConfigFile}}", CodeGen.CodeGenFileManager.GetConfigFilename(CodeGen.CommandType.Database, Company, AppName), StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{ConnectionString}}", connectionString, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Assembly}}", assembly, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Company}}", Company, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{AppName}}", AppName, StringComparison.OrdinalIgnoreCase);
-            return text.Replace("{{OutDir}}", OutDir, StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{Script}}", script, StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{Supported}}", ((int)_supports).ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.OrdinalIgnoreCase);
+            return text.Replace("{{OutDir}}", _outDir, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

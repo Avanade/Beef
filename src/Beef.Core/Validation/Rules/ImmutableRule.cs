@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -13,6 +14,7 @@ namespace Beef.Validation.Rules
     {
         private readonly Predicate<TEntity>? _predicate;
         private readonly Func<bool>? _immutable;
+        private readonly Func<Task<bool>>? _immutableAsync;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImmutableRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.
@@ -33,10 +35,19 @@ namespace Beef.Validation.Rules
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ImmutableRule{TEntity, TProperty}"/> class with an <paramref name="immutableAsync"/> function.
+        /// </summary>
+        /// <param name="immutableAsync">The immutable function.</param>
+        public ImmutableRule(Func<Task<bool>> immutableAsync)
+        {
+            _immutableAsync = immutableAsync ?? throw new ArgumentNullException(nameof(immutableAsync));
+        }
+
+        /// <summary>
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
@@ -45,9 +56,14 @@ namespace Beef.Validation.Rules
                 if (!_predicate.Invoke(context.Parent.Value))
                     context.CreateErrorMessage(ErrorText ?? ValidatorStrings.ImmutableFormat);
             }
-            else
+            else if (_immutable != null)
             {
-                if (!_immutable!.Invoke())
+                if (!_immutable.Invoke())
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.ImmutableFormat);
+            }
+            else 
+            {
+                if (!(await _immutableAsync!.Invoke().ConfigureAwait(false)))
                     context.CreateErrorMessage(ErrorText ?? ValidatorStrings.ImmutableFormat);
             }
         }

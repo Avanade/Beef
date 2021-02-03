@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 using Beef.Demo.Common.Entities;
@@ -28,5 +28,5 @@ namespace Beef.Demo.Business
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

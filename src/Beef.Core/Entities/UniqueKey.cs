@@ -26,7 +26,6 @@ namespace Beef.Entities
             _args = Check.NotNull(args, nameof(args));
         }
 
-#pragma warning disable CA1819 // Properties should not return arrays; by-design, returns an immutable list.
         /// <summary>
         /// Gets the argument values for the key.
         /// </summary>
@@ -40,7 +39,6 @@ namespace Beef.Entities
                 return _args;
             }
         }
-#pragma warning restore CA1819
 
         /// <summary>
         /// Determines whether the current <see cref="UniqueKey"/> is equal to another <see cref="UniqueKey"/>.
@@ -97,6 +95,32 @@ namespace Beef.Entities
         {
             return !(left == right);
         }
+
+        /// <summary>
+        /// Determines whether the <see cref="UniqueKey"/> is considered initial; i.e. all <see cref="Args"/> have their default value.
+        /// </summary>
+        /// <returns><c>true</c> indicates that the <see cref="UniqueKey"/> is initial; otherwise, <c>false</c>.</returns>
+        public bool IsInitial
+        {
+            get
+            {
+                if (_args == null || _args.Length == 0)
+                    return true;
+
+                foreach (var arg in _args)
+                {
+                    if (arg != null && !arg.Equals(GetDefaultValue(arg.GetType())))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets the default value for a specified <paramref name="type"/>.
+        /// </summary>
+        private static object? GetDefaultValue(Type type) => Check.NotNull(type, nameof(type)).IsValueType ? Activator.CreateInstance(type) : null;
     }
 
     /// <summary>

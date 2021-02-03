@@ -4,8 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 {{! ===== Using ===== }}
 using System;
@@ -29,7 +28,7 @@ using {{Root.UsingNamespace3}};
 {{/if}}
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
@@ -40,7 +39,7 @@ using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
 {{! ===== Class ===== }}
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
     /// <summary>
     /// Represents the {{{Text}}} entity.
@@ -110,7 +109,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         public {{{PrivateType}}} {{PropertyName}}
         {
             get => {{PropertyPrivateName}};
-            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
+            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
         }
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
@@ -185,7 +184,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         {
   {{#if RefDataMapping}}
             get => GetMapping<string>(nameof({{Name}}));
-            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
+            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
   {{else}}
             get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}};
             set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#ifeq Type 'string'}}StringTrim.{{StringTrim}}, StringTransform.{{StringTransform}}{{else}}{{#ifeq Type 'DateTime'}}DateTimeTransform.{{DateTimeTransform}}{{else}}{{lower BubblePropertyChanged}}{{/ifeq}}{{/ifeq}}, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});
@@ -232,16 +231,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
 {{#unless RefDataType}}
   {{#ifne UniqueKeyProperties.Count 0}}
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the {{{EntityNameSeeComments}}} has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
+        public string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -255,7 +249,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+        public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
 
         #endregion
 
@@ -271,7 +265,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityName}}}({{RefDataType}} id) => ConvertFromId<{{{EntityName}}}>(id);
 
         /// <summary>
@@ -279,7 +272,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityName}}}(string? code) => ConvertFromCode<{{{EntityName}}}>(code);
 
         #endregion
@@ -483,7 +475,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     {
         /// <summary>
@@ -527,7 +518,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         /// </summary>
         /// <param name="result">The {{{seecomments EntityCollectionResultName}}}.</param>
         /// <returns>The corresponding {{{seecomments EntityCollectionName}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityCollectionName}}}({{{EntityCollectionResultName}}} result) => result?.Result!;
   {{/if}}
     }
@@ -542,7 +532,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
     {
         /// <summary>
@@ -579,6 +568,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
 {{/if}}
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

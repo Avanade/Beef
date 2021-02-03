@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -15,12 +15,12 @@ using Newtonsoft.Json.Linq;
 using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
-using {{Root.Company}}.{{Root.AppName}}.Business;
+using {{Root.NamespaceBusiness}};
 {{#ifeq Root.EntityUsing 'Business' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -29,7 +29,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
+namespace {{Root.NamespaceApi}}.Controllers
 {
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} Web API functionality.
@@ -42,7 +42,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
 {{/ifval}}
     public partial class {{Name}}Controller : ControllerBase
     {
-{{#each WebApiConstructorParameters}}
+{{#each WebApiCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -51,11 +51,20 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Controller"/> class.
         /// </summary>
-{{#each WebApiConstructorParameters}}
+{{#each WebApiCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower WebApiConstructor}} {{Name}}Controller({{#each WebApiConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each WebApiConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ControllerCtor(); }
+        {{lower WebApiCtor}} {{Name}}Controller({{#each WebApiCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle WebApiCtorParameters.Count 2}}
+            { {{#each WebApiCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ControllerCtor(); }
+{{else}}
+        {
+  {{#each WebApiCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}DataCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}ControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -114,11 +123,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
   {{#ifeq WebApiMethod 'HttpDelete'}}
             return new WebApiDelete{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
   {{/ifeq}}
-                operationType: OperationType.{{WebApiOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}});
+                operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}});
         }
 {{/each}}
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

@@ -33,30 +33,30 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataConstructorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataCtorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
-            var oc = new OperationConfig();
+            var oc = new OperationConfig { Name = "<internal>" };
             oc.Prepare(Root!, new EntityConfig { Name = "RefData" });
 
             // Data constructors.
             if (UsesDatabase)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Db", Type = Root!.DatabaseName, Text = $"{{{{{Root!.DatabaseName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Db", Type = Root!.DatabaseName, Text = $"{{{{{Root!.DatabaseName}}}}}" });
 
             if (UsesEntityFramework)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Ef", Type = Root!.EntityFrameworkName, Text = $"{{{{{Root!.EntityFrameworkName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Ef", Type = Root!.EntityFrameworkName, Text = $"{{{{{Root!.EntityFrameworkName}}}}}" });
 
             if (UsesCosmos)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = Root!.CosmosName, Text = $"{{{{{Root!.CosmosName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = Root!.CosmosName, Text = $"{{{{{Root!.CosmosName}}}}}" });
 
             if (UsesOData)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataName, Text = $"{{{{{Root!.ODataName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataName, Text = $"{{{{{Root!.ODataName}}}}}" });
 
-            foreach (var ctor in DataConstructorParameters)
+            foreach (var ctor in DataCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -93,8 +93,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public RobotAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public RobotAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="Robot"/>.
@@ -173,5 +173,5 @@ namespace Beef.Demo.Common.Agents
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

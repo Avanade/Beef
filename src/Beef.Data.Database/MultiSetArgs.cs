@@ -28,6 +28,11 @@ namespace Beef.Data.Database
         bool StopOnNull { get; }
 
         /// <summary>
+        /// Gets the predicate that when returns <c>true</c> indicates to stop further query result set processing.
+        /// </summary>
+        Func<DatabaseRecord, bool>? StopOnPredicate { get; }
+
+        /// <summary>
         /// Gets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
         /// </summary>
         OperationTypes OperationType { get; }
@@ -52,9 +57,9 @@ namespace Beef.Data.Database
         where TItem : class, new()
     {
         /// <summary>
-        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
+        /// Gets the <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        DatabaseMapper<TItem> Mapper { get; }
+        IDatabaseMapper<TItem> Mapper { get; }
     }
 
     /// <summary>
@@ -67,10 +72,12 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="isMandatory">Indicates whether the value is mandatory; defaults to <c>true</c>.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        protected MultiSetSingleArgs(bool isMandatory = true, bool stopOnNull = false)
+        /// <param name="stopOnPredicate">The predicate that when returns <c>true</c> indicates to stop further query result set processing.</param>
+        protected MultiSetSingleArgs(bool isMandatory = true, bool stopOnNull = false, Func<DatabaseRecord, bool>? stopOnPredicate = null)
         {
             IsMandatory = isMandatory;
             StopOnNull = stopOnNull;
+            StopOnPredicate = stopOnPredicate;
         }
 
         /// <summary>
@@ -99,6 +106,11 @@ namespace Beef.Data.Database
         public bool StopOnNull { get; set; }
 
         /// <summary>
+        /// Gets the predicate that when returns <c>true</c> indicates to stop further query result set processing.
+        /// </summary>
+        public Func<DatabaseRecord, bool>? StopOnPredicate { get; set; }
+
+        /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
@@ -123,12 +135,13 @@ namespace Beef.Data.Database
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiSetSingleArgs{TItem}"/> class.
         /// </summary>
-        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
+        /// <param name="mapper">The <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
         /// <param name="result">The action that will be invoked with the result of the set.</param>
         /// <param name="isMandatory">Indicates whether the value is mandatory; defaults to <c>true</c>.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetSingleArgs(DatabaseMapper<TItem> mapper, Action<TItem> result, bool isMandatory = true, bool stopOnNull = false)
-            : base(isMandatory, stopOnNull)
+        /// <param name="stopOnPredicate">The predicate that when returns <c>true</c> indicates to stop further query result set processing.</param>
+        public MultiSetSingleArgs(IDatabaseMapper<TItem> mapper, Action<TItem> result, bool isMandatory = true, bool stopOnNull = false, Func<DatabaseRecord, bool>? stopOnPredicate = null)
+            : base(isMandatory, stopOnNull, stopOnPredicate)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             _result = Check.NotNull(result, nameof(result));
@@ -137,7 +150,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        public DatabaseMapper<TItem> Mapper { get; private set; }
+        public IDatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
@@ -145,7 +158,7 @@ namespace Beef.Data.Database
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
         public override void DatasetRecord(DatabaseRecord dr)
         {
-            _value = Mapper.MapFromDb(dr, OperationType);
+            _value = Mapper.MapFromDb(dr, OperationType, null!);
         }
 
         /// <summary>
@@ -169,12 +182,14 @@ namespace Beef.Data.Database
         /// <param name="minRows">The minimum number of rows allowed.</param>
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        protected MultiSetCollArgs(int minRows = 0, int? maxRows = null, bool stopOnNull = false)
+        /// <param name="stopOnPredicate">The predicate that when returns <c>true</c> indicates to stop further query result set processing.</param>
+        protected MultiSetCollArgs(int minRows = 0, int? maxRows = null, bool stopOnNull = false, Func<DatabaseRecord, bool>? stopOnPredicate = null)
         {
             Check.IsTrue(!maxRows.HasValue || minRows <= maxRows.Value, nameof(maxRows), "Max Rows is less than Min Rows.");
             MinRows = minRows;
             MaxRows = maxRows;
             StopOnNull = stopOnNull;
+            StopOnPredicate = stopOnPredicate;
         }
 
         /// <summary>
@@ -196,6 +211,11 @@ namespace Beef.Data.Database
         /// Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).
         /// </summary>
         public bool StopOnNull { get; set; }
+
+        /// <summary>
+        /// Gets the predicate that when returns <c>true</c> indicates to stop further query result set processing.
+        /// </summary>
+        public Func<DatabaseRecord, bool>? StopOnPredicate { get; set; }
 
         /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
@@ -224,22 +244,23 @@ namespace Beef.Data.Database
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiSetCollArgs{TColl, TItem}"/> class.
         /// </summary>
-        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
+        /// <param name="mapper">The <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
         /// <param name="result">The action that will be invoked with the result of the set.</param>
         /// <param name="minRows">The minimum number of rows allowed.</param>
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetCollArgs(DatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
-            : base(minRows, maxRows, stopOnNull)
+        /// <param name="stopOnPredicate">The predicate that when returns <c>true</c> indicates to stop further query result set processing.</param>
+        public MultiSetCollArgs(IDatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false, Func<DatabaseRecord, bool>? stopOnPredicate = null)
+            : base(minRows, maxRows, stopOnNull, stopOnPredicate)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             _result = Check.NotNull(result, nameof(result));
         }
 
         /// <summary>
-        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
+        /// Gets the <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        public DatabaseMapper<TItem> Mapper { get; private set; }
+        public IDatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
@@ -253,7 +274,7 @@ namespace Beef.Data.Database
             if (_coll == null)
                 _coll = new TColl();
 
-            var item = Mapper.MapFromDb(dr, OperationType);
+            var item = Mapper.MapFromDb(dr, OperationType, null!);
             if (item != null)
                 _coll.Add(item);
         }
@@ -289,8 +310,9 @@ namespace Beef.Data.Database
         /// <param name="minRows">The minimum number of rows allowed.</param>
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetCollReferenceDataSidArgs(string columnName, Action<IEnumerable<TItem>> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
-            : base(minRows, maxRows, stopOnNull)
+        /// <param name="stopOnPredicate">The predicate that when returns <c>true</c> indicates to stop further query result set processing.</param>
+        public MultiSetCollReferenceDataSidArgs(string columnName, Action<IEnumerable<TItem>> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false, Func<DatabaseRecord, bool>? stopOnPredicate = null)
+            : base(minRows, maxRows, stopOnNull, stopOnPredicate)
         {
             _columnName = Check.NotEmpty(columnName, nameof(columnName));
             _result = Check.NotNull(result, nameof(result));

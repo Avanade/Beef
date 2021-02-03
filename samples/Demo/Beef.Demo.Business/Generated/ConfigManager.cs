@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,8 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigManager"/> class.
         /// </summary>
-        public ConfigManager() => ConfigManagerCtor();
+        public ConfigManager()
+            { ConfigManagerCtor(); }
 
         partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -35,16 +36,15 @@ namespace Beef.Demo.Business
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        public Task<System.Collections.IDictionary> GetEnvVarsAsync()
+        public async Task<System.Collections.IDictionary> GetEnvVarsAsync()
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

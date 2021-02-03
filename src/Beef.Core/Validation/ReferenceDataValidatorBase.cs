@@ -2,6 +2,7 @@
 
 using Beef.RefData;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -45,7 +46,7 @@ namespace Beef.Validation
         /// </summary>
         public ReferenceDataValidator()
         {
-            Property(x => x.Id).Custom(ValidateId);
+            Property(x => x.Id).Custom(ValidateIdAsync);
             Property(x => x.Code).Mandatory().String(ReferenceDataValidation.MaxCodeLength);
             Property(x => x.Text).Mandatory().String(ReferenceDataValidation.MaxTextLength);
             Property(x => x.Description).String(ReferenceDataValidation.MaxDescriptionLength);
@@ -55,18 +56,19 @@ namespace Beef.Validation
         /// <summary>
         /// Perform more complex mandatory check based on the ReferenceData base ID type.
         /// </summary>
-        private void ValidateId(PropertyContext<TEntity, object?> context)
+        private Task ValidateIdAsync(PropertyContext<TEntity, object?> context)
         {
             if (context.Value != null)
             {
                 if (context.Parent.Value is ReferenceDataBaseInt && (int)context.Value != 0)
-                    return;
+                    return Task.CompletedTask;
 
                 if (context.Parent.Value is ReferenceDataBaseGuid && (Guid)context.Value != Guid.Empty)
-                    return;
+                    return Task.CompletedTask;
             }
 
             context.CreateErrorMessage(ValidatorStrings.MandatoryFormat);
+            return Task.CompletedTask;
         }
     }
 }

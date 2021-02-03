@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -14,6 +15,7 @@ namespace Beef.Validation.Rules
     {
         private readonly TProperty _compareToValue;
         private readonly Func<TEntity, TProperty>? _compareToValueFunction;
+        private readonly Func<TEntity, Task<TProperty>>? _compareToValueFunctionAsync;
         private readonly LText? _compareToText;
         private readonly Func<TEntity, LText>? _compareToTextFunction;
 
@@ -43,13 +45,31 @@ namespace Beef.Validation.Rules
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="CompareValueRule{TEntity, TProperty}"/> class specifying the compare to value async function.
+        /// </summary>
+        /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
+        /// <param name="compareToValueFunctionAsync">The compare to value function.</param>
+        /// <param name="compareToTextFunction">The compare to text function (default is to use the result of the <paramref name="compareToValueFunctionAsync"/>).</param>
+        public CompareValueRule(CompareOperator compareOperator, Func<TEntity, Task<TProperty>> compareToValueFunctionAsync, Func<TEntity, LText>? compareToTextFunction = null) : base(compareOperator)
+        {
+            _compareToValueFunctionAsync = compareToValueFunctionAsync ?? throw new ArgumentNullException(nameof(compareToValueFunctionAsync));
+            _compareToTextFunction = compareToTextFunction;
+            _compareToValue = default!;
+        }
+
+        /// <summary>
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
-        {
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
+        {   
             Beef.Check.NotNull(context, nameof(context));
-            var compareToValue = _compareToValueFunction == null ? _compareToValue : _compareToValueFunction.Invoke(context.Parent.Value);
+            var compareToValue = _compareToValueFunction != null
+                ? _compareToValueFunction(context.Parent.Value) 
+                : (_compareToValueFunctionAsync != null
+                    ? await _compareToValueFunctionAsync(context.Parent.Value).ConfigureAwait(false)
+                    : _compareToValue);
+
             if (!Compare(context.Value, compareToValue))
             {
                 string? compareToText = _compareToText ?? compareToValue?.ToString() ?? new LText("null");

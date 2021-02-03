@@ -9,7 +9,7 @@ namespace Beef.Demo.Business.Validation
     /// <summary>
     /// Represents a <see cref="Person"/> validator.
     /// </summary>
-    public class PersonValidator : Validator<Person, PersonValidator>
+    public class PersonValidator : Validator<Person>
     {
         private static readonly Validator<Address> _addressValidator = Validator.Create<Address>()
             .HasProperty(x => x.Street, p => p.Mandatory().Common(CommonValidators.Text))

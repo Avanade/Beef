@@ -3,7 +3,7 @@
  */
  
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GenderGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Gender>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, codes, text, includeInactive: this.IncludeInactive())),
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -51,7 +51,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult TerminationReasonGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TerminationReason>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(RefDataNamespace.ReferenceData.Current.TerminationReason, codes, text, includeInactive: this.IncludeInactive())),
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(RefDataNamespace.ReferenceData.Current.TerminationReason, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -65,7 +65,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult RelationshipTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.RelationshipType>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(RefDataNamespace.ReferenceData.Current.RelationshipType, codes, text, includeInactive: this.IncludeInactive())),
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(RefDataNamespace.ReferenceData.Current.RelationshipType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -79,7 +79,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult USStateGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.USState>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, codes, text, includeInactive: this.IncludeInactive())),
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -93,7 +93,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult PerformanceOutcomeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.PerformanceOutcome>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, codes, text, includeInactive: this.IncludeInactive())),
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
@@ -119,11 +119,11 @@ namespace My.Hr.Api.Controllers
                 {
                     switch (q.Key)
                     {
-                        case var s when string.Compare(s, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Gender), ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.TerminationReason), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TerminationReason), ReferenceDataFilter.ApplyFilter<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(RefDataNamespace.ReferenceData.Current.TerminationReason, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.RelationshipType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.RelationshipType), ReferenceDataFilter.ApplyFilter<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(RefDataNamespace.ReferenceData.Current.RelationshipType, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.USState), ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.PerformanceOutcome), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PerformanceOutcome), ReferenceDataFilter.ApplyFilter<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Gender), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.TerminationReason), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TerminationReason), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(RefDataNamespace.ReferenceData.Current.TerminationReason, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.RelationshipType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.RelationshipType), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(RefDataNamespace.ReferenceData.Current.RelationshipType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.USState), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.PerformanceOutcome), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PerformanceOutcome), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
                     }
                 }
                 
@@ -133,5 +133,5 @@ namespace My.Hr.Api.Controllers
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

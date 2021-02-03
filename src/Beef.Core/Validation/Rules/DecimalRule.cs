@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -56,12 +57,12 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             // Where the value is null, do nothing; i.e. Nullable<Type>.
             Beef.Check.NotNull(context, nameof(context));
             if (Comparer<object>.Default.Compare(context.Value!, null!) == 0)
-                return;
+                return Task.CompletedTask;
 
             // Convert numeric to a decimal value.
             decimal value = Convert.ToDecimal(context.Value, System.Globalization.CultureInfo.CurrentCulture);
@@ -70,7 +71,7 @@ namespace Beef.Validation.Rules
             if (!AllowNegatives && value < 0)
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.AllowNegativesFormat);
-                return;
+                return Task.CompletedTask;
             }
 
             int il = MaxDigits.HasValue ? DecimalRuleHelper.CalcIntegerPartLength(value) : 0;
@@ -80,15 +81,14 @@ namespace Beef.Validation.Rules
             if (MaxDigits.HasValue && !DecimalRuleHelper.CheckMaxDigits(MaxDigits.Value, DecimalPlaces, il, dp))
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MaxDigitsFormat, MaxDigits);
-                return;
+                return Task.CompletedTask;
             }
 
             // Check decimal places.
             if (DecimalPlaces.HasValue && !DecimalRuleHelper.CheckDecimalPlaces(DecimalPlaces.Value, dp))
-            {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.DecimalPlacesFormat, DecimalPlaces);
-                return;
-            }
+
+            return Task.CompletedTask;
         }
     }
 }

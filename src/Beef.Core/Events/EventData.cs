@@ -60,11 +60,7 @@ namespace Beef.Events
                     break;
 
                 case IUniqueKey uk:
-                    if (uk.HasUniqueKey)
-                        ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
-                    else
-                        throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
-
+                    ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
                     break;
             }
 
@@ -89,6 +85,8 @@ namespace Beef.Events
         /// </summary>
         public EventData()
         {
+            EventId = Guid.NewGuid();
+
             if (ExecutionContext.HasCurrent)
             {
                 TenantId = ExecutionContext.Current.TenantId;
@@ -100,6 +98,12 @@ namespace Beef.Events
             else
                 Timestamp = Cleaner.Clean(DateTime.Now);
         }
+
+        /// <summary>
+        /// Gets or sets the unique event identifier.
+        /// </summary>
+        [JsonProperty("eventId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Guid? EventId { get; set; }
 
         /// <summary>
         /// Gets or sets the tenant identifier.
@@ -170,6 +174,12 @@ namespace Beef.Events
         /// </summary>
         /// <returns>The <see cref="EventData{T}.Value"/> or <c>null</c>.</returns>
         public virtual object? GetValue() => null;
+
+        /// <summary>
+        /// Gets the <see cref="EventData"/> <b>value</b>; will throw <see cref="NotSupportedException"/> where appropriate.
+        /// </summary>
+        /// <param name="value"></param>
+        public virtual void SetValue(object? value) => throw new NotSupportedException();
     }
 
     /// <summary>
@@ -184,9 +194,7 @@ namespace Beef.Events
         /// Gets (same as <see cref="GetValue"/>) or sets the event value (automatically setting the <see cref="EventData.ETag"/> where not already set).
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
-#pragma warning disable CA1721 // Property names should not match get methods; by-design, most meaningful name (are same-same).
         public T Value
-#pragma warning restore CA1721 
         {
             get => _value;
 
@@ -216,5 +224,11 @@ namespace Beef.Events
         /// </summary>
         /// <returns>The <see cref="Value"/>.</returns>
         public override object? GetValue() => Value;
+
+        /// <summary>
+        /// Sets the <see cref="EventData"/> <see cref="Value"/>.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        public override void SetValue(object? value) => Value = (T)value!;
     }
 }

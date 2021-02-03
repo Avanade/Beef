@@ -6,17 +6,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\TestScript.xml" />
+    <None Remove="Templates\Test_cs.hbs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Generated\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\TestScript.xml" />
+    <EmbeddedResource Include="Templates\Test_cs.hbs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\tools\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Beef.Demo.DataModel.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Beef.Demo.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Beef.RefData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="datamodel.beef.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

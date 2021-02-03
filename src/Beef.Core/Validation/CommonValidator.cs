@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -38,7 +39,7 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public override ValueValidatorResult<ValidationValue<T>, T> Run(bool throwOnError = false)
+        public override Task<ValueValidatorResult<ValidationValue<T>, T>> RunAsync(bool throwOnError = false)
         {
             throw new NotSupportedException("The Run method is not supported for a CommonValueRule<T>.");
         }
@@ -51,13 +52,13 @@ namespace Beef.Validation
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public ValueValidatorResult<ValidationValue<T>, T> Validate(T value, string? name = null, LText? text = null, bool throwOnError = false)
+        public async Task<ValueValidatorResult<ValidationValue<T>, T>> ValidateAsync(T value, string? name = null, LText? text = null, bool throwOnError = false)
         {
             var vv = new ValidationValue<T>(null, value);
             var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(vv,
                 new ValidationArgs()), value, name ?? Validator.ValueNameDefault, null, text);
 
-            Invoke(ctx);
+            await InvokeAsync(ctx).ConfigureAwait(false);
             var res = new ValueValidatorResult<ValidationValue<T>, T>(ctx);
             if (throwOnError)
                 res.ThrowOnError();
@@ -70,7 +71,7 @@ namespace Beef.Validation
         /// </summary>
         /// <typeparam name="TEntity">The related entity <see cref="Type"/>.</typeparam>
         /// <param name="context">The related <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        internal void Validate<TEntity>(PropertyContext<TEntity, T> context) where TEntity : class
+        internal async Task ValidateAsync<TEntity>(PropertyContext<TEntity, T> context) where TEntity : class
         {
             Check.NotNull(context, nameof(context));
             var vv = new ValidationValue<T>(context.Parent.Value, context.Value);
@@ -84,7 +85,7 @@ namespace Beef.Validation
             });
 
             var ctx = new PropertyContext<ValidationValue<T>, T>(vc, context.Value, context.Name, context.JsonName, context.Text);
-            Invoke(ctx);
+            await InvokeAsync(ctx).ConfigureAwait(false);
             context.HasError = ctx.HasError;
             context.Parent.MergeResult(ctx.Parent.Messages);
         }

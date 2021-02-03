@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -43,22 +43,21 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
+        public async Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId, args);
-                MultiValidator.Create()
+                (await MultiValidator.Create()
                     .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
-                    .Add(args.Validate(nameof(args)).Entity(TransactionArgsValidator.Default))
-                    .Run().ThrowOnError();
+                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<TransactionArgs>>())
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

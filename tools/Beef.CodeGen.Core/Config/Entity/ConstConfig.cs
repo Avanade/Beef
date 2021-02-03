@@ -8,10 +8,24 @@ namespace Beef.CodeGen.Config.Entity
     /// Represents the <b>Const</b> code-generation configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Const", Title = "The **Const** is used to define an constant value for an `Entity`.", Description = "", Markdown = "")]
+    [ClassSchema("Const", Title = "'Const' object (entity-driven)", 
+        Description = "The `Const` object is used to define a .NET (C#) constant value for an `Entity`.", 
+        ExampleMarkdown = @"A YAML configuration example is as follows:
+``` yaml
+consts: [
+  { name: Female, value: F },
+  { name: Male, value: M }
+]
+```")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class ConstConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Const", Name);
+
         /// <summary>
         /// Gets or sets the unique constant name.
         /// </summary>
@@ -23,16 +37,16 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the C# code for the constant value.
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The C# code for the constant value.", IsMandatory = true, IsImportant = true,
-            Description = "The code generation will ensure it is delimited correctly to output correctly formed C# code.")]
+        [PropertySchema("Key", Title = "The .NET (C#) code for the constant value.", IsMandatory = true, IsImportant = true,
+            Description = "The code generation will ensure the value is delimited properly to output correctly formed (delimited) .NET (C#) code.")]
         public string? Value { get; set; }
 
         /// <summary>
-        /// Gets or sets the overridding text for use in comments.
+        /// Gets or sets the overriding text for use in comments.
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The overriding text for use in comments.",
-            Description = "By default the `Text` will be the `Name` reformatted as sentence casing. It will be formatted as: Represents a {text} constant value.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            Description = "By default the `Text` will be the `Name` reformatted as sentence casing. It will be formatted as: `Represents a {text} constant value.` To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. `{{Xxx}}`).")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -50,6 +64,8 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
             DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
         }
     }

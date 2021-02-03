@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Trip Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class TripPerson : EntityBase, IStringIdentifier, IEquatable<TripPerson>
+    public partial class TripPerson : EntityBase, IStringIdentifier, IUniqueKey, IEquatable<TripPerson>
     {
         #region Privates
 
@@ -70,16 +69,11 @@ namespace Beef.Demo.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="TripPerson"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -91,7 +85,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Id);
+        public UniqueKey UniqueKey => CreateUniqueKey(Id);
 
         #endregion
 
@@ -244,7 +238,6 @@ namespace Beef.Demo.Common.Entities
     /// <summary>
     /// Represents the <see cref="TripPerson"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class TripPersonCollection : EntityBaseCollection<TripPerson>
     {
         /// <summary>
@@ -278,7 +271,6 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="TripPersonCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="TripPersonCollection"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator TripPersonCollection(TripPersonCollectionResult result) => result?.Result!;
     }
 
@@ -289,7 +281,6 @@ namespace Beef.Demo.Common.Entities
     /// <summary>
     /// Represents the <see cref="TripPerson"/> collection result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class TripPersonCollectionResult : EntityCollectionResult<TripPersonCollection, TripPerson>
     {
         /// <summary>
@@ -325,6 +316,5 @@ namespace Beef.Demo.Common.Entities
     #endregion
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

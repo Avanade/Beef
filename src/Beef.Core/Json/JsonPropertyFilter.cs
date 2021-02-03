@@ -15,24 +15,24 @@ namespace Beef.Json
     public static class JsonPropertyFilter
     {
         /// <summary>
-        /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> resulting in the same <paramref name="value"/> instance where no <paramref name="include"/> or <paramref name="exclude"/>
-        /// specified; otherwise, a <see cref="JsonToken"/> representation of the <paramref name="value"/>.
+        /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> returning a JSON representation only where serialized 
+        /// (i.e <paramref name="include"/> or <paramref name="exclude"/> were specified).
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
         /// <param name="include">The list of JSON property names to include.</param>
         /// <param name="exclude">The list of JSON property names to exclude.</param>
-        /// <returns>The resulting <see cref="JToken"/>.</returns>
+        /// <returns>The JSON <see cref="string"/> where serialized; otherwise <c>null</c>.</returns>
         /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
-        public static object? ApplyAsObject<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
+        public static string? ApplyAsObject<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             if (value == null)
-                return value;
+                return null;
 
             if (IsEmpty(include) && IsEmpty(exclude))
-                return value;
+                return null;
 
-            return Apply(value, include, exclude)!;
+            return Apply(value, include, exclude)?.ToString(Formatting.None);
         }
 
         /// <summary>
@@ -92,9 +92,7 @@ namespace Beef.Json
             {
                 foreach (var jp in json.Children().ToArray())
                 {
-#pragma warning disable CA1062 // Validate arguments of public methods; is checked; false negative.
                     Filter(jp, isInclude, isInclude ? Expand(include) : exclude);
-#pragma warning restore CA1062
                 }
             }
         }
@@ -112,11 +110,7 @@ namespace Beef.Json
 
             bool isInclude = include != null && include.Any();
             if ((isInclude) || (exclude != null && exclude.Any()))
-            {
-#pragma warning disable CA1062 // Validate arguments of public methods; is checked; false negative.
                 Filter(json, isInclude, isInclude ? Expand(include) : exclude);
-#pragma warning restore CA1062 
-            }
         }
 
         /// <summary>
@@ -135,7 +129,7 @@ namespace Beef.Json
                     for (int i = 0; i < parts.Length; i++)
                     {
                         if (i > 0)
-                            sb.Append(".");
+                            sb.Append('.');
 
                         sb.Append(parts[i]);
                         kod.Add(sb.ToString());
@@ -220,7 +214,7 @@ namespace Beef.Json
                 txt = txt.Remove(li, ri - li + 1);
             }
 
-            return (txt.Length > 1 && txt[0] == '.') ? txt.Substring(1) : txt;
+            return (txt.Length > 1 && txt[0] == '.') ? txt[1..] : txt;
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<Script ConfigType="Database" LoaderType="Beef.CodeGen.Loaders.TableConfigLoader, Beef.CodeGen.Core">
-  <Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableUpsert_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableDelete_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableMerge_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbSpTableGetByArgs_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbVwTable_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbUdtTableList_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
-  <Generate Template="DbTvpTable_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/" />
-  <Generate Template="DbEfTableModel_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
-  <Generate Template="DbEfModelBuilderExtensions_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
+<Script ConfigType="Database">
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseGetCodeGenerator" Template="DbSpTableGet_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseGetCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseGetCollCodeGenerator" Template="DbSpTableGetColl_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseGetCollCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCreateCodeGenerator" Template="DbSpTableCreate_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseCreateCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseUpdateCodeGenerator" Template="DbSpTableUpdate_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseUpdateCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseUpsertCodeGenerator" Template="DbSpTableUpsert_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseUpsertCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseDeleteCodeGenerator" Template="DbSpTableDelete_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseMergeCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseMergeCodeGenerator" Template="DbSpTableMerge_sql.hbs" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Parent.Schema}}/Stored Procedures/Generated" HelpText="DatabaseGetCollCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseUdtCodeGenerator" Template="DbUdtTableList_sql.hbs" FileName="udt{{Name}}List.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Schema}}/Types/User-Defined Table Types/Generated" HelpText="DatabaseUdtCodeGenerator: Database/Schema/Xxx/Types/User-Defined Table Types" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseTvpCodeGenerator" Template="DbTvpTable_cs.hbs" FileName="{{Tvp}}DataTvp.cs" OutDir="{{Root.PathBusiness}}/Data/Generated" HelpText="DatabaseTvpCodeGenerator: Business/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelGenerator" Template="DbEfModel_cs.hbs" FileName="{{EFModelName}}.cs" OutDir="{{Root.PathBusiness}}/Data/EfModel/Generated" HelpText="DatabaseEfModelGenerator: Business/Data/EfModel" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelBuilderCodeGenerator" Template="DbEfModelBuilder_cs.hbs" FileName="ModelBuilderExtensions.cs" OutDir="{{Root.PathBusiness}}/Data/EfModel/Generated" HelpText="DatabaseEfModelBuilderCodeGenerator: Business/Data/EfModel" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryViewCodeGenerator" Template="DbVwQuery_sql.hbs" FileName="{{ViewName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{ViewSchema}}/Views/Generated" HelpText="DatabaseQueryViewCodeGenerator: Database/Schema/Xxx/Views" />
 </Script>

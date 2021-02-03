@@ -6,6 +6,7 @@ using Moq;
 using Moq.Language;
 using Moq.Language.Flow;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,6 +17,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Provides extension methods to support testing.
     /// </summary>
+    [DebuggerStepThrough]
     public static class ExtensionMethods
     {
         /// <summary>

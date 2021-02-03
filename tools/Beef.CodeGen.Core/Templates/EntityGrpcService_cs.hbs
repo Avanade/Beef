@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Net;
@@ -13,9 +13,9 @@ using Beef;
 using Beef.Grpc;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using {{Root.Company}}.{{Root.AppName}}.Business;
-using {{Root.Company}}.{{Root.AppName}}.Common.Grpc;
-using {{Root.Company}}.{{Root.AppName}}.Common.Grpc.Proto;
+using {{Root.NamespaceBusiness}};
+using {{Root.NamespaceCommon}}.Grpc;
+using {{Root.NamespaceCommon}}.Grpc.Proto;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
@@ -23,7 +23,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Grpc
+namespace {{Root.NamespaceApi}}.Grpc
 {
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} gRPC Server functionality.
@@ -64,11 +64,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Grpc
                 var __req = request ?? new {{Parent.Name}}{{Name}}Request();
                 {{#if HasReturnValue}}var __result = {{/if}}await _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Transformers.{{Type}}.MapToSrce(__req.Value)!{{else}}{{#if IsPagingArgs}}__req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToSrce(__req.{{Name}}){{else}}{{#if GrpcMapper}}Transformers.{{GrpcMapper}}.MapToSrce(__req.{{Name}})!{{else}}__req.{{Name}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}});
                 return {{#if HasReturnValue}}Transformers.{{ReturnType}}.MapToDest(__result!)!;{{else}}new Google.Protobuf.WellKnownTypes.Empty();{{/if}}
-            }, operationType: OperationType.{{WebApiOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}).ExecuteAsync();
+            }, operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}).ExecuteAsync();
         }
 {{/each}}
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

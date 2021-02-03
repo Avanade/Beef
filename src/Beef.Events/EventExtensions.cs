@@ -68,7 +68,7 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="IEventPublisher"/> <see cref="EventHubPublisher"/> instance.
+        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="EventHubPublisher"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="connectionString">The connection string.</param>
@@ -79,7 +79,7 @@ namespace Beef.Events
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton<IEventPublisher>(_ =>
+            return services.AddScoped<IEventPublisher>(_ =>
             {
                 var ehc = EventHubClient.CreateFromConnectionString(Check.NotEmpty(connectionString, nameof(connectionString)));
                 ehc.RetryPolicy = retryPolicy ?? RetryPolicy.Default;

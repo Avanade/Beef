@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.RefData
 {
@@ -92,9 +93,9 @@ namespace Beef.RefData
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
         /// <returns>The filtered collection and corresponding ETag.</returns>
-        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string>? codes = null, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static Task<ReferenceDataFilterResult<TItem>> ApplyFilterAsync<TColl, TItem>(TColl coll, IEnumerable<string>? codes = null, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
-            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text }, includeInactive);
+            return ApplyFilterAsync<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text }, includeInactive);
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace Beef.RefData
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
         /// <returns>The filtered collection and corresponding ETag.</returns>
-        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static Task<ReferenceDataFilterResult<TItem>> ApplyFilterAsync<TColl, TItem>(TColl coll, StringValues codes = default, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             var list = new List<string>();
             foreach (var c in codes)
@@ -115,7 +116,7 @@ namespace Beef.RefData
                 list.AddRange(c.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries));
             }
 
-            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = list, Text = text }, includeInactive);
+            return ApplyFilterAsync<TColl, TItem>(coll, new ReferenceDataFilter { Codes = list, Text = text }, includeInactive);
         }
 
         /// <summary>
@@ -127,7 +128,7 @@ namespace Beef.RefData
         /// <param name="filter">The <see cref="ReferenceDataFilter"/>.</param>
         /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
         /// <returns>The filtered collection and corresponding ETag.</returns>
-        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, ReferenceDataFilter filter, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static async Task<ReferenceDataFilterResult<TItem>> ApplyFilterAsync<TColl, TItem>(TColl coll, ReferenceDataFilter filter, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             Check.NotNull(coll, nameof(coll));
             Check.NotNull(filter, nameof(filter));
@@ -135,7 +136,7 @@ namespace Beef.RefData
                 return new ReferenceDataFilterResult<TItem>(coll.ActiveList) { ETag = coll.ETag };
 
             // Validate the arguments.
-            Validator.Validate(filter).ThrowOnError();
+            (await Validator.ValidateAsync(filter).ConfigureAwait(false)).ThrowOnError();
 
             // Apply the filter.
             var items = includeInactive ? coll.AllList : coll.ActiveList; 

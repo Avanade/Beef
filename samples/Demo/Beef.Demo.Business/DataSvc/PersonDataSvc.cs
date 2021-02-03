@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Beef.Demo.Common.Entities;
+using System;
 using System.Threading.Tasks;
 
 namespace Beef.Demo.Business.DataSvc
@@ -8,16 +9,24 @@ namespace Beef.Demo.Business.DataSvc
         partial void PersonDataSvcCtor()
         {
             _markOnAfterAsync = MarkOnAfterAsync;
+            _updateWithRollbackOnAfterAsync = _ => throw new InvalidOperationException("Some made up exception to validate that the update rolled back as expected.");
         }
 
-        private async Task MarkOnAfterAsync()
+        private Task MarkOnAfterAsync()
         {
-            await _evtPub.PublishValueAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
+            _evtPub.PublishValue("Wahlberg", "Demo.Mark", "Marked");
+            return Task.CompletedTask;
         }
 
         private Task<int> DataSvcCustomOnImplementationAsync()
         {
             throw new NotImplementedException();
+        }
+
+        private Task<Person> EventPublishNoSendOnImplementationAsync(Person value)
+        {
+            _evtPub.PublishValue(value, $"Beef.Demo.NoSend.{value.Id}");
+            return Task.FromResult(value);
         }
     }
 }

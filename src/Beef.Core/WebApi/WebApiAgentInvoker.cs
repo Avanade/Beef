@@ -5,6 +5,7 @@ namespace Beef.WebApi
     /// <summary>
     /// Wraps a <b>WebApi Agent</b> invocation enabling standard functionality to be added to all invocations. 
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class WebApiAgentInvoker : InvokerBase<object>
     {
         /// <summary>

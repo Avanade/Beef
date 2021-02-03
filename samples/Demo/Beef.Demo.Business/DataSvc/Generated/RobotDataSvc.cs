@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -69,8 +69,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                await _evtPub.PublishValue(__result, $"Demo.Robot.{__result.Id}", "Create").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -85,8 +85,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                await _evtPub.PublishValue(__result, $"Demo.Robot.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -100,7 +100,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
+                await _evtPub.Publish($"Demo.Robot.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Robot>(new UniqueKey(id));
             });
         }
@@ -122,5 +122,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore
 #nullable restore

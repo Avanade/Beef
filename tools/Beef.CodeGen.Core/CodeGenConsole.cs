@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>CodeGen Console</b> that facilitates the code generation output by handling the standard console arguments invoking the underlying <see cref="CodeGenerator"/>.
+    /// <b>CodeGen Console</b> that facilitates the code generation output by handling the standard console arguments invoking the underlying <see cref="CodeGeneratorEventArgs"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
     public class CodeGenConsole
@@ -52,13 +52,12 @@ namespace Beef.CodeGen
 
             App.HelpOption(true);
 
-            _configArg = App.Argument("config", "CodeGeneration configuration XML file.")
+            _configArg = App.Argument("config", "CodeGeneration configuration YAML/JSON/XML file.")
                 .IsRequired()
                 .Accepts(v => v.ExistingFile());
 
             _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name.", CommandOptionType.SingleValue)
-                .IsRequired()
-                .Accepts(v => v.Use(new FileResourceValidator()));
+                .IsRequired();
 
             _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources).", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());
@@ -74,16 +73,9 @@ namespace Beef.CodeGen
 
             _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
 
-            _logger = Logger.Default == null ? Logger.Default = new ColoredConsoleLogger(nameof(CodeGenConsole)) : Logger.Default;
+            _logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
 
-            App.OnExecuteAsync(async (_) =>
-            {
-                // Check the Execution script file or embedded resource names.
-                if (!File.Exists(_scriptOpt.Value()) && await ResourceManager.GetScriptContentAsync(_scriptOpt.Value()!).ConfigureAwait(false) == null)
-                    throw new InvalidOperationException($"The file or embedded resource '{_scriptOpt.Value()}' does not exist.");
-
-                return await RunRunAwayAsync().ConfigureAwait(false);
-            });
+            App.OnExecuteAsync(async (_) => await RunRunAwayAsync().ConfigureAwait(false));
         }
     
         /// <summary>
@@ -155,7 +147,7 @@ namespace Beef.CodeGen
             var result = await cge.RunAsync().ConfigureAwait(false);
 
             sw.Stop();
-            WriteFooter(sw);
+            WriteFooter(_logger, sw);
             return result ? 0 : -1;
         }
 
@@ -186,7 +178,7 @@ namespace Beef.CodeGen
             if (pos < 0)
                 return Array.Empty<string>();
 
-            return new string[] { text.Substring(0, pos), text.Substring(pos + 1) };
+            return new string[] { text.Substring(0, pos), text[(pos + 1)..] };
         }
 
         /// <summary>
@@ -225,20 +217,36 @@ namespace Beef.CodeGen
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
-            _logger.LogInformation(App.Description);
-            _logger.LogInformation(string.Empty);
+            WriteMasthead(_logger);
             LogCodeGenExecutionArgs(args);
             _logger.LogInformation(string.Empty);
         }
 
         /// <summary>
+        /// Writes the mast head information.
+        /// </summary>
+        public static void WriteMasthead(ILogger? logger = null)
+        {
+            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
+
+            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Code-Gen%20Tool%0A
+            logger.LogInformation(@"
+╔╗ ┌─┐┌─┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
+╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
+╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
+");
+            logger.LogInformation("Business Entity Execution Framework (Beef) Code Generator.");
+            logger.LogInformation(string.Empty);
+        }
+
+        /// <summary>
         /// Write the footer information.
         /// </summary>
-        private void WriteFooter(Stopwatch sw)
+        public static void WriteFooter(ILogger logger, Stopwatch sw)
         {
-            _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"CodeGen complete [{sw.ElapsedMilliseconds}ms].");
-            _logger.LogInformation(string.Empty);
+            logger.LogInformation(string.Empty);
+            logger.LogInformation($"Beef Code-Gen Tool complete [{sw?.ElapsedMilliseconds}ms].");
+            logger.LogInformation(string.Empty);
         }
     }
 }

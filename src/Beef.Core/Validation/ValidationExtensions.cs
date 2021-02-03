@@ -7,6 +7,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -95,6 +96,20 @@ namespace Beef.Validation
             return Check.NotNull(rule, nameof(rule)).AddRule(new MustRule<TEntity, TProperty>(() => must) { ErrorText = errorText });
         }
 
+        /// <summary>
+        /// Adds a validation where the rule <paramref name="mustAsync"/> function <b>must</b> return <c>true</c> to be considered valid (see <see cref="MustRule{TEntity, TProperty}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="mustAsync">The must function.</param>
+        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Must<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<Task<bool>> mustAsync, LText? errorText = null) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new MustRule<TEntity, TProperty>(mustAsync) { ErrorText = errorText });
+        }
+
         #endregion
 
         #region Exists
@@ -122,7 +137,7 @@ namespace Beef.Validation
         /// <param name="exists">The exists function.</param>
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<bool> exists, LText? errorText = null) where TEntity : class
+        public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, Task<bool>> exists, LText? errorText = null) where TEntity : class
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(exists) { ErrorText = errorText });
         }
@@ -138,20 +153,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, bool exists, LText? errorText = null) where TEntity : class
         {
-            return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(() => exists) { ErrorText = errorText });
-        }
-
-        /// <summary>
-        /// Adds a validation where not exists (see <see cref="ExistsRule{TEntity, TProperty}"/>).
-        /// </summary>
-        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
-        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
-        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, LText? errorText = null) where TEntity : class
-        {
-            return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(() => false) { ErrorText = errorText });
+            return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(_ => Task.FromResult(exists)) { ErrorText = errorText });
         }
 
         /// <summary>
@@ -163,7 +165,7 @@ namespace Beef.Validation
         /// <param name="exists">The exists function.</param>
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, object> exists, LText? errorText = null) where TEntity : class
+        public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, Task<object>> exists, LText? errorText = null) where TEntity : class
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(exists) { ErrorText = errorText });
         }
@@ -179,7 +181,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Exists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, object exists, LText? errorText = null) where TEntity : class
         {
-            return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(() => exists != null) { ErrorText = errorText });
+            return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(_ => Task.FromResult(exists != null)) { ErrorText = errorText });
         }
 
         /// <summary>
@@ -191,7 +193,7 @@ namespace Beef.Validation
         /// <param name="agentResult">The <see cref="WebApiAgentResult"/> function.</param>
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> AgentExists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, WebApiAgentResult> agentResult, LText? errorText = null) where TEntity : class
+        public static PropertyRuleBase<TEntity, TProperty> AgentExists<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, Task<WebApiAgentResult>> agentResult, LText? errorText = null) where TEntity : class
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new ExistsRule<TEntity, TProperty>(agentResult) { ErrorText = errorText });
         }
@@ -288,6 +290,20 @@ namespace Beef.Validation
         }
 
         /// <summary>
+        /// Adds a validation where the rule <paramref name="immutableAsync"/> function <b>must</b> return <c>true</c> to be considered valid (see <see cref="MustRule{TEntity, TProperty}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="immutableAsync">The must function.</param>
+        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Immutable<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<Task<bool>> immutableAsync, LText? errorText = null) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new MustRule<TEntity, TProperty>(immutableAsync) { ErrorText = errorText });
+        }
+
+        /// <summary>
         /// Adds a validation where the rule <paramref name="immutable"/> value be <c>true</c> to be considered valid (see <see cref="MustRule{TEntity, TProperty}"/>).
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
@@ -347,6 +363,23 @@ namespace Beef.Validation
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> CompareValue<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, CompareOperator compareOperator, Func<TEntity, TProperty> compareToValueFunction, Func<TEntity, LText>? compareToTextFunction = null, LText? errorText = null)
+            where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new CompareValueRule<TEntity, TProperty>(compareOperator, compareToValueFunction, compareToTextFunction) { ErrorText = errorText });
+        }
+
+        /// <summary>
+        /// Adds a comparision validation against a value returned by a async function (<see cref="CompareValueRule{TEntity, TProperty}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
+        /// <param name="compareToValueFunction">The compare to function.</param>
+        /// <param name="compareToTextFunction">The compare to text function (default is to use the result of the <paramref name="compareToValueFunction"/>).</param>
+        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> CompareValue<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, CompareOperator compareOperator, Func<TEntity, Task<TProperty>> compareToValueFunction, Func<TEntity, LText>? compareToTextFunction = null, LText? errorText = null)
             where TEntity : class
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new CompareValueRule<TEntity, TProperty>(compareOperator, compareToValueFunction, compareToTextFunction) { ErrorText = errorText });
@@ -709,21 +742,49 @@ namespace Beef.Validation
             return Check.NotNull(rule, nameof(rule)).AddRule(new EntityRule<TEntity, TProperty, TValidator>(validator));
         }
 
+        /// <summary>
+        /// Enables the addition of an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> using a validator <see cref="EntityRuleWith{TEntity, TProperty}.With{TValidator}"/> a specified validator <see cref="Type"/>
+        /// (leverages the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance at runtime).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <returns>An <see cref="EntityRuleWith{TEntity, TProperty}"/>.</returns>
+        public static EntityRuleWith<TEntity, TProperty> Entity<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule)
+            where TEntity : class
+            where TProperty : class?
+        {
+            return new EntityRuleWith<TEntity, TProperty>(Check.NotNull(rule, nameof(rule)));
+        }
+
         #endregion
 
         #region Custom
 
         /// <summary>
-        /// Adds a custom <paramref name="action"/> validation (see <see cref="CustomRule{TEntity, TProperty}"/>).
+        /// Adds a <paramref name="custom"/> validation (see <see cref="CustomRule{TEntity, TProperty}"/>).
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
         /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
-        /// <param name="action">The custom action.</param>
+        /// <param name="custom">The custom action.</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Custom<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Action<PropertyContext<TEntity, TProperty>> action) where TEntity : class
+        public static PropertyRuleBase<TEntity, TProperty> Custom<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Action<PropertyContext<TEntity, TProperty>> custom) where TEntity : class
         {
-            return Check.NotNull(rule, nameof(rule)).AddRule(new CustomRule<TEntity, TProperty>(action));
+            return Check.NotNull(rule, nameof(rule)).AddRule(new CustomRule<TEntity, TProperty>(custom));
+        }
+
+        /// <summary>
+        /// Adds a <paramref name="customAsync"/> validation (see <see cref="CustomRule{TEntity, TProperty}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="customAsync">The custom function.</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Custom<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<PropertyContext<TEntity, TProperty>, Task> customAsync) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new CustomRule<TEntity, TProperty>(customAsync));
         }
 
         #endregion
@@ -793,6 +854,19 @@ namespace Beef.Validation
         }
 
         /// <summary>
+        /// Adds a value override (see <see cref="OverrideRule{TEntity, TProperty}"/>) using the specified <paramref name="overrideFuncAsync"/>.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param> 
+        /// <param name="overrideFuncAsync">The override function.</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Override<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, Task<TProperty>> overrideFuncAsync) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new OverrideRule<TEntity, TProperty>(overrideFuncAsync));
+        }
+
+        /// <summary>
         /// Adds a value override (see <see cref="OverrideRule{TEntity, TProperty}"/>) using the specified <paramref name="overrideValue"/>.
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
@@ -816,6 +890,19 @@ namespace Beef.Validation
         public static PropertyRuleBase<TEntity, TProperty> Default<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, TProperty> defaultFunc) where TEntity : class
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new OverrideRule<TEntity, TProperty>(defaultFunc) { OnlyOverrideDefault = true });
+        }
+
+        /// <summary>
+        /// Adds a default (see <see cref="OverrideRule{TEntity, TProperty}"/>) using the specified <paramref name="defaultFuncAsync"/> (overrides only where current value is the default for <see cref="Type"/>) .
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param> 
+        /// <param name="defaultFuncAsync">The override function.</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Default<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, Func<TEntity, Task<TProperty>> defaultFuncAsync) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new OverrideRule<TEntity, TProperty>(defaultFuncAsync) { OnlyOverrideDefault = true });
         }
 
         /// <summary>

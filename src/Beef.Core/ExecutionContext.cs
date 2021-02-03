@@ -11,10 +11,88 @@ using System.Threading.Tasks;
 namespace Beef
 {
     /// <summary>
+    /// Provides the core capabilities for the <see cref="ExecutionContext"/>.
+    /// </summary>
+    public interface IExecutionContext : IETag
+    {
+        /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> that provides access to the configured service container.
+        /// </summary>
+        public IServiceProvider? ServiceProvider { get; }
+
+        /// <summary>
+        /// Gets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
+        /// </summary>
+        OperationType OperationType { get; }
+
+        /// <summary>
+        /// Gets the unique user identifier.
+        /// </summary>
+        string? UserId { get; }
+
+        /// <summary>
+        /// Gets the username for the request.
+        /// </summary>
+        string Username { get; }
+
+        /// <summary>
+        /// Gets the tenant identifier.
+        /// </summary>
+        Guid? TenantId { get; }
+
+        /// <summary>
+        /// Gets the parition key. This value is immutable.
+        /// </summary>
+        public string? PartitionKey { get; }
+
+        /// <summary>
+        /// Gets the correlation identifier (a unique identifier assigned to the request).
+        /// </summary>
+        public string? CorrelationId { get; }
+
+        /// <summary>
+        /// Gets the session correlation identifier (a unique identifier assigned to the session).
+        /// </summary>
+        public string? SessionCorrelationId { get; }
+
+        /// <summary>
+        /// Gets the request timestamp (to enable consistent execution-related timestamping). This value is immutable.
+        /// </summary>
+        public DateTime Timestamp { get; }
+
+        /// <summary>
+        /// Determines whether the user has the required <paramref name="permission"/>.
+        /// </summary>
+        /// <param name="permission">The permission to validate.</param>
+        /// <param name="throwAuthorizationException">Indicates whether to throw an <see cref="AuthorizationException"/> where the user is not authorised.</param>
+        /// <returns><c>true</c> where the user is authorized; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method is intended to be overridden; this implementation always returns <c>false</c>.</remarks>
+        bool IsAuthorized(string permission, bool throwAuthorizationException = false);
+
+        /// <summary>
+        /// Determines whether the user has the required permission (as a combination of an <paramref name="entity"/> and <paramref name="action"/>).
+        /// </summary>
+        /// <param name="entity">The entity name.</param>
+        /// <param name="action">The action name.</param>
+        /// <param name="throwAuthorizationException">Indicates whether to throw an <see cref="AuthorizationException"/> where the user is not authorised.</param>
+        /// <returns><c>true</c> where the user is authorized; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method is intended to be overridden; this implementation always returns <c>false</c>.</remarks>
+        bool IsAuthorized(string entity, string action, bool throwAuthorizationException = false);
+
+        /// <summary>
+        /// Determines whether the user is in the specified role (see <see cref="ExecutionContext.SetRoles"/> and <see cref="ExecutionContext.GetRoles"/>).
+        /// </summary>
+        /// <param name="role">The role name.</param>
+        /// <param name="throwAuthorizationException">Indicates whether to throw an <see cref="AuthorizationException"/> where the user is not in the specified role.</param>
+        /// <returns><c>true</c> where the user is in the specified role; otherwise, <c>false</c>.</returns>
+        bool IsInRole(string role, bool throwAuthorizationException = false);
+    }
+
+    /// <summary>
     /// Represents a thread-bound (request) execution context using <see cref="AsyncLocal{ExecutionContext}"/>.
     /// </summary>
     /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments.</remarks>
-    public class ExecutionContext : IETag
+    public class ExecutionContext : IExecutionContext
     {
         private static readonly AsyncLocal<ExecutionContext?> _asyncLocal = new AsyncLocal<ExecutionContext?>();
         private static readonly Func<ExecutionContext?> _get = () => _asyncLocal.Value;
@@ -73,14 +151,14 @@ namespace Beef
         /// <typeparam name="T">The service <see cref="Type"/>.</typeparam>
         /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
         /// <returns>The corresponding instance.</returns>
-        public static T GetService<T>(bool throwExceptionOnNull = true)
+        public static T? GetService<T>(bool throwExceptionOnNull = true)
         {
             if (HasCurrent && Current.ServiceProvider != null)
                 return Current.ServiceProvider.GetService<T>() ??
-                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but null was returned; this would indicate that the service has not been configured correctly.") : default(T)!);
+                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{typeof(T).FullName}' but null was returned; this would indicate that the service has not been configured correctly.") : default(T)!);
 
             if (throwExceptionOnNull)
-                throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+                throw new InvalidOperationException($"Attempted to get service '{typeof(T).FullName}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
 
             return default!;
         }
@@ -98,9 +176,9 @@ namespace Beef
 
             if (HasCurrent && Current.ServiceProvider != null)
                 return Current.ServiceProvider.GetService(type) ??
-                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{type.Name}' but null was returned; this would indicate that the service has not been configured correctly.") : (object?)null);
+                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{type.FullName}' but null was returned; this would indicate that the service has not been configured correctly.") : (object?)null);
 
-            throw new InvalidOperationException($"Attempted to get service '{type.Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+            throw new InvalidOperationException($"Attempted to get service '{type.FullName}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
         }
 
         /// <summary>

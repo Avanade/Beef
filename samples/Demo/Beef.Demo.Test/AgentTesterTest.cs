@@ -41,7 +41,7 @@ namespace Beef.Demo.Test
             Assert.IsTrue(ExecutionContext.HasCurrent);
             Assert.AreEqual("USER_NAME", ExecutionContext.Current.Username);
 
-            // Execute test overridding the user.
+            // Execute test overriding the user.
             AgentTester.Test<PersonAgent, Person>("ANOTHER_USER")
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()

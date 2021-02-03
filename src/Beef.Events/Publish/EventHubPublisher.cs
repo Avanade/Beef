@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Beef.Events.Publish
 {
     /// <summary>
-    /// <see cref="PublishEventsAsync(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
+    /// <see cref="SendEventsAsync(EventData[])">Send</see> the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
     /// </summary>
     public class EventHubPublisher : EventPublisherBase
     {
@@ -36,11 +36,11 @@ namespace Beef.Events.Publish
         public bool SwallowException { get; set; }
 
         /// <summary>
-        /// Publishes the <paramref name="events"/>.
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="events">The <see cref="EventData"/> instances.</param>
-        /// <returns>The corresponding <see cref="Task"/>.</returns>
-        protected override async Task PublishEventsAsync(params EventData[] events)
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        protected override async Task SendEventsAsync(params EventData[] events)
         {
             if (events == null || events.Length == 0)
                 return;
@@ -56,9 +56,7 @@ namespace Beef.Events.Publish
             {
                 await _invoker.InvokeAsync(this, async () => await _client.SendAsync(eventHubEvents, partitionKey).ConfigureAwait(false)).ConfigureAwait(false);
             }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design, is a catch all.
             catch (Exception ex)
-#pragma warning restore CA1031 
             {
                 OnException(events, partitionKey, ex);
                 if (!SwallowException)

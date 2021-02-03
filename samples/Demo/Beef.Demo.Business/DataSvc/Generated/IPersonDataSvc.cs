@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -47,6 +47,13 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         Task<Person> UpdateAsync(Person value);
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        Task<Person> UpdateWithRollbackAsync(Person value);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -132,6 +139,13 @@ namespace Beef.Demo.Business.DataSvc
         Task<Person?> GetNullAsync(string? name, List<string>? names);
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        Task<Person> EventPublishNoSendAsync(Person value);
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
@@ -143,6 +157,13 @@ namespace Beef.Demo.Business.DataSvc
         /// Throw Error.
         /// </summary>
         Task ThrowErrorAsync();
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        Task<string?> InvokeApiViaAgentAsync(Guid id);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -173,5 +194,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

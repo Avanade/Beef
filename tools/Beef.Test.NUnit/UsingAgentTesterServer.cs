@@ -62,21 +62,6 @@ namespace Beef.Test.NUnit
             => NUnit.AgentTester.BuildConfiguration<TStartup>(environmentVariablePrefix, environment);
 
         /// <summary>
-        /// Expects and asserts a <see cref="ValidationException"/> and its corresponding messages.
-        /// </summary>
-        /// <remarks>Automatically invokes <see cref="PrepareExecutionContext(string?, object?)"/> where <see cref="ExecutionContext.HasCurrent"/> is <c>false</c>.</remarks>
-        public ExpectValidationExceptionTest ExpectValidationException
-        {
-            get
-            {
-                if (!ExecutionContext.HasCurrent)
-                    PrepareExecutionContext();
-
-                return new ExpectValidationExceptionTest();
-            }
-        }
-
-        /// <summary>
         /// Expects and asserts an <see cref="Exception"/> and its corresponding message.
         /// </summary>
         /// <remarks>Automatically invokes <see cref="PrepareExecutionContext(string?, object?)"/> where <see cref="ExecutionContext.HasCurrent"/> is <c>false</c>.</remarks>

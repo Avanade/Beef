@@ -22,45 +22,52 @@ namespace Beef.Demo.Test
         #region Validators
 
         [Test, TestSetUp]
-        public void A110_Validation_Null()
+        public async Task A110_Validation_Null()
         {
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(null),
-                "Value is required.");
+            await ValidationTester.Test()
+                .ExpectMessages("Value is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).CreateAsync(null));
 
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(null, 1.ToGuid()),
-                "Value is required.");
+            await ValidationTester.Test()
+                .ExpectMessages("Value is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).UpdateAsync(null, 1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public async Task A110_Validation_Empty()
+        public async Task A120_Validation_Empty()
         {
-            await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()),
-                "First Name is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.");
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name is required.",
+                    "Last Name is required.",
+                    "Gender is required.",
+                    "Birthday is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).CreateAsync(new Person()));
 
-            await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(new Person(), 1.ToGuid()),
-                "First Name is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.");
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name is required.",
+                    "Last Name is required.",
+                    "Gender is required.",
+                    "Birthday is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).UpdateAsync(new Person(), 1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void A130_Validation_Invalid()
+        public async Task A130_Validation_Invalid()
         {
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
-                "First Name must not exceed 50 characters in length.",
-                "Last Name must not exceed 50 characters in length.",
-                "Gender is invalid.",
-                "Eye Color is invalid.",
-                "Birthday must be less than or equal to Today.");
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name must not exceed 50 characters in length.",
+                    "Last Name must not exceed 50 characters in length.",
+                    "Gender is invalid.",
+                    "Eye Color is invalid.",
+                    "Birthday must be less than or equal to Today.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object)
+                    .CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }));
         }
 
         [Test, TestSetUp]
@@ -156,7 +163,7 @@ namespace Beef.Demo.Test
 
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + p.ETag + "\""));
                 })).GetAsync(3.ToGuid()));
@@ -167,7 +174,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"ABCDEFG\""));
                 })).GetAsync(3.ToGuid()));
@@ -422,6 +429,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogCreated()
                 .ExpectETag()
                 .ExpectUniqueKey()
+                .ExpectEvent("Demo.Person.*", "Create")
                 .ExpectValue((t) => p)
                 .Run(a => a.CreateAsync(p)).Value;
 
@@ -651,6 +659,33 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetDetailAsync(p.Id)).Value;
+        }
+
+        [Test, TestSetUp]
+        public void F160_Update_WithRollback()
+        {
+            // Get an existing person.
+            var p = AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid())).Value;
+
+            var orig = (Person)p.Clone();
+
+            // Update the person with an address.
+            p.FirstName += "X";
+            p.LastName += "Y";
+            p.Gender = "M";
+            p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
+
+            AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.InternalServerError)
+                .Run(a => a.UpdateWithRollbackAsync(p, 1.ToGuid()));
+
+            // Check the person was **NOT** updated.
+            AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => orig)
+                .Run(a => a.GetAsync(p.Id));
         }
 
         [Test, TestSetUp]
@@ -1056,12 +1091,39 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void I150_GetNoArgs()
+        public void I160_GetNoArgs()
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
                 .Run(a => a.GetNoArgsAsync());
+        }
+
+        [Test, TestSetUp]
+        public void I210_InvokeApiViaAgent_Mocked()
+        {
+            Mock<IPersonAgent> mock = new Mock<IPersonAgent>();
+            mock.Setup(x => x.GetAsync(1.ToGuid(), null)).ReturnsWebApiAgentResultAsync(new Person { LastName = "Mockulater" });
+
+            var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped<IPersonAgent>(mock.Object));
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+            
+            agentTester.Test<PersonAgent, string>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => "Mockulater")
+                .Run(a => a.InvokeApiViaAgentAsync(1.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void I310_EventPublishNoSend()
+        {
+            ExpectException.Throws<AssertionException>("Publish/Send mismatch 1 Event(s) were published; there were 0 sent.", () =>
+                AgentTester.Test<PersonAgent, Person>()
+                    .ExpectStatusCode(HttpStatusCode.OK)
+                    .Run(a => a.EventPublishNoSendAsync(new Person { FirstName = "John", LastName = "Doe", GenderSid = "M", Birthday = new DateTime(200, 01, 01) })));
+
+            Assert.Pass("Expected Publish/Send mismatch.");
         }
 
         #endregion

@@ -3,12 +3,15 @@
 using Beef.Entities;
 using Beef.RefData;
 using Beef.Test.NUnit.Logging;
+using Beef.Test.NUnit.Tests;
 using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
@@ -16,6 +19,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Orchestrates the setup for testing; whilst also providing reusable utility methods.
     /// </summary>
+    [DebuggerStepThrough]
     public sealed class TestSetUp
     {
         private static readonly object _lock = new object();
@@ -30,7 +34,8 @@ namespace Beef.Test.NUnit
         private static Type? _refAgentServiceType;
         private static Type? _refAgentType;
         private static Func<object?, string> _usernameConverter = (x) => x?.ToString()!;
-        private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername };
+        private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername! ?? throw new InvalidOperationException($"{nameof(DefaultUsername)} must not be null.") };
+        internal static readonly Dictionary<Type, Type> _webApiAgentArgsTypes = new Dictionary<Type, Type>() { { typeof(IWebApiAgentArgs), typeof(WebApiAgentArgs) } };
 
         #region Setup
 
@@ -337,6 +342,25 @@ namespace Beef.Test.NUnit
             ExecutionContext.Reset();
             ExecutionContext.SetCurrent(ec);
             return sp;
+        }
+
+        /// <summary>
+        /// Adds additional <see cref="IWebApiAgentArgs"/> to <see cref="WebApiAgentArgs"/> equivalent mappings required for dependency injection. This configuration will be used by all testers that 
+        /// inherit from <see cref="TesterBase"/>.
+        /// </summary>
+        /// <typeparam name="TService">The <see cref="IWebApiAgentArgs"/> service interface.</typeparam>
+        /// <typeparam name="TImplementation">The <see cref="WebApiAgentArgs"/> service implementation.</typeparam>
+        public static void AddWebApiAgentArgsType<TService, TImplementation>() where TService : class, IWebApiAgentArgs where TImplementation : class, TService
+        {
+            var itype = typeof(TService);
+            if (!itype.IsInterface)
+                throw new InvalidOperationException("The TService type must be an interface.");
+
+            var stype = typeof(TImplementation);
+            if (stype.IsInterface)
+                throw new InvalidOperationException("The TImplementation must not be an interface.");
+
+            _webApiAgentArgsTypes[itype] = typeof(TImplementation);
         }
     }
 }

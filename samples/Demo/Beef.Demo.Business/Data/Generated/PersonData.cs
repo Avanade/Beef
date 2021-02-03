@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -25,14 +25,14 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Provides the <see cref="Person"/> data access.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class PersonData : IPersonData
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
+        private readonly Microsoft.Extensions.Logging.ILogger<PersonData> _logger;
+        private readonly Common.Agents.IPersonAgent _personAgent;
 
         #region Extensions
-        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
         private Func<Person, IDatabaseArgs, Task>? _createOnBeforeAsync;
         private Func<Person, Task>? _createOnAfterAsync;
@@ -46,6 +46,9 @@ namespace Beef.Demo.Business.Data
         private Func<Person, IDatabaseArgs, Task>? _updateOnBeforeAsync;
         private Func<Person, Task>? _updateOnAfterAsync;
         private Action<Exception>? _updateOnException;
+        private Func<Person, IDatabaseArgs, Task>? _updateWithRollbackOnBeforeAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
+        private Action<Exception>? _updateWithRollbackOnException;
         private Action<DatabaseParameters, IDatabaseArgs>? _getAllOnQuery;
         private Func<IDatabaseArgs, Task>? _getAllOnBeforeAsync;
         private Func<PersonCollectionResult, Task>? _getAllOnAfterAsync;
@@ -71,6 +74,7 @@ namespace Beef.Demo.Business.Data
         private Func<PersonCollectionResult, PersonArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Action<Exception>? _getByArgsWithEfOnException;
         private Action<Exception>? _throwErrorOnException;
+        private Action<Exception>? _invokeApiViaAgentOnException;
         private Func<Guid, IEfDbArgs, Task>? _getWithEfOnBeforeAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Action<Exception>? _getWithEfOnException;
@@ -84,7 +88,6 @@ namespace Beef.Demo.Business.Data
         private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
         private Action<Exception>? _deleteWithEfOnException;
 
-        #pragma warning restore CS0649, IDE0044
         #endregion
 
         /// <summary>
@@ -92,8 +95,16 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        private PersonData(IDatabase db, IEfDb ef)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); PersonDataCtor(); }
+        /// <param name="logger">The <see cref="Microsoft.Extensions.Logging.ILogger{PersonData}"/>.</param>
+        /// <param name="personAgent">The <see cref="Common.Agents.IPersonAgent"/>.</param>
+        public PersonData(IDatabase db, IEfDb ef, Microsoft.Extensions.Logging.ILogger<PersonData> logger, Common.Agents.IPersonAgent personAgent)
+        {
+            _db = Check.NotNull(db, nameof(db));
+            _ef = Check.NotNull(ef, nameof(ef));
+            _logger = Check.NotNull(logger, nameof(logger));
+            _personAgent = Check.NotNull(personAgent, nameof(personAgent));
+            PersonDataCtor();
+        }
 
         partial void PersonDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -164,6 +175,24 @@ namespace Beef.Demo.Business.Data
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> UpdateWithRollbackAsync(Person value)
+        {
+            return DataInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Person __result;
+                var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonUpdate]");
+                if (_updateWithRollbackOnBeforeAsync != null) await _updateWithRollbackOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
+                __result = await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result).ConfigureAwait(false);
+                return __result;
+            }, new BusinessInvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
         }
 
         /// <summary>
@@ -310,6 +339,14 @@ namespace Beef.Demo.Business.Data
             => DataInvoker.Current.InvokeAsync(this, () => ThrowErrorOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _throwErrorOnException });
 
         /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        public Task<string?> InvokeApiViaAgentAsync(Guid id)
+            => DataInvoker.Current.InvokeAsync(this, () => InvokeApiViaAgentOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _invokeApiViaAgentOnException });
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -381,7 +418,6 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> property and database column mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<Person, DbMapper>
         {
             /// <summary>
@@ -389,7 +425,7 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public DbMapper()
             {
-                Property(s => s.Id, "PersonId").SetUniqueKey(true);
+                Property(s => s.Id, "PersonId").SetUniqueKey(false);
                 Property(s => s.FirstName);
                 Property(s => s.LastName);
                 Property(s => s.UniqueCode);
@@ -407,7 +443,6 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> and Entity Framework <see cref="EfModel.Person"/> property mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<Person, EfModel.Person, EfMapper>
         {
             /// <summary>
@@ -415,7 +450,7 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EfMapper()
             {
-                Property(s => s.Id, d => d.PersonId).SetUniqueKey(true);
+                Property(s => s.Id, d => d.PersonId).SetUniqueKey(false);
                 Property(s => s.FirstName, d => d.FirstName);
                 Property(s => s.LastName, d => d.LastName);
                 Property(s => s.UniqueCode, d => d.UniqueCode);
@@ -431,5 +466,5 @@ namespace Beef.Demo.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

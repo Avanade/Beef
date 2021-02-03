@@ -9,14 +9,14 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the <b>Grpc EntityAgent</b> code generator; where not excluded and at least one operation exists.
     /// </summary>
-    public class EntityGrpcAgentCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
+    public class EntityGrpcAgentCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
+        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
             => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.Grpc) && x.GrpcOperations!.Count > 0).AsEnumerable();
     }
 }

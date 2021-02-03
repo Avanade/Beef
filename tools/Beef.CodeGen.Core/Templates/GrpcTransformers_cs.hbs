@@ -3,15 +3,15 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-using entities = Beef.Demo.Common.Entities;
-using proto = Beef.Demo.Common.Grpc.Proto;
+using entities = {{Root.NamespaceCommon}}.Entities;
+using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
 
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Grpc
+namespace {{Root.NamespaceCommon}}.Grpc
 {
     /// <summary>
     /// Provides entity to gRpc transformations (conversion and/or mapping).
@@ -109,7 +109,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Grpc
         /// </summary>
         public static EntityMapper<entities.{{Name}}, proto.{{Name}}> {{Name}} => EntityMapper.Create<entities.{{Name}}, proto.{{Name}}>()
   {{#each GrpcProperties}}
-            .HasProperty(e => e.{{PropertyName}}, g => g.{{pascal ArgumentName}}{{#ifval GrpcConverter}}, p => p.SetConverter({{GrpcConverter}}){{/ifval}}{{#ifval GrpcMapper}}, p => p.SetMapper({{GrpcMapper}}){{/ifval}}){{#if @last}};{{/if}}
+            .HasProperty(e => e.{{PropertyName}}, g => g.{{pascalx ArgumentName}}{{#ifval GrpcConverter}}, p => p.SetConverter({{GrpcConverter}}){{/ifval}}{{#ifval GrpcMapper}}, p => p.SetMapper({{GrpcMapper}}){{/ifval}}){{#if @last}};{{/if}}
   {{/each}}
   {{#if CollectionResult}}
 
@@ -126,5 +126,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Grpc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

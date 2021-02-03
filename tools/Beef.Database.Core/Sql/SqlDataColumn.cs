@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.DbModels;
 using System;
 
 namespace Beef.Database.Core.Sql
@@ -20,6 +21,16 @@ namespace Beef.Database.Core.Sql
         public object? Value { get; set; }
 
         /// <summary>
+        /// Gets or sets the database <see cref="CodeGen.DbModels.DbColumn"/> configuration.
+        /// </summary>
+        public DbColumn? DbColumn { get; set; }
+
+        /// <summary>
+        /// Gets the SQL formatted value.
+        /// </summary>
+        public string SqlValue => ToSqlValue();
+
+        /// <summary>
         /// Indicates whether to use a foreign key query for the identifier.
         /// </summary>
         public bool UseForeignKeyQueryForId { get; set; }
@@ -28,21 +39,20 @@ namespace Beef.Database.Core.Sql
         /// Gets the value formatted for use in a SQL statement.
         /// </summary>
         /// <returns>The value formatted for use in a SQL statement.</returns>
-        public string? ToSqlValue()
+        public string ToSqlValue()
         {
             if (Value == null)
                 return "NULL";
-
-            if (Value is string)
-                return $"'{((string)Value).Replace("'", "''", StringComparison.Ordinal)}'";
-            else if (Value is bool)
-                return ((bool)Value) ? "1" : "0";
+            else if (Value is string str)
+                return $"'{str.Replace("'", "''", StringComparison.Ordinal)}'";
+            else if (Value is bool b)
+                return b ? "1" : "0";
             else if (Value is Guid)
                 return $"'{Value}'";
-            else if (Value is DateTime)
-                return $"'{((DateTime)Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture)}'";
+            else if (Value is DateTime time)
+                return $"'{time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture)}'";
             else
-                return Value.ToString();
+                return Value.ToString()!;
         }
     }
 }

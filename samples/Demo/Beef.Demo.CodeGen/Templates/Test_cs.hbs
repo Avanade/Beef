@@ -1,0 +1,11 @@
+﻿/* 
+Company: {{Root.Company}}
+AppName: {{Root.AppName}}
+Entity name: {{Name}}
+Extra dictionary: {{ExtraProperties}}
+Extra loop: {{#each ExtraProperties}}{{@key}},{{@value}}{{#unless @last}};{{/unless}}{{/each}}
+Extra loop2: {{#ExtraProperties}}{{@key}},{{@value}}{{#unless @last}};{{/unless}}{{/ExtraProperties}}
+Extra lookup: {{lookup ExtraProperties 'TestExtra'}}
+Custom lookup: {{lookup CustomProperties 'TestExtra'}}
+Custom lookup lowercase: {{lower (lookup CustomProperties 'TestExtra')}}
+*/

@@ -15,7 +15,7 @@ namespace Beef.Test.NUnit.Tests
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public class AgentTest<TStartup, TAgent> : AgentTestBase<TStartup> where TStartup : class where TAgent : WebApiAgentBase
     {
         /// <summary>
@@ -96,6 +96,16 @@ namespace Beef.Test.NUnit.Tests
         public AgentTest<TStartup, TAgent> ExpectNoEvents()
         {
             SetExpectNoEvents();
+            return this;
+        }
+
+        /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTest<TStartup, TAgent> IgnorePublishSendEventMismatch()
+        {
+            SetIgnorePublishSendEventMismatch();
             return this;
         }
 

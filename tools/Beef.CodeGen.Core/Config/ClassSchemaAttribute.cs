@@ -35,5 +35,10 @@ namespace Beef.CodeGen.Config
         /// Gets or sets the markdown.
         /// </summary>
         public string? Markdown { get; set; }
+
+        /// <summary>
+        /// Gets or sets the example markdown.
+        /// </summary>
+        public string? ExampleMarkdown { get; set; }
     }
 }

@@ -82,9 +82,9 @@ See the example [RobotAgent](../../samples/Demo/Beef.Demo.Common/Grpc/Generated/
 
 <br/>
 
-## Run-time enablement
+## runtime enablement
 
-The following describes the changes required for run-time enablement.
+The following describes the changes required for runtime enablement.
 
 <br/>
 

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -93,8 +93,8 @@ namespace My.Hr.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public EmployeeAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IHrWebApiAgentArgs"/>.</param>
+        public EmployeeAgent(IHrWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
@@ -173,5 +173,5 @@ namespace My.Hr.Common.Agents
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

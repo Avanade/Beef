@@ -4,6 +4,7 @@ using Beef.Core.UnitTest.Validation.Entities;
 using Beef.Entities;
 using Beef.Validation;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation
 {
@@ -13,13 +14,13 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Run_ErrorWithException()
         {
-            Assert.Throws<ValidationException>(() => new ValueValidator<TestData, int>(x => x.CountA, 0).Mandatory().Run(true));
+            Assert.ThrowsAsync<ValidationException>(async () => await new ValueValidator<TestData, int>(x => x.CountA, 0).Mandatory().RunAsync(true));
         }
 
         [Test]
-        public void Run_ErrorWithResult()
+        public async Task Run_ErrorWithResult()
         {
-            var r = new ValueValidator<TestData, int>(x => x.CountA, 0).Mandatory().Run();
+            var r = await new ValueValidator<TestData, int>(x => x.CountA, 0).Mandatory().RunAsync();
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);
@@ -29,19 +30,19 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Run_NoError()
+        public async Task Run_NoError()
         {
-            var r = new ValueValidator<TestData, int>(x => x.CountA, 1).Mandatory().Run();
+            var r = await new ValueValidator<TestData, int>(x => x.CountA, 1).Mandatory().RunAsync();
             Assert.IsNotNull(r);
             Assert.IsFalse(r.HasError);
         }
 
         [Test]
-        public void Run_Common_Error()
+        public async Task Run_Common_Error()
         {
             var cv = CommonValidator.Create<int>(v => v.Mandatory());
 
-            var r = new ValueValidator<TestData, int>(x => x.CountA, 0).Common(cv).Run();
+            var r = await new ValueValidator<TestData, int>(x => x.CountA, 0).Common(cv).RunAsync();
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);
@@ -51,10 +52,10 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Run_Will_Null()
+        public async Task Run_Will_Null()
         {
             string name = null;
-            var r = name.Validate().Mandatory().Run();
+            var r = await name.Validate().Mandatory().RunAsync();
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);

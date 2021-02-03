@@ -69,12 +69,11 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Prepares the entity value for a 'Create' by setting the IChangeLog and IIdentifer.
+        /// Prepares the entity value for a 'Create' by setting the IChangeLog.
         /// </summary>
         /// <param name="value">The entity value.</param>
-        /// <param name="setIdentifier">Indicates whether to override the <c>Id</c> where entity implements <see cref="IIdentifier"/>.</param>
         /// <returns>The entity value.</returns>
-        internal static void PrepareEntityForCreate(object? value, bool setIdentifier)
+        internal static void PrepareEntityForCreate(object? value)
         {
             if (value == null)
                 return;
@@ -86,16 +85,6 @@ namespace Beef.Data.Cosmos
 
                 cl.ChangeLog.CreatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
-            }
-
-            if (setIdentifier)
-            {
-                if (value is IGuidIdentifier gid)
-                    gid.Id = Guid.NewGuid();
-                else if (value is IStringIdentifier sid)
-                    sid.Id = Guid.NewGuid().ToString();
-                else
-                    throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
             }
         }
 

@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +31,6 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="AccountUType"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator AccountUType(Guid id) => ConvertFromId<AccountUType>(id);
 
         /// <summary>
@@ -40,7 +38,6 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="AccountUType"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator AccountUType(string? code) => ConvertFromCode<AccountUType>(code);
 
         #endregion
@@ -131,7 +128,6 @@ namespace Cdr.Banking.Common.Entities
     /// <summary>
     /// Represents the <see cref="AccountUType"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class AccountUTypeCollection : ReferenceDataCollectionBase<AccountUType>
     {
         /// <summary>
@@ -149,6 +145,5 @@ namespace Cdr.Banking.Common.Entities
     #endregion  
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

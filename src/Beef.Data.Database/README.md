@@ -14,12 +14,12 @@ Adds additional capabilities extending ADO.NET ([`System.Data.Common`](https://d
 
 ## Database
 
-To encapsulate the database access the [`Database`](./Database.cs) or [`DatabaseBase`](./DatabaseBase.cs) is inherited to enable.
+To encapsulate the database access the [`DatabaseBase`](./DatabaseBase.cs) is inherited to enable.
 
 The following demonstrates the usage:
 
 ```
-public class Database : Database<Database>
+public class Database : DatabaseBase
 {
     public Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
 }

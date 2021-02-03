@@ -2,6 +2,7 @@
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
+using Beef.Entities;
 using Beef.Events;
 using Beef.Events.Subscribe;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -42,8 +43,13 @@ namespace Beef.Demo.Functions
 
             // Add the generated entity services for dependency injection requirements.
             builder.Services.AddGeneratedManagerServices()
+                            .AddGeneratedValidationServices()
                             .AddGeneratedDataSvcServices()
                             .AddGeneratedDataServices();
+
+            // Add identifier generator services.
+            builder.Services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
+                            .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
 
             // Add event publishing.
             builder.Services.AddBeefEventHubEventPublisher(config.GetValue<string>("EventHubConnectionString"));

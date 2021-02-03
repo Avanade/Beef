@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -65,10 +66,10 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public override ValueValidatorResult<ValidationValue<T>, T> Run(bool throwOnError = false)
+        public override async Task<ValueValidatorResult<ValidationValue<T>, T>> RunAsync(bool throwOnError = false)
         {
             var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(null!, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
-            Invoke(ctx);
+            await InvokeAsync(ctx).ConfigureAwait(false);
             var res = new ValueValidatorResult<ValidationValue<T>, T>(ctx);
             if (throwOnError)
                 res.ThrowOnError();
@@ -104,10 +105,10 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public override ValueValidatorResult<TEntity, TProperty> Run(bool throwOnError = false)
+        public override async Task<ValueValidatorResult<TEntity, TProperty>> RunAsync(bool throwOnError = false)
         {
             var ctx = new PropertyContext<TEntity, TProperty>(new ValidationContext<TEntity>(null!, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
-            Invoke(ctx);
+            await InvokeAsync(ctx).ConfigureAwait(false);
             var res = new ValueValidatorResult<TEntity, TProperty>(ctx);
             if (throwOnError)
                 res.ThrowOnError();

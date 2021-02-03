@@ -151,7 +151,7 @@ Each property for the entity is configured using the `Property` method and a cor
 An example is as follows:
 
 ``` csharp
-public class PersonValidator : Validator<Person, PersonValidator>
+public class PersonValidator : Validator<Person>
 {
     public PersonValidator()
     {
@@ -159,17 +159,19 @@ public class PersonValidator : Validator<Person, PersonValidator>
         Property(x => x.Birthday).CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "today");
     }
 
-    protected override void OnValidate(ValidationContext<Test> context)
+    protected override Task OnValidateAsync(ValidationContext<Test> context)
     {
         // Check that Amount property has not had an error already; then validate and error.
         context.Check(x = x.Amount, (val) => val <= 100, "{0} must be greater than 100.");
+
+        return Task.CompletedTask;
     }
 }
 
 var person = new Person { Name = "Freddie", Birthday = new DateTime(1946, 09, 05), Amount = 150 };
 
-// Use the static default property to access the validator.
-PersonValidator.Default.Validate(person).ThrowOnError();
+// Validate the value.
+var result = await new PersonValidator().ValidateAsync(person);
 ```
 
 <br/>
@@ -184,10 +186,10 @@ An example is as follows:
 var person = new Person { Name = "Freddie", Birthday = new DateTime(1946, 09, 05);
 
 // Create an entity-based validator on the fly.
-Validator<Test>.Create()
+var result = await Validator<Test>.Create()
     .HasProperty(x => x.Name, p => p.Mandatory().String(maxLength: 50))
     .HasProperty(x => x.Birthdar, p => p.CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "today"))
-    .Validate(person).ThrowOnError();
+    .ValidateAsync(person);
 ```
 
 <br/>
@@ -200,10 +202,11 @@ Values, both entity and non-entity, can be validated directly. Examples are as f
 var person = new Person { Name = "Freddie", Birthday = new DateTime(1946, 09, 05);
 
 // Validate an entity value; being the Person class.
-person.Validate().Entity(TestValidator.Default).Run();
+var pv = new PersonValidator();
+await person.Validate().Entity(pv).RunAsync();
 
 // Validate a value (e.g. a string, int, DateTime, etc.) without an entity-based validator.
-person.Name.Validate().Mandatory().String(maxLength: 10).Run(throwOnError: true);
+await person.Name.Validate().Mandatory().String(maxLength: 10).RunAsync(throwOnError: true);
 ```
 
 <br/>
@@ -235,9 +238,9 @@ To support reusablility of property validations a `CommonValidator` is used to e
 An example is as follows:
 
 ``` csharp
-var cv = CommonValidator<string> _cv = CommonValidator<string>.Create(v => v.String(5).Must(x => x.Value != "XXXXX"));
+var cv = CommonValidator<string> _cv = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
 
-var v = Validator<TestData>.Create()
+var v = Validator.Create<TestData>()
     .HasProperty(x => x.Text, p => p.Mandatory().Common(cv));
 ```
 
@@ -277,18 +280,18 @@ Property(x => x.PhoneNo).String(new Regex(@"\+0\d{9}|\+0[1-9]\d{12}|0[1-9]\d{8}|
 Property(x => x.Gender).Mandatory().IsValid();
 
 // Check the sub entity exists (mandatory) and is valid (using defined validator).
-Property(x => x.SubTest).Mandatory().Entity(Test2Validator.Default);
+Property(x => x.SubTest).Mandatory().Entity().With(test2Validator);
 
 // Check the sub entity collection (exists), has 1-4 items in the collection, and each is valid (using defined validator).
-Property(x => x.SubTesters).Mandatory().Collection(minCount: 1, maxCount: 4, item: new CollectionRuleItem<Test2>(Test2Validator.Default));
+Property(x => x.SubTesters).Mandatory().Collection(minCount: 1, maxCount: 4, item: CollectionRuleItem.Create<Test2>(test2Validator));
 ```
 
 The following demonstrates the mixing of both entity-based options:
 
 ``` csharp
-public class PersonValidator : Validator<Person, PersonValidator>
+public class PersonValidator : Validator<Person>
 {
-    private static readonly Validator<Address> _addressValidator = Validator<Address>.Create()
+    private static readonly Validator<Address> _addressValidator = Validator.Create<Address>()
         .HasProperty(x => x.Street, p => p.Mandatory().String(50))
         .HasProperty(x => x.City, p => p.Mandatory().String(50));
 
@@ -301,7 +304,7 @@ public class PersonValidator : Validator<Person, PersonValidator>
         Property(x => x.LastName).Mandatory().String(50);
         Property(x => x.Gender).Mandatory().IsValid();
         Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "Today");
-        Property(x => x.Address).Entity(_addressValidator);
+        Property(x => x.Address).Entity().With(_addressValidator);
     }
 }
 ```
@@ -321,7 +324,7 @@ The `RuleSet` represents a conditional validation rule for an entity, in that it
 The following demonstrates `RuleSet` usage for an *Entity-based validator class*:
 
 ``` csharp
-public class TestItemValidator : Validator<TestItem, TestItemValidator>
+public class TestItemValidator : Validator<TestItem>
 {
     public TestItemValidator()
     {
@@ -341,7 +344,7 @@ public class TestItemValidator : Validator<TestItem, TestItemValidator>
 The following demonstrates `HasRuleSet` usage for an `Entity-based inline validator`:
 
 ``` csharp
-var v = Validator<TestItem>.Create()
+var v = Validator.Create<TestItem>()
     .HasRuleSet(x => x.Value.Code == "A", y =>
     {
         y.Property(x => x.Text).Mandatory().Must(x => x.Text == "A");
@@ -361,8 +364,8 @@ Where entities leverage inheritence, having the corresponding validators include
 The following is an example of using the `IncludeBase` method:
 
 ``` csharp
-var r = Validator<TestData>.Create()
-    .IncludeBase(TestDataBaseValidator.Default)
+var r = Validator.Create<TestData>()
+    .IncludeBase(testDataBaseValidator)
     .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
     .Validate(new TestData { CountB = 0 });
 ```
@@ -376,8 +379,8 @@ The `MultiValidator` enables the validation of multiple values there is a need t
 An example is as follows:
 
 ``` csharp
-MultiValidator.Create()
-    .Add(person.Validate(nameof(value)).Mandatory().Entity(PersonValidator.Default))
-    .Add(other.Validate(nameof(other)).Mandatory().Entity(OtherValidator.Default))
-    .Run().ThrowOnError();
+var result = await MultiValidator.Create()
+    .Add(person.Validate(nameof(value)).Mandatory().Entity(personValidator))
+    .Add(other.Validate(nameof(other)).Mandatory().Entity(otherValidator))
+    .RunAsync();
 ```

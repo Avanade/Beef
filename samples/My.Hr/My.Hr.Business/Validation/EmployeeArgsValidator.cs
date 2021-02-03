@@ -6,7 +6,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="EmployeeArgs"/> validator.
     /// </summary>
-    public class EmployeeArgsValidator : Validator<EmployeeArgs, EmployeeArgsValidator>
+    public class EmployeeArgsValidator : Validator<EmployeeArgs>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeValidator"/> class.

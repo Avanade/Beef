@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -65,5 +65,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore
 #nullable restore

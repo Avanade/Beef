@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -516,14 +515,12 @@ namespace Beef.Reflection
             return Args.GetReflector(ComplexTypeReflector.ItemType);
         }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, should use the other GetJtokenValue
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
         object? IPropertyReflector.GetJTokenValue(JToken jtoken)
-#pragma warning restore CA1033 
         {
             return GetJTokenValue(jtoken);
         }

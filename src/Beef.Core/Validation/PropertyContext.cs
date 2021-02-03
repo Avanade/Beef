@@ -174,7 +174,7 @@ namespace Beef.Validation
         /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
         /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
         /// <returns>The specified service where found; </returns>
-        public TService GetService<TService>(bool throwExceptionOnNull = true) where TService : class => ExecutionContext.GetService<TService>(throwExceptionOnNull);
+        public TService GetService<TService>(bool throwExceptionOnNull = true) where TService : class => ExecutionContext.GetService<TService>(throwExceptionOnNull)!;
 
         /// <summary>
         /// Enables the underlying value to be overridden (updated).

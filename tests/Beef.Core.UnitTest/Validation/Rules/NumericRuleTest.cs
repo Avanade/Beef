@@ -3,6 +3,7 @@
 using Beef.Validation;
 using NUnit.Framework;
 using Beef.Entities;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -10,32 +11,32 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class NumericRuleTest
     {
         [Test]
-        public void Validate_AllowNegatives()
+        public async Task Validate_AllowNegatives()
         {
-            var v1 = (123f).Validate().Numeric().Run();
+            var v1 = await (123f).Validate().Numeric().RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = (-123f).Validate().Numeric().Run();
+            v1 = await (-123f).Validate().Numeric().RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must not be negative.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = (-123f).Validate().Numeric(true).Run();
+            v1 = await (-123f).Validate().Numeric(true).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            var v2 = (123d).Validate().Numeric().Run();
+            var v2 = await (123d).Validate().Numeric().RunAsync();
             Assert.IsFalse(v2.HasError);
 
-            v2 = (-123d).Validate().Numeric().Run();
+            v2 = await (-123d).Validate().Numeric().RunAsync();
             Assert.IsTrue(v2.HasError);
             Assert.AreEqual(1, v2.Messages.Count);
             Assert.AreEqual("Value must not be negative.", v2.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v2.Messages[0].Type);
             Assert.AreEqual("Value", v2.Messages[0].Property);
 
-            v2 = (-123d).Validate().Numeric(true).Run();
+            v2 = await (-123d).Validate().Numeric(true).RunAsync();
             Assert.IsFalse(v2.HasError);
         }
     }

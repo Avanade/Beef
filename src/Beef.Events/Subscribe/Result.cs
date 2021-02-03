@@ -46,7 +46,7 @@ namespace Beef.Events.Subscribe
         /// Creates a <see cref="SubscriberStatus.DataNotFound"/> <see cref="Result"/>.
         /// </summary>
         /// <param name="reason">The optional reason.</param>
-        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overridding the default behaviour.</param>
+        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
         /// <returns>The <see cref="SubscriberStatus.DataNotFound"/> <see cref="Result"/>.</returns>
         public static Result DataNotFound(string? reason = null, ResultHandling ? resultHandlingOverride = null)
             => new Result { Status = SubscriberStatus.DataNotFound, Reason = reason ?? new LText("Beef.NotFoundException"), ResultHandling = resultHandlingOverride };
@@ -55,7 +55,7 @@ namespace Beef.Events.Subscribe
         /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.
         /// </summary>
         /// <param name="reason">The optional reason.</param>
-        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overridding the default behaviour.</param>
+        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
         /// <returns>The <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.</returns>
         public static Result InvalidData(string? reason = null, ResultHandling? resultHandlingOverride = null) 
             => new Result { Status = SubscriberStatus.InvalidData, Reason = reason ?? new LText("Beef.ValidationException"), ResultHandling = resultHandlingOverride };
@@ -64,7 +64,7 @@ namespace Beef.Events.Subscribe
         /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a set of <paramref name="messages"/>.
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/>.</param>
-        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overridding the default behaviour.</param>
+        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
         /// <returns>The <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.</returns>
         public static Result InvalidData(MessageItemCollection messages, ResultHandling? resultHandlingOverride = null) 
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(messages, nameof(messages)).ToString(), ResultHandling = resultHandlingOverride };
@@ -73,7 +73,7 @@ namespace Beef.Events.Subscribe
         /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.ValidationException"/>.
         /// </summary>
         /// <param name="exception">The <see cref="Beef.ValidationException"/>.</param>
-        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overridding the default behaviour.</param>
+        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
         /// <returns>The <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.</returns>
         public static Result InvalidData(Beef.ValidationException exception, ResultHandling? resultHandlingOverride = null) 
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(exception, nameof(exception)).Messages?.ToString() ?? exception?.Message, Exception = exception, ResultHandling = resultHandlingOverride };
@@ -82,7 +82,7 @@ namespace Beef.Events.Subscribe
         /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.BusinessException"/>.
         /// </summary>
         /// <param name="exception">The <see cref="Beef.BusinessException"/>.</param>
-        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overridding the default behaviour.</param>
+        /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
         /// <returns>The <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.</returns>
         public static Result InvalidData(Beef.BusinessException exception, ResultHandling? resultHandlingOverride = null)
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(exception, nameof(exception)).Message, Exception = exception, ResultHandling = resultHandlingOverride };
@@ -118,7 +118,7 @@ namespace Beef.Events.Subscribe
         public string? Reason { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ResultHandling"/> where specified (overridding the default).
+        /// Gets the <see cref="ResultHandling"/> where specified (overriding the default).
         /// </summary>
         public ResultHandling? ResultHandling { get; private set; }
 

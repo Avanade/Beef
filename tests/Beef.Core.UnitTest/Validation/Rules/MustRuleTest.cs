@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using Beef.Validation;
 using Beef.Entities;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -10,22 +11,22 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class MustRuleTest
     {
         [Test]
-        public void Validate_Value()
+        public async Task Validate_Value()
         {
-            var v1 = 123.Validate().Must(x => true).Run();
+            var v1 = await 123.Validate().Must(x => true).RunAsync();
             Assert.IsFalse(v1.HasError);
             
-            v1 = 123.Validate().Must(x => false).Run();
+            v1 = await 123.Validate().Must(x => false).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value is invalid.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = 123.Validate().Must(() => true).Run();
+            v1 = await 123.Validate().Must(() => true).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = 123.Validate().Must(() => false).Run();
+            v1 = await 123.Validate().Must(() => false).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value is invalid.", v1.Messages[0].Text);

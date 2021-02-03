@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>4.1.2</Version>
+    <Version>4.1.3</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -34,9 +34,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Alter_sql.hbs" />
+    <None Remove="Resources\CdcDb_sql.hbs" />
+    <None Remove="Resources\Cdc_sql.hbs" />
+    <None Remove="Resources\Createref_sql.hbs" />
+    <None Remove="Resources\Create_sql.hbs" />
+    <None Remove="Resources\Default_sql.hbs" />
     <None Remove="Resources\DeleteAllAndReset.sql" />
-    <None Remove="Resources\ScriptNew_sql.xml" />
-    <None Remove="Resources\TableInsertOrMerge_sql.xml" />
+    <None Remove="Resources\TableInsertOrMerge_sql.hbs" />
     <None Remove="Schema\dbo\Functions\fnGetTenantId.sql" />
     <None Remove="Schema\dbo\Functions\fnGetTimestamp.sql" />
     <None Remove="Schema\dbo\Functions\fnGetUsername.sql" />
@@ -57,9 +62,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Cdc_sql.hbs" />
+    <EmbeddedResource Include="Resources\CdcDb_sql.hbs" />
+    <EmbeddedResource Include="Resources\CreateRef_sql.hbs" />
+    <EmbeddedResource Include="Resources\Alter_sql.hbs" />
     <EmbeddedResource Include="Resources\DeleteAllAndReset.sql" />
-    <EmbeddedResource Include="Resources\ScriptNew_sql.xml" />
-    <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.xml" />
+    <EmbeddedResource Include="Resources\Default_sql.hbs" />
+    <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.hbs" />
+    <EmbeddedResource Include="Resources\Create_sql.hbs" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetTenantId.sql" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetTimestamp.sql" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetUsername.sql" />

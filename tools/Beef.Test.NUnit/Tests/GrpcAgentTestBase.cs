@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Beef.Test.NUnit.Tests
 {
@@ -16,7 +17,7 @@ namespace Beef.Test.NUnit.Tests
     /// Provides the base gRPC <b>Agent</b> test capabilities.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public abstract class GrpcAgentTestBase<TStartup> : AgentTestCore<TStartup> where TStartup : class
     {
         /// <summary>
@@ -77,8 +78,8 @@ namespace Beef.Test.NUnit.Tests
                 TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
             TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = ExpectEvent.GetEvents();
+            TestContext.Out.WriteLine($"EVENTS SENT >");
+            var events = ExpectEvent.GetSentEvents();
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
@@ -104,7 +105,7 @@ namespace Beef.Test.NUnit.Tests
                 Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.");
 
             if (_expectedMessages != null)
-                ExpectValidationException.CompareExpectedVsActual(_expectedMessages, result.Messages);
+                TesterBase.CompareExpectedVsActualMessages(_expectedMessages, result.Messages);
         }
 
         /// <summary>
@@ -119,7 +120,19 @@ namespace Beef.Test.NUnit.Tests
             if (agent != null)
                 return agent;
 
-            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs());
+            var ctors = typeof(TAgent).GetConstructors();
+            if (ctors.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor could not be determined.");
+
+            var pis = ctors[0].GetParameters();
+            if (pis.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor must only have a single parameter.");
+
+            var pi = pis[0];
+            if (pi.ParameterType != typeof(IWebApiAgentArgs) && !pi.ParameterType.GetInterfaces().Contains(typeof(IWebApiAgentArgs)))
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor parameter must implement IWebApiAgentArgs.");
+
+            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs(pi.ParameterType));
             if (obj == null)
                 throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created.");
 

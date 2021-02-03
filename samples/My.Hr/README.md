@@ -46,7 +46,7 @@ Endpoint | Description
 `POST /employees/id/reviews` | Create a review for a specified employee.
 `PUT /reviews/id` | Update (replace) the review.
 `PATCH /reviews/id` | Patch the existing review.
-`DELETE /reviews/id` | Delete an existing employee (only where not started).
+`DELETE /reviews/id` | Delete an existing review.
 `GET /employee/id/reviews` | Gets all review(s) for the employee (with paging support).
 
 </br>

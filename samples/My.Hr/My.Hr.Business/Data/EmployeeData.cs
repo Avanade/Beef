@@ -72,7 +72,7 @@ namespace My.Hr.Business.Data
             // 2. Zero or more EmergencyContact rows. Use EmergencyContactData.DbMapper to map between columns and .NET Type. Update the Employee with result.
             await db.SelectQueryMultiSetAsync(
                 new MultiSetSingleArgs<Employee>(DbMapper.Default, r => employee = r, isMandatory: false, stopOnNull: true),
-                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r));
+                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r)).ConfigureAwait(false);
 
             return employee;
         }
@@ -83,7 +83,7 @@ namespace My.Hr.Business.Data
         private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
         {
             // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-            var curr = await GetOnImplementationAsync(id);
+            var curr = await GetOnImplementationAsync(id).ConfigureAwait(false);
             if (curr == null)
                 throw new NotFoundException();
 
@@ -94,7 +94,7 @@ namespace My.Hr.Business.Data
                 throw new ValidationException("An Employee can not be terminated prior to their start date.");
 
             curr.Termination = value;
-            return await UpdateOnImplementationAsync(curr);
+            return await UpdateOnImplementationAsync(curr).ConfigureAwait(false);
         }
     }
 }

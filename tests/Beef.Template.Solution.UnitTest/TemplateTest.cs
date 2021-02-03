@@ -121,11 +121,14 @@ namespace Beef.Template.Solution.UnitTest
             Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "nuget-publish")}", dir).exitCode, "dotnet restore");
 
             // CodeGen: Execute code-generation.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet rull all (entity)");
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
             if (datasource == "Database" || datasource == "EntityFramework")
-                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet rull all (database)");
+            {
+                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
+                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
+            }
 
             // Run the intra-integration tests.
             Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -40,15 +40,14 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id)
+        public async Task<Gender?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
+                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -56,16 +55,15 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value)
+        public async Task<Gender> CreateAsync(Gender value)
         {
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -74,20 +72,19 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value, Guid id)
+        public async Task<Gender> UpdateAsync(Gender value, Guid id)
         {
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

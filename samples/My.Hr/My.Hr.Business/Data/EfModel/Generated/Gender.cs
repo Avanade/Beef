@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for an EF Model.
+#pragma warning disable
 
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.Gender'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.Gender'.
     /// </summary>
     public partial class Gender
     {
@@ -78,7 +77,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<Gender>(entity =>
             {
-                entity.ToTable("Gender", "Ref");
+                entity.ToTable("Gender", "Hr");
                 entity.HasKey("GenderId");
                 entity.Property(p => p.GenderId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");
@@ -101,6 +100,5 @@ namespace My.Hr.Business.Data.EfModel
     }
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

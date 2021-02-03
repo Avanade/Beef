@@ -59,7 +59,7 @@ The `GetByArgs` operation needs to be added to the `Employee` entity configurati
 ``` xml
     <!-- Search operation 
          - OperationType is GetColl which indicates that a collection is the expected result. 
-         - ReturnType is overridding the default Employee as we want to use EmployeeBase (reduced set of fields). 
+         - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields). 
          - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation. 
          - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
          - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated. -->
@@ -72,7 +72,7 @@ So that the code-gen knows what Entity Framework model is to be used this needs 
 
 ``` xml
        - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
-  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DatabaseSchema="Hr" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
+  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
 
 ```
 
@@ -129,7 +129,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="EmployeeArgs"/> validator.
     /// </summary>
-    public class EmployeeArgsValidator : Validator<EmployeeArgs, EmployeeArgsValidator>
+    public class EmployeeArgsValidator : Validator<EmployeeArgs>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeValidator"/> class.

@@ -66,7 +66,6 @@ Property | Description
 `ItemRequestOptions` | The [`ItemRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.itemrequestoptions) used for `Get`, `Create`, `Update` and `Delete`.
 `QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
 `NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
-`SetIdentifierOnCreate` | Indicates whether to the set (override) the identifier on `Create` where the entity implements [`IIdentifer`](../Beef.Core/Entities/IIdentifier.cs).
 `SetAuthorizedFilter` | Sets the filter (`IQueryable`) for all operations to ensure consistent authorisation is applied. Applies automatically to all queries, in that the filter is applied each time a `CosmosDbQuery` or `CosmosDbValueQuery` is executed. Additionally, the filter is applied to the standard `Get`, `Create`, `Update` and `Delete` (CRUD) operations to ensure only authorised data is accessed and modified.
 
 The following demonstrates the usage:
@@ -110,7 +109,7 @@ The primary data persistence activities are CRUD (Create, Read, Update and Delet
 Operation | Description
 -|-
 `GetAsync` | Gets the entity for the specified key where found; otherwise, `null` (default) or [`NotFoundException`](../Beef.Core/NotFoundException.cs) depending on the corresponding [`CosmosDbArgs.NullOnNotFoundResponse`](./CosmosDbArgs.cs).
-`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented. Where the  the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the Cosmos `Id` will be set to `Guid.NewGuid` (overridding any prior value).
+`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented. Where the  the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the Cosmos `Id` will be set to `Guid.NewGuid` (overriding any prior value).
 `UpdateAsync` | Updates the entity. Automatically updates the `Updated*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented; also ensuring that the existing `Created*` fields are not changed.
 `DeleteAsync` | Deletes the entity. Given a delete is idempotent it will be successful even where the entity does not exist.
 

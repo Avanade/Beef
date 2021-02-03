@@ -4,6 +4,7 @@ using Beef.Core.UnitTest.Validation.Entities;
 using Beef.Entities;
 using Beef.Validation;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation
 {
@@ -14,9 +15,9 @@ namespace Beef.Core.UnitTest.Validation
         private static readonly CommonValidator<int?> _cv2 = CommonValidator.Create<int?>(v => v.CompareValue(CompareOperator.NotEqual, 1));
 
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
-            var r = _cv.Validate("XXXXXX");
+            var r = await _cv.ValidateAsync("XXXXXX");
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);
@@ -24,7 +25,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Value", r.Messages[0].Property);
 
-            r = _cv.Validate("XXXXX", "Name");
+            r = await _cv.ValidateAsync("XXXXX", "Name");
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);
@@ -32,17 +33,17 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Name", r.Messages[0].Property);
 
-            r = _cv.Validate("XXX", "Name");
+            r = await _cv.ValidateAsync("XXX", "Name");
             Assert.IsNotNull(r);
             Assert.IsFalse(r.HasError);
         }
 
         [Test]
-        public void Common()
+        public async Task Common()
         {
-            var r = Validator.Create<TestData>()
+            var r = await Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
-                .Validate(new TestData { Text = "XXXXXX" });
+                .ValidateAsync(new TestData { Text = "XXXXXX" });
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
@@ -51,9 +52,9 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = Validator.Create<TestData>()
+            r = await Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
-                .Validate(new TestData { Text = "XXXXX" });
+                .ValidateAsync(new TestData { Text = "XXXXX" });
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
@@ -62,19 +63,19 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = Validator.Create<TestData>()
+            r = await Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
-                .Validate(new TestData { Text = "XXX" });
+                .ValidateAsync(new TestData { Text = "XXX" });
 
             Assert.IsNotNull(r);
             Assert.IsFalse(r.HasErrors);
         }
 
         [Test]
-        public void Validate_Nullable()
+        public async Task Validate_Nullable()
         {
             int? v = 1;
-            var r = _cv2.Validate(v);
+            var r = await _cv2.ValidateAsync(v);
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasError);
             Assert.AreEqual(1, r.Messages.Count);
@@ -84,11 +85,11 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Common_Nullable()
+        public async Task Common_Nullable()
         {
-            var r = Validator.Create<TestData>()
+            var r = await Validator.Create<TestData>()
                 .HasProperty(x => x.CountB, p => p.Mandatory().Common(_cv2))
-                .Validate(new TestData { CountB = 1 });
+                .ValidateAsync(new TestData { CountB = 1 });
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);

@@ -5,6 +5,7 @@ using Beef.RefData;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 
 namespace Beef.Test.NUnit.Tests
@@ -12,6 +13,7 @@ namespace Beef.Test.NUnit.Tests
     /// <summary>
     /// Provides the base agent tester capabilities.
     /// </summary>
+    [DebuggerStepThrough()]
     public abstract class AgentTesterBase : TesterBase
     {
         private Action<HttpRequestMessage>? _beforeRequest;

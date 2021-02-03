@@ -6,37 +6,10 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
-    /// <summary>
-    /// Provides entity validation with a <see cref="Default"/> instance.
-    /// </summary>
-    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    /// <typeparam name="TValidator">The validator <see cref="Type"/>.</typeparam>
-    public abstract class Validator<TEntity, TValidator> : Validator<TEntity>
-        where TEntity : class
-        where TValidator : Validator<TEntity, TValidator>, new()
-    {
-        private readonly static TValidator _default = new TValidator();
-
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
-        /// <summary>
-        /// Gets the current instance of the validator.
-        /// </summary>
-        public static TValidator Default
-#pragma warning restore CA1000
-        {
-            get
-            {
-                if (_default == null)
-                    throw new InvalidOperationException("An instance of this Validator cannot be referenced as it is still being constructed; beware that you may have a circular reference within the constructor.");
-
-                return _default;
-            }
-        }
-    }
-
     /// <summary>
     /// Provides access to the validator capabilities.
     /// </summary>
@@ -65,7 +38,7 @@ namespace Beef.Validation
         where TEntity : class
     {
         private RuleSet<TEntity>? _currentRuleSet;
-        private Action<ValidationContext<TEntity>>? _additional;
+        private Func<ValidationContext<TEntity>, Task>? _additionalAsync;
 
         /// <summary>
         /// Validate the entity value with specified <see cref="ValidationArgs"/>.
@@ -73,18 +46,20 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="ValidationContext{TEntity}"/>.</returns>
-        public override ValidationContext<TEntity> Validate(TEntity value, ValidationArgs? args = null)
+        public override async Task<ValidationContext<TEntity>> ValidateAsync(TEntity value, ValidationArgs? args = null)
         {
             var context = new ValidationContext<TEntity>(value, args ?? new ValidationArgs());
 
             // Validate each of the property rules.
             foreach (var rule in Rules)
             {
-                rule.Validate(context);
+                await rule.ValidateAsync(context).ConfigureAwait(false);
             }
 
-            OnValidate(context);
-            _additional?.Invoke(context);
+            await OnValidateAsync(context).ConfigureAwait(false);
+            if (_additionalAsync != null)
+                await _additionalAsync(context).ConfigureAwait(false);
+
             return context;
         }
 
@@ -92,9 +67,8 @@ namespace Beef.Validation
         /// Validate the entity value (post all configured property rules) enabling additional validation logic to be added by the inheriting classes.
         /// </summary>
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/>.</param>
-        protected virtual void OnValidate(ValidationContext<TEntity> context)
-        {
-        }
+        /// <returns>The corresponding <see cref="Task"/>.</returns>
+        protected virtual Task OnValidateAsync(ValidationContext<TEntity> context) => Task.CompletedTask;
 
         /// <summary>
         /// Adds a <see cref="PropertyRule{TEntity, TProperty}"/> to the validator.
@@ -129,11 +103,13 @@ namespace Beef.Validation
         /// Adds a <see cref="IncludeBaseRule{TEntity, TInclude}"/> to the validator to enable a base validator to be included within the validator rule set.
         /// </summary>
         /// <typeparam name="TInclude">The include <see cref="Type"/> in which <typeparamref name="TEntity"/> inherits from.</typeparam>
-        /// <param name="include">The <see cref="IncludeBaseRule{TEntity, TInclude}"/> to add.</param>
+        /// <param name="include">The <see cref="IValidator{TInclude}"/> to include (add).</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
-        public Validator<TEntity> IncludeBase<TInclude>(ValidatorBase<TInclude> include)
+        public Validator<TEntity> IncludeBase<TInclude>(IValidator<TInclude> include)
             where TInclude : class
         {
+            Check.NotNull(include, nameof(include));
+
             if (!typeof(TEntity).GetTypeInfo().IsSubclassOf(typeof(TInclude)))
                 throw new ArgumentException($"Type {typeof(TEntity).Name} must inherit from {typeof(TInclude).Name}.");
 
@@ -146,18 +122,30 @@ namespace Beef.Validation
         }
 
         /// <summary>
+        /// Adds a <see cref="IncludeBaseRule{TEntity, TInclude}"/> to the validator to enable a base validator to be included within the validator rule set leveraging the underlying
+        /// <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// </summary>
+        /// <typeparam name="TInclude">The include <see cref="Type"/> in which <typeparamref name="TEntity"/> inherits from.</typeparam>
+        /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
+        public Validator<TEntity> IncludeBase<TInclude>()
+            where TInclude : class
+        {
+            return IncludeBase(ExecutionContext.GetService<IValidator<TInclude>>(throwExceptionOnNull: true)!);
+        }
+
+        /// <summary>
         /// Validate the entity value (post all configured property rules) enabling additional validation logic to be added.
         /// </summary>
-        /// <param name="additional">The action to invoke.</param>
+        /// <param name="additionalAsync">The asynchronous function to invoke.</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
-        public Validator<TEntity> Additional(Action<ValidationContext<TEntity>> additional)
+        public Validator<TEntity> Additional(Func<ValidationContext<TEntity>, Task> additionalAsync)
         {
-            Check.NotNull(additional, nameof(additional));
+            Check.NotNull(additionalAsync, nameof(additionalAsync));
 
-            if (_additional != null)
+            if (_additionalAsync != null)
                 throw new InvalidOperationException("Additional can only be defined once for a Validator.");
 
-            _additional = additional;
+            _additionalAsync = additionalAsync;
             return this;
         }
 

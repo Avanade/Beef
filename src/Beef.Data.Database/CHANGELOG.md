@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* Added `DeletedByName` and `DeletedDateName` to `DatabaseColumns`. These are currently required for the database code-generation tooling.
+- *Fixed:* `DatabaseWildcard` needed `#pragma warning disable CS8618` added based on errant compiler warning introduced with Visual Studio 2019 v16.8.2.
+- *Enhancement:* Added `DatabaseMapper.CreateAuto` where properties are added automatically (assumes the property and column names share the same name).
+
 ## v4.1.2
 - *Fixed:* The `DatabasePropertyMapper.MapToDb()` where mapping to a sub-property (via a `DatabaseMapper` was mapping each sub-property where the overarching property value was `null`. This resulted in each `DbParameter` being set to its default value (from a .NET perspective) which did not account for database nullability. The underlying `DatabaseMapper` will now _not_ be invoked where `null` and the properties should default as per the invoked stored procedure definition.
 - *Fixed:* A `NotFoundException` will be thrown on a delete if it does not exist; otherwise, the application will assume it deleted successfully and the likes of a related event could be raised incorrectly.
@@ -45,13 +50,13 @@ Represents the **NuGet** versions.
 - *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
 
 ## v2.1.5
-- *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Other Invokers updated accordingly.
+- *Fixed:* `InvokerBase` was non functioning as a generic class; reimplemented. Other _Invokers_ updated accordingly.
 
 ## v2.1.4
-- *New:* Added SqlTransientErrorNumbers to DatabaseBase; standardised list that can be used for retries, etc.
+- *New:* Added `SqlTransientErrorNumbers` to `DatabaseBase`; standardised list that can be used for retries, etc.
 
 ## v2.1.3
-- *Fixed:* ETag not returned for Reference Data items.
+- *Fixed:* `ETag` not returned for Reference Data items.
 
 ## v2.1.2
 - *Fixed:* Inconsistent version numbers.

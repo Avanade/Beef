@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -90,6 +90,20 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult Update([FromBody] Person value, Guid id)
         {
             return new WebApiPut<Person>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [HttpPut("withRollback/{id}")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        public IActionResult UpdateWithRollback([FromBody] Person value, Guid id)
+        {
+            return new WebApiPut<Person>(this, () => _manager.UpdateWithRollbackAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -290,6 +304,19 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [HttpPut("publishnosend")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        public IActionResult EventPublishNoSend([FromBody] Person value)
+        {
+            return new WebApiPut<Person>(this, () => _manager.EventPublishNoSendAsync(WebApiActionBase.Value(value)),
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        }
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>
@@ -315,6 +342,20 @@ namespace Beef.Demo.Api.Controllers
         {
             return new WebApiPost(this, () => _manager.ThrowErrorAsync(),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        [HttpPost("invokeApi")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult InvokeApiViaAgent(Guid id)
+        {
+            return new WebApiPost<string?>(this, () => _manager.InvokeApiViaAgentAsync(id),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -386,5 +427,5 @@ namespace Beef.Demo.Api.Controllers
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

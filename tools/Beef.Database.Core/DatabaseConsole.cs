@@ -31,7 +31,10 @@ namespace Beef.Database.Core
         private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
-        private readonly CommandOption _refSchema;
+        private readonly CommandOption _schemaOrder;
+        private readonly CommandOption<int> _supportedOpt;
+        private readonly CommandOption _envVarNameOpt;
+        private string? _connectionString;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -57,15 +60,14 @@ namespace Beef.Database.Core
             App.HelpOption(true);
 
             _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _connectionStringArg = App.Argument("connectionstring", "Database connection string.").IsRequired();
-            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
+            _connectionStringArg = App.Argument("connectionstring", "Database connection string.");
+            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified, in order of use).", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
 
             _configOpt = App.Option("-c|--config", "CodeGeneration configuration XML file.", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingFile());
 
-            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue)
-                .Accepts(v => v.Use(new FileResourceValidator()));
+            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue);
 
             _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources) for code generation.", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());
@@ -76,7 +78,9 @@ namespace Beef.Database.Core
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
 
-            _refSchema = App.Option("-rs|--refschema", "Reference data schema name.", CommandOptionType.SingleValue);
+            _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
+            _supportedOpt = App.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue);
+            _envVarNameOpt = App.Option<string>("-evn|--environmentVariableName", "Override the connection string using the specified environment variable name.", CommandOptionType.SingleValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -89,11 +93,12 @@ namespace Beef.Database.Core
         /// </summary>
         private ValidationResult OnValidate()
         {
-            if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen))
-            {
-                if (_configOpt.Value() == null)
-                    return new ValidationResult($"The --config option is required when CodeGen is selected.");
-            }
+            _connectionString = _envVarNameOpt.HasValue() ? Environment.GetEnvironmentVariable(_envVarNameOpt.Value()!) : _connectionStringArg.Value;
+            if (_connectionString == null)
+                return new ValidationResult($"The connectionString command and/or --environmentVariableName option must be specified; with the latter at least resulting in a non-null value.");
+
+            if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen) && _configOpt.Value() == null)
+                return new ValidationResult($"The --config option is required when CodeGen is selected.");
 
             return ValidationResult.Success;
         }
@@ -149,15 +154,19 @@ namespace Beef.Database.Core
         {
             var args = new CodeGenExecutorArgs(_logger, _scriptAssemblies, CreateParamDict(_paramsOpt))
             {
-                ConfigFile = new FileInfo(_configOpt.Value()),
-                ScriptFile = new FileInfo(_scriptOpt.Value()),
+                ConfigFile = _configOpt.HasValue() ? new FileInfo(_configOpt.Value()) : null,
+                ScriptFile = _scriptOpt.HasValue() ? new FileInfo(_scriptOpt.Value()) : null,
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory)
             };
 
             WriteHeader(args);
 
-            var de = new DatabaseExecutor(new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args });
+            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionString!, _scriptAssemblies.ToArray()) { CodeGenArgs = args, SupportedCommands = _supportedOpt.HasValue() ? (DatabaseExecutorCommand)_supportedOpt.ParsedValue : DatabaseExecutorCommand.All };
+            if (_schemaOrder.HasValue())
+                dea.SchemaOrder.AddRange(_schemaOrder.Values);
+
+            var de = new DatabaseExecutor(dea);
             var sw = Stopwatch.StartNew();
 
             var result = await de.RunAsync().ConfigureAwait(false);
@@ -172,11 +181,27 @@ namespace Beef.Database.Core
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
-            _logger.LogInformation(App.Description);
-            _logger.LogInformation(string.Empty);
+            WriteMasthead(_logger);
             _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");
             _logger.LogInformation($"  ConnectionString = {_connectionStringArg.Value}");
             LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
+        }
+
+        /// <summary>
+        /// Writes the mast head information.
+        /// </summary>
+        public static void WriteMasthead(ILogger? logger = null)
+        {
+            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
+
+            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Database%20Tool%0A
+            logger.LogInformation(@"
+╔╗ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌┬┐┌─┐┌┐ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌─┐┬  
+╠╩╗├┤ ├┤ ├┤    ║║├─┤ │ ├─┤├┴┐├─┤└─┐├┤    ║ │ ││ ││  
+╚═╝└─┘└─┘└    ═╩╝┴ ┴ ┴ ┴ ┴└─┘┴ ┴└─┘└─┘   ╩ └─┘└─┘┴─┘
+");
+            logger.LogInformation("Business Entity Execution Framework (Beef) Database Tooling.");
+            logger.LogInformation(string.Empty);
         }
 
         /// <summary>
@@ -185,7 +210,7 @@ namespace Beef.Database.Core
         private void WriteFooter(Stopwatch sw)
         {
             _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"Database complete [{sw.ElapsedMilliseconds}ms].");
+            _logger.LogInformation($"Beef Database Tool complete [{sw.ElapsedMilliseconds}ms].");
             _logger.LogInformation(string.Empty);
         }
     }

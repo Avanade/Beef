@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.Grpc;
 using Beef.WebApi;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
-using proto = {{Root.Company}}.{{Root.AppName}}.Common.Grpc.Proto;
+using {{Root.NamespaceCommon}}.Entities;
+using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Grpc
+namespace {{Root.NamespaceCommon}}.Grpc
 {
     /// <summary>
     /// Defines the {{{EntityNameSeeComments}}} gRPC agent.
@@ -52,8 +52,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Grpc
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public {{Name}}Agent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="{{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}}"/>.</param>
+        public {{Name}}Agent({{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}} args) : base(args) { }
 {{#each GrpcOperations}}
 
         /// <summary>
@@ -78,5 +78,5 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Grpc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

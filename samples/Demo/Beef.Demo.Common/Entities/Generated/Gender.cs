@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -76,7 +75,6 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="Gender"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator Gender(Guid id) => ConvertFromId<Gender>(id);
 
         /// <summary>
@@ -84,7 +82,6 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="Gender"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator Gender(string? code) => ConvertFromCode<Gender>(code);
 
         #endregion
@@ -179,7 +176,6 @@ namespace Beef.Demo.Common.Entities
     /// <summary>
     /// Represents the <see cref="Gender"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class GenderCollection : ReferenceDataCollectionBase<Gender>
     {
         /// <summary>
@@ -197,6 +193,5 @@ namespace Beef.Demo.Common.Entities
     #endregion  
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

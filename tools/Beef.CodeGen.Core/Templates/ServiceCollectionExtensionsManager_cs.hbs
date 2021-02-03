@@ -3,19 +3,19 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 {{#if IsRefData}}
   {{#ifeq EntityUsing 'Business' 'All'}}
-using {{Company}}.{{AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
   {{/ifeq}}
   {{#ifeq EntityUsing 'Common' 'All'}}
-using {{Company}}.{{AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
 {{/if}}
 
-namespace {{Company}}.{{AppName}}.Business
+namespace {{Root.NamespaceBusiness}}
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
@@ -39,5 +39,5 @@ namespace {{Company}}.{{AppName}}.Business
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

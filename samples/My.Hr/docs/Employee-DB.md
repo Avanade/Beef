@@ -8,26 +8,39 @@ _Note:_ Any time that command line execution is requested, this should be perfor
 
 <br/>
 
+## Entity relationship diagram
+
+The following provides a visual (ERD) for the database tables that will be created. A relationship label of _refers_ indicates a reference data relationship. The _(via JSON)_ implies that the relating table references invisibly to the database via a JSON data column. 
+
+``` mermaid
+erDiagram
+    Employee ||--o{ EmergencyContact : has
+    Employee }|..|{ Gender : refers
+    Employee }|..|{ TerminationReason : refers
+    Employee }|..|{ USState : "refers (via JSON)" 
+    EmergencyContact }|..|{ RelationshipType : refers
+```
+<br/>
+
 ## Clean up existing migrations
 
-Within the `Migrations` folder there will four entries that were created during the initial solution skeleton creation. The last two of these should be removed. The first two create the `Ref` and `Hr` database schemas. The `Ref` is for the reference data, and `Hr` is for the master data; in some scenarios it may make sense to use only the `Hr` schema which will house both types of data. For this sample two schemas will be used.
+Within the `Migrations` folder there will three entries that were created during the initial solution skeleton creation. The last two of these should be removed. The first creates the `Hr` database schema. 
 
 ```
 └── Migrations
-  └── 20190101-000000-create-Ref-schema.sql    <- leave
   └── 20190101-000001-create-Hr-schema.sql     <- leave
-  └── 20190101-000002-create-Ref-Gender.sql    <- remove
-  └── 20190101-000003-create-Hr-Person.sql     <- remove
+  └── 20190101-000002-create-Hr-gender.sql     <- remove
+  └── 20190101-000003-create-Hr-person.sql     <- remove
 ```
 
 <br/>
 
 ## Create Employee table
 
-First step is to create the `Employee` table migration script itself, following a similar naming convention to ensure it is executed (applied) in the correct order. This will create the migration script using a pre-defined naming convention and templated T-SQL to aid development.
+First step is to create the migration script for the `Employee` table table within the `Hr` schema following a similar naming convention to ensure it is executed (applied) in the correct order. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
 
 ```
-dotnet run scriptnew -create Hr.Employee
+dotnet run scriptnew create Hr Employee
 ```
 
 For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable.
@@ -63,10 +76,10 @@ COMMIT TRANSACTION
 
 ## Create Emergency Contacts table
 
-Use the following command line to create the `EmergencyContact` table migration script.
+Use the following command line to generate the migration script to create the `EmergencyContact` table within the `Hr` schema.
 
 ```
-dotnet run scriptnew -create Hr.EmergencyContact
+dotnet run scriptnew create Hr EmergencyContact
 ```
 
 Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
@@ -93,18 +106,18 @@ COMMIT TRANSACTION
 ## Create Reference Data tables
 
 To support the capabilities of the tables above the following Reference Data tables are also required.
-- `Ref.Gender`
-- `Ref.TerminationReason`
-- `Ref.RelationshipType`
-- `Ref.USState`
+- `Hr.Gender`
+- `Hr.TerminationReason`
+- `Hr.RelationshipType`
+- `Hr.USState`
 
-At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `-creatref` option specified. No further changes will be needed for these tables.
+At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `creatref` option specified. No further changes will be needed for these tables.
 
 ```
-dotnet run scriptnew -createref Ref.Gender
-dotnet run scriptnew -createref Ref.TerminationReason
-dotnet run scriptnew -createref Ref.RelationshipType
-dotnet run scriptnew -createref Ref.USState
+dotnet run scriptnew createref Hr Gender
+dotnet run scriptnew createref Hr TerminationReason
+dotnet run scriptnew createref Hr RelationshipType
+dotnet run scriptnew createref Hr USState
 ```
 
 <br/>
@@ -115,10 +128,10 @@ Now that the Reference Data tables exist they will need to be populated. It is r
 
 These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.
 
-_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically).
+_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically). The `$` prefix for a table indicates a `merge` versus an `insert` (default).
 
 ``` yaml
-Ref:
+Hr:
   - $Gender:
     - M: Male
     - F: Female
@@ -135,12 +148,12 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 ``` XML
 <?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration DatabaseSchema="Hr" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- Reference data tables/models. -->
-  <Table Name="Gender" Schema="Ref" EfModel="true" />
-  <Table Name="TerminationReason" Schema="Ref" EfModel="true" />
-  <Table Name="RelationshipType" Schema="Ref" EfModel="true" />
-  <Table Name="USState" Schema="Ref" EfModel="true" />
+  <Table Name="Gender" EfModel="true" />
+  <Table Name="TerminationReason" EfModel="true" />
+  <Table Name="RelationshipType" EfModel="true" />
+  <Table Name="USState" EfModel="true" />
 </CodeGeneration>
 ```
 
@@ -148,7 +161,9 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 ## Stored Procedure CRUD
 
-Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, such as `EmergencyContact`.
+Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, in this case `EmergencyContact`.
+
+Where these related tables contain a related collection (i.e. zero or more rows), then a SQL [Merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql?view=sql-server-ver15) is used as it will `insert`, `update` or `delete` each row accordingly. To generate this the _Beef code-gen_ enables a `Type` of `Merge`. Additionally, a SQL [User-Defined Type (UDT)](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql?view=sql-server-ver15) and corresponding .NET (C#) [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) will also need to be generated to support the passing of the data (multiple rows) between .NET and SQL Server.
 
 Copy the following configuration and append (after reference data) to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
 
@@ -156,7 +171,7 @@ Copy the following configuration and append (after reference data) to the `My.Hr
   <!-- References the Employee table to infer the underlying schema, then creates stored procedures as configured:
        - Each then specifies an additional SQL statement to be executed after the primary action (as defined by Type). 
        - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure. -->
-  <Table Name="Employee" Schema="Hr">
+  <Table Name="Employee">
     <StoredProcedure Name="Get" Type="Get">
       <Execute Statement="EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId" />
     </StoredProcedure>
@@ -177,7 +192,7 @@ Copy the following configuration and append (after reference data) to the `My.Hr
        - Specifies need for a SQL User-Defined Type (UDT) and corresponding .NET (C#) Table-Valued Parameter (TVP) excluding the EmployeeId column (as this is the merge key).
        - GetByEmployeeId will get all rows using the specified Parameter - the characteristics of the Parameter are inferred from the underlying schema.
        - Merge will perform a SQL merge using the specified Parameter. -->
-  <Table Name="EmergencyContact" Schema="Hr" Udt="true" Tvp="EmergencyContact" UdtExcludeColumns="EmployeeId">
+  <Table Name="EmergencyContact" Udt="true" Tvp="EmergencyContact" UdtExcludeColumns="EmployeeId">
     <StoredProcedure Name="GetByEmployeeId" Type="GetAll">
       <Parameter Name="EmployeeId" />
     </StoredProcedure>
@@ -195,7 +210,7 @@ To support a flexible query approach for the `Employee` Entity Framework (EF) wi
 
 ``` xml
   <!-- References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only. -->
-  <Table Name="Employee" Schema="Hr" EfModel="true" IncludeColumns="EmployeeId, Email, FirstName, LastName, GenderCode, Birthday, StartDate, TerminationDate, TerminationReasonCode, PhoneNo" />
+  <Table Name="Employee" EfModel="true" IncludeColumns="EmployeeId, Email, FirstName, LastName, GenderCode, Birthday, StartDate, TerminationDate, TerminationReasonCode, PhoneNo" />
 ```
 
 <br/>

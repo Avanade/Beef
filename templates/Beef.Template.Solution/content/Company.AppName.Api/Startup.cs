@@ -85,8 +85,12 @@ namespace Company.AppName.Api
 
             // Add the generated entity services.
             services.AddGeneratedManagerServices()
+                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
+
+            // Add GUID identifier generator service.
+            services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>();
 
             // Add event publishing services.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");

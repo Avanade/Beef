@@ -211,7 +211,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="updateExecutionContext">The action to update the <see cref="Beef.ExecutionContext"/>.</param>
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance to support fluent-style method chaining.</returns>
-        /// <remarks><b>Note:</b> when overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.
+        /// <remarks><b>Note:</b> when overriding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.
         /// <para><b>Note:</b> that the <see cref="ExecutionContext.ServiceProvider"/> and <see cref="ExecutionContext.CorrelationId"/> are set directly by <i>Beef</i>.</para></remarks>
         public EventSubscriberHostArgs ExecutionContext(Action<ExecutionContext, IEventSubscriber, EventData> updateExecutionContext)
         {

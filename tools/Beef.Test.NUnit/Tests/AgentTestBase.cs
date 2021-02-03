@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 
 namespace Beef.Test.NUnit.Tests
@@ -19,7 +20,7 @@ namespace Beef.Test.NUnit.Tests
     /// Provides the base <b>Agent</b> test capabilities.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public abstract class AgentTestBase<TStartup> : AgentTestCore<TStartup> where TStartup : class
     {
         /// <summary>
@@ -120,7 +121,7 @@ namespace Beef.Test.NUnit.Tests
             }
 
             json = null;
-            if (!string.IsNullOrEmpty(result.Content) && result.Response?.Content?.Headers?.ContentType?.MediaType == "application/json")
+            if (!string.IsNullOrEmpty(result.Content) && result.Response?.Content?.Headers?.ContentType?.MediaType == MediaTypeNames.Application.Json)
             {
                 try
                 {
@@ -142,7 +143,20 @@ namespace Beef.Test.NUnit.Tests
 
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = ExpectEvent.GetEvents(CorrelationId);
+            var events = ExpectEvent.GetPublishedEvents(CorrelationId);
+            if (events.Count == 0)
+                TestContext.Out.WriteLine("  None.");
+            else
+            {
+                foreach (var e in events)
+                {
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                }
+            }
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS SENT >");
+            events = ExpectEvent.GetSentEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
@@ -181,7 +195,7 @@ namespace Beef.Test.NUnit.Tests
                 Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.");
 
             if (_expectedMessages != null)
-                ExpectValidationException.CompareExpectedVsActual(_expectedMessages, result.Messages);
+                TesterBase.CompareExpectedVsActualMessages(_expectedMessages, result.Messages);
         }
 
         /// <summary>
@@ -196,7 +210,19 @@ namespace Beef.Test.NUnit.Tests
             if (agent != null)
                 return agent;
 
-            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs());
+            var ctors = typeof(TAgent).GetConstructors();
+            if (ctors.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor could not be determined.");
+
+            var pis = ctors[0].GetParameters();
+            if (pis.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor must only have a single parameter.");
+
+            var pi = pis[0];
+            if (pi.ParameterType != typeof(IWebApiAgentArgs) && !pi.ParameterType.GetInterfaces().Contains(typeof(IWebApiAgentArgs)))
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor parameter must implement IWebApiAgentArgs.");
+
+            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs(pi.ParameterType));
             if (obj == null)
                 throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created.");
 

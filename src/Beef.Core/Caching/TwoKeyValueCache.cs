@@ -141,7 +141,7 @@ namespace Beef.Caching
                 }
                 
                 // Get the value by key1.
-                var r = _get1 != null ? _get1(key1) : _getAsync1!(key1).Result;
+                var r = _get1 != null ? _get1(key1) : _getAsync1!(key1).GetAwaiter().GetResult();
                 if (r.hasValue)
                 {
                     var policy = (ICachePolicy)GetPolicy().Clone();
@@ -172,7 +172,7 @@ namespace Beef.Caching
         /// <returns><c>true</c> if the key exists; otherwise, <c>false</c>.</returns>
         public bool ContainsKey1(TKey1 key)
         {
-            return (!_dict1.TryGetValue(key, out CacheValue cv) || cv.Policy.HasExpired()) ? false : true;
+            return _dict1.TryGetValue(key, out CacheValue cv) && !cv.Policy.HasExpired();
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace Beef.Caching
                     return true;
                 }
 
-                r = _get2 != null ? _get2(key2) : _getAsync2!(key2).Result;
+                r = _get2 != null ? _get2(key2) : _getAsync2!(key2).GetAwaiter().GetResult();
 
                 // Exit where no data found.
                 if (!r.hasValue)
@@ -298,7 +298,7 @@ namespace Beef.Caching
         /// <returns><c>true</c> if the key exists; otherwise, <c>false</c>.</returns>
         public bool ContainsKey2(TKey2 key)
         {
-            return (!_dict2.TryGetValue(key, out CacheValue cv) || cv.Policy.HasExpired()) ? false : true;
+            return _dict2.TryGetValue(key, out CacheValue cv) && !cv.Policy.HasExpired();
         }
 
         /// <summary>

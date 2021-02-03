@@ -8,7 +8,7 @@ namespace Beef.Demo.Business.Validation
     /// <summary>
     /// Represents a <see cref="PersonArgs"/> validator.
     /// </summary>
-    public class PersonArgsValidator : Validator<PersonArgs, PersonArgsValidator>
+    public class PersonArgsValidator : Validator<PersonArgs>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonArgsValidator"/>.

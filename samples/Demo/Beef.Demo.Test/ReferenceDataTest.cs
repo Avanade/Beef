@@ -16,7 +16,7 @@ namespace Beef.Demo.Test
     [TestFixture, Parallelizable(ParallelScope.Children)]
     public class ReferenceDataTest : UsingAgentTesterServer<Startup>
     {
-        private static RobotTest _robotTest = new RobotTest();
+        private static readonly RobotTest _robotTest = new RobotTest();
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();
@@ -49,7 +49,7 @@ namespace Beef.Demo.Test
 
             r = AgentTester.Test<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new ReferenceDataAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
                 {
                     x.Headers.Add("If-None-Match", etags.First());
                 })).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
@@ -60,7 +60,7 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Test<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .RunOverride(() => new ReferenceDataAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
                 {
                     x.Headers.Add("If-None-Match", new string[] { "\"ABC\"", "\"DEF\"" });
                 })).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
@@ -93,7 +93,7 @@ namespace Beef.Demo.Test
 
             AgentTester.Test<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new ReferenceDataAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
                 {
                     x.Headers.Add("If-None-Match", vals.First());
                 })).GenderGetAllAsync());

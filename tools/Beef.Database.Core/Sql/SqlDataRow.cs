@@ -1,8 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Config.Database;
+using Beef.CodeGen.DbModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Beef.Database.Core.Sql
 {
@@ -15,10 +18,7 @@ namespace Beef.Database.Core.Sql
         /// Initializes a new instance of the <see cref="SqlDataRow"/> class.
         /// </summary>
         /// <param name="table">The parent <see cref="SqlDataTable"/>.</param>
-        public SqlDataRow(SqlDataTable table)
-        {
-            Table = table;
-        }
+        public SqlDataRow(SqlDataTable table) => Table = table;
 
         /// <summary>
         /// Gets the <see cref="SqlDataTable"/>.
@@ -28,17 +28,14 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public Dictionary<string, SqlDataColumn> Columns { get; } = new Dictionary<string, SqlDataColumn>();
+        public List<SqlDataColumn> Columns { get; } = new List<SqlDataColumn>();
 
         /// <summary>
         /// Adds a <see cref="SqlDataColumn"/> to the row using the specified name and value.
         /// </summary>
         /// <param name="name">The column name.</param>
         /// <param name="value">The column value.</param>
-        public void AddColumn(string name, object? value)
-        {
-            AddColumn(new SqlDataColumn { Name = name, Value = value });
-        }
+        public void AddColumn(string name, object? value) => AddColumn(new SqlDataColumn { Name = name, Value = value });
 
         /// <summary>
         /// Adds a <see cref="SqlDataColumn"/> to the row.
@@ -58,13 +55,16 @@ namespace Beef.Database.Core.Sql
                 // Check and see if it is a reference data id.
                 col = Table.DbTable.Columns.Where(c => c.Name == column.Name + "Id").SingleOrDefault();
                 if (col == null || !col.IsForeignRefData)
-                    throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' does not have a column named '{column.Name}'.");
+                    throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' does not have a column named '{column.Name}' or '{column.Name}Id'; or was not identified as a foreign key to Reference Data.");
 
                 column.Name += "Id";
             }
 
-            if (!Columns.TryAdd(column.Name, column))
+            if (Columns.Any(x => x.Name == column.Name))
                 throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' column '{column.Name}' has been specified more than once.");
+
+            column.DbColumn = col;
+            Columns.Add(column);
 
             if (column.Value == null)
                 return;
@@ -72,8 +72,8 @@ namespace Beef.Database.Core.Sql
             string? str = null;
             try
             {
-                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
-                switch (col.DotNetType)
+                str = column.Value is DateTime time ? time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
+                switch (DbColumn.GetDotNetTypeName(col.Type))
                 {
                     case "string": column.Value = str; break;
                     case "decimal": column.Value = decimal.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
@@ -116,7 +116,7 @@ namespace Beef.Database.Core.Sql
                     column.UseForeignKeyQueryForId = true;
                 }
                 else
-                    throw new SqlDataUpdaterException($"'{Table.Schema}.{Table.Name}' column '{column.Name}' type '{col.Type}' cannot parse value '{column.Value.ToString()}': {fex.Message}");
+                    throw new SqlDataUpdaterException($"'{Table.Schema}.{Table.Name}' column '{column.Name}' type '{col.Type}' cannot parse value '{column.Value}': {fex.Message}");
             }
         }
     }

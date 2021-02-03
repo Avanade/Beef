@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,5 +26,5 @@ namespace Cdr.Banking.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

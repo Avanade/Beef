@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -42,15 +42,14 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public async Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                args.Validate(nameof(args)).Entity(AccountArgsValidator.Default).Run().ThrowOnError();
+                (await args.Validate(nameof(args)).Entity().With<IValidator<AccountArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -58,15 +57,14 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public async Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
-                accountId.Validate(nameof(accountId)).Mandatory().Run().ThrowOnError();
+                (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -74,18 +72,17 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId)
+        public async Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
-                accountId.Validate(nameof(accountId)).Mandatory().Run().ThrowOnError();
+                (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
-            });
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore
 #nullable restore

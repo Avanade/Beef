@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -14,6 +15,7 @@ namespace Beef.Test.NUnit.Logging
     /// Represents the <see cref="CorrelationIdLogger"/> provider.
     /// </summary>
     [ProviderAlias("")]
+    [DebuggerStepThrough]
     public sealed class CorrelationIdLoggerProvider : ILoggerProvider
     {
         /// <summary>
@@ -32,6 +34,7 @@ namespace Beef.Test.NUnit.Logging
     /// <summary>
     /// Represents a logger where all messages are written to an internal (in-memory) list by correlation identifier.
     /// </summary>
+    [DebuggerStepThrough]
     public sealed class CorrelationIdLogger : ILogger
     {
         private static readonly ConcurrentDictionary<string, List<(DateTime, string)>> _messageDict = new ConcurrentDictionary<string, List<(DateTime, string)>>();

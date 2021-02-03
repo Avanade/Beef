@@ -53,8 +53,11 @@ namespace Beef.Events.UnitTest
             var id = Guid.NewGuid();
 
             var ed = EventData.CreateEvent("Subject", "Action", id);
+            Assert.IsNotNull(ed.EventId);
+            var eid = ed.EventId;
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
+            Assert.AreEqual(eid, eh.Properties[EventDataMapper.EventIdPropertyName]);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
             Assert.AreEqual("Action", eh.Properties[EventDataMapper.ActionPropertyName]);
             Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
@@ -62,6 +65,7 @@ namespace Beef.Events.UnitTest
 
             ed = eh.ToBeefEventData();
             Assert.IsNotNull(eh);
+            Assert.AreEqual(eid, ed.EventId);
             Assert.AreEqual("Subject", ed.Subject);
             Assert.AreEqual("Action", ed.Action);
             Assert.AreEqual(null, ed.TenantId);

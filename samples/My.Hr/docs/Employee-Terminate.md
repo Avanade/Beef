@@ -60,7 +60,7 @@ Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/D
         private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
         {
             // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-            var curr = await GetOnImplementationAsync(id);
+            var curr = await GetOnImplementationAsync(id).ConfigureAwait(false);
             if (curr == null)
                 throw new NotFoundException();
 
@@ -71,7 +71,7 @@ Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/D
                 throw new ValidationException("An Employee can not be terminated prior to their start date.");
 
             curr.Termination = value;
-            return await UpdateOnImplementationAsync(curr);
+            return await UpdateOnImplementationAsync(curr).ConfigureAwait(false);
         }
 ```
 
@@ -92,7 +92,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="TerminationDetail"/> validator.
     /// </summary>
-    public class TerminationDetailValidator : Validator<TerminationDetail, TerminationDetailValidator>
+    public class TerminationDetailValidator : Validator<TerminationDetail>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TerminationDetailValidator"/> class.

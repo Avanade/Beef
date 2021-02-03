@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using static Beef.Core.UnitTest.Validation.ValidatorTest;
 
 namespace Beef.Core.UnitTest.Validation.Rules
@@ -15,10 +16,10 @@ namespace Beef.Core.UnitTest.Validation.Rules
         private static readonly IValidator _tev = Validator.Create<TestEntity>().HasProperty(x => x.Item, p => p.Entity(_tiv));
 
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
             var te = new TestEntity { Item = new TestItem() };
-            var v1 = te.Validate().Entity(_tev).Run();
+            var v1 = await te.Validate().Entity(_tev).RunAsync();
 
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);

@@ -34,16 +34,14 @@ namespace Beef.Events.Subscribe
                 return;
 
             // Convert EventHubs.EventData to Beef.EventData.
-            var (subject, action, _) = @event.GetBeefMetadata();
+            var (_, subject, action, _) = @event.GetBeefMetadata();
             await ReceiveAsync(subject, action, (subscriber) =>
             {
                 try
                 {
                     return subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
                 catch (Exception ex) { throw new InvalidEventDataException(ex); }
-#pragma warning restore CA1031
             }).ConfigureAwait(false);
         }
     }

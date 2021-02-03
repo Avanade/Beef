@@ -5,6 +5,7 @@ namespace Beef.Business
     /// <summary>
     /// Wraps a <b>Manager invoke</b> enabling standard <b>business tier</b> functionality to be added to all invocations.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class ManagerInvoker : BusinessInvokerBase
     {
         /// <summary>
