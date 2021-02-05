@@ -32,7 +32,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsImportant = true)]
         public string? Schema { get; set; }
 
         #endregion

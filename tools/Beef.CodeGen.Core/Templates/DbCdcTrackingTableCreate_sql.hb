@@ -4,7 +4,7 @@ CREATE TABLE [{{CdcSchema}}].[{{CdcTrackingTableName}}] (
    * This is automatically generated; any changes will be lost.
    */
 
-  [{{CdcTrackingTableName}}Id] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY NONCLUSTERED ([{{CdcTrackingTableName}}Id] ASC),
+  [{{CdcTrackingTableName}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY NONCLUSTERED ([{{CdcTrackingTableName}}Id] ASC),
   [Schema] VARCHAR(50) NOT NULL,
   [Table] VARCHAR(128) NOT NULL,
   [Key] NVARCHAR(128) NOT NULL,
