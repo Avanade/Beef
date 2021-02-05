@@ -5,13 +5,13 @@
       <xs:documentation>'CodeGeneration' object (entity-driven)</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
         <xs:element name="Entity" minOccurs="0" maxOccurs="unbounded">
           <xs:annotation>
             <xs:documentation>'Entity' object (entity-driven)</xs:documentation>
           </xs:annotation>
           <xs:complexType>
-            <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
               <xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                   <xs:documentation>'Property' object (entity-driven)</xs:documentation>
@@ -315,7 +315,7 @@
                   <xs:documentation>'CodeGeneration' object (entity-driven)</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:choice maxOccurs="unbounded">
                     <xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
                         <xs:documentation>'Parameter' object (entity-driven)</xs:documentation>
@@ -440,7 +440,7 @@
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
+                  </xs:choice>
                   <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The unique operation name.</xs:documentation>
@@ -746,7 +746,7 @@
                   </xs:attribute>
                 </xs:complexType>
               </xs:element>
-            </xs:sequence>
+            </xs:choice>
             <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The unique entity name.</xs:documentation>
@@ -1244,7 +1244,7 @@
             </xs:attribute>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>
+      </xs:choice>
       <xs:attribute name="RefDataNamespace" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.</xs:documentation>

@@ -28,7 +28,7 @@ namespace Beef.CodeGen.Generators
             var xdoc = new XDocument(new XDeclaration("1.0", "utf-8", null),
                 new XElement(ns + "schema",
                     new XAttribute(XNamespace.Xmlns + "xs", ns),
-                    new XAttribute("targetNamespace", "http://schemas.beef.com/codegen/2015/01/entity"),
+                    new XAttribute("targetNamespace", configType == ConfigType.Entity ? "http://schemas.beef.com/codegen/2015/01/entity" : "http://schemas.beef.com/codegen/2015/01/database"),
                     new XAttribute("attributeFormDefault", "unqualified"),
                     new XAttribute("elementFormDefault", "qualified")));
 
@@ -60,9 +60,10 @@ namespace Beef.CodeGen.Generators
             xml.Add(new XElement(ns + "annotation", new XElement(ns + "documentation", csa.Title)));
             var xct = new XElement(ns + "complexType");
 
-            // Add sub-collections within xs:sequence element.
+            // Add sub-collections within xs:choice element.
             var hasSeq = false;
-            var xs = new XElement(ns + "sequence");
+            var xs = new XElement(ns + "choice");
+            xs.Add(new XAttribute("maxOccurs", "unbounded"));
             foreach (var pi in type.GetProperties())
             {
                 var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
@@ -93,7 +94,24 @@ namespace Beef.CodeGen.Generators
 
                 var psa = xmlOverride.Attribute ?? pi.GetCustomAttribute<PropertySchemaAttribute>();
                 if (psa == null)
+                {
+                    // Properties with List<string> are not compatible with XML and should be picked up as comma separated strings.
+                    if (pi.PropertyType == typeof(List<string>))
+                    {
+                        var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                        if (pcsa == null)
+                            continue;
+
+                        var xpx = new XElement(ns + "attribute",
+                            new XAttribute("name", xmlName),
+                            new XAttribute("use", pcsa.IsMandatory ? "required" : "optional"));
+
+                        xpx.Add(new XElement(ns + "annotation", new XElement(ns + "documentation", GetDocumentation(name, pcsa))));
+                        xct.Add(xpx);
+                    }
+
                     continue;
+                }
 
                 var xp = new XElement(ns + "attribute",
                     new XAttribute("name", xmlName),
@@ -140,5 +158,11 @@ namespace Beef.CodeGen.Generators
         /// </summary>
         private static string GetDocumentation(string name, PropertySchemaAttribute psa) =>
             psa.Description == null ? (psa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{psa.Title ?? StringConversion.ToSentenceCase(name)!} {psa.Description}";
+
+        /// <summary>
+        /// Gets the documentation text.
+        /// </summary>
+        private static string GetDocumentation(string name, PropertyCollectionSchemaAttribute pcsa) =>
+            pcsa.Description == null ? (pcsa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{pcsa.Title ?? StringConversion.ToSentenceCase(name)!} {pcsa.Description}";
     }
 }

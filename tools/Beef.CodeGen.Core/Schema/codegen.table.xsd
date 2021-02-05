@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.beef.com/codegen/2015/01/entity" attributeFormDefault="unqualified" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.beef.com/codegen/2015/01/database" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:element name="CodeGeneration">
     <xs:annotation>
       <xs:documentation>'CodeGeneration' object (database-driven)</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
         <xs:element name="Table" minOccurs="0" maxOccurs="unbounded">
           <xs:annotation>
             <xs:documentation>'Table' object (entity-driven)</xs:documentation>
           </xs:annotation>
           <xs:complexType>
-            <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
               <xs:element name="StoredProcedure" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                   <xs:documentation>'StoredProcedure' object (database-driven)</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:choice maxOccurs="unbounded">
                     <xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
                         <xs:documentation>'Parameter' object (database-driven)</xs:documentation>
@@ -129,7 +129,7 @@
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
+                  </xs:choice>
                   <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc. See `StoredProcedureName` for the actual name used in the database.</xs:documentation>
@@ -186,9 +186,19 @@
                       <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="IncludeColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`). Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`). Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
-            </xs:sequence>
+            </xs:choice>
             <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The name of the `Table` in the database.</xs:documentation>
@@ -341,13 +351,13 @@
             <xs:documentation>'Query' object (database-driven)</xs:documentation>
           </xs:annotation>
           <xs:complexType>
-            <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
               <xs:element name="QueryJoin" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                   <xs:documentation>'QueryJoin' object (database-driven)</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:choice maxOccurs="unbounded">
                     <xs:element name="QueryJoinOn" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
                         <xs:documentation>'QueryJoinOn' object (database-driven)</xs:documentation>
@@ -380,7 +390,7 @@
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
+                  </xs:choice>
                   <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The name of the table to join.</xs:documentation>
@@ -521,7 +531,7 @@
                   </xs:attribute>
                 </xs:complexType>
               </xs:element>
-            </xs:sequence>
+            </xs:choice>
             <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The name of the primary table of the query.</xs:documentation>
@@ -629,13 +639,13 @@
             <xs:documentation>'Cdc' object (database-driven)</xs:documentation>
           </xs:annotation>
           <xs:complexType>
-            <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
               <xs:element name="CdcJoin" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                   <xs:documentation>'CdcJoin' object (database-driven)</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:choice maxOccurs="unbounded">
                     <xs:element name="CdcJoinOn" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
                         <xs:documentation>'CdcJoinOn' object (database-driven)</xs:documentation>
@@ -658,7 +668,7 @@
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
+                  </xs:choice>
                   <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The unique name.</xs:documentation>
@@ -700,6 +710,21 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="IncludeColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AliasColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="Type" use="optional">
                     <xs:annotation>
                       <xs:documentation>The SQL join type. Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.</xs:documentation>
@@ -726,7 +751,7 @@
                   </xs:attribute>
                 </xs:complexType>
               </xs:element>
-            </xs:sequence>
+            </xs:choice>
             <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The name of the primary table.</xs:documentation>
@@ -740,6 +765,21 @@
             <xs:attribute name="Alias" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The `Schema.Table` alias name. Will automatically default where not specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IncludeColumns" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeColumns" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="AliasColumns" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="StoredProcedureName" use="optional" type="xs:string">
@@ -774,6 +814,11 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="DataCtorParams" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="DatabaseName" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The .NET database interface name. Defaults to `IDatabase`.</xs:documentation>
@@ -796,8 +841,8 @@
             </xs:attribute>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>
-      <xs:attribute name="Schema" use="required" type="xs:string">
+      </xs:choice>
+      <xs:attribute name="Schema" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
         </xs:annotation>
