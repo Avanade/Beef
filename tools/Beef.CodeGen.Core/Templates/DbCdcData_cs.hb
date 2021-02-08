@@ -74,7 +74,7 @@ namespace {{Root.NamespaceCdc}}.Data
             var {{Alias}}Coll = new {{ModelName}}CdcWrapperCollection();
 
             var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
-                new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne Joins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
+                new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne CdcJoins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
 {{#each CdcJoins}}
                 new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>
                 {

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.15
+- *Fixed:* Issue [100](https://github.com/Avanade/Beef/issues/100) fixed. Corrected CDC codegen to no longer output errant code where there is a single left outer join specified.
+
 ## v4.1.14
 - *Fixed:* The XML schema was being generated with the incorrect `targetNamespace` which has been corrected. Schema order has been corrected to allow any. Missing `List<string>` properties are now included.
 - *Fixed:* The `CdcTracking` table `Id` column changed from `INT` to `UNIQUEIDENTIFIER` as the preferred identifier data type.

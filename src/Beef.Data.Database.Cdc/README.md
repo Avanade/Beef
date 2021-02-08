@@ -42,15 +42,21 @@ An example is as follows.
 
 ``` sql
 -- Enable for the database.
-EXEC sp_changedbowner 'sa'
-EXEC sys.sp_cdc_enable_db
+IF (SELECT TOP 1 is_cdc_enabled FROM sys.databases WHERE [name] = N'$(DatabaseName)') = 0
+BEGIN
+  EXEC sp_changedbowner 'sa'
+  EXEC sys.sp_cdc_enable_db
+END
 
 -- Enable for the seleted table.
-EXEC sys.sp_cdc_enable_table  
-  @source_schema = N'SchemaName',  
-  @source_name   = N'TableName',  
-  @role_name     = null,
-  @supports_net_changes = 1
+IF (SELECT TOP 1 is_tracked_by_cdc FROM sys.tables WHERE [OBJECT_ID] = OBJECT_ID(N'SchemaName.TableName')) = 0
+BEGIN
+  EXEC sys.sp_cdc_enable_table  
+    @source_schema = N'SchemaName',  
+    @source_name   = N'TableName',  
+    @role_name     = NULL,
+    @supports_net_changes = 1
+END
 ```
 
 Where using [Migration](./../../tools/Beef.Database.Core/README.md) Scripts [code-generation](#Code-generation) can be leveraged to accelerate. The following command line executions will create the migration scripts that contain the contents described above.
