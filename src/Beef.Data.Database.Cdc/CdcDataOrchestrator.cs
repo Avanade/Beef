@@ -196,6 +196,9 @@ namespace Beef.Data.Database.Cdc
             else
                 Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found.");
 
+            // As the EventPublisher may be reused within the context of the scoping, then we should explicitly reset to avoid internal exception.
+            EventPublisher.Reset(); 
+
             // Complete the outbox (ignore any further 'cancel' as event(s) have been published and we *must* complete to minimise chance of sending more than once).
             await MarkOutboxAsCompleteAsync(result.Outbox.Id, tracking).ConfigureAwait(false);
             Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed.");
