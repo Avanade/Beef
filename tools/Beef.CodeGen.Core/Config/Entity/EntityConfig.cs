@@ -178,7 +178,7 @@ entities:
         /// <summary>
         /// Indicates whether to automatically infer the interface implements for the entity from the properties declared.
         /// </summary>
-        [JsonProperty("autoInferImplements", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("implementsAutoInfer", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Entity", Title = "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
             Description = "Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
         public bool? ImplementsAutoInfer { get; set; }
@@ -1216,52 +1216,55 @@ entities:
         /// </summary>
         private void InferImplements()
         {
-            if (ImplementsAutoInfer.HasValue && !ImplementsAutoInfer.Value)
-                return;
-
             var implements = new List<string>();
             var modelImplements = new List<string>();
-
-            if (Implements != null)
-            {
-                foreach (var str in Implements!.Split(",", StringSplitOptions.RemoveEmptyEntries))
-                {
-                    var txt = str?.Trim();
-                    if (!string.IsNullOrEmpty(txt))
-                        implements.Add(txt!);
-                }
-            }
-
             var i = 0;
             var m = 0;
-            var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
-            if (id != null)
-            {
-                var iid = id.Type switch
-                {
-                    "Guid" => "IGuidIdentifier",
-                    "int" => "IIntIdentifier",
-                    "string" => "IStringIdentifier",
-                    _ => "IIdentifier",
-                };
 
-                implements.Insert(i++, iid);
-                modelImplements.Insert(m++, iid);
+            if (CompareValue(ImplementsAutoInfer, true))
+            {
+                if (Implements != null)
+                {
+                    foreach (var str in Implements!.Split(",", StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var txt = str?.Trim();
+                        if (!string.IsNullOrEmpty(txt))
+                            implements.Add(txt!);
+                    }
+                }
+
+                var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
+                if (id != null)
+                {
+                    var iid = id.Type switch
+                    {
+                        "Guid" => "IGuidIdentifier",
+                        "int" => "IIntIdentifier",
+                        "string" => "IStringIdentifier",
+                        _ => "IIdentifier",
+                    };
+
+                    implements.Insert(i++, iid);
+                    modelImplements.Insert(m++, iid);
+                }
             }
 
             if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
                 implements.Insert(i++, "IUniqueKey");
 
-            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+            if (CompareValue(ImplementsAutoInfer, true))
             {
-                implements.Insert(i++, "IETag");
-                modelImplements.Insert(m++, "IETag");
-            }
+                if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+                {
+                    implements.Insert(i++, "IETag");
+                    modelImplements.Insert(m++, "IETag");
+                }
 
-            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
-            {
-                implements.Insert(i++, "IChangeLog");
-                modelImplements.Insert(m++, "IChangeLog");
+                if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
+                {
+                    implements.Insert(i++, "IChangeLog");
+                    modelImplements.Insert(m++, "IChangeLog");
+                }
             }
 
             if (RefDataType == null)

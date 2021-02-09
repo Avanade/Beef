@@ -148,7 +148,7 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 ``` XML
 <?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration DatabaseSchema="Hr" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- Reference data tables/models. -->
   <Table Name="Gender" EfModel="true" />
   <Table Name="TerminationReason" EfModel="true" />

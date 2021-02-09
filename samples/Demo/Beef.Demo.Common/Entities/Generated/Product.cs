@@ -21,7 +21,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Product entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Product : EntityBase, IIntIdentifier, IUniqueKey, IEquatable<Product>
+    public partial class Product : EntityBase, IUniqueKey, IEquatable<Product>
     {
         #region Privates
 

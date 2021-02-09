@@ -28,9 +28,8 @@ namespace Beef.CodeGen.Generators
             var xdoc = new XDocument(new XDeclaration("1.0", "utf-8", null),
                 new XElement(ns + "schema",
                     new XAttribute(XNamespace.Xmlns + "xs", ns),
-                    new XAttribute("targetNamespace", configType == ConfigType.Entity ? "http://schemas.beef.com/codegen/2015/01/entity" : "http://schemas.beef.com/codegen/2015/01/database"),
                     new XAttribute("attributeFormDefault", "unqualified"),
-                    new XAttribute("elementFormDefault", "qualified")));
+                    new XAttribute("elementFormDefault", "unqualified")));
 
             WriteObject(configType, typeof(T), ns, xdoc.Root, true);
 
