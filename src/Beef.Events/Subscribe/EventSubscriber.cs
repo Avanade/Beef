@@ -17,9 +17,9 @@ namespace Beef.Events.Subscribe
         public RunAsUser RunAsUser { get; protected set; } = RunAsUser.Originating;
 
         /// <summary>
-        /// Determines the <see cref="Subscribe.UnhandledExceptionHandling"/> option; defaults to <see cref="UnhandledExceptionHandling.Stop"/>.
+        /// Determines the <see cref="Subscribe.UnhandledExceptionHandling"/> option; defaults to <see cref="UnhandledExceptionHandling.ThrowException"/>.
         /// </summary>
-        public UnhandledExceptionHandling UnhandledExceptionHandling { get; protected set; } = UnhandledExceptionHandling.Stop;
+        public UnhandledExceptionHandling UnhandledExceptionHandling { get; protected set; } = UnhandledExceptionHandling.ThrowException;
 
         /// <summary>
         /// Gets or sets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (overrides <see cref="EventSubscriberHostArgs.InvalidEventDataHandling"/>).

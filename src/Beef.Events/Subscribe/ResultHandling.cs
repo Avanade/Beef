@@ -8,9 +8,10 @@ namespace Beef.Events.Subscribe
     public enum ResultHandling
     {
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is unexpected and should stop, allowing the hosting process to determine the appropriate action.
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is unexpected and should throw an <see cref="EventSubscriberUnhandledException"/> allowing the hosting process
+        /// to determine the appropriate action based on its default unhandled exception behaviour.
         /// </summary>
-        Stop,
+        ThrowException,
 
         /// <summary>
         /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue silently.
@@ -18,12 +19,12 @@ namespace Beef.Events.Subscribe
         ContinueSilent,
 
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue (write <see cref="Beef.Diagnostics.Logger">log message</see>).
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing a log message using the <see cref="EventSubscriberHostArgs.Logger"/>.
         /// </summary>
         ContinueWithLogging,
 
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue (an <see cref="EventData"/> audit is required).
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing an audit message using the <see cref="EventSubscriberHostArgs.AuditWriter"/>.
         /// </summary>
         ContinueWithAudit
     }

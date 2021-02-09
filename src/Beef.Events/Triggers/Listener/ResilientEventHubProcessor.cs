@@ -251,10 +251,10 @@ namespace Beef.Events.Triggers.Listener
             var data = new TriggeredFunctionData { TriggerValue = new ResilientEventHubData(_currEventData!) };
             var fr = await _executor.TryExecuteAsync(data, ct).ConfigureAwait(false);
 
-            // Where we have a failure then checkpoint the last so we will at least restart back at this point; an EventSubscriberStopException is a special case - skip + audit.
+            // Where we have a failure then checkpoint the last so we will at least restart back at this point; an EventSubscriberUnhandledException is a special case - skip + audit.
             var essex = fr.Exception is FunctionInvocationException 
-                ? fr.Exception.InnerException as Beef.Events.Subscribe.EventSubscriberStopException 
-                : fr.Exception as Beef.Events.Subscribe.EventSubscriberStopException;
+                ? fr.Exception.InnerException as Beef.Events.Subscribe.EventSubscriberUnhandledException 
+                : fr.Exception as Beef.Events.Subscribe.EventSubscriberUnhandledException;
 
             if (fr.Succeeded || essex != null)
             {

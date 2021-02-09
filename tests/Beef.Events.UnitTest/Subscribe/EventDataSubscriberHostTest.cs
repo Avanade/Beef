@@ -135,7 +135,7 @@ namespace Beef.Events.UnitTest.Subscribe
         [Test]
         public async Task A160_Receive_OK_ExceptionStop()
         {
-            var ts = new TestSub(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.Stop);
+            var ts = new TestSub(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.ThrowException);
             var ed = new EventData { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser" };
 
             try
@@ -213,7 +213,7 @@ namespace Beef.Events.UnitTest.Subscribe
         [Test]
         public async Task B160_Receive_OK_ExceptionStop()
         {
-            var ts = new TestSubS(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.Stop);
+            var ts = new TestSubS(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.ThrowException);
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser", Value = "TEST" };
 
             try

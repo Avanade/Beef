@@ -32,7 +32,7 @@ namespace Beef.Test.NUnit.Tests
             {
                 Result = await ReceiveAsync(@event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
             }
-            catch (EventSubscriberStopException essex)
+            catch (EventSubscriberUnhandledException essex)
             {
                 Result = essex.Result;
             }
