@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Republish:* Fixed code merge issues.
+
 ## v4.1.4
 - *Enhancement:* Issue [97](https://github.com/Avanade/Beef/issues/97). 
 - *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
