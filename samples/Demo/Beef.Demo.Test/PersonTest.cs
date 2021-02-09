@@ -689,6 +689,30 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void F170_Update_OverrideSystemTime()
+        {
+            var st = new DateTime(1999, 12, 31, 12, 59, 59);
+            var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped<ISystemTime>(new TestSystemTime(st)));
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+
+            // Get an existing person.
+            var p = agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid())).Value;
+
+            p.FirstName += "X";
+            p.LastName += "Y";
+
+            p = agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectChangeLogUpdated("*", st)  // Should be 31-12-1999!
+                .ExpectETag(p.ETag)
+                .ExpectValue((t) => p)
+                .Run(a => a.UpdateAsync(p, 1.ToGuid())).Value;
+        }
+
+        [Test, TestSetUp]
         public void F210_UpdateWithEF_NotFound()
         {
             // Get an existing person.

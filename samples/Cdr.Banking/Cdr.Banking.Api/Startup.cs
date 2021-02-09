@@ -14,6 +14,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Api
@@ -53,6 +54,7 @@ namespace Cdr.Banking.Api
 
             // Add the core beef services (including the customized ExecutionContext).
             services.AddBeefExecutionContext(_ => new Business.ExecutionContext())
+                    .AddBeefSystemTime()
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                     .AddBeefWebApiServices()
@@ -119,6 +121,7 @@ namespace Cdr.Banking.Api
                     throw new Beef.AuthorizationException();
 
                 var bec = (Business.ExecutionContext)ec;
+                bec.Timestamp = SystemTime.Get(hc.RequestServices).UtcNow;
 
                 switch (username[0])
                 {
@@ -136,6 +139,8 @@ namespace Cdr.Banking.Api
                     default:
                         throw new Beef.AuthorizationException();
                 }
+
+                return Task.CompletedTask;
             });
 
             // Use controllers.

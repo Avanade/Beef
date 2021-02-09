@@ -3,6 +3,8 @@
 Represents the **NuGet** versions.
 
 ## v4.1.4
+- *Enhancement:* Issue [97](https://github.com/Avanade/Beef/issues/97). 
+- *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
 - *Fixed:* Issue [100](https://github.com/Avanade/Beef/issues/100) fixed. The `AddBeefLoggerEventPublisher` is now adding the service as scoped, versus a singleton.
 
 ## v4.1.3

@@ -42,6 +42,7 @@ namespace Beef.Demo.Api
         {
             // Add the core beef services.
             services.AddBeefExecutionContext()
+                    .AddBeefSystemTime()
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                     .AddBeefWebApiServices()
@@ -118,11 +119,7 @@ namespace Beef.Demo.Api
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BEEF Demo"));
 
             // Configure the ExecutionContext for the request.
-            app.UseExecutionContext((context, ec) =>
-            {
-                ec.Username = context.User.Identity.Name ?? WebApiExecutionContextMiddleware.DefaultUsername;
-                ec.Timestamp = Cleaner.Clean(DateTime.Now);
-            });
+            app.UseExecutionContext();
 
             // Use controllers.
             app.UseHttpsRedirection();

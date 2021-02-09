@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
+
 ## v4.1.4
 - *Removed:* **Breaking change** to `ExpectValidationException` with its deprecation (removal). Existing usage should be migrated to the more feature rich [`ValidationTester`](https://github.com/Avanade/Beef/blob/master/tools/Beef.Test.NUnit/ValidationTester.cs).
 - *Enhancement:* New `ValidationTester.CreateAndRunAsync` and `ValidationTester.CreateAndRun` methods have been added that creates (instantiates) the `Validator` using the underlying Dependency Injection (DI) capability and validates the passed value.

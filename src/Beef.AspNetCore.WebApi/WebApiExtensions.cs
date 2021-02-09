@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.AspNetCore.WebApi
 {
@@ -14,13 +15,13 @@ namespace Beef.AspNetCore.WebApi
     public static class WebApiExtensions
     {
         /// <summary>
-        /// Registers the action to <paramref name="updateAction"/> the <see cref="ExecutionContext"/> for a request. 
+        /// Registers the action to <paramref name="executionContextUpdate"/> the <see cref="ExecutionContext"/> for a request. 
         /// </summary>
         /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="updateAction">The optional <see cref="Action{HttpContext, ExecutionContext}"/>.</param>
+        /// <param name="executionContextUpdate">An optional function to update the <see cref="ExecutionContext"/>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Action<HttpContext, ExecutionContext>? updateAction = null)
-            => builder.UseMiddleware<WebApiExecutionContextMiddleware>(updateAction ?? WebApiExecutionContextMiddleware.DefaultUpdateAction);
+        public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Func<HttpContext, ExecutionContext, Task>? executionContextUpdate = null)
+            => builder.UseMiddleware<WebApiExecutionContextMiddleware>(executionContextUpdate ?? WebApiExecutionContextMiddleware.DefaultExecutionContextUpdate);
 
         /// <summary>
         /// Adds <see cref="WebApiExceptionHandlerMiddleware"/> to the <see cref="IApplicationBuilder"/> request execution pipeline.

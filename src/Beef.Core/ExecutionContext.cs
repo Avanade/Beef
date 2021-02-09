@@ -103,7 +103,7 @@ namespace Beef
         private string? _username;
         private Guid? _tenantId;
         private string? _partitionKey;
-        private DateTime _timestamp = Cleaner.Clean(DateTime.Now);
+        private DateTime _timestamp = Cleaner.Clean(DateTime.UtcNow);
         private bool _timestampChanged;
         private PagingArgs? _pagingArgs;
         private KeyOnlyDictionary<string>? _roles;
@@ -180,6 +180,11 @@ namespace Beef
 
             throw new InvalidOperationException($"Attempted to get service '{type.FullName}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
         }
+
+        /// <summary>
+        /// Gets the current <see cref="ISystemTime"/> using <see cref="GetService{ISystemTime}(bool)"/>.
+        /// </summary>
+        public static ISystemTime SystemTime => GetService<ISystemTime>(true)!;
 
         /// <summary>
         /// Gets the username from the <see cref="Environment"/> settings.
