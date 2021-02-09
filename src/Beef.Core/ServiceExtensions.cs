@@ -22,8 +22,7 @@ namespace Beef
         /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
         /// <remarks>Use the <paramref name="createExecutionContext"/> function to instantiate a custom <see cref="ExecutionContext"/> (inherited) <see cref="Type"/> where required; otherwise, by default the <i>Beef</i>
-        /// <see cref="ExecutionContext"/> will be used.
-        /// </remarks>
+        /// <see cref="ExecutionContext"/> will be used.</remarks>
         public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<IServiceProvider, ExecutionContext>? createExecutionContext = null)
         {
             if (services == null)
@@ -118,7 +117,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="IEventPublisher"/> <see cref="LoggerEventPublisher"/> instance.
+        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="LoggerEventPublisher"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
@@ -127,7 +126,7 @@ namespace Beef
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton<IEventPublisher, LoggerEventPublisher>();
+            return services.AddScoped<IEventPublisher, LoggerEventPublisher>();
         }
 
         /// <summary>

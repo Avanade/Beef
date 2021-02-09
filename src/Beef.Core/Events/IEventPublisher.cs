@@ -129,7 +129,7 @@ namespace Beef.Events
         Task SendAsync();
 
         /// <summary>
-        /// Resets by clearning the internal cache/store and <see cref="HasBeenSent"/>.
+        /// Resets by clearing the internal cache/store and setting <see cref="HasBeenSent"/> back to <c>false</c>.
         /// </summary>
         void Reset();
     }

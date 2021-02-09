@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.15
+- *Fixed:* Issue [100](https://github.com/Avanade/Beef/issues/100) fixed. Corrected CDC codegen to no longer output errant code where there is a single left outer join specified.
+
+## v4.1.14
+- *Fixed:* The XML schema was being generated with the incorrect `targetNamespace` which has been corrected. Schema order has been corrected to allow any. Missing `List<string>` properties are now included.
+- *Fixed:* The `CdcTracking` table `Id` column changed from `INT` to `UNIQUEIDENTIFIER` as the preferred identifier data type.
+
 ## v4.1.13
 - *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been deprecated (removed).
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
