@@ -22,6 +22,7 @@ namespace Beef.Demo.Functions
 
             // Add the core beef services.
             builder.Services.AddBeefExecutionContext()
+                            .AddBeefSystemTime()
                             .AddBeefRequestCache()
                             .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                             .AddBeefBusinessServices();

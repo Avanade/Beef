@@ -10,14 +10,13 @@ using System.Threading.Tasks;
 namespace Beef.AspNetCore.WebApi
 {
     /// <summary>
-    /// Provides an <see cref="ExecutionContext"/> handling middleware that creates (using dependency injection) and enables additional configuration (<see cref="UpdateAction"/>) where required.
+    /// Provides an <see cref="ExecutionContext"/> handling middleware that creates (using dependency injection) and enables additional configuration where required.
     /// </summary>
-    /// <remarks>A new <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> is instantiated through dependency injection using the <see cref="HttpContext.RequestServices"/>.
-    /// <para>Where no <see cref="UpdateAction"/> has been specified then the <see cref="ExecutionContext.Username"/> will be set to the <see cref="System.Security.Principal.IIdentity.Name"/>
-    /// from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>.</para></remarks>
+    /// <remarks>A new <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> is instantiated through dependency injection using the <see cref="HttpContext.RequestServices"/>.</remarks>
     public class WebApiExecutionContextMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly Func<HttpContext, ExecutionContext, Task> _updateFunc;
 
         /// <summary>
         /// Gets the default username where it is unable to be inferred (<see cref="System.Security.Principal.IIdentity.Name"/> from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>).
@@ -26,31 +25,35 @@ namespace Beef.AspNetCore.WebApi
         public static string DefaultUsername { get; set; } = "Anonymous";
 
         /// <summary>
-        /// Represents the default <see cref="UpdateAction"/>.
+        /// Represents the default <see cref="ExecutionContext"/> update function. The <see cref="ExecutionContext.Username"/> will be set to the <see cref="System.Security.Principal.IIdentity.Name"/>
+        /// from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>. The <see cref="ExecutionContext.Timestamp"/>
+        /// will be set to <see cref="ISystemTime.UtcNow"/>.
         /// </summary>
         /// <param name="context">The <see cref="HttpContext"/>.</param>
         /// <param name="ec">The <see cref="ExecutionContext"/>.</param>
-        internal static void DefaultUpdateAction(HttpContext context, ExecutionContext ec)
+        public static Task DefaultExecutionContextUpdate(HttpContext context, ExecutionContext ec)
         {
-            ec.Username = context.User.Identity.Name ?? DefaultUsername;
-            ec.Timestamp = Entities.Cleaner.Clean(DateTime.Now);
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            
+            if (ec == null)
+                throw new ArgumentNullException(nameof(ec));
+
+            ec.Username = context.User?.Identity?.Name ?? DefaultUsername;
+            ec.Timestamp = SystemTime.Get(context.RequestServices).UtcNow;
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiExecutionContextMiddleware"/>.
         /// </summary>
         /// <param name="next">The next <see cref="RequestDelegate"/>.</param>
-        /// <param name="updateAction">The optional <see cref="UpdateAction"/>.</param>
-        public WebApiExecutionContextMiddleware(RequestDelegate next, Action<HttpContext, ExecutionContext> updateAction)
+        /// <param name="executionContextUpdate">The optional function to update the <see cref="ExecutionContext"/>. Defaults to <see cref="DefaultExecutionContextUpdate(HttpContext, ExecutionContext)"/> where not specified.</param>
+        public WebApiExecutionContextMiddleware(RequestDelegate next, Func<HttpContext, ExecutionContext, Task>? executionContextUpdate = null)
         {
             _next = Check.NotNull(next, nameof(next));
-            UpdateAction = Check.NotNull(updateAction, nameof(updateAction));
+            _updateFunc = executionContextUpdate ?? DefaultExecutionContextUpdate;
         }
-
-        /// <summary>
-        /// Gets the <see cref="Action{HttpContext, ExecutionContext}"/> to enable further updates to the <see cref="ExecutionContext"/>.
-        /// </summary>
-        public Action<HttpContext, ExecutionContext> UpdateAction { get; private set; }
 
         /// <summary>
         /// Invokes the <see cref="WebApiExceptionHandlerMiddleware"/>.
@@ -63,11 +66,11 @@ namespace Beef.AspNetCore.WebApi
                 throw new ArgumentNullException(nameof(context));
 
             var ec = context.RequestServices.GetService<ExecutionContext>();
-            UpdateAction.Invoke(context, ec);
             ec.ServiceProvider = context.RequestServices;
-
             if (context.Request.Headers.TryGetValue(WebApiConsts.CorrelationIdHeaderName, out var val))
                 ec.CorrelationId = val.FirstOrDefault();
+            
+            await _updateFunc(context, ec).ConfigureAwait(false);
 
             ExecutionContext.Reset();
             ExecutionContext.SetCurrent(ec);

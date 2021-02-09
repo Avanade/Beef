@@ -33,7 +33,7 @@ namespace Beef.RefData
             get
             {
                 if (_date == null)
-                    return Cleaner.Clean(DateTime.Now, DateTimeTransform.DateOnly);
+                    return Cleaner.Clean(ExecutionContext.SystemTime.UtcNow, DateTimeTransform.DateOnly);
 
                 return _date;
             }

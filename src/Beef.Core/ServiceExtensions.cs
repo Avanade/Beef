@@ -47,6 +47,20 @@ namespace Beef
         }
 
         /// <summary>
+        /// Adds a scoped service to instantiate a new <see cref="ISystemTime"/> <see cref="SystemTime"/> instance.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="createSystemTime">The function to override the creation of the <see cref="ISystemTime"/> instance; defaults to <see cref="SystemTime"/> where not specified.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefSystemTime(this IServiceCollection services, Func<IServiceProvider, ISystemTime>? createSystemTime = null)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            return services.AddScoped<ISystemTime>(sp => createSystemTime?.Invoke(sp) ?? new SystemTime());
+        }
+
+        /// <summary>
         /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance with the specified <paramref name="config"/>, <paramref name="flushDueTime"/> and <paramref name="flushPeriod"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
