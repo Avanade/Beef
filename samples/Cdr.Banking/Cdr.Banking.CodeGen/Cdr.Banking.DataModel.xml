@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Defines the internal model (persisted in Cosmos) that inherits the AccountModel which adds the Balance. -->
-<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- In this example there is almost a one-to-one entity-to-model mapping; however, it is still considered good practice to seperate.
        Reference data properties need to be simplified (as string) for Cosmos. 
        -->

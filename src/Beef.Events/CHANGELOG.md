@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Fixed:* **Breaking change**. The `ResultHandling.Stop` has been renamed to `ResultHandling.ThrowException` as this is more aligned to what is happening. The corresponding`EventSubscriberStopException` has been renamed `EventSubscriberUnhandledException`.
+
 ## v4.1.3
 - *Enhancement:* Added support for the new unique `EventData.EventId`.
 - *Enhancement:* `EventHubPublisher` updated to reflect `IEventHubPublisher` changes.

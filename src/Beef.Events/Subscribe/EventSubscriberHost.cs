@@ -48,7 +48,7 @@ namespace Beef.Events.Subscribe
         protected async Task<Result> ReceiveAsync(string? subject, string? action, Func<IEventSubscriber, EventData> getEventData)
         {
             if (Args.AuditWriter == null)
-                throw new InvalidOperationException("The Args.AuditWriter must be specified; otherwise, ResultHandling.ContinueWithAudit cannot be actioned.");
+                throw new InvalidOperationException("The Args.AuditWriter must be specified for the ResultHandling.ContinueWithAudit and ResultHandling.ThrowException to function correctly.");
 
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
@@ -101,7 +101,7 @@ namespace Beef.Events.Subscribe
             catch (ValidationException vex) { return CheckResult(Result.InvalidData(vex), subject, action, subscriber); }
             catch (BusinessException bex) { return CheckResult(Result.InvalidData(bex), subject, action, subscriber); }
             catch (NotFoundException) { return CheckResult(Result.DataNotFound(), subject, action, subscriber); }
-            catch (EventSubscriberStopException) { throw; }
+            catch (EventSubscriberUnhandledException) { throw; }
             catch (Exception ex)
             {
                 // Handle the exception as per the subscriber configuration.
@@ -168,8 +168,8 @@ namespace Beef.Events.Subscribe
                     Args.AuditWriter?.Invoke(result);
                     break;
 
-                case ResultHandling.Stop:
-                    throw new EventSubscriberStopException(result);
+                case ResultHandling.ThrowException:
+                    throw new EventSubscriberUnhandledException(result);
 
                 case ResultHandling.ContinueSilent:
                 default:

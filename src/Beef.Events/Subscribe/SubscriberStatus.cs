@@ -35,13 +35,15 @@ namespace Beef.Events.Subscribe
         NotSubscribed,
 
         /// <summary>
-        /// Indicates that an unhandled <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Stop"/>.
+        /// Indicates that an unhandled <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.ThrowException"/>.
         /// </summary>
+        /// <remarks>This will result in an audit write (see <see cref="EventSubscriberHostArgs.AuditWriter"/>).</remarks>
         UnhandledException,
 
         /// <summary>
         /// Indicates that an <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Continue"/>.
         /// </summary>
+        /// <remarks>This will result in an audit write (see <see cref="EventSubscriberHostArgs.AuditWriter"/>).</remarks>
         ExceptionContinue
     }
 }

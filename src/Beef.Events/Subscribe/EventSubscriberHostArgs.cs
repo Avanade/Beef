@@ -121,19 +121,19 @@ namespace Beef.Events.Subscribe
         public ResultHandling NotSubscribedHandling { get; set; } = ResultHandling.ContinueSilent;
 
         /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ThrowException"/>.
         /// </summary>
-        public ResultHandling DataNotFoundHandling { get; set; } = ResultHandling.Stop;
+        public ResultHandling DataNotFoundHandling { get; set; } = ResultHandling.ThrowException;
 
         /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ThrowException"/>.
         /// </summary>
-        public ResultHandling InvalidEventDataHandling { get; set; } = ResultHandling.Stop;
+        public ResultHandling InvalidEventDataHandling { get; set; } = ResultHandling.ThrowException;
 
         /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ThrowException"/>.
         /// </summary>
-        public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
+        public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.ThrowException;
 
         /// <summary>
         /// Gets or sets the subject path seperator <see cref="string"/> (see <see cref="IEventPublisher.PathSeparator"/>).
@@ -227,15 +227,16 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets or sets the audit writer. This is invoked where the <see cref="Result"/> has a corresponding <see cref="ResultHandling"/> of <see cref="ResultHandling.ContinueWithAudit"/>.
         /// </summary>
+        /// <remarks>The <see cref="UseLoggerForAuditing"/> can be used to set up the audit writer to use the <see cref="Logger"/>.</remarks>
         public Action<Result>? AuditWriter { get; set; }
 
         /// <summary>
-        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/>; <b>note:</b> this should only be used in testing situations.
+        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/> as a warning.
         /// </summary>
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
         public EventSubscriberHostArgs UseLoggerForAuditing()
         {
-            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. {result}'");
+            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful. {result}'");
             return this;
         }
 

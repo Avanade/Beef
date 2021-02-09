@@ -94,7 +94,7 @@ namespace Beef.Events.UnitTest.Triggers
                 if (e.Properties.TryGetValue("StopInvalidData", out var exc) && exc is bool bexc && bexc == true)
                 {
                     return Task.FromResult(new FunctionResult(false,
-                         (Exception)typeof(EventSubscriberStopException).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null,
+                         (Exception)typeof(EventSubscriberUnhandledException).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null,
                             new Type[] { typeof(Result) }, null)
                             .Invoke(new object[] { CreateResult(SubscriberStatus.InvalidData, null) })));
                 }

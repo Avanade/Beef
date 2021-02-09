@@ -5,18 +5,18 @@ using System;
 namespace Beef.Events.Subscribe
 {
     /// <summary>
-    /// Provides the unhandled <see cref="Exception"/> options of either <see cref="Stop"/> or <see cref="Continue"/>.
+    /// Provides the unhandled <see cref="Exception"/> options of either <see cref="ThrowException"/> or <see cref="Continue"/>.
     /// </summary>
     public enum UnhandledExceptionHandling
     {
         /// <summary>
         /// Stops and bubbles up the unhandled <see cref="Exception"/> allowing the hosting process to determine the appropriate action.
         /// </summary>
-        Stop,
+        ThrowException,
 
         /// <summary>
         /// Skips and continues effectively swallowing the <see cref="Exception"/>.
         /// </summary>
-        Continue,
+        Continue
     }
 }
