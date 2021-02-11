@@ -15,6 +15,8 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Creates a <see cref="SubscriberStatus.InvalidEventData"/> <see cref="Result"/>.
         /// </summary>
+        /// <param name="exception">The <see cref="System.Exception"/>.</param>
+        /// <param name="reason">The optional reason.</param>
         /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
         internal static Result InvalidEventData(System.Exception? exception, string? reason = null)
             => new Result { Status = SubscriberStatus.InvalidEventData, Reason = reason ?? (exception == null ? null : $"EventData is invalid: {exception.Message}") ?? "EventData is invalid.", Exception = exception };
@@ -22,9 +24,10 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Creates a <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.
         /// </summary>
+        /// <param name="reason">The optional reason.</param>
         /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
-        internal static Result NotSubscribed()
-            => new Result { Status = SubscriberStatus.NotSubscribed, Reason = "An EventSubscriber was not found." };
+        internal static Result NotSubscribed(string? reason = null)
+            => new Result { Status = SubscriberStatus.NotSubscribed, Reason = reason ?? "An EventSubscriber was not found." };
 
         /// <summary>
         /// Creates a <see cref="SubscriberStatus.ExceptionContinue"/> <see cref="Result"/>.
@@ -36,11 +39,28 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.ExceptionContinue, Exception = exception, Reason = reason ?? exception.Message };
 
         /// <summary>
+        /// Creates a <see cref="SubscriberStatus.PoisonSkipped"/> <see cref="Result"/>.
+        /// </summary>
+        /// <param name="reason">The optional reason.</param>
+        /// <returns>The <see cref="SubscriberStatus.PoisonSkipped"/> <see cref="Result"/>.</returns>
+        internal static Result PoisonSkipped(string? reason = null)
+            => new Result { Status = SubscriberStatus.PoisonSkipped, Reason = reason ?? "EventData was identified as Poison and was marked as SkipMessage; this event is skipped (i.e. not processed)." };
+
+        /// <summary>
+        /// Creates a <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.
+        /// </summary>
+        /// <param name="reason">The optional reason.</param>
+        /// <returns>The <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.</returns>
+        internal static Result PoisonMismatch(string? reason = null)
+            => new Result { Status = SubscriberStatus.PoisonMismatch, Reason = reason ?? "EventData does not match the expected poison message and it is uncertain whether it has been successfully processed." };
+
+        /// <summary>
         /// Creates a <see cref="SubscriberStatus.Success"/> <see cref="Result"/>.
         /// </summary>
+        /// <param name="reason">The optional reason.</param>
         /// <returns>The <see cref="SubscriberStatus.Success"/> <see cref="Result"/>.</returns>
-        public static Result Success() 
-            => new Result { Status = SubscriberStatus.Success, Reason = "Success." };
+        public static Result Success(string? reason = null) 
+            => new Result { Status = SubscriberStatus.Success, Reason = reason ?? "Success." };
 
         /// <summary>
         /// Creates a <see cref="SubscriberStatus.DataNotFound"/> <see cref="Result"/>.
@@ -95,17 +115,17 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the event subject.
         /// </summary>
-        internal string? Subject { get; set; }
+        public string? Subject { get; internal set; }
 
         /// <summary>
         /// Gets the event action.
         /// </summary>
-        internal string? Action { get; set; }
+        public string? Action { get; internal set; }
 
         /// <summary>
         /// Gets the corresponding subscriber.
         /// </summary>
-        internal IEventSubscriber? Subscriber { get; set; }
+        public IEventSubscriber? Subscriber { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="SubscriberStatus"/>.

@@ -44,6 +44,16 @@ namespace Beef.Events.Subscribe
         /// Indicates that an <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Continue"/>.
         /// </summary>
         /// <remarks>This will result in an audit write (see <see cref="EventSubscriberHostArgs.AuditWriter"/>).</remarks>
-        ExceptionContinue
+        ExceptionContinue,
+
+        /// <summary>
+        /// Indicates that the event is considered poison (continues to result in an <see cref="UnhandledException"/>) and has been explicitly marked within the <see cref="IEventRepository"/> to <see cref="PoisonMessageAction.PoisonSkip"/> at next subscriber receive.
+        /// </summary>
+        PoisonSkipped,
+
+        /// <summary>
+        /// Indicates that the event does not match the expected poison message and it is uncertain whether it has been successfully processed and is audited accordingly.
+        /// </summary>
+        PoisonMismatch
     }
 }
