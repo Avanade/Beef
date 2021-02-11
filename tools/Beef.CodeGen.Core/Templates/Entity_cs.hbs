@@ -419,9 +419,9 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
         public override bool IsInitial
         {
+{{#ifnull IsInitialOverride}}
             get
             {
-{{#ifnull IsInitialOverride}}
   {{#ifne EntityInherits 'EntityBase'}}
                 if (!base.IsInitial)
                     return false;
@@ -435,10 +435,10 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
   {{#ifeq CoreProperties.Count 0}}
                 return true;
   {{/ifeq}}
-{{else}}
-                return {{IsInitialOverride}};
-{{/ifnull}}
             }
+{{else}}
+            get => {{lower IsInitialOverride}};
+{{/ifnull}}
         }
 
         #endregion
