@@ -214,12 +214,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
         public override bool IsInitial
         {
-            get
-            {
-                return Cleaner.IsInitial(Id)
-                    && Cleaner.IsInitial(FirstName)
-                    && Cleaner.IsInitial(LastName);
-            }
+            get => false;
         }
 
         #endregion

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.17
+- *Fixed:* Issue [105](https://github.com/Avanade/Beef/issues/105) fixed. Incorrect capitalization of boolean when using `IsInitialOverride` has been corrected.
+
 ## v4.1.16
 - *Fixed:* Issue [102](https://github.com/Avanade/Beef/issues/102) fixed. The `AutoInferImplements` and `implementsAutoInfer` internal XML->YAML translation was incorrect resulting in incorrect code-gen when set to `false`.
 - *Fixed:* The code generation XML Schemas have had the `targetNamespace` attribute removed as this was serving no real purpose; and was resulting in errors depending on the validator used. Please remove `xmlns="http://schemas.beef.com/codegen/2015/01/entity"` or `xmlns="http://schemas.beef.com/codegen/2015/01/database"` from the code generation XML configuration files for the schema validation and intellisense to function correctly.
