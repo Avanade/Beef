@@ -17,6 +17,11 @@ namespace Beef.Events.Subscribe
         public EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
 
         /// <summary>
+        /// Gets or sets the <see cref="EventDataSubscriberHostInvoker"/>. Defaults to <see cref="EventDataSubscriberHostInvoker"/>.
+        /// </summary>
+        public EventDataSubscriberHostInvoker? Invoker { get; set; }
+
+        /// <summary>
         /// Performs the receive processing for one or more <see cref="EventData"/> instances.
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> instances to receive/process.</param>
@@ -33,13 +38,10 @@ namespace Beef.Events.Subscribe
 
             foreach (var @event in events)
             {
-                var result = await ReceiveAsync(@event.Subject, @event.Action, (_) => @event).ConfigureAwait(false);
-
-                switch (result.Status)
+                await (Invoker ??= new EventDataSubscriberHostInvoker()).InvokeAsync(this, async () =>
                 {
-                    case SubscriberStatus.UnhandledException:
-                        throw result.Exception!;
-                }
+                    await ReceiveAsync(@event, @event.Subject, @event.Action, (_) => @event).ConfigureAwait(false);
+                }, @event).ConfigureAwait(false);
             }
         }
     }

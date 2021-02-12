@@ -41,25 +41,26 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
         /// </summary>
+        /// <param name="originatingEvent">The originating (non-converted) event (required to enable <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
         /// <returns>The <see cref="Result"/>.</returns>
-        protected async Task<Result> ReceiveAsync(string? subject, string? action, Func<IEventSubscriber, EventData> getEventData)
+        protected async Task<Result> ReceiveAsync(object originatingEvent, string? subject, string? action, Func<IEventSubscriber, EventData> getEventData)
         {
-            if (Args.AuditWriter == null)
-                throw new InvalidOperationException("The Args.AuditWriter must be specified for the ResultHandling.ContinueWithAudit and ResultHandling.ThrowException to function correctly.");
-
+            if (originatingEvent == null)
+                throw new ArgumentNullException(nameof(originatingEvent));
+            
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
 
             if (string.IsNullOrEmpty(subject))
-                return CheckResult(Result.InvalidEventData(null, "EventData is invalid; Subject is required."), null, null, null);
+                return await CheckResultAsync(originatingEvent, Result.InvalidEventData(null, "EventData is invalid; Subject is required."), null, null, null).ConfigureAwait(false);
 
             // Match a subscriber to the subject + template supplied.
             var subscriber = Args.CreateEventSubscriber(Args.SubjectTemplateWildcard, Args.SubjectPathSeparator, subject, action);
             if (subscriber == null)
-                return CheckResult(Result.NotSubscribed(), subject, action, null);
+                return await CheckResultAsync(originatingEvent, Result.NotSubscribed(), subject, action, null).ConfigureAwait(false);
 
             // Where matched get the EventData and execute the subscriber receive.
             EventData @event;
@@ -67,7 +68,7 @@ namespace Beef.Events.Subscribe
             {
                 @event = getEventData(subscriber);
                 if (@event == null)
-                    return CheckResult(Result.InvalidEventData(null, $"EventData is invalid; is required."), subject, action, subscriber);
+                    return await CheckResultAsync(originatingEvent, Result.InvalidEventData(null, $"EventData is invalid; is required."), subject, action, subscriber).ConfigureAwait(false);
             }
 #pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
             catch (Exception ex)
@@ -75,9 +76,9 @@ namespace Beef.Events.Subscribe
             {
                 // Handle the exception as per the subscriber configuration.
                 if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
-                    return CheckResult(Result.ExceptionContinue(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber);
+                    return await CheckResultAsync(originatingEvent, Result.ExceptionContinue(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber).ConfigureAwait(false);
 
-                return CheckResult(Result.InvalidEventData(ex), subject, action, subscriber);
+                return await CheckResultAsync(originatingEvent, Result.InvalidEventData(ex), subject, action, subscriber).ConfigureAwait(false);
             }
 
             try
@@ -95,18 +96,20 @@ namespace Beef.Events.Subscribe
                 ExecutionContext.SetCurrent(ec);
 
                 // Process the event.
-                return CheckResult(await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber);
+                return await CheckResultAsync(originatingEvent, await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber).ConfigureAwait(false);
             }
-            catch (InvalidEventDataException iedex) { return CheckResult(Result.InvalidEventData(iedex), subject, action, subscriber); }
-            catch (ValidationException vex) { return CheckResult(Result.InvalidData(vex), subject, action, subscriber); }
-            catch (BusinessException bex) { return CheckResult(Result.InvalidData(bex), subject, action, subscriber); }
-            catch (NotFoundException) { return CheckResult(Result.DataNotFound(), subject, action, subscriber); }
+            catch (InvalidEventDataException iedex) { return await CheckResultAsync(originatingEvent, Result.InvalidEventData(iedex), subject, action, subscriber).ConfigureAwait(false); }
+            catch (ValidationException vex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(vex), subject, action, subscriber).ConfigureAwait(false); }
+            catch (BusinessException bex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(bex), subject, action, subscriber).ConfigureAwait(false); }
+            catch (NotFoundException) { return await CheckResultAsync(originatingEvent, Result.DataNotFound(), subject, action, subscriber).ConfigureAwait(false); }
             catch (EventSubscriberUnhandledException) { throw; }
             catch (Exception ex)
             {
                 // Handle the exception as per the subscriber configuration.
                 if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
-                    return CheckResult(Result.ExceptionContinue(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber);
+                    return await CheckResultAsync(originatingEvent, Result.ExceptionContinue(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber).ConfigureAwait(false);
+
+                await Args.AuditWriter!.WriteAuditAsync(null!, null!).ConfigureAwait(false);
 
                 throw;
             }
@@ -115,7 +118,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Checks the <see cref="Result"/> and handles accordingly.
         /// </summary>
-        private Result CheckResult(Result result, string? subject, string? action, IEventSubscriber? subscriber = null)
+        private async Task<Result> CheckResultAsync(object originatingEvent, Result result, string? subject, string? action, IEventSubscriber? subscriber = null)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
@@ -130,23 +133,23 @@ namespace Beef.Events.Subscribe
                     break;
 
                 case SubscriberStatus.InvalidEventData:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? Args.InvalidEventDataHandling);
+                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? Args.InvalidEventDataHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.NotSubscribed:
-                    HandleTheHandling(result, result.ResultHandling ?? Args.NotSubscribedHandling);
+                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? Args.NotSubscribedHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.DataNotFound:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? Args.DataNotFoundHandling);
+                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? Args.DataNotFoundHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.InvalidData:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? Args.InvalidDataHandling);
+                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? Args.InvalidDataHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.ExceptionContinue:
-                    Args.AuditWriter?.Invoke(result);
+                    await Args.AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
                     break;
             }
 
@@ -156,7 +159,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Handle the result as required.
         /// </summary>
-        private void HandleTheHandling(Result result, ResultHandling handling)
+        private async Task HandleTheHandlingAsync(object originatingEvent, Result result, ResultHandling handling)
         {
             switch (result.ResultHandling ?? handling)
             {
@@ -165,7 +168,7 @@ namespace Beef.Events.Subscribe
                     break;
 
                 case ResultHandling.ContinueWithAudit:
-                    Args.AuditWriter?.Invoke(result);
+                    await Args.AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
                     break;
 
                 case ResultHandling.ThrowException:

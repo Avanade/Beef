@@ -37,17 +37,17 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Indicates that an unhandled <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.ThrowException"/>.
         /// </summary>
-        /// <remarks>This will result in an audit write (see <see cref="EventSubscriberHostArgs.AuditWriter"/>).</remarks>
+        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</remarks>
         UnhandledException,
 
         /// <summary>
-        /// Indicates that an <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Continue"/>.
+        /// Indicates that an <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Continue"/> (swallow and carry on).
         /// </summary>
-        /// <remarks>This will result in an audit write (see <see cref="EventSubscriberHostArgs.AuditWriter"/>).</remarks>
+        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</remarks>
         ExceptionContinue,
 
         /// <summary>
-        /// Indicates that the event is considered poison (continues to result in an <see cref="UnhandledException"/>) and has been explicitly marked within the <see cref="IEventRepository"/> to <see cref="PoisonMessageAction.PoisonSkip"/> at next subscriber receive.
+        /// Indicates that the event is considered poison (continues to result in an <see cref="UnhandledException"/>) and has been explicitly marked as <see cref="PoisonMessageAction.PoisonSkip"/> (swallow and carry on)..
         /// </summary>
         PoisonSkipped,
 

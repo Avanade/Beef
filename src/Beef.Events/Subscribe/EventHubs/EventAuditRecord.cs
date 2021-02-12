@@ -8,19 +8,19 @@ namespace Beef.Events.Subscribe.EventHubs
     /// <summary>
     /// Represents an Event Audit <see cref="TableEntity"/>.
     /// </summary>
-    public class EventAudit : TableEntity
+    public class EventAuditRecord : TableEntity
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventAudit"/> class.
+        /// Initializes a new instance of the <see cref="EventAuditRecord"/> class.
         /// </summary>
-        public EventAudit() { }
+        public EventAuditRecord() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventAudit"/> class with a specified <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
+        /// Initializes a new instance of the <see cref="EventAuditRecord"/> class with a specified <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
         /// </summary>
         /// <param name="partitionKey">The <see cref="TableEntity.PartitionKey"/>.</param>
         /// <param name="rowKey">The <see cref="TableEntity.RowKey"/>.</param>
-        public EventAudit(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
+        public EventAuditRecord(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
 
         /// <summary>
         /// Gets or sets the offset of the data relative to the Event Hub partition stream.

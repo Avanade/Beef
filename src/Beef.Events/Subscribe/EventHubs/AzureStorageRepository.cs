@@ -13,9 +13,9 @@ using AzureEventHubs = Microsoft.Azure.EventHubs;
 namespace Beef.Events.Subscribe.EventHubs
 {
     /// <summary>
-    /// Provides an <see cref="AzureEventHubs.EventData"/> <see cref="IEventRepository"/> using <b>Azure Storage</b>.
+    /// Provides the <see cref="AzureEventHubs.EventData"/> <b>Azure Storage</b> repository.
     /// </summary>
-    public class AzureStorageRepository : IEventRepository<AzureEventHubs.EventData>
+    public class AzureStorageRepository
     {
         private readonly EventHubsRepositoryArgs _args;
         private readonly IConfiguration _config;
@@ -49,46 +49,29 @@ namespace Beef.Events.Subscribe.EventHubs
         public string PoisonTableName { get; set; } = "EventHubPoisonMessages";
 
         /// <summary>
-        /// Indicates whether poison event/message support is enabled.
+        /// Writes the event to the audit repository.
         /// </summary>
-        /// <remarks>Where not supported then <b>no</b> poison message management will occur.</remarks>
-        public bool IsPoisonSupportEnabled { get; set; }
-
-        /// <summary>
-        /// Writes the event/message to the audit repository.
-        /// </summary>
-        /// <param name="event">The event/message.</param>
+        /// <param name="event">The event.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         public async Task WriteAuditAsync(AzureEventHubs.EventData @event, Result result)
         {
-            var audit = CreateEventAudit(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
+            var audit = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
             await WriteAuditAsync(audit, null).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Writes the <see cref="EventAudit"/> to the audit repository.
+        /// Writes the <see cref="EventAuditRecord"/> to the audit repository.
         /// </summary>
-        private async Task WriteAuditAsync(EventAudit audit, Result? overrideResult)
+        private async Task WriteAuditAsync(EventAuditRecord audit, Result? overrideResult)
         {
-            // Override result where specified.
-            if (overrideResult != null)
-            {
-                audit.Reason = overrideResult.Reason;
-                if (overrideResult.Exception != null)
-                    audit.Exception = overrideResult.Exception.ToString()[0..64000]; //  Substring to a 64K (64,000 char) limit allowed by Azure Storage.
-            }
-
             var prevRowKey = audit.RowKey;
+            OverrideEventAuditRecordResult(audit, overrideResult);
 
             while (true)
             {
-                // Get the high-precision audit time.
-                long tickCount = System.Diagnostics.Stopwatch.GetTimestamp();
-                var highResDateTime = new DateTime(tickCount);
-
                 // Insert the audit message table.
                 var at = await GetAuditMessageTableAsync().ConfigureAwait(false);
-                audit.RowKey = new DateTime(tickCount).ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + audit.RowKey;
+                audit.RowKey = GetTimestamp().ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + audit.RowKey;
                 var r = await at.ExecuteAsync(TableOperation.Insert(audit)).ConfigureAwait(false);
 
                 switch ((HttpStatusCode)r.HttpStatusCode)
@@ -109,11 +92,33 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Create (instantiate) the <see cref="EventAudit"/>.
+        /// Gets the timestamp.
         /// </summary>
-        private EventAudit CreateEventAudit(AzureEventHubs.EventData @event, Result result)
+        private static DateTime GetTimestamp()
         {
-            return new EventAudit(_storagePartitionKey, CreateRowKey(@event))
+            long tickCount = System.Diagnostics.Stopwatch.GetTimestamp();
+            return new DateTime(tickCount);
+        }
+
+        /// <summary>
+        /// Override result where specified.
+        /// </summary>
+        private static void OverrideEventAuditRecordResult(EventAuditRecord audit, Result? overrideResult)
+        {
+            if (overrideResult != null)
+            {
+                audit.Reason = overrideResult.Reason;
+                if (overrideResult.Exception != null)
+                    audit.Exception = overrideResult.Exception.ToString()[0..64000]; //  Substring to a 64K (64,000 char) limit allowed by Azure Storage.
+            }
+        }
+
+        /// <summary>
+        /// Create (instantiate) the <see cref="EventAuditRecord"/>.
+        /// </summary>
+        private EventAuditRecord CreateEventAuditRecord(AzureEventHubs.EventData @event, Result result)
+        {
+            return new EventAuditRecord(_storagePartitionKey, CreateRowKey(@event))
             {
                 Offset = @event.SystemProperties.Offset,
                 SequenceNumber = @event.SystemProperties.SequenceNumber,
@@ -121,8 +126,8 @@ namespace Beef.Events.Subscribe.EventHubs
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
-                Body = Encoding.UTF8.GetString(@event.Body.Array)[0..64000], //  Substring to a 64K (64,000 char) limit allowed by Azure Storage.
-                Exception = result.Exception?.ToString()[0..64000] //  Substring to a 64K (64,000 char) limit allowed by Azure Storage.
+                Body = Encoding.UTF8.GetString(@event.Body.Array)[0..64000], // Substring to a 64K (64,000 char) limit allowed by Azure Storage.
+                Exception = result.Exception?.ToString()[0..64000] // Substring to a 64K (64,000 char) limit allowed by Azure Storage.
             };
         }
 
@@ -165,12 +170,12 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Gets the poisoned <see cref="EventAudit"/>.
+        /// Gets the poisoned <see cref="EventAuditRecord"/>.
         /// </summary>
-        private async Task<EventAudit> GetPoisonedAsync(CloudTable poisonTable, AzureEventHubs.EventData @event)
+        private async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, AzureEventHubs.EventData @event)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAudit>(_storagePartitionKey, CreateRowKey(@event))).ConfigureAwait(false);
-            return (EventAudit)r.Result;
+            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAuditRecord>(_storagePartitionKey, CreateRowKey(@event))).ConfigureAwait(false);
+            return (EventAuditRecord)r.Result;
         }
 
         /// <summary>
@@ -184,11 +189,11 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Remove the poisoned <see cref="EventAudit"/>.
+        /// Remove the poisoned <see cref="EventAuditRecord"/>.
         /// </summary>
-        private async Task RemovePoisonedAsync(CloudTable poisonTable, EventAudit ea)
+        private async Task RemovePoisonedAsync(CloudTable poisonTable, EventAuditRecord ea)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventAudit(_storagePartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
+            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventAuditRecord(_storagePartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
             _ = r.Result;
         }
 
@@ -197,22 +202,53 @@ namespace Beef.Events.Subscribe.EventHubs
         /// </summary>
         /// <param name="event"><inheritdoc/></param>
         /// <param name="result"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
-        public async Task<PoisonMessageAction> MarkAsPoisonedAsync(AzureEventHubs.EventData @event, Result result)
+        public async Task MarkAsPoisonedAsync(AzureEventHubs.EventData @event, Result result)
         {
-            var audit = CreateEventAudit(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
+            // Get the poison message table.
+            var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
+
+            while (true)
+            {
+                // Get the current poison event (if there is one).
+                var ear = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
+                if (ear == null)
+                    ear = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
+                else
+                {
+                    OverrideEventAuditRecordResult(ear, result);
+                    ear.Retries++;
+                }
+
+                if (ear.PoisonedTimeUtc == null)
+                    ear.PoisonedTimeUtc = GetTimestamp();
+
+                var r = await pt.ExecuteAsync(TableOperation.InsertOrReplace(ear)).ConfigureAwait(false);
+                switch ((HttpStatusCode)r.HttpStatusCode)
+                {
+                    case HttpStatusCode.PreconditionFailed:
+                        continue; // Try again.
+
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.NoContent:
+                    case HttpStatusCode.Accepted:
+                        return; // All good, carry on.
+
+                    default:
+                        throw new InvalidOperationException($"WriteAuditAsync failed with HttpStatusCode: {r.HttpStatusCode}.");
+                }
+            }
         }
 
         /// <summary>
         /// Gets (creates) the <b>Audit</b> <see cref="CloudTable"/> (table name is <see cref="AuditTableName"/>).
         /// </summary>
-        /// <returns>The <see cref="EventAudit"/> <see cref="CloudTable"/>.</returns>
+        /// <returns>The <see cref="EventAuditRecord"/> <see cref="CloudTable"/>.</returns>
         public async Task<CloudTable> GetAuditMessageTableAsync()
         {
             if (_auditTable != null)
                 return _auditTable;
 
-            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString));
+            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString);
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(AuditTableName);
             await t.CreateIfNotExistsAsync().ConfigureAwait(false);
@@ -222,16 +258,13 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Gets (creates) the <b>Poison</b> <see cref="CloudTable"/> (table name is <see cref="PoisonTableName"/>).
         /// </summary>
-        /// <returns>The <see cref="EventAudit"/> <see cref="CloudTable"/>.</returns>
+        /// <returns>The <see cref="EventAuditRecord"/> <see cref="CloudTable"/>.</returns>
         public async Task<CloudTable> GetPoisonMessageTableAsync()
         {
-            if (!IsPoisonSupportEnabled)
-                throw new NotSupportedException("IsPoisonSupportEnabled is set to false; as such any Poison-related operation is not allowed.");
-
             if (_poisonTable != null)
                 return _poisonTable;
 
-            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString));
+            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString);
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(PoisonTableName);
             await t.CreateIfNotExistsAsync().ConfigureAwait(false);

@@ -16,6 +16,7 @@ namespace Beef.Events.Subscribe
     {
         private readonly List<EventSubscriberConfig> _subscribers;
         private ILogger? _logger;
+        private IAuditWriter? _auditWriter;
 
         /// <summary>
         /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <typeparamref name="TStartup"/> (to infer the underlying subscribers <see cref="Assembly"/>).
@@ -220,23 +221,22 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
-        /// Gets the <see cref="ILogger"/>.
+        /// Gets the <see cref="ILogger"/> from the <see cref="ServiceProvider"/>.
         /// </summary>
         public ILogger Logger => _logger ??= ServiceProvider.GetService<ILogger<EventSubscriberHost>>();
 
         /// <summary>
-        /// Gets or sets the audit writer. This is invoked where the <see cref="Result"/> has a corresponding <see cref="ResultHandling"/> of <see cref="ResultHandling.ContinueWithAudit"/>.
+        /// Gets or sets the <see cref="IAuditWriter"/>. Defaults to <see cref="LoggerAuditWriter"/> where not specified.
         /// </summary>
-        /// <remarks>The <see cref="UseLoggerForAuditing"/> can be used to set up the audit writer to use the <see cref="Logger"/>.</remarks>
-        public Action<Result>? AuditWriter { get; set; }
+        public IAuditWriter? AuditWriter => _auditWriter ??= new LoggerAuditWriter(Logger);
 
         /// <summary>
         /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/> as a warning.
         /// </summary>
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
-        public EventSubscriberHostArgs UseLoggerForAuditing()
+        public EventSubscriberHostArgs UseAuditWriter(IAuditWriter auditWriter)
         {
-            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful. {result}'");
+            _auditWriter = Check.NotNull(auditWriter, nameof(auditWriter));
             return this;
         }
 
