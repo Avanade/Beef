@@ -35,8 +35,8 @@ BEGIN
   {{#ifval Parent.ColumnCreatedBy}}
     EXEC @{{Parent.ColumnCreatedBy.Name}} = fnGetUsername @{{Parent.ColumnCreatedBy.Name}}
   {{/ifval}}
-{{/if}}
 
+{{/if}}
 {{#each ExecuteBefore}}
   {{#if @first}}
     -- Execute additional (pre) statements.
@@ -47,14 +47,18 @@ BEGIN
   {{/if}}
 {{/each}}
     -- Create the record.
+{{#ifne Parent.PrimaryKeyIdentityColumns.Count 0}}
     DECLARE @InsertedIdentity TABLE({{#each Parent.PrimaryKeyIdentityColumns}}[{{Name}}] {{SqlType}}{{#unless @last}}, {{/unless}}{{/each}})
 
+{{/ifne}}
     INSERT INTO {{Parent.QualifiedName}} (
 {{#each SettableColumnsInsert}}
       [{{Name}}]{{#unless @last}},{{/unless}}
 {{/each}}
     )
+{{#ifne Parent.PrimaryKeyIdentityColumns.Count 0}}
     OUTPUT {{#each Parent.PrimaryKeyIdentityColumns}}inserted.{{Name}}{{#unless @last}}, {{/unless}}{{/each}} INTO @InsertedIdentity
+{{/ifne}}
     VALUES (
 {{#each SettableColumnsInsert}}
       {{ParameterName}}{{#unless @last}},{{/unless}}
@@ -65,15 +69,17 @@ BEGIN
   {{#each Parent.PrimaryKeyIdentityColumns}}
     SELECT @{{Name}} = [{{Name}}] FROM @InsertedIdentity
   {{/each}}
+
 {{/ifne}}
 {{#each ExecuteAfter}}
   {{#if @first}}
-
     -- Execute additional statements.
   {{/if}}
     {{{Statement}}}
-{{/each}}
+  {{#if @last}}
 
+  {{/if}}
+{{/each}}
     -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY

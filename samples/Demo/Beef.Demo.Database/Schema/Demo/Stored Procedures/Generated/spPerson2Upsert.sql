@@ -33,6 +33,7 @@ BEGIN
       EXEC @CreatedDate = fnGetTimestamp @CreatedDate
       EXEC @CreatedBy = fnGetUsername @CreatedBy
 
+      -- Create the record.
       INSERT INTO [Demo].[Person2] (
         [PersonId],
         [FirstName],
