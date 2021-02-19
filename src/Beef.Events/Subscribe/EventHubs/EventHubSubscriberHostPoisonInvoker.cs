@@ -8,20 +8,20 @@ using System.Runtime.CompilerServices;
 namespace Beef.Events.Subscribe.EventHubs
 {
     /// <summary>
-    /// Represents an <see cref="EventHubSubscriberHostInvoker"/> that uses an <see cref="AzureStorageRepository"/> to manage poison events (both retry and skipping).
+    /// Represents an <see cref="EventHubSubscriberHostInvoker"/> that uses an <see cref="EventHubsAzureStorageRepository"/> to manage poison events (both retry and skipping).
     /// </summary>
     public class EventHubSubscriberHostPoisonInvoker : EventHubSubscriberHostInvoker
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubSubscriberHostPoisonInvoker"/> class.
         /// </summary>
-        /// <param name="storage">The <see cref="AzureStorageRepository"/>.</param>
-        public EventHubSubscriberHostPoisonInvoker(AzureStorageRepository storage) => Storage = Check.NotNull(storage, nameof(storage));
+        /// <param name="storage">The <see cref="EventHubsAzureStorageRepository"/>.</param>
+        public EventHubSubscriberHostPoisonInvoker(EventHubsAzureStorageRepository storage) => Storage = Check.NotNull(storage, nameof(storage));
 
         /// <summary>
-        /// Gets the <see cref="AzureStorageRepository"/>.
+        /// Gets the <see cref="EventHubsAzureStorageRepository"/>.
         /// </summary>
-        public AzureStorageRepository Storage { get; }
+        public EventHubsAzureStorageRepository Storage { get; }
 
         /// <summary>
         /// Invokes a <paramref name="func"/> asynchronously.

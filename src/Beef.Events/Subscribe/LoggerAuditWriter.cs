@@ -36,8 +36,9 @@ namespace Beef.Events.Subscribe
         /// <param name="originatingEvent">The originating event.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>This provides a reusable/standardized approach to the logging.</remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1801:Review unused parameters", Justification = "Same contract as IAuditWriter.WriteAuditAsync(object, Result).")]
+#pragma warning disable IDE0060, CA1801 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
         public static Task WriteAuditAsync(ILogger logger, object originatingEvent, Result result)
+#pragma warning restore IDE0060, CA1801
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -48,29 +49,34 @@ namespace Beef.Events.Subscribe
             if (result.Exception != null)
             {
                 if (result.Status == SubscriberStatus.ExceptionContinue)
-                    logger.LogWarning(result.Exception, result.ToString());
+                    logger.LogWarning(result.Exception, FormatReasonMessage(result));
                 else
-                    logger.LogError(result.Exception, result.ToString());
+                    logger.LogError(result.Exception, FormatReasonMessage(result));
             }
             else
             {
                 switch (result.Status)
                 {
                     case SubscriberStatus.Success:
-                        logger.LogInformation(result.ToString());
+                        logger.LogInformation(FormatReasonMessage(result));
                         break;
 
                     case SubscriberStatus.PoisonMismatch:
-                        logger.LogError(result.ToString());
+                        logger.LogError(FormatReasonMessage(result));
                         break;
 
                     default:
-                        logger.LogWarning(result.ToString());
+                        logger.LogWarning(FormatReasonMessage(result));
                         break;
                 }
             }
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Formats the reason message.
+        /// </summary>
+        private static string FormatReasonMessage(Result result) => $"Event Subscriber - {result}";
     }
 }

@@ -31,7 +31,7 @@ namespace Beef.Events.Publish
         }
 
         /// <summary>
-        /// Indicates whether any <see cref="Exception"/> thrown during the publish should be swallowed (e.g. log and continue processing).
+        /// Indicates whether any <see cref="Exception"/> thrown during the publish should be swallowed (e.g. log and continue processing). Defaults to <c>false</c>.
         /// </summary>
         public bool SwallowException { get; set; }
 

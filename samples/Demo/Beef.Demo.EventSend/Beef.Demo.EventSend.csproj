@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
+  </ItemGroup>
+
+</Project>

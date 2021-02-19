@@ -17,28 +17,36 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubsRepositoryArgs"/>.
         /// </summary>
+        /// <param name="eventHubName"> The <b>Event Hubs</b> name.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="eventHubConnectionStringName">The Event Hubs connection string setting name; defaults to 'EventHubConnectionString'.</param>
         /// <param name="consumerGroup">The consumer group, defaults to '$Default'.</param>
-        public EventHubsRepositoryArgs(IConfiguration config, string eventHubConnectionStringName = "EventHubConnectionString", string consumerGroup = "$Default") :
-            this(config, new EventHubsConnectionStringBuilder(config.GetConnectionStringOrSetting(eventHubConnectionStringName)), consumerGroup) { }
+        public EventHubsRepositoryArgs(string eventHubName, IConfiguration config, string eventHubConnectionStringName = "EventHubConnectionString", string consumerGroup = "$Default") :
+            this(eventHubName, config, new EventHubsConnectionStringBuilder(config.GetConnectionStringOrSetting(eventHubConnectionStringName)), consumerGroup) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubsRepositoryArgs"/> using the specified <paramref name="connectionStringBuilder"/>.
         /// </summary>
+        /// <param name="eventHubName"> The <b>Event Hubs</b> name.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="connectionStringBuilder">The <see cref="EventHubsConnectionStringBuilder"/>.</param>
         /// <param name="consumerGroup">The consumer group, defaults to '$Default'.</param>
-        public EventHubsRepositoryArgs(IConfiguration config, EventHubsConnectionStringBuilder connectionStringBuilder, string consumerGroup = "$Default")
+        public EventHubsRepositoryArgs(string eventHubName, IConfiguration config, EventHubsConnectionStringBuilder connectionStringBuilder, string consumerGroup = "$Default")
         {
             if (connectionStringBuilder == null)
                 throw new ArgumentNullException(nameof(connectionStringBuilder));
 
+            EventHubName = string.IsNullOrEmpty(eventHubName) ? throw new ArgumentNullException(nameof(eventHubName)) : eventHubName;
             EventHubPath = EscapeBlobPath(connectionStringBuilder.Endpoint.Host);
-            EventHubName = EscapeBlobPath(connectionStringBuilder.EntityPath);
             ConsumerGroup = consumerGroup;
-            StorageConnectionString = Check.NotNull(config, nameof(config)).GetWebJobsConnectionString(ConnectionStringNames.Storage);
+            Config = Check.NotNull(config, nameof(config));
+            StorageConnectionString = Config.GetWebJobsConnectionString(ConnectionStringNames.Storage);
         }
+
+        /// <summary>
+        /// Get the <see cref="IConfiguration"/>.
+        /// </summary>
+        public IConfiguration Config { get; }
 
         /// <summary>
         /// Gets the Event Hubs path.

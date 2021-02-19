@@ -22,22 +22,25 @@ namespace Beef.Events.Subscribe
         /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <typeparamref name="TStartup"/> (to infer the underlying subscribers <see cref="Assembly"/>).
         /// </summary>
         /// <typeparam name="TStartup">The startup class whereby all the subscribers reside.</typeparam>
+        /// <param name="logger">Optional <see cref="ILogger"/>; defaults to <see cref="ILogger{EventSubscriberHost}"/>.</param>
         /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
-        public static EventSubscriberHostArgs Create<TStartup>() where TStartup : class => Create(typeof(TStartup).Assembly);
+        public static EventSubscriberHostArgs Create<TStartup>(ILogger? logger = null) where TStartup : class => Create(typeof(TStartup).Assembly, logger);
 
         /// <summary>
         /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified  <paramref name="subscribersAssembly"/>.
         /// </summary>
         /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
+        /// <param name="logger">Optional <see cref="ILogger"/>; defaults to <see cref="ILogger{EventSubscriberHost}"/>.</param>
         /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
-        public static EventSubscriberHostArgs Create(Assembly subscribersAssembly) => new EventSubscriberHostArgs(subscribersAssembly);
+        public static EventSubscriberHostArgs Create(Assembly subscribersAssembly, ILogger? logger = null) => new EventSubscriberHostArgs(subscribersAssembly, logger);
 
         /// <summary>
         /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <paramref name="eventSubscriberTypes"/>.
         /// </summary>
+        /// <param name="logger">Optional <see cref="ILogger"/>; defaults to <see cref="ILogger{EventSubscriberHost}"/>.</param>
         /// <param name="eventSubscriberTypes">One or more <see cref="IEventSubscriber"/> types.</param>
         /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
-        public static EventSubscriberHostArgs Create(params Type[] eventSubscriberTypes) => new EventSubscriberHostArgs(eventSubscriberTypes);
+        public static EventSubscriberHostArgs Create(ILogger? logger, params Type[] eventSubscriberTypes) => new EventSubscriberHostArgs(logger, eventSubscriberTypes);
 
         /// <summary>
         /// Gets all the subscriber configuration from the specified assembly.
@@ -61,10 +64,10 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="subscribersAssembly"/>.
         /// </summary>
-        /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
-        private EventSubscriberHostArgs(Assembly subscribersAssembly)
+        private EventSubscriberHostArgs(Assembly subscribersAssembly, ILogger? logger)
         {
             _subscribers = GetSubscriberConfig(subscribersAssembly ?? throw new ArgumentNullException(nameof(subscribersAssembly)));
+            _logger = logger;
 
             if (_subscribers.Count == 0)
                 throw new ArgumentException($"No {nameof(IEventSubscriber)} instances were found within Assembly '{subscribersAssembly.FullName}'; at least one must exist to enable execution.");
@@ -73,13 +76,13 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="eventSubscriberTypes"/>.
         /// </summary>
-        /// <param name="eventSubscriberTypes">One or more <see cref="IEventSubscriber"/> types.</param>
-        private EventSubscriberHostArgs(params Type[] eventSubscriberTypes)
+        private EventSubscriberHostArgs(ILogger? logger, params Type[] eventSubscriberTypes)
         {
             if (eventSubscriberTypes == null || eventSubscriberTypes.Length == 0)
                 throw new ArgumentException($"At least one event {nameof(IEventSubscriber)} must be specified to enable execution.", nameof(eventSubscriberTypes));
 
             _subscribers = new List<EventSubscriberConfig>();
+            _logger = logger;
             foreach (var type in eventSubscriberTypes)
             {
                 if (typeof(IEventSubscriber).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
@@ -152,6 +155,36 @@ namespace Beef.Events.Subscribe
         internal Action<ExecutionContext, IEventSubscriber, EventData>? UpdateExecutionContext { get; private set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="ILogger"/>. Defaults to <see cref="ILogger{EventSubscriberHost}"/>.
+        /// </summary>
+        public ILogger Logger { get => _logger ??= ServiceProvider.GetService<ILogger<EventSubscriberHost>>(); set => _logger = value ?? throw new ArgumentNullException(nameof(value)); }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/> to write the audit information.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs UseLogger(ILogger logger)
+        {
+            Logger = logger;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAuditWriter"/>. Defaults to <see cref="LoggerAuditWriter"/>.
+        /// </summary>
+        public IAuditWriter AuditWriter { get => _auditWriter ??= new LoggerAuditWriter(Logger); set => _auditWriter = value ?? throw new ArgumentNullException(nameof(value)); }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/> to write the audit information.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs UseAuditWriter(IAuditWriter auditWriter)
+        {
+            AuditWriter = auditWriter;
+            return this;
+        }
+
+        /// <summary>
         /// Sets the <see cref="AreMultipleMessagesSupported"/> value to <b>true</b>.
         /// </summary>
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
@@ -217,26 +250,6 @@ namespace Beef.Events.Subscribe
         public EventSubscriberHostArgs ExecutionContext(Action<ExecutionContext, IEventSubscriber, EventData> updateExecutionContext)
         {
             UpdateExecutionContext = Check.NotNull(updateExecutionContext, nameof(updateExecutionContext));
-            return this;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="ILogger"/> from the <see cref="ServiceProvider"/>.
-        /// </summary>
-        public ILogger Logger => _logger ??= ServiceProvider.GetService<ILogger<EventSubscriberHost>>();
-
-        /// <summary>
-        /// Gets or sets the <see cref="IAuditWriter"/>. Defaults to <see cref="LoggerAuditWriter"/> where not specified.
-        /// </summary>
-        public IAuditWriter? AuditWriter => _auditWriter ??= new LoggerAuditWriter(Logger);
-
-        /// <summary>
-        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/> as a warning.
-        /// </summary>
-        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
-        public EventSubscriberHostArgs UseAuditWriter(IAuditWriter auditWriter)
-        {
-            _auditWriter = Check.NotNull(auditWriter, nameof(auditWriter));
             return this;
         }
 

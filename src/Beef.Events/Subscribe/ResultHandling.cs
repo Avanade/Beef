@@ -19,12 +19,12 @@ namespace Beef.Events.Subscribe
         ContinueSilent,
 
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing a log message using the <see cref="EventSubscriberHostArgs.Logger"/>.
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing a log message using the <see cref="EventSubscriberHost.Logger"/>.
         /// </summary>
         ContinueWithLogging,
 
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing an audit message using the <see cref="EventSubscriberHostArgs.AuditWriter"/>.
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is expected and to continue after writing an audit message using the <see cref="EventSubscriberHost.AuditWriter"/>.
         /// </summary>
         ContinueWithAudit
     }

@@ -86,7 +86,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
         /// <returns>The <see cref="Result"/>.</returns>
-        public override Task<Result> ReceiveAsync(EventData eventData)
+        public async override Task<Result> ReceiveAsync(EventData eventData)
         {
             EventData<T> ed;
 
@@ -94,9 +94,9 @@ namespace Beef.Events.Subscribe
             {
                 ed = (EventData<T>)eventData;
             }
-            catch (InvalidCastException icex) { return Task.FromResult(Result.InvalidEventData(icex)); }
+            catch (InvalidCastException icex) { return EventSubscriberHost.CreateInvalidEventDataResult(icex); }
 
-            return ReceiveAsync(ed);
+            return await ReceiveAsync(ed).ConfigureAwait(false);
         }
 
         /// <summary>

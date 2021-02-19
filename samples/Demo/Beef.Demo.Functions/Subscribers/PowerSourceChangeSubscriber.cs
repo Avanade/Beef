@@ -38,7 +38,7 @@ namespace Beef.Demo.Functions.Subscribers
                 return Result.Success();
             }
             else
-                return Result.InvalidData($"Key '{@event.Key}' must be a GUID.", ResultHandling.ContinueWithAudit);
+                return Result.InvalidData($"Key '{@event.Key ?? "null"}' must be a GUID.", ResultHandling.ContinueWithAudit);
         }
     }
 }

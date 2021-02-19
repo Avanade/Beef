@@ -279,7 +279,7 @@ namespace Beef.Test.NUnit
                 try
                 {
                     ExecutionContext.Reset();
-                    var args = EventSubscriberHostArgs.Create(typeof(TSubscriber)).UseServiceProvider(scope.ServiceProvider).UseLoggerForAuditing();
+                    var args = EventSubscriberHostArgs.Create(typeof(TSubscriber)).UseServiceProvider(scope.ServiceProvider);
                     tesh = new EventSubscriberTestHost(args);
                     sw = Stopwatch.StartNew();
                     await tesh.ReceiveAsync(@event).ConfigureAwait(false);

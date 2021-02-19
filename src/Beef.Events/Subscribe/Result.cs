@@ -13,48 +13,6 @@ namespace Beef.Events.Subscribe
     public class Result
     {
         /// <summary>
-        /// Creates a <see cref="SubscriberStatus.InvalidEventData"/> <see cref="Result"/>.
-        /// </summary>
-        /// <param name="exception">The <see cref="System.Exception"/>.</param>
-        /// <param name="reason">The optional reason.</param>
-        /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
-        internal static Result InvalidEventData(System.Exception? exception, string? reason = null)
-            => new Result { Status = SubscriberStatus.InvalidEventData, Reason = reason ?? (exception == null ? null : $"EventData is invalid: {exception.Message}") ?? "EventData is invalid.", Exception = exception };
-
-        /// <summary>
-        /// Creates a <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.
-        /// </summary>
-        /// <param name="reason">The optional reason.</param>
-        /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
-        internal static Result NotSubscribed(string? reason = null)
-            => new Result { Status = SubscriberStatus.NotSubscribed, Reason = reason ?? "An EventSubscriber was not found." };
-
-        /// <summary>
-        /// Creates a <see cref="SubscriberStatus.ExceptionContinue"/> <see cref="Result"/>.
-        /// </summary>
-        /// <param name="exception">The <see cref="System.Exception"/>.</param>
-        /// <param name="reason">The optional reason.</param>
-        /// <returns>The <see cref="SubscriberStatus.ExceptionContinue"/> <see cref="Result"/>.</returns>
-        internal static Result ExceptionContinue(System.Exception exception, string? reason)
-            => new Result { Status = SubscriberStatus.ExceptionContinue, Exception = exception, Reason = reason ?? exception.Message };
-
-        /// <summary>
-        /// Creates a <see cref="SubscriberStatus.PoisonSkipped"/> <see cref="Result"/>.
-        /// </summary>
-        /// <param name="reason">The optional reason.</param>
-        /// <returns>The <see cref="SubscriberStatus.PoisonSkipped"/> <see cref="Result"/>.</returns>
-        internal static Result PoisonSkipped(string? reason = null)
-            => new Result { Status = SubscriberStatus.PoisonSkipped, Reason = reason ?? "EventData was identified as Poison and was marked as SkipMessage; this event is skipped (i.e. not processed)." };
-
-        /// <summary>
-        /// Creates a <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.
-        /// </summary>
-        /// <param name="reason">The optional reason.</param>
-        /// <returns>The <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.</returns>
-        internal static Result PoisonMismatch(string? reason = null)
-            => new Result { Status = SubscriberStatus.PoisonMismatch, Reason = reason ?? "EventData does not match the expected poison message and it is uncertain whether it has been successfully processed." };
-
-        /// <summary>
         /// Creates a <see cref="SubscriberStatus.Success"/> <see cref="Result"/>.
         /// </summary>
         /// <param name="reason">The optional reason.</param>
@@ -72,7 +30,7 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.DataNotFound, Reason = reason ?? new LText("Beef.NotFoundException"), ResultHandling = resultHandlingOverride };
 
         /// <summary>
-        /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.
+        /// Creates an <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/>.
         /// </summary>
         /// <param name="reason">The optional reason.</param>
         /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
@@ -81,7 +39,7 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.InvalidData, Reason = reason ?? new LText("Beef.ValidationException"), ResultHandling = resultHandlingOverride };
 
         /// <summary>
-        /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a set of <paramref name="messages"/>.
+        /// Creates an <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a set of <paramref name="messages"/>.
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/>.</param>
         /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
@@ -90,7 +48,7 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(messages, nameof(messages)).ToString(), ResultHandling = resultHandlingOverride };
 
         /// <summary>
-        /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.ValidationException"/>.
+        /// Creates an <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.ValidationException"/>.
         /// </summary>
         /// <param name="exception">The <see cref="Beef.ValidationException"/>.</param>
         /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
@@ -99,7 +57,7 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(exception, nameof(exception)).Messages?.ToString() ?? exception?.Message, Exception = exception, ResultHandling = resultHandlingOverride };
 
         /// <summary>
-        /// Creates a <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.BusinessException"/>.
+        /// Creates an <see cref="SubscriberStatus.InvalidData"/> <see cref="Result"/> from a <see cref="Beef.BusinessException"/>.
         /// </summary>
         /// <param name="exception">The <see cref="Beef.BusinessException"/>.</param>
         /// <param name="resultHandlingOverride">The <see cref="ResultHandling"/> where overriding the default behaviour.</param>
@@ -108,44 +66,44 @@ namespace Beef.Events.Subscribe
             => new Result { Status = SubscriberStatus.InvalidData, Reason = Check.NotNull(exception, nameof(exception)).Message, Exception = exception, ResultHandling = resultHandlingOverride };
 
         /// <summary>
-        /// Private contructor.
+        /// Initializes a new instance of the <see cref="Result"/> class.
         /// </summary>
-        private Result() { }
+        internal Result() { }
 
         /// <summary>
-        /// Gets the event subject.
+        /// Gets or sets the event subject.
         /// </summary>
-        public string? Subject { get; internal set; }
+        public string? Subject { get; set; }
 
         /// <summary>
-        /// Gets the event action.
+        /// Gets or sets the event action.
         /// </summary>
-        public string? Action { get; internal set; }
+        public string? Action { get; set; }
 
         /// <summary>
-        /// Gets the corresponding subscriber.
+        /// Gets or set the corresponding subscriber.
         /// </summary>
-        public IEventSubscriber? Subscriber { get; internal set; }
+        public IEventSubscriber? Subscriber { get; set; }
 
         /// <summary>
         /// Gets the <see cref="SubscriberStatus"/>.
         /// </summary>
-        public SubscriberStatus Status { get; private set; }
+        public SubscriberStatus Status { get; internal set; }
 
         /// <summary>
         /// Gets the reason text.
         /// </summary>
-        public string? Reason { get; private set; }
+        public string? Reason { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="ResultHandling"/> where specified (overriding the default).
         /// </summary>
-        public ResultHandling? ResultHandling { get; private set; }
+        public ResultHandling? ResultHandling { get; internal set; }
 
         /// <summary>
         /// Gets the corresponding <see cref="System.Exception"/>.
         /// </summary>
-        public System.Exception? Exception { get; private set; }
+        public System.Exception? Exception { get; internal set; }
 
         /// <summary>
         /// Outputs the <see cref="Result"/> as a <see cref="string"/>.

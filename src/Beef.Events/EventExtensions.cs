@@ -2,17 +2,17 @@
 
 using Beef.Events.Publish;
 using Beef.Events.Subscribe;
-using Beef.Events.Triggers.Config;
+using Beef.Events.Subscribe.EventHubs;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Beef.Events
@@ -23,29 +23,14 @@ namespace Beef.Events
     public static class EventExtensions
     {
         /// <summary>
-        /// Adds "resilient event hubs" to the <see cref="IFunctionsHostBuilder"/>.
-        /// </summary>
-        /// <param name="builder">The <see cref="IFunctionsHostBuilder"/>.</param>
-        /// <returns>The <see cref="IFunctionsHostBuilder"/>.</returns>
-        public static IWebJobsBuilder AddBeefResilientEventHubs(this IWebJobsBuilder builder)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-
-            builder.AddExtension<ResilientEventHubExtensionConfigProvider>()
-                .BindOptions<ResilientEventHubOptions>();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds a scoped service to instantiate a new <see cref="EventHubSubscriberHost"/> instance using the specified <paramref name="args"/>.
+        /// Adds a transient service to instantiate a new <see cref="EventHubSubscriberHost"/> instance using the specified <paramref name="args"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        /// <param name="addSubscriberTypeServices">Indicates whether to add all the <see cref="EventSubscriberHostArgs.GetSubscriberTypes"/> as transient services (defaults to <c>true</c>).</param>
+        /// <param name="addSubscriberTypeServices">Indicates whether to add all the <see cref="EventSubscriberHostArgs.GetSubscriberTypes"/> as scoped services (defaults to <c>true</c>).</param>
+        /// <param name="additional">Optional (additional) opportunity to further configure the instantiated <see cref="EventHubSubscriberHost"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventHubSubscriberHost(this IServiceCollection services, EventSubscriberHostArgs args, bool addSubscriberTypeServices = true)
+        public static IServiceCollection AddBeefEventHubSubscriberHost(this IServiceCollection services, EventSubscriberHostArgs args, bool addSubscriberTypeServices = true, Action<IServiceProvider, EventHubSubscriberHost>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -53,14 +38,19 @@ namespace Beef.Events
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            services.AddScoped(sp => args.UseServiceProvider(sp))
-                    .AddScoped<EventHubSubscriberHost>();
+            services.AddTransient(sp =>
+            {
+                var ehsh = new EventHubSubscriberHost(args);
+                args.UseServiceProvider(sp);
+                additional?.Invoke(sp, ehsh);
+                return ehsh;
+            });
 
             if (addSubscriberTypeServices)
             {
                 foreach (var type in args.GetSubscriberTypes())
                 {
-                    services.AddTransient(type);
+                    services.TryAddScoped(type);
                 }
             }
 

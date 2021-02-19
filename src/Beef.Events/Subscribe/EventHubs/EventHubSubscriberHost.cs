@@ -3,6 +3,7 @@
 using AzureEventHubs = Microsoft.Azure.EventHubs;
 using System.Threading.Tasks;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Beef.Events.Subscribe.EventHubs
 {
@@ -11,6 +12,8 @@ namespace Beef.Events.Subscribe.EventHubs
     /// </summary>
     public class EventHubSubscriberHost : EventSubscriberHost
     {
+        private EventHubSubscriberHostInvoker? _invoker;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubSubscriberHost"/> with the specified <see cref="EventSubscriberHostArgs"/>.
         /// </summary>
@@ -20,7 +23,38 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Gets or sets the <see cref="EventHubSubscriberHostInvoker"/>. Defaults to <see cref="EventHubSubscriberHostInvoker"/>.
         /// </summary>
-        public EventHubSubscriberHostInvoker? Invoker { get; set; }
+        public EventHubSubscriberHostInvoker Invoker { get => _invoker ??= new EventHubSubscriberHostInvoker(); set => _invoker = value ?? throw new ArgumentNullException(nameof(value)); }
+
+        /// <summary>
+        /// Use (set) the <see cref="Invoker"/>.
+        /// </summary>
+        /// <param name="invoker">The <see cref="EventHubSubscriberHostInvoker"/>.</param>
+        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
+        public EventHubSubscriberHost UseInvoker(EventHubSubscriberHostInvoker invoker)
+        {
+            Invoker = invoker;
+            return this;
+        }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.Logger"/>.
+        /// </summary>
+        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
+        public EventHubSubscriberHost UseLogger(ILogger logger)
+        {
+            Logger = logger;
+            return this;
+        }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/>.
+        /// </summary>
+        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
+        public EventHubSubscriberHost UseAuditWriter(IAuditWriter auditWriter)
+        {
+            AuditWriter = auditWriter;
+            return this;
+        }
 
         /// <summary>
         /// Performs the receive processing for an <see cref="AzureEventHubs.EventData"/> instance.
@@ -31,7 +65,7 @@ namespace Beef.Events.Subscribe.EventHubs
             if (@event == null)
                 return Task.CompletedTask;
 
-            return (Invoker ??= new EventHubSubscriberHostInvoker()).InvokeAsync(this, async () =>
+            return Invoker.InvokeAsync(this, async () =>
             {
                 // Invoke the base EventSubscriberHost.ReceiveAsync to do the actual work!
                 var (_, subject, action, _) = @event.GetBeefMetadata();
@@ -42,7 +76,7 @@ namespace Beef.Events.Subscribe.EventHubs
                     {
                         return subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType);
                     }
-                    catch (Exception ex) { throw new EventSubscriberUnhandledException(Result.InvalidEventData(ex)); }
+                    catch (Exception ex) { throw new EventSubscriberUnhandledException(CreateInvalidEventDataResult(ex)); }
                 }).ConfigureAwait(false);
             }, @event);
         }

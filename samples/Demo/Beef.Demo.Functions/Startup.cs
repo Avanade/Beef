@@ -5,6 +5,7 @@ using Beef.Demo.Business.DataSvc;
 using Beef.Entities;
 using Beef.Events;
 using Beef.Events.Subscribe;
+using Beef.Events.Subscribe.EventHubs;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

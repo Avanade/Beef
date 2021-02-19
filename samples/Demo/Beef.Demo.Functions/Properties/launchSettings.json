@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Beef.Demo.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--verbose"
+    }
+  }
+}

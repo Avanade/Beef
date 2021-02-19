@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -15,27 +14,25 @@ namespace Beef.Events.Subscribe.EventHubs
     /// <summary>
     /// Provides the <see cref="AzureEventHubs.EventData"/> <b>Azure Storage</b> repository.
     /// </summary>
-    public class AzureStorageRepository
+    /// <remarks>Also provides the underlying <see cref="IAuditWriter"/> capability to audit directly to the <b>Azure Storage</b> repository.</remarks>
+    public class EventHubsAzureStorageRepository : IAuditWriter<AzureEventHubs.EventData>
     {
         private readonly EventHubsRepositoryArgs _args;
-        private readonly IConfiguration _config;
         private readonly ILogger _logger;
         private readonly string _storagePartitionKey;
         private CloudTable? _auditTable;
         private CloudTable? _poisonTable;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureStorageRepository"/> class.
+        /// Initializes a new instance of the <see cref="EventHubsAzureStorageRepository"/> class.
         /// </summary>
         /// <param name="args">The <see cref="EventHubsRepositoryArgs"/>.</param>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public AzureStorageRepository(EventHubsRepositoryArgs args, IConfiguration config, ILogger<AzureStorageRepository> logger)
+        public EventHubsAzureStorageRepository(EventHubsRepositoryArgs args, ILogger logger)
         {
             _args = Check.NotNull(args, nameof(args));
-            _config = Check.NotNull(config, nameof(config));
             _logger = Check.NotNull(logger, nameof(logger));
-            _storagePartitionKey = $"{_args.EventHubPath}-{_args.EventHubName}";
+            _storagePartitionKey = $"{_args.EventHubPath}-{_args.EventHubName}-{_args.ConsumerGroup}";
         }
 
         /// <summary>
@@ -49,14 +46,16 @@ namespace Beef.Events.Subscribe.EventHubs
         public string PoisonTableName { get; set; } = "EventHubPoisonMessages";
 
         /// <summary>
-        /// Writes the event to the audit repository.
+        /// Writes the <paramref name="event"/> <paramref name="result"/> to the audit repository.
         /// </summary>
-        /// <param name="event">The event.</param>
+        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
+        /// <remarks>A corresponding log message for the <i>audit</i> will be written to the <see cref="ILogger"/> using <see cref="LoggerAuditWriter.WriteAuditAsync(ILogger, object, Result)"/>.</remarks>
         public async Task WriteAuditAsync(AzureEventHubs.EventData @event, Result result)
         {
             var audit = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
             await WriteAuditAsync(audit, null).ConfigureAwait(false);
+            await LoggerAuditWriter.WriteAuditAsync(_logger, @event, result).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace Beef.Events.Subscribe.EventHubs
             {
                 // Insert the audit message table.
                 var at = await GetAuditMessageTableAsync().ConfigureAwait(false);
-                audit.RowKey = GetTimestamp().ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + audit.RowKey;
+                audit.RowKey = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + audit.RowKey;
                 var r = await at.ExecuteAsync(TableOperation.Insert(audit)).ConfigureAwait(false);
 
                 switch ((HttpStatusCode)r.HttpStatusCode)
@@ -92,24 +91,22 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Gets the timestamp.
-        /// </summary>
-        private static DateTime GetTimestamp()
-        {
-            long tickCount = System.Diagnostics.Stopwatch.GetTimestamp();
-            return new DateTime(tickCount);
-        }
-
-        /// <summary>
         /// Override result where specified.
         /// </summary>
         private static void OverrideEventAuditRecordResult(EventAuditRecord audit, Result? overrideResult)
         {
             if (overrideResult != null)
             {
+                if (overrideResult.Status == SubscriberStatus.PoisonSkipped || overrideResult.Status == SubscriberStatus.PoisonMismatch)
+                {
+                    audit.OriginatingReason = audit.Reason;
+                    audit.OriginatingStatus = audit.Status;
+                }
+                else
+                    audit.Exception = overrideResult.Exception == null ? null : Substring(overrideResult.Exception.ToString());
+
+                audit.Status = overrideResult.Status.ToString();
                 audit.Reason = overrideResult.Reason;
-                if (overrideResult.Exception != null)
-                    audit.Exception = overrideResult.Exception.ToString()[0..64000]; //  Substring to a 64K (64,000 char) limit allowed by Azure Storage.
             }
         }
 
@@ -126,16 +123,22 @@ namespace Beef.Events.Subscribe.EventHubs
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
-                Body = Encoding.UTF8.GetString(@event.Body.Array)[0..64000], // Substring to a 64K (64,000 char) limit allowed by Azure Storage.
-                Exception = result.Exception?.ToString()[0..64000] // Substring to a 64K (64,000 char) limit allowed by Azure Storage.
+                Status = result.Status.ToString(),
+                Body = Substring(Encoding.UTF8.GetString(@event.Body.Array)),
+                Exception = Substring(result.Exception?.ToString()),
             };
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Substring to a 64K (64,000 char) limit allowed by Azure Storage.
         /// </summary>
-        /// <param name="event"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
+        private static string? Substring(string? text) => string.IsNullOrEmpty(text) ? null : (text.Length >= 64000 ? text[0..64000] : text);
+
+        /// <summary>
+        /// Checks whether the <paramref name="event"/> is considered poison.
+        /// </summary>
+        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
+        /// <returns>The <see cref="PoisonMessageAction"/>.</returns>
         public async Task<PoisonMessageAction> CheckPoisonedAsync(AzureEventHubs.EventData @event)
         {
             if (@event == null)
@@ -152,17 +155,22 @@ namespace Beef.Events.Subscribe.EventHubs
             // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
             if (@event.SystemProperties.SequenceNumber != cpe.SequenceNumber)
             {
-                var reason = $"EventData (Seq#: '{@event.SystemProperties.SequenceNumber}' Offset#: '{@event.SystemProperties.Offset}') being processed is out of sync with persisted Poison Message (Seq#: '{cpe.SequenceNumber}' Offset#: '{cpe.Offset}'); EventData assumed correct and this Poison Message deleted.";
-                await WriteAuditAsync(cpe, Result.PoisonMismatch(reason)).ConfigureAwait(false);
+                var reason = $"Current EventData (Seq#: '{@event.SystemProperties.SequenceNumber}' Offset#: '{@event.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{cpe.SequenceNumber}' Offset#: '{cpe.Offset}'); current assumed correct with previous Poison now deleted.";
+                var result = EventSubscriberHost.CreatePoisonMismatchResult(cpe.Subject, cpe.Action, reason);
+                await WriteAuditAsync(cpe, result).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
+                await LoggerAuditWriter.WriteAuditAsync(_logger, @event, result).ConfigureAwait(false);
                 return PoisonMessageAction.NotPoison;
             }
 
             // Determine action; where skipping remove poison, then audit and carry on.
-            if (cpe.SkipMessage)
+            if (cpe.SkipProcessing)
             {
+                cpe.SkippedTimeUtc = DateTime.UtcNow;
+                var result = EventSubscriberHost.CreatePoisonSkippedResult(cpe.Subject, cpe.Action);
+                await WriteAuditAsync(cpe, result).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
-                await WriteAuditAsync(@event, Result.PoisonSkipped()).ConfigureAwait(false);
+                await LoggerAuditWriter.WriteAuditAsync(_logger, @event, result).ConfigureAwait(false);
                 return PoisonMessageAction.PoisonSkip;
             }
             else
@@ -179,13 +187,19 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Removes the poisoned <paramref name="event"/>.
         /// </summary>
-        /// <param name="event"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
-        public Task RemovePoisonedAsync(AzureEventHubs.EventData @event)
+        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
+        public async Task RemovePoisonedAsync(AzureEventHubs.EventData @event)
         {
-            throw new System.NotImplementedException();
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
+            // Get the poison message table.
+            var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
+            var ear = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
+            if (ear != null)
+                await RemovePoisonedAsync(pt, ear).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -198,10 +212,10 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Marks the <paramref name="event"/> with a poisoned <paramref name="result"/>.
         /// </summary>
-        /// <param name="event"><inheritdoc/></param>
-        /// <param name="result"><inheritdoc/></param>
+        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
+        /// <param name="result">The subscriber <see cref="Result"/>.</param>
         public async Task MarkAsPoisonedAsync(AzureEventHubs.EventData @event, Result result)
         {
             // Get the poison message table.
@@ -220,7 +234,7 @@ namespace Beef.Events.Subscribe.EventHubs
                 }
 
                 if (ear.PoisonedTimeUtc == null)
-                    ear.PoisonedTimeUtc = GetTimestamp();
+                    ear.PoisonedTimeUtc = DateTime.UtcNow;
 
                 var r = await pt.ExecuteAsync(TableOperation.InsertOrReplace(ear)).ConfigureAwait(false);
                 switch ((HttpStatusCode)r.HttpStatusCode)
@@ -234,7 +248,43 @@ namespace Beef.Events.Subscribe.EventHubs
                         return; // All good, carry on.
 
                     default:
-                        throw new InvalidOperationException($"WriteAuditAsync failed with HttpStatusCode: {r.HttpStatusCode}.");
+                        throw new InvalidOperationException($"MarkAsPoisonedAsync failed with HttpStatusCode: {r.HttpStatusCode}.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Marks the previously poisoned <paramref name="event"/> to skip.
+        /// </summary>
+        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
+        public async Task SkipPoisonedAsync(AzureEventHubs.EventData @event)
+        {
+            // Get the poison message table.
+            var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
+
+            while (true)
+            {
+                // Get the current poison event (if there is one).
+                var ear = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
+                if (ear == null || ear.SkipProcessing)
+                    return;
+
+                ear.SkipProcessing = true;
+
+                var r = await pt.ExecuteAsync(TableOperation.Replace(ear)).ConfigureAwait(false);
+                switch ((HttpStatusCode)r.HttpStatusCode)
+                {
+                    case HttpStatusCode.PreconditionFailed:
+                        continue; // Try again.
+
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.NoContent:
+                    case HttpStatusCode.Accepted:
+                    case HttpStatusCode.NotFound:
+                        return; // All good, carry on.
+
+                    default:
+                        throw new InvalidOperationException($"SkipPoisonedAsync failed with HttpStatusCode: {r.HttpStatusCode}.");
                 }
             }
         }
@@ -272,8 +322,8 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Create the row key (ConsumerGroup-PartitionKey).
+        /// Create the row key (PartitionKey-SequenceNumber).
         /// </summary>
-        private string CreateRowKey(AzureEventHubs.EventData message) => $"{_args.ConsumerGroup}-{message.SystemProperties.PartitionKey}";
+        private static string CreateRowKey(AzureEventHubs.EventData message) => $"{message.SystemProperties.PartitionKey}-{message.SystemProperties.SequenceNumber}";
     }
 }

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +21,26 @@ namespace Beef.Events.Subscribe
         /// Gets or sets the <see cref="EventDataSubscriberHostInvoker"/>. Defaults to <see cref="EventDataSubscriberHostInvoker"/>.
         /// </summary>
         public EventDataSubscriberHostInvoker? Invoker { get; set; }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.Logger"/>.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventDataSubscriberHost UseLogger(ILogger logger)
+        {
+            Logger = logger;
+            return this;
+        }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/>.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventDataSubscriberHost UseAuditWriter(IAuditWriter auditWriter)
+        {
+            AuditWriter = auditWriter;
+            return this;
+        }
 
         /// <summary>
         /// Performs the receive processing for one or more <see cref="EventData"/> instances.

@@ -35,7 +35,7 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Indicates whether to skip the poison message and continue processing the next.
         /// </summary>
-        public bool SkipMessage { get; set; }
+        public bool SkipProcessing { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time of the enqueue time in UTC.
@@ -76,6 +76,16 @@ namespace Beef.Events.Subscribe.EventHubs
         /// Gets or sets the reason (see <see cref="Result.Reason"/>).
         /// </summary>
         public string? Reason { get; set; }
+
+        /// <summary>
+        /// Gets or sets the originating status (see <see cref="Result.Status"/>).
+        /// </summary>
+        public string? OriginatingStatus { get; set; }
+
+        /// <summary>
+        /// Gets or sets the originating reason (see <see cref="Result.Reason"/>).
+        /// </summary>
+        public string? OriginatingReason { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Microsoft.Azure.EventHubs.EventData.Body"/> content as a <see cref="string"/>.

@@ -54,8 +54,4 @@
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="WebJobs\" />
-  </ItemGroup>
-
 </Project>
