@@ -239,7 +239,7 @@ tables:
         /// <summary>
         /// Gets the settable columns for an update.
         /// </summary>
-        public List<StoredProcedureColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => (!x.DbColumn!.IsPrimaryKey && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for a delete.
@@ -254,7 +254,7 @@ tables:
         /// <summary>
         /// Gets the settable columns for an upsert-update.
         /// </summary>
-        public List<StoredProcedureColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => (!x.DbColumn!.IsPrimaryKey && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
 
         /// <summary>
         /// Gets the primary merge on statements.
