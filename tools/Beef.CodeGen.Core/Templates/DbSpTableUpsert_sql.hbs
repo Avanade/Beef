@@ -28,9 +28,15 @@ BEGIN
 
 {{/ifval}}
     -- Check exists.
+{{#ifnull Parent.ColumnRowVersion}}
+    DECLARE @PrevRowCount INT
+    SET @PrevRowCount = (SELECT COUNT(*) FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
+    IF @PrevRowCount <> 1
+{{else}}
     DECLARE @PrevRowVersion BINARY(8)
     SET @PrevRowVersion = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnRowVersion.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
     IF @PrevRowVersion IS NULL
+{{/ifnull}}
     BEGIN
 {{#if Parent.HasAuditCreated}}
       -- Set audit details.
@@ -40,8 +46,8 @@ BEGIN
   {{#ifval Parent.ColumnCreatedBy}}
       EXEC @{{Parent.ColumnCreatedBy.Name}} = fnGetUsername @{{Parent.ColumnCreatedBy.Name}}
   {{/ifval}}
-{{/if}}
 
+{{/if}}
 {{#each ExecuteBefore}}
   {{#if @first}}
       -- Execute additional (pre) statements.
@@ -51,6 +57,7 @@ BEGIN
 
   {{/if}}
 {{/each}}
+      -- Create the record.
       INSERT INTO {{Parent.QualifiedName}} (
 {{#each SettableColumnsUpsertInsert}}
         [{{Name}}]{{#unless @last}},{{/unless}}
@@ -83,12 +90,14 @@ BEGIN
       END
 
 {{/ifval}}
+{{#ifor Parent.ColumnRowVersion}}
       -- Check concurrency (where provided).
       IF @RowVersion IS NULL OR @PrevRowVersion <> @RowVersion
       BEGIN
         EXEC spThrowConcurrencyException
       END
 
+{{/ifor}}
 {{#if Parent.HasAuditUpdated}}
       -- Set audit details.
   {{#ifval Parent.ColumnUpdatedDate}}

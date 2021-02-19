@@ -29,18 +29,24 @@ BEGIN
 {{/ifval}}
 {{#if Parent.HasAuditUpdated}}
     -- Set audit details.
-{{#ifval Parent.ColumnUpdatedDate}}
+  {{#ifval Parent.ColumnUpdatedDate}}
     EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
-{{/ifval}}
-{{#ifval Parent.ColumnUpdatedBy}}
+  {{/ifval}}
+  {{#ifval Parent.ColumnUpdatedBy}}
     EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
-{{/ifval}}
-{{/if}}
+  {{/ifval}}
 
+{{/if}}
     -- Check exists.
+{{#ifnull Parent.ColumnRowVersion}}
+    DECLARE @PrevRowCount INT
+    SET @PrevRowCount = (SELECT COUNT(*) FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
+    IF @PrevRowCount <> 1
+{{else}}
     DECLARE @PrevRowVersion BINARY(8)
     SET @PrevRowVersion = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnRowVersion.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
     IF @PrevRowVersion IS NULL
+{{/ifnull}}
     BEGIN
       EXEC spThrowNotFoundException
     END
@@ -57,21 +63,23 @@ BEGIN
     END
 
 {{/ifval}}
+{{#ifor Parent.ColumnRowVersion}}
     -- Check concurrency (where provided).
     IF @RowVersion IS NULL OR @PrevRowVersion <> @RowVersion
     BEGIN
       EXEC spThrowConcurrencyException
     END
+
+{{/ifor}}
 {{#each ExecuteBefore}}
-{{#if @first}}
+  {{#if @first}}
     -- Execute additional (pre) statements.
-{{/if}}
+  {{/if}}
 {{{Statement}}}
-{{#if @last}}
+  {{#if @last}}
 
-{{/if}}
+  {{/if}}
 {{/each}}
-
     -- Update the record.
     UPDATE [{{Parent.Alias}}] SET
 {{#each SettableColumnsUpdate}}
@@ -82,10 +90,10 @@ BEGIN
       {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
 {{/each}}
 {{#each ExecuteAfter}}
-{{#if @first}}
+  {{#if @first}}
 
     -- Execute additional statements.
-{{/if}}
+  {{/if}}
     {{{Statement}}}
 {{/each}}
 
