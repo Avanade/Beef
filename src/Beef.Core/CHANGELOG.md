@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Fixed:* Issue [110](https://github.com/Avanade/Beef/issues/110). The `EventPublisherBase` has been corrected to allow mulitple `Publish`/`Send` invocations without error.
+
 ## v4.1.5
 - *Republish:* Fixed code merge issues.
 

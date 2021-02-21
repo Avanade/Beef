@@ -78,7 +78,7 @@ namespace Beef.Test.NUnit.Tests
                 TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
             TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS SENT >");
+            TestContext.Out.WriteLine($"EVENTS SENT (Send invocation count: {Events.ExpectEvent.GetSendCount(CorrelationId)}) >");
             var events = ExpectEvent.GetSentEvents();
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");

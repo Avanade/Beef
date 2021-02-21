@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Fixed:* Associated with Issue [108](https://github.com/Avanade/Beef/issues/108). The testing output will include the `EventPublisherBase.SendAsync` count.
+
 ## v4.1.5
 - *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
 

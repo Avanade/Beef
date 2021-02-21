@@ -32,6 +32,11 @@ namespace Beef.Test.NUnit.Events
         public static List<EventData> GetPublishedEvents(string? correlationId = null) => ExpectEventPublisher.GetPublishedEvents(correlationId);
 
         /// <summary>
+        /// Gets the count of <see cref="IEventPublisher.SendAsync">sends</see> that were performed for the specified <paramref name="correlationId"/>.
+        /// </summary>
+        public static int GetSendCount(string? correlationId = null) => ExpectEventPublisher.GetSendCount(correlationId);
+
+        /// <summary>
         /// Verifies that at least one event was sent that matched the <paramref name="template"/> which may contain wildcards (<see cref="IEventPublisher.TemplateWildcard"/>) and optional <paramref name="action"/>.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
