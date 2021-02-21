@@ -29,11 +29,6 @@ namespace Beef.Events
         string TemplateWildcard { get; }
 
         /// <summary>
-        /// Indicates whether the published (queued) events have been sent.
-        /// </summary>
-        bool HasBeenSent { get; }
-
-        /// <summary>
         /// Gets the published/queued events.
         /// </summary>
         /// <returns>An <see cref="EventData"/> array.</returns>
@@ -129,7 +124,7 @@ namespace Beef.Events
         Task SendAsync();
 
         /// <summary>
-        /// Resets by clearing the internal cache/store and setting <see cref="HasBeenSent"/> back to <c>false</c>.
+        /// Resets by clearing the internal cache/store.
         /// </summary>
         void Reset();
     }

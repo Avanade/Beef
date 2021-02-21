@@ -15,6 +15,7 @@ namespace Beef.Test.NUnit.Events
     {
         private static readonly ConcurrentDictionary<string, List<EventData>> _sentEventDict = new ConcurrentDictionary<string, List<EventData>>();
         private static readonly ConcurrentDictionary<string, List<EventData>> _publishedEventDict = new ConcurrentDictionary<string, List<EventData>>();
+        private static readonly ConcurrentDictionary<string, int> _sentCountDict = new ConcurrentDictionary<string, int>();
 
         /// <summary>
         /// Gets the sent events for the specified <paramref name="correlationId"/>.
@@ -40,7 +41,14 @@ namespace Beef.Test.NUnit.Events
         {
             _sentEventDict.TryRemove(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var _);
             _publishedEventDict.TryRemove(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var _);
+            _sentCountDict.TryRemove(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var _);
         }
+
+        /// <summary>
+        /// Gets the count of <see cref="IEventPublisher.SendAsync">sends</see> that were performed for the specified <paramref name="correlationId"/>.
+        /// </summary>
+        public static int GetSendCount(string? correlationId = null)
+            => _sentCountDict.TryGetValue(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var sends) ? sends : 0;
 
         /// <summary>
         /// <inheritdoc/>
@@ -69,6 +77,8 @@ namespace Beef.Test.NUnit.Events
             {
                 var list = _sentEventDict.GetOrAdd(ExecutionContext.Current.CorrelationId, new List<EventData>());
                 list.AddRange(events);
+
+                _sentCountDict.AddOrUpdate(ExecutionContext.Current.CorrelationId, 1, (_, count) => count++);
             }
 
             return Task.CompletedTask;

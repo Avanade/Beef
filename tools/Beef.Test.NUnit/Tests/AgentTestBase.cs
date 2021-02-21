@@ -155,7 +155,7 @@ namespace Beef.Test.NUnit.Tests
             }
 
             TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS SENT >");
+            TestContext.Out.WriteLine($"EVENTS SENT (Send invocation count: {Events.ExpectEvent.GetSendCount(CorrelationId)}) >");
             events = ExpectEvent.GetSentEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");

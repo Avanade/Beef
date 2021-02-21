@@ -33,11 +33,6 @@ namespace Beef.Events
         public string TemplateWildcard { get; set; } = "*";
 
         /// <summary>
-        /// Indicates whether the published (queued) events have been sent.
-        /// </summary>
-        public bool HasBeenSent { get; private set; }
-
-        /// <summary>
         /// Gets the published/queued events.
         /// </summary>
         /// <returns>An <see cref="EventData"/> array.</returns>
@@ -145,9 +140,6 @@ namespace Beef.Events
         /// <returns>The <see cref="Task"/>.</returns>
         public virtual IEventPublisher Publish(params EventData[] events)
         {
-            if (HasBeenSent)
-                throw new InvalidOperationException("No further events can be published (queued) once they have been sent.");
-
             Check.IsFalse(events.Any(x => string.IsNullOrEmpty(x.Subject)), nameof(events), "EventData must have a Subject.");
             foreach (var ed in events)
             {
@@ -161,13 +153,11 @@ namespace Beef.Events
         /// Sends all previously (queued) published events.
         /// </summary>
         /// <returns>The <see cref="Task"/>.</returns>
+        /// <remarks>Once sent also automatically invokes the <see cref="Reset"/>.</remarks>
         public async Task SendAsync()
         {
-            if (HasBeenSent)
-                throw new InvalidOperationException("Published (queued) events can only be sent once.");
-
             await SendEventsAsync(GetEvents()).ConfigureAwait(false);
-            HasBeenSent = true;
+            Reset();
         }
 
         /// <summary>
@@ -180,10 +170,6 @@ namespace Beef.Events
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void Reset()
-        {
-            _queue.Value.Clear();
-            HasBeenSent = false;
-        }
+        public void Reset() => _queue.Value.Clear();
     }
 }
