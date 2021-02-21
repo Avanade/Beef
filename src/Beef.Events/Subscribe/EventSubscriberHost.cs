@@ -13,7 +13,6 @@ namespace Beef.Events.Subscribe
     public abstract class EventSubscriberHost
     {
         private ILogger? _logger;
-        private IAuditWriter? _auditWriter;
 
         /// <summary>
         /// Gets or sets the <see cref="RunAsUser.System"/> username (this defaults to <see cref="ExecutionContext"/> <see cref="ExecutionContext.EnvironmentUsername"/>).
@@ -41,14 +40,25 @@ namespace Beef.Events.Subscribe
         public EventSubscriberHostArgs Args { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ILogger"/>. Defaults to <see cref="Args"/> <see cref="EventSubscriberHostArgs.Logger"/>.
+        /// Gets or sets the <see cref="ILogger"/>.
         /// </summary>
-        public ILogger Logger { get => _logger ??= Args.Logger; set => _logger = value ?? throw new ArgumentNullException(nameof(value)); }
+        /// <remarks>Where the <see cref="AuditWriter"/> implements <see cref="IUseLogger"/> then the underlying <see cref="IUseLogger.UseLogger(ILogger)"/> will be invoked on set.</remarks>
+        public ILogger Logger
+        {
+            get => _logger ?? throw new InvalidOperationException("Logger has not been set; the implementing class must set prior to any use.");
+
+            protected set
+            {
+                _logger = value ?? throw new ArgumentNullException(nameof(value));
+                if (AuditWriter is IUseLogger ul)
+                    ul.UseLogger(_logger);
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the <see cref="IAuditWriter"/>. Defaults to <see cref="Args"/> <see cref="EventSubscriberHostArgs.AuditWriter"/>.
+        /// Gets the <see cref="IAuditWriter"/> from <see cref="Args"/> <see cref="EventSubscriberHostArgs.AuditWriter"/>.
         /// </summary>
-        public IAuditWriter? AuditWriter { get => _auditWriter ??= Args.AuditWriter; set => _auditWriter = value ?? throw new ArgumentNullException(nameof(value)); }
+        public IAuditWriter? AuditWriter => Args.AuditWriter;
 
         /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.

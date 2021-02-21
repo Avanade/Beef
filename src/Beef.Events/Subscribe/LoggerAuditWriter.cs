@@ -9,25 +9,37 @@ namespace Beef.Events.Subscribe
     /// <summary>
     /// Represents an <see cref="IAuditWriter"/> that writes the audits to the <see cref="Logger"/>.
     /// </summary>
-    public class LoggerAuditWriter : IAuditWriter
+    public class LoggerAuditWriter : IAuditWriter, IUseLogger
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoggerAuditWriter"/> class.
-        /// </summary>
-        /// <param name="logger"></param>
-        public LoggerAuditWriter(ILogger logger) => Logger = Check.NotNull(logger, nameof(logger));
+        private ILogger? _logger;
 
         /// <summary>
         /// Gets the <see cref="ILogger"/>.
         /// </summary>
-        public ILogger Logger { get; }
+        public ILogger Logger { get => _logger ?? throw new InvalidOperationException("The UseLogger method must be invoked to set the Logger before it can be used."); }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/> to write the audit information.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public LoggerAuditWriter UseLogger(ILogger logger)
+        {
+            _logger = logger;
+            return this;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="logger"><inheritdoc/></param>
+        void IUseLogger.UseLogger(ILogger logger) => UseLogger(logger);
 
         /// <summary>
         /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> using the <see cref="Logger"/>.
         /// </summary>
         /// <param name="originatingEvent">The originating event.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        public Task WriteAuditAsync(object originatingEvent, Result result) => WriteAuditAsync(Logger, originatingEvent, result);
+        public Task WriteAuditAsync(object originatingEvent, Result result) => WriteFormattedAuditAsync(Logger, originatingEvent, result);
 
         /// <summary>
         /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> using the <paramref name="logger"/>.
@@ -37,7 +49,7 @@ namespace Beef.Events.Subscribe
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>This provides a reusable/standardized approach to the logging.</remarks>
 #pragma warning disable IDE0060, CA1801 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
-        public static Task WriteAuditAsync(ILogger logger, object originatingEvent, Result result)
+        public static Task WriteFormattedAuditAsync(ILogger logger, object originatingEvent, Result result)
 #pragma warning restore IDE0060, CA1801
         {
             if (logger == null)

@@ -47,29 +47,22 @@ namespace Beef.Events.Subscribe.EventHubs
         }
 
         /// <summary>
-        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/>.
-        /// </summary>
-        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
-        public EventHubSubscriberHost UseAuditWriter(IAuditWriter auditWriter)
-        {
-            AuditWriter = auditWriter;
-            return this;
-        }
-
-        /// <summary>
         /// Performs the receive processing for an <see cref="AzureEventHubs.EventData"/> instance.
         /// </summary>
+        /// <param name="partitionContext">The <see cref="AzureEventHubs.Processor.PartitionContext"/>.</param>
         /// <param name="event">The <see cref="AzureEventHubs.EventData"/> instance to receive/process.</param>
-        public Task ReceiveAsync(AzureEventHubs.EventData @event)
+        public Task ReceiveAsync(AzureEventHubs.Processor.PartitionContext partitionContext, AzureEventHubs.EventData @event)
         {
-            if (@event == null)
-                return Task.CompletedTask;
+            if (partitionContext == null)
+                throw new ArgumentNullException(nameof(partitionContext));
+
+            var ehd = new EventHubsData(partitionContext.EventHubPath, partitionContext.ConsumerGroupName, partitionContext.PartitionId, @event ?? throw new ArgumentNullException(nameof(@event)));
 
             return Invoker.InvokeAsync(this, async () =>
             {
                 // Invoke the base EventSubscriberHost.ReceiveAsync to do the actual work!
                 var (_, subject, action, _) = @event.GetBeefMetadata();
-                await ReceiveAsync(@event, subject, action, (subscriber) =>
+                await ReceiveAsync(ehd, subject, action, (subscriber) =>
                 {
                     // Convert AzureEventHubs.EventData to Beef.EventData.
                     try
@@ -78,7 +71,7 @@ namespace Beef.Events.Subscribe.EventHubs
                     }
                     catch (Exception ex) { throw new EventSubscriberUnhandledException(CreateInvalidEventDataResult(ex)); }
                 }).ConfigureAwait(false);
-            }, @event);
+            }, ehd);
         }
     }
 }

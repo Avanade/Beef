@@ -33,16 +33,6 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
-        /// Use (set) the <see cref="EventSubscriberHost.AuditWriter"/>.
-        /// </summary>
-        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
-        public EventDataSubscriberHost UseAuditWriter(IAuditWriter auditWriter)
-        {
-            AuditWriter = auditWriter;
-            return this;
-        }
-
-        /// <summary>
         /// Performs the receive processing for one or more <see cref="EventData"/> instances.
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> instances to receive/process.</param>

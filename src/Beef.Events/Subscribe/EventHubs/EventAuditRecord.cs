@@ -23,12 +23,27 @@ namespace Beef.Events.Subscribe.EventHubs
         public EventAuditRecord(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
 
         /// <summary>
-        /// Gets or sets the offset of the data relative to the Event Hub partition stream.
+        /// Gets or sets the Event Hubs path.
+        /// </summary>
+        public string? EventHubPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Event Hubs consumer group name.
+        /// </summary>
+        public string? ConsumerGroupName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Event Hubs partition identifier.
+        /// </summary>
+        public string? PartitionId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the offset of the data relative to the Event Hubs partition stream.
         /// </summary>
         public string? Offset { get; set; }
 
         /// <summary>
-        /// Gets or sets the logical sequence number of the event within the partition stream of the Event Hub.
+        /// Gets or sets the logical sequence number of the event within the partition stream of the Event Hubs.
         /// </summary>
         public long SequenceNumber { get; set; }
 

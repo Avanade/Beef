@@ -28,17 +28,21 @@ namespace Beef.Events.Subscribe.EventHubs
         /// </summary>
         /// <param name="caller">The calling (invoking) object.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
+        /// <param name="event">The <see cref="EventHubsData"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, AzureEventHubs.EventData? @event, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, EventHubsData? @event, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
 
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
+
+            // Update the EventHubSubscriberHost ILogger instance.
+            if (caller is EventHubSubscriberHost ehsh && ehsh is IUseLogger ul)
+                ul.UseLogger(ehsh.Logger);
 
             // Where previously marked as poison and is skip, then we can simply skip (ignore) the poison event (it is deleted and audited by storage).
             var pma = await Storage.CheckPoisonedAsync(@event).ConfigureAwait(false);

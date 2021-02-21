@@ -26,6 +26,9 @@ namespace Beef.Demo.Functions.Subscribers
 
             if (@event.Key is Guid id)
             {
+                if (id == new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                    throw new DivideByZeroException("The mystery 88 guid can't be divided by zero.");
+
                 var robot = await _mgr.GetAsync(id);
                 if (robot == null)
                     return Result.DataNotFound();

@@ -36,6 +36,11 @@ namespace Beef.Demo.EventSend
                         ehp.Publish("Demo.Robot.123", "PowerSourceChange", Guid.NewGuid());
                         await ehp.SendAsync();
                         break;
+
+                    case "4":
+                        ehp.Publish("Demo.Robot.88", "PowerSourceChange", new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+                        await ehp.SendAsync();
+                        break;
                 }
 
                 ehp.Reset();
