@@ -31,7 +31,7 @@ namespace Beef.Demo.Functions
                             .AddBeefBusinessServices();
 
             // Add event subscriber host with auto-discovered subscribers and set the audit writer to use azure storage; plus use the poison event orchestrator/invoker.
-            var ehasr = new EventHubsAzureStorageRepository(config.GetWebJobsConnectionString(ConnectionStringNames.Storage));
+            var ehasr = new EventHubAzureStorageRepository(config.GetWebJobsConnectionString(ConnectionStringNames.Storage));
             builder.Services.AddBeefEventHubSubscriberHost(
                 EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(ehasr), additional: (_, ehsh) => ehsh.UseInvoker(new EventHubSubscriberHostPoisonInvoker(ehasr)));
 

@@ -88,6 +88,8 @@ namespace Beef.Events.Subscribe
                 if (subscriber == null)
                     return await CheckResultAsync(originatingEvent, CreateNotSubscribedResult(), subject, action, null).ConfigureAwait(false);
 
+                subscriber.Logger = Logger;
+
                 // Where matched get the EventData and execute the subscriber receive.
                 EventData @event;
                 try

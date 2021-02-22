@@ -7,16 +7,16 @@ namespace Beef.Events.Subscribe.EventHubs
     /// <summary>
     /// Represents the originating event data for the <see cref="EventHubSubscriberHost"/>.
     /// </summary>
-    public class EventHubsData
+    public class EventHubData
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubsData"/> class.
+        /// Initializes a new instance of the <see cref="EventHubData"/> class.
         /// </summary>
         /// <param name="eventHubPath">The Event Hubs path.</param>
         /// <param name="consumerGroupName">The Event Hubs consumer group name.</param>
         /// <param name="partitionId">The Event Hubs partition identifier.</param>
         /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
-        public EventHubsData(string eventHubPath, string consumerGroupName, string partitionId, AzureEventHubs.EventData @event)
+        public EventHubData(string eventHubPath, string consumerGroupName, string partitionId, AzureEventHubs.EventData @event)
         {
             EventHubPath = Check.NotNull(eventHubPath, nameof(eventHubPath));
             ConsumerGroupName = Check.NotNull(consumerGroupName, nameof(consumerGroupName));

@@ -32,7 +32,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             return _config;
         }
 
-        private static EventHubsData CreateEventData(string offset, long seqNo)
+        private static EventHubData CreateEventData(string offset, long seqNo)
         {
             var e = new EventData
             {
@@ -50,7 +50,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             dict.Add("x-opt-sequence-number", seqNo);
             dict.Add("x-opt-partition-key", "0");
 
-            return new EventHubsData("testhub", "$Default", "0", e);
+            return new EventHubData("testhub", "$Default", "0", e);
         }
 
         public static async Task<List<EventAuditRecord>> GetAuditRecords(CloudTable ct)
@@ -81,7 +81,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var cfg = GetConfig();
             var lgr = TestSetUp.CreateLogger();
 
-            var asr = new EventHubsAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
+            var asr = new EventHubAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
             {
                 PoisonTableName = cfg.GetValue<string>("EventHubPoisonMessagesTable"),
                 AuditTableName = cfg.GetValue<string>("EventHubAuditMessagesTable")
@@ -193,7 +193,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var cfg = GetConfig();
             var lgr = TestSetUp.CreateLogger();
 
-            var asr = new EventHubsAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
+            var asr = new EventHubAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
             {
                 PoisonTableName = cfg.GetValue<string>("EventHubPoisonMessagesTable"),
                 AuditTableName = cfg.GetValue<string>("EventHubAuditMessagesTable")

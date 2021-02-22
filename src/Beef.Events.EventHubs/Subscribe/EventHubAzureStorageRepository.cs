@@ -15,7 +15,7 @@ namespace Beef.Events.Subscribe.EventHubs
     /// Provides the <see cref="AzureEventHubs.EventData"/> <b>Azure Storage</b> repository.
     /// </summary>
     /// <remarks>Also provides the underlying <see cref="IAuditWriter"/> capability to audit directly to the <b>Azure Storage</b> repository.</remarks>
-    public class EventHubsAzureStorageRepository : IAuditWriter<EventHubsData>, IUseLogger
+    public class EventHubAzureStorageRepository : IEventHubStorageRepository, IUseLogger
     {
         private readonly string _storageConnectionString;
         private CloudTable? _auditTable;
@@ -25,9 +25,9 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Create the partition key.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <returns>The partition key.</returns>
-        public static string CreatePartitionKey(EventHubsData @event) => CreatePartitionKey((@event ?? throw new ArgumentNullException(nameof(@event))).EventHubPath, @event.ConsumerGroupName);
+        public static string CreatePartitionKey(EventHubData @event) => CreatePartitionKey((@event ?? throw new ArgumentNullException(nameof(@event))).EventHubPath, @event.ConsumerGroupName);
 
         /// <summary>
         /// Create the partition key.
@@ -38,10 +38,10 @@ namespace Beef.Events.Subscribe.EventHubs
         public static string CreatePartitionKey(string eventHubPath, string consumerGroupName) => Check.NotNull(eventHubPath, nameof(eventHubPath)) + "-" + Check.NotNull(consumerGroupName, nameof(consumerGroupName));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubsAzureStorageRepository"/> class.
+        /// Initializes a new instance of the <see cref="EventHubAzureStorageRepository"/> class.
         /// </summary>
         /// <param name="storageConnectionString">The Azure storage connection string.</param>
-        public EventHubsAzureStorageRepository(string storageConnectionString) 
+        public EventHubAzureStorageRepository(string storageConnectionString) 
             => _storageConnectionString = string.IsNullOrEmpty(storageConnectionString) ? throw new ArgumentNullException(nameof(storageConnectionString)) : storageConnectionString;
 
         /// <summary>
@@ -68,10 +68,10 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Writes the <paramref name="event"/> <paramref name="result"/> to the audit repository.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>A corresponding log message for the <i>audit</i> will be written to the <see cref="ILogger"/> using <see cref="LoggerAuditWriter.WriteFormattedAuditAsync(ILogger, object, Result)"/>.</remarks>
-        public async Task WriteAuditAsync(EventHubsData @event, Result result)
+        public async Task WriteAuditAsync(EventHubData @event, Result result)
         {
             var audit = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
             await WriteAuditAsync(audit, null).ConfigureAwait(false);
@@ -133,7 +133,7 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Create (instantiate) the <see cref="EventAuditRecord"/>.
         /// </summary>
-        private static EventAuditRecord CreateEventAuditRecord(EventHubsData @event, Result result)
+        private static EventAuditRecord CreateEventAuditRecord(EventHubData @event, Result result)
         {
             return new EventAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionId)
             {
@@ -160,9 +160,9 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Checks whether the <paramref name="event"/> is considered poison.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <returns>The <see cref="PoisonMessageAction"/>.</returns>
-        public async Task<PoisonMessageAction> CheckPoisonedAsync(EventHubsData @event)
+        public async Task<PoisonMessageAction> CheckPoisonedAsync(EventHubData @event)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
@@ -203,7 +203,7 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Gets the poisoned <see cref="EventAuditRecord"/>.
         /// </summary>
-        private static async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubsData @event)
+        private static async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubData @event)
         {
             var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAuditRecord>(CreatePartitionKey(@event), @event.PartitionId)).ConfigureAwait(false);
             return (EventAuditRecord)r.Result;
@@ -212,8 +212,8 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Removes the poisoned <paramref name="event"/>.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
-        public async Task RemovePoisonedAsync(EventHubsData @event)
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
+        public async Task RemovePoisonedAsync(EventHubData @event)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
@@ -237,9 +237,9 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Marks the <paramref name="event"/> with a poisoned <paramref name="result"/>.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        public async Task MarkAsPoisonedAsync(EventHubsData @event, Result result)
+        public async Task MarkAsPoisonedAsync(EventHubData @event, Result result)
         {
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -279,8 +279,8 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Marks the previously poisoned <paramref name="event"/> to skip.
         /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
-        public async Task SkipPoisonedAsync(EventHubsData @event)
+        /// <param name="event">The <see cref="EventHubData"/>.</param>
+        public async Task SkipPoisonedAsync(EventHubData @event)
         {
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);

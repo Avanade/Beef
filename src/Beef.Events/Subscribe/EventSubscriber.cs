@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -11,6 +12,17 @@ namespace Beef.Events.Subscribe
     /// </summary>
     public abstract class EventSubscriberBase : IEventSubscriber
     {
+        private ILogger? _logger;
+
+        /// <summary>
+        /// Gets or sets the <see cref="ILogger"/>.
+        /// </summary>
+        public ILogger Logger 
+        { 
+            get => _logger ?? throw new InvalidOperationException("The Logger instance must be set prior to use."); 
+            set => _logger = value ?? throw new ArgumentNullException(nameof(value)); 
+        }
+
         /// <summary>
         /// Determines the <see cref="Subscribe.RunAsUser"/>; defaults to <see cref="RunAsUser.Originating"/>.
         /// </summary>

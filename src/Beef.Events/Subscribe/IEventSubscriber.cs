@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -10,6 +11,11 @@ namespace Beef.Events.Subscribe
     /// </summary>
     public interface IEventSubscriber
     {
+        /// <summary>
+        /// Gets or sets the <see cref="ILogger"/>.
+        /// </summary>
+        ILogger Logger { get; set; }
+
         /// <summary>
         /// Gets the <see cref="RunAsUser"/> option.
         /// </summary>

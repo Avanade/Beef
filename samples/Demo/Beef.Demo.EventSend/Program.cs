@@ -14,6 +14,16 @@ namespace Beef.Demo.EventSend
             var ehc = Azure.EventHubClient.CreateFromConnectionString(cs);
             var ehp = new EventHubPublisher(ehc);
 
+            Console.WriteLine("Options are:");
+            Console.WriteLine(" x - Stop.");
+            Console.WriteLine(" 1 - Non-subscribed Event.");
+            Console.WriteLine(" 2 - Null Identifier.");
+            Console.WriteLine(" 3 - Not Found Exception.");
+            Console.WriteLine(" 4 - Unhandled Exception.");
+            Console.WriteLine(" 5 - Invalid Data.");
+            Console.WriteLine(" 6 - Success.");
+            Console.WriteLine();
+
             while (true)
             {
                 Console.Write("Enter option: ");
@@ -39,6 +49,16 @@ namespace Beef.Demo.EventSend
 
                     case "4":
                         ehp.Publish("Demo.Robot.88", "PowerSourceChange", new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+                        await ehp.SendAsync();
+                        break;
+
+                    case "5":
+                        ehp.PublishValue("Q", "Demo.Robot.1", "PowerSourceChange", new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+                        await ehp.SendAsync();
+                        break;
+
+                    case "6":
+                        ehp.PublishValue("N", "Demo.Robot.1", "PowerSourceChange", new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
                         await ehp.SendAsync();
                         break;
                 }
