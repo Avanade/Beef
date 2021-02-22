@@ -89,6 +89,6 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Formats the reason message.
         /// </summary>
-        private static string FormatReasonMessage(Result result) => $"Event Subscriber - {result}";
+        private static string FormatReasonMessage(Result result) => $"EventSubscriber > {result}";
     }
 }

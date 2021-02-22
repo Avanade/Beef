@@ -109,7 +109,7 @@ namespace Beef.Events.Subscribe
         /// Outputs the <see cref="Result"/> as a <see cref="string"/>.
         /// </summary>
         /// <returns>The <see cref="Result"/> as a <see cref="string"/>.</returns>
-        public override string ToString() => $"Status: {Status}, Subject: {Subject}, Action: {Action}, Reason: {Reason}{(Exception == null ? "" : $", Exception: {Exception.Message}")}";
+        public override string ToString() => $"Status: {Status}, Handling: {ResultHandling}, Subject: {Subject}, Action: {Action}, Reason: {Reason}{(Exception == null ? "" : $", Exception: {Exception.Message}")}";
 
         /// <summary>
         /// Outputs the <see cref="Result"/> as a multi-line <see cref="string"/>.

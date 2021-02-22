@@ -101,9 +101,6 @@ namespace Beef.Events.Subscribe
 #pragma warning restore CA1031
                 {
                     // Handle the exception as per the subscriber configuration.
-                    if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
-                        return await CheckResultAsync(originatingEvent, CreateExceptionContinueResult(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber).ConfigureAwait(false);
-
                     return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(ex), subject, action, subscriber).ConfigureAwait(false);
                 }
 
@@ -129,16 +126,9 @@ namespace Beef.Events.Subscribe
                 catch (BusinessException bex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(bex), subject, action, subscriber).ConfigureAwait(false); }
                 catch (NotFoundException) { return await CheckResultAsync(originatingEvent, Result.DataNotFound(), subject, action, subscriber).ConfigureAwait(false); }
                 catch (EventSubscriberUnhandledException) { throw; }
-                catch (Exception ex)
-                {
-                    // Handle the exception as per the subscriber configuration.
-                    if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
-                        return await CheckResultAsync(originatingEvent, CreateExceptionContinueResult(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber).ConfigureAwait(false);
-
-                    await AuditWriter!.WriteAuditAsync(originatingEvent, CreateUnhandledExceptionResult(ex)).ConfigureAwait(false);
-
-                    throw;
-                }
+#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
+                catch (Exception ex) { return await CheckResultAsync(originatingEvent, CreateUnhandledExceptionResult(ex), subject, action, subscriber).ConfigureAwait(false); }
+#pragma warning restore CA1031
             }
         }
 
@@ -237,7 +227,13 @@ namespace Beef.Events.Subscribe
                     break;
 
                 case SubscriberStatus.ExceptionContinue:
-                    await AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(originatingEvent, result, ResultHandling.ContinueWithAudit).ConfigureAwait(false);
+                    break;
+
+                case SubscriberStatus.UnhandledException:
+                    await HandleTheHandlingAsync(originatingEvent, result,
+                        subscriber == null || subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.ThrowException ? ResultHandling.ThrowException : ResultHandling.ContinueWithAudit).ConfigureAwait(false);
+
                     break;
             }
 
@@ -249,7 +245,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         private async Task HandleTheHandlingAsync(object originatingEvent, Result result, ResultHandling handling)
         {
-            switch (result.ResultHandling ?? handling)
+            switch (result.ResultHandling ??= handling)
             {
                 case ResultHandling.ContinueWithLogging:
                     Logger.LogWarning(result.ToString());
@@ -260,6 +256,7 @@ namespace Beef.Events.Subscribe
                     break;
 
                 case ResultHandling.ThrowException:
+                    await AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
                     throw new EventSubscriberUnhandledException(result);
 
                 case ResultHandling.ContinueSilent:

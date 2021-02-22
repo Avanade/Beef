@@ -76,7 +76,7 @@ namespace Beef.Events.UnitTest.Subscribe
         private EventDataSubscriberHost CreateTestHost<T>(Func<T> create) where T : class
         {
             var sp = TestSetUp.CreateServiceProvider(sc => sc.AddTransient(_ => create()));
-            return new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(T)).UseServiceProvider(sp));
+            return new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(T)).UseServiceProvider(sp)).UseLogger(TestSetUp.CreateLogger());
         }
 
         [Test]
@@ -142,8 +142,11 @@ namespace Beef.Events.UnitTest.Subscribe
             {
                 await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
-            catch (DivideByZeroException)
+            catch (EventSubscriberUnhandledException esuex)
             {
+                if (esuex.InnerException == null || !(esuex.InnerException is DivideByZeroException))
+                    Assert.Fail();
+
                 Assert.IsTrue(ts.MessageReceived);
                 return;
             }
@@ -220,8 +223,11 @@ namespace Beef.Events.UnitTest.Subscribe
             {
                 await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
-            catch (DivideByZeroException)
+            catch (EventSubscriberUnhandledException esuex)
             {
+                if (esuex.InnerException == null || !(esuex.InnerException is DivideByZeroException))
+                    Assert.Fail();
+
                 Assert.IsTrue(ts.MessageReceived);
                 Assert.AreEqual("TEST", ts.Value);
                 Assert.AreEqual(typeof(string), ts.ValueType);

@@ -1,6 +1,7 @@
 ﻿using Beef.Events.Subscribe;
 using Beef.Events.Subscribe.EventHubs;
 using Beef.Test.NUnit;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -31,7 +32,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             return _config;
         }
 
-        private static AzureEventHubs.EventData CreateEventData(string offset, long seqNo)
+        private static EventHubsData CreateEventData(string offset, long seqNo)
         {
             var e = new EventData
             {
@@ -49,7 +50,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             dict.Add("x-opt-sequence-number", seqNo);
             dict.Add("x-opt-partition-key", "0");
 
-            return e;
+            return new EventHubsData("testhub", "$Default", "0", e);
         }
 
         public static async Task<List<EventAuditRecord>> GetAuditRecords(CloudTable ct)
@@ -80,13 +81,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var cfg = GetConfig();
             var lgr = TestSetUp.CreateLogger();
 
-            var asrArgs = new EventHubsRepositoryArgs("testhub", cfg);
-
-            var asr = new AzureStorageRepository(asrArgs, cfg, lgr)
+            var asr = new EventHubsAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
             {
                 PoisonTableName = cfg.GetValue<string>("EventHubPoisonMessagesTable"),
                 AuditTableName = cfg.GetValue<string>("EventHubAuditMessagesTable")
             };
+
+            ((IUseLogger)asr).UseLogger(lgr);
 
             // Make sure there are no AuditRecords to begin with.
             var pmt = await asr.GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -110,8 +111,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
             var ear = (await GetAuditRecords(pmt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.AreEqual("$Default-0", ear.RowKey);
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.AreEqual("0", ear.RowKey);
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.IsNull(ear.SkippedTimeUtc);
@@ -131,8 +132,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
             ear = (await GetAuditRecords(pmt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.AreEqual("$Default-0", ear.RowKey);
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.AreEqual("0", ear.RowKey);
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.IsNull(ear.SkippedTimeUtc);
@@ -151,8 +152,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
             ear = (await GetAuditRecords(pmt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.AreEqual("$Default-0", ear.RowKey);
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.AreEqual("0", ear.RowKey);
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.IsNull(ear.SkippedTimeUtc);
@@ -171,8 +172,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(1, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
             ear = (await GetAuditRecords(amt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.IsTrue(ear.RowKey.EndsWith("-$Default-0"));
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.IsTrue(ear.RowKey.EndsWith("-0"));
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.NotNull(ear.SkippedTimeUtc);
@@ -192,13 +193,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var cfg = GetConfig();
             var lgr = TestSetUp.CreateLogger();
 
-            var asrArgs = new EventHubsRepositoryArgs("testhub", cfg);
-
-            var asr = new AzureStorageRepository(asrArgs, cfg, lgr)
+            var asr = new EventHubsAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
             {
                 PoisonTableName = cfg.GetValue<string>("EventHubPoisonMessagesTable"),
                 AuditTableName = cfg.GetValue<string>("EventHubAuditMessagesTable")
             };
+
+            ((IUseLogger)asr).UseLogger(lgr);
 
             // Make sure there are no AuditRecords to begin with.
             var pmt = await asr.GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -216,8 +217,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
             var ear = (await GetAuditRecords(pmt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.AreEqual("$Default-0", ear.RowKey);
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.AreEqual("0", ear.RowKey);
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.IsNull(ear.SkippedTimeUtc);
@@ -237,8 +238,8 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(1, (await GetAuditRecords(amt)).Count);
 
             ear = (await GetAuditRecords(amt).ConfigureAwait(false)).First();
-            Assert.AreEqual("unittest.servicebus.windows.net-testhub", ear.PartitionKey);
-            Assert.IsTrue(ear.RowKey.EndsWith("-$Default-0"));
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.IsTrue(ear.RowKey.EndsWith("-0"));
             Assert.NotNull(ear.Body);
             Assert.NotNull(ear.PoisonedTimeUtc);
             Assert.IsNull(ear.SkippedTimeUtc);

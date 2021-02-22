@@ -15,7 +15,7 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventSubscriberUnhandledException"/>.
         /// </summary>
         /// <param name="result">The <see cref="Result"/>.</param>
-        internal EventSubscriberUnhandledException(Result result) : base(result.ToString()) => Result = result;
+        internal EventSubscriberUnhandledException(Result result) : base(result.ToString(), result.Exception) => Result = result;
 
         /// <summary>
         /// Gets the <see cref="Result"/>.

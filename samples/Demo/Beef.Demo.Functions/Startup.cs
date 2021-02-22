@@ -30,8 +30,10 @@ namespace Beef.Demo.Functions
                             .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                             .AddBeefBusinessServices();
 
-            // Add event subscriber host with auto-discovered subscribers and set the audit writer.
-            builder.Services.AddBeefEventHubSubscriberHost(EventSubscriberHostArgs.Create<Startup>(), additional: (sp, ehsh) => ehsh.UseAuditWriter(new EventHubsAzureStorageRepository(config.GetWebJobsConnectionString(ConnectionStringNames.Storage)));
+            // Add event subscriber host with auto-discovered subscribers and set the audit writer to use azure storage; plus use the poison event orchestrator/invoker.
+            var ehasr = new EventHubsAzureStorageRepository(config.GetWebJobsConnectionString(ConnectionStringNames.Storage));
+            builder.Services.AddBeefEventHubSubscriberHost(
+                EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(ehasr), additional: (_, ehsh) => ehsh.UseInvoker(new EventHubSubscriberHostPoisonInvoker(ehasr)));
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = config.GetSection("CosmosDb");

@@ -27,17 +27,17 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Gets or sets the Event Hubs path.
         /// </summary>
-        public string? EventHubPath { get; }
+        public string EventHubPath { get; }
 
         /// <summary>
         /// Gets or sets the Event Hubs consumer group name.
         /// </summary>
-        public string? ConsumerGroupName { get; }
+        public string ConsumerGroupName { get; }
 
         /// <summary>
         /// Gets or sets the Event Hubs partition identifier.
         /// </summary>
-        public string? PartitionId { get; }
+        public string PartitionId { get; }
 
         /// <summary>
         /// Gets the <see cref="AzureEventHubs.EventData"/>.

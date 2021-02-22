@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using AzureEventHubs = Microsoft.Azure.EventHubs;
 using System;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;

@@ -23,6 +23,21 @@ namespace Beef.Events.Subscribe.EventHubs
         private ILogger? _logger;
 
         /// <summary>
+        /// Create the partition key.
+        /// </summary>
+        /// <param name="event">The <see cref="EventHubsData"/>.</param>
+        /// <returns>The partition key.</returns>
+        public static string CreatePartitionKey(EventHubsData @event) => CreatePartitionKey((@event ?? throw new ArgumentNullException(nameof(@event))).EventHubPath, @event.ConsumerGroupName);
+
+        /// <summary>
+        /// Create the partition key.
+        /// </summary>
+        /// <param name="eventHubPath">The event hubs name.</param>
+        /// <param name="consumerGroupName">The consumer group name.</param>
+        /// <returns>The partition key.</returns>
+        public static string CreatePartitionKey(string eventHubPath, string consumerGroupName) => Check.NotNull(eventHubPath, nameof(eventHubPath)) + "-" + Check.NotNull(consumerGroupName, nameof(consumerGroupName));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EventHubsAzureStorageRepository"/> class.
         /// </summary>
         /// <param name="storageConnectionString">The Azure storage connection string.</param>
@@ -120,11 +135,11 @@ namespace Beef.Events.Subscribe.EventHubs
         /// </summary>
         private static EventAuditRecord CreateEventAuditRecord(EventHubsData @event, Result result)
         {
-            return new EventAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionContext.PartitionId)
+            return new EventAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionId)
             {
-                EventHubPath = @event.PartitionContext.EventHubPath,
-                ConsumerGroupName = @event.PartitionContext.ConsumerGroupName,
-                PartitionId = @event.PartitionContext.PartitionId,
+                EventHubPath = @event.EventHubPath,
+                ConsumerGroupName = @event.ConsumerGroupName,
+                PartitionId = @event.PartitionId,
                 Offset = @event.Event.SystemProperties.Offset,
                 SequenceNumber = @event.Event.SystemProperties.SequenceNumber,
                 EnqueuedTimeUtc = @event.Event.SystemProperties.EnqueuedTimeUtc,
@@ -161,13 +176,13 @@ namespace Beef.Events.Subscribe.EventHubs
                 return PoisonMessageAction.NotPoison;
 
             // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
-            if (@event.SystemProperties.SequenceNumber != cpe.SequenceNumber)
+            if (@event.Event.SystemProperties.SequenceNumber != cpe.SequenceNumber)
             {
-                var reason = $"Current EventData (Seq#: '{@event.SystemProperties.SequenceNumber}' Offset#: '{@event.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{cpe.SequenceNumber}' Offset#: '{cpe.Offset}'); current assumed correct with previous Poison now deleted.";
+                var reason = $"Current EventData (Seq#: '{@event.Event.SystemProperties.SequenceNumber}' Offset#: '{@event.Event.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{cpe.SequenceNumber}' Offset#: '{cpe.Offset}'); current assumed correct with previous Poison now deleted.";
                 var result = EventSubscriberHost.CreatePoisonMismatchResult(cpe.Subject, cpe.Action, reason);
                 await WriteAuditAsync(cpe, result).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
-                await LoggerAuditWriter.WriteFormattedAuditAsync(_logger, @event, result).ConfigureAwait(false);
+                await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, @event, result).ConfigureAwait(false);
                 return PoisonMessageAction.NotPoison;
             }
 
@@ -188,9 +203,9 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Gets the poisoned <see cref="EventAuditRecord"/>.
         /// </summary>
-        private async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubsData @event)
+        private static async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubsData @event)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAuditRecord>(_storagePartitionKey, CreateRowKey(@event))).ConfigureAwait(false);
+            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAuditRecord>(CreatePartitionKey(@event), @event.PartitionId)).ConfigureAwait(false);
             return (EventAuditRecord)r.Result;
         }
 
@@ -213,9 +228,9 @@ namespace Beef.Events.Subscribe.EventHubs
         /// <summary>
         /// Remove the poisoned <see cref="EventAuditRecord"/>.
         /// </summary>
-        private async Task RemovePoisonedAsync(CloudTable poisonTable, EventAuditRecord ea)
+        private static async Task RemovePoisonedAsync(CloudTable poisonTable, EventAuditRecord ea)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventAuditRecord(_storagePartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
+            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventAuditRecord(ea.PartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
             _ = r.Result;
         }
 
@@ -232,7 +247,7 @@ namespace Beef.Events.Subscribe.EventHubs
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
+                var ear = await GetPoisonedAsync(pt, @event ?? throw new ArgumentNullException(nameof(@event))).ConfigureAwait(false);
                 if (ear == null)
                     ear = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
                 else
@@ -273,7 +288,7 @@ namespace Beef.Events.Subscribe.EventHubs
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
+                var ear = await GetPoisonedAsync(pt, @event ?? throw new ArgumentNullException(nameof(@event))).ConfigureAwait(false);
                 if (ear == null || ear.SkipProcessing)
                     return;
 
@@ -306,7 +321,7 @@ namespace Beef.Events.Subscribe.EventHubs
             if (_auditTable != null)
                 return _auditTable;
 
-            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString);
+            var csa = CloudStorageAccount.Parse(_storageConnectionString);
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(AuditTableName);
             await t.CreateIfNotExistsAsync().ConfigureAwait(false);
@@ -322,26 +337,11 @@ namespace Beef.Events.Subscribe.EventHubs
             if (_poisonTable != null)
                 return _poisonTable;
 
-            var csa = CloudStorageAccount.Parse(_args.StorageConnectionString);
+            var csa = CloudStorageAccount.Parse(_storageConnectionString);
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(PoisonTableName);
             await t.CreateIfNotExistsAsync().ConfigureAwait(false);
             return _poisonTable ??= t;
         }
-
-        /// <summary>
-        /// Create the partition key.
-        /// </summary>
-        /// <param name="event">The <see cref="EventHubsData"/>.</param>
-        /// <returns>The partition key.</returns>
-        public static string CreatePartitionKey(EventHubsData @event) => CreatePartitionKey(@event?.PartitionContext.EventHubPath!, @event?.PartitionContext.ConsumerGroupName!);
-
-        /// <summary>
-        /// Create the partition key.
-        /// </summary>
-        /// <param name="eventHubPath">The event hubs name.</param>
-        /// <param name="consumerGroupName">The consumer group name.</param>
-        /// <returns>The partition key.</returns>
-        public static string CreatePartitionKey(string eventHubPath, string consumerGroupName) => Check.NotNull(eventHubPath, nameof(eventHubPath)) + "-" + Check.NotNull(consumerGroupName, nameof(consumerGroupName));
     }
 }
