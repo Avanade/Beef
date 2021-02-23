@@ -17,6 +17,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,26 +29,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.2.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.6" />
-    <PackageReference Include="Polly" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.12" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.12" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.FileProviders.Embedded">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.embedded\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

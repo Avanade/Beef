@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -33,6 +33,17 @@
 
   <ItemGroup>
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.3.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.8.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Publish\" />
+    <Folder Include="Subscribe\" />
   </ItemGroup>
 
 </Project>

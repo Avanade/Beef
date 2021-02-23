@@ -1,5 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Events.Publish;
+using Beef.Events.Subscribe;
+using Beef.Events.Subscribe.EventHubs;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -18,6 +22,61 @@ namespace Beef.Events
     /// </summary>
     public static class EventExtensions
     {
+        /// <summary>
+        /// Adds a transient service to instantiate a new <see cref="EventHubSubscriberHost"/> instance using the specified <paramref name="args"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
+        /// <param name="addSubscriberTypeServices">Indicates whether to add all the <see cref="EventSubscriberHostArgs.GetSubscriberTypes"/> as scoped services (defaults to <c>true</c>).</param>
+        /// <param name="additional">Optional (additional) opportunity to further configure the instantiated <see cref="EventHubSubscriberHost"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefEventHubSubscriberHost(this IServiceCollection services, EventSubscriberHostArgs args, bool addSubscriberTypeServices = true, Action<IServiceProvider, EventHubSubscriberHost>? additional = null)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            services.AddTransient(sp =>
+            {
+                var ehsh = new EventHubSubscriberHost(args);
+                args.UseServiceProvider(sp);
+                additional?.Invoke(sp, ehsh);
+                return ehsh;
+            });
+
+            if (addSubscriberTypeServices)
+            {
+                foreach (var type in args.GetSubscriberTypes())
+                {
+                    services.TryAddScoped(type);
+                }
+            }
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="EventHubPublisher"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="retryPolicy">The <see cref="RetryPolicy"/>; defaults to <see cref="RetryPolicy.Default"/> where not specified.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefEventHubEventPublisher(this IServiceCollection services, string connectionString, RetryPolicy? retryPolicy = null)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            return services.AddScoped<IEventPublisher>(_ =>
+            {
+                var ehc = EventHubClient.CreateFromConnectionString(Check.NotEmpty(connectionString, nameof(connectionString)));
+                ehc.RetryPolicy = retryPolicy ?? RetryPolicy.Default;
+                return new EventHubPublisher(ehc);
+            });
+        }
+
         /// <summary>
         /// Gets (and builds on first access) the <see cref="IConfiguration"/>. 
         /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
@@ -83,8 +142,10 @@ namespace Beef.Events
             if (!string.IsNullOrEmpty(kvn))
             {
                 var astp = new AzureServiceTokenProvider();
+#pragma warning disable CA2000 // Dispose objects before losing scope; this object MUST NOT be disposed or will result in further error - only a single instance so is OK.
                 var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
                 cb.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
+#pragma warning restore CA2000
             }
 
             // Build again and replace existing.

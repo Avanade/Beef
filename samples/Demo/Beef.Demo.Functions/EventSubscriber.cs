@@ -1,4 +1,4 @@
-using Beef.Events.Subscribe.EventHubs;
+using Beef.Events.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
