@@ -33,6 +33,7 @@ $projectsToPublish = @(
 	"src\Beef.Data.OData",
 	"src\Beef.Data.Cosmos",
 	"src\Beef.Events",
+	"src\Beef.Events.EventHubs",
 	"src\Beef.Grpc",
 	"tools\Beef.CodeGen.Core",
     "tools\Beef.Database.Core",

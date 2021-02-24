@@ -68,9 +68,9 @@ namespace Beef.Events.EventHubs
         public DateTime? SkippedTimeUtc { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of retries.
+        /// Gets or sets the number of invocation attempts counter.
         /// </summary>
-        public int Retries { get; set; }
+        public int Attempts { get; set; }
 
         /// <summary>
         /// Gets or sets the event subject.

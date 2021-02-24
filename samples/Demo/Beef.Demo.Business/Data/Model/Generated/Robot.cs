@@ -65,7 +65,6 @@ namespace Beef.Demo.Business.Data.Model
     /// <summary>
     /// Represents the <see cref="Robot"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class RobotCollection : List<Robot> { }
 }
 

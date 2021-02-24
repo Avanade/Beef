@@ -14,8 +14,8 @@ namespace Beef.Events.EventHubs
         /// Checks whether the <paramref name="event"/> is considered poison.
         /// </summary>
         /// <param name="event">The <see cref="EventHubData"/>.</param>
-        /// <returns>The <see cref="PoisonMessageAction"/>.</returns>
-        Task<PoisonMessageAction> CheckPoisonedAsync(EventHubData @event);
+        /// <returns>The <see cref="PoisonMessageAction"/> and number of previous attempts.</returns>
+        Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAsync(EventHubData @event);
 
         /// <summary>
         /// Marks the <paramref name="event"/> with a poisoned <paramref name="result"/>.
@@ -25,7 +25,7 @@ namespace Beef.Events.EventHubs
         Task MarkAsPoisonedAsync(EventHubData @event, Result result);
 
         /// <summary>
-        /// Marks the previously poisoned <paramref name="event"/> to skip.
+        /// Marks the previously poisoned <paramref name="event"/> to skip and updates the internal attempts counter.
         /// </summary>
         /// <param name="event">The <see cref="EventHubData"/>.</param>
         Task SkipPoisonedAsync(EventHubData @event);

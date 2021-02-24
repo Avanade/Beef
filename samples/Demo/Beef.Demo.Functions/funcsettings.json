@@ -2,7 +2,8 @@
   "UseUserSecrets": false,
   "KeyVaultName": null,
   "ConnectionStrings": {
-    "BeefDemo": "Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True"
+    "BeefDemo": "Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True",
+    "AzureStorage": "UseDevelopmentStorage=true"
   },
   "CosmosDb": {
     "EndPoint": "https://localhost:8081",

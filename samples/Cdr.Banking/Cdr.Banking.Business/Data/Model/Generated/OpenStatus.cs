@@ -25,7 +25,6 @@ namespace Cdr.Banking.Business.Data.Model
     /// <summary>
     /// Represents the <see cref="OpenStatus"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class OpenStatusCollection : List<OpenStatus> { }
 }
 

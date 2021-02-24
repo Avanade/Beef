@@ -44,16 +44,20 @@ namespace Beef.Events.EventHubs
                 ul.UseLogger(ehsh.Logger);
 
             // Where previously marked as poison and is skip, then we can simply skip (ignore) the poison event (it is deleted and audited by storage).
-            var pma = await Storage.CheckPoisonedAsync(@event).ConfigureAwait(false);
-            if (pma == PoisonMessageAction.PoisonSkip)
+            var aa = await Storage.CheckPoisonedAsync(@event).ConfigureAwait(false);
+            if (aa.Action == PoisonMessageAction.PoisonSkip)
                 return;
 
+            // Update the attempt count as we are about to attempt to process.
+            @event.Attempt = aa.Attempts + 1;
+
+            // Invoke the worker function.
             try
             {
                 await func().ConfigureAwait(false);
 
                 // Where previously poisoned and is now successful remove from the underlying repository.
-                if (pma == PoisonMessageAction.PoisonRetry)
+                if (aa.Action == PoisonMessageAction.PoisonRetry)
                     await Storage.RemovePoisonedAsync(@event).ConfigureAwait(false);
             }
             catch (EventSubscriberUnhandledException esuex)

@@ -175,10 +175,11 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="reason">The optional reason.</param>
+        /// <param name="handling">The <see cref="ResultHandling"/>. Defaults to <see cref="ResultHandling.ContinueWithAudit"/>.</param>
         /// <returns>The <see cref="SubscriberStatus.PoisonSkipped"/> <see cref="Result"/>.</returns>
         /// <remarks>This should only be used internally when implementing an <see cref="EventSubscriberHost"/> or <see cref="IAuditWriter"/> for example; otherwise, an unintended side-effect could occur.</remarks>
-        public static Result CreatePoisonSkippedResult(string? subject, string? action, string? reason = null)
-            => new Result { Subject = subject, Action = action, Status = SubscriberStatus.PoisonSkipped, Reason = reason ?? "EventData was identified as Poison and was marked as SkipMessage; this event is skipped (i.e. not processed)." };
+        public static Result CreatePoisonSkippedResult(string? subject, string? action, string? reason = null, ResultHandling handling = ResultHandling.ContinueWithAudit)
+            => new Result { Subject = subject, Action = action, Status = SubscriberStatus.PoisonSkipped, ResultHandling = handling, Reason = reason ?? "EventData was identified as Poison and was marked as SkipMessage; this event is skipped (i.e. not processed)." };
 
         /// <summary>
         /// Creates a <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.
@@ -186,10 +187,11 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="reason">The optional reason.</param>
+        /// <param name="handling">The <see cref="ResultHandling"/>. Defaults to <see cref="ResultHandling.ContinueWithAudit"/>.</param>
         /// <returns>The <see cref="SubscriberStatus.PoisonMismatch"/> <see cref="Result"/>.</returns>
         /// <remarks>This should only be used internally when implementing an <see cref="EventSubscriberHost"/> or <see cref="IAuditWriter"/> for example; otherwise, an unintended side-effect could occur.</remarks>
-        public static Result CreatePoisonMismatchResult(string? subject, string? action, string? reason = null)
-            => new Result { Subject = subject, Action = action, Status = SubscriberStatus.PoisonMismatch, Reason = reason ?? "EventData does not match the expected poison message and it is uncertain whether it has been successfully processed." };
+        public static Result CreatePoisonMismatchResult(string? subject, string? action, string? reason = null, ResultHandling handling = ResultHandling.ContinueWithAudit)
+            => new Result { Subject = subject, Action = action, Status = SubscriberStatus.PoisonMismatch, ResultHandling = handling, Reason = reason ?? "EventData does not match the expected poison message and it is uncertain whether it has been successfully processed." };
 
         /// <summary>
         /// Checks the <see cref="Result"/> and handles accordingly.

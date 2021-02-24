@@ -176,7 +176,7 @@ namespace Beef.Data.Database.Cdc
                 // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
                 if (entity.ETag == null)
-                    entity.ETag = ETag.Generate(entity, item.DatabaseOperationType.ToString());
+                    entity.ETag = ETagGenerator.Generate(entity, item.DatabaseOperationType.ToString());
 
                 // Where the ETag and TrackingHash match then skip (has already been published).
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)

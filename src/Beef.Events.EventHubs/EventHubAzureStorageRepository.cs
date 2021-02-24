@@ -73,17 +73,17 @@ namespace Beef.Events.EventHubs
         public async Task WriteAuditAsync(EventHubData @event, Result result)
         {
             var audit = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
-            await WriteAuditAsync(audit, null).ConfigureAwait(false);
+            await WriteAuditAsync(audit, null, null).ConfigureAwait(false);
             await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, @event, result).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Writes the <see cref="EventAuditRecord"/> to the audit repository.
         /// </summary>
-        private async Task WriteAuditAsync(EventAuditRecord audit, Result? overrideResult)
+        private async Task WriteAuditAsync(EventAuditRecord audit, Result? overrideResult, int? overrideAttempt)
         {
             var prevRowKey = audit.RowKey;
-            OverrideEventAuditRecordResult(audit, overrideResult);
+            OverrideEventAuditRecordResult(audit, overrideResult, overrideAttempt);
 
             while (true)
             {
@@ -112,7 +112,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Override result where specified.
         /// </summary>
-        private static void OverrideEventAuditRecordResult(EventAuditRecord audit, Result? overrideResult)
+        private static void OverrideEventAuditRecordResult(EventAuditRecord audit, Result? overrideResult, int? overrideAttempt)
         {
             if (overrideResult != null)
             {
@@ -127,6 +127,9 @@ namespace Beef.Events.EventHubs
                 audit.Status = overrideResult.Status.ToString();
                 audit.Reason = overrideResult.Reason;
             }
+
+            if (overrideAttempt.HasValue)
+                audit.Attempts = overrideAttempt.Value;
         }
 
         /// <summary>
@@ -142,6 +145,7 @@ namespace Beef.Events.EventHubs
                 Offset = @event.Event.SystemProperties.Offset,
                 SequenceNumber = @event.Event.SystemProperties.SequenceNumber,
                 EnqueuedTimeUtc = @event.Event.SystemProperties.EnqueuedTimeUtc,
+                Attempts = @event.Attempt <= 0 ? 1 : @event.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
@@ -160,8 +164,8 @@ namespace Beef.Events.EventHubs
         /// Checks whether the <paramref name="event"/> is considered poison.
         /// </summary>
         /// <param name="event">The <see cref="EventHubData"/>.</param>
-        /// <returns>The <see cref="PoisonMessageAction"/>.</returns>
-        public async Task<PoisonMessageAction> CheckPoisonedAsync(EventHubData @event)
+        /// <returns>The <see cref="PoisonMessageAction"/> and number of previous attempts.</returns>
+        public async Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAsync(EventHubData @event)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
@@ -172,17 +176,17 @@ namespace Beef.Events.EventHubs
             // Get the current poison event (if there is one).
             var cpe = await GetPoisonedAsync(pt, @event).ConfigureAwait(false);
             if (cpe == null)
-                return PoisonMessageAction.NotPoison;
+                return (PoisonMessageAction.NotPoison, 0);
 
             // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
             if (@event.Event.SystemProperties.SequenceNumber != cpe.SequenceNumber)
             {
                 var reason = $"Current EventData (Seq#: '{@event.Event.SystemProperties.SequenceNumber}' Offset#: '{@event.Event.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{cpe.SequenceNumber}' Offset#: '{cpe.Offset}'); current assumed correct with previous Poison now deleted.";
                 var result = EventSubscriberHost.CreatePoisonMismatchResult(cpe.Subject, cpe.Action, reason);
-                await WriteAuditAsync(cpe, result).ConfigureAwait(false);
+                await WriteAuditAsync(cpe, result, null).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
                 await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, @event, result).ConfigureAwait(false);
-                return PoisonMessageAction.NotPoison;
+                return (PoisonMessageAction.NotPoison, 0);
             }
 
             // Determine action; where skipping remove poison, then audit and carry on.
@@ -190,13 +194,13 @@ namespace Beef.Events.EventHubs
             {
                 cpe.SkippedTimeUtc = DateTime.UtcNow;
                 var result = EventSubscriberHost.CreatePoisonSkippedResult(cpe.Subject, cpe.Action);
-                await WriteAuditAsync(cpe, result).ConfigureAwait(false);
+                await WriteAuditAsync(cpe, result, null).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
                 await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, @event, result).ConfigureAwait(false);
-                return PoisonMessageAction.PoisonSkip;
+                return (PoisonMessageAction.PoisonSkip, cpe.Attempts);
             }
             else
-                return PoisonMessageAction.PoisonRetry;
+                return (PoisonMessageAction.PoisonRetry, cpe.Attempts);
         }
 
         /// <summary>
@@ -250,10 +254,7 @@ namespace Beef.Events.EventHubs
                 if (ear == null)
                     ear = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
                 else
-                {
-                    OverrideEventAuditRecordResult(ear, result);
-                    ear.Retries++;
-                }
+                    OverrideEventAuditRecordResult(ear, result, ++ear.Attempts);
 
                 if (ear.PoisonedTimeUtc == null)
                     ear.PoisonedTimeUtc = DateTime.UtcNow;

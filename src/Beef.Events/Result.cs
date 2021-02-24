@@ -96,6 +96,11 @@ namespace Beef.Events
         public string? Reason { get; internal set; }
 
         /// <summary>
+        /// Gets the number of retries. A value of zero indicates the first invocation.
+        /// </summary>
+        public int? Retries { get; internal set; }
+
+        /// <summary>
         /// Gets the <see cref="ResultHandling"/> where specified (overriding the default).
         /// </summary>
         public ResultHandling? ResultHandling { get; internal set; }

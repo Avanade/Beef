@@ -53,7 +53,6 @@ namespace Beef.Demo.Common.Entities
     /// <summary>
     /// Represents the <see cref="PersonOther"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PersonOtherCollection : List<PersonOther> { }
 }
 

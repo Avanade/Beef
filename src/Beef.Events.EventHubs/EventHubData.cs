@@ -43,5 +43,11 @@ namespace Beef.Events.EventHubs
         /// Gets the <see cref="AzureEventHubs.EventData"/>.
         /// </summary>
         public AzureEventHubs.EventData Event { get; }
+
+        /// <summary>
+        /// Gets the invocation attempt counter.
+        /// </summary>
+        /// <remarks>A value of zero indicates that the attempt count is currently unknown.</remarks>
+        public int Attempt { get; internal set; }
     }
 }

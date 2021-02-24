@@ -97,14 +97,18 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var ed = CreateEventData("100", 1);
 
             // Checking and removing with unknown is a-ok.
-            Assert.AreEqual(PoisonMessageAction.NotPoison, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            var ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.NotPoison, ar.Action);
+            Assert.AreEqual(0, ar.Attempts);
             await asr.RemovePoisonedAsync(ed).ConfigureAwait(false);
             Assert.AreEqual(0, (await GetAuditRecords(pmt)).Count);
             Assert.AreEqual(0, (await GetAuditRecords(amt)).Count);
 
             // Add an event as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found."))).ConfigureAwait(false);
-            Assert.AreEqual(PoisonMessageAction.PoisonRetry, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonRetry, ar.Action);
+            Assert.AreEqual(1, ar.Attempts);
             Assert.AreEqual(1, (await GetAuditRecords(pmt).ConfigureAwait(false)).Count);
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
@@ -121,11 +125,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
-            Assert.AreEqual(0, ear.Retries);
+            Assert.AreEqual(1, ear.Attempts);
 
             // Update again an event as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.InvalidData("Bad data."))).ConfigureAwait(false);
-            Assert.AreEqual(PoisonMessageAction.PoisonRetry, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonRetry, ar.Action);
+            Assert.AreEqual(2, ar.Attempts);
             Assert.AreEqual(1, (await GetAuditRecords(pmt).ConfigureAwait(false)).Count);
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
@@ -142,7 +148,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
-            Assert.AreEqual(1, ear.Retries);
+            Assert.AreEqual(2, ear.Attempts);
 
             // Update to skip.
             await asr.SkipPoisonedAsync(ed).ConfigureAwait(false);
@@ -162,14 +168,16 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(true, ear.SkipProcessing);
-            Assert.AreEqual(1, ear.Retries);
+            Assert.AreEqual(2, ear.Attempts);
 
             // Check poisoned which will remove and audit.
-            Assert.AreEqual(PoisonMessageAction.PoisonSkip, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonSkip, ar.Action);
+            Assert.AreEqual(2, ar.Attempts);
             Assert.AreEqual(0, (await GetAuditRecords(pmt).ConfigureAwait(false)).Count);
             Assert.AreEqual(1, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
-            ear = (await GetAuditRecords(amt).ConfigureAwait(false)).First();
+            ear = (await GetAuditRecords(amt).ConfigureAwait(false)).Last();
             Assert.AreEqual("testhub-$Default", ear.PartitionKey);
             Assert.IsTrue(ear.RowKey.EndsWith("-0"));
             Assert.NotNull(ear.Body);
@@ -182,7 +190,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(true, ear.SkipProcessing);
-            Assert.AreEqual(1, ear.Retries);
+            Assert.AreEqual(2, ear.Attempts);
         }
 
         [Test]
@@ -210,7 +218,9 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
 
             // Add an event as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found."))).ConfigureAwait(false);
-            Assert.AreEqual(PoisonMessageAction.PoisonRetry, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            var ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonRetry, ar.Action);
+            Assert.AreEqual(1, ar.Attempts);
             Assert.AreEqual(1, (await GetAuditRecords(pmt).ConfigureAwait(false)).Count);
             Assert.AreEqual(0, (await GetAuditRecords(amt).ConfigureAwait(false)).Count);
 
@@ -227,11 +237,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
-            Assert.AreEqual(0, ear.Retries);
+            Assert.AreEqual(1, ear.Attempts);
 
             // Pretend to check a different event to that poisoned.
             ed = CreateEventData("200", 2);
-            Assert.AreEqual(PoisonMessageAction.NotPoison, await asr.CheckPoisonedAsync(ed).ConfigureAwait(false));
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.NotPoison, ar.Action);
+            Assert.AreEqual(0, ar.Attempts);
             Assert.AreEqual(0, (await GetAuditRecords(pmt)).Count);
             Assert.AreEqual(1, (await GetAuditRecords(amt)).Count);
 
@@ -248,7 +260,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("100", ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
-            Assert.AreEqual(0, ear.Retries);
+            Assert.AreEqual(1, ear.Attempts);
 
             await Task.CompletedTask;
         }
