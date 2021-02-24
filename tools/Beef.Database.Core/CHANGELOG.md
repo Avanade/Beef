@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.3
 - *Enhancement:* All database code generation now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net).
 - *Enhancement:* Reference data schema specification now removed throughout; will now be inferred from the database itself (columns `Code`, `Text`, `IsActive` and `SortOrder`). This will allow any schema to be used.

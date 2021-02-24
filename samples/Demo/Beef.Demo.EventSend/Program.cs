@@ -1,6 +1,5 @@
-﻿using Beef.Events;
-using Beef.Events.Publish;
-using Azure = Microsoft.Azure.EventHubs;
+﻿using Beef.Events.EventHubs;
+using AzureEventHubs = Azure.Messaging.EventHubs.Producer;
 using System;
 using System.Threading.Tasks;
 
@@ -8,11 +7,11 @@ namespace Beef.Demo.EventSend
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main()
         {
             var cs = Environment.GetEnvironmentVariable("Beef_EventHubConnectionString");
-            var ehc = Azure.EventHubClient.CreateFromConnectionString(cs);
-            var ehp = new EventHubPublisher(ehc);
+            var ehc = new AzureEventHubs.EventHubProducerClient(cs);
+            var ehp = new EventHubProducer(ehc);
 
             Console.WriteLine("Options are:");
             Console.WriteLine(" x - Stop.");

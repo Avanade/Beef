@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Azure.Storage.Blobs;
+using Microsoft.Azure.Cosmos.Table;
 using System;
 
 namespace Beef.Events.EventHubs
@@ -103,7 +103,7 @@ namespace Beef.Events.EventHubs
         public string? OriginatingReason { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Microsoft.Azure.EventHubs.EventData.Body"/> content as a <see cref="string"/>.
+        /// Gets or sets the <see cref="Azure.Messaging.EventHubs.EventData.Body"/> content as a <see cref="string"/>.
         /// </summary>
         public string? Body { get; set; }
 

@@ -4,7 +4,6 @@ using Beef.Demo.Common.Entities;
 using Beef.Demo.Functions;
 using Beef.Demo.Functions.Subscribers;
 using Beef.Events;
-using Beef.Events.Subscribe;
 using Beef.Test.NUnit;
 using Moq;
 using NUnit.Framework;

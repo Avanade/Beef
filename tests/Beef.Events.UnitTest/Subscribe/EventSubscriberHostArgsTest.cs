@@ -1,8 +1,6 @@
-﻿using Beef.Events.Subscribe;
-using Beef.Test.NUnit;
+﻿using Beef.Test.NUnit;
 using NUnit.Framework;
 using System;
-using System.Linq;
 
 namespace Beef.Events.UnitTest.Subscribe
 {

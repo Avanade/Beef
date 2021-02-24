@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Events;
-using Beef.Events.Subscribe;
 using Beef.Test.NUnit.Events;
 using Beef.Test.NUnit.Logging;
 using Beef.Test.NUnit.Tests;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -280,14 +280,12 @@ namespace Beef.Test.NUnit
                 {
                     ExecutionContext.Reset();
                     var args = EventSubscriberHostArgs.Create(typeof(TSubscriber)).UseServiceProvider(scope.ServiceProvider);
-                    tesh = new EventSubscriberTestHost(args);
+                    tesh = new EventSubscriberTestHost(args).UseLogger(scope.ServiceProvider.GetService<ILogger<EventSubscriberTester<TStartup>>>());
                     sw = Stopwatch.StartNew();
                     await tesh.ReceiveAsync(@event).ConfigureAwait(false);
                     sw.Stop();
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design.
                 catch (Exception ex)
-#pragma warning restore CA1031
                 {
                     cex = ex;
                 }

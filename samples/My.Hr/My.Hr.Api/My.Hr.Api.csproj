@@ -10,11 +10,12 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.6.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\My.Hr.Business\My.Hr.Business.csproj" />
     <ProjectReference Include="..\My.Hr.Common\My.Hr.Common.csproj" />

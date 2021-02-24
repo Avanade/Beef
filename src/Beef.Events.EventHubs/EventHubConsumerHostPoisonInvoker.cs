@@ -7,15 +7,15 @@ using System.Runtime.CompilerServices;
 namespace Beef.Events.EventHubs
 {
     /// <summary>
-    /// Represents an <see cref="EventHubSubscriberHostInvoker"/> that uses an <see cref="IEventHubStorageRepository"/> to manage poison events (both retry and skipping).
+    /// Represents an <see cref="EventHubConsumerHostInvoker"/> that uses an <see cref="IEventHubStorageRepository"/> to manage poison events (both retry and skipping).
     /// </summary>
-    public class EventHubSubscriberHostPoisonInvoker : EventHubSubscriberHostInvoker
+    public class EventHubConsumerHostPoisonInvoker : EventHubConsumerHostInvoker
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubSubscriberHostPoisonInvoker"/> class.
+        /// Initializes a new instance of the <see cref="EventHubConsumerHostPoisonInvoker"/> class.
         /// </summary>
         /// <param name="storage">The <see cref="IEventHubStorageRepository"/>.</param>
-        public EventHubSubscriberHostPoisonInvoker(IEventHubStorageRepository storage) => Storage = Check.NotNull(storage, nameof(storage));
+        public EventHubConsumerHostPoisonInvoker(IEventHubStorageRepository storage) => Storage = Check.NotNull(storage, nameof(storage));
 
         /// <summary>
         /// Gets the <see cref="EventHubAzureStorageRepository"/>.
@@ -40,7 +40,7 @@ namespace Beef.Events.EventHubs
                 throw new ArgumentNullException(nameof(@event));
 
             // Update the EventHubSubscriberHost ILogger instance where applicable.
-            if (caller is EventHubSubscriberHost ehsh && ehsh is IUseLogger ul)
+            if (caller is EventHubConsumerHost ehsh && ehsh is IUseLogger ul)
                 ul.UseLogger(ehsh.Logger);
 
             // Where previously marked as poison and is skip, then we can simply skip (ignore) the poison event (it is deleted and audited by storage).

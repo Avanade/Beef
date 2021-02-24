@@ -35,11 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.12" />
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\Beef.Data.Database\Beef.Data.Database.csproj" />
   </ItemGroup>

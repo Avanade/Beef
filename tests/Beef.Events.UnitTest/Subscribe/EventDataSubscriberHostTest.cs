@@ -1,5 +1,4 @@
-﻿using Beef.Events.Subscribe;
-using Beef.Test.NUnit;
+﻿using Beef.Test.NUnit;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;

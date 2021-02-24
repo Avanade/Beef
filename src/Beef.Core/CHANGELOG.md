@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.7
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+- *Enhancement:* Added `PartitionKeyGenerator` to generate from object array using similar logic to `ETag` MD5 hash.
+- *Enhancement:* `EventData` updated to include `PartitionKey` property.
+
 ## v4.1.6
 - *Fixed:* Issue [110](https://github.com/Avanade/Beef/issues/110). The `EventPublisherBase` has been corrected to allow mulitple `Publish`/`Send` invocations without error.
 

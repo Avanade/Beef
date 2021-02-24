@@ -98,9 +98,7 @@ namespace Beef.Events
                     if (@event == null)
                         return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(null, $"EventData is invalid; is required."), subject, action, subscriber).ConfigureAwait(false);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
                 catch (Exception ex)
-#pragma warning restore CA1031
                 {
                     // Handle the exception as per the subscriber configuration.
                     return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(ex), subject, action, subscriber).ConfigureAwait(false);
@@ -128,9 +126,7 @@ namespace Beef.Events
                 catch (BusinessException bex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(bex), subject, action, subscriber).ConfigureAwait(false); }
                 catch (NotFoundException) { return await CheckResultAsync(originatingEvent, Result.DataNotFound(), subject, action, subscriber).ConfigureAwait(false); }
                 catch (EventSubscriberUnhandledException) { throw; }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
                 catch (Exception ex) { return await CheckResultAsync(originatingEvent, CreateUnhandledExceptionResult(ex), subject, action, subscriber).ConfigureAwait(false); }
-#pragma warning restore CA1031
             }
         }
 

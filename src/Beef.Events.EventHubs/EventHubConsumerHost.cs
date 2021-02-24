@@ -1,36 +1,37 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using AzureEventHubs = Microsoft.Azure.EventHubs;
-using System.Threading.Tasks;
-using System;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+using AzureEventHubs = Microsoft.Azure.EventHubs;
+using AzureConsumer = Microsoft.Azure.EventHubs.Processor;
 
 namespace Beef.Events.EventHubs
 {
     /// <summary>
     /// Provides the Azure Event Hubs (see <see cref="AzureEventHubs.EventData"/>) <see cref="EventSubscriberHost"/>.
     /// </summary>
-    public class EventHubSubscriberHost : EventSubscriberHost
+    public class EventHubConsumerHost : EventSubscriberHost
     {
-        private EventHubSubscriberHostInvoker? _invoker;
+        private EventHubConsumerHostInvoker? _invoker;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubSubscriberHost"/> with the specified <see cref="EventSubscriberHostArgs"/>.
+        /// Initializes a new instance of the <see cref="EventHubConsumerHost"/> with the specified <see cref="EventSubscriberHostArgs"/>.
         /// </summary>
-        /// <param name="args">The optional <see cref="EventHubSubscriberHost"/>.</param>
-        public EventHubSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        /// <param name="args">The optional <see cref="EventHubConsumerHost"/>.</param>
+        public EventHubConsumerHost(EventSubscriberHostArgs args) : base(args) { }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventHubSubscriberHostInvoker"/>. Defaults to <see cref="EventHubSubscriberHostInvoker"/>.
+        /// Gets or sets the <see cref="EventHubConsumerHostInvoker"/>. Defaults to <see cref="EventHubConsumerHostInvoker"/>.
         /// </summary>
-        public EventHubSubscriberHostInvoker Invoker { get => _invoker ??= new EventHubSubscriberHostInvoker(); set => _invoker = value ?? throw new ArgumentNullException(nameof(value)); }
+        public EventHubConsumerHostInvoker Invoker { get => _invoker ??= new EventHubConsumerHostInvoker(); set => _invoker = value ?? throw new ArgumentNullException(nameof(value)); }
 
         /// <summary>
         /// Use (set) the <see cref="Invoker"/>.
         /// </summary>
-        /// <param name="invoker">The <see cref="EventHubSubscriberHostInvoker"/>.</param>
-        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
-        public EventHubSubscriberHost UseInvoker(EventHubSubscriberHostInvoker invoker)
+        /// <param name="invoker">The <see cref="EventHubConsumerHostInvoker"/>.</param>
+        /// <returns>The <see cref="EventHubConsumerHost"/> instance (for fluent-style method chaining).</returns>
+        public EventHubConsumerHost UseInvoker(EventHubConsumerHostInvoker invoker)
         {
             Invoker = invoker;
             return this;
@@ -39,8 +40,8 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Use (set) the <see cref="EventSubscriberHost.Logger"/>.
         /// </summary>
-        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (for fluent-style method chaining).</returns>
-        public EventHubSubscriberHost UseLogger(ILogger logger)
+        /// <returns>The <see cref="EventHubConsumerHost"/> instance (for fluent-style method chaining).</returns>
+        public EventHubConsumerHost UseLogger(ILogger logger)
         {
             Logger = logger;
             return this;
@@ -49,9 +50,9 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Performs the receive processing for an <see cref="AzureEventHubs.EventData"/> instance.
         /// </summary>
-        /// <param name="partitionContext">The <see cref="AzureEventHubs.Processor.PartitionContext"/>.</param>
+        /// <param name="partitionContext">The <see cref="AzureConsumer.PartitionContext"/>.</param>
         /// <param name="event">The <see cref="AzureEventHubs.EventData"/> instance to receive/process.</param>
-        public Task ReceiveAsync(AzureEventHubs.Processor.PartitionContext partitionContext, AzureEventHubs.EventData @event)
+        public Task ReceiveAsync(AzureConsumer.PartitionContext partitionContext, AzureEventHubs.EventData @event)
         {
             if (partitionContext == null)
                 throw new ArgumentNullException(nameof(partitionContext));
@@ -61,7 +62,7 @@ namespace Beef.Events.EventHubs
             return Invoker.InvokeAsync(this, async () =>
             {
                 // Invoke the base EventSubscriberHost.ReceiveAsync to do the actual work!
-                var (_, subject, action, _) = @event.GetBeefMetadata();
+                var (_, subject, action, _, _, _) = @event.GetBeefMetadata();
                 await ReceiveAsync(ehd, subject, action, (subscriber) =>
                 {
                     // Convert AzureEventHubs.EventData to Beef.EventData.

@@ -1,15 +1,13 @@
-﻿using Beef.Events.Subscribe;
-using Beef.Events.Subscribe.EventHubs;
+﻿using Beef.Events.EventHubs;
 using Beef.Test.NUnit;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AzureEventHubs = Microsoft.Azure.EventHubs;
 

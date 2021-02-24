@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.19
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.18
 - *Fixed:* Issue [108](https://github.com/Avanade/Beef/issues/108) fixed. Invalid code-gen where a table contains a primary key that is not considered identity (being self-generating) has been corrected. Will also only output `RowVersion` logic where the column has been specified.
 

@@ -277,10 +277,8 @@ namespace Beef.AspNetCore.WebApi
 
             if (statusCode == HttpStatusCode.NotFound)
             {
-#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorTypeHeaderName, ErrorType.NotFoundError.ToString());
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ErrorType.NotFoundError).ToString(System.Globalization.CultureInfo.InvariantCulture));
-#pragma warning restore CA1062 
             }
 
             return new StatusCodeResult((int)statusCode);
@@ -441,7 +439,7 @@ namespace Beef.AspNetCore.WebApi
                     if (item is IETag cetag && cetag.ETag != null)
                     {
                         if (sb.Length > 0)
-                            sb.Append(ETag.DividerCharacter);
+                            sb.Append(ETagGenerator.DividerCharacter);
 
                         sb.Append(cetag.ETag);
                         continue;
@@ -463,7 +461,7 @@ namespace Beef.AspNetCore.WebApi
             else
                 txt = json = JsonConvert.SerializeObject(result);
 
-            return (json, ETag.Generate(txt));
+            return (json, ETagGenerator.Generate(txt));
         }
 
         /// <summary>

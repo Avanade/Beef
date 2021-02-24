@@ -5,20 +5,20 @@ using AzureEventHubs = Microsoft.Azure.EventHubs;
 namespace Beef.Events.EventHubs
 {
     /// <summary>
-    /// Represents the originating event data for the <see cref="EventHubSubscriberHost"/>.
+    /// Represents the originating event data for the <see cref="EventHubConsumerHost"/>.
     /// </summary>
     public class EventHubData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubData"/> class.
         /// </summary>
-        /// <param name="eventHubPath">The Event Hubs path.</param>
+        /// <param name="eventHubName">The Event Hubs name.</param>
         /// <param name="consumerGroupName">The Event Hubs consumer group name.</param>
         /// <param name="partitionId">The Event Hubs partition identifier.</param>
         /// <param name="event">The <see cref="AzureEventHubs.EventData"/>.</param>
-        public EventHubData(string eventHubPath, string consumerGroupName, string partitionId, AzureEventHubs.EventData @event)
+        public EventHubData(string eventHubName, string consumerGroupName, string partitionId, AzureEventHubs.EventData @event)
         {
-            EventHubPath = Check.NotNull(eventHubPath, nameof(eventHubPath));
+            EventHubName = Check.NotNull(eventHubName, nameof(eventHubName));
             ConsumerGroupName = Check.NotNull(consumerGroupName, nameof(consumerGroupName));
             PartitionId = Check.NotNull(partitionId, nameof(partitionId));
             Event = Check.NotNull(@event, nameof(@event));
@@ -27,7 +27,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Gets or sets the Event Hubs path.
         /// </summary>
-        public string EventHubPath { get; }
+        public string EventHubName { get; }
 
         /// <summary>
         /// Gets or sets the Event Hubs consumer group name.

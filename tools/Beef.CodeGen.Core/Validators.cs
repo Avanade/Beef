@@ -44,7 +44,7 @@ namespace Beef.CodeGen
                 pd.Add(parts[0], parts[1]);
             }
 
-            return ValidationResult.Success;
+            return ValidationResult.Success!;
         }
     }
 
@@ -90,7 +90,7 @@ namespace Beef.CodeGen
                 }
             }
 
-            return ValidationResult.Success;
+            return ValidationResult.Success!;
         }
     }
 }

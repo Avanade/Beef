@@ -7,7 +7,7 @@ using Beef.Caching.Policy;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
-using Beef.Events;
+using Beef.Events.EventHubs;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -77,7 +77,7 @@ namespace My.Hr.Api
             // Add event publishing services.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");
             if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventPublisher(ehcs);
+                services.AddBeefEventHubEventProducer(ehcs);
             else
                 services.AddBeefNullEventPublisher();
 

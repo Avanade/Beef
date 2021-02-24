@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />

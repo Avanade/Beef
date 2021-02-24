@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-#pragma warning disable CA1716 // Identifiers should not match keywords; best name so it stays!
-
 using System.Threading.Tasks;
-using AzureEventHubs = Microsoft.Azure.EventHubs;
+using AzureEventHubs = Azure.Messaging.EventHubs;
 
 namespace Beef.Events.EventHubs
 {
@@ -39,5 +37,3 @@ namespace Beef.Events.EventHubs
         Task RemovePoisonedAsync(EventHubData @event);
     }
 }
-
-#pragma warning restore CA1716

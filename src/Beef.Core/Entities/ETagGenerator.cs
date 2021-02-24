@@ -7,9 +7,9 @@ using System.Text;
 namespace Beef.Entities
 {
     /// <summary>
-    /// Provides <see cref="IETag.ETag"/> capabilities.
+    /// Provides <see cref="IETag.ETag"/> generator capabilities.
     /// </summary>
-    public static class ETag
+    public static class ETagGenerator
     {
         /// <summary>
         /// Represents the divider character where ETag value is made up of multiple parts.
@@ -38,6 +38,8 @@ namespace Beef.Entities
                     sb.Append(DividerCharacter);
                     sb.Append(ex);
                 }
+
+                txt = sb.ToString();
             }
 
             var buf = Encoding.UTF8.GetBytes(txt);

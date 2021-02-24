@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.3
 - *Removed:* The `ICosmosDbArgs.SetIdentifierOnCreate` has been deprecated (removed). The new `IIdentifierGenerator` capability should be leveraged as a more flexible alternative.
 

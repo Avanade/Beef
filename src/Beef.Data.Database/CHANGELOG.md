@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.3
 - *Enhancement:* Added `DeletedByName` and `DeletedDateName` to `DatabaseColumns`. These are currently required for the database code-generation tooling.
 - *Fixed:* `DatabaseWildcard` needed `#pragma warning disable CS8618` added based on errant compiler warning introduced with Visual Studio 2019 v16.8.2.

@@ -1,6 +1,5 @@
 ﻿using Beef.Demo.Business;
 using Beef.Events;
-using Beef.Events.Subscribe;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Beef.Entities
 {
     /// <summary>
-    /// Represents a <see cref="string"/> identifier generator that uses <see cref="Guid.NewGuid"/> to create.
+    /// Represents a default <see cref="string"/> identifier generator that uses <see cref="Guid.NewGuid"/> to create.
     /// </summary>
     public class StringIdentifierGenerator : IStringIdentifierGenerator
     {

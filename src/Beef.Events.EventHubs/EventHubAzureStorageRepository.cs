@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using AzureEventHubs = Microsoft.Azure.EventHubs;
+using AzureEventHubs = Azure.Messaging.EventHubs;
 
 namespace Beef.Events.EventHubs
 {
@@ -27,7 +26,7 @@ namespace Beef.Events.EventHubs
         /// </summary>
         /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <returns>The partition key.</returns>
-        public static string CreatePartitionKey(EventHubData @event) => CreatePartitionKey((@event ?? throw new ArgumentNullException(nameof(@event))).EventHubPath, @event.ConsumerGroupName);
+        public static string CreatePartitionKey(EventHubData @event) => CreatePartitionKey((@event ?? throw new ArgumentNullException(nameof(@event))).EventHubName, @event.ConsumerGroupName);
 
         /// <summary>
         /// Create the partition key.
@@ -137,7 +136,7 @@ namespace Beef.Events.EventHubs
         {
             return new EventAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionId)
             {
-                EventHubPath = @event.EventHubPath,
+                EventHubPath = @event.EventHubName,
                 ConsumerGroupName = @event.ConsumerGroupName,
                 PartitionId = @event.PartitionId,
                 Offset = @event.Event.SystemProperties.Offset,
@@ -147,7 +146,7 @@ namespace Beef.Events.EventHubs
                 Action = result.Action,
                 Reason = result.Reason,
                 Status = result.Status.ToString(),
-                Body = Substring(Encoding.UTF8.GetString(@event.Event.Body.Array)),
+                Body = Substring(Encoding.UTF8.GetString(@event.Event.Body)),
                 Exception = Substring(result.Exception?.ToString()),
             };
         }

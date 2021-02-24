@@ -100,7 +100,7 @@ namespace Beef.Database.Core
             if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen) && _configOpt.Value() == null)
                 return new ValidationResult($"The --config option is required when CodeGen is selected.");
 
-            return ValidationResult.Success;
+            return ValidationResult.Success!;
         }
 
         /// <summary>
