@@ -1,15 +1,23 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{CdcSchema}}].[{{StoredProcedureName}}]
-  @MaxQuerySize INT NULL = 100,
-  @GetIncompleteOutbox BIT NULL = 0,
-  @OutboxIdToMarkComplete INT NULL = NULL,
-  @CompleteTrackingList AS [{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List] READONLY
+  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (perf vs failure cost).
+  @GetIncompleteOutbox BIT NULL = 0,        -- Gets incomplete outbox (batch) where existing.
+  @ContinueWithDataLoss BIT NULL = 0,       -- Ignores data loss and continues; versus returning -2.
+  @OutboxIdToMarkComplete INT NULL = NULL,  -- Marks the specified outbox as Complete; no further data is retrieved.
+  @CompleteTrackingList AS [{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List] READONLY  -- When Marking/Completing the corresponding tracking list should also be merged.
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost.
    */
 
+  /* Return Codes:
+   *   0 = Success
+   *  -1 = Cannot continue where there is an incomplete outbox; must be completed.
+   *  -2 = SQL Server has cleaned up CDC data that should have been included in the batch; i.e changes have been missed.
+   *        (see https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server)
+   */
+ 
   SET NOCOUNT ON;
 
   BEGIN TRY
@@ -139,10 +147,10 @@ BEGIN
       END
     END
 
-    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
+    -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
 {{#each CdcJoins}}
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
 {{/each}}
 
     -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
@@ -293,6 +301,7 @@ BEGIN
 {{/each}}
     -- Commit the transaction.
     COMMIT TRANSACTION
+    RETURN 0
   END TRY
   BEGIN CATCH
     -- Rollback transaction and rethrow error.

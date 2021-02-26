@@ -1,14 +1,22 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePostsCdcOutbox]
-  @MaxQuerySize INT NULL = 100,
-  @GetIncompleteOutbox BIT NULL = 0,
-  @OutboxIdToMarkComplete INT NULL = NULL,
-  @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
+  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (perf vs failure cost).
+  @GetIncompleteOutbox BIT NULL = 0,        -- Gets incomplete outbox (batch) where existing.
+  @ContinueWithDataLoss BIT NULL = 0,       -- Ignores data loss and continues; versus returning -2.
+  @OutboxIdToMarkComplete INT NULL = NULL,  -- Marks the specified outbox as Complete; no further data is retrieved.
+  @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY  -- When Marking/Completing the corresponding tracking list should also be merged.
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost.
    */
 
+  /* Return Codes:
+   *   0 = Success
+   *  -1 = Cannot continue where there is an incomplete outbox; must be completed.
+   *  -2 = SQL Server has cleaned up CDC data that should have been included in the batch; i.e changes have been missed.
+   *        (see https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server)
+   */
+ 
   SET NOCOUNT ON;
 
   BEGIN TRY
@@ -140,11 +148,11 @@ BEGIN
       END
     END
 
-    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
-    IF (@PostsMinLsn < @PostsBaseMinLsn) BEGIN SET @PostsMinLsn = @PostsBaseMinLsn END
-    IF (@CommentsMinLsn < @CommentsBaseMinLsn) BEGIN SET @CommentsMinLsn = @CommentsBaseMinLsn END
-    IF (@CommentsTagsMinLsn < @CommentsTagsBaseMinLsn) BEGIN SET @CommentsTagsMinLsn = @CommentsTagsBaseMinLsn END
-    IF (@PostsTagsMinLsn < @PostsTagsBaseMinLsn) BEGIN SET @PostsTagsMinLsn = @PostsTagsBaseMinLsn END
+    -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
+    IF (@PostsMinLsn < @PostsBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @PostsMinLsn = @PostsBaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
+    IF (@CommentsMinLsn < @CommentsBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @CommentsMinLsn = @CommentsBaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
+    IF (@CommentsTagsMinLsn < @CommentsTagsBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @CommentsTagsMinLsn = @CommentsTagsBaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
+    IF (@PostsTagsMinLsn < @PostsTagsBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @PostsTagsMinLsn = @PostsTagsBaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
 
     -- Find changes on the root table: Legacy.Posts - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
@@ -332,6 +340,7 @@ BEGIN
 
     -- Commit the transaction.
     COMMIT TRANSACTION
+    RETURN 0
   END TRY
   BEGIN CATCH
     -- Rollback transaction and rethrow error.

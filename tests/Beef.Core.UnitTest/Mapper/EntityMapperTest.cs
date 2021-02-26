@@ -211,7 +211,7 @@ namespace Beef.Core.UnitTest.Mapper
         {
             var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
-                .MapToDest(new PersonA {  Addresses = System.Array.Empty<Address>() });
+                .MapToDest(new PersonA { Addresses = System.Array.Empty<Address>() });
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Addresses);
@@ -228,6 +228,129 @@ namespace Beef.Core.UnitTest.Mapper
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Addresses);
             Assert.AreEqual(2, r.Addresses.Count);
+        }
+
+        [Test]
+        public void XMapToDest_AutoPerfVolume()
+        {
+            var mapper = EntityMapper.CreateAuto<PersonA, PersonB>()
+                .HasProperty(s => s.Street, d => d.StreetX)
+                .HasProperty(s => s.City, d => d.CityX)
+                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper.CreateAuto<Address, AddressX>()));
+
+            var pa = new PersonA
+            {
+                Name = "Bob",
+                Age = 21,
+                Salary = 18995m,
+                Street = "Simpsons",
+                City = "Bardon",
+                Codes = new int[] { 1, 2, 3 },
+                Address = new Address
+                {
+                    Street = "Petherick",
+                    City = "Pomare"
+                },
+                Addresses = new Address[]
+                {
+                    new Address { Street = "158TH", City = "Redmond" },
+                    new Address { Street = "Upoko", City = "Hataitai" }
+                }
+            };
+
+            PersonB pb = null;
+            for (int i = 0; i < 10000; i++)
+            {
+                pa.Age = i;
+                pb = mapper.MapToDest(pa);
+            }
+
+            Assert.IsNotNull(pb);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.AreEqual(9999, pb.Age);
+            Assert.AreEqual(18995m, pb.Salary);
+            Assert.AreEqual("Simpsons", pb.StreetX);
+            Assert.AreEqual("Bardon", pb.CityX);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.IsNotNull(pb.Codes);
+            Assert.AreEqual(new int[] { 1, 2, 3 }, pb.Codes);
+            Assert.IsNotNull(pb.AddressX);
+            Assert.AreEqual("Petherick", pb.AddressX.Street);
+            Assert.AreEqual("Pomare", pb.AddressX.City);
+            Assert.IsNotNull(pb.Addresses);
+            Assert.AreEqual(2, pb.Addresses.Count);
+            Assert.AreEqual("158TH", pb.Addresses[0].Street);
+            Assert.AreEqual("Redmond", pb.Addresses[0].City);
+            Assert.AreEqual("Upoko", pb.Addresses[1].Street);
+            Assert.AreEqual("Hataitai", pb.Addresses[1].City);
+        }
+
+        [Test]
+        public void XMapToDest_AutoPerfVolume_ManualCompare()
+        {
+            var pa = new PersonA
+            {
+                Name = "Bob",
+                Age = 21,
+                Salary = 18995m,
+                Street = "Simpsons",
+                City = "Bardon",
+                Codes = new int[] { 1, 2, 3 },
+                Address = new Address
+                {
+                    Street = "Petherick",
+                    City = "Pomare"
+                },
+                Addresses = new Address[]
+                {
+                    new Address { Street = "158TH", City = "Redmond" },
+                    new Address { Street = "Upoko", City = "Hataitai" }
+                }
+            };
+
+            PersonB pb = null;
+            for (int i = 0; i < 10000; i++)
+            {
+                pa.Age = i;
+                pb = new PersonB
+                {
+                    Name = pa.Name,
+                    Age = i,
+                    Salary = pa.Salary.Value,
+                    StreetX = pa.Street,
+                    CityX = pa.City,
+                    Codes = (int[])pa.Codes.Clone(),
+                    AddressX = new AddressX
+                    {
+                        Street = pa.Address.Street,
+                        City = pa.Address.City
+                    },
+                    Addresses = new List<AddressX>
+                    {
+                        new AddressX { Street = pa.Addresses[0].Street, City = pa.Addresses[0].City },
+                        new AddressX { Street = pa.Addresses[1].Street, City = pa.Addresses[1].City }
+                    }
+                };
+            }
+
+            Assert.IsNotNull(pb);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.AreEqual(9999, pb.Age);
+            Assert.AreEqual(18995m, pb.Salary);
+            Assert.AreEqual("Simpsons", pb.StreetX);
+            Assert.AreEqual("Bardon", pb.CityX);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.IsNotNull(pb.Codes);
+            Assert.AreEqual(new int[] { 1, 2, 3 }, pb.Codes);
+            Assert.IsNotNull(pb.AddressX);
+            Assert.AreEqual("Petherick", pb.AddressX.Street);
+            Assert.AreEqual("Pomare", pb.AddressX.City);
+            Assert.IsNotNull(pb.Addresses);
+            Assert.AreEqual(2, pb.Addresses.Count);
+            Assert.AreEqual("158TH", pb.Addresses[0].Street);
+            Assert.AreEqual("Redmond", pb.Addresses[0].City);
+            Assert.AreEqual("Upoko", pb.Addresses[1].Street);
+            Assert.AreEqual("Hataitai", pb.Addresses[1].City);
         }
 
         #endregion

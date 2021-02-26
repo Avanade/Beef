@@ -2,6 +2,7 @@
 using AzureEventHubs = Azure.Messaging.EventHubs.Producer;
 using System;
 using System.Threading.Tasks;
+using Beef.Entities;
 
 namespace Beef.Demo.EventSend
 {
@@ -57,7 +58,10 @@ namespace Beef.Demo.EventSend
                         break;
 
                     case "6":
-                        ehp.PublishValue("N", "Demo.Robot.1", "PowerSourceChange", new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+                        var ed = ehp.CreateValueEvent("N", "Demo.Robot.1", "PowerSourceChange");
+                        ed.Key = new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                        ed.PartitionKey = PartitionKeyGenerator.Generate(Guid.NewGuid());
+                        ehp.Publish(ed);
                         await ehp.SendAsync();
                         break;
                 }

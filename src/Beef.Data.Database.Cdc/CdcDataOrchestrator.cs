@@ -27,12 +27,15 @@ namespace Beef.Data.Database.Cdc
     {
         private const string OutboxIdParamName = "OutboxIdToMarkComplete";
         private const string GetIncompleteOutboxParamName = "GetIncompleteOutbox";
-        private const string QuerySizeParamName = "MaxQuerySize";
+        private const string MaxQuerySizeParamName = "MaxQuerySize";
+        private const string ContinueWithDataLossParamName = "@ContinueWithDataLoss";
         private const string CompleteTrackingListParamName = "@CompleteTrackingList";
 
         private static readonly DatabaseMapper<CdcOutbox> _outboxMapper = DatabaseMapper.CreateAuto<CdcOutbox>();
         private static readonly TCdcTrackingMapper _trackingMapper = new TCdcTrackingMapper();
         private string? _name;
+        private int _maxQuerySize = 100;
+        private bool _executeIncomplete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class.
@@ -85,6 +88,18 @@ namespace Beef.Data.Database.Cdc
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
 
         /// <summary>
+        /// Gets or sets the maximum query size to limit the number of CDC (Change Data Capture) rows that are batched in a <see cref="CdcOutbox"/>.
+        /// </summary>
+        /// <remarks>Defaults to 100.</remarks>
+        public int MaxQuerySize { get => _maxQuerySize; set => _maxQuerySize = value < 1 ? 100 : value; }
+
+        /// <summary>
+        /// Indicates whether to ignore any data loss and continue using the CDC (Change Data Capture) data that is available.
+        /// </summary>
+        /// <remarks>For more information as to why data loss may occur see: https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server </remarks>
+        public bool ContinueWithDataLoss { get; set; }
+
+        /// <summary>
         /// Marks an existing outbox as complete.
         /// </summary>
         /// <param name="outboxId">The outbox identifier.</param>
@@ -93,7 +108,7 @@ namespace Beef.Data.Database.Cdc
         {
             await Db.StoredProcedure(StoredProcedureName)
                 .Param(OutboxIdParamName, outboxId)
-                .Param(QuerySizeParamName, System.Data.DbType.Int32, 0)
+                .Param(MaxQuerySizeParamName, System.Data.DbType.Int32, 0)
                 .TableValuedParam(CompleteTrackingListParamName, _trackingMapper.CreateTableValuedParameter(list))
                 .NonQueryAsync().ConfigureAwait(false);
         }
@@ -112,43 +127,55 @@ namespace Beef.Data.Database.Cdc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
         public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteIncompleteAsync(CancellationToken? cancellationToken = null)
-            => ExecuteSelectedInternalAsync($"{ServiceName} Query for previously incomplete Change Data Capture outbox.", true, -1, cancellationToken ?? CancellationToken.None);
+            => ExecuteSelectedInternalAsync($"{ServiceName} Query for previously incomplete Change Data Capture outbox (ContinueWithDataLoss = {ContinueWithDataLoss}).", true, cancellationToken ?? CancellationToken.None);
 
         /// <summary>
         /// Executes the next (new) outbox.
         /// </summary>
-        /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken)
-            => await ExecuteNextAsync(maxQuerySize < 1 ? 100 : maxQuerySize, cancellationToken).ConfigureAwait(false);
+        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteNextAsync(CancellationToken? cancellationToken)
+            => await ExecuteNextAsync(cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes the next (new) outbox.
         /// </summary>
-        /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(int maxQuerySize = 100, CancellationToken? cancellationToken = null)
-            => ExecuteSelectedInternalAsync($"{ServiceName} Query for next (new) Change Data Capture outbox with maximum query size of {maxQuerySize}.", false, maxQuerySize, cancellationToken ?? CancellationToken.None);
+        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(CancellationToken? cancellationToken = null)
+            => ExecuteSelectedInternalAsync($"{ServiceName} Query for next (new) Change Data Capture outbox (MaxQuerySize = {MaxQuerySize}, ContinueWithDataLoss = {ContinueWithDataLoss}).", false, cancellationToken ?? CancellationToken.None);
 
         /// <summary>
         /// Execute selected (internal).
         /// </summary>
-        private async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteSelectedInternalAsync(string text, bool incomplete, int maxQuerySize, CancellationToken cancellationToken)
+        private async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteSelectedInternalAsync(string text, bool incomplete, CancellationToken cancellationToken)
         {
             // Get the requested outbox data.
             Logger.LogInformation(text);
-            var result = await GetOutboxEntityDataAsync(maxQuerySize, incomplete).ConfigureAwait(false);
+            _executeIncomplete = incomplete;
+            var result = await GetOutboxEntityDataAsync().ConfigureAwait(false);
 
-            if (result.ReturnCode < 0)
+            // Check the return code.
+            switch (result.ReturnCode)
             {
-                if (result.Outbox != null)
-                    Logger.LogError($"{ServiceName} Outbox '{result.Outbox.Id}': previously created on '{result.Outbox.CreatedDate}' is not complete; this must be completed to continue.");
-                else
-                    Logger.LogCritical($"{ServiceName}: Unexpected execution outcome (return code '{result.ReturnCode}') with no incomplete outbox; this is not expected.");
+                case 0:
+                    break;
 
-                return result;
+                case -1:
+                    if (result.Outbox != null)
+                        Logger.LogError($"{ServiceName} Outbox '{result.Outbox.Id}': previously created on '{result.Outbox.CreatedDate}' is not complete; this must be completed to continue.");
+                    else
+                        Logger.LogCritical($"{ServiceName}: Unexpected execution outcome (return code '{result.ReturnCode}') with no incomplete outbox.");
+
+                    return result;
+
+                case -2:
+                    Logger.LogCritical($"{ServiceName}: Unexpected data loss error (return code '{result.ReturnCode}'); this indicates that the CDC data has probably been cleaned up before being successfully processed.");
+                    return result;
+
+                default:
+                    Logger.LogCritical($"{ServiceName}: Unexpected execution outcome (return code '{result.ReturnCode}').");
+                    return result;
             }
 
             if (result.Outbox == null)
@@ -209,19 +236,18 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Executes a multi-dataset query command with one or more <paramref name="multiSetArgs"/>; whilst also outputing the resulting return value.
         /// </summary>
-        /// <param name="maxQuerySize">The recommended maximum query size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
         /// <returns>The resultant <see cref="CdcDataOrchestratorResult{TCdcEntityWrapperColl, TCdcEntityWrapper}"/>.</returns>
-        protected async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(int maxQuerySize, bool incomplete, params IMultiSetArgs[] multiSetArgs)
+        protected async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(params IMultiSetArgs[] multiSetArgs)
         {
             var result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>();
             var msa = new List<IMultiSetArgs> { new MultiSetSingleArgs<CdcOutbox>(_outboxMapper, r => result.Outbox = r, isMandatory: false, stopOnNull: true) };
             msa.AddRange(multiSetArgs);
 
             result.ReturnCode = await Db.StoredProcedure(StoredProcedureName)
-                .Param(QuerySizeParamName, maxQuerySize)
-                .Param(GetIncompleteOutboxParamName, incomplete)
+                .Param(MaxQuerySizeParamName, MaxQuerySize)
+                .Param(GetIncompleteOutboxParamName, _executeIncomplete)
+                .Param(ContinueWithDataLossParamName, ContinueWithDataLoss)
                 .SelectQueryMultiSetWithValueAsync(msa.ToArray())
                 .ConfigureAwait(false);
 
@@ -231,10 +257,8 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
-        /// <param name="maxQuerySize">The recommended maximum query size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>A <typeparamref name="TCdcEntityWrapperColl"/>.</returns>
-        protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetOutboxEntityDataAsync(int maxQuerySize, bool incomplete);
+        protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetOutboxEntityDataAsync();
 
         /// <summary>
         /// Creates an <see cref="EventData{T}"/> for the specified <paramref name="value"/>.

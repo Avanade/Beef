@@ -48,14 +48,12 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
-        /// <param name="maxBatchSize">The recommended maximum batch size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetOutboxEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetOutboxEntityDataAsync()
         {
             var pColl = new PostsCdcWrapperCollection();
 
-            var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
+            var result = await SelectQueryMultiSetAsync(
                 new MultiSetCollArgs<PostsCdcWrapperCollection, PostsCdcWrapper>(_postsCdcWrapperMapper, r => pColl = r, stopOnNull: true), // Root table: Legacy.Posts
                 new MultiSetCollArgs<PostsCdc.CommentsCdcCollection, PostsCdc.CommentsCdc>(_commentsCdcMapper, r =>
                 {

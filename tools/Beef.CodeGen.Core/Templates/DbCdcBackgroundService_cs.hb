@@ -20,21 +20,13 @@ namespace {{Root.NamespaceCdc}}.Services
     /// </summary>
     public partial class {{ModelName}}CdcBackgroundService : CdcBackgroundService<I{{ModelName}}CdcData>
     {
-        private readonly IConfiguration _config;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="{{ModelName}}CdcBackgroundService"/> class.
         /// </summary>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public {{ModelName}}CdcBackgroundService(IConfiguration config, IServiceProvider serviceProvider, ILogger<{{ModelName}}CdcBackgroundService> logger) :
-            base(serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
-
-        /// <summary>
-        /// Gets the interval seconds between each execution.
-        /// </summary>
-        public override int? IntervalSeconds => _config.GetValue<int?>("{{ModelName}}CdcIntervalSeconds");
+        public {{ModelName}}CdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger<{{ModelName}}CdcBackgroundService> logger) : base(serviceProvider, config, logger) { }
     }
 }
 

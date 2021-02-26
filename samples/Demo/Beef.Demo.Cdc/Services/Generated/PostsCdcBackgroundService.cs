@@ -19,21 +19,13 @@ namespace Beef.Demo.Cdc.Services
     /// </summary>
     public partial class PostsCdcBackgroundService : CdcBackgroundService<IPostsCdcData>
     {
-        private readonly IConfiguration _config;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PostsCdcBackgroundService"/> class.
         /// </summary>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public PostsCdcBackgroundService(IConfiguration config, IServiceProvider serviceProvider, ILogger<PostsCdcBackgroundService> logger) :
-            base(serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
-
-        /// <summary>
-        /// Gets the interval seconds between each execution.
-        /// </summary>
-        public override int? IntervalSeconds => _config.GetValue<int?>("PostsCdcIntervalSeconds");
+        public PostsCdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger<PostsCdcBackgroundService> logger) : base(serviceProvider, config, logger) { }
     }
 }
 

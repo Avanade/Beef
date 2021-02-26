@@ -244,12 +244,35 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
   {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
         public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+
+        #endregion
+
+  {{/ifne}}
+{{/unless}}
+{{! ===== UniqueKey ===== }}
+{{#unless RefDataType}}
+  {{#ifne PartitionKeyProperties.Count 0}}
+        #region IPartitionKey
+        
+        /// <summary>
+        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+        /// </summary>
+        /// <returns>The Partition Key.</returns>
+  {{#each PartitionKeyProperties}}
+        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+  {{/each}}
+        public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => PartitionKeyGenerator.Generate({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+
+        /// <summary>
+        /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// </summary>
+        public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
 
         #endregion
 

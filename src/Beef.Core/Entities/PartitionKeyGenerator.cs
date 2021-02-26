@@ -12,11 +12,6 @@ namespace Beef.Entities
     public static class PartitionKeyGenerator
     {
         /// <summary>
-        /// Represents the divider character where ETag value is made up of multiple parts.
-        /// </summary>
-        public const char DividerCharacter = '|';
-
-        /// <summary>
         /// Generates a <see cref="IPartitionKey.PartitionKey"/> by serializing to JSON and performing an <see cref="System.Security.Cryptography.MD5"/> hash.
         /// </summary>
         /// <param name="args">The value or values that represent the <see cref="IPartitionKey.PartitionKey"/>.</param>
@@ -26,22 +21,18 @@ namespace Beef.Entities
             if (args == null || args.Length == 0 || (args.Length == 1 && args[0] == null))
                 return null;
 
-            if (args.Length == 1 && args[0] is string sarg)
-                return sarg;
+            var (Value, IsJsonSerialized) = ETagGenerator.ConvertToString(args[0]);
+            if (!IsJsonSerialized && args.Length == 1)
+                return Value;
 
-            var sb = new StringBuilder();
-            foreach (var arg in args)
+            var sb = new StringBuilder(Value);
+            for (int i = 1; i < args.Length; i++)
             {
-                sb.Append((arg is IConvertible ic) ? ic.ToString(System.Globalization.CultureInfo.InvariantCulture) : JsonConvert.SerializeObject(arg));
-                sb.Append(DividerCharacter);
+                sb.Append(ETagGenerator.DividerCharacter);
+                sb.Append(ETagGenerator.ConvertToString(args[i]).Value);
             }
 
-            var buf = Encoding.UTF8.GetBytes(sb.ToString());
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate a hash/etag.
-            using var md5 = System.Security.Cryptography.MD5.Create();
-#pragma warning restore CA5351 
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
-            return Convert.ToBase64String(hash);
+            return ETagGenerator.GenerateHash(sb.ToString());
         }
     }
 }

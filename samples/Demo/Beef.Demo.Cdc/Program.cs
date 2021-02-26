@@ -1,4 +1,6 @@
-﻿using Beef.Data.Database;
+﻿using Beef.Data.Cosmos;
+using Beef.Data.Database;
+using Beef.Data.Database.Cdc;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
@@ -6,6 +8,7 @@ using Beef.Demo.Business.DataSvc;
 using Beef.Demo.Cdc.Data;
 using Beef.Demo.Cdc.Services;
 using Beef.Entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -17,9 +20,13 @@ namespace Beef.Demo.Cdc
     /// </summary>
     class Program
     {
+        // Command lines args to override versus config file: dotnet run --ContactCdc:IntervalSeconds 60
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args)
+                .ConfigureHostConfiguration(c => c.AddEnvironmentVariables(prefix: "BeefCdc"))
+                .Build()
+                .Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -30,8 +37,13 @@ namespace Beef.Demo.Cdc
                             .AddBeefRequestCache()
                             .AddBeefBusinessServices();
 
-                    services.AddBeefDatabaseServices(() => new Business.Data.Database("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True"))
-                            .AddBeefEntityFrameworkServices<EfDbContext, EfDb>();
+                    services.AddBeefDatabaseServices(() => new Business.Data.Database(hostContext.Configuration.GetConnectionString("BeefDemo")))
+                            .AddBeefEntityFrameworkServices<EfDbContext, EfDb>()
+                            .AddBeefCosmosDbServices<CosmosDb>(hostContext.Configuration.GetSection("CosmosDb"));
+
+                    services.AddGeneratedReferenceDataManagerServices()
+                            .AddGeneratedReferenceDataDataSvcServices()
+                            .AddGeneratedReferenceDataDataServices();
 
                     services.AddGeneratedManagerServices()
                             .AddGeneratedValidationServices()
@@ -47,10 +59,10 @@ namespace Beef.Demo.Cdc
                     services.AddBeefLoggerEventPublisher();
                     services.AddGeneratedCdcDataServices();
 
-                    services.AddHostedService<PostsCdcBackgroundService>();
-                    services.AddHostedService<ContactCdcBackgroundService>();
-                    services.AddHostedService<PersonCdcBackgroundService>();
-                    services.AddHostedService<Person2CdcBackgroundService>();
+                    services.AddCdcHostedService<PostsCdcBackgroundService>(hostContext.Configuration);
+                    services.AddCdcHostedService<ContactCdcBackgroundService>(hostContext.Configuration);
+                    services.AddCdcHostedService<PersonCdcBackgroundService>(hostContext.Configuration);
+                    services.AddCdcHostedService<Person2CdcBackgroundService>(hostContext.Configuration);
                 });
     }
 }

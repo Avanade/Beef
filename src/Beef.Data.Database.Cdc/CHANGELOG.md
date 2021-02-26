@@ -3,6 +3,8 @@
 Represents the **NuGet** versions.
 
 ## v4.1.3
+- *Enhancement:* Added support for `ContinueWithDataLoss`.
+- *Enhancement:* Added support for `CdcBackgroundService<T>.RunAsync` to enable execution without the `IHostedService` capabilties. For example, direct invocation from the likes of an Azure Function that would use an Azure `TimerTrigger` to handle the multiple long-running nature.
 - *Enhancement:* Required change as a result of `ETag` rename to `ETagGenerator`.
 
 ## v4.1.2

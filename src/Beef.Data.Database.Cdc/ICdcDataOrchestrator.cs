@@ -11,18 +11,28 @@ namespace Beef.Data.Database.Cdc
     public interface ICdcDataOrchestrator
     {
         /// <summary>
+        /// Gets or sets the maximum query size to limit the number of CDC (Change Data Capture) rows that are batched in a <see cref="CdcOutbox"/>.
+        /// </summary>
+        int MaxQuerySize { get; set; }
+
+        /// <summary>
+        /// Indicates whether to ignore any data loss and continue using the CDC (Change Data Capture) data that is available.
+        /// </summary>
+        /// <remarks>For more information as to why data loss may occur see: https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server </remarks>
+        bool ContinueWithDataLoss { get; set; }
+
+        /// <summary>
         /// Executes the next (new) outbox.
         /// </summary>
-        /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        public Task<CdcDataOrchestratorResult> ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken);
+        Task<CdcDataOrchestratorResult> ExecuteNextAsync(CancellationToken? cancellationToken);
 
         /// <summary>
         /// Executes any previously incomplete outbox.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        public Task<CdcDataOrchestratorResult> ExecuteIncompleteAsync(CancellationToken? cancellationToken = null);
+        Task<CdcDataOrchestratorResult> ExecuteIncompleteAsync(CancellationToken? cancellationToken);
     }
 }

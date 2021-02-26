@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.1.4
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+- *Fixed:* The `DeleteAllAndReset.sql` updated to ignore schema `cdc`.
 
 ## v4.1.3
 - *Enhancement:* All database code generation now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net).

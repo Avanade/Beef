@@ -66,14 +66,12 @@ namespace {{Root.NamespaceCdc}}.Data
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
-        /// <param name="maxBatchSize">The recommended maximum batch size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetOutboxEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetOutboxEntityDataAsync()
         {
             var {{Alias}}Coll = new {{ModelName}}CdcWrapperCollection();
 
-            var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
+            var result = await SelectQueryMultiSetAsync(
                 new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne CdcJoins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
 {{#each CdcJoins}}
                 new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>

@@ -51,6 +51,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(123, ed.Key);
             Assert.IsFalse(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
+            Assert.IsNull(ed.PartitionKey);
         }
 
         private class Entity : IIntIdentifier
@@ -78,6 +79,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsTrue(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
             Assert.AreEqual(v, ed.Value);
+            Assert.IsNull(ed.PartitionKey);
         }
 
         private class Entity2 : IUniqueKey
@@ -112,6 +114,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsTrue(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
             Assert.AreEqual(v, ed.Value);
+            Assert.IsNull(ed.PartitionKey);
         }
 
         [Test]
@@ -132,6 +135,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(null, ed.Key);
             Assert.IsFalse(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
+            Assert.IsNull(ed.PartitionKey);
         }
 
         [Test]
@@ -153,6 +157,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsTrue(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
             Assert.AreEqual("TESTER", ed.Value);
+            Assert.IsNull(ed.PartitionKey);
         }
 
         [Test]
@@ -163,6 +168,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(123, ed1.Value);
             Assert.AreEqual(123, ed1.GetValue());
             Assert.IsNull(ed1.ETag);
+            Assert.IsNull(ed1.PartitionKey);
 
             ed1.ResetValue();
             Assert.AreEqual(0, ed1.Value);
@@ -198,36 +204,47 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsNull(ed1.ETag);
         }
 
-        public class TestData : IETag
+        public class TestData : IETag, IPartitionKey
         {
             public string Blah { get; set; }
             public string ETag { get; set; }
+
+            public string PartitionKey => "PK";
         }
 
         [Test]
-        public void EventData_IETag()
+        public void EventData_IETag_IPartitionKey()
         {
             var td = new TestData();
             var ed = new EventData<TestData> { Value = td };
             Assert.AreSame(td, ed.Value);
             Assert.IsNull(td.ETag);
+            Assert.AreEqual("PK", ed.PartitionKey);
 
             td = new TestData() { Blah = "B" };
             ed = new EventData<TestData> { Value = td };
             Assert.AreSame(td, ed.Value);
             Assert.IsNull(td.ETag);
+            Assert.AreEqual("PK", ed.PartitionKey);
 
             td = new TestData { Blah = "B", ETag = "E" };
             ed = new EventData<TestData> { Value = td };
             Assert.AreSame(td, ed.Value);
             Assert.AreEqual("E", td.ETag);
+            Assert.AreEqual("PK", ed.PartitionKey);
 
             ed.ETag = "X";
             Assert.AreEqual("X", ed.ETag);
+            Assert.AreEqual("PK", ed.PartitionKey);
+
+            ed.PartitionKey = "KP";
+            Assert.AreEqual("X", ed.ETag);
+            Assert.AreEqual("KP", ed.PartitionKey);
 
             ed.ResetValue();
             Assert.IsNull(ed.Value);
             Assert.AreEqual("X", ed.ETag);
+            Assert.AreEqual("KP", ed.PartitionKey);
         }
     }
 }

@@ -28,8 +28,10 @@ namespace Beef.Entities
             if (value == null)
                 return null;
 
-            // Where value is IConvertible use ToString otherwise JSON serialize.
-            var txt = (value is IConvertible ic) ? ic.ToString(System.Globalization.CultureInfo.InvariantCulture) : JsonConvert.SerializeObject(value);
+            // Where value is IComparable use ToString otherwise JSON serialize.
+            var (Value, _) = ConvertToString(value);
+            var txt = Value;
+
             if (parts.Length > 0)
             {
                 var sb = new StringBuilder(txt);
@@ -42,12 +44,44 @@ namespace Beef.Entities
                 txt = sb.ToString();
             }
 
-            var buf = Encoding.UTF8.GetBytes(txt);
+            return GenerateHash(txt);
+        }
+
+        /// <summary>
+        /// Generates a hash of the string using <see cref="System.Security.Cryptography.MD5"/>.
+        /// </summary>
+        /// <param name="value">The text value to hash.</param>
+        /// <returns>The hashed value.</returns>
+        /// <remarks>The hash is <b>not</b> intended for <i>Cryptographic</i> usage; therefore using the MD5 algorithm is acceptable.</remarks>
+        internal static string? GenerateHash(string? value)
+        {
+            var buf = Encoding.UTF8.GetBytes(value ?? throw new ArgumentNullException(nameof(value)));
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate a hash/etag.
             using var md5 = System.Security.Cryptography.MD5.Create();
 #pragma warning restore CA5351 
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             return Convert.ToBase64String(hash);
+        }
+
+        /// <summary>
+        /// Converts the value to a corresponding <see cref="string"/>.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The string equivalent and whether the contents are a JSON serialized representation.</returns>
+        public static (string? Value, bool IsJsonSerialized) ConvertToString(object value)
+        {
+            if (value == null)
+                return (null, false);
+
+            if (value is string str)
+                return (str, false);
+
+            if (value is DateTime dte)
+                return (dte.ToString("o"), false);
+
+            return (value is IConvertible ic)
+                ? (ic.ToString(System.Globalization.CultureInfo.InvariantCulture), false)
+                : ((value is IComparable) ? (value.ToString(), false) : (JsonConvert.SerializeObject(value), true));
         }
     }
 }

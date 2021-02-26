@@ -168,6 +168,14 @@ properties: [
         public string? Default { get; set; }
 
         /// <summary>
+        /// Indicates whether the property is considered part of the Partition Key.
+        /// </summary>
+        [JsonProperty("partitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Property", Title = "Indicates whether the property is considered part of the Partition Key.",
+            Description = "This will implement `IPartitionKey` for the generated entity.")]
+        public bool? PartitionKey { get; set; }
+
+        /// <summary>
         /// Gets or sets the names of the secondary property(s), comma delimited, that are to be notified on a property change.
         /// </summary>
         [JsonProperty("secondaryPropertyChanged", DefaultValueHandling = DefaultValueHandling.Ignore)]
