@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Events;
-using Beef.Events.Subscribe;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -20,6 +20,16 @@ namespace Beef.Test.NUnit.Tests
         public EventSubscriberTestHost(EventSubscriberHostArgs args) : base(args) { }
 
         /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.Logger"/>.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberTestHost"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberTestHost UseLogger(ILogger logger)
+        {
+            Logger = logger;
+            return this;
+        }
+
+        /// <summary>
         /// Performs the receive processing for <see cref="EventData"/> instance.
         /// </summary>
         /// <param name="event">The <see cref="EventData"/> instance to receive/process.</param>
@@ -30,7 +40,7 @@ namespace Beef.Test.NUnit.Tests
 
             try
             {
-                Result = await ReceiveAsync(@event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
+                Result = await ReceiveAsync(@event, @event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
             }
             catch (EventSubscriberUnhandledException essex)
             {

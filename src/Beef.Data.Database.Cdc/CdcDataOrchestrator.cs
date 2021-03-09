@@ -25,26 +25,29 @@ namespace Beef.Data.Database.Cdc
         where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new() 
         where TCdcTrackingMapper : ITrackingTvp, new()
     {
-        private const string OutboxIdParamName = "OutboxIdToMarkComplete";
-        private const string GetIncompleteOutboxParamName = "GetIncompleteOutbox";
-        private const string QuerySizeParamName = "MaxQuerySize";
-        private const string CompleteTrackingListParamName = "@CompleteTrackingList";
+        private const string MaxQuerySizeParamName = "MaxQuerySize";
+        private const string ContinueWithDataLossParamName = "@ContinueWithDataLoss";
+        private const string OutboxIdParamName = "OutboxId";
+        private const string TrackingListParamName = "@TrackingList";
 
         private static readonly DatabaseMapper<CdcOutbox> _outboxMapper = DatabaseMapper.CreateAuto<CdcOutbox>();
         private static readonly TCdcTrackingMapper _trackingMapper = new TCdcTrackingMapper();
         private string? _name;
+        private int _maxQuerySize = 100;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
-        /// <param name="storedProcedureName">The name of the get outbox data stored procedure.</param>
+        /// <param name="executeStoredProcedureName">The name of the execute outbox stored procedure.</param>
+        /// <param name="completeStoredProcedureName">The name of the complete outbox stored procedure.</param>
         /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcDataOrchestrator(IDatabase db, string storedProcedureName, IEventPublisher eventPublisher, ILogger logger)
+        public CdcDataOrchestrator(IDatabase db, string executeStoredProcedureName, string completeStoredProcedureName, IEventPublisher eventPublisher, ILogger logger)
         {
             Db = Check.NotNull(db, nameof(db));
-            StoredProcedureName = Check.NotEmpty(storedProcedureName, nameof(storedProcedureName));
+            ExecuteStoredProcedureName = Check.NotEmpty(executeStoredProcedureName, nameof(executeStoredProcedureName));
+            CompleteStoredProcedureName = Check.NotEmpty(completeStoredProcedureName, nameof(completeStoredProcedureName));
             EventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
             Logger = Check.NotNull(logger, nameof(logger));
         }
@@ -55,9 +58,14 @@ namespace Beef.Data.Database.Cdc
         public IDatabase Db { get; private set; }
 
         /// <summary>
-        /// Gets the name of the get outbox data stored procedure.
+        /// Gets the name of the <b>execute</b> outbox stored procedure.
         /// </summary>
-        public string StoredProcedureName { get; private set; }
+        public string ExecuteStoredProcedureName { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the <b>complete</b> outbox stored procedure.
+        /// </summary>
+        public string CompleteStoredProcedureName { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IEventPublisher"/>.
@@ -85,68 +93,87 @@ namespace Beef.Data.Database.Cdc
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
 
         /// <summary>
-        /// Marks an existing outbox as complete.
+        /// Gets or sets the maximum query size to limit the number of CDC (Change Data Capture) rows that are batched in a <see cref="CdcOutbox"/>.
         /// </summary>
-        /// <param name="outboxId">The outbox identifier.</param>
-        /// <param name="list">The <see cref="CdcTracker"/> list.</param>
-        public async Task MarkOutboxAsCompleteAsync(int outboxId, IEnumerable<CdcTracker> list)
+        /// <remarks>Defaults to 100.</remarks>
+        public int MaxQuerySize { get => _maxQuerySize; set => _maxQuerySize = value < 1 ? 100 : value; }
+
+        /// <summary>
+        /// Indicates whether to ignore any data loss and continue using the CDC (Change Data Capture) data that is available.
+        /// </summary>
+        /// <remarks>For more information as to why data loss may occur see: https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server </remarks>
+        public bool ContinueWithDataLoss { get; set; }
+
+        /// <summary>
+        /// Completes an existing outbox updating the corresponding <paramref name="tracking"/> where appropriate.
+        /// </summary>
+        /// <param name="outboxId">The outbox identifer.</param>
+        /// <param name="tracking">The <see cref="CdcTracker"/> list.</param>
+        /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
+        Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.CompleteAsync(int outboxId, List<CdcTracker> tracking) => CompleteAsync(outboxId, tracking);
+
+        /// <summary>
+        /// Completes an existing outbox updating the corresponding <paramref name="tracking"/> where appropriate.
+        /// </summary>
+        /// <param name="outboxId">The outbox identifer.</param>
+        /// <param name="tracking">The <see cref="CdcTracker"/> list.</param>
+        /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
+        public async Task<CdcDataOrchestratorResult> CompleteAsync(int outboxId, List<CdcTracker> tracking)
         {
-            await Db.StoredProcedure(StoredProcedureName)
-                .Param(OutboxIdParamName, outboxId)
-                .Param(QuerySizeParamName, System.Data.DbType.Int32, 0)
-                .TableValuedParam(CompleteTrackingListParamName, _trackingMapper.CreateTableValuedParameter(list))
-                .NonQueryAsync().ConfigureAwait(false);
+            var result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>();
+            var msa = new List<IMultiSetArgs> { new MultiSetSingleArgs<CdcOutbox>(_outboxMapper, r => result.Outbox = r, isMandatory: false, stopOnNull: true) };
+
+            try
+            {
+                await Db.StoredProcedure(CompleteStoredProcedureName)
+                    .Param(OutboxIdParamName, outboxId)
+                    .TableValuedParam(TrackingListParamName, _trackingMapper.CreateTableValuedParameter(tracking))
+                    .SelectQueryMultiSetAsync(msa.ToArray()).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                result.Exception = ex;
+
+                if (ex is IBusinessException)
+                    Logger.LogError($"{ServiceName}: {result.Exception.Message}");
+                else
+                    Logger.LogCritical($"{ServiceName}: Unexpected Exception encountered: {result.Exception.Message}");
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// Executes any previously incomplete outbox.
+        /// Executes the next (new) outbox, or reprocesses the last incomplete, then <see cref="CompleteAsync(int, List{CdcTracker})">completes</see> on success.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteIncompleteAsync(CancellationToken? cancellationToken)
-            => await ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
-
-        /// <summary>
-        /// Executes any previously incomplete outbox.
-        /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteIncompleteAsync(CancellationToken? cancellationToken = null)
-            => ExecuteSelectedInternalAsync($"{ServiceName} Query for previously incomplete Change Data Capture outbox.", true, -1, cancellationToken ?? CancellationToken.None);
-
-        /// <summary>
-        /// Executes the next (new) outbox.
-        /// </summary>
-        /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken)
-            => await ExecuteNextAsync(maxQuerySize < 1 ? 100 : maxQuerySize, cancellationToken).ConfigureAwait(false);
+        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteAsync(CancellationToken? cancellationToken)
+            => await ExecuteAsync(cancellationToken).ConfigureAwait(false);
 
         /// <summary>
-        /// Executes the next (new) outbox.
+        /// Executes the next (new) outbox, or reprocesses the last incomplete, then <see cref="CompleteAsync(int, List{CdcTracker})">completes</see> on success.
         /// </summary>
-        /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(int maxQuerySize = 100, CancellationToken? cancellationToken = null)
-            => ExecuteSelectedInternalAsync($"{ServiceName} Query for next (new) Change Data Capture outbox with maximum query size of {maxQuerySize}.", false, maxQuerySize, cancellationToken ?? CancellationToken.None);
-
-        /// <summary>
-        /// Execute selected (internal).
-        /// </summary>
-        private async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteSelectedInternalAsync(string text, bool incomplete, int maxQuerySize, CancellationToken cancellationToken)
+        public async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteAsync(CancellationToken? cancellationToken = null)
         {
             // Get the requested outbox data.
-            Logger.LogInformation(text);
-            var result = await GetOutboxEntityDataAsync(maxQuerySize, incomplete).ConfigureAwait(false);
+            CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> result;
+            Logger.LogInformation($"{ServiceName} Query for next (new) Change Data Capture outbox (MaxQuerySize = {MaxQuerySize}, ContinueWithDataLoss = {ContinueWithDataLoss}).");
 
-            if (result.ReturnCode < 0)
+            try
             {
-                if (result.Outbox != null)
-                    Logger.LogError($"{ServiceName} Outbox '{result.Outbox.Id}': previously created on '{result.Outbox.CreatedDate}' is not complete; this must be completed to continue.");
+                result = await GetOutboxEntityDataAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> { Exception = ex };
+
+                if (ex is IBusinessException)
+                    Logger.LogError($"{ServiceName}: {result.Exception.Message}");
                 else
-                    Logger.LogCritical($"{ServiceName}: Unexpected execution outcome (return code '{result.ReturnCode}') with no incomplete outbox; this is not expected.");
+                    Logger.LogCritical($"{ServiceName}: Unexpected Exception encountered: {result.Exception.Message}");
 
                 return result;
             }
@@ -158,17 +185,26 @@ namespace Beef.Data.Database.Cdc
             }
 
             Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Result.Count} entity(s) were found.");
-            if (cancellationToken.IsCancellationRequested)
+            if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
             {
                 Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
-                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken).ConfigureAwait(false);
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
             }
 
             // Determine whether anything may have been sent before and exclude (i.e. do not send again).
             var coll = new TCdcEntityWrapperColl();
             var tracking = new List<CdcTracker>();
-            foreach (var item in result.Result)
+            foreach (var grp in result.Result.GroupBy(x => new { x.UniqueKey }))
             {
+                // Find delete and use.
+                var item = grp.Where(x => x.DatabaseOperationType == OperationType.Delete).FirstOrDefault();
+                if (item != null && grp.Any(x => x.DatabaseOperationType == OperationType.Create))
+                    continue;  // Created and deleted in quick succession; no need to publish.
+
+                // Where there is no delete then just use the first.
+                if (item == null)
+                    item = grp.First();
+
                 // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
                 if (item is ILogicallyDeleted ild && ild.IsDeleted)
                     item.DatabaseOperationType = OperationType.Delete;
@@ -176,7 +212,7 @@ namespace Beef.Data.Database.Cdc
                 // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
                 if (entity.ETag == null)
-                    entity.ETag = ETag.Generate(entity, item.DatabaseOperationType.ToString());
+                    entity.ETag = ETagGenerator.Generate(entity);
 
                 // Where the ETag and TrackingHash match then skip (has already been published).
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)
@@ -186,21 +222,18 @@ namespace Beef.Data.Database.Cdc
                 }
             }
 
-            // Publish the events.
+            // Publish & send the events.
             if (coll.Count > 0)
             {
-                var events = (await CreateEventsAsync(coll, cancellationToken).ConfigureAwait(false)).ToArray();
-                await EventPublisher.Publish(events).SendAsync().ConfigureAwait(false);
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {events.Length} event(s) were published successfully.");
+                result.Events = (await CreateEventsAsync(coll, cancellationToken.Value).ConfigureAwait(false)).ToArray();
+                await EventPublisher.Publish(result.Events).SendAsync().ConfigureAwait(false);
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully.");
             }
             else
                 Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found.");
 
-            // As the EventPublisher may be reused within the context of the scoping, then we should explicitly reset to avoid internal exception.
-            EventPublisher.Reset(); 
-
             // Complete the outbox (ignore any further 'cancel' as event(s) have been published and we *must* complete to minimise chance of sending more than once).
-            await MarkOutboxAsCompleteAsync(result.Outbox.Id, tracking).ConfigureAwait(false);
+            await CompleteAsync(result.Outbox.Id, tracking).ConfigureAwait(false);
             Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed.");
 
             return result;
@@ -209,19 +242,17 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Executes a multi-dataset query command with one or more <paramref name="multiSetArgs"/>; whilst also outputing the resulting return value.
         /// </summary>
-        /// <param name="maxQuerySize">The recommended maximum query size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
         /// <returns>The resultant <see cref="CdcDataOrchestratorResult{TCdcEntityWrapperColl, TCdcEntityWrapper}"/>.</returns>
-        protected async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(int maxQuerySize, bool incomplete, params IMultiSetArgs[] multiSetArgs)
+        protected async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(params IMultiSetArgs[] multiSetArgs)
         {
             var result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>();
             var msa = new List<IMultiSetArgs> { new MultiSetSingleArgs<CdcOutbox>(_outboxMapper, r => result.Outbox = r, isMandatory: false, stopOnNull: true) };
             msa.AddRange(multiSetArgs);
 
-            result.ReturnCode = await Db.StoredProcedure(StoredProcedureName)
-                .Param(QuerySizeParamName, maxQuerySize)
-                .Param(GetIncompleteOutboxParamName, incomplete)
+            await Db.StoredProcedure(ExecuteStoredProcedureName)
+                .Param(MaxQuerySizeParamName, MaxQuerySize)
+                .Param(ContinueWithDataLossParamName, ContinueWithDataLoss)
                 .SelectQueryMultiSetWithValueAsync(msa.ToArray())
                 .ConfigureAwait(false);
 
@@ -231,10 +262,8 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
-        /// <param name="maxQuerySize">The recommended maximum query size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>A <typeparamref name="TCdcEntityWrapperColl"/>.</returns>
-        protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetOutboxEntityDataAsync(int maxQuerySize, bool incomplete);
+        protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetOutboxEntityDataAsync();
 
         /// <summary>
         /// Creates an <see cref="EventData{T}"/> for the specified <paramref name="value"/>.

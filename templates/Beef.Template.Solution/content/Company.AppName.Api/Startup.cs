@@ -14,7 +14,7 @@ using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 #endif
 using Beef.Entities;
-using Beef.Events;
+using Beef.Events.EventHubs;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -96,7 +96,7 @@ namespace Company.AppName.Api
             // Add event publishing services.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");
             if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventPublisher(ehcs);
+                services.AddBeefEventHubEventProducer(ehcs);
             else
                 services.AddBeefNullEventPublisher();
 

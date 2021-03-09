@@ -25,7 +25,6 @@ namespace Cdr.Banking.Business.Data.Model
     /// <summary>
     /// Represents the <see cref="ProductCategory"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class ProductCategoryCollection : List<ProductCategory> { }
 }
 

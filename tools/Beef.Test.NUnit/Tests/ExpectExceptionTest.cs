@@ -9,8 +9,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Expects and asserts an <see cref="Exception"/> and its corresponding exception message.
     /// </summary>
-    //[System.Diagnostics.DebuggerStepThrough]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "By-design, want to appear as instance methods.")]
+    [System.Diagnostics.DebuggerStepThrough]
     public class ExpectExceptionTest
     {
         /// <summary>
@@ -19,7 +18,7 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TException">The <see cref="Exception"/> <see cref="Type"/>.</typeparam>
         /// <param name="expectedExceptionMessage">The expected exception message; "*" indicates any.</param>
         /// <param name="action">The action to execute.</param>
-        //[System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerStepThrough]
         public void Throws<TException>(string expectedExceptionMessage, Action action) where TException : Exception
         {
             if (expectedExceptionMessage == null)

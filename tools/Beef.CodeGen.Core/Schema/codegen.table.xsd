@@ -782,9 +782,14 @@
                 <xs:documentation>The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="StoredProcedureName" use="optional" type="xs:string">
+            <xs:attribute name="ExecuteStoredProcedureName" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The `CDC` get outbox data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.</xs:documentation>
+                <xs:documentation>The `CDC` _execute_ outbox stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CompleteStoredProcedureName" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The `CDC` _complete_ outbox stored procedure name. Defaults to `spComplete` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spCompleteTableNameCdcOutbox`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="CdcSchema" use="optional" type="xs:string">
@@ -954,6 +959,11 @@
       <xs:attribute name="PluralizeCollectionProperties" use="optional" type="xs:boolean">
         <xs:annotation>
           <xs:documentation>Indicates whether the .NET collection properties should be pluralized.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="HasBeefDbo" use="optional" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects. Defaults to `true`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">

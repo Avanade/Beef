@@ -168,6 +168,14 @@ properties: [
         public string? Default { get; set; }
 
         /// <summary>
+        /// Indicates whether the property is considered part of the Partition Key.
+        /// </summary>
+        [JsonProperty("partitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Property", Title = "Indicates whether the property is considered part of the Partition Key.",
+            Description = "This will implement `IPartitionKey` for the generated entity.")]
+        public bool? PartitionKey { get; set; }
+
+        /// <summary>
         /// Gets or sets the names of the secondary property(s), comma delimited, that are to be notified on a property change.
         /// </summary>
         [JsonProperty("secondaryPropertyChanged", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -234,7 +242,7 @@ properties: [
         /// </summary>
         [JsonProperty("jsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Serialization", Title = "The JSON property name.",
-            Description = "Defaults to `ArgumentName` where not specified (i.e. camelCase).")]
+            Description = "Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`.")]
         public string? JsonName { get; set; }
 
         /// <summary>
@@ -628,7 +636,7 @@ properties: [
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !IgnoreNullableTypes.Contains(Type!));
-            JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : ArgumentName);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);

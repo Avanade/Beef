@@ -11,7 +11,6 @@ namespace Beef.Test.NUnit
     /// Simplifies the testing using an <see cref="AgentTesterServer{TStartup}"/> using system-wide defaults. Automatically manages the instantiation and disposing through the one-time setup and tear-down.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Managed via the onetime tear down.")]
     [System.Diagnostics.DebuggerStepThrough]
     public abstract class UsingAgentTesterServer<TStartup> : ITestSetupPrepareExecutionContext where TStartup : class
     {

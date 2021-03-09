@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.1.18</Version>
+    <Version>4.1.19</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -47,6 +47,7 @@
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEntity_cs.hb" />
     <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcSpCompleteOutbox_sql.hb" />
     <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
@@ -118,6 +119,7 @@
     <EmbeddedResource Include="Templates\DbCdcBackgroundService_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpCompleteOutbox_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
@@ -169,9 +171,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="2.0.3" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
+    <PackageReference Include="Handlebars.Net" Version="2.0.4" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.12" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,7 @@
     <Property Name="LastName" Type="string" GrpcFieldNo="3" />
     <Property Name="UniqueCode" Type="string" GrpcFieldNo="4" />
     <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" GrpcFieldNo="5" DataName="GenderId" DataConverter="ReferenceDataNullableGuidIdConverter{T}" />
-    <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" GrpcFieldNo="6" DataName="EyeColorCode" />
+    <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" PartitionKey="true" GrpcFieldNo="6" DataName="EyeColorCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" GrpcFieldNo="7" />
     <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" DataEntityFrameworkIgnore="true" />
     <Property Name="ETag" Type="string" GrpcFieldNo="500" />
@@ -174,7 +174,7 @@
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
-    <Property Name="ETag" Type="string" />
+    <Property Name="ETag" Type="string" JsonName="etag" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   </Entity> 
  </CodeGeneration>

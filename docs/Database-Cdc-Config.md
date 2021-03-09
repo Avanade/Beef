@@ -53,7 +53,8 @@ Provides the _database_ configuration.
 
 Property | Description
 -|-
-`storedProcedureName` | The `CDC` get outbox data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.
+`executeStoredProcedureName` | The `CDC` _execute_ outbox stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.
+`completeStoredProcedureName` | The `CDC` _complete_ outbox stored procedure name. Defaults to `spComplete` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spCompleteTableNameCdcOutbox`.
 `cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGeneration.CdcSchema`.
 `outboxTableName` | The corresponding `CDC` Outbox table name. Defaults to `Name` + `Outbox` (literal).
 

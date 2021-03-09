@@ -78,7 +78,6 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
 {{/if}}
 }

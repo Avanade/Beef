@@ -1,5 +1,4 @@
-﻿using Beef.Events.Subscribe;
-using Beef.Test.NUnit;
+﻿using Beef.Test.NUnit;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
@@ -76,7 +75,7 @@ namespace Beef.Events.UnitTest.Subscribe
         private EventDataSubscriberHost CreateTestHost<T>(Func<T> create) where T : class
         {
             var sp = TestSetUp.CreateServiceProvider(sc => sc.AddTransient(_ => create()));
-            return new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(T)).UseServiceProvider(sp).UseLoggerForAuditing());
+            return new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(T)).UseServiceProvider(sp)).UseLogger(TestSetUp.CreateLogger());
         }
 
         [Test]
@@ -142,8 +141,11 @@ namespace Beef.Events.UnitTest.Subscribe
             {
                 await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
-            catch (DivideByZeroException)
+            catch (EventSubscriberUnhandledException esuex)
             {
+                if (esuex.InnerException == null || !(esuex.InnerException is DivideByZeroException))
+                    Assert.Fail();
+
                 Assert.IsTrue(ts.MessageReceived);
                 return;
             }
@@ -220,8 +222,11 @@ namespace Beef.Events.UnitTest.Subscribe
             {
                 await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
-            catch (DivideByZeroException)
+            catch (EventSubscriberUnhandledException esuex)
             {
+                if (esuex.InnerException == null || !(esuex.InnerException is DivideByZeroException))
+                    Assert.Fail();
+
                 Assert.IsTrue(ts.MessageReceived);
                 Assert.AreEqual("TEST", ts.Value);
                 Assert.AreEqual(typeof(string), ts.ValueType);
@@ -239,7 +244,7 @@ namespace Beef.Events.UnitTest.Subscribe
 
             ExpectException.Throws<EventSubscriberException>(
                 "There are 2 IEventSubscriber instances subscribing to Subject 'Test.Blah.123' and Action 'CREATE'; there must be only a single subscriber.",
-                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub), typeof(TestSubS)).UseServiceProvider(sp).UseLoggerForAuditing()).ReceiveAsync(ed));
+                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub), typeof(TestSubS)).UseServiceProvider(sp)).ReceiveAsync(ed));
         }
 
         [Test]
@@ -249,7 +254,7 @@ namespace Beef.Events.UnitTest.Subscribe
 
             ExpectException.Throws<EventSubscriberException>(
                 "The 'EventDataSubscriberHost' does not AllowMultipleMessages; there were 2 event messages.",
-                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub)).UseServiceProvider(sp).UseLoggerForAuditing()).ReceiveAsync(new EventData(), new EventData()));
+                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub)).UseServiceProvider(sp)).ReceiveAsync(new EventData(), new EventData()));
         }
 
         [Test]
@@ -257,7 +262,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var sp = TestSetUp.CreateServiceProvider();
 
-            await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub)).UseServiceProvider(sp).UseLoggerForAuditing().AllowMultipleMessages()).ReceiveAsync(new EventData { Subject = "X" }, new EventData { Subject = "X" });
+            await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(typeof(TestSub)).UseServiceProvider(sp).AllowMultipleMessages()).ReceiveAsync(new EventData { Subject = "X" }, new EventData { Subject = "X" });
         }
     }
 }

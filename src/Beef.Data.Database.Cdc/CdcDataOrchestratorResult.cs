@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Events;
 using System;
 using System.Collections.Generic;
 
@@ -11,19 +12,24 @@ namespace Beef.Data.Database.Cdc
     public abstract class CdcDataOrchestratorResult
     {
         /// <summary>
-        /// Gets or sets the database return code.
-        /// </summary>
-        public int ReturnCode { get; internal set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="CdcOutbox"/>.
+        /// Gets the <see cref="CdcOutbox"/> where <see cref="IsSuccessful"/>.
         /// </summary>
         public CdcOutbox? Outbox { get; internal set; }
 
         /// <summary>
-        /// Indicates that a outbox execution was successful and can continue.
+        /// Indicates that the outbox execution is successful and can continue.
         /// </summary>
-        public bool OutboxExecuted => ReturnCode == 0 && Outbox != null;
+        public bool IsSuccessful => Exception  == null;
+
+        /// <summary>
+        /// Gets the <see cref="System.Exception"/> where <b>not</b> <see cref="IsSuccessful"/>
+        /// </summary>
+        public Exception? Exception { get; internal set; }
+
+        /// <summary>
+        /// Gets the events that were published/sent.
+        /// </summary>
+        public EventData[]? Events { get; internal set; }
     }
 
     /// <summary>

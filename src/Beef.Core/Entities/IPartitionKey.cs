@@ -3,7 +3,7 @@
 namespace Beef.Entities
 {
     /// <summary>
-    /// Provides the Partition Key for an entity class to guide persistence paritioning.
+    /// Provides the Partition Key for an entity class to drive persistence partitioning where applicable.
     /// </summary>
     public interface IPartitionKey
     {

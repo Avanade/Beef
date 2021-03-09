@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+- *Enhancement:* Moved all Event Hubs specific functionality to `Beef.Events.EventHubs`.
+
 ## v4.1.4
 - *Fixed:* **Breaking change**. The `ResultHandling.Stop` has been renamed to `ResultHandling.ThrowException` as this is more aligned to what is happening. The corresponding`EventSubscriberStopException` has been renamed `EventSubscriberUnhandledException`.
 

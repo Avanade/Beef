@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.2
 - *Fixed:* A `NotFoundException` will be thrown on a delete if it does not exist; otherwise, the application will assume it deleted successfully and the likes of a related event could be raised incorrectly.
 

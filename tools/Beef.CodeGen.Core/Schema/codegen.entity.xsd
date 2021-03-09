@@ -119,6 +119,11 @@
                       <xs:documentation>The C# code to default the value. Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="PartitionKey" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property is considered part of the Partition Key. This will implement `IPartitionKey` for the generated entity.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="SecondaryPropertyChanged" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The names of the secondary property(s), comma delimited, that are to be notified on a property change.</xs:documentation>
@@ -163,7 +168,7 @@
                   </xs:attribute>
                   <xs:attribute name="JsonName" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase).</xs:documentation>
+                      <xs:documentation>The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="JsonDataModelName" use="optional" type="xs:string">
@@ -1289,6 +1294,20 @@
           <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
             <xs:enumeration value="Newtonsoft" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ETagJsonName" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default JSON name for the `ETag` property. Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="etag" />
+            <xs:enumeration value="eTag" />
+            <xs:enumeration value="_etag" />
+            <xs:enumeration value="_eTag" />
+            <xs:enumeration value="ETag" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

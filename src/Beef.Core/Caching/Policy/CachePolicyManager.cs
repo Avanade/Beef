@@ -15,6 +15,7 @@ namespace Beef.Caching.Policy
     /// </summary>
     public class CachePolicyManager : IDisposable
     {
+        private static readonly Lazy<CachePolicyManager> _fallback = new Lazy<CachePolicyManager>(() => new CachePolicyManager());
         private static readonly Random _random = new Random();
 
         private ICachePolicy _defaultPolicy = new NoExpiryCachePolicy();
@@ -58,7 +59,7 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets the current <see cref="CachePolicyManager"/> (uses the <see cref="ExecutionContext.GetService{T}"/> to get/instantiate).
         /// </summary>
-        public static CachePolicyManager Current => ExecutionContext.GetService<CachePolicyManager>(throwExceptionOnNull: true)!;
+        public static CachePolicyManager Current => ExecutionContext.GetService<CachePolicyManager>(throwExceptionOnNull: false) ?? _fallback.Value;
 
         /// <summary>
         /// Gets the logger.

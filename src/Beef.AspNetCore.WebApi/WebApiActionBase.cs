@@ -152,7 +152,7 @@ namespace Beef.AspNetCore.WebApi
             CallerLineNumber = lineNumber;
 
             // Get the list of etags specified in the header.
-            if (controller.Request.Headers.TryGetValue("If-None-Match", out var vals))
+            if (controller.Request?.Headers != null && controller.Request.Headers.TryGetValue("If-None-Match", out var vals))
             {
                 var l = new List<string>();
                 foreach (var v in vals)
@@ -166,7 +166,7 @@ namespace Beef.AspNetCore.WebApi
                     IfNoneMatchETags = l;
             }
 
-            if (Controller.Request.Headers.TryGetValue("If-Match", out vals))
+            if (controller.Request?.Headers != null && Controller.Request.Headers.TryGetValue("If-Match", out vals))
             {
                 var l = new List<string>();
                 foreach (var v in vals)
@@ -277,10 +277,8 @@ namespace Beef.AspNetCore.WebApi
 
             if (statusCode == HttpStatusCode.NotFound)
             {
-#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorTypeHeaderName, ErrorType.NotFoundError.ToString());
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ErrorType.NotFoundError).ToString(System.Globalization.CultureInfo.InvariantCulture));
-#pragma warning restore CA1062 
             }
 
             return new StatusCodeResult((int)statusCode);
@@ -441,7 +439,7 @@ namespace Beef.AspNetCore.WebApi
                     if (item is IETag cetag && cetag.ETag != null)
                     {
                         if (sb.Length > 0)
-                            sb.Append(ETag.DividerCharacter);
+                            sb.Append(ETagGenerator.DividerCharacter);
 
                         sb.Append(cetag.ETag);
                         continue;
@@ -463,7 +461,7 @@ namespace Beef.AspNetCore.WebApi
             else
                 txt = json = JsonConvert.SerializeObject(result);
 
-            return (json, ETag.Generate(txt));
+            return (json, ETagGenerator.Generate(txt));
         }
 
         /// <summary>

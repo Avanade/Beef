@@ -1,8 +1,6 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePersonCdcOutbox]
-  @MaxQuerySize INT NULL = 100,
-  @GetIncompleteOutbox BIT NULL = 0,
-  @OutboxIdToMarkComplete INT NULL = NULL,
-  @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
+  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -15,34 +13,6 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
-    -- Mark the outbox as complete and merge the tracking info; then return the updated outbox data and stop!
-    IF (@OutboxIdToMarkComplete IS NOT NULL)
-    BEGIN
-      UPDATE [_outbox] SET
-          [_outbox].[IsComplete] = 1,
-          [_outbox].[CompletedDate] = GETUTCDATE()
-        FROM [DemoCdc].[PersonOutbox] AS [_outbox]
-        WHERE OutboxId = @OutboxIdToMarkComplete 
-
-      MERGE INTO [DemoCdc].[CdcTracking] WITH (HOLDLOCK) AS [_ct]
-        USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = [_list].[Key])
-        WHEN MATCHED AND EXISTS (
-            SELECT [_list].[Key], [_list].[Hash]
-            EXCEPT
-            SELECT [_ct].[Key], [_ct].[Hash])
-          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[OutboxId] = @OutboxIdToMarkComplete
-        WHEN NOT MATCHED BY TARGET
-          THEN INSERT ([Schema], [Table], [Key], [Hash], [OutboxId])
-            VALUES ('Demo', 'Person', [_list].[Key], [_list].[Hash], @OutboxIdToMarkComplete);
-
-      SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-        FROM [DemoCdc].[PersonOutbox] AS [_outbox]
-        WHERE [_outbox].OutboxId = @OutboxIdToMarkComplete
-
-      COMMIT TRANSACTION
-      RETURN 0;
-    END
-
     -- Declare variables.
     DECLARE @PersonBaseMinLsn BINARY(10), @PersonMinLsn BINARY(10), @PersonMaxLsn BINARY(10)
     DECLARE @OutboxId INT
@@ -50,53 +20,34 @@ BEGIN
     -- Get the latest 'base' minimum.
     SET @PersonBaseMinLsn = sys.fn_cdc_get_min_lsn('Demo_Person');
 
-    -- Where requesting for incomplete outbox, get first that is marked as incomplete.
-    IF (@GetIncompleteOutbox = 1)
+    -- Check if there is already an incomplete batch and attempt to reprocess.
+    SELECT
+        @PersonMinLsn = [_outbox].[PersonMinLsn],
+        @PersonMaxLsn = [_outbox].[PersonMaxLsn],
+        @OutboxId = [OutboxId]
+      FROM [DemoCdc].[PersonOutbox] AS [_outbox]
+      WHERE [_outbox].[IsComplete] = 0 
+      ORDER BY [_outbox].[OutboxId]
+
+    -- There should never be more than one incomplete outbox.
+    IF @@ROWCOUNT > 1
     BEGIN
-      SELECT TOP 1
-          @PersonMinLsn = [_outbox].[PersonMinLsn],
-          @PersonMaxLsn = [_outbox].[PersonMaxLsn],
-          @OutboxId = [OutboxId]
-        FROM [DemoCdc].[PersonOutbox] AS [_outbox]
-        WHERE [_outbox].[IsComplete] = 0 
-        ORDER BY [_outbox].[OutboxId]
-
-      -- Where no incomplete outbox is found then stop!
-      IF (@OutboxId IS NULL)
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
-      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
+      ;THROW 56002, 'There are multiple incomplete outboxes; there should not be more than one incomplete outbox at any one time.', 1
     END
-    ELSE
-    BEGIN
-      -- Check that there are no incomplete outboxes; if there are then stop with error; otherwise, continue!
-      DECLARE @IsComplete BIT
 
+    -- Where there is no incomplete outbox then the next should be processed.
+    IF (@OutboxId IS NULL)
+    BEGIN
+      -- New outbox so force creation of a new outbox.
+      SET @OutboxId = null 
+
+      -- Get the last outbox processed.
       SELECT TOP 1
-          @OutboxId = [_outbox].[OutboxId],
-          @PersonMinLsn = [_outbox].[PersonMaxLsn],
-          @IsComplete = [_outbox].IsComplete
+          @PersonMinLsn = [_outbox].[PersonMaxLsn]
         FROM [DemoCdc].[PersonOutbox] AS [_outbox]
         ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[OutboxId] DESC
 
-      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete outbox; must be completed.
-      BEGIN
-        SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-          FROM [DemoCdc].[PersonOutbox] AS [_outbox]
-          WHERE [_outbox].OutboxId = @OutboxId 
-
-        COMMIT TRANSACTION
-        RETURN -1;
-      END
-      ELSE
-      BEGIN
-        SET @OutboxId = null -- Force creation of a new outbox.
-      END
-
-      IF (@IsComplete IS NULL) -- No previous outbox; i.e. is the first time!
+      IF (@@ROWCOUNT = 0) -- No previous outbox; i.e. is the first time!
       BEGIN
         SET @PersonMinLsn = @PersonBaseMinLsn;
       END
@@ -116,21 +67,21 @@ BEGIN
       END
     END
 
-    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
-    IF (@PersonMinLsn < @PersonBaseMinLsn) BEGIN SET @PersonMinLsn = @PersonBaseMinLsn END
+    -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
+    IF (@PersonMinLsn < @PersonBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @PersonMinLsn = @PersonBaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Demo.Person''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
 
     -- Find changes on the root table: Demo.Person - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
     SET @hasChanges = 0
 
-    IF (@PersonMinLsn < @PersonMaxLsn)
+    IF (@PersonMinLsn <= @PersonMaxLsn)
     BEGIN
       SELECT TOP (@MaxQuerySize)
           [_cdc].[__$start_lsn] AS [_Lsn],
           [_cdc].[__$operation] AS [_Op],
           [_cdc].[PersonId] AS [PersonId]
         INTO #_changes
-        FROM cdc.fn_cdc_get_net_changes_Demo_Person(@PersonMinLsn, @PersonMaxLsn, 'all') AS [_cdc]
+        FROM cdc.fn_cdc_get_all_changes_Demo_Person(@PersonMinLsn, @PersonMaxLsn, 'all') AS [_cdc]
         ORDER BY [_cdc].[__$start_lsn]
 
       IF (@@ROWCOUNT <> 0)
@@ -178,6 +129,7 @@ BEGIN
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
+        [_chg].[_Lsn] AS [_Lsn],
         [_chg].[PersonId] AS [PersonId],
         [p].[RowVersion] AS [RowVersion]
       FROM #_changes AS [_chg]
@@ -186,6 +138,7 @@ BEGIN
 
     -- Commit the transaction.
     COMMIT TRANSACTION
+    RETURN 0
   END TRY
   BEGIN CATCH
     -- Rollback transaction and rethrow error.

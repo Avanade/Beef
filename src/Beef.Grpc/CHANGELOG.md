@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v4.1.2
 - *Fixed:* An HTTP Delete will now catch a `NotFoundException` and return an HTTP Status Code 204 (no content) as a delete is considered idempotent.
 

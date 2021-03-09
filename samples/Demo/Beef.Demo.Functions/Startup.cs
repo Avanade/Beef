@@ -4,10 +4,12 @@ using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
 using Beef.Entities;
 using Beef.Events;
-using Beef.Events.Subscribe;
+using Beef.Events.EventHubs;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Cosmos = Microsoft.Azure.Cosmos;
 
 [assembly: FunctionsStartup(typeof(Beef.Demo.Functions.Startup))]
@@ -27,8 +29,10 @@ namespace Beef.Demo.Functions
                             .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                             .AddBeefBusinessServices();
 
-            // Add event subscriber host and auto-discovered subscribers.
-            builder.Services.AddBeefEventHubSubscriberHost(EventSubscriberHostArgs.Create<Startup>());
+            // Add event subscriber host with auto-discovered subscribers and set the audit writer to use azure storage; plus use the poison event orchestrator/invoker.
+            var ehasr = new EventHubAzureStorageRepository(config.GetConnectionString("AzureStorage"));
+            builder.Services.AddBeefEventHubConsumerHost(
+                EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(ehasr), additional: (_, ehsh) => ehsh.UseInvoker(new EventHubConsumerHostPoisonInvoker(ehasr)));
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = config.GetSection("CosmosDb");
@@ -53,7 +57,10 @@ namespace Beef.Demo.Functions
                             .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
 
             // Add event publishing.
-            builder.Services.AddBeefEventHubEventPublisher(config.GetValue<string>("EventHubConnectionString"));
+            builder.Services.AddBeefEventHubEventProducer(config.GetValue<string>("EventHubConnectionString"));
+
+            // Add logging.
+            builder.Services.AddLogging();
         }
     }
 }

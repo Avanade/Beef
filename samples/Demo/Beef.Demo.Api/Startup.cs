@@ -7,7 +7,7 @@ using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
 using Beef.Entities;
-using Beef.Events;
+using Beef.Events.EventHubs;
 using Beef.Grpc;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -70,7 +70,7 @@ namespace Beef.Demo.Api
             // Add event publishing.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");
             if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventPublisher(ehcs);
+                services.AddBeefEventHubEventProducer(ehcs);
             else
                 services.AddBeefNullEventPublisher();
 

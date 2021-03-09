@@ -33,9 +33,7 @@ namespace Beef.Data.Database
 
             Database = database ?? throw new ArgumentNullException(nameof(database));
             DbCommand = Database.Provider.CreateCommand();
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, trusts that the consumer has validated the command text where applicable.
             DbCommand.CommandText = commandText;
-#pragma warning restore CA2100 
             DbCommand.CommandType = commandType;
             Parameters = new DatabaseParameters(this);
         }

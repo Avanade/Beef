@@ -111,6 +111,11 @@
       "type": "boolean",
       "title": "Indicates whether the .NET collection properties should be pluralized."
     },
+    "hasBeefDbo": {
+      "type": "boolean",
+      "title": "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
+      "description": "Defaults to `true`."
+    },
     "pathBase": {
       "type": "string",
       "title": "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
@@ -948,10 +953,15 @@
                 }
               ]
             },
-            "storedProcedureName": {
+            "executeStoredProcedureName": {
               "type": "string",
-              "title": "The `CDC` get outbox data stored procedure name.",
+              "title": "The `CDC` _execute_ outbox stored procedure name.",
               "description": "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`."
+            },
+            "completeStoredProcedureName": {
+              "type": "string",
+              "title": "The `CDC` _complete_ outbox stored procedure name.",
+              "description": "Defaults to `spComplete` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spCompleteTableNameCdcOutbox`."
             },
             "cdcSchema": {
               "type": "string",

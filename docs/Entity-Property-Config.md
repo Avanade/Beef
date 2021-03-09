@@ -70,6 +70,7 @@ Property | Description
 `stringTransform` | The `string` transformation to be performed on `Set` and `CleanUp`. Valid options are: `UseDefault`, `None`, `NullToEmpty`, `EmptyToNull`. Defaults to `UseDefault`. This is only applied where the `Type` is `string`.
 `autoCreate` | Indicates whether an instance of the `Type` is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).
 `default` | The C# code to default the value. Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.
+`partitionKey` | Indicates whether the property is considered part of the Partition Key. This will implement `IPartitionKey` for the generated entity.
 `secondaryPropertyChanged` | The names of the secondary property(s), comma delimited, that are to be notified on a property change.
 `bubblePropertyChanges` | Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself. Note that the `IsEntity` property is also required to enable.
 `excludeCleanup` | Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.
@@ -93,7 +94,7 @@ Provides the _Serialization_ configuration.
 
 Property | Description
 -|-
-`jsonName` | The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase).
+`jsonName` | The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`.
 `jsonDataModelName` | The JSON property name for the corresponding data model (see `Entity.DataModel`). Defaults to `JsonName` where not specified.
 `serializationIgnore` | Indicates whether the property is not to be serialized. All properties are serialized by default.
 `serializationEmitDefault` | Indicates whether to emit the default value when serializing.

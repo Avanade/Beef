@@ -21,7 +21,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person : EntityBase, IGuidIdentifier, IUniqueKey, IETag, IChangeLog, IEquatable<Person>
+    public partial class Person : EntityBase, IGuidIdentifier, IUniqueKey, IPartitionKey, IETag, IChangeLog, IEquatable<Person>
     {
         #region Privates
 
@@ -231,6 +231,22 @@ namespace Beef.Demo.Common.Entities
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
         public UniqueKey UniqueKey => CreateUniqueKey(Id);
+
+        #endregion
+
+        #region IPartitionKey
+        
+        /// <summary>
+        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+        /// </summary>
+        /// <returns>The Partition Key.</returns>
+        /// <param name="eyeColor">The <see cref="EyeColor"/>.</param>
+        public static string CreatePartitionKey(string? eyeColorSid) => PartitionKeyGenerator.Generate(eyeColorSid);
+
+        /// <summary>
+        /// Gets the Partition Key (consists of the following property(s): <see cref="EyeColor"/>).
+        /// </summary>
+        public string PartitionKey => CreatePartitionKey(EyeColorSid);
 
         #endregion
 

@@ -92,10 +92,18 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the `Cdc` execute outbox stored procedure name.
         /// </summary>
-        [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The `CDC` get outbox data stored procedure name.",
+        [JsonProperty("executeStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "The `CDC` _execute_ outbox stored procedure name.",
             Description = "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.")]
-        public string? StoredProcedureName { get; set; }
+        public string? ExecuteStoredProcedureName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `Cdc` complete outbox stored procedure name.
+        /// </summary>
+        [JsonProperty("completeStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "The `CDC` _complete_ outbox stored procedure name.",
+            Description = "Defaults to `spComplete` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spCompleteTableNameCdcOutbox`.")]
+        public string? CompleteStoredProcedureName { get; set; }
 
         /// <summary>
         /// Gets or sets the schema name for the `Cdc`-related database artefacts.
@@ -345,7 +353,8 @@ namespace Beef.CodeGen.Config.Database
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 
-            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
+            ExecuteStoredProcedureName = DefaultWhereNull(ExecuteStoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
+            CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));

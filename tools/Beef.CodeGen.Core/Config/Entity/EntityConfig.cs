@@ -805,6 +805,11 @@ entities:
         public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
+        /// Gets the list of properties that form the partition key.
+        /// </summary>
+        public List<PropertyConfig>? PartitionKeyProperties => Properties!.Where(x => (x.PartitionKey.HasValue && x.PartitionKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
         /// Gets the list of properties that are sub-entities.
         /// </summary>
         public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
@@ -1251,6 +1256,9 @@ entities:
 
             if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
                 implements.Insert(i++, "IUniqueKey");
+
+            if (Properties.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
+                implements.Insert(i++, "IPartitionKey");
 
             if (CompareValue(ImplementsAutoInfer, true))
             {

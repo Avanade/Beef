@@ -80,8 +80,7 @@ namespace Beef.Events
             => new EventData<T> { Value = value, Subject = Check.NotEmpty(subject, nameof(subject)), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventData"/> class defaulting the <see cref="TenantId"/> and <see cref="Timestamp"/> as applicable 
-        /// (will use <see cref="ExecutionContext"/> where <see cref="ExecutionContext.HasCurrent"/>).
+        /// Initializes a new instance of the <see cref="EventData"/> class defaulting as applicable using the equivalent <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> values.
         /// </summary>
         public EventData()
         {
@@ -94,6 +93,7 @@ namespace Beef.Events
                 Username = ExecutionContext.Current.Username;
                 UserId = ExecutionContext.Current.UserId;
                 CorrelationId = ExecutionContext.Current.CorrelationId;
+                PartitionKey = ExecutionContext.Current.TenantId?.ToString();
             }
             else
                 Timestamp = Cleaner.Clean(DateTime.UtcNow);
@@ -160,6 +160,11 @@ namespace Beef.Events
         public string? ETag { get; set; }
 
         /// <summary>
+        /// Gets or sets the partition key.
+        /// </summary>
+        public string? PartitionKey { get; set; }
+
+        /// <summary>
         /// Resets the value to the default.
         /// </summary>
         public virtual void ResetValue() { }
@@ -191,7 +196,7 @@ namespace Beef.Events
         private T _value = default!;
 
         /// <summary>
-        /// Gets (same as <see cref="GetValue"/>) or sets the event value (automatically setting the <see cref="EventData.ETag"/> where not already set).
+        /// Gets (same as <see cref="GetValue"/>) or sets (same as <see cref="SetValue"/>) the event value (automatically setting/overriding the <see cref="EventData.ETag"/> and <see cref="EventData.PartitionKey"/>).
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public T Value
@@ -201,18 +206,18 @@ namespace Beef.Events
             set
             {
                 _value = value;
-                if (ETag == null && _value != null && _value is IETag etag)
+                if (_value != null && _value is IETag etag)
                     ETag = etag.ETag;
+
+                if (_value != null && _value is IPartitionKey pk)
+                    PartitionKey = pk.PartitionKey;
             }
         }
 
         /// <summary>
         /// Resets the value to the default.
         /// </summary>
-        public override void ResetValue()
-        {
-            Value = default!;
-        }
+        public override void ResetValue() => Value = default!;
 
         /// <summary>
         /// Indicates whether the <see cref="EventData"/> has a <see cref="Value"/> property; always returns <c>true</c>.

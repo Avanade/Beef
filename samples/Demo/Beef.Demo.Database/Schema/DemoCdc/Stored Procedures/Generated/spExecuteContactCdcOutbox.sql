@@ -1,8 +1,6 @@
 CREATE PROCEDURE [DemoCdc].[spExecuteContactCdcOutbox]
-  @MaxQuerySize INT NULL = 100,
-  @GetIncompleteOutbox BIT NULL = 0,
-  @OutboxIdToMarkComplete INT NULL = NULL,
-  @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
+  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -15,34 +13,6 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
-    -- Mark the outbox as complete and merge the tracking info; then return the updated outbox data and stop!
-    IF (@OutboxIdToMarkComplete IS NOT NULL)
-    BEGIN
-      UPDATE [_outbox] SET
-          [_outbox].[IsComplete] = 1,
-          [_outbox].[CompletedDate] = GETUTCDATE()
-        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
-        WHERE OutboxId = @OutboxIdToMarkComplete 
-
-      MERGE INTO [DemoCdc].[CdcTracking] WITH (HOLDLOCK) AS [_ct]
-        USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = [_list].[Key])
-        WHEN MATCHED AND EXISTS (
-            SELECT [_list].[Key], [_list].[Hash]
-            EXCEPT
-            SELECT [_ct].[Key], [_ct].[Hash])
-          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[OutboxId] = @OutboxIdToMarkComplete
-        WHEN NOT MATCHED BY TARGET
-          THEN INSERT ([Schema], [Table], [Key], [Hash], [OutboxId])
-            VALUES ('Legacy', 'Contact', [_list].[Key], [_list].[Hash], @OutboxIdToMarkComplete);
-
-      SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
-        WHERE [_outbox].OutboxId = @OutboxIdToMarkComplete
-
-      COMMIT TRANSACTION
-      RETURN 0;
-    END
-
     -- Declare variables.
     DECLARE @ContactBaseMinLsn BINARY(10), @ContactMinLsn BINARY(10), @ContactMaxLsn BINARY(10)
     DECLARE @AddressBaseMinLsn BINARY(10), @AddressMinLsn BINARY(10), @AddressMaxLsn BINARY(10)
@@ -52,56 +22,37 @@ BEGIN
     SET @ContactBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Contact');
     SET @AddressBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Address');
 
-    -- Where requesting for incomplete outbox, get first that is marked as incomplete.
-    IF (@GetIncompleteOutbox = 1)
+    -- Check if there is already an incomplete batch and attempt to reprocess.
+    SELECT
+        @ContactMinLsn = [_outbox].[ContactMinLsn],
+        @ContactMaxLsn = [_outbox].[ContactMaxLsn],
+        @AddressMinLsn = [_outbox].[AddressMinLsn],
+        @AddressMaxLsn = [_outbox].[AddressMaxLsn],
+        @OutboxId = [OutboxId]
+      FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+      WHERE [_outbox].[IsComplete] = 0 
+      ORDER BY [_outbox].[OutboxId]
+
+    -- There should never be more than one incomplete outbox.
+    IF @@ROWCOUNT > 1
     BEGIN
-      SELECT TOP 1
-          @ContactMinLsn = [_outbox].[ContactMinLsn],
-          @ContactMaxLsn = [_outbox].[ContactMaxLsn],
-          @AddressMinLsn = [_outbox].[AddressMinLsn],
-          @AddressMaxLsn = [_outbox].[AddressMaxLsn],
-          @OutboxId = [OutboxId]
-        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
-        WHERE [_outbox].[IsComplete] = 0 
-        ORDER BY [_outbox].[OutboxId]
-
-      -- Where no incomplete outbox is found then stop!
-      IF (@OutboxId IS NULL)
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
-      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
+      ;THROW 56002, 'There are multiple incomplete outboxes; there should not be more than one incomplete outbox at any one time.', 1
     END
-    ELSE
-    BEGIN
-      -- Check that there are no incomplete outboxes; if there are then stop with error; otherwise, continue!
-      DECLARE @IsComplete BIT
 
+    -- Where there is no incomplete outbox then the next should be processed.
+    IF (@OutboxId IS NULL)
+    BEGIN
+      -- New outbox so force creation of a new outbox.
+      SET @OutboxId = null 
+
+      -- Get the last outbox processed.
       SELECT TOP 1
-          @OutboxId = [_outbox].[OutboxId],
           @ContactMinLsn = [_outbox].[ContactMaxLsn],
-          @AddressMinLsn = [_outbox].[AddressMaxLsn],
-          @IsComplete = [_outbox].IsComplete
+          @AddressMinLsn = [_outbox].[AddressMaxLsn]
         FROM [DemoCdc].[ContactOutbox] AS [_outbox]
         ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[OutboxId] DESC
 
-      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete outbox; must be completed.
-      BEGIN
-        SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-          FROM [DemoCdc].[ContactOutbox] AS [_outbox]
-          WHERE [_outbox].OutboxId = @OutboxId 
-
-        COMMIT TRANSACTION
-        RETURN -1;
-      END
-      ELSE
-      BEGIN
-        SET @OutboxId = null -- Force creation of a new outbox.
-      END
-
-      IF (@IsComplete IS NULL) -- No previous outbox; i.e. is the first time!
+      IF (@@ROWCOUNT = 0) -- No previous outbox; i.e. is the first time!
       BEGIN
         SET @ContactMinLsn = @ContactBaseMinLsn;
         SET @AddressMinLsn = @AddressBaseMinLsn;
@@ -124,22 +75,22 @@ BEGIN
       END
     END
 
-    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
-    IF (@ContactMinLsn < @ContactBaseMinLsn) BEGIN SET @ContactMinLsn = @ContactBaseMinLsn END
-    IF (@AddressMinLsn < @AddressBaseMinLsn) BEGIN SET @AddressMinLsn = @AddressBaseMinLsn END
+    -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
+    IF (@ContactMinLsn < @ContactBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @ContactMinLsn = @ContactBaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Legacy.Contact''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
+    IF (@AddressMinLsn < @AddressBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @AddressMinLsn = @AddressBaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Legacy.Address''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
 
     -- Find changes on the root table: Legacy.Contact - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
     SET @hasChanges = 0
 
-    IF (@ContactMinLsn < @ContactMaxLsn)
+    IF (@ContactMinLsn <= @ContactMaxLsn)
     BEGIN
       SELECT TOP (@MaxQuerySize)
           [_cdc].[__$start_lsn] AS [_Lsn],
           [_cdc].[__$operation] AS [_Op],
           [_cdc].[ContactId] AS [ContactId]
         INTO #_changes
-        FROM cdc.fn_cdc_get_net_changes_Legacy_Contact(@ContactMinLsn, @ContactMaxLsn, 'all') AS [_cdc]
+        FROM cdc.fn_cdc_get_all_changes_Legacy_Contact(@ContactMinLsn, @ContactMaxLsn, 'all') AS [_cdc]
         ORDER BY [_cdc].[__$start_lsn]
 
       IF (@@ROWCOUNT <> 0)
@@ -150,14 +101,14 @@ BEGIN
     END
 
     -- Find changes on related table: Address (Legacy.Address) - assume all are 'update' operation (i.e. it doesn't matter).
-    IF (@AddressMinLsn < @AddressMaxLsn)
+    IF (@AddressMinLsn <= @AddressMaxLsn)
     BEGIN
       SELECT TOP (@MaxQuerySize)
           [_cdc].[__$start_lsn] AS [_Lsn],
           4 AS [_Op],
           [c].[ContactId] AS [ContactId]
         INTO #a
-        FROM cdc.fn_cdc_get_net_changes_Legacy_Address(@AddressMinLsn, @AddressMaxLsn, 'all') AS [_cdc]
+        FROM cdc.fn_cdc_get_all_changes_Legacy_Address(@AddressMinLsn, @AddressMaxLsn, 'all') AS [_cdc]
         INNER JOIN [Legacy].[Contact] AS [c] WITH (NOLOCK) ON ([_cdc].[Id] = [c].[AddressId])
         ORDER BY [_cdc].[__$start_lsn]
 
@@ -215,6 +166,7 @@ BEGIN
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
+        [_chg].[_Lsn] AS [_Lsn],
         [_chg].[ContactId] AS [ContactId],
         [c].[Name] AS [Name],
         [c].[Phone] AS [Phone],
@@ -226,7 +178,7 @@ BEGIN
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
-      INNER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
+      LEFT OUTER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
 
     -- Related table: Address (Legacy.Address) - only use INNER JOINS to get what is actually there right now.
     SELECT
@@ -243,6 +195,7 @@ BEGIN
 
     -- Commit the transaction.
     COMMIT TRANSACTION
+    RETURN 0
   END TRY
   BEGIN CATCH
     -- Rollback transaction and rethrow error.

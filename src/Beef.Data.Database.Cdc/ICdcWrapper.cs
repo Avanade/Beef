@@ -16,5 +16,10 @@ namespace Beef.Data.Database.Cdc
         /// Gets or sets the database tracking hash code.
         /// </summary>
         string? DatabaseTrackingHash { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database log sequence number (LSN).
+        /// </summary>
+        byte[] DatabaseLsn { get; set; }
     }
 }

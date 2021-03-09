@@ -43,6 +43,18 @@
         "Newtonsoft"
       ]
     },
+    "etagJsonName": {
+      "type": "string",
+      "title": "The default JSON name for the `ETag` property.",
+      "description": "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.",
+      "enum": [
+        "etag",
+        "eTag",
+        "_etag",
+        "_eTag",
+        "ETag"
+      ]
+    },
     "entityUsing": {
       "type": "string",
       "title": "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).",
@@ -309,7 +321,7 @@
               "type": "string",
               "title": "The list of comma separated interfaces that are to be declared for the entity class."
             },
-            "autoInferImplements": {
+            "implementsAutoInfer": {
               "type": "boolean",
               "title": "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
               "description": "Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`."
@@ -832,6 +844,11 @@
                       "title": "The C# code to default the value.",
                       "description": "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used."
                     },
+                    "partitionKey": {
+                      "type": "boolean",
+                      "title": "Indicates whether the property is considered part of the Partition Key.",
+                      "description": "This will implement `IPartitionKey` for the generated entity."
+                    },
                     "secondaryPropertyChanged": {
                       "type": "string",
                       "title": "The names of the secondary property(s), comma delimited, that are to be notified on a property change."
@@ -873,7 +890,7 @@
                     "jsonName": {
                       "type": "string",
                       "title": "The JSON property name.",
-                      "description": "Defaults to `ArgumentName` where not specified (i.e. camelCase)."
+                      "description": "Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`."
                     },
                     "jsonDataModelName": {
                       "type": "string",

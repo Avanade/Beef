@@ -41,7 +41,7 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         /// <param name="personManager"></param>
         public PersonCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PersonCdcData> logger, Beef.Demo.Business.IPersonManager personManager) :
-            base(db, "[DemoCdc].[spExecutePersonCdcOutbox]", evtPub, logger)
+            base(db, "[DemoCdc].[spExecutePersonCdcOutbox]", "[DemoCdc].[spCompletePersonCdcOutbox]", evtPub, logger)
         {
             _personManager = Check.NotNull(personManager, nameof(personManager));
             PersonCdcDataCtor();
@@ -52,14 +52,12 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
-        /// <param name="maxBatchSize">The recommended maximum batch size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<PersonCdcWrapperCollection, PersonCdcWrapper>> GetOutboxEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<PersonCdcWrapperCollection, PersonCdcWrapper>> GetOutboxEntityDataAsync()
         {
             var pColl = new PersonCdcWrapperCollection();
 
-            var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
+            var result = await SelectQueryMultiSetAsync(
                 new MultiSetCollArgs<PersonCdcWrapperCollection, PersonCdcWrapper>(_personCdcWrapperMapper, r => pColl = r, stopOnNull: true) // Root table: Demo.Person
                 ).ConfigureAwait(false);
 
@@ -93,6 +91,12 @@ namespace Beef.Demo.Cdc.Data
             /// </summary>
             [MapperProperty("_TrackingHash")]
             public string? DatabaseTrackingHash { get; set; }
+
+            /// <summary>
+            /// Gets or sets the database log sequence number (LSN).
+            /// </summary>
+            [MapperProperty("_Lsn")]
+            public byte[] DatabaseLsn { get; set; }
         }
 
         /// <summary>
