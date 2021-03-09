@@ -91,9 +91,7 @@ namespace Beef.Database.Core
     /// <summary>
     /// Represents the database executor.
     /// </summary>
-#pragma warning disable CA1001 // Types that own disposable fields should be disposable; they are handled and OK.
     public class DatabaseExecutor
-#pragma warning restore CA1001
     {
         /// <summary>
         /// Gets or sets the <b>Migrations</b> scripts namespace part name.
@@ -338,9 +336,7 @@ namespace Beef.Database.Core
                 _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms].");
                 return result;
             }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design.
             catch (Exception ex)
-#pragma warning restore CA1031 
             {
                 _logger.LogError(ex, ex.Message);
                 return false;
@@ -528,7 +524,7 @@ namespace Beef.Database.Core
         {
             using var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.DeleteAllAndReset.sql")!;
             using var sr = new StreamReader(st);
-            return await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.ReadToEnd()).NonQueryAsync(), "the deletion of all data from all tables (excluding 'dbo' schema).").ConfigureAwait(false);
+            return await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.ReadToEnd()).NonQueryAsync(), "the deletion of all data from all tables (excluding 'dbo' and 'cdc' schema).").ConfigureAwait(false);
         }
 
         /// <summary>
@@ -589,9 +585,7 @@ namespace Beef.Database.Core
                 _args.CodeGenArgs!.Parameters.Where(x => x.Key.StartsWith("Param", StringComparison.InvariantCultureIgnoreCase)).ForEach(x => fn += $"-{x.Value}");
 
             var di = new DirectoryInfo(Environment.CurrentDirectory);
-#pragma warning disable CA1308 // Normalize strings to uppercase; desire/require lowercase for this thanks!
             var fi = new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{fn.ToLowerInvariant()}.sql"));
-#pragma warning restore CA1308
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 

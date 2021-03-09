@@ -139,7 +139,6 @@ namespace Beef.Data.Database.Cdc
         private Timer? _timer;
         private Task? _executeTask;
         private bool _disposed;
-        private bool _processIncomplete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
@@ -231,35 +230,16 @@ namespace Beef.Data.Database.Cdc
             if (cwdl.HasValue)
                 cdo.ContinueWithDataLoss = cwdl.Value;
 
-            CdcDataOrchestratorResult cdor;
-
+            // Keep executing until unsucessful or reached end of CDC data.
             while (true)
             {
-                if (_processIncomplete)
-                    cdor = await cdo.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
-                else
-                    cdor = await cdo.ExecuteNextAsync(cancellationToken).ConfigureAwait(false);
-
+                var result = await cdo.ExecuteAsync(cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
-                    return cdor;
+                    return await Task.FromCanceled<CdcDataOrchestratorResult>(cancellationToken).ConfigureAwait(false);
 
                 // Where successful, then the next outbox should be attempted immediately.
-                if (cdor.OutboxExecuted)
-                    _processIncomplete = false;
-                else
-                {
-                    // Nothing found to process so retry later.
-                    if (cdor.Outbox == null)
-                        return cdor;
-
-                    if (!cdor.Outbox.IsComplete && !_processIncomplete)
-                    {
-                        _processIncomplete = true;
-                        Logger.LogInformation($"Subsequent executions will attempt to complete outbox '{cdor.Outbox.Id}' prior to executing next.");
-                    }
-                    else
-                        return cdor; // Retry later.
-                }
+                if (!result.IsSuccessful || result.Outbox == null)
+                    return result; // Retry later.
             } 
         }
 

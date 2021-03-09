@@ -51,7 +51,7 @@ namespace {{Root.NamespaceCdc}}.Data
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
-            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", evtPub, logger){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
+            base(db, "[{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]", "[{{CdcSchema}}].[{{CompleteStoredProcedureName}}]", evtPub, logger){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
 {{#ifne DataCtorParameters.Count 0}}
         {
   {{#each DataCtorParameters}}
@@ -122,6 +122,12 @@ namespace {{Root.NamespaceCdc}}.Data
             /// </summary>
             [MapperProperty("_TrackingHash")]
             public string? DatabaseTrackingHash { get; set; }
+
+            /// <summary>
+            /// Gets or sets the database log sequence number (LSN).
+            /// </summary>
+            [MapperProperty("_Lsn")]
+            public byte[] DatabaseLsn { get; set; }
         }
 
         /// <summary>

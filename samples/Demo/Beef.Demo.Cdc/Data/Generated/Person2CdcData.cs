@@ -38,7 +38,7 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public Person2CdcData(IDatabase db, IEventPublisher evtPub, ILogger<Person2CdcData> logger) :
-            base(db, "[DemoCdc].[spExecutePerson2CdcOutbox]", evtPub, logger) => Person2CdcDataCtor();
+            base(db, "[DemoCdc].[spExecutePerson2CdcOutbox]", "[DemoCdc].[spCompletePerson2CdcOutbox]", evtPub, logger) => Person2CdcDataCtor();
 
         partial void Person2CdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -84,6 +84,12 @@ namespace Beef.Demo.Cdc.Data
             /// </summary>
             [MapperProperty("_TrackingHash")]
             public string? DatabaseTrackingHash { get; set; }
+
+            /// <summary>
+            /// Gets or sets the database log sequence number (LSN).
+            /// </summary>
+            [MapperProperty("_Lsn")]
+            public byte[] DatabaseLsn { get; set; }
         }
 
         /// <summary>

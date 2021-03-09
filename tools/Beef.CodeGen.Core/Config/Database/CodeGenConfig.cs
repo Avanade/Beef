@@ -194,6 +194,14 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("CDC", Title = "Indicates whether the .NET collection properties should be pluralized.")]
         public bool? PluralizeCollectionProperties { get; set; }
 
+        /// <summary>
+        /// Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.
+        /// </summary>
+        [JsonProperty("hasBeefDbo", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
+            Description = "Defaults to `true`.")]
+        public bool? HasBeefDbo { get; set; }
+
         #endregion
 
         #region Path
@@ -423,6 +431,7 @@ namespace Beef.CodeGen.Config.Database
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
             CdcSchema = DefaultWhereNull(CdcSchema, () => "Cdc");
             CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
+            HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
 

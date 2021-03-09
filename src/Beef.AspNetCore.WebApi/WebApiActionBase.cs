@@ -152,7 +152,7 @@ namespace Beef.AspNetCore.WebApi
             CallerLineNumber = lineNumber;
 
             // Get the list of etags specified in the header.
-            if (controller.Request.Headers.TryGetValue("If-None-Match", out var vals))
+            if (controller.Request?.Headers != null && controller.Request.Headers.TryGetValue("If-None-Match", out var vals))
             {
                 var l = new List<string>();
                 foreach (var v in vals)
@@ -166,7 +166,7 @@ namespace Beef.AspNetCore.WebApi
                     IfNoneMatchETags = l;
             }
 
-            if (Controller.Request.Headers.TryGetValue("If-Match", out vals))
+            if (controller.Request?.Headers != null && Controller.Request.Headers.TryGetValue("If-Match", out vals))
             {
                 var l = new List<string>();
                 foreach (var v in vals)

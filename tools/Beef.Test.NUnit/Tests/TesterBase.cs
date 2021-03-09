@@ -70,7 +70,6 @@ namespace Beef.Test.NUnit.Tests
         /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="LocalServiceProvider"/>).
         /// </summary>
         /// <param name="serviceCollection">The <see cref="IServiceCollection"/> action.</param>
-        /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
         protected void ConfigureLocalServices(Action<IServiceCollection> serviceCollection)
         {
             if (serviceCollection != null)
@@ -103,6 +102,9 @@ namespace Beef.Test.NUnit.Tests
             var ec = TestSetUp.CreateExecutionContext(username ?? TestSetUp.DefaultUsername, args);
             ec.ServiceProvider = LocalServiceProvider;
             ec.Properties.Add(ServiceCollectionKey, _serviceCollection);
+            if (string.IsNullOrEmpty(ec.CorrelationId))
+                ec.CorrelationId = Guid.NewGuid().ToString();
+
             ExecutionContext.SetCurrent(ec);
         }
 

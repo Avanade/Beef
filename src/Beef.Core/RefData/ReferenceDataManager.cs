@@ -71,14 +71,12 @@ namespace Beef.RefData
         /// </summary>
         Type IReferenceDataProvider.ProviderType => typeof(ReferenceDataManager);
 
-#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, Type indexer seems perfectly reasonable.
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
         public IReferenceDataCollection this[Type type]
-#pragma warning restore CA1043 
         {
             get
             {

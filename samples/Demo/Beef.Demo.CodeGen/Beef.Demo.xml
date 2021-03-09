@@ -174,7 +174,7 @@
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
-    <Property Name="ETag" Type="string" />
+    <Property Name="ETag" Type="string" JsonName="etag" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   </Entity> 
  </CodeGeneration>

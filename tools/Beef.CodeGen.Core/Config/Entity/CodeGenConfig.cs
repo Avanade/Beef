@@ -97,6 +97,14 @@ entities:
         public string? JsonSerializer { get; set; }
 
         /// <summary>
+        /// Gets or sets the default JSON name for the ETag property.
+        /// </summary>
+        [JsonProperty("etagJsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Entity", Title = "The default JSON name for the `ETag` property.", Options = new string[] { "etag", "eTag", "_etag", "_eTag", "ETag" },
+            Description = "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.")]
+        public string? ETagJsonName { get; set; }
+
+        /// <summary>
         /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
         /// </summary>
         [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -543,6 +551,7 @@ entities:
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
+            ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
 
             if (Entities != null && Entities.Count > 0)

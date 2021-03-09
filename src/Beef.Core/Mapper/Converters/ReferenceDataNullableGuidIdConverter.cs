@@ -18,7 +18,7 @@ namespace Beef.Mapper.Converters
         {
             var tc = ReferenceDataBase.GetIdTypeCode(typeof(TSrceProperty));
             if (tc != ReferenceDataIdTypeCode.Guid)
-                throw new InvalidOperationException($"ReferenceData '{GetType().Name}.Id' has Type of '{tc.ToString()}'; must be Type 'Guid' to use this Converter.");
+                throw new InvalidOperationException($"ReferenceData '{GetType().Name}.Id' has Type of '{tc}'; must be Type 'Guid' to use this Converter.");
         }
 
         /// <summary>

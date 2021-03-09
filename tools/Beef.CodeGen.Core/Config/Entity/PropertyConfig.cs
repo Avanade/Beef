@@ -242,7 +242,7 @@ properties: [
         /// </summary>
         [JsonProperty("jsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Serialization", Title = "The JSON property name.",
-            Description = "Defaults to `ArgumentName` where not specified (i.e. camelCase).")]
+            Description = "Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`.")]
         public string? JsonName { get; set; }
 
         /// <summary>
@@ -636,7 +636,7 @@ properties: [
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !IgnoreNullableTypes.Contains(Type!));
-            JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : ArgumentName);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);

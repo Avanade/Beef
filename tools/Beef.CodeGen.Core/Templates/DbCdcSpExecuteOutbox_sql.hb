@@ -1,56 +1,18 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{CdcSchema}}].[{{StoredProcedureName}}]
-  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (perf vs failure cost).
-  @GetIncompleteOutbox BIT NULL = 0,        -- Gets incomplete outbox (batch) where existing.
-  @ContinueWithDataLoss BIT NULL = 0,       -- Ignores data loss and continues; versus returning -2.
-  @OutboxIdToMarkComplete INT NULL = NULL,  -- Marks the specified outbox as Complete; no further data is retrieved.
-  @CompleteTrackingList AS [{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List] READONLY  -- When Marking/Completing the corresponding tracking list should also be merged.
+CREATE PROCEDURE [{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]
+  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost.
    */
 
-  /* Return Codes:
-   *   0 = Success
-   *  -1 = Cannot continue where there is an incomplete outbox; must be completed.
-   *  -2 = SQL Server has cleaned up CDC data that should have been included in the batch; i.e changes have been missed.
-   *        (see https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/administer-and-monitor-change-data-capture-sql-server)
-   */
- 
   SET NOCOUNT ON;
 
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
-
-    -- Mark the outbox as complete and merge the tracking info; then return the updated outbox data and stop!
-    IF (@OutboxIdToMarkComplete IS NOT NULL)
-    BEGIN
-      UPDATE [_outbox] SET
-          [_outbox].[IsComplete] = 1,
-          [_outbox].[CompletedDate] = GETUTCDATE()
-        FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
-        WHERE OutboxId = @OutboxIdToMarkComplete 
-
-      MERGE INTO [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] WITH (HOLDLOCK) AS [_ct]
-        USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Table}}' AND [_ct].[Key] = [_list].[Key])
-        WHEN MATCHED AND EXISTS (
-            SELECT [_list].[Key], [_list].[Hash]
-            EXCEPT
-            SELECT [_ct].[Key], [_ct].[Hash])
-          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[OutboxId] = @OutboxIdToMarkComplete
-        WHEN NOT MATCHED BY TARGET
-          THEN INSERT ([Schema], [Table], [Key], [Hash], [OutboxId])
-            VALUES ('{{Schema}}', '{{Table}}', [_list].[Key], [_list].[Hash], @OutboxIdToMarkComplete);
-
-      SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-        FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
-        WHERE [_outbox].OutboxId = @OutboxIdToMarkComplete
-
-      COMMIT TRANSACTION
-      RETURN 0;
-    END
 
     -- Declare variables.
     DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
@@ -65,60 +27,41 @@ BEGIN
     SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
 {{/each}}
 
-    -- Where requesting for incomplete outbox, get first that is marked as incomplete.
-    IF (@GetIncompleteOutbox = 1)
-    BEGIN
-      SELECT TOP 1
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
-          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
+    -- Check if there is already an incomplete batch and attempt to reprocess.
+    SELECT
+        @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
+        @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{#each CdcJoins}}
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
-          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
+        @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
+        @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{/each}}
-          @OutboxId = [OutboxId]
-        FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
-        WHERE [_outbox].[IsComplete] = 0 
-        ORDER BY [_outbox].[OutboxId]
+        @OutboxId = [OutboxId]
+      FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
+      WHERE [_outbox].[IsComplete] = 0 
+      ORDER BY [_outbox].[OutboxId]
 
-      -- Where no incomplete outbox is found then stop!
-      IF (@OutboxId IS NULL)
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
-      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
+    -- There should never be more than one incomplete outbox.
+    IF @@ROWCOUNT > 1
+    BEGIN
+      {{#if Root.HasBeefDbo}}EXEC spThrowBusinessException {{else}};THROW 56002, {{/if}}'There are multiple incomplete outboxes; there should not be more than one incomplete outbox at any one time.'{{#unless Root.HasBeefDbo}}, 1{{/unless}}
     END
-    ELSE
-    BEGIN
-      -- Check that there are no incomplete outboxes; if there are then stop with error; otherwise, continue!
-      DECLARE @IsComplete BIT
 
+    -- Where there is no incomplete outbox then the next should be processed.
+    IF (@OutboxId IS NULL)
+    BEGIN
+      -- New outbox so force creation of a new outbox.
+      SET @OutboxId = null 
+
+      -- Get the last outbox processed.
       SELECT TOP 1
-          @OutboxId = [_outbox].[OutboxId],
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn]{{#ifne CdcJoins.Count 0}},{{/ifne}}
 {{#each CdcJoins}}
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn]{{#unless @last}},{{/unless}}
 {{/each}}
-          @IsComplete = [_outbox].IsComplete
         FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
         ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[OutboxId] DESC
 
-      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete outbox; must be completed.
-      BEGIN
-        SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-          FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
-          WHERE [_outbox].OutboxId = @OutboxId 
-
-        COMMIT TRANSACTION
-        RETURN -1;
-      END
-      ELSE
-      BEGIN
-        SET @OutboxId = null -- Force creation of a new outbox.
-      END
-
-      IF (@IsComplete IS NULL) -- No previous outbox; i.e. is the first time!
+      IF (@@ROWCOUNT = 0) -- No previous outbox; i.e. is the first time!
       BEGIN
         SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
 {{#each CdcJoins}}
@@ -148,16 +91,16 @@ BEGIN
     END
 
     -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{Name}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
 {{#each CdcJoins}}
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN COMMIT TRANSACTION RETURN -2 END END
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{TableName}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
 {{/each}}
 
     -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
     SET @hasChanges = 0
 
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}MaxLsn)
+    IF (@{{pascal Name}}MinLsn <= @{{pascal Name}}MaxLsn)
     BEGIN
       SELECT TOP (@MaxQuerySize)
           [_cdc].[__$start_lsn] AS [_Lsn],
@@ -166,7 +109,7 @@ BEGIN
           [_cdc].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
 {{/each}}
         INTO #_changes
-        FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
+        FROM cdc.fn_cdc_get_all_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
         ORDER BY [_cdc].[__$start_lsn]
 
       IF (@@ROWCOUNT <> 0)
@@ -178,7 +121,7 @@ BEGIN
 
 {{#each CdcJoins}}
     -- Find changes on related table: {{Name}} ({{Schema}}.{{TableName}}) - assume all are 'update' operation (i.e. it doesn't matter).
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}MaxLsn)
+    IF (@{{pascal Name}}MinLsn <= @{{pascal Name}}MaxLsn)
     BEGIN
       SELECT TOP (@MaxQuerySize)
           [_cdc].[__$start_lsn] AS [_Lsn],
@@ -187,7 +130,7 @@ BEGIN
           [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
   {{/each}}
         INTO #{{Alias}}
-        FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
+        FROM cdc.fn_cdc_get_all_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
   {{#each JoinHierarchy}}
         INNER JOIN [{{JoinToSchema}}].[{{JoinTo}}] AS [{{JoinToAlias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{#if Parent.IsFirstInJoinHierarchy}}[_cdc]{{else}}[{{Parent.Alias}}]{{/if}}.[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
@@ -252,6 +195,7 @@ BEGIN
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
+        [_chg].[_Lsn] AS [_Lsn],
 {{#each PrimaryKeyColumns}}
         [_chg].[{{Name}}] AS [{{NameAlias}}]{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}
 {{/each}}

@@ -157,9 +157,7 @@ namespace Beef.Data.Database
                 throw new InvalidOperationException("The SessionContextStoredProcedure property must have a value.");
 
             var cmd = dbConnection.CreateCommand();
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, is a stored procedure command type.
             cmd.CommandText = SessionContextStoredProcedure;
-#pragma warning restore CA2100
             cmd.CommandType = CommandType.StoredProcedure;
 
             var p = cmd.CreateParameter();

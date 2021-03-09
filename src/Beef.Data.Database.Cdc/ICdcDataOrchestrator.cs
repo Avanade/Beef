@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,17 +23,19 @@ namespace Beef.Data.Database.Cdc
         bool ContinueWithDataLoss { get; set; }
 
         /// <summary>
-        /// Executes the next (new) outbox.
+        /// Executes the next (new) outbox, or reprocesses the last incomplete, then <see cref="CompleteAsync(int, List{CdcTracker})">completes</see> on success.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        Task<CdcDataOrchestratorResult> ExecuteNextAsync(CancellationToken? cancellationToken);
+        /// <remarks>An outbox may be incomplete where there was a previous execution failure.</remarks>
+        Task<CdcDataOrchestratorResult> ExecuteAsync(CancellationToken? cancellationToken);
 
         /// <summary>
-        /// Executes any previously incomplete outbox.
+        /// Completes an existing outbox updating the corresponding <paramref name="tracking"/> where appropriate.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <param name="outboxId">The outbox identifer.</param>
+        /// <param name="tracking">The <see cref="CdcTracker"/> list.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
-        Task<CdcDataOrchestratorResult> ExecuteIncompleteAsync(CancellationToken? cancellationToken);
+        Task<CdcDataOrchestratorResult> CompleteAsync(int outboxId, List<CdcTracker> tracking);
     }
 }
