@@ -37,7 +37,7 @@ namespace Beef.Demo.Functions
 
             var sbasr = new ServiceBusAzureStorageRepository(config.GetConnectionString("AzureStorage"));
             builder.Services.AddBeefServiceBusReceiverHost(
-                EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(sbasr)); //, additional: (_, ehsh) => ehsh.UseInvoker(new ServiceBusReceiverHostPoisonInvoker(sbasr)));
+                EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(sbasr).UseMaxAttempts(10), additional: (_, ehsh) => ehsh.UseInvoker(new ServiceBusReceiverHostPoisonInvoker(sbasr)));
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = config.GetSection("CosmosDb");

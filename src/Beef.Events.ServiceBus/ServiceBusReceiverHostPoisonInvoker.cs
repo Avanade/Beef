@@ -63,10 +63,11 @@ namespace Beef.Events.ServiceBus
             catch (EventSubscriberUnhandledException esuex)
             {
                 // Mark as poisoned (will be audited by storage).
-                await Storage.MarkAsPoisonedAsync(message, esuex.Result).ConfigureAwait(false);
+                var result = await Storage.MarkAsPoisonedAsync(message, esuex.Result, (caller as EventSubscriberHost)?.MaxAttempts).ConfigureAwait(false);
 
-                // In the end, let it bubble up as there is nothing further we can do; our host's host will take it from here!
-                throw;
+                // In the end, if we can't continue, then let it bubble up as there is nothing further we can do; our host's host will take it from here!
+                if (result == UnhandledExceptionHandling.ThrowException)
+                    throw;
             }
         }
     }

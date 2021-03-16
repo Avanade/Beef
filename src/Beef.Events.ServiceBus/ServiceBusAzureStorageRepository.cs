@@ -16,6 +16,7 @@ namespace Beef.Events.ServiceBus
     /// <remarks>Also provides the underlying <see cref="IAuditWriter"/> capability to audit directly to the <b>Azure Storage</b> repository.</remarks>
     public class ServiceBusAzureStorageRepository : IServiceBusStorageRepository, IUseLogger
     {
+        private const string _seqNoFormat = "000000000000000000#";
         private readonly string _storageConnectionString;
         private CloudTable? _auditTable;
         private CloudTable? _poisonTable;
@@ -24,9 +25,9 @@ namespace Beef.Events.ServiceBus
         /// <summary>
         /// Create the partition key.
         /// </summary>
-        /// <param name="message">The <see cref="ServiceBusData"/>.</param>
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
         /// <returns>The partition key.</returns>
-        public static string CreatePartitionKey(ServiceBusData message) => CreatePartitionKey((message ?? throw new ArgumentNullException(nameof(message))).ServiceBusName, message.QueueName);
+        public static string CreatePartitionKey(ServiceBusData messageData) => CreatePartitionKey((messageData ?? throw new ArgumentNullException(nameof(messageData))).ServiceBusName, messageData.QueueName);
 
         /// <summary>
         /// Create the partition key.
@@ -35,6 +36,20 @@ namespace Beef.Events.ServiceBus
         /// <param name="queueName">The service bus queue name.</param>
         /// <returns>The partition key.</returns>
         public static string CreatePartitionKey(string serviceBusName, string queueName) => Check.NotNull(serviceBusName, nameof(serviceBusName)) + "-" + Check.NotNull(queueName, nameof(queueName));
+
+        /// <summary>
+        /// Create the row key.
+        /// </summary>
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
+        /// <returns>The row key.</returns>
+        public static string CreateRowKey(ServiceBusData messageData) => CreateRowKey((messageData ?? throw new ArgumentNullException(nameof(messageData))).Message.SystemProperties.SequenceNumber);
+
+        /// <summary>
+        /// Create the row key.
+        /// </summary>
+        /// <param name="sequenceNumber">The messages sequence number.</param>
+        /// <returns>The row key.</returns>
+        public static string CreateRowKey(long sequenceNumber) => sequenceNumber.ToString(_seqNoFormat, System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBusAzureStorageRepository"/> class.
@@ -65,16 +80,16 @@ namespace Beef.Events.ServiceBus
         void IUseLogger.UseLogger(ILogger logger) => _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         /// <summary>
-        /// Writes the <paramref name="message"/> <paramref name="result"/> to the audit repository.
+        /// Writes the <paramref name="messageData"/> <paramref name="result"/> to the audit repository.
         /// </summary>
-        /// <param name="message">The <see cref="ServiceBusData"/>.</param>
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>A corresponding log message for the <i>audit</i> will be written to the <see cref="ILogger"/> using <see cref="LoggerAuditWriter.WriteFormattedAuditAsync(ILogger, object, Result)"/>.</remarks>
-        public async Task WriteAuditAsync(ServiceBusData message, Result result)
+        public async Task WriteAuditAsync(ServiceBusData messageData, Result result)
         {
-            var audit = CreateEventAuditRecord(Check.NotNull(message, nameof(message)), Check.NotNull(result, nameof(result)));
+            var audit = CreateEventAuditRecord(Check.NotNull(messageData, nameof(messageData)), Check.NotNull(result, nameof(result)));
             await WriteAuditAsync(audit, null, null).ConfigureAwait(false);
-            await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, message, result).ConfigureAwait(false);
+            await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, messageData, result).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -89,7 +104,7 @@ namespace Beef.Events.ServiceBus
             {
                 // Insert the audit message table.
                 var at = await GetAuditMessageTableAsync().ConfigureAwait(false);
-                audit.RowKey = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+                audit.RowKey = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + audit.RowKey;
                 var r = await at.ExecuteAsync(TableOperation.Insert(audit)).ConfigureAwait(false);
 
                 switch ((HttpStatusCode)r.HttpStatusCode)
@@ -135,23 +150,23 @@ namespace Beef.Events.ServiceBus
         /// <summary>
         /// Create (instantiate) the <see cref="ServiceBusAuditRecord"/>.
         /// </summary>
-        private static ServiceBusAuditRecord CreateEventAuditRecord(ServiceBusData message, Result result)
+        private static ServiceBusAuditRecord CreateEventAuditRecord(ServiceBusData messageData, Result result)
         {
-            var metadata = EventDataMapper.GetBeefMetadata(message.Message);
+            var metadata = EventDataMapper.GetBeefMetadata(messageData.Message);
 
-            return new ServiceBusAuditRecord(CreatePartitionKey(message ?? throw new ArgumentNullException(nameof(message))), string.Empty)
+            return new ServiceBusAuditRecord(CreatePartitionKey(messageData ?? throw new ArgumentNullException(nameof(messageData))), CreateRowKey(messageData))
             {
-                ServiceBusName = message.ServiceBusName,
-                QueueName = message.QueueName,
-                SequenceNumber = message.Message.SystemProperties.SequenceNumber,
-                EnqueuedTimeUtc = message.Message.SystemProperties.EnqueuedTimeUtc,
+                ServiceBusName = messageData.ServiceBusName,
+                QueueName = messageData.QueueName,
+                SequenceNumber = messageData.Message.SystemProperties.SequenceNumber,
+                EnqueuedTimeUtc = messageData.Message.SystemProperties.EnqueuedTimeUtc,
                 EventId = metadata.EventId,
-                Attempts = message.Attempt <= 0 ? 1 : message.Attempt,
+                Attempts = messageData.Attempt <= 0 ? 1 : messageData.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
                 Status = result.Status.ToString(),
-                Body = Substring(Encoding.UTF8.GetString(message.Message.Body)),
+                Body = Substring(Encoding.UTF8.GetString(messageData.Message.Body)),
                 Exception = Substring(result.Exception?.ToString()),
             };
         }
@@ -162,33 +177,22 @@ namespace Beef.Events.ServiceBus
         private static string? Substring(string? text) => string.IsNullOrEmpty(text) ? null : (text.Length >= 64000 ? text[0..64000] : text);
 
         /// <summary>
-        /// Checks whether the <paramref name="message"/> is considered poison.
+        /// Checks whether the <paramref name="messageData"/> is considered poison.
         /// </summary>
-        /// <param name="message">The <see cref="ServiceBusData"/>.</param>
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
         /// <returns>The <see cref="PoisonMessageAction"/> and number of previous attempts.</returns>
-        public async Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAsync(ServiceBusData message)
+        public async Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAsync(ServiceBusData messageData)
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
+            if (messageData == null)
+                throw new ArgumentNullException(nameof(messageData));
 
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
 
             // Get the current poison event (if there is one).
-            var cpe = await GetPoisonedAsync(pt, message).ConfigureAwait(false);
+            var cpe = await GetPoisonedAsync(pt, messageData).ConfigureAwait(false);
             if (cpe == null)
                 return (PoisonMessageAction.NotPoison, 0);
-
-            // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
-            if (message.Message.SystemProperties.SequenceNumber != cpe.SequenceNumber)
-            {
-                var reason = $"Current EventData (Seq#: '{message.Message.SystemProperties.SequenceNumber}') being processed is out of sync with previous Poison (Seq#: '{cpe.SequenceNumber}'); current assumed correct with previous Poison now deleted.";
-                var result = EventSubscriberHost.CreatePoisonMismatchResult(cpe.Subject, cpe.Action, reason);
-                await WriteAuditAsync(cpe, result, null).ConfigureAwait(false);
-                await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
-                await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, message, result).ConfigureAwait(false);
-                return (PoisonMessageAction.NotPoison, 0);
-            }
 
             // Determine action; where skipping remove poison, then audit and carry on.
             if (cpe.SkipProcessing)
@@ -197,7 +201,7 @@ namespace Beef.Events.ServiceBus
                 var result = EventSubscriberHost.CreatePoisonSkippedResult(cpe.Subject, cpe.Action);
                 await WriteAuditAsync(cpe, result, null).ConfigureAwait(false);
                 await RemovePoisonedAsync(pt, cpe).ConfigureAwait(false);
-                await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, message, result).ConfigureAwait(false);
+                await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, messageData, result).ConfigureAwait(false);
                 return (PoisonMessageAction.PoisonSkip, cpe.Attempts);
             }
             else
@@ -207,24 +211,24 @@ namespace Beef.Events.ServiceBus
         /// <summary>
         /// Gets the poisoned <see cref="ServiceBusAuditRecord"/>.
         /// </summary>
-        private static async Task<ServiceBusAuditRecord> GetPoisonedAsync(CloudTable poisonTable, ServiceBusData message)
+        private static async Task<ServiceBusAuditRecord> GetPoisonedAsync(CloudTable poisonTable, ServiceBusData messageData)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<ServiceBusAuditRecord>(CreatePartitionKey(message), string.Empty)).ConfigureAwait(false);
+            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<ServiceBusAuditRecord>(CreatePartitionKey(messageData), CreateRowKey(messageData))).ConfigureAwait(false);
             return (ServiceBusAuditRecord)r.Result;
         }
 
         /// <summary>
-        /// Removes the poisoned <paramref name="message"/>.
+        /// Removes the poisoned <paramref name="messageData"/>.
         /// </summary>
-        /// <param name="message">The <see cref="ServiceBusData"/>.</param>
-        public async Task RemovePoisonedAsync(ServiceBusData message)
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
+        public async Task RemovePoisonedAsync(ServiceBusData messageData)
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
+            if (messageData == null)
+                throw new ArgumentNullException(nameof(messageData));
 
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
-            var ear = await GetPoisonedAsync(pt, message).ConfigureAwait(false);
+            var ear = await GetPoisonedAsync(pt, messageData).ConfigureAwait(false);
             if (ear != null)
                 await RemovePoisonedAsync(pt, ear).ConfigureAwait(false);
         }
@@ -239,11 +243,13 @@ namespace Beef.Events.ServiceBus
         }
 
         /// <summary>
-        /// Marks the <paramref name="event"/> with a poisoned <paramref name="result"/>.
+        /// Marks the <paramref name="messageData"/> with a poisoned <paramref name="result"/>.
         /// </summary>
-        /// <param name="event">The <see cref="ServiceBusData"/>.</param>
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        public async Task MarkAsPoisonedAsync(ServiceBusData @event, Result result)
+        /// <param name="maxAttempts">The maximum number of attempts; a <c>null</c> or any non-positive number indicates infinite.</param>
+        /// <returns>The resulting <see cref="UnhandledExceptionHandling"/>.</returns>
+        public async Task<UnhandledExceptionHandling> MarkAsPoisonedAsync(ServiceBusData messageData, Result result, int? maxAttempts)
         {
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -251,15 +257,31 @@ namespace Beef.Events.ServiceBus
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, @event ?? throw new ArgumentNullException(nameof(@event))).ConfigureAwait(false);
+                var ear = await GetPoisonedAsync(pt, messageData ?? throw new ArgumentNullException(nameof(messageData))).ConfigureAwait(false);
                 if (ear == null)
-                    ear = CreateEventAuditRecord(Check.NotNull(@event, nameof(@event)), Check.NotNull(result, nameof(result)));
+                    ear = CreateEventAuditRecord(Check.NotNull(messageData, nameof(messageData)), Check.NotNull(result, nameof(result)));
                 else
                     OverrideEventAuditRecordResult(ear, result, ++ear.Attempts);
 
                 if (ear.PoisonedTimeUtc == null)
                     ear.PoisonedTimeUtc = DateTime.UtcNow;
 
+                // Make sure maximum attempts not exceeded where specified.
+                var max = result.Subscriber?.MaxAttempts;
+                if (!max.HasValue || max <= 0)
+                    max = maxAttempts;
+
+                if (max.HasValue && max > 0 && ear.Attempts >= max)
+                {
+                    var nr = EventSubscriberHost.CreatePoisonMaxAttemptsResult(result, ear.Attempts);
+                    OverrideEventAuditRecordResult(ear, nr, null);
+                    await WriteAuditAsync(ear, null, null).ConfigureAwait(false);
+                    await RemovePoisonedAsync(pt, ear).ConfigureAwait(false);
+                    await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, messageData, nr).ConfigureAwait(false);
+                    return UnhandledExceptionHandling.Continue;
+                }
+
+                // Create/update the poisoned message.
                 var r = await pt.ExecuteAsync(TableOperation.InsertOrReplace(ear)).ConfigureAwait(false);
                 switch ((HttpStatusCode)r.HttpStatusCode)
                 {
@@ -269,7 +291,7 @@ namespace Beef.Events.ServiceBus
                     case HttpStatusCode.OK:
                     case HttpStatusCode.NoContent:
                     case HttpStatusCode.Accepted:
-                        return; // All good, carry on.
+                        return UnhandledExceptionHandling.ThrowException; // All good, carry on.
 
                     default:
                         throw new InvalidOperationException($"MarkAsPoisonedAsync failed with HttpStatusCode: {r.HttpStatusCode}.");
@@ -278,10 +300,10 @@ namespace Beef.Events.ServiceBus
         }
 
         /// <summary>
-        /// Marks the previously poisoned <paramref name="event"/> to skip.
+        /// Marks the previously poisoned <paramref name="messageData"/> to skip.
         /// </summary>
-        /// <param name="event">The <see cref="ServiceBusData"/>.</param>
-        public async Task SkipPoisonedAsync(ServiceBusData @event)
+        /// <param name="messageData">The <see cref="ServiceBusData"/>.</param>
+        public async Task SkipPoisonedAsync(ServiceBusData messageData)
         {
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -289,7 +311,7 @@ namespace Beef.Events.ServiceBus
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, @event ?? throw new ArgumentNullException(nameof(@event))).ConfigureAwait(false);
+                var ear = await GetPoisonedAsync(pt, messageData ?? throw new ArgumentNullException(nameof(messageData))).ConfigureAwait(false);
                 if (ear == null || ear.SkipProcessing)
                     return;
 

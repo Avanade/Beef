@@ -22,7 +22,9 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="message">The <see cref="ServiceBusData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        Task MarkAsPoisonedAsync(ServiceBusData message, Result result);
+        /// <param name="maxAttempts">The maximum number of attempts; a <c>null</c> or any non-positive number indicates infinite.</param>
+        /// <returns>The resulting <see cref="UnhandledExceptionHandling"/>.</returns>
+        Task<UnhandledExceptionHandling> MarkAsPoisonedAsync(ServiceBusData message, Result result, int? maxAttempts);
 
         /// <summary>
         /// Marks the previously poisoned <paramref name="message"/> to skip and updates the internal attempts counter.

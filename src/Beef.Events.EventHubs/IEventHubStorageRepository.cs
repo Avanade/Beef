@@ -22,7 +22,9 @@ namespace Beef.Events.EventHubs
         /// </summary>
         /// <param name="event">The <see cref="EventHubData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        Task MarkAsPoisonedAsync(EventHubData @event, Result result);
+        /// <param name="maxAttempts">The maximum number of attempts; a <c>null</c> or any non-positive number indicates infinite.</param>
+        /// <returns>The resulting <see cref="UnhandledExceptionHandling"/>.</returns>
+        Task<UnhandledExceptionHandling> MarkAsPoisonedAsync(EventHubData @event, Result result, int? maxAttempts);
 
         /// <summary>
         /// Marks the previously poisoned <paramref name="event"/> to skip and updates the internal attempts counter.

@@ -56,9 +56,15 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Gets the <see cref="IAuditWriter"/> from <see cref="Args"/> <see cref="EventSubscriberHostArgs.AuditWriter"/>.
+        /// Gets the <see cref="IAuditWriter"/> (value from <see cref="Args"/> <see cref="EventSubscriberHostArgs.AuditWriter"/>).
         /// </summary>
         public IAuditWriter? AuditWriter => Args.AuditWriter;
+
+        /// <summary>
+        /// Gets the maximum number of attempts before the event is automatically skipped (value from <see cref="Args"/> <see cref="EventSubscriberHostArgs.MaxAttempts"/>).
+        /// </summary>
+        /// <remarks>This functionality is dependent on the <see cref="EventSubscriberHost"/> providing the functionality to check and action.</remarks>
+        public int? MaxAttempts => Args.MaxAttempts;
 
         /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
@@ -73,7 +79,7 @@ namespace Beef.Events
         {
             if (originatingEvent == null)
                 throw new ArgumentNullException(nameof(originatingEvent));
-            
+
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
 
@@ -192,6 +198,25 @@ namespace Beef.Events
         /// <remarks>This should only be used internally when implementing an <see cref="EventSubscriberHost"/> or <see cref="IAuditWriter"/> for example; otherwise, an unintended side-effect could occur.</remarks>
         public static Result CreatePoisonMismatchResult(string? subject, string? action, string? reason = null, ResultHandling handling = ResultHandling.ContinueWithAudit)
             => new Result { Subject = subject, Action = action, Status = SubscriberStatus.PoisonMismatch, ResultHandling = handling, Reason = reason ?? "EventData does not match the expected poison message and it is uncertain whether it has been successfully processed." };
+
+        /// <summary>
+        /// Creates a <see cref="SubscriberStatus.PoisonMaxAttempts"/> <see cref="Result"/> from an existing <paramref name="result"/>.
+        /// </summary>
+        /// <param name="result">The existing <see cref="Result"/>.</param>
+        /// <param name="attempts">The number of attempts.</param>
+        /// <param name="reason">The optional reason.</param>
+        /// <returns>The <see cref="SubscriberStatus.PoisonMaxAttempts"/> <see cref="Result"/>.</returns>
+        /// <remarks>This should only be used internally when implementing an <see cref="EventSubscriberHost"/> or <see cref="IAuditWriter"/> for example; otherwise, an unintended side-effect could occur.</remarks>
+        public static Result CreatePoisonMaxAttemptsResult(Result result, int attempts, string? reason = null)
+            => new Result
+            {
+                Subject = result.Subject,
+                Action = result.Action,
+                Status = SubscriberStatus.PoisonMaxAttempts,
+                ResultHandling = ResultHandling.ContinueWithAudit,
+                Subscriber = result.Subscriber,
+                Reason = reason ?? $"EventData was identified as Poison and has been configured to automatically SkipMessage after {attempts} attempts; this event is skipped (i.e. not processed)."
+            };
 
         /// <summary>
         /// Checks the <see cref="Result"/> and handles accordingly.
