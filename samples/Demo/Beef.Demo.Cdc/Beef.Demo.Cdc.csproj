@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Generated\" />
+    <Folder Include="Services\Generated\" />
   </ItemGroup>
 
   <ItemGroup>

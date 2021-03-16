@@ -5,6 +5,7 @@ using Beef.Demo.Business.DataSvc;
 using Beef.Entities;
 using Beef.Events;
 using Beef.Events.EventHubs;
+using Beef.Events.ServiceBus;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,10 @@ namespace Beef.Demo.Functions
             var ehasr = new EventHubAzureStorageRepository(config.GetConnectionString("AzureStorage"));
             builder.Services.AddBeefEventHubConsumerHost(
                 EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(ehasr), additional: (_, ehsh) => ehsh.UseInvoker(new EventHubConsumerHostPoisonInvoker(ehasr)));
+
+            var sbasr = new ServiceBusAzureStorageRepository(config.GetConnectionString("AzureStorage"));
+            builder.Services.AddBeefServiceBusReceiverHost(
+                EventSubscriberHostArgs.Create<Startup>().UseAuditWriter(sbasr)); //, additional: (_, ehsh) => ehsh.UseInvoker(new ServiceBusReceiverHostPoisonInvoker(sbasr)));
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = config.GetSection("CosmosDb");

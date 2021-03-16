@@ -44,7 +44,7 @@ Property | Description
 -|-
 **`includeColumns`** | The list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.
 **`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.
-**`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`
+**`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.
 
 <br/>
 
@@ -69,6 +69,8 @@ Property | Description
 `dataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `databaseName` | The .NET database interface name. Defaults to `IDatabase`.
 `eventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
+`includeColumnsOnDelete` | The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.
+**`excludeBackgroundService`** | The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`). Valid options are: `No`, `Yes`.
 
 <br/>
 

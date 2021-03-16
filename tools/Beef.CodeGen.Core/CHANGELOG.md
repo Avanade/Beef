@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.20
+- *Enhancement:* Added `CdcConfig.IncludeColumnsOnDelete` to enable a list of `Column` names to be specified that should be included (in addition to the primary key) for a logical delete. Otherwise, the .NET property values will be cleared within the `CdcDataOrchestrator` as the data is technically non-existing.
+- *Enhancement:* Added `ExcludeBackgroundService` to exclude the generation of the `XxxBackgroundService.cs` class.
+
 ## v4.1.19
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 - *Enhancement:* Add `Property.PartitionKey` to select one or more properties to be included as the `IPartitionKey.PartitionKey` for a generated entity.

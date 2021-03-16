@@ -71,7 +71,7 @@ namespace Beef.Demo.Test
                     "DELETE FROM [DemoCdc].[ContactOutbox]" + Environment.NewLine +
                     "DECLARE @Lsn BINARY(10)" + Environment.NewLine +
                     "SET @Lsn = sys.fn_cdc_get_max_lsn()" + Environment.NewLine +
-                    "INSERT INTO [DemoCdc].[ContactOutbox] ([CreatedDate], [ContactMinLsn], [ContactMaxLsn], [AddressMinLsn], [AddressMaxLsn], [IsComplete], [CompletedDate]) VALUES ('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00')";
+                    "INSERT INTO [DemoCdc].[ContactOutbox] ([CreatedDate], [ContactMinLsn], [ContactMaxLsn], [AddressMinLsn], [AddressMaxLsn], [IsComplete], [CompletedDate], [HasDataLoss]) VALUES ('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00', 0)";
 
                 await db.SqlStatement(script).NonQueryAsync().ConfigureAwait(false);
 
@@ -152,6 +152,7 @@ namespace Beef.Demo.Test
                 Assert.IsTrue(cdor2.IsSuccessful);
                 Assert.AreEqual(cdor.Outbox.Id, cdor2.Outbox.Id);
                 Assert.AreEqual(1, cdor2.Result.Count);
+                Assert.IsFalse(cdor2.Outbox.HasDataLoss);
 
                 Assert.IsNull(cdor2.Result[0].Name);
                 Assert.AreEqual(OperationType.Delete, cdor2.Result[0].DatabaseOperationType);
@@ -168,6 +169,7 @@ namespace Beef.Demo.Test
                 Assert.IsFalse(cdor2.IsSuccessful);
                 Assert.NotNull(cdor2.Exception);
                 Assert.IsInstanceOf<BusinessException>(cdor2.Exception);
+                Assert.IsNull(cdor2.Outbox);
 
                 // Try again without worrying about data loss.
                 cdc.ContinueWithDataLoss = true;
@@ -175,6 +177,7 @@ namespace Beef.Demo.Test
                 WriteResult(cdor2);
                 Assert.NotNull(cdor2);
                 Assert.IsTrue(cdor2.IsSuccessful);
+                Assert.IsTrue(cdor2.Outbox.HasDataLoss);
 
                 // Let's corrput further by having more than one incomplete outbox.
                 script = $"UPDATE [DemoCdc].[ContactOutbox] SET [IsComplete] = 0";
@@ -204,7 +207,7 @@ namespace Beef.Demo.Test
                     "DELETE FROM [DemoCdc].[ContactOutbox]" + Environment.NewLine +
                     "DECLARE @Lsn BINARY(10)" + Environment.NewLine +
                     "SET @Lsn = sys.fn_cdc_get_max_lsn()" + Environment.NewLine +
-                    "INSERT INTO [DemoCdc].[ContactOutbox] ([CreatedDate], [ContactMinLsn], [ContactMaxLsn], [AddressMinLsn], [AddressMaxLsn], [IsComplete], [CompletedDate]) VALUES('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00')" + Environment.NewLine +
+                    "INSERT INTO [DemoCdc].[ContactOutbox] ([CreatedDate], [ContactMinLsn], [ContactMaxLsn], [AddressMinLsn], [AddressMaxLsn], [IsComplete], [CompletedDate], [HasDataLoss]) VALUES('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00', 0)" + Environment.NewLine +
                     "SELECT TOP 1 * FROM [DemoCdc].[ContactOutbox]";
 
                 var outbox = await db.SqlStatement(script).SelectSingleAsync(DatabaseMapper.CreateAuto<CdcOutbox>()).ConfigureAwait(false);
@@ -227,7 +230,7 @@ namespace Beef.Demo.Test
                 Assert.IsInstanceOf<NotFoundException>(cdor.Exception);
 
                 // Make it incomplete and complete it.
-                script = $"UPDATE [DemoCdc].[ContactOutbox] SET [IsComplete] = 0WHERE [OutboxId] = {outbox.Id}";
+                script = $"UPDATE [DemoCdc].[ContactOutbox] SET [IsComplete] = 0 WHERE [OutboxId] = {outbox.Id}";
                 await db.SqlStatement(script).NonQueryAsync().ConfigureAwait(false);
 
                 cdor = await cdc.CompleteAsync(outbox.Id, new List<CdcTracker>()).ConfigureAwait(false);
@@ -274,7 +277,7 @@ namespace Beef.Demo.Test
                     "DELETE FROM [DemoCdc].[PostsOutbox]" + Environment.NewLine +
                     "DECLARE @Lsn BINARY(10)" + Environment.NewLine +
                     "SET @Lsn = sys.fn_cdc_get_max_lsn()" + Environment.NewLine +
-                    "INSERT INTO [DemoCdc].[PostsOutbox] ([CreatedDate], [PostsMinLsn], [PostsMaxLsn], [CommentsMinLsn], [CommentsMaxLsn], [CommentsTagsMinLsn], [CommentsTagsMaxLsn], [PostsTagsMinLsn], [PostsTagsMaxLsn], [IsComplete], [CompletedDate]) VALUES('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00')" + Environment.NewLine +
+                    "INSERT INTO [DemoCdc].[PostsOutbox] ([CreatedDate], [PostsMinLsn], [PostsMaxLsn], [CommentsMinLsn], [CommentsMaxLsn], [CommentsTagsMinLsn], [CommentsTagsMaxLsn], [PostsTagsMinLsn], [PostsTagsMaxLsn], [IsComplete], [CompletedDate], [HasDataLoss]) VALUES('2021-01-01T00:00:00', @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, @Lsn, 1, '2021-01-01T00:00:00', 0)" + Environment.NewLine +
                     "SELECT TOP 1 * FROM [DemoCdc].[PostsOutbox]";
 
                 await db.SqlStatement(script).NonQueryAsync().ConfigureAwait(false);

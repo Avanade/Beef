@@ -158,6 +158,14 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.")]
         public string? PropertyName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of `Column` names that should be included (in addition to the primary key) for a logical delete.
+        /// </summary>
+        [JsonProperty("includeColumnsOnDelete", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
+           Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
+        public List<string>? IncludeColumnsOnDelete { get; set; }
+
         #endregion
 
         #region ISpecialColumns
@@ -380,14 +388,14 @@ namespace Beef.CodeGen.Config.Database
             {
                 if (c.IsPrimaryKey)
                 {
-                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c };
+                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
-                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c };
+                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
                     var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
                     if (ca != null)
                     {

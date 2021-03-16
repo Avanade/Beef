@@ -82,7 +82,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
-            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
         public List<string>? AliasColumns { get; set; }
 
         #endregion
@@ -164,6 +164,21 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("DotNet", Title = "The event subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names that should be included (in addition to the primary key) for a logical delete.
+        /// </summary>
+        [JsonProperty("includeColumnsOnDelete", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
+           Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
+        public List<string>? IncludeColumnsOnDelete { get; set; }
+
+        /// <summary>
+        /// The option to exclude the generation of the <c>Background Service</c> class (<c>XxxBackgroundService.cs</c>).
+        /// </summary>
+        [JsonProperty("excludeBackgroundService", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeBackgroundService { get; set; }
 
         #endregion
 
@@ -361,6 +376,7 @@ namespace Beef.CodeGen.Config.Database
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
+            ExcludeBackgroundService = DefaultWhereNull(ExcludeBackgroundService, () => NoOption);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
@@ -372,9 +388,12 @@ namespace Beef.CodeGen.Config.Database
                 var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
                 if (c.IsPrimaryKey)
                 {
+                    cc.IncludeColumnOnDelete = true;
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
+                else if (IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!))
+                    cc.IncludeColumnOnDelete = true;
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
@@ -404,7 +423,7 @@ namespace Beef.CodeGen.Config.Database
             // Build up the selected columns list.
             foreach (var c in Columns)
             {
-                var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
+                var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias, IncludeColumnOnDelete = c.IncludeColumnOnDelete };
                 cc.Prepare(Root!, this);
                 SelectedColumns.Add(cc);
             }

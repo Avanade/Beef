@@ -6,26 +6,26 @@ using System;
 namespace Beef.Events.EventHubs
 {
     /// <summary>
-    /// Represents an Event Audit <see cref="TableEntity"/>.
+    /// Represents an Event Hub Audit <see cref="TableEntity"/>.
     /// </summary>
-    public class EventAuditRecord : TableEntity
+    public class EventHubAuditRecord : TableEntity
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventAuditRecord"/> class.
+        /// Initializes a new instance of the <see cref="EventHubAuditRecord"/> class.
         /// </summary>
-        public EventAuditRecord() { }
+        public EventHubAuditRecord() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventAuditRecord"/> class with a specified <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
+        /// Initializes a new instance of the <see cref="EventHubAuditRecord"/> class with a specified <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
         /// </summary>
         /// <param name="partitionKey">The <see cref="TableEntity.PartitionKey"/>.</param>
         /// <param name="rowKey">The <see cref="TableEntity.RowKey"/>.</param>
-        public EventAuditRecord(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
+        public EventHubAuditRecord(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
 
         /// <summary>
         /// Gets or sets the Event Hubs path.
         /// </summary>
-        public string? EventHubPath { get; set; }
+        public string? EventHubName { get; set; }
 
         /// <summary>
         /// Gets or sets the Event Hubs consumer group name.
@@ -46,6 +46,11 @@ namespace Beef.Events.EventHubs
         /// Gets or sets the logical sequence number of the event within the partition stream of the Event Hubs.
         /// </summary>
         public long SequenceNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique event identifier.
+        /// </summary>
+        public Guid? EventId { get; set; }
 
         /// <summary>
         /// Indicates whether to skip the poison message and continue processing the next.

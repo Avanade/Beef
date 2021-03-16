@@ -6,7 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events.ServiceBus\Beef.Events.ServiceBus.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
   </ItemGroup>

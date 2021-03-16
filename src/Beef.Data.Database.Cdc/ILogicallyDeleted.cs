@@ -11,5 +11,10 @@ namespace Beef.Data.Database.Cdc
         /// Indicates whether the entity is logically deleted.
         /// </summary>
         bool IsDeleted { get; }
+
+        /// <summary>
+        /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
+        /// </summary>
+        void ClearWhereDeleted();
     }
 }

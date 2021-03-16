@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Enhancement:* Added new `EventMetadata` class to house the _Beef_ metadata property names.
+
 ## v4.1.5
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 - *Enhancement:* Moved all Event Hubs specific functionality to `Beef.Events.EventHubs`.

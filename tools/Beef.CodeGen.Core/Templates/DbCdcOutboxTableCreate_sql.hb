@@ -13,5 +13,6 @@ CREATE TABLE [{{CdcSchema}}].[{{OutboxTableName}}] (
   [{{pascal Name}}MaxLsn] BINARY(10) NOT NULL,
 {{/each}}
   [IsComplete] BIT NOT NULL,
-  [CompletedDate] DATETIME NULL
+  [CompletedDate] DATETIME NULL,
+  [HasDataLoss] BIT NOT NULL
 );

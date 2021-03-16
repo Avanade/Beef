@@ -3,7 +3,7 @@
 namespace Beef.Events.EventHubs
 {
     /// <summary>
-    /// The publisher (<see cref="EventHubProducer"/>) invoker. 
+    /// The producer (<see cref="EventHubProducer"/>) invoker. 
     /// </summary>
     public class EventHubProducerInvoker : InvokerBase<object> { }
 }

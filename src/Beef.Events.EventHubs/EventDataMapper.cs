@@ -9,48 +9,10 @@ using MicrosoftEventHubs = Microsoft.Azure.EventHubs;
 namespace Beef.Events
 {
     /// <summary>
-    /// Provides <see cref="AzureEventHubs.EventData"/> to / from <see cref="EventData"/> mapping (as extension methods). <b>Beef</b> automatically adds the following <see cref="AzureEventHubs.EventData.Properties"/>
-    /// to an <see cref="AzureEventHubs.EventData"/> for usage: <see cref="EventData.Subject"/> (named <see cref="SubjectPropertyName"/>), <see cref="EventData.Action"/> (named
-    /// <see cref="ActionPropertyName"/>), <see cref="EventData.EventId"/> (named <see cref="EventIdPropertyName"/>) and <see cref="EventData.TenantId"/> 
-    /// (named <see cref="TenantIdPropertyName"/>).
+    /// Provides <see cref="AzureEventHubs.EventData"/> to / from <see cref="EventData"/> mapping (as extension methods). <b>Beef</b> automatically adds automatically adds the <see cref="EventMetadata"/> properties.
     /// </summary>
     public static class EventDataMapper
     {
-        /// <summary>
-        /// Gets or sets the <b>EventId</b> property name.
-        /// </summary>
-        public static string EventIdPropertyName { get; set; } = "Beef.EventId";
-
-        /// <summary>
-        /// Gets or sets the <b>Subject</b> property name.
-        /// </summary>
-        public static string SubjectPropertyName { get; set; } = "Beef.Subject";
-
-        /// <summary>
-        /// Gets or sets the <b>Action</b> property name.
-        /// </summary>
-        public static string ActionPropertyName { get; set; } = "Beef.Action";
-
-        /// <summary>
-        /// Gets or sets the <b>TenantId</b> property name.
-        /// </summary>
-        public static string TenantIdPropertyName { get; set; } = "Beef.TenantId";
-
-        /// <summary>
-        /// Gets or sets the <b>Key</b> property name.
-        /// </summary>
-        public static string KeyPropertyName { get; set; } = "Beef.Key";
-
-        /// <summary>
-        /// Gets or sets the <b>CorrelationId</b> property name.
-        /// </summary>
-        public static string CorrelationIdPropertyName { get; set; } = "Beef.CorrelationId";
-
-        /// <summary>
-        /// Gets or sets the <b>PartitionKey</b> property name.
-        /// </summary>
-        public static string PartitionKeyPropertyName { get; set; } = "Beef.PartitionKey";
-
         /// <summary>
         /// Converts the <see cref="AzureEventHubs.EventData"/> instance to the corresponding <see cref="EventData"/>.
         /// </summary>
@@ -102,7 +64,7 @@ namespace Beef.Events
         /// </summary>
         private static EventData OverrideKey(EventData ed, AzureEventHubs.EventData eh)
         {
-            if (eh.Properties.TryGetValue(KeyPropertyName, out var key))
+            if (eh.Properties.TryGetValue(EventMetadata.KeyPropertyName, out var key))
                 ed.Key = key;
 
             return ed;
@@ -159,7 +121,7 @@ namespace Beef.Events
         /// </summary>
         private static EventData OverrideKey(EventData ed, MicrosoftEventHubs.EventData eh)
         {
-            if (eh.Properties.TryGetValue(KeyPropertyName, out var key))
+            if (eh.Properties.TryGetValue(EventMetadata.KeyPropertyName, out var key))
                 ed.Key = key;
 
             return ed;
@@ -182,13 +144,13 @@ namespace Beef.Events
             var bytes = Encoding.UTF8.GetBytes(json);
             var ed = new MicrosoftEventHubs.EventData(bytes);
 
-            ed.Properties.Add(EventIdPropertyName, eventData.EventId);
-            ed.Properties.Add(SubjectPropertyName, eventData.Subject);
-            ed.Properties.Add(ActionPropertyName, eventData.Action);
-            ed.Properties.Add(TenantIdPropertyName, eventData.TenantId);
-            ed.Properties.Add(KeyPropertyName, eventData.Key);
-            ed.Properties.Add(CorrelationIdPropertyName, eventData.CorrelationId);
-            ed.Properties.Add(PartitionKeyPropertyName, eventData.PartitionKey);
+            ed.Properties.Add(EventMetadata.EventIdPropertyName, eventData.EventId);
+            ed.Properties.Add(EventMetadata.SubjectPropertyName, eventData.Subject);
+            ed.Properties.Add(EventMetadata.ActionPropertyName, eventData.Action);
+            ed.Properties.Add(EventMetadata.TenantIdPropertyName, eventData.TenantId);
+            ed.Properties.Add(EventMetadata.KeyPropertyName, eventData.Key);
+            ed.Properties.Add(EventMetadata.CorrelationIdPropertyName, eventData.CorrelationId);
+            ed.Properties.Add(EventMetadata.PartitionKeyPropertyName, eventData.PartitionKey);
 
             return ed;
         }
@@ -210,13 +172,13 @@ namespace Beef.Events
             var bytes = Encoding.UTF8.GetBytes(json);
             var ed = new AzureEventHubs.EventData(bytes);
 
-            ed.Properties.Add(EventIdPropertyName, eventData.EventId);
-            ed.Properties.Add(SubjectPropertyName, eventData.Subject);
-            ed.Properties.Add(ActionPropertyName, eventData.Action);
-            ed.Properties.Add(TenantIdPropertyName, eventData.TenantId);
-            ed.Properties.Add(KeyPropertyName, eventData.Key);
-            ed.Properties.Add(CorrelationIdPropertyName, eventData.CorrelationId);
-            ed.Properties.Add(PartitionKeyPropertyName, eventData.PartitionKey);
+            ed.Properties.Add(EventMetadata.EventIdPropertyName, eventData.EventId);
+            ed.Properties.Add(EventMetadata.SubjectPropertyName, eventData.Subject);
+            ed.Properties.Add(EventMetadata.ActionPropertyName, eventData.Action);
+            ed.Properties.Add(EventMetadata.TenantIdPropertyName, eventData.TenantId);
+            ed.Properties.Add(EventMetadata.KeyPropertyName, eventData.Key);
+            ed.Properties.Add(EventMetadata.CorrelationIdPropertyName, eventData.CorrelationId);
+            ed.Properties.Add(EventMetadata.PartitionKeyPropertyName, eventData.PartitionKey);
 
             return ed;
         }
@@ -225,19 +187,20 @@ namespace Beef.Events
         /// Gets the <i>Beef</i>-related metadata from the <see cref="AzureEventHubs.EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="AzureEventHubs.EventData"/>.</param>
-        /// <returns>The values of the following properties: <see cref="SubjectPropertyName"/>, <see cref="ActionPropertyName"/> and <see cref="TenantIdPropertyName"/>.</returns>
+        /// <returns>The values of the following properties: <see cref="EventMetadata.EventIdPropertyName"/>, <see cref="EventMetadata.SubjectPropertyName"/>, <see cref="EventMetadata.ActionPropertyName"/>,
+        /// <see cref="EventMetadata.TenantIdPropertyName"/>, <see cref="EventMetadata.CorrelationIdPropertyName"/>, and <see cref="EventMetadata.PartitionKeyPropertyName"/>.</returns>
         public static (Guid? EventId, string? Subject, string? Action, Guid? TenantId, string? CorrelationId, string? PartitionKey) GetBeefMetadata(this AzureEventHubs.EventData eventData)
         {
             if (eventData == null)
                 throw new ArgumentNullException(nameof(eventData));
 
-            eventData.Properties.TryGetValue(SubjectPropertyName, out var subject);
-            eventData.Properties.TryGetValue(ActionPropertyName, out var action);
+            eventData.Properties.TryGetValue(EventMetadata.SubjectPropertyName, out var subject);
+            eventData.Properties.TryGetValue(EventMetadata.ActionPropertyName, out var action);
 
-            var eventId = (eventData.Properties.TryGetValue(EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
-            var tenantId = (eventData.Properties.TryGetValue(TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
-            eventData.Properties.TryGetValue(CorrelationIdPropertyName, out var correlationId);
-            eventData.Properties.TryGetValue(PartitionKeyPropertyName, out var partitionKey);
+            var eventId = (eventData.Properties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
+            var tenantId = (eventData.Properties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
+            eventData.Properties.TryGetValue(EventMetadata.CorrelationIdPropertyName, out var correlationId);
+            eventData.Properties.TryGetValue(EventMetadata.PartitionKeyPropertyName, out var partitionKey);
 
             return (eventId, (string?)subject, (string?)action, tenantId, (string?)correlationId, (string?)partitionKey);
         }
@@ -246,19 +209,20 @@ namespace Beef.Events
         /// Gets the <i>Beef</i>-related metadata from the <see cref="MicrosoftEventHubs.EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="MicrosoftEventHubs.EventData"/>.</param>
-        /// <returns>The values of the following properties: <see cref="SubjectPropertyName"/>, <see cref="ActionPropertyName"/> and <see cref="TenantIdPropertyName"/>.</returns>
+        /// <returns>The values of the following properties: <see cref="EventMetadata.EventIdPropertyName"/>, <see cref="EventMetadata.SubjectPropertyName"/>, <see cref="EventMetadata.ActionPropertyName"/>,
+        /// <see cref="EventMetadata.TenantIdPropertyName"/>, <see cref="EventMetadata.CorrelationIdPropertyName"/>, and <see cref="EventMetadata.PartitionKeyPropertyName"/>.</returns>
         public static (Guid? EventId, string? Subject, string? Action, Guid? TenantId, string? CorrelationId, string? PartitionKey) GetBeefMetadata(this MicrosoftEventHubs.EventData eventData)
         {
             if (eventData == null)
                 throw new ArgumentNullException(nameof(eventData));
 
-            eventData.Properties.TryGetValue(SubjectPropertyName, out var subject);
-            eventData.Properties.TryGetValue(ActionPropertyName, out var action);
+            eventData.Properties.TryGetValue(EventMetadata.SubjectPropertyName, out var subject);
+            eventData.Properties.TryGetValue(EventMetadata.ActionPropertyName, out var action);
 
-            var eventId = (eventData.Properties.TryGetValue(EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
-            var tenantId = (eventData.Properties.TryGetValue(TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
-            eventData.Properties.TryGetValue(CorrelationIdPropertyName, out var correlationId);
-            eventData.Properties.TryGetValue(PartitionKeyPropertyName, out var partitionKey);
+            var eventId = (eventData.Properties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
+            var tenantId = (eventData.Properties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
+            eventData.Properties.TryGetValue(EventMetadata.CorrelationIdPropertyName, out var correlationId);
+            eventData.Properties.TryGetValue(EventMetadata.PartitionKeyPropertyName, out var partitionKey);
 
             return (eventId, (string?)subject, (string?)action, tenantId, (string?)correlationId, (string?)partitionKey);
         }

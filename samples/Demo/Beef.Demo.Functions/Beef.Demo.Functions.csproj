@@ -12,14 +12,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="4.3.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.25" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events.ServiceBus\Beef.Events.ServiceBus.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />

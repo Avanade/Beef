@@ -78,9 +78,9 @@ namespace Beef.Events.EventHubs
         }
 
         /// <summary>
-        /// Writes the <see cref="EventAuditRecord"/> to the audit repository.
+        /// Writes the <see cref="EventHubAuditRecord"/> to the audit repository.
         /// </summary>
-        private async Task WriteAuditAsync(EventAuditRecord audit, Result? overrideResult, int? overrideAttempt)
+        private async Task WriteAuditAsync(EventHubAuditRecord audit, Result? overrideResult, int? overrideAttempt)
         {
             var prevRowKey = audit.RowKey;
             OverrideEventAuditRecordResult(audit, overrideResult, overrideAttempt);
@@ -112,7 +112,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Override result where specified.
         /// </summary>
-        private static void OverrideEventAuditRecordResult(EventAuditRecord audit, Result? overrideResult, int? overrideAttempt)
+        private static void OverrideEventAuditRecordResult(EventHubAuditRecord audit, Result? overrideResult, int? overrideAttempt)
         {
             if (overrideResult != null)
             {
@@ -133,18 +133,21 @@ namespace Beef.Events.EventHubs
         }
 
         /// <summary>
-        /// Create (instantiate) the <see cref="EventAuditRecord"/>.
+        /// Create (instantiate) the <see cref="EventHubAuditRecord"/>.
         /// </summary>
-        private static EventAuditRecord CreateEventAuditRecord(EventHubData @event, Result result)
+        private static EventHubAuditRecord CreateEventAuditRecord(EventHubData @event, Result result)
         {
-            return new EventAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionId)
+            var metadata = EventDataMapper.GetBeefMetadata(@event.Event);
+
+            return new EventHubAuditRecord(CreatePartitionKey(@event ?? throw new ArgumentNullException(nameof(@event))), @event.PartitionId)
             {
-                EventHubPath = @event.EventHubName,
+                EventHubName = @event.EventHubName,
                 ConsumerGroupName = @event.ConsumerGroupName,
                 PartitionId = @event.PartitionId,
                 Offset = @event.Event.SystemProperties.Offset,
                 SequenceNumber = @event.Event.SystemProperties.SequenceNumber,
                 EnqueuedTimeUtc = @event.Event.SystemProperties.EnqueuedTimeUtc,
+                EventId = metadata.EventId,
                 Attempts = @event.Attempt <= 0 ? 1 : @event.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
@@ -204,12 +207,12 @@ namespace Beef.Events.EventHubs
         }
 
         /// <summary>
-        /// Gets the poisoned <see cref="EventAuditRecord"/>.
+        /// Gets the poisoned <see cref="EventHubAuditRecord"/>.
         /// </summary>
-        private static async Task<EventAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubData @event)
+        private static async Task<EventHubAuditRecord> GetPoisonedAsync(CloudTable poisonTable, EventHubData @event)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventAuditRecord>(CreatePartitionKey(@event), @event.PartitionId)).ConfigureAwait(false);
-            return (EventAuditRecord)r.Result;
+            var r = await poisonTable.ExecuteAsync(TableOperation.Retrieve<EventHubAuditRecord>(CreatePartitionKey(@event), @event.PartitionId)).ConfigureAwait(false);
+            return (EventHubAuditRecord)r.Result;
         }
 
         /// <summary>
@@ -229,11 +232,11 @@ namespace Beef.Events.EventHubs
         }
 
         /// <summary>
-        /// Remove the poisoned <see cref="EventAuditRecord"/>.
+        /// Remove the poisoned <see cref="EventHubAuditRecord"/>.
         /// </summary>
-        private static async Task RemovePoisonedAsync(CloudTable poisonTable, EventAuditRecord ea)
+        private static async Task RemovePoisonedAsync(CloudTable poisonTable, EventHubAuditRecord ea)
         {
-            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventAuditRecord(ea.PartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
+            var r = await poisonTable.ExecuteAsync(TableOperation.Delete(new EventHubAuditRecord(ea.PartitionKey, ea.RowKey) { ETag = "*" })).ConfigureAwait(false);
             _ = r.Result;
         }
 
@@ -315,7 +318,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Gets (creates) the <b>Audit</b> <see cref="CloudTable"/> (table name is <see cref="AuditTableName"/>).
         /// </summary>
-        /// <returns>The <see cref="EventAuditRecord"/> <see cref="CloudTable"/>.</returns>
+        /// <returns>The <see cref="EventHubAuditRecord"/> <see cref="CloudTable"/>.</returns>
         public async Task<CloudTable> GetAuditMessageTableAsync()
         {
             if (_auditTable != null)
@@ -331,7 +334,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Gets (creates) the <b>Poison</b> <see cref="CloudTable"/> (table name is <see cref="PoisonTableName"/>).
         /// </summary>
-        /// <returns>The <see cref="EventAuditRecord"/> <see cref="CloudTable"/>.</returns>
+        /// <returns>The <see cref="EventHubAuditRecord"/> <see cref="CloudTable"/>.</returns>
         public async Task<CloudTable> GetPoisonMessageTableAsync()
         {
             if (_poisonTable != null)

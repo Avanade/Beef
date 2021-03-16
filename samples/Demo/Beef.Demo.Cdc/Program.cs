@@ -62,7 +62,6 @@ namespace Beef.Demo.Cdc
                     services.AddCdcHostedService<PostsCdcBackgroundService>(hostContext.Configuration);
                     services.AddCdcHostedService<ContactCdcBackgroundService>(hostContext.Configuration);
                     services.AddCdcHostedService<PersonCdcBackgroundService>(hostContext.Configuration);
-                    services.AddCdcHostedService<Person2CdcBackgroundService>(hostContext.Configuration);
                 });
     }
 }

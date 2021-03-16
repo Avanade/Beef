@@ -10,5 +10,6 @@ CREATE TABLE [DemoCdc].[ContactOutbox] (
   [AddressMinLsn] BINARY(10) NOT NULL,  -- Related table: Legacy.Address
   [AddressMaxLsn] BINARY(10) NOT NULL,
   [IsComplete] BIT NOT NULL,
-  [CompletedDate] DATETIME NULL
+  [CompletedDate] DATETIME NULL,
+  [HasDataLoss] BIT NOT NULL
 );

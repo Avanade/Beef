@@ -68,7 +68,10 @@ BEGIN
     END
 
     -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
-    IF (@PersonMinLsn < @PersonBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @PersonMinLsn = @PersonBaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Demo.Person''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
+    DECLARE @hasDataLoss BIT
+    SET @hasDataLoss = 0
+
+    IF (@PersonMinLsn < @PersonBaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @hasDataLoss = 1; SET @PersonMinLsn = @PersonBaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Demo.Person''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
 
     -- Find changes on the root table: Demo.Person - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
@@ -92,7 +95,7 @@ BEGIN
     END
 
     -- Create a new outbox where not processing an existing.
-    IF (@OutboxId IS NULL AND @hasChanges = 1)
+    IF (@OutboxId IS NULL AND (@hasDataLoss = 1 OR @hasChanges = 1))
     BEGIN
       DECLARE @InsertedOutboxId TABLE([OutboxId] INT)
 
@@ -100,21 +103,32 @@ BEGIN
           [PersonMinLsn],
           [PersonMaxLsn],
           [CreatedDate],
-          [IsComplete]
+          [IsComplete],
+          [HasDataLoss]
         ) 
         OUTPUT inserted.OutboxId INTO @InsertedOutboxId
         VALUES (
           @PersonMinLsn,
           @PersonMaxLsn,
           GETUTCDATE(),
-          0
+          0,
+          @hasDataLoss
         )
 
         SELECT @OutboxId = [OutboxId] FROM @InsertedOutboxId
     END
+    ELSE
+    BEGIN
+      IF (@OutboxId IS NOT NULL AND @hasDataLoss = 1)
+      BEGIN
+        UPDATE [DemoCdc].[PersonOutbox] 
+          SET [HasDataLoss] = @hasDataLoss
+          WHERE [OutboxId] = @OutboxId
+      END
+    END
 
     -- Return the *latest* outbox data.
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outBox].[HasDataLoss]
       FROM [DemoCdc].[PersonOutbox] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId 
 

@@ -39,7 +39,7 @@ namespace Beef.Events.EventHubs
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            // Update the EventHubSubscriberHost ILogger instance where applicable.
+            // Update the EventHubConsumerHost ILogger instance where applicable.
             if (caller is EventHubConsumerHost ehsh && ehsh is IUseLogger ul)
                 ul.UseLogger(ehsh.Logger);
 

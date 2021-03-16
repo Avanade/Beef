@@ -51,9 +51,9 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             return new EventHubData("testhub", "$Default", "0", e);
         }
 
-        public static async Task<List<EventAuditRecord>> GetAuditRecords(CloudTable ct)
+        public static async Task<List<EventHubAuditRecord>> GetAuditRecords(CloudTable ct)
         {
-            var r = await ct.ExecuteQuerySegmentedAsync(new TableQuery<EventAuditRecord>(), null).ConfigureAwait(false);
+            var r = await ct.ExecuteQuerySegmentedAsync(new TableQuery<EventHubAuditRecord>(), null).ConfigureAwait(false);
             return r.Results;
         }
 

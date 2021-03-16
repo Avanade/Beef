@@ -215,6 +215,11 @@ namespace Beef.CodeGen.Config.Database
         public string? UdtSql { get; private set; }
 
         /// <summary>
+        /// Indicates whether the column should be included on a delete.
+        /// </summary>
+        public bool IncludeColumnOnDelete { get; set; }
+
+        /// <summary>
         /// Gets the where equality clause.
         /// </summary>
         public string WhereEquals => Name == Parent?.ColumnIsDeleted?.Name ? $"({QualifiedName} IS NULL OR {QualifiedName} = 0)" : $"{QualifiedName} = {ParameterName}";
