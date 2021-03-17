@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Poison
@@ -7,7 +8,9 @@ namespace Beef.Events.Poison
     /// <summary>
     /// Enables the <b>storage repository</b>.
     /// </summary>
-    public interface IStorageRepository<TData> where TData : class
+    /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
+
+    public interface IStorageRepository<TData> : IAuditWriter<TData> where TData : class
     {
         /// <summary>
         /// Checks whether the event is considered poison.

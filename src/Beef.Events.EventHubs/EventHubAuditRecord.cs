@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Events.Poison;
 using Microsoft.Azure.Cosmos.Table;
 using System;
 
@@ -8,7 +9,7 @@ namespace Beef.Events.EventHubs
     /// <summary>
     /// Represents an Event Hub Audit <see cref="TableEntity"/>.
     /// </summary>
-    public class EventHubAuditRecord : TableEntity
+    public class EventHubAuditRecord : TableEntity, IAuditRecord
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubAuditRecord"/> class.

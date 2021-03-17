@@ -11,31 +11,31 @@ namespace Beef.Events
     public interface IAuditWriter
     {
         /// <summary>
-        /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> to the audit repository.
+        /// Writes the event <paramref name="data"/> <paramref name="result"/> to the audit repository.
         /// </summary>
-        /// <param name="originatingEvent">The originating event.</param>
+        /// <param name="data">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        Task WriteAuditAsync(object originatingEvent, Result result);
+        Task WriteAuditAsync(object data, Result result);
     }
 
     /// <summary>
-    /// Enables the writing (persistence) of a <see cref="Result"/> audit record where the event is of <see cref="Type"/> <typeparamref name="TEvent"/>.
+    /// Enables the writing (persistence) of a <see cref="Result"/> audit record where the event data is of <see cref="Type"/> <typeparamref name="TData"/>.
     /// </summary>
-    /// <typeparam name="TEvent">The event <see cref="Type"/>.</typeparam>
-    public interface IAuditWriter<TEvent> : IAuditWriter where TEvent : class
+    /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
+    public interface IAuditWriter<TData> : IAuditWriter where TData : class
     {
         /// <summary>
-        /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> to the audit repository.
+        /// Writes the event <paramref name="data"/> <paramref name="result"/> to the audit repository.
         /// </summary>
-        /// <param name="originatingEvent">The originating event.</param>
+        /// <param name="data">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        Task IAuditWriter.WriteAuditAsync(object originatingEvent, Result result) => WriteAuditAsync((TEvent)originatingEvent, result);
+        Task IAuditWriter.WriteAuditAsync(object data, Result result) => WriteAuditAsync((TData)data, result);
 
         /// <summary>
         /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> to the audit repository.
         /// </summary>
-        /// <param name="originatingEvent">The originating event.</param>
+        /// <param name="originatingEvent">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        Task WriteAuditAsync(TEvent originatingEvent, Result result);
+        Task WriteAuditAsync(TData originatingEvent, Result result);
     }
 }
