@@ -3,8 +3,8 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "EventHubName": "testhub",
-        "EventHubConnectionString": "secret",
-        "ServiceBusConnectionString": "secret",
+        "EventHubConnectionString": "uses envvar: Beef_EventHubConnectionString",
+        "ServiceBusConnectionString": "uses envvar: Beef_ServiceBusConnectionString",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet"
     }
 }

@@ -48,9 +48,9 @@ namespace Beef.Events
         /// <param name="originatingEvent">The originating event.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>This provides a reusable/standardized approach to the logging.</remarks>
-#pragma warning disable IDE0060, CA1801 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
+#pragma warning disable IDE0060 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
         public static Task WriteFormattedAuditAsync(ILogger logger, object originatingEvent, Result result)
-#pragma warning restore IDE0060, CA1801
+#pragma warning restore IDE0060
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));

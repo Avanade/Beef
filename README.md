@@ -143,6 +143,8 @@ Assembly | Description | NuGet | Changes
 [`Beef.Data.Cosmos`](./src/Beef.Data.Cosmos) | Cosmos DB execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Cosmos.svg)](https://badge.fury.io/nu/Beef.Data.Cosmos) | [Log](./src/Beef.Data.Cosmos/CHANGELOG.md)
 [`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData) | [Log](./src/Beef.Data.OData/CHANGELOG.md)
 [`Beef.Events`](./src/Beef.Events) | Supporting Event-driven framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.svg)](https://badge.fury.io/nu/Beef.Events) | [Log](./src/Beef.Events/CHANGELOG.md)
+[`Beef.Events.EventHubs`](./src/Beef.Events.EventHubs) | Supporting Event-driven framework using Azure Event Hubs. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.EventHubs.svg)](https://badge.fury.io/nu/Beef.Events.EventHubs) | [Log](./src/Beef.Events.EventHubs/CHANGELOG.md)
+[`Beef.Events.ServiceBus`](./src/Beef.Events.ServiceBus) | Supporting Event-driven framework using Azure Service Bus. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.ServiceBus.svg)](https://badge.fury.io/nu/Beef.Events.ServiceBus) | [Log](./src/Beef.Events.ServiceBus/CHANGELOG.md)
 
 The tooling / supporting capabilities for _Beef_ are enabled by the following assemblies:
 

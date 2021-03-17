@@ -3,19 +3,18 @@
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Beef.Events.Poison
+namespace Beef.Events.Repository
 {
     /// <summary>
-    /// Enables the <see cref="CloudTable"/> storage repository standardized capabilities.
+    /// Enables the <see cref="CloudTable"/> storage repository base capabilities.
     /// </summary>
     /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
     /// <typeparam name="TAudit">The audit record <see cref="Type"/>.</typeparam>
+    /// <remarks>Also provides the underlying <see cref="IAuditWriter"/> capability to audit directly to the <see cref="CloudTable"/> storage repository.</remarks>
     public abstract class AzureStorageRepository<TData, TAudit> : IStorageRepository<TData>, IUseLogger where TData : class where TAudit : TableEntity, IAuditRecord, new()
     {
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -63,7 +62,7 @@ namespace Beef.Events.Poison
         /// Gets (creates on first access) the <b>Audit</b> <see cref="CloudTable"/> (table name is <see cref="AuditTableName"/>).
         /// </summary>
         /// <returns>The <see cref="AuditTableName"/> <see cref="CloudTable"/>.</returns>
-        protected async Task<CloudTable> GetAuditMessageTableAsync()
+        public async Task<CloudTable> GetAuditMessageTableAsync()
         {
             if (_auditTable != null)
                 return _auditTable;
@@ -87,7 +86,7 @@ namespace Beef.Events.Poison
         /// Gets (creates on first access) the <b>Poison</b> <see cref="CloudTable"/> (table name is <see cref="PoisonTableName"/>).
         /// </summary>
         /// <returns>The <see cref="PoisonTableName"/> <see cref="CloudTable"/>.</returns>
-        protected async Task<CloudTable> GetPoisonMessageTableAsync()
+        public async Task<CloudTable> GetPoisonMessageTableAsync()
         {
             if (_poisonTable != null)
                 return _poisonTable;
@@ -244,9 +243,9 @@ namespace Beef.Events.Poison
 
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
-            var ear = await GetPoisonedAsync(pt, data).ConfigureAwait(false);
-            if (ear != null)
-                await RemovePoisonedAsync(pt, ear).ConfigureAwait(false);
+            var pa = await GetPoisonedAsync(pt, data).ConfigureAwait(false);
+            if (pa != null)
+                await RemovePoisonedAsync(pt, pa).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -256,7 +255,7 @@ namespace Beef.Events.Poison
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <param name="maxAttempts">The maximum number of attempts; a <c>null</c> or any non-positive number indicates infinite.</param>
         /// <returns>The resulting <see cref="UnhandledExceptionHandling"/>.</returns>
-        public async Task<UnhandledExceptionHandling> MarkAsPoisonedAsync(TData data, Result result, int? maxAttempts)
+        public async Task<UnhandledExceptionHandling> MarkAsPoisonedAsync(TData data, Result result, int? maxAttempts = null)
         {
             // Get the poison message table.
             var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);
@@ -264,32 +263,34 @@ namespace Beef.Events.Poison
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, data ?? throw new ArgumentNullException(nameof(data))).ConfigureAwait(false);
-                if (ear == null)
-                    ear = CreateAuditRecord(Check.NotNull(data, nameof(data)), Check.NotNull(result, nameof(result)));
+                var pa = await GetPoisonedAsync(pt, data ?? throw new ArgumentNullException(nameof(data))).ConfigureAwait(false);
+                if (pa == null)
+                    pa = CreateAuditRecord(Check.NotNull(data, nameof(data)), Check.NotNull(result, nameof(result)));
                 else
-                    OverrideEventAuditRecordResult(ear, result, ++ear.Attempts);
+                    OverrideEventAuditRecordResult(pa, result, ++pa.Attempts);
 
-                if (ear.PoisonedTimeUtc == null)
-                    ear.PoisonedTimeUtc = DateTime.UtcNow;
+                if (pa.PoisonedTimeUtc == null)
+                    pa.PoisonedTimeUtc = DateTime.UtcNow;
 
                 // Make sure maximum attempts not exceeded where specified.
                 var max = result.Subscriber?.MaxAttempts;
                 if (!max.HasValue || max <= 0)
                     max = maxAttempts;
 
-                if (max.HasValue && max > 0 && ear.Attempts >= max)
+                if (max.HasValue && max > 0 && pa.Attempts >= max)
                 {
-                    var nr = EventSubscriberHost.CreatePoisonMaxAttemptsResult(result, ear.Attempts);
-                    OverrideEventAuditRecordResult(ear, nr, null);
-                    await WriteAuditAsync(ear, null, null).ConfigureAwait(false);
-                    await RemovePoisonedAsync(pt, ear).ConfigureAwait(false);
+                    var nr = EventSubscriberHost.CreatePoisonMaxAttemptsResult(result, pa.Attempts);
+                    OverrideEventAuditRecordResult(pa, nr, null);
+                    pa.SkippedTimeUtc = DateTime.UtcNow;
+
+                    await WriteAuditAsync(pa, null, null).ConfigureAwait(false);
+                    await RemovePoisonedAsync(pt, pa).ConfigureAwait(false);
                     await LoggerAuditWriter.WriteFormattedAuditAsync(Logger, data, nr).ConfigureAwait(false);
                     return UnhandledExceptionHandling.Continue;
                 }
 
                 // Create/update the poisoned message.
-                var r = await pt.ExecuteAsync(TableOperation.InsertOrReplace(ear)).ConfigureAwait(false);
+                var r = await pt.ExecuteAsync(TableOperation.InsertOrReplace(pa)).ConfigureAwait(false);
                 switch ((HttpStatusCode)r.HttpStatusCode)
                 {
                     case HttpStatusCode.PreconditionFailed:
@@ -318,13 +319,13 @@ namespace Beef.Events.Poison
             while (true)
             {
                 // Get the current poison event (if there is one).
-                var ear = await GetPoisonedAsync(pt, data ?? throw new ArgumentNullException(nameof(data))).ConfigureAwait(false);
-                if (ear == null || ear.SkipProcessing)
+                var pa = await GetPoisonedAsync(pt, data ?? throw new ArgumentNullException(nameof(data))).ConfigureAwait(false);
+                if (pa == null || pa.SkipProcessing)
                     return;
 
-                ear.SkipProcessing = true;
+                pa.SkipProcessing = true;
 
-                var r = await pt.ExecuteAsync(TableOperation.Replace(ear)).ConfigureAwait(false);
+                var r = await pt.ExecuteAsync(TableOperation.Replace(pa)).ConfigureAwait(false);
                 switch ((HttpStatusCode)r.HttpStatusCode)
                 {
                     case HttpStatusCode.PreconditionFailed:
@@ -365,7 +366,7 @@ namespace Beef.Events.Poison
         {
             if (overrideResult != null)
             {
-                if (overrideResult.Status == SubscriberStatus.PoisonSkipped || overrideResult.Status == SubscriberStatus.PoisonMismatch)
+                if (overrideResult.Status == SubscriberStatus.PoisonSkipped || overrideResult.Status == SubscriberStatus.PoisonMismatch || overrideResult.Status == SubscriberStatus.PoisonMaxAttempts)
                 {
                     audit.OriginatingReason = audit.Reason;
                     audit.OriginatingStatus = audit.Status;

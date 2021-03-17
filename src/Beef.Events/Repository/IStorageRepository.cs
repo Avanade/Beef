@@ -3,13 +3,12 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Beef.Events.Poison
+namespace Beef.Events.Repository
 {
     /// <summary>
     /// Enables the <b>storage repository</b>.
     /// </summary>
     /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
-
     public interface IStorageRepository<TData> : IAuditWriter<TData> where TData : class
     {
         /// <summary>

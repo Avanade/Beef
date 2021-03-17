@@ -194,7 +194,62 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
         }
 
         [Test]
-        public async Task A110_PoisonMismatch()
+        public async Task A110_PoisonMaxAttempts()
+        {
+            var cfg = GetConfig();
+            var lgr = TestSetUp.CreateLogger();
+
+            var asr = new EventHubAzureStorageRepository(cfg.GetWebJobsConnectionString(ConnectionStringNames.Storage))
+            {
+                PoisonTableName = cfg.GetValue<string>("EventHubPoisonMessagesTable"),
+                AuditTableName = cfg.GetValue<string>("EventHubAuditMessagesTable")
+            };
+
+            ((IUseLogger)asr).UseLogger(lgr);
+
+            // Make sure there are no AuditRecords to begin with.
+            var pmt = await asr.GetPoisonMessageTableAsync().ConfigureAwait(false);
+            await DeleteAuditRecords(pmt).ConfigureAwait(false);
+
+            var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
+            await DeleteAuditRecords(amt).ConfigureAwait(false);
+
+            var ed = CreateEventData("100", 1);
+
+            // Add events as poison.
+            await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found.")), 3).ConfigureAwait(false);
+            var ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonRetry, ar.Action);
+            Assert.AreEqual(1, ar.Attempts);
+
+            await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found.")), 3).ConfigureAwait(false);
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.PoisonRetry, ar.Action);
+            Assert.AreEqual(2, ar.Attempts);
+
+            await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found.")), 3).ConfigureAwait(false);
+            ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
+            Assert.AreEqual(PoisonMessageAction.NotPoison, ar.Action);
+            Assert.AreEqual(0, ar.Attempts);
+
+            var ear = (await GetAuditRecords(amt).ConfigureAwait(false)).Last();
+            Assert.AreEqual("testhub-$Default", ear.PartitionKey);
+            Assert.IsTrue(ear.RowKey.EndsWith("-0"));
+            Assert.NotNull(ear.Body);
+            Assert.NotNull(ear.PoisonedTimeUtc);
+            Assert.NotNull(ear.SkippedTimeUtc);
+            Assert.AreEqual("PoisonMaxAttempts", ear.Status);
+            Assert.AreEqual("EventData was identified as Poison and has been configured to automatically SkipMessage after 3 attempts; this event is skipped (i.e. not processed).", ear.Reason);
+            Assert.AreEqual("DataNotFound", ear.OriginatingStatus);
+            Assert.AreEqual("Data not found.", ear.OriginatingReason);
+            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(1, ear.SequenceNumber);
+            Assert.AreEqual(false, ear.SkipProcessing);
+            Assert.AreEqual(3, ear.Attempts);
+        }
+
+        [Test]
+        public async Task A120_PoisonMismatch()
         {
             var cfg = GetConfig();
             var lgr = TestSetUp.CreateLogger();

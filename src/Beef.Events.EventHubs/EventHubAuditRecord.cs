@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Events.Poison;
+using Beef.Events.Repository;
 using Microsoft.Azure.Cosmos.Table;
 using System;
 
@@ -56,6 +56,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Indicates whether to skip the poison message and continue processing the next.
         /// </summary>
+        /// <remarks>This value is set manually (outside of the process) to indicate that the messsage is to be skipped at next processing attempt.</remarks>
         public bool SkipProcessing { get; set; }
 
         /// <summary>

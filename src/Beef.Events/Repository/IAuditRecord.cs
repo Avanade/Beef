@@ -2,10 +2,10 @@
 
 using System;
 
-namespace Beef.Events.Poison
+namespace Beef.Events.Repository
 {
     /// <summary>
-    /// Represents the core audit record properties.
+    /// Represents the core audit record properties; used by the likes of the <see cref="AzureStorageRepository{TData, TAudit}"/>.
     /// </summary>
     public interface IAuditRecord
     {
