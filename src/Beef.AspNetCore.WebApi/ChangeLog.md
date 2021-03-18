@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Fixed:* Issue [114](https://github.com/Avanade/Beef/issues/114). 
+
 ## v4.1.5
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

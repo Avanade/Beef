@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Caching;
 using Beef.Entities;
 using Beef.Json;
 using Beef.WebApi;
@@ -1108,6 +1109,12 @@ namespace Beef.AspNetCore.WebApi
                     return (false, value);
                 }
             }
+
+            // Where possible clone the value to differentiate to that which may be cached as a result of the Get; otherwise, remove from cache.
+            if (value is Entities.ICloneable ic)
+                value = (T)ic.Clone();
+            else if (value is IUniqueKey uk)
+                ExecutionContext.GetService<IRequestCache>(throwExceptionOnNull: false)?.Remove<T>(uk.UniqueKey);
 
             return (true, value);
         }
