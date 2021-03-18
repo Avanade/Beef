@@ -17,6 +17,6 @@ namespace Beef.Demo.Functions
         [FunctionName("ServiceBusSubscriber")]
         [ExponentialBackoffRetry(-1, "00:00:05", "00:00:30")] // https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-error-pages?tabs=csharp
         public async Task Run([ServiceBusTrigger("default", Connection = "ServiceBusConnectionString")] Message message, ILogger logger) 
-            => await _subscriber.UseLogger(logger).ReceiveAsync("BeefServiceBus", "default", message);
+            => await _subscriber.UseLogger(logger).ReceiveAsync(new ServiceBusData("BeefServiceBus", "default", message));
     }
 }

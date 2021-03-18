@@ -32,7 +32,7 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="data">The <see cref="ServiceBusData"/>.</param>
         /// <returns>The row key.</returns>
-        public override string CreateRowKey(ServiceBusData data) => data.Message.SystemProperties.SequenceNumber.ToString("000000000000000000#", System.Globalization.CultureInfo.InvariantCulture);
+        public override string CreateRowKey(ServiceBusData data) => data.Originating.SystemProperties.SequenceNumber.ToString("000000000000000000#", System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Creates the <see cref="ServiceBusAuditRecord"/> from the event <paramref name="data"/> <paramref name="result"/>.
@@ -40,25 +40,21 @@ namespace Beef.Events.ServiceBus
         /// <param name="data">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <returns>The audit record.</returns>
-        protected override ServiceBusAuditRecord CreateAuditRecord(ServiceBusData data, Result result)
-        {
-            var (EventId, _, _, _, _, _) = EventDataMapper.GetBeefMetadata(data.Message);
-
-            return new ServiceBusAuditRecord(CreatePartitionKey(data), CreateRowKey(data))
+        protected override ServiceBusAuditRecord CreateAuditRecord(ServiceBusData data, Result result) =>
+            new ServiceBusAuditRecord(CreatePartitionKey(data), CreateRowKey(data))
             {
                 ServiceBusName = data.ServiceBusName,
                 QueueName = data.QueueName,
-                SequenceNumber = data.Message.SystemProperties.SequenceNumber,
-                EnqueuedTimeUtc = data.Message.SystemProperties.EnqueuedTimeUtc,
-                EventId = EventId,
+                SequenceNumber = data.Originating.SystemProperties.SequenceNumber,
+                EnqueuedTimeUtc = data.Originating.SystemProperties.EnqueuedTimeUtc,
+                EventId = data.Metadata.EventId,
                 Attempts = data.Attempt <= 0 ? 1 : data.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
                 Status = result.Status.ToString(),
-                Body = TruncateText(Encoding.UTF8.GetString(data.Message.Body)),
+                Body = TruncateText(Encoding.UTF8.GetString(data.Originating.Body)),
                 Exception = TruncateText(result.Exception?.ToString()),
             };
-        }
     }
 }

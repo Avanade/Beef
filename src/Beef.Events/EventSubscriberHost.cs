@@ -8,6 +8,87 @@ using System.Threading.Tasks;
 namespace Beef.Events
 {
     /// <summary>
+    /// Provides the typed <see cref="EventData"/> subscriber capabilities.
+    /// </summary>
+    /// <typeparam name="TOriginating">The originating event/message <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
+    /// <typeparam name="THost">This <see cref="Type"/> for fluent-style method-chaining support.</typeparam>
+    public abstract class EventSubscriberHost<TOriginating, TData, THost> : EventSubscriberHost
+        where TOriginating : class
+        where TData : EventSubscriberData<TOriginating>
+        where THost : EventSubscriberHost<TOriginating, TData, THost>
+    {
+        private InvokerBase<TData, Result>? _invoker;
+
+        private class EventSubscriberHostInvoker : InvokerBase<TData, Result> { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventSubscriberHost{TOriginating, TData, THost}"/> with the specified <see cref="EventSubscriberHostArgs"/>.
+        /// </summary>
+        /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
+        public EventSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+
+        /// <summary>
+        /// Gets or sets the <see cref="InvokerBase{TData, Result}"/>.
+        /// </summary>
+        /// <remarks>Defaults to an internal invoker where not specified.</remarks>
+        public InvokerBase<TData, Result> Invoker { get => _invoker ??= new EventSubscriberHostInvoker(); set => _invoker = value ?? throw new ArgumentNullException(nameof(value)); }
+
+        /// <summary>
+        /// Use (set) the <see cref="Invoker"/>.
+        /// </summary>
+        /// <param name="invoker">The <see cref="InvokerBase{TData}"/>.</param>
+        /// <returns>This <typeparamref name="THost"/> instance (for fluent-style method chaining).</returns>
+        public THost UseInvoker(InvokerBase<TData, Result> invoker)
+        {
+            Invoker = invoker;
+            return (THost)this;
+        }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.Logger"/>.
+        /// </summary>
+        /// <returns>This <typeparamref name="THost"/> instance (for fluent-style method chaining).</returns>
+        public THost UseLogger(ILogger logger)
+        {
+            Logger = logger;
+            return (THost)this;
+        }
+
+        /// <summary>
+        /// Receives the message and processes.
+        /// </summary>
+        /// <param name="data">The event data.</param>
+        public Task<Result> ReceiveAsync(TData data)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            return Invoker.InvokeAsync(this, async () =>
+            {
+                // Invoke the base EventSubscriberHost.ReceiveAsync to do the actual work!
+                return await ReceiveAsync(data, (subscriber) =>
+                {
+                    // Convert/get the beef event data.
+                    try
+                    {
+                        return GetBeefEventData(data, subscriber);
+                    }
+                    catch (Exception ex) { throw new EventSubscriberUnhandledException(CreateInvalidEventDataResult(ex)); }
+                }).ConfigureAwait(false);
+            }, data);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="EventData"/> from the <paramref name="data"/>.
+        /// </summary>
+        /// <param name="data">The event/message data.</param>
+        /// <param name="subscriber">The <see cref="IEventSubscriber"/> identified to process.</param>
+        /// <returns>The corresponding <see cref="EventData"/>.</returns>
+        protected abstract EventData GetBeefEventData(TData data, IEventSubscriber subscriber);
+    }
+
+    /// <summary>
     /// Provides the base <see cref="EventData"/> subscriber capabilities.
     /// </summary>
     public abstract class EventSubscriberHost
@@ -67,32 +148,30 @@ namespace Beef.Events
         public int? MaxAttempts => Args.MaxAttempts;
 
         /// <summary>
-        /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
+        /// Receives the message and processes when the <see cref="EventMetadata.Subject"/> and <see cref="EventMetadata.Action"/> has been subscribed.
         /// </summary>
-        /// <param name="originatingEvent">The originating (non-converted) event (required to enable <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
+        /// <param name="data">The originating <see cref="IEventSubscriberData"/> (required to enable <see cref="IAuditWriter.WriteAuditAsync(IEventSubscriberData, Result)"/>).</param>
         /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
         /// <returns>The <see cref="Result"/>.</returns>
         /// <remarks>This method also manages the Dependency Injection (DI) scope for each event execution (see <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)"/>).</remarks>
-        protected async Task<Result> ReceiveAsync(object originatingEvent, string? subject, string? action, Func<IEventSubscriber, EventData> getEventData)
+        protected async Task<Result> ReceiveAsync(IEventSubscriberData data, Func<IEventSubscriber, EventData> getEventData)
         {
-            if (originatingEvent == null)
-                throw new ArgumentNullException(nameof(originatingEvent));
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
 
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
 
-            if (string.IsNullOrEmpty(subject))
-                return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(null, "EventData is invalid; Subject is required."), null, null, null).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(data.Metadata.Subject))
+                return await CheckResultAsync(data, CreateInvalidEventDataResult(null, "EventData is invalid; Subject is required."), null).ConfigureAwait(false);
 
             // Manages a Dependency Injection (DI) scope for each event execution.
             using (Args.ServiceProvider.CreateScope())
             {
                 // Match a subscriber to the subject + template supplied.
-                var subscriber = Args.CreateEventSubscriber(Args.SubjectTemplateWildcard, Args.SubjectPathSeparator, subject, action);
+                var subscriber = Args.CreateEventSubscriber(Args.SubjectTemplateWildcard, Args.SubjectPathSeparator, data.Metadata.Subject, data.Metadata.Action);
                 if (subscriber == null)
-                    return await CheckResultAsync(originatingEvent, CreateNotSubscribedResult(), subject, action, null).ConfigureAwait(false);
+                    return await CheckResultAsync(data, CreateNotSubscribedResult(), null).ConfigureAwait(false);
 
                 subscriber.Logger = Logger;
 
@@ -102,12 +181,12 @@ namespace Beef.Events
                 {
                     @event = getEventData(subscriber);
                     if (@event == null)
-                        return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(null, $"EventData is invalid; is required."), subject, action, subscriber).ConfigureAwait(false);
+                        return await CheckResultAsync(data, CreateInvalidEventDataResult(null, $"EventData is invalid; is required."), subscriber).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     // Handle the exception as per the subscriber configuration.
-                    return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(ex), subject, action, subscriber).ConfigureAwait(false);
+                    return await CheckResultAsync(data, CreateInvalidEventDataResult(ex), subscriber).ConfigureAwait(false);
                 }
 
                 try
@@ -125,14 +204,14 @@ namespace Beef.Events
                     ExecutionContext.SetCurrent(ec);
 
                     // Process the event.
-                    return await CheckResultAsync(originatingEvent, await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber).ConfigureAwait(false);
+                    return await CheckResultAsync(data, await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subscriber).ConfigureAwait(false);
                 }
-                catch (InvalidEventDataException iedex) { return await CheckResultAsync(originatingEvent, CreateInvalidEventDataResult(iedex), subject, action, subscriber).ConfigureAwait(false); }
-                catch (ValidationException vex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(vex), subject, action, subscriber).ConfigureAwait(false); }
-                catch (BusinessException bex) { return await CheckResultAsync(originatingEvent, Result.InvalidData(bex), subject, action, subscriber).ConfigureAwait(false); }
-                catch (NotFoundException) { return await CheckResultAsync(originatingEvent, Result.DataNotFound(), subject, action, subscriber).ConfigureAwait(false); }
+                catch (InvalidEventDataException iedex) { return await CheckResultAsync(data, CreateInvalidEventDataResult(iedex), subscriber).ConfigureAwait(false); }
+                catch (ValidationException vex) { return await CheckResultAsync(data, Result.InvalidData(vex), subscriber).ConfigureAwait(false); }
+                catch (BusinessException bex) { return await CheckResultAsync(data, Result.InvalidData(bex), subscriber).ConfigureAwait(false); }
+                catch (NotFoundException) { return await CheckResultAsync(data, Result.DataNotFound(), subscriber).ConfigureAwait(false); }
                 catch (EventSubscriberUnhandledException) { throw; }
-                catch (Exception ex) { return await CheckResultAsync(originatingEvent, CreateUnhandledExceptionResult(ex), subject, action, subscriber).ConfigureAwait(false); }
+                catch (Exception ex) { return await CheckResultAsync(data, CreateUnhandledExceptionResult(ex), subscriber).ConfigureAwait(false); }
             }
         }
 
@@ -221,13 +300,13 @@ namespace Beef.Events
         /// <summary>
         /// Checks the <see cref="Result"/> and handles accordingly.
         /// </summary>
-        private async Task<Result> CheckResultAsync(object originatingEvent, Result result, string? subject, string? action, IEventSubscriber? subscriber = null)
+        private async Task<Result> CheckResultAsync(IEventSubscriberData data, Result result, IEventSubscriber? subscriber = null)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 
-            result.Subject = subject;
-            result.Action = action;
+            result.Subject = data.Metadata.Subject;
+            result.Action = data.Metadata.Action;
             result.Subscriber = subscriber;
 
             switch (result.Status)
@@ -236,27 +315,27 @@ namespace Beef.Events
                     break;
 
                 case SubscriberStatus.InvalidEventData:
-                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? Args.InvalidEventDataHandling).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(data, result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? Args.InvalidEventDataHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.NotSubscribed:
-                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? Args.NotSubscribedHandling).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(data, result, result.ResultHandling ?? Args.NotSubscribedHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.DataNotFound:
-                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? Args.DataNotFoundHandling).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(data, result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? Args.DataNotFoundHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.InvalidData:
-                    await HandleTheHandlingAsync(originatingEvent, result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? Args.InvalidDataHandling).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(data, result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? Args.InvalidDataHandling).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.ExceptionContinue:
-                    await HandleTheHandlingAsync(originatingEvent, result, ResultHandling.ContinueWithAudit).ConfigureAwait(false);
+                    await HandleTheHandlingAsync(data, result, ResultHandling.ContinueWithAudit).ConfigureAwait(false);
                     break;
 
                 case SubscriberStatus.UnhandledException:
-                    await HandleTheHandlingAsync(originatingEvent, result,
+                    await HandleTheHandlingAsync(data, result,
                         subscriber == null || subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.ThrowException ? ResultHandling.ThrowException : ResultHandling.ContinueWithAudit).ConfigureAwait(false);
 
                     break;
@@ -268,7 +347,7 @@ namespace Beef.Events
         /// <summary>
         /// Handle the result as required.
         /// </summary>
-        private async Task HandleTheHandlingAsync(object originatingEvent, Result result, ResultHandling handling)
+        private async Task HandleTheHandlingAsync(IEventSubscriberData data, Result result, ResultHandling handling)
         {
             switch (result.ResultHandling ??= handling)
             {
@@ -277,11 +356,11 @@ namespace Beef.Events
                     break;
 
                 case ResultHandling.ContinueWithAudit:
-                    await AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
+                    await AuditWriter!.WriteAuditAsync(data, result).ConfigureAwait(false);
                     break;
 
                 case ResultHandling.ThrowException:
-                    await AuditWriter!.WriteAuditAsync(originatingEvent, result).ConfigureAwait(false);
+                    await AuditWriter!.WriteAuditAsync(data, result).ConfigureAwait(false);
                     throw new EventSubscriberUnhandledException(result);
 
                 case ResultHandling.ContinueSilent:

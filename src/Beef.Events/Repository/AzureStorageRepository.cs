@@ -15,7 +15,7 @@ namespace Beef.Events.Repository
     /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
     /// <typeparam name="TAudit">The audit record <see cref="Type"/>.</typeparam>
     /// <remarks>Also provides the underlying <see cref="IAuditWriter"/> capability to audit directly to the <see cref="CloudTable"/> storage repository.</remarks>
-    public abstract class AzureStorageRepository<TData, TAudit> : IStorageRepository<TData>, IUseLogger where TData : class where TAudit : TableEntity, IAuditRecord, new()
+    public abstract class AzureStorageRepository<TData, TAudit> : IStorageRepository<TData>, IUseLogger where TData : class, IEventSubscriberData where TAudit : TableEntity, IAuditRecord, new()
     {
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
@@ -131,9 +131,16 @@ namespace Beef.Events.Repository
         /// <summary>
         /// Writes the event <paramref name="data"/> <paramref name="result"/> to the audit repository.
         /// </summary>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
+        /// <param name="result">The subscriber <see cref="Result"/>.</param>
+        Task IAuditWriter.WriteAuditAsync(IEventSubscriberData data, Result result) => WriteAuditAsync((TData)data, result);
+
+        /// <summary>
+        /// Writes the event <paramref name="data"/> <paramref name="result"/> to the audit repository.
+        /// </summary>
         /// <param name="data">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        /// <remarks>A corresponding log message for the <i>audit</i> will be written to the <see cref="ILogger"/> using <see cref="LoggerAuditWriter.WriteFormattedAuditAsync(ILogger, object, Result)"/>.</remarks>
+        /// <remarks>A corresponding log message for the <i>audit</i> will be written to the <see cref="ILogger"/> using <see cref="LoggerAuditWriter.WriteFormattedAuditAsync(ILogger, IEventSubscriberData, Result)"/>.</remarks>
         public async Task WriteAuditAsync(TData data, Result result)
         {
             var audit = CreateAuditRecord(Check.NotNull(data, nameof(data)), Check.NotNull(result, nameof(result)));

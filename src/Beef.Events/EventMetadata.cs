@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
+
 namespace Beef.Events
 {
     /// <summary>
     /// Provides the <i>Beef</i> metadata property names.
     /// </summary>
-    public static class EventMetadata
+    public class EventMetadata
     {
         /// <summary>
         /// Gets or sets the <b>EventId</b> property name.
@@ -41,5 +43,40 @@ namespace Beef.Events
         /// Gets or sets the <b>PartitionKey</b> property name.
         /// </summary>
         public static string PartitionKeyPropertyName { get; set; } = "Beef.PartitionKey";
+
+        /// <summary>
+        /// Gets or sets the unique event identifier.
+        /// </summary>
+        public Guid? EventId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tenant identifier.
+        /// </summary>
+        public Guid? TenantId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event subject (the name should use the '.' character to denote paths).
+        /// </summary>
+        public string? Subject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event action.
+        /// </summary>
+        public string? Action { get; set; }
+
+        /// <summary>
+        /// Gets or sets the entity key (could be single value or an array of values).
+        /// </summary>
+        public object? Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets the correlation identifier.
+        /// </summary>
+        public string? CorrelationId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the partition key.
+        /// </summary>
+        public string? PartitionKey { get; set; }
     }
 }

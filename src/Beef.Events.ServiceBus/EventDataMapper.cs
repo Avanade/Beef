@@ -231,25 +231,29 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Gets the <i>Beef</i>-related metadata from the <see cref="MicrosoftServiceBus.Message"/>.
+        /// Gets the <see cref="EventMetadata"/> from the <see cref="MicrosoftServiceBus.Message"/>.
         /// </summary>
         /// <param name="message">The <see cref="MicrosoftServiceBus.Message"/>.</param>
-        /// <returns>The values of the following properties: <see cref="EventMetadata.EventIdPropertyName"/>, <see cref="EventMetadata.SubjectPropertyName"/>, <see cref="EventMetadata.ActionPropertyName"/>,
-        /// <see cref="EventMetadata.TenantIdPropertyName"/>, <see cref="EventMetadata.CorrelationIdPropertyName"/>, and <see cref="EventMetadata.PartitionKeyPropertyName"/>.</returns>
-        public static (Guid? EventId, string? Subject, string? Action, Guid? TenantId, string? CorrelationId, string? PartitionKey) GetBeefMetadata(this MicrosoftServiceBus.Message message)
+        /// <returns>The <see cref="EventMetadata"/>.</returns>
+        public static EventMetadata GetEventMetadata(this MicrosoftServiceBus.Message message)
         {
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
             message.UserProperties.TryGetValue(EventMetadata.SubjectPropertyName, out var subject);
             message.UserProperties.TryGetValue(EventMetadata.ActionPropertyName, out var action);
-
-            var eventId = (message.UserProperties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
-            var tenantId = (message.UserProperties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
             message.UserProperties.TryGetValue(EventMetadata.CorrelationIdPropertyName, out var correlationId);
             message.UserProperties.TryGetValue(EventMetadata.PartitionKeyPropertyName, out var partitionKey);
 
-            return (eventId, (string?)subject, (string?)action, tenantId, (string?)correlationId, (string?)partitionKey);
+            return new EventMetadata
+            {
+                EventId = (message.UserProperties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null,
+                TenantId = (message.UserProperties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
+                Subject = (string?)subject,
+                Action = (string?)action,
+                CorrelationId = (string?)correlationId,
+                PartitionKey = (string?)partitionKey
+            };
         }
     }
 }

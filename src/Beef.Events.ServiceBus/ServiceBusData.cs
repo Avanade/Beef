@@ -7,19 +7,18 @@ namespace Beef.Events.ServiceBus
     /// <summary>
     /// Represents the originating event data for the <see cref="ServiceBusReceiverHost"/>.
     /// </summary>
-    public class ServiceBusData
+    public class ServiceBusData : EventSubscriberData<AzureServiceBus.Message>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBusData"/> class.
         /// </summary>
         /// <param name="serviceBusName">The Event Hubs name.</param>
         /// <param name="queueName">The Event Hubs partition identifier.</param>
-        /// <param name="message">The <see cref="AzureServiceBus.Message"/>.</param>
-        public ServiceBusData(string serviceBusName, string queueName, AzureServiceBus.Message message)
+        /// <param name="originating">The <see cref="EventSubscriberData{TOriginating}.Originating"/> <see cref="AzureServiceBus.Message"/>.</param>
+        public ServiceBusData(string serviceBusName, string queueName, AzureServiceBus.Message originating) : base(originating)
         {
             ServiceBusName = Check.NotNull(serviceBusName, nameof(serviceBusName));
             QueueName = Check.NotNull(queueName, nameof(queueName));
-            Message = Check.NotNull(message, nameof(message));
         }
 
         /// <summary>
@@ -33,14 +32,8 @@ namespace Beef.Events.ServiceBus
         public string QueueName { get; }
 
         /// <summary>
-        /// Gets the <see cref="AzureServiceBus.Message"/>.
+        /// Gets the <see cref="EventMetadata"/> metadata.
         /// </summary>
-        public AzureServiceBus.Message Message { get; }
-
-        /// <summary>
-        /// Gets the invocation attempt counter.
-        /// </summary>
-        /// <remarks>A value of zero indicates that the attempt count is currently unknown.</remarks>
-        public int Attempt { get; internal set; }
+        protected override EventMetadata GetEventMetadata() => Originating.GetEventMetadata();
     }
 }

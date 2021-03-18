@@ -37,13 +37,13 @@ namespace Beef.Events
         /// <summary>
         /// Indicates that an unhandled <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.ThrowException"/>.
         /// </summary>
-        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</remarks>
+        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(IEventSubscriberData, Result)"/>).</remarks>
         UnhandledException,
 
         /// <summary>
         /// Indicates that an <see cref="System.Exception"/> occured and the <see cref="IEventSubscriber">subscriber</see> <see cref="IEventSubscriber.UnhandledExceptionHandling"/> was set to <see cref="UnhandledExceptionHandling.Continue"/> (swallow and carry on).
         /// </summary>
-        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(object, Result)"/>).</remarks>
+        /// <remarks>This will always result in an audit write (see <see cref="IAuditWriter.WriteAuditAsync(IEventSubscriberData, Result)"/>).</remarks>
         ExceptionContinue,
 
         /// <summary>

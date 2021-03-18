@@ -41,28 +41,24 @@ namespace Beef.Events.EventHubs
         /// <param name="data">The event data.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <returns>The audit record.</returns>
-        protected override EventHubAuditRecord CreateAuditRecord(EventHubData data, Result result)
-        {
-            var (EventId, _, _, _, _, _) = EventDataMapper.GetBeefMetadata(data.Event);
-
-            return new EventHubAuditRecord(CreatePartitionKey(data), CreateRowKey(data))
+        protected override EventHubAuditRecord CreateAuditRecord(EventHubData data, Result result) =>
+            new EventHubAuditRecord(CreatePartitionKey(data), CreateRowKey(data))
             {
                 EventHubName = data.EventHubName,
                 ConsumerGroupName = data.ConsumerGroupName,
                 PartitionId = data.PartitionId,
-                Offset = data.Event.SystemProperties.Offset,
-                SequenceNumber = data.Event.SystemProperties.SequenceNumber,
-                EnqueuedTimeUtc = data.Event.SystemProperties.EnqueuedTimeUtc,
-                EventId = EventId,
+                Offset = data.Originating.SystemProperties.Offset,
+                SequenceNumber = data.Originating.SystemProperties.SequenceNumber,
+                EnqueuedTimeUtc = data.Originating.SystemProperties.EnqueuedTimeUtc,
+                EventId = data.Metadata.EventId,
                 Attempts = data.Attempt <= 0 ? 1 : data.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
                 Status = result.Status.ToString(),
-                Body = TruncateText(Encoding.UTF8.GetString(data.Event.Body)),
+                Body = TruncateText(Encoding.UTF8.GetString(data.Originating.Body)),
                 Exception = TruncateText(result.Exception?.ToString()),
             };
-        }
 
         /// <summary>
         /// Checks whether the poisoned event exists with a different sequence number and recalibrates accordingly.
@@ -73,9 +69,9 @@ namespace Beef.Events.EventHubs
         protected override async Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAdditionalAsync(EventHubData data, EventHubAuditRecord audit)
         {
             // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
-            if (data.Event.SystemProperties.SequenceNumber != audit.SequenceNumber)
+            if (data.Originating.SystemProperties.SequenceNumber != audit.SequenceNumber)
             {
-                var reason = $"Current EventData (Seq#: '{data.Event.SystemProperties.SequenceNumber}' Offset#: '{data.Event.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{audit.SequenceNumber}' Offset#: '{audit.Offset}'); current assumed correct with previous Poison now deleted.";
+                var reason = $"Current EventData (Seq#: '{data.Originating.SystemProperties.SequenceNumber}' Offset#: '{data.Originating.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{audit.SequenceNumber}' Offset#: '{audit.Offset}'); current assumed correct with previous Poison now deleted.";
                 var result = EventSubscriberHost.CreatePoisonMismatchResult(audit.Subject, audit.Action, reason);
                 await WriteAuditAsync(audit, result, null).ConfigureAwait(false);
                 var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);

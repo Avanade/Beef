@@ -9,7 +9,7 @@ namespace Beef.Events.Repository
     /// Enables the <b>storage repository</b>.
     /// </summary>
     /// <typeparam name="TData">The event data <see cref="Type"/>.</typeparam>
-    public interface IStorageRepository<TData> : IAuditWriter<TData> where TData : class
+    public interface IStorageRepository<TData> : IAuditWriter where TData : class, IEventSubscriberData
     {
         /// <summary>
         /// Checks whether the event is considered poison.
