@@ -749,6 +749,11 @@
                       <xs:documentation>The .NET property name. Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="IncludeColumnsOnDelete" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
             </xs:choice>
@@ -779,7 +784,7 @@
             </xs:attribute>
             <xs:attribute name="AliasColumns" use="optional">
               <xs:annotation>
-                <xs:documentation>The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
+                <xs:documentation>The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ExecuteStoredProcedureName" use="optional" type="xs:string">
@@ -833,6 +838,22 @@
               <xs:annotation>
                 <xs:documentation>The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IncludeColumnsOnDelete" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeBackgroundService" use="optional">
+              <xs:annotation>
+                <xs:documentation>The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="No" />
+                  <xs:enumeration value="Yes" />
+                </xs:restriction>
+              </xs:simpleType>
             </xs:attribute>
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
               <xs:annotation>

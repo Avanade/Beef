@@ -76,6 +76,7 @@ Property | Description
 -|-
 `modelName` | The .NET model name. Defaults to `Name`.
 `propertyName` | The .NET property name. Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.
+`includeColumnsOnDelete` | The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.
 
 <br/>
 

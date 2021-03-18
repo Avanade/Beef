@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.8
+- *Enhancement:* Added new `InvokerBase<TParam, TResult>` to enable the ability to specifically define the return `Type`.
+
 ## v4.1.7
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 - *Enhancement:* Added `PartitionKeyGenerator` to generate from object array using similar logic to `ETag` MD5 hash.

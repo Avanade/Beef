@@ -15,6 +15,7 @@ namespace Beef.Demo.Functions.Subscribers
         {
             _mgr = Check.NotNull(mgr, nameof(mgr));
             DataNotFoundHandling = ResultHandling.ContinueWithAudit;
+            MaxAttempts = 5;
         }
 
         public override async Task<Result> ReceiveAsync(EventData<string> @event)

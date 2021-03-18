@@ -18,7 +18,7 @@ This [article](https://www.mssqltips.com/sqlservertip/5212/sql-server-temporal-t
 
 The CDC approach taken here is to consolidate the tracking of individual tables (one or more) into a central entity to simplify the publishing to an event stream (or equivalent). The advantage of this is where a change occurs to any of the rows related to an entity, even where multiples rows are updated, this will only result in a single event. This makes it easier (more logical) for downstream subscribers to consume.
 
-This is achieved by defining (configuring) the entity, being the primary (parent) table, and it's related secondary (child) tables. For example, a Sales Order, may be made up multiple tables - when any of these change then a single _SalesOrder_ event should occur. These relationships are also defined with a cardinality of either `OneToMany` or `OneToOne`.
+This is achieved by defining (configuring) the entity, being the primary (parent) table, and its related secondary (child) tables. For example, a Sales Order, may be made up multiple tables - when any of these change then a single _SalesOrder_ event should occur. These relationships are also defined with a cardinality of either `OneToMany` or `OneToOne`.
 
 ```
 SalesOrder             // Parent
@@ -36,7 +36,7 @@ To further guarantee only a single event for a specific version is published the
 
 The first activity is to enable CDC on the database and then enable on each of the tables; using the SQL Server system (native) stored procedures:
 - [`sys.sp_cdc_enable_db`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-db-transact-sql) - enables the database.
-- [`sys.sp_cdc_enable_table`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql) - enables the table. Please note that  `@supports_net_changes` **must** be selected (set to `1`).
+- [`sys.sp_cdc_enable_table`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql) - enables the table. Please note that  `@supports_net_changes` need not be selected as they are not used.
 
 An example is as follows.
 
@@ -55,7 +55,7 @@ BEGIN
     @source_schema = N'SchemaName',  
     @source_name   = N'TableName',  
     @role_name     = NULL,
-    @supports_net_changes = 1
+    @supports_net_changes = 0
 END
 ```
 
@@ -188,7 +188,8 @@ Type | Name | Description
 `Table` | `CdcTracking.sql` | Represents the related _Entity Hash_ tracking table used to identify whether a version of a specific entity has been previously (successfully) processed. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163724-create-democdc-cdctracking.sql).
 `Table` | `XxxOutbox.sql` | Represents the _Entity_ outbox table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next outbox set. An outbox set is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163747-create-democdc-postsoutbox.sql).
 `Type` | `udtTrackingList.sql` | Represents the user-defined type / table-valued parameter required to pass a list of key/hash values from .NET code to a SQL Stored Procedure. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Types/User-Defined%20Table%20Types/Generated/UdtCdcTrackingList.sql).
-`Stored Procedure` | `spExecuteXxxCdcOutbox.sql` | Represents the **key** CDC-related logic. This stored procedure is responsible for getting the next outbox set for an _Entity_, retrying an existing outbox set, and completing an existing outbox set. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcOutbox.sql).
+`Stored Procedure` | `spExecuteXxxCdcOutbox.sql` | Represents the **key** CDC-related execution logic. This stored procedure is responsible for getting the next outbox set for an _Entity_, or retrying an existing outbox set. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcOutbox.sql).
+`Stored Procedure` | `spCompleteXxxCdcOutbox.sql` | Represents the **key** CDC-related completion logic. This stored procedure is responsible for completing an existing outbox set. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spCompleteContactCdcOutbox.sql).
 
 _Tip:_ If any of the generated files are not automatically added to the Visual Studio Project structure, the _Show All Files_ in the _Solution Explorer_ can be used to view, and then individually added using _Include In Project_.
 

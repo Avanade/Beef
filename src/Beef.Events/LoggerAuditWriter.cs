@@ -35,22 +35,22 @@ namespace Beef.Events
         void IUseLogger.UseLogger(ILogger logger) => UseLogger(logger);
 
         /// <summary>
-        /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> using the <see cref="Logger"/>.
+        /// Writes the event <paramref name="data"/> <paramref name="result"/> using the <see cref="Logger"/>.
         /// </summary>
-        /// <param name="originatingEvent">The originating event.</param>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
-        public Task WriteAuditAsync(object originatingEvent, Result result) => WriteFormattedAuditAsync(Logger, originatingEvent, result);
+        public Task WriteAuditAsync(IEventSubscriberData data, Result result) => WriteFormattedAuditAsync(Logger, data, result);
 
         /// <summary>
-        /// Writes the <paramref name="result"/> for an <paramref name="originatingEvent"/> using the <paramref name="logger"/>.
+        /// Writes the event <paramref name="data"/> <paramref name="result"/> using the <paramref name="logger"/>.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        /// <param name="originatingEvent">The originating event.</param>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
         /// <param name="result">The subscriber <see cref="Result"/>.</param>
         /// <remarks>This provides a reusable/standardized approach to the logging.</remarks>
-#pragma warning disable IDE0060, CA1801 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
-        public static Task WriteFormattedAuditAsync(ILogger logger, object originatingEvent, Result result)
-#pragma warning restore IDE0060, CA1801
+#pragma warning disable IDE0060 // Review unused parameters; want same contract as Interface to avoid possible future breaking change.
+        public static Task WriteFormattedAuditAsync(ILogger logger, IEventSubscriberData data, Result result)
+#pragma warning restore IDE0060
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));

@@ -132,6 +132,12 @@ namespace Beef.Data.Database.Cdc
             }
             catch (Exception ex)
             {
+                if (ex is TaskCanceledException || (ex is AggregateException aex && aex.InnerException is TaskCanceledException))
+                {
+                    Logger.LogWarning($"{ServiceName}: Task canceled.");
+                    throw;
+                }
+
                 result.Exception = ex;
 
                 if (ex is IBusinessException)
@@ -168,6 +174,12 @@ namespace Beef.Data.Database.Cdc
             }
             catch (Exception ex)
             {
+                if (ex is TaskCanceledException || (ex is AggregateException aex && aex.InnerException is TaskCanceledException))
+                {
+                    Logger.LogWarning($"{ServiceName}: Task canceled.");
+                    throw;
+                }
+
                 result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> { Exception = ex };
 
                 if (ex is IBusinessException)
@@ -207,7 +219,10 @@ namespace Beef.Data.Database.Cdc
 
                 // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
                 if (item is ILogicallyDeleted ild && ild.IsDeleted)
+                {
                     item.DatabaseOperationType = OperationType.Delete;
+                    ild.ClearWhereDeleted();
+                }
 
                 // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;

@@ -295,7 +295,7 @@ namespace Beef.CodeGen.Config
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value where the property is not found.</param>
         /// <returns>The value.</returns>
-        public T GetExtraProperty<T>(string key, T defaultValue = default)
+        public T GetExtraProperty<T>(string key, T defaultValue = default!)
         {
             if (ExtraProperties != null && ExtraProperties.TryGetValue(key, out var val))
                 return (T)Convert.ChangeType(val.ToString(), typeof(T));
@@ -337,7 +337,7 @@ namespace Beef.CodeGen.Config
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value where the property is not found.</param>
         /// <returns>The value.</returns>
-        public T GetCustomProperty<T>(string key, T defaultValue = default)
+        public T GetCustomProperty<T>(string key, T defaultValue = default!)
         {
             if (CustomProperties != null && CustomProperties.TryGetValue(key, out var val))
                 return (T)Convert.ChangeType(val, typeof(T));

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Added `ILogicallyDeleted.ClearWhereDeleted()` to clear all properties that should not have a value where logically deleted; as the data is technically considered as non-existing.
+
 ## v4.1.3
 - *Enhancement:* Added support for `ContinueWithDataLoss`.
 - *Enhancement:* Added support for `CdcBackgroundService<T>.RunAsync` to enable execution without the `IHostedService` capabilties. For example, direct invocation from the likes of an Azure Function that would use an Azure `TimerTrigger` to handle the multiple long-running nature.

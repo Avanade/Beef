@@ -38,9 +38,11 @@ namespace Beef.Test.NUnit.Tests
             if (@event == null)
                 return;
 
+            var x = new EventDataSubscriberData(@event);
+
             try
             {
-                Result = await ReceiveAsync(@event, @event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
+                Result = await ReceiveAsync(new EventDataSubscriberData(@event), (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
             }
             catch (EventSubscriberUnhandledException essex)
             {

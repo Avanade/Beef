@@ -321,7 +321,7 @@ namespace Beef.CodeGen.Config.Database
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value where the property is not found.</param>
         /// <returns>The value.</returns>
-        public T GetRuntimeParameter<T>(string key, T defaultValue = default)
+        public T GetRuntimeParameter<T>(string key, T defaultValue = default!)
         {
             if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
                 return (T)Convert.ChangeType(val.ToString(), typeof(T));

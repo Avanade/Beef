@@ -98,6 +98,31 @@ namespace {{Root.NamespaceCdc}}.Entities
         [MapperProperty("{{ColumnIsDeleted.Name}}")]
         public bool IsDeleted { get; set; }
 
+        /// <summary>
+        /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
+        /// </summary>
+        public void ClearWhereDeleted()
+        {
+            if (!IsDeleted)
+                return;
+
+    {{#each SelectedEntityColumns}}
+      {{#unless IncludeColumnOnDelete}}
+            {{pascal NameAlias}} = default{{#if IsDotNetNullable}}!{{/if}};
+      {{/unless}}
+    {{/each}}
+    {{#each JoinNonCdcChildren}}
+      {{#each Columns}}
+        {{#unless IncludeColumnOnDelete}}
+            {{pascal NameAlias}} = default{{#if IsDotNetNullable}}!{{/if}};
+        {{/unless}}
+      {{/each}}
+    {{/each}}
+    {{#each JoinCdcChildren}}
+            {{PropertyName}} = default!;
+    {{/each}}
+        }
+
   {{/ifval}}
         /// <summary>
         /// <inheritdoc/>

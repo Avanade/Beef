@@ -31,5 +31,10 @@ namespace Beef.Data.Database.Cdc
         /// Gets or sets the processed date.
         /// </summary>
         public DateTime? CompletedDate { get; set; }
+
+        /// <summary>
+        /// Indicates whether there is/was possible data loss; that the CDC data has probably been cleaned up before being successfully processed.
+        /// </summary>
+        public bool HasDataLoss { get; set; }
     }
 }

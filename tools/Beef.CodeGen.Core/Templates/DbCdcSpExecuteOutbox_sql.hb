@@ -91,9 +91,12 @@ BEGIN
     END
 
     -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{Name}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
+    DECLARE @hasDataLoss BIT
+    SET @hasDataLoss = 0
+
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @hasDataLoss = 1; SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{Name}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
 {{#each CdcJoins}}
-    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{TableName}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @hasDataLoss = 1; SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END ELSE BEGIN{{#if Root.HasBeefDbo}} EXEC spThrowBusinessException{{else}} ;THROW 56002, {{/if}}'Unexpected data loss error for ''{{Schema}}.{{TableName}}''; this indicates that the CDC data has probably been cleaned up before being successfully processed.'{{#unless Root.HasBeefDbo}}, 1;{{/unless}} END END
 {{/each}}
 
     -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
@@ -150,7 +153,7 @@ BEGIN
 
 {{/each}}
     -- Create a new outbox where not processing an existing.
-    IF (@OutboxId IS NULL AND @hasChanges = 1)
+    IF (@OutboxId IS NULL AND (@hasDataLoss = 1 OR @hasChanges = 1))
     BEGIN
       DECLARE @InsertedOutboxId TABLE([OutboxId] INT)
 
@@ -162,7 +165,8 @@ BEGIN
           [{{pascal Name}}MaxLsn],
 {{/each}}
           [CreatedDate],
-          [IsComplete]
+          [IsComplete],
+          [HasDataLoss]
         ) 
         OUTPUT inserted.OutboxId INTO @InsertedOutboxId
         VALUES (
@@ -173,14 +177,24 @@ BEGIN
           @{{pascal Name}}MaxLsn,
 {{/each}}
           GETUTCDATE(),
-          0
+          0,
+          @hasDataLoss
         )
 
         SELECT @OutboxId = [OutboxId] FROM @InsertedOutboxId
     END
+    ELSE
+    BEGIN
+      IF (@OutboxId IS NOT NULL AND @hasDataLoss = 1)
+      BEGIN
+        UPDATE [{{CdcSchema}}].[{{OutboxTableName}}] 
+          SET [HasDataLoss] = @hasDataLoss
+          WHERE [OutboxId] = @OutboxId
+      END
+    END
 
     -- Return the *latest* outbox data.
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outBox].[HasDataLoss]
       FROM [{{CdcSchema}}].[{{OutboxTableName}}] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId 
 

@@ -27,6 +27,66 @@ namespace Beef.Demo.Cdc.Entities
         public Guid PersonId { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'FirstName' column value.
+        /// </summary>
+        [JsonProperty("firstName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? FirstName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'LastName' column value.
+        /// </summary>
+        [JsonProperty("lastName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? LastName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'Birthday' column value.
+        /// </summary>
+        [JsonProperty("birthday", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public DateTime? Birthday { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'GenderId' column value.
+        /// </summary>
+        [JsonProperty("genderId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Guid? GenderId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'Street' column value.
+        /// </summary>
+        [JsonProperty("street", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? Street { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'City' column value.
+        /// </summary>
+        [JsonProperty("city", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? City { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'CreatedBy' column value.
+        /// </summary>
+        [JsonProperty("createdBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? CreatedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'CreatedDate' column value.
+        /// </summary>
+        [JsonProperty("createdDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public DateTime? CreatedDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'UpdatedBy' column value.
+        /// </summary>
+        [JsonProperty("updatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'UpdatedDate' column value.
+        /// </summary>
+        [JsonProperty("updatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public DateTime? UpdatedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the entity tag ('RowVersion' column).
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -38,6 +98,24 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperProperty("IsDeleted")]
         public bool IsDeleted { get; set; }
+
+        /// <summary>
+        /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
+        /// </summary>
+        public void ClearWhereDeleted()
+        {
+            if (!IsDeleted)
+                return;
+
+            FirstName = default!;
+            LastName = default!;
+            Birthday = default!;
+            GenderId = default!;
+            Street = default!;
+            City = default!;
+            CreatedBy = default!;
+            CreatedDate = default!;
+        }
 
         /// <summary>
         /// <inheritdoc/>

@@ -49,6 +49,12 @@ namespace Beef.Events
         public ResultHandling? InvalidDataHandling { get; set;  }
 
         /// <summary>
+        /// Gets or sets the maximum number of attempts before the event is automatically skipped.
+        /// </summary>
+        /// <remarks>This functionality is dependent on the <see cref="EventSubscriberHost"/> providing the functionality to check and action.</remarks>
+        public int? MaxAttempts { get; set; }
+
+        /// <summary>
         /// Gets the value <see cref="Type"/>; <c>null</c> indicates no value.
         /// </summary>
         public abstract Type? ValueType { get; }

@@ -49,7 +49,7 @@ BEGIN
         THEN INSERT ([Schema], [Table], [Key], [Hash], [OutboxId])
           VALUES ('Demo', 'Person2', [_list].[Key], [_list].[Hash], @OutboxId);
 
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outbox].[HasDataLoss]
       FROM [DemoCdc].[Person2Outbox] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId
 

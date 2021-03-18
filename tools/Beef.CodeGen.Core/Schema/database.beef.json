@@ -945,7 +945,7 @@
             "aliasColumns": {
               "type": "array",
               "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
-              "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+              "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.",
               "items": [
                 {
                   "type": "string",
@@ -1008,6 +1008,25 @@
               "type": "string",
               "title": "The event subject.",
               "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified."
+            },
+            "includeColumnsOnDelete": {
+              "type": "array",
+              "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
+              "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeBackgroundService": {
+              "type": "string",
+              "title": "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).",
+              "enum": [
+                "No",
+                "Yes"
+              ]
             },
             "columnNameIsDeleted": {
               "type": "string",
@@ -1118,6 +1137,17 @@
                       "type": "string",
                       "title": "The .NET property name.",
                       "description": "Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`."
+                    },
+                    "includeColumnsOnDelete": {
+                      "type": "array",
+                      "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
+                      "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
                     },
                     "on": {
                       "type": "array",

@@ -68,7 +68,10 @@ BEGIN
     END
 
     -- The minimum should _not_ be less than the base otherwise we have lost data; either continue with this data loss, or error and stop.
-    IF (@Person2MinLsn < @Person2BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @Person2MinLsn = @Person2BaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Demo.Person2''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
+    DECLARE @hasDataLoss BIT
+    SET @hasDataLoss = 0
+
+    IF (@Person2MinLsn < @Person2BaseMinLsn) BEGIN IF (@ContinueWithDataLoss = 1) BEGIN SET @hasDataLoss = 1; SET @Person2MinLsn = @Person2BaseMinLsn END ELSE BEGIN ;THROW 56002, 'Unexpected data loss error for ''Demo.Person2''; this indicates that the CDC data has probably been cleaned up before being successfully processed.', 1; END END
 
     -- Find changes on the root table: Demo.Person2 - this determines overall operation type: 'create', 'update' or 'delete'.
     DECLARE @hasChanges BIT
@@ -92,7 +95,7 @@ BEGIN
     END
 
     -- Create a new outbox where not processing an existing.
-    IF (@OutboxId IS NULL AND @hasChanges = 1)
+    IF (@OutboxId IS NULL AND (@hasDataLoss = 1 OR @hasChanges = 1))
     BEGIN
       DECLARE @InsertedOutboxId TABLE([OutboxId] INT)
 
@@ -100,21 +103,32 @@ BEGIN
           [Person2MinLsn],
           [Person2MaxLsn],
           [CreatedDate],
-          [IsComplete]
+          [IsComplete],
+          [HasDataLoss]
         ) 
         OUTPUT inserted.OutboxId INTO @InsertedOutboxId
         VALUES (
           @Person2MinLsn,
           @Person2MaxLsn,
           GETUTCDATE(),
-          0
+          0,
+          @hasDataLoss
         )
 
         SELECT @OutboxId = [OutboxId] FROM @InsertedOutboxId
     END
+    ELSE
+    BEGIN
+      IF (@OutboxId IS NOT NULL AND @hasDataLoss = 1)
+      BEGIN
+        UPDATE [DemoCdc].[Person2Outbox] 
+          SET [HasDataLoss] = @hasDataLoss
+          WHERE [OutboxId] = @OutboxId
+      END
+    END
 
     -- Return the *latest* outbox data.
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outBox].[HasDataLoss]
       FROM [DemoCdc].[Person2Outbox] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId 
 
@@ -131,7 +145,17 @@ BEGIN
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
         [_chg].[PersonId] AS [PersonId],
+        [p].[FirstName] AS [FirstName],
+        [p].[LastName] AS [LastName],
+        [p].[Birthday] AS [Birthday],
+        [p].[GenderId] AS [GenderId],
+        [p].[Street] AS [Street],
+        [p].[City] AS [City],
         [p].[RowVersion] AS [RowVersion],
+        [p].[CreatedBy] AS [CreatedBy],
+        [p].[CreatedDate] AS [CreatedDate],
+        [p].[UpdatedBy] AS [UpdatedBy],
+        [p].[UpdatedDate] AS [UpdatedDate],
         [p].[IsDeleted] AS [IsDeleted]
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person2' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))

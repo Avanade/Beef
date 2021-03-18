@@ -113,7 +113,7 @@ namespace Beef.Events
         public bool AreMultipleMessagesSupported { get; set; } = false;
 
         /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ContinueSilent"/>.
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.NotSubscribed"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ContinueSilent"/>.
         /// </summary>
         public ResultHandling NotSubscribedHandling { get; set; } = ResultHandling.ContinueSilent;
 
@@ -228,6 +228,23 @@ namespace Beef.Events
         public EventSubscriberHostArgs ExecutionContext(Action<ExecutionContext, IEventSubscriber, EventData> updateExecutionContext)
         {
             UpdateExecutionContext = Check.NotNull(updateExecutionContext, nameof(updateExecutionContext));
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum number of attempts before the event is automatically skipped.
+        /// </summary>
+        /// <remarks>This functionality is dependent on the <see cref="EventSubscriberHost"/> providing the functionality to check and action.</remarks>
+        public int? MaxAttempts { get; set; }
+
+        /// <summary>
+        /// Use (set) the <see cref="EventSubscriberHost.MaxAttempts"/>.
+        /// </summary>
+        /// <param name="maxAttempts">The maxiumum attempts.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs UseMaxAttempts(int? maxAttempts)
+        {
+            MaxAttempts = maxAttempts;
             return this;
         }
 

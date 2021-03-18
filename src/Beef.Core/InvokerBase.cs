@@ -129,4 +129,65 @@ namespace Beef
 
         #endregion
     }
+
+    /// <summary>
+    /// Wraps an <b>Invoke</b> enabling standard functionality to be added to all invocations. 
+    /// </summary>
+    /// <typeparam name="TParam">The optional parameter <see cref="Type"/> (for an <b>Invoke</b>).</typeparam>
+    /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+    [DebuggerStepThrough()]
+    public abstract class InvokerBase<TParam, TResult> : Invoker
+    {
+        /// <summary>
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
+        /// </summary>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        public TResult Invoke(object caller, Func<TResult> func, TParam? param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            => WrapInvoke(caller, func, param, memberName, filePath, lineNumber);
+
+        /// <summary>
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
+        /// </summary>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected virtual TResult WrapInvoke(object caller, Func<TResult> func, TParam? param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            => Check.NotNull(func, nameof(func)).Invoke();
+
+        /// <summary>
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
+        /// </summary>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        public Task<TResult> InvokeAsync(object caller, Func<Task<TResult>> func, TParam? param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            => WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber);
+
+        /// <summary>
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
+        /// </summary>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected virtual Task<TResult> WrapInvokeAsync(object caller, Func<Task<TResult>> func, TParam? param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            => Check.NotNull(func, nameof(func)).Invoke();
+    }
 }

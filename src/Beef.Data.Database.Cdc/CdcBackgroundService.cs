@@ -194,7 +194,17 @@ namespace Beef.Data.Database.Cdc
             ec.ServiceProvider = scope.ServiceProvider;
             ExecutionContext.SetCurrent(ec);
 
-            await ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                await ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (ex is TaskCanceledException || (ex is AggregateException aex && aex.InnerException is TaskCanceledException))
+                    return;
+
+                throw;
+            }
         }
 
         /// <summary>

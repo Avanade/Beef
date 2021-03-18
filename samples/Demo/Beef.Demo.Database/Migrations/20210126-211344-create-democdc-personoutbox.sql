@@ -8,5 +8,6 @@ CREATE TABLE [DemoCdc].[PersonOutbox] (
   [PersonMinLsn] BINARY(10) NOT NULL,  -- Primary table: Demo.Person
   [PersonMaxLsn] BINARY(10) NOT NULL,
   [IsComplete] BIT NOT NULL,
-  [CompletedDate] DATETIME NULL
+  [CompletedDate] DATETIME NULL,
+  [HasDataLoss] BIT NOT NULL
 );

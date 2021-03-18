@@ -15,10 +15,10 @@ namespace Beef.Events.UnitTest
             var ed = EventData.CreateEvent("Subject");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.KeyPropertyName]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.ActionPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = eh.ToBeefEventData();
             Assert.IsNotNull(eh);
@@ -34,10 +34,10 @@ namespace Beef.Events.UnitTest
             var ed = EventData.CreateEvent("Subject", "Action");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventDataMapper.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.KeyPropertyName]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = eh.ToBeefEventData();
             Assert.IsNotNull(eh);
@@ -57,11 +57,11 @@ namespace Beef.Events.UnitTest
             var eid = ed.EventId;
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
-            Assert.AreEqual(eid, eh.Properties[EventDataMapper.EventIdPropertyName]);
-            Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventDataMapper.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
-            Assert.AreEqual(id, eh.Properties[EventDataMapper.KeyPropertyName]);
+            Assert.AreEqual(eid, eh.Properties[EventMetadata.EventIdPropertyName]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.AreEqual(id, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = eh.ToBeefEventData();
             Assert.IsNotNull(eh);
@@ -81,11 +81,11 @@ namespace Beef.Events.UnitTest
             var ed = EventData.CreateEvent("Subject", "Action", id, no);
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventDataMapper.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
-            Assert.AreEqual(id, ((object[])eh.Properties[EventDataMapper.KeyPropertyName])[0]);
-            Assert.AreEqual(no, ((object[])eh.Properties[EventDataMapper.KeyPropertyName])[1]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.AreEqual(id, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[0]);
+            Assert.AreEqual(no, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[1]);
 
             ed = eh.ToBeefEventData();
             Assert.IsNotNull(eh);
@@ -110,10 +110,10 @@ namespace Beef.Events.UnitTest
             var ed = EventData.CreateValueEvent(p, "Subject", "Action");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventDataMapper.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventDataMapper.TenantIdPropertyName]);
-            Assert.AreEqual(p.Id, eh.Properties[EventDataMapper.KeyPropertyName]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
+            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.AreEqual(p.Id, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = eh.ToBeefEventData<Person>();
             Assert.IsNotNull(eh);
