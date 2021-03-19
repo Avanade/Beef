@@ -145,7 +145,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi") 
                 { 
                     Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
-                    Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                    Description = "Defaults to `AllowAnonymous`. This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s)."
                 }),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", typeof(string), new PropertySchemaAttribute("Manager")

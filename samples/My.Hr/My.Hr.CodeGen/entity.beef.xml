@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration RefDataNamespace="My.Hr.Common.Entities" RefDataText="true" EventSubjectRoot="My" EventActionFormat="PastTense" AppBasedAgentArgs="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="My.Hr.Common.Entities" RefDataText="true" EventSubjectRoot="My" EventActionFormat="PastTense" AppBasedAgentArgs="true" WebApiAutoLocation="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
        - As we will be returning more than one we need the Collection and CollectionResult.
        - Any Text with a handlebars '{{xxx}}' is a shortcut for .NET see comments; e.g. '<see cref="xxx"/>'.

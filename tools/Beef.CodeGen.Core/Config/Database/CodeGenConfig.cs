@@ -168,7 +168,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The root for the event name by prepending to all event subject names.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).", IsImportant = true)]
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).", IsImportant = true)]
         public string? EventSubjectRoot { get; set; }
 
         /// <summary>

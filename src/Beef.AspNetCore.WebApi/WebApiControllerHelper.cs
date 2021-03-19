@@ -121,5 +121,21 @@ namespace Beef.AspNetCore.WebApi
             if (messages != null && messages.Count > 0)
                 response.Headers[WebApiConsts.MessagesHeaderName] = JsonConvert.SerializeObject(messages);
         }
+
+        /// <summary>
+        /// Sets the <see cref="HttpResponse.Headers"/> <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> where the <paramref name="locationUri"/> has a value.
+        /// </summary>
+        /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
+        /// <param name="locationUri">The <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
+        public static void SetLocation(HttpResponse response, Uri? locationUri)
+        {
+            if (response == null)
+                throw new ArgumentNullException(nameof(response));
+
+            if (locationUri == null)
+                return;
+
+            response.GetTypedHeaders().Location = locationUri;
+        }
     }
 }

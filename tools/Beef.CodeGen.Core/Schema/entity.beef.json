@@ -84,11 +84,16 @@
     "webApiAuthorize": {
       "type": "string",
       "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
-      "description": "This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+      "description": "This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s)."
     },
     "appBasedAgentArgs": {
       "type": "boolean",
       "title": "Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage."
+    },
+    "webApiAutoLocation": {
+      "type": "boolean",
+      "title": "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
+      "description": "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s)."
     },
     "validatorLayer": {
       "type": "string",
@@ -159,12 +164,12 @@
     "eventPublish": {
       "type": "boolean",
       "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
-      "description": "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s)."
+      "description": "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
     },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
-      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s)."
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
     },
     "eventActionFormat": {
       "type": "string",
@@ -639,6 +644,11 @@
                   "uniqueItems": true
                 }
               ]
+            },
+            "webApiAutoLocation": {
+              "type": "boolean",
+              "title": "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
+              "description": "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This is defaulted from the `CodeGen.WebApiAutoLocation`."
             },
             "dataModel": {
               "type": "boolean",
@@ -1218,6 +1228,11 @@
                         "NotFound",
                         "ThrowException"
                       ]
+                    },
+                    "webApiLocation": {
+                      "type": "string",
+                      "title": "The HTTP Response Location Header route.",
+                      "description": "This uses similar formatting to the `WebApiRoute`. The response value is accessed using `r.` notation to access underlying properties; for example `{r.Id}` or `person/{r.Id}`. The `Entity.WebApiRoutePrefix` will be prepended automatically; however, to disable set the first character to `!`, e.g. `!person/{r.Id}`. The URI can be inferred from another `Operation` by using a lookup `^`; for example `^Get` indicates to infer from the named `Get` operation (where only `^` is specified this is shorthand for `^Get` as this is the most common value). The Location URI will ensure the first character is a `/` so it acts a 'relative URL absolute path'."
                     },
                     "patchGetOperation": {
                       "type": "string",

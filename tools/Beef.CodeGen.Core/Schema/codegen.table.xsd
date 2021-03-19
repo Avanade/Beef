@@ -950,7 +950,7 @@
       </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">

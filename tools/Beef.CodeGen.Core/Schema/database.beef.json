@@ -85,7 +85,7 @@
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
-      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s)."
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
     },
     "eventActionFormat": {
       "type": "string",

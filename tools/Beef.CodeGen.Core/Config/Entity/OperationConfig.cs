@@ -310,6 +310,15 @@ operations: [
         public string? WebApiAlternateStatus { get; set; }
 
         /// <summary>
+        /// Gets or sets the HTTP Response Location Header route. 
+        /// </summary>
+        [JsonProperty("webApiLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The HTTP Response Location Header route.",
+            Description = "This uses similar formatting to the `WebApiRoute`. The response value is accessed using `r.` notation to access underlying properties; for example `{r.Id}` or `person/{r.Id}`. The `Entity.WebApiRoutePrefix` will be prepended automatically; however, to disable set the first character to `!`, e.g. `!person/{r.Id}`. " +
+            "The URI can be inferred from another `Operation` by using a lookup `^`; for example `^Get` indicates to infer from the named `Get` operation (where only `^` is specified this is shorthand for `^Get` as this is the most common value). The Location URI will ensure the first character is a `/` so it acts a 'relative URL absolute path'.")]
+        public string? WebApiLocation { get; set; }
+
+        /// <summary>
         /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
         /// </summary>
         [JsonProperty("patchGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -896,6 +905,66 @@ operations: [
             }
 
             DataArgs.Prepare(Root!, this);
+        }
+
+        /// <summary>
+        /// Prepare after previous Prepare round.
+        /// </summary>
+        public void PrepareAfter()
+        {
+            RefactorApiLocation();
+        }
+
+        /// <summary>
+        /// Refactor the API location URI.
+        /// </summary>
+        private void RefactorApiLocation()
+        {
+            if (WebApiLocation == null)
+                return;
+
+            if (WebApiLocation.StartsWith('!'))
+                WebApiLocation = WebApiLocation[1..];
+            else
+            {
+                if (WebApiLocation.StartsWith('^'))
+                {
+                    var name = WebApiLocation.Length == 1 ? "Get" : WebApiLocation[1..];
+                    var op = Parent!.Operations.FirstOrDefault(x => x.Name == name);
+                    if (op == null)
+                        throw new CodeGenException(this, nameof(WebApiLocation), $"Attempt to lookup Operation '{name}' which does not exist.");
+
+                    WebApiLocation = op.WebApiRoute;
+                    var s = 0;
+                    if (WebApiLocation != null)
+                    {
+                        while (true)
+                        {
+                            var i = WebApiLocation.IndexOf('{', s);
+                            if (i < 0)
+                                break;
+
+                            var j = WebApiLocation.IndexOf('}', s);
+                            if (j < 0 || j < i)
+                                throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' tokens are invalid.");
+
+                            var arg = WebApiLocation.Substring(i, j - i + 1);
+                            var p = op.Parameters.FirstOrDefault(x => x.ArgumentName == arg[1..^1]);
+                            if (p == null)
+                                throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' references Parameter token '{arg}' that does not exist.");
+
+                            WebApiLocation = WebApiLocation.Replace(arg, "{r." + p.Name + "}");
+                            s = j + 1;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
+                    WebApiLocation = Parent!.WebApiRoutePrefix + "/" + WebApiLocation;
+            }
+
+            if (WebApiLocation.FirstOrDefault() != '/')
+                WebApiLocation = "/" + WebApiLocation;
         }
     }
 }

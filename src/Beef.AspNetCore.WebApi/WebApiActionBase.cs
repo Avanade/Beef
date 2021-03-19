@@ -305,13 +305,14 @@ namespace Beef.AspNetCore.WebApi
         /// Executes the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
-        /// <param name="func">The The function to invoke.</param>
+        /// <param name="func">The function to invoke.</param>
         /// <param name="convertNotfoundToNoContent">Indicates whether a <see cref="NotFoundObjectResult"/> should be converted to an <see cref="HttpStatusCode.NoContent"/>.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
+        protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri)
         {
-            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, convertNotfoundToNoContent),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, convertNotfoundToNoContent, locationUri),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -319,7 +320,7 @@ namespace Beef.AspNetCore.WebApi
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
         [DebuggerStepThrough()]
-        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
+        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri)
         {
             try
             {
@@ -327,6 +328,7 @@ namespace Beef.AspNetCore.WebApi
                 await func().ConfigureAwait(false);
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
+                WebApiControllerHelper.SetLocation(context.HttpContext.Response, locationUri?.Invoke());
                 await CreateResult(context, StatusCode).ExecuteResultAsync(context).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -352,11 +354,12 @@ namespace Beef.AspNetCore.WebApi
         /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="func">The function to invoke.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        protected virtual Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func)
+        protected virtual Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
-            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, locationUri),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -364,7 +367,7 @@ namespace Beef.AspNetCore.WebApi
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
         [DebuggerStepThrough()]
-        private async Task ExecuteResultAsyncInternal<TResult>(ActionContext context, Func<Task<TResult>> func)
+        private async Task ExecuteResultAsyncInternal<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
             try
             {
@@ -381,6 +384,9 @@ namespace Beef.AspNetCore.WebApi
                     await CreateResult(context, HttpStatusCode.NotModified).ExecuteResultAsync(context).ConfigureAwait(false);
                     return;
                 }
+
+                if (result != null && locationUri != null)
+                    WebApiControllerHelper.SetLocation(context.HttpContext.Response, locationUri(result));
 
                 await ((result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
@@ -503,6 +509,7 @@ namespace Beef.AspNetCore.WebApi
     public sealed class WebApiGet<TResult> : WebApiActionBase
     {
         private readonly Func<Task<TResult>> _func;
+        private readonly Func<TResult, Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiGet{TResult}"/> class.
@@ -515,12 +522,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiGet(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Read,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NotFound,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<TResult, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -528,10 +538,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, _locationUri);
     }
 
     /// <summary>
@@ -546,6 +553,7 @@ namespace Beef.AspNetCore.WebApi
         where TEntity : EntityBase
     {
         private readonly Func<Task<TResult>> _func;
+        private readonly Func<TResult, Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiGet{TResult, TColl, TEntity}"/> class.
@@ -558,12 +566,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiGet(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Read,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<TResult, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -593,9 +604,12 @@ namespace Beef.AspNetCore.WebApi
                         return;
                     }
 
-                    await (((result == null || result.Result == null) ?
+                    if (result != null && result.Result != null && _locationUri != null)
+                        WebApiControllerHelper.SetLocation(context.HttpContext.Response, _locationUri(result));
+
+                    await ((result == null || result.Result == null) ?
                         (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                        CreateResult(context, StatusCode, result?.Result, json).ExecuteResultAsync(context)).ConfigureAwait(false));
+                        CreateResult(context, StatusCode, result?.Result, json).ExecuteResultAsync(context)).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -621,6 +635,7 @@ namespace Beef.AspNetCore.WebApi
     public sealed class WebApiPost : WebApiActionBase
     {
         private readonly Func<Task> _func;
+        private readonly Func<Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPost"/> class.
@@ -632,12 +647,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPost(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Unspecified,
-            HttpStatusCode statusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        HttpStatusCode statusCode = HttpStatusCode.NoContent, 
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<Uri>? locationUri = null)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -646,10 +664,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func, false);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, false, _locationUri);
     }
 
     /// <summary>
@@ -659,6 +674,7 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiPost<TResult> : WebApiActionBase
     {
         private readonly Func<Task<TResult>> _func;
+        private readonly Func<TResult, Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPost{TResult}"/> class.
@@ -671,12 +687,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPost(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<TResult, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -685,10 +704,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, _locationUri);
     }
 
     #endregion
@@ -701,6 +717,7 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiPut : WebApiActionBase
     {
         private readonly Func<Task> _func;
+        private readonly Func<Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPut"/> class.
@@ -712,12 +729,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPut(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<Uri>? locationUri = null)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -726,10 +746,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func, false);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, false, _locationUri);
     }
 
     /// <summary>
@@ -739,6 +756,7 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiPut<TResult> : WebApiActionBase
     {
         private readonly Func<Task<TResult>> _func;
+        private readonly Func<TResult, Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPut{TResult}"/> class.
@@ -751,12 +769,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPut(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<TResult, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -765,10 +786,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, _locationUri);
     }
 
     #endregion
@@ -781,6 +799,7 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiDelete : WebApiActionBase
     {
         private readonly Func<Task> _func;
+        private readonly Func<Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiDelete"/> class.
@@ -792,12 +811,15 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiDelete(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Delete,
             HttpStatusCode statusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<Uri>? locationUri = null)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
+            _locationUri = locationUri;
         }
 
         /// <summary>
@@ -806,10 +828,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            return ExecuteResultAsync(context, _func, true);
-        }
+        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, true, _locationUri);
     }
 
     #endregion
@@ -826,6 +845,8 @@ namespace Beef.AspNetCore.WebApi
         private readonly Func<Task<T?>> _getFunc;
         private readonly Func<T, Task>? _updateFuncNoResult;
         private readonly Func<T, Task<T>>? _updateFuncWithResult;
+        private readonly Func<Uri>? _locationUriNoResult;
+        private readonly Func<T, Uri>? _locationUriWithResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPatch{T}"/> class.
@@ -840,14 +861,17 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task> updateFuncNoResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _value = value;
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncNoResult = updateFuncNoResult ?? throw new ArgumentNullException(nameof(updateFuncNoResult));
+            _locationUriNoResult = locationUri;
         }
 
         /// <summary>
@@ -863,14 +887,17 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<T, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             BodyValue = _value = value;
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncWithResult = updateFuncWithResult ?? throw new ArgumentNullException(nameof(updateFuncWithResult));
+            _locationUriWithResult = locationUri;
         }
 
         /// <summary>
@@ -880,11 +907,9 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="func">The The function to invoke.</param>
         /// <param name="convertNotfoundToNoContent">Indicates whether a <see cref="NotFoundObjectResult"/> should be converted to an <see cref="HttpStatusCode.NoContent"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         [DebuggerStepThrough()]
-        protected override Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
-        {
-            throw new NotSupportedException();
-        }
+        protected override Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri) => throw new NotSupportedException();
 
         /// <summary>
         /// Throws a <see cref="NotSupportedException"/>; use <see cref="ExecuteResultAsync(ActionContext)"/>.
@@ -892,12 +917,10 @@ namespace Beef.AspNetCore.WebApi
         /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="func">The function to invoke.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        protected override Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func)
-        {
-            throw new NotSupportedException();
-        }
+        protected override Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri) => throw new NotSupportedException();
 
         /// <summary>
         /// Executes the result operation of the action method asynchronously.
@@ -908,17 +931,17 @@ namespace Beef.AspNetCore.WebApi
         public override Task ExecuteResultAsync(ActionContext context)
         {
             if (_updateFuncWithResult == null)
-                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult!),
+                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult!, _locationUriNoResult),
                     memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
             else
-                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncWithResult),
+                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncWithResult, _locationUriWithResult),
                     memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
-        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<T, Task> func)
+        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<T, Task> func, Func<Uri>? locationUri)
         {
             ExecutionContext.Current.OperationType = OperationType;
 
@@ -962,6 +985,7 @@ namespace Beef.AspNetCore.WebApi
                 }
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
+                WebApiControllerHelper.SetLocation(context.HttpContext.Response, locationUri?.Invoke());
                 await CreateResult(context, StatusCode).ExecuteResultAsync(context).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -976,9 +1000,9 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
-        /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
+        /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a result.
         /// </summary>
-        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<T, Task<T>> func)
+        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<T, Task<T>> func, Func<T, Uri>? locationUri)
         {
             ExecutionContext.Current.OperationType = OperationType;
 
@@ -1028,9 +1052,12 @@ namespace Beef.AspNetCore.WebApi
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
                 WebApiControllerHelper.SetETag(context.HttpContext.Response, etag);
 
-                await ((result == null ?
+                if (result != null && locationUri != null)
+                    WebApiControllerHelper.SetLocation(context.HttpContext.Response, locationUri(result));
+
+                await (result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                    CreateResult(context, StatusCode, result, json).ExecuteResultAsync(context)).ConfigureAwait(false));
+                    CreateResult(context, StatusCode, result, json).ExecuteResultAsync(context)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
