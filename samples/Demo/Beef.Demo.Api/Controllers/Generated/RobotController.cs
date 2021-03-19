@@ -61,7 +61,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult Create([FromBody] Robot value)
         {
             return new WebApiPost<Robot>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
+                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
         }
 
         /// <summary>

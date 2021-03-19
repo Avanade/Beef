@@ -657,6 +657,14 @@ entities:
                 "Where the `Type` matches an already inferred value it will be ignored.")]
         public List<string>? WebApiCtorParams { get; set; }
 
+        /// <summary>
+        /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.
+        /// </summary>
+        [JsonProperty("webApiAutoLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
+            Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This is defaulted from the `CodeGen.WebApiAutoLocation`.")]
+        public bool? WebApiAutoLocation { get; set; }
+
         #endregion
 
         #region Model
@@ -1071,6 +1079,7 @@ entities:
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
+            WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => NoOption);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -1213,6 +1222,23 @@ entities:
             foreach (var operation in Operations)
             {
                 operation.Prepare(Root!, this);
+            }
+
+            if (WebApiAutoLocation == true)
+            {
+                var co = Operations!.FirstOrDefault(x => x.Type == "Create" && x.Name == "Create");
+                if (co != null)
+                {
+                    var go = Operations!.FirstOrDefault(x => x.Type == "Get" && x.Name == "Get");
+                    if (go != null && co.WebApiLocation == null)
+                        co.WebApiLocation = "^";
+                }
+            }
+
+            // Go back and do another pass.
+            foreach (var operation in Operations)
+            {
+                operation.PrepareAfter();
             }
         }
 

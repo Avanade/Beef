@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.7
+- *Enhancement:* Issue [116](https://github.com/Avanade/Beef/issues/116). Add capability to set the HTTP `Location` Header value.
+
 ## v4.1.6
 - *Fixed:* Issue [114](https://github.com/Avanade/Beef/issues/114). 
 

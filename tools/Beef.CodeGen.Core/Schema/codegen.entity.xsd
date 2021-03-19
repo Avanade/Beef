@@ -652,6 +652,11 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="WebApiLocation" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The HTTP Response Location Header route. This uses similar formatting to the `WebApiRoute`. The response value is accessed using `r.` notation to access underlying properties; for example `{r.Id}` or `person/{r.Id}`. The `Entity.WebApiRoutePrefix` will be prepended automatically; however, to disable set the first character to `!`, e.g. `!person/{r.Id}`. The URI can be inferred from another `Operation` by using a lookup `^`; for example `^Get` indicates to infer from the named `Get` operation (where only `^` is specified this is shorthand for `^Get` as this is the most common value). The Location URI will ensure the first character is a `/` so it acts a 'relative URL absolute path'.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="PatchGetOperation" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`. Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.</xs:documentation>
@@ -1177,6 +1182,11 @@
                 <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="WebApiAutoLocation" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This is defaulted from the `CodeGen.WebApiAutoLocation`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="DataModel" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether a data `model` version of the entity should also be generated (output to `.\Business\Data\Model`). The model will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` intrinsic `Type` versus their corresponding (actual) reference data `Type`.</xs:documentation>
@@ -1341,12 +1351,17 @@
       </xs:attribute>
       <xs:attribute name="WebApiAuthorize" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`). Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).</xs:documentation>
+          <xs:documentation>The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`). Defaults to `AllowAnonymous`. This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="AppBasedAgentArgs" use="optional" type="xs:boolean">
         <xs:annotation>
           <xs:documentation>Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="WebApiAutoLocation" use="optional" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">
@@ -1426,12 +1441,12 @@
       </xs:attribute>
       <xs:attribute name="EventPublish" use="optional" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">

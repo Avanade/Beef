@@ -145,7 +145,7 @@ entities:
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
-            Description = "This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+            Description = "This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
 
         /// <summary>
@@ -154,6 +154,14 @@ entities:
         [JsonProperty("appBasedAgentArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.")]
         public bool? AppBasedAgentArgs { get; set; }
+
+        /// <summary>
+        /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.
+        /// </summary>
+        [JsonProperty("webApiAutoLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
+            Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).")]
+        public bool? WebApiAutoLocation { get; set; }
 
         #endregion
 
@@ -263,7 +271,7 @@ entities:
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.", IsImportant = true,
-            Description = "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).")]
+            Description = "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public bool? EventPublish { get; set; }
 
         /// <summary>
@@ -271,7 +279,7 @@ entities:
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "The root for the event name by prepending to all event subject names.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).", IsImportant = true)]
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).", IsImportant = true)]
         public string? EventSubjectRoot { get; set; }
 
         /// <summary>
@@ -540,6 +548,7 @@ entities:
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
+            WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
             RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
             EventPublish = DefaultWhereNull(EventPublish, () => true);

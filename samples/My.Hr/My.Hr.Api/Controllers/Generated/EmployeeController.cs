@@ -61,7 +61,7 @@ namespace My.Hr.Api.Controllers
         public IActionResult Create([FromBody] Employee value)
         {
             return new WebApiPost<Employee>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
+                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/employees/{r.Id}", UriKind.Relative));
         }
 
         /// <summary>

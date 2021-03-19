@@ -76,7 +76,7 @@ namespace My.Hr.Api.Controllers
         public IActionResult Create([FromBody] PerformanceReview value, Guid employeeId)
         {
             return new WebApiPost<PerformanceReview>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value), employeeId),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
+                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/reviews/{r.Id}", UriKind.Relative));
         }
 
         /// <summary>

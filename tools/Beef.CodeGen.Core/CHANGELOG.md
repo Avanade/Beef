@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.21
+- *Enhancement:* Issue [116](https://github.com/Avanade/Beef/issues/116). Add capability to set the HTTP `Location` Header value.
+
 ## v4.1.20
 - *Enhancement:* Added `CdcConfig.IncludeColumnsOnDelete` to enable a list of `Column` names to be specified that should be included (in addition to the primary key) for a logical delete. Otherwise, the .NET property values will be cleared within the `CdcDataOrchestrator` as the data is technically non-existing.
 - *Enhancement:* Added `ExcludeBackgroundService` to exclude the generation of the `XxxBackgroundService.cs` class.
