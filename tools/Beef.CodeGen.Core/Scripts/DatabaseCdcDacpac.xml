@@ -3,5 +3,6 @@
 <!-- As DACPAC supports table create statements this extends support; DbUp will need to execute directly as required. -->
 <Script ConfigType="Database" Inherits="DatabaseCdc.xml">
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcTrackingTableCreate_sql.hb" FileName="{{Root.CdcTrackingTableName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Root.CdcSchema}}/Tables/Generated" HelpText="DatabaseCdcRootCodeGenerator: Database/Schema/Xxx/Tables" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcIdentityMappingCodeGenerator" Template="DbCdcIdentityMappingTableCreate_sql.hb" FileName="{{Root.CdcIdentityMappingTableName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{Root.CdcSchema}}/Tables/Generated" HelpText="DatabaseCdcIdentityMappingCodeGenerator: Database/Schema/Xxx/Tables" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcOutboxTableCreate_sql.hb" FileName="{{OutboxTableName}}.sql" OutDir="{{Root.PathDatabaseSchema}}/{{CdcSchema}}/Tables/Generated" HelpText="DatabaseCdcCodeGenerator: Database/Schema/Xxx/Tables" />
 </Script>

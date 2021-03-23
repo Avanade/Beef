@@ -38,6 +38,7 @@
   <ItemGroup>
     <None Remove="Scripts\DatabaseCdc.xml" />
     <None Remove="Scripts\DatabaseCdcDacpac.xml" />
+    <None Remove="Scripts\DatabaseCdcIdentityMapping.xml" />
     <None Remove="Scripts\DatabaseCdcOutbox.xml" />
     <None Remove="Scripts\DatabaseCdcTracking.xml" />
     <None Remove="Scripts\DatabaseWithCdc.xml" />
@@ -46,8 +47,11 @@
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEntity_cs.hb" />
+    <None Remove="Templates\DbCdcIdentityMappingTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcIdentityMappingUdt_sql.hb" />
     <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcSpCompleteOutbox_sql.hb" />
+    <None Remove="Templates\DbCdcSpCreateIdentityMapping_sql.hb" />
     <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
@@ -103,6 +107,7 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcIdentityMapping.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
@@ -119,8 +124,11 @@
     <EmbeddedResource Include="Templates\DbCdcBackgroundService_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpCreateIdentityMapping_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcSpCompleteOutbox_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcIdentityMappingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcIdentityMappingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />

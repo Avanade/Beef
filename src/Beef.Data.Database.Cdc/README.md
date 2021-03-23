@@ -202,6 +202,9 @@ dotnet run codegen --script DatabaseCdcTracking.xml
 -- Create (each) `XxxOutbox.sql` by specifying the unique CdcName as configured.
 dotnet run codegen --script DatabaseCdcOutbox.xml --param CdcName=Contact
 dotnet run codegen --script DatabaseCdcOutbox.xml --param CdcName=Posts
+
+-- Create the CdcIdentityMapping.sql
+dotnet run codegen --script DatabaseCdcIdentityMapping.xml
 ```
 
 <br/>

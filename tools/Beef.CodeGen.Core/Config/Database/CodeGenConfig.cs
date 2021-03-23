@@ -164,6 +164,29 @@ namespace Beef.CodeGen.Config.Database
         public string? CdcTrackingTableName { get; set; }
 
         /// <summary>
+        /// The option to exclude the generation of the generic `Cdc`-IdentityMapping capabilities.
+        /// </summary>
+        [JsonProperty("hasCdcIdentityMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The option to exclude the generation of the generic `Cdc`-IdentityMapping database capabilities.", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeCdcIdentityMapping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name for the `Cdc`-IdentityMapping.
+        /// </summary>
+        [JsonProperty("cdcIdentityMappingTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentityMapping.",
+            Description = "Defaults to `CdcIdentityMapping` (literal).")]
+        public string? CdcIdentityMappingTableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stored procedure name for the `Cdc`-IdentityMapping.
+        /// </summary>
+        [JsonProperty("cdcIdentityMappingStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentityMapping.",
+            Description = "Defaults to `spCreateCdcIdentityMapping` (literal).")]
+        public string? CdcIdentityMappingStoredProcedureName { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -431,6 +454,9 @@ namespace Beef.CodeGen.Config.Database
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
             CdcSchema = DefaultWhereNull(CdcSchema, () => "Cdc");
             CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
+            CdcIdentityMappingTableName = DefaultWhereNull(CdcIdentityMappingTableName, () => "CdcIdentityMapping");
+            CdcIdentityMappingStoredProcedureName = DefaultWhereNull(CdcIdentityMappingStoredProcedureName, () => "spCreateCdcIdentityMapping");
+            ExcludeCdcIdentityMapping = DefaultWhereNull(ExcludeCdcIdentityMapping, () => NoOption);
             HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
