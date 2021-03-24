@@ -5,6 +5,7 @@
 #nullable enable
 #pragma warning disable
 
+using Beef.Data.Database.Cdc;
 using Beef.Entities;
 using Beef.Mapper;
 using Newtonsoft.Json;
@@ -20,9 +21,14 @@ namespace Beef.Demo.Cdc.Entities
     public partial class ContactCdc : IUniqueKey, IETag
     {
         /// <summary>
+        /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+        /// </summary>
+        [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? GlobalId { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'ContactId' column value.
         /// </summary>
-        [JsonProperty("contactId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ContactId { get; set; }
 
         /// <summary>
@@ -60,6 +66,17 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [JsonProperty("addressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? AddressId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'AlternateContactId' column value.
+        /// </summary>
+        public int? AlternateContactId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'GlobalAlternateContactId' column value.
+        /// </summary>
+        [JsonProperty("globalAlternateContactId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? GlobalAlternateContactId { get; set; }
 
         /// <summary>
         /// Gets or sets the 'UniqueId' column value (join table 'Legacy.ContactMapping').
@@ -108,9 +125,14 @@ namespace Beef.Demo.Cdc.Entities
         public partial class AddressCdc : IUniqueKey
         {
             /// <summary>
+            /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+            /// </summary>
+            [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public string? GlobalId { get; set; }
+
+            /// <summary>
             /// Gets or sets the 'Id' (Address.Id) column value.
             /// </summary>
-            [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int Id { get; set; }
 
             /// <summary>

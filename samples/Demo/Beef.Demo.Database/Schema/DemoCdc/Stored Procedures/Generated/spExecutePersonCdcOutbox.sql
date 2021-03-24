@@ -141,9 +141,9 @@ BEGIN
 
     -- Root table: Demo.Person - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
-        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
+        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PersonId] AS [PersonId],
         [p].[RowVersion] AS [RowVersion]
       FROM #_changes AS [_chg]

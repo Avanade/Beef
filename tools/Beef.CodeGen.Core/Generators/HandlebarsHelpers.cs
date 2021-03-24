@@ -31,9 +31,6 @@ namespace Beef.CodeGen.Generators
             // Will check that the first argument equals at least one of the subsequent arguments.
             Handlebars.RegisterHelper("ifeq", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifeq", writer, args))
-                    return;
-
                 if (IfEq(args))
                     context.Template(writer, parameters);
                 else
@@ -43,9 +40,6 @@ namespace Beef.CodeGen.Generators
             // Will check that the first argument does not equal any of the subsequent arguments.
             Handlebars.RegisterHelper("ifne", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifne", writer, args))
-                    return;
-
                 if (IfEq(args))
                     context.Inverse(writer, parameters);
                 else
@@ -55,9 +49,6 @@ namespace Beef.CodeGen.Generators
             // Will check that the first argument is less than or equal to the subsequent arguments.
             Handlebars.RegisterHelper("ifle", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifle", writer, args))
-                    return;
-
                 if (IfLe(args))
                     context.Template(writer, parameters);
                 else
@@ -67,9 +58,6 @@ namespace Beef.CodeGen.Generators
             // Will check that the first argument is greater than or equal to the subsequent arguments.
             Handlebars.RegisterHelper("ifge", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifge", writer, args))
-                    return;
-
                 if (IfGe(args))
                     context.Template(writer, parameters);
                 else
@@ -79,9 +67,6 @@ namespace Beef.CodeGen.Generators
             // Will check that all of the arguments have a non-<c>null</c> value.
             Handlebars.RegisterHelper("ifval", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifval", writer, args))
-                    return;
-
                 foreach (var arg in args)
                 {
                     if (arg == null)
@@ -97,9 +82,6 @@ namespace Beef.CodeGen.Generators
             // Will check that all of the arguments have a <c>null</c> value.
             Handlebars.RegisterHelper("ifnull", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifnull", writer, args))
-                    return;
-
                 foreach (var arg in args)
                 {
                     if (arg != null)
@@ -115,9 +97,6 @@ namespace Beef.CodeGen.Generators
             // Will check that any of the arguments have a <c>true</c> value where bool; otherwise, non-null.
             Handlebars.RegisterHelper("ifor", (writer, context, parameters, args) =>
             {
-                if (!CheckArgs("ifor", writer, args))
-                    return;
-
                 foreach (var arg in args)
                 {
                     if (arg is bool opt)
@@ -130,6 +109,10 @@ namespace Beef.CodeGen.Generators
                     }
                     else if (arg != null)
                     {
+                        var opt2 = arg as bool?;
+                        if (opt2 != null && !opt2.Value)
+                            continue;
+
                         context.Template(writer, parameters);
                         return;
                     }
@@ -265,23 +248,6 @@ namespace Beef.CodeGen.Generators
                 return bool.Parse(rval.ToString()!);
             else
                 return int.Parse(rval.ToString()!, CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Check the arguments to validate for correctness.
-        /// </summary>
-        private static bool CheckArgs(string name, EncodedTextWriter writer, Arguments args)
-        {
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] != null && args[i].GetType().Name == "UndefinedBindingResult")
-                {
-                    writer.Write($"!!! {name}: Arg[{i}] == UndefinedBindingResult !!!");
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

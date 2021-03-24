@@ -207,14 +207,17 @@ BEGIN
 
     -- Root table: {{Schema}}.{{Name}} - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
-        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
+        [_ct].[Hash] AS [_TrackingHash],
+{{#if IdentifierMapping}}
+        [_im].[GlobalId] AS [GlobalId],
+{{/if}}
 {{#each PrimaryKeyColumns}}
         [_chg].[{{Name}}] AS [{{NameAlias}}]{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}
 {{/each}}
 {{#each SelectedColumnsExcludingPrimaryKey}}
-        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
+        [{{#ifval IdentifierMappingAlias}}{{IdentifierMappingAlias}}{{else}}{{Parent.Alias}}{{/ifval}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
 {{/each}}
 {{#each JoinNonCdcChildren}}
   {{#each Columns}}
@@ -223,6 +226,9 @@ BEGIN
 {{/each}}
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+{{#if IdentifierMapping}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+{{/if}}
       LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
 {{#each JoinNonCdcChildren}}
       {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
@@ -231,6 +237,9 @@ BEGIN
 {{#each CdcJoins}}
     -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now.
     SELECT
+  {{#if IdentifierMapping}}
+        [_im].[GlobalId] AS [GlobalId],
+  {{/if}}
   {{#each JoinHierarchyReverse}}
     {{#unless @last}}
       {{#each OnSelectColumns}}
@@ -251,6 +260,9 @@ BEGIN
   {{#each JoinHierarchyReverse}}
       INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
+  {{#if IdentifierMapping}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+  {{/if}}
   {{#each JoinNonCdcChildren}}
       {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}

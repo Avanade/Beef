@@ -342,6 +342,11 @@ namespace Beef.CodeGen.Config.Database
         public string QualifiedNameWithAlias => string.IsNullOrEmpty(NameAlias) || NameAlias == Name ? QualifiedName : $"{QualifiedName} AS [{NameAlias}]";
 
         /// <summary>
+        /// Indicates whether the column should not be serialized when creating an .NET entity equivalent.
+        /// </summary>
+        public bool IgnoreSerialization { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -396,7 +401,23 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the <see cref="QueryConfig"/> column configuration.
     /// </summary>
-    public class CdcColumnConfig : ColumnConfigBase<CodeGenConfig, CdcConfig> { }
+    public class CdcColumnConfig : ColumnConfigBase<CodeGenConfig, CdcConfig> 
+    {
+        /// <summary>
+        /// Gets or sets the identifier mapping schema name.
+        /// </summary>
+        public string? IdentifierMappingSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping table name.
+        /// </summary>
+        public string? IdentifierMappingTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping alias.
+        /// </summary>
+        public string? IdentifierMappingAlias { get; set; }
+    }
 
     /// <summary>
     /// Represents the <see cref="QueryJoinConfig"/> column configuration.

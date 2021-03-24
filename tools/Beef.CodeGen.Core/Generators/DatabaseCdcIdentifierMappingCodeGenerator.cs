@@ -8,7 +8,7 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the Database Change Data Capture (CDC) <c>IdentityMapping</c> generator.
     /// </summary>
-    public class DatabaseCdcIdentityMappingCodeGenerator : CodeGeneratorBase<CodeGenConfig, CodeGenConfig>
+    public class DatabaseCdcIdentifierMappingCodeGenerator : CodeGeneratorBase<CodeGenConfig, CodeGenConfig>
     {
         /// <summary>
         /// <inheritdoc/>
@@ -16,6 +16,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => IsNoOption(Check.NotNull(config, nameof(config)).ExcludeCdcIdentityMapping) ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+            => IsNoOption(Check.NotNull(config, nameof(config)).ExcludeCdcIdentifierMapping) ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
     }
 }

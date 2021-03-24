@@ -13,7 +13,7 @@ using Beef.Data.Database.Cdc;
 namespace Beef.Demo.Cdc.Data
 {
     /// <summary>
-    /// Provides the <see cref="CdcTracker"/> data access.
+    /// Provides the <see cref="CdcTracker"/> data mapper.
     /// </summary>
     public class CdcTrackingDbMapper : DatabaseMapper<CdcTracker>, ITrackingTvp
     {

@@ -14,31 +14,35 @@ using Beef.Data.Database.Cdc;
 namespace {{Root.NamespaceCdc}}.Data
 {
     /// <summary>
-    /// Provides the <see cref="CdcTracker"/> data mapper.
+    /// Provides the <see cref="CdcIdentifierMapping"/> data mapper.
     /// </summary>
-    public class CdcTrackingDbMapper : DatabaseMapper<CdcTracker>, ITrackingTvp
+    public class CdcIdentifierMappingDbMapper : DatabaseMapper<CdcIdentifierMapping>, IIdentifierMappingTvp
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CdcTrackingDbMapper"/> class.
+        /// Initializes a new instance of the <see cref="CdcIdentifierMappingDbMapper"/> class.
         /// </summary>
-        public CdcTrackingDbMapper()
+        public CdcIdentifierMappingDbMapper()
         {
+            Property(s => s.Schema);
+            Property(s => s.Table);
             Property(s => s.Key);
-            Property(s => s.Hash);
+            Property(s => s.GlobalId);
         }
 
         /// <summary>
         /// Creates a <see cref="TableValuedParameter"/> for the <paramref name="list"/>.
         /// </summary>
-        /// <param name="list">The <see cref="CdcTracker"/> list.</param>
+        /// <param name="list">The <see cref="CdcIdentifierMapping"/> list.</param>
         /// <returns>The Table-Valued Parameter.</returns>
-        public TableValuedParameter CreateTableValuedParameter(IEnumerable<CdcTracker> list)
+        public TableValuedParameter CreateTableValuedParameter(IEnumerable<CdcIdentifierMapping> list)
         {        
             var dt = new DataTable();
+            dt.Columns.Add("Schema", typeof(string));
+            dt.Columns.Add("Table", typeof(string));
             dt.Columns.Add("Key", typeof(string));
-            dt.Columns.Add("Hash", typeof(string));
+            dt.Columns.Add("GlobalId", typeof(string));
 
-            var tvp = new TableValuedParameter("[{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List]", dt);
+            var tvp = new TableValuedParameter("[{{Root.CdcSchema}}].[udt{{Root.CdcIdentifierMappingTableName}}List]", dt);
             AddToTableValuedParameter(tvp, list);
             return tvp;
         }

@@ -85,6 +85,14 @@ namespace Beef.CodeGen.Config.Database
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
         public List<string>? AliasColumns { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
+        /// </summary>
+        [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
+            Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
+        public List<string>? IdentifierMappingColumns { get; set; }
+
         #endregion
 
         #region Database
@@ -179,6 +187,14 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("excludeBackgroundService", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
         public string? ExcludeBackgroundService { get; set; }
+
+        /// <summary>
+        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) on the primary key.
+        /// </summary>
+        [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+           Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
+        public bool? IdentifierMapping { get; set; }
 
         #endregion
 
@@ -351,6 +367,16 @@ namespace Beef.CodeGen.Config.Database
         public List<CtorParameterConfig> DataCtorParameters { get; } = new List<CtorParameterConfig>();
 
         /// <summary>
+        /// Gets the fully qualified name schema.table name.
+        /// </summary>
+        public string? QualifiedName => DbTable!.QualifiedName;
+
+        /// <summary>
+        /// Indicates whether there is at least one global identifier being used somewhere.
+        /// </summary>
+        public bool UsesGlobalIdentifier { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -383,18 +409,22 @@ namespace Beef.CodeGen.Config.Database
 
             PrepareJoins();
 
+            UsesGlobalIdentifier = IdentifierMapping == true || Joins.Any(x => x.IdentifierMapping == true);
+
             foreach (var c in DbTable.Columns)
             {
                 var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
                 if (c.IsPrimaryKey)
                 {
                     cc.IncludeColumnOnDelete = true;
+                    cc.IgnoreSerialization = IdentifierMapping == true;
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
                 else if (IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!))
                     cc.IncludeColumnOnDelete = true;
 
+                MapIdentityMappingColumn(cc);
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
                     var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
@@ -423,9 +453,31 @@ namespace Beef.CodeGen.Config.Database
             // Build up the selected columns list.
             foreach (var c in Columns)
             {
-                var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias, IncludeColumnOnDelete = c.IncludeColumnOnDelete };
+                var cc = new CdcColumnConfig
+                {
+                    Name = c.Name,
+                    DbColumn = c.DbColumn,
+                    NameAlias = c.NameAlias,
+                    IncludeColumnOnDelete = c.IncludeColumnOnDelete,
+                    IgnoreSerialization = c.IgnoreSerialization || c.IdentifierMappingTable != null
+                };
+
                 cc.Prepare(Root!, this);
                 SelectedColumns.Add(cc);
+
+                if (c.IdentifierMappingTable != null)
+                {
+                    cc = new CdcColumnConfig
+                    {
+                        Name = "Global" + c.Name,
+                        DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = c.DbColumn!.DbTable },
+                        NameAlias = "Global" + c.NameAlias,
+                        IdentifierMappingAlias = c.IdentifierMappingAlias
+                    };
+
+                    cc.Prepare(Root!, this);
+                    SelectedColumns.Add(cc);
+                }
             }
 
             // Data constructors. 
@@ -438,11 +490,6 @@ namespace Beef.CodeGen.Config.Database
                 DataCtorParameters.Add(ctor);
             }
         }
-
-        /// <summary>
-        /// Gets the fully qualified name schema.table name.
-        /// </summary>
-        public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
         /// Prepares the joins.
@@ -478,6 +525,37 @@ namespace Beef.CodeGen.Config.Database
                 if (Joins.Any(x => x != j && x.Name == j.Name))
                     throw new CodeGenException(this, nameof(Joins), $"The Name '{j.Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to correct.");
             }
+        }
+
+        /// <summary>
+        /// Check whether column is selected for identity mapping and map accordingly.
+        /// </summary>
+        private void MapIdentityMappingColumn(CdcColumnConfig cc)
+        {
+            if (IdentifierMappingColumns == null)
+                return;
+
+            var imc = IdentifierMappingColumns.FirstOrDefault(x => x.StartsWith(cc.Name + "^", StringComparison.Ordinal));
+            if (imc == null)
+                return;
+
+            if (cc.DbColumn!.IsPrimaryKey)
+                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' cannot be configured using IdentityMappingColumns as it is part of the primary key; use the IdentityMapping feature instead.");
+
+            var parts = imc.Split("^");
+            if (parts.Length < 2 || parts.Length > 3)
+                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' configuration '{imc}' that is not correctly formatted.");
+
+            cc.IdentifierMappingSchema = parts.Length == 3 ? parts[1] : Schema;
+            cc.IdentifierMappingTable = parts.Length == 2 ? parts[1] : parts[2];
+            cc.IdentifierMappingAlias = $"_im{IdentifierMappingColumns.IndexOf(imc) + 1}";
+
+            var t = Root!.DbTables.FirstOrDefault(x => x.Schema == cc.IdentifierMappingSchema && x.Name == cc.IdentifierMappingTable);
+            if (t == null)
+                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' that does not exist.");
+
+            if (t.Columns.Count(x => x.IsPrimaryKey) != 1)
+                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' which must only have a single column representing the primary key.");
         }
     }
 }

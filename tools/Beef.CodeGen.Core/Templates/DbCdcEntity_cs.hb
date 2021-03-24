@@ -6,9 +6,9 @@
 #nullable enable
 #pragma warning disable
 
-{{#ifval ColumnIsDeleted}}
+{{#ifor ColumnIsDeleted UsesGlobalIdentifier}}
 using Beef.Data.Database.Cdc;
-{{/ifval}}
+{{/ifor}}
 using Beef.Entities;
 using Beef.Mapper;
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
@@ -25,15 +25,25 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}
+    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}
     {
+{{#if IdentifierMapping}}
+        /// <summary>
+        /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+        /// </summary>
+        [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? GlobalId { get; set; }
+
+{{/if}}
 {{#each SelectedEntityColumns}}
         /// <summary>
         /// Gets or sets the '{{Name}}' column value.
         /// </summary>
-  {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+  {{#unless IgnoreSerialization}}
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-  {{/ifeq}}
+    {{/ifeq}}
+  {{/unless}}
         public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
   {{#unless @last}}
 
@@ -151,15 +161,25 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}Cdc : IUniqueKey
+        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}
         {
+  {{#if IdentifierMapping}}
+            /// <summary>
+            /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+            /// </summary>
+            [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public string? GlobalId { get; set; }
+
+  {{/if}}
   {{#each Columns}}
             /// <summary>
             /// Gets or sets the '{{NameAlias}}' ({{Parent.TableName}}.{{Name}}) column value.
             /// </summary>
-    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+    {{#unless IgnoreSerialization}}
+      {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
             [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-    {{/ifeq}}
+      {{/ifeq}}
+    {{/unless}}
             public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
     {{#unless @last}}
 

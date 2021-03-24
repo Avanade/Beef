@@ -166,6 +166,14 @@ namespace Beef.CodeGen.Config.Database
            Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
         public List<string>? IncludeColumnsOnDelete { get; set; }
 
+        /// <summary>
+        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) on the primary key.
+        /// </summary>
+        [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+           Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
+        public bool? IdentifierMapping { get; set; }
+
         #endregion
 
         #region ISpecialColumns
@@ -389,6 +397,7 @@ namespace Beef.CodeGen.Config.Database
                 if (c.IsPrimaryKey)
                 {
                     var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
+                    cc.IgnoreSerialization = IdentifierMapping == true;
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
@@ -396,6 +405,7 @@ namespace Beef.CodeGen.Config.Database
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
                     var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
+                    cc.IgnoreSerialization = c.IsPrimaryKey && IdentifierMapping == true;
                     var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
                     if (ca != null)
                     {

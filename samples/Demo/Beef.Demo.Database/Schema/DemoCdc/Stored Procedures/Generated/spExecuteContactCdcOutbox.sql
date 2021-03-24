@@ -178,9 +178,10 @@ BEGIN
 
     -- Root table: Legacy.Contact - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
-        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
+        [_ct].[Hash] AS [_TrackingHash],
+        [_im].[GlobalId] AS [GlobalId],
         [_chg].[ContactId] AS [ContactId],
         [c].[Name] AS [Name],
         [c].[Phone] AS [Phone],
@@ -188,14 +189,18 @@ BEGIN
         [c].[Active] AS [Active],
         [c].[DontCallList] AS [DontCallList],
         [c].[AddressId] AS [AddressId],
+        [c].[AlternateContactId] AS [AlternateContactId],
+        [_im1].[GlobalAlternateContactId] AS [GlobalAlternateContactId],
         [cm].[UniqueId] AS [UniqueId]
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
+      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Contact' AND [_im].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
       LEFT OUTER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
 
     -- Related table: Address (Legacy.Address) - only use INNER JOINS to get what is actually there right now.
     SELECT
+        [_im].[GlobalId] AS [GlobalId],
         [a].[Id] AS [Id],
         [a].[Street1] AS [Street1],
         [a].[Street2] AS [Street2],
@@ -205,6 +210,7 @@ BEGIN
       FROM #_changes AS [_chg]
       INNER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
       INNER JOIN [Legacy].[Address] AS [a] ON ([a].[Id] = [c].[AddressId])
+      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Address' AND [_im].[Key] = CAST([_chg].[Id] AS NVARCHAR(128)))
       WHERE [_chg].[_Op] <> 1
 
     -- Commit the transaction.
