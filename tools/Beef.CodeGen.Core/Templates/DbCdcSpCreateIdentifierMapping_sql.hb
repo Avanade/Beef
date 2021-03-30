@@ -17,7 +17,7 @@ BEGIN
     INSERT INTO [{{CdcSchema}}].[{{CdcIdentifierMappingTableName}}]
         ([Schema], [Table], [Key], [GlobalId])
       SELECT [n].[Schema], [n].[Table], [n].[Key], [n].[GlobalId]
-        FROM [{{CdcSchema}}].[{{CdcIdentifierMappingTableName}}] AS [n]
+        FROM @IdentifierList AS [n]
         WHERE NOT EXISTS (SELECT 0 FROM [{{CdcSchema}}].[{{CdcIdentifierMappingTableName}}] AS [o]
                             WHERE [n].[Schema] = [o].[Schema] AND [n].[Table] = [o].[Table] AND [n].[Key] = [o].[Key])
 

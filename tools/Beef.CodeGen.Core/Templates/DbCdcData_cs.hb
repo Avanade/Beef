@@ -9,6 +9,9 @@
 using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
+{{#if UsesGlobalIdentifier}}
+using Beef.Entities;
+{{/if}}
 using Beef.Events;
 using Beef.Mapper;
 using Microsoft.Extensions.Logging;
@@ -47,11 +50,14 @@ namespace {{Root.NamespaceCdc}}.Data
         /// <param name="db">The <see cref="{{DatabaseName}}"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
+{{#if UsesGlobalIdentifier}}
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+{{/if}}
 {{#each DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
-            base(db, "[{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]", "[{{CdcSchema}}].[{{CompleteStoredProcedureName}}]", evtPub, logger){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
+        {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#if UsesGlobalIdentifier}}, IStringIdentifierGenerator idGen{{/if}}{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
+            base(db, "[{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]", "[{{CdcSchema}}].[{{CompleteStoredProcedureName}}]", evtPub, logger{{#if UsesGlobalIdentifier}}, "[{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingStoredProcedureName}}]", idGen, new CdcIdentifierMappingDbMapper(){{/if}}){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
 {{#ifne DataCtorParameters.Count 0}}
         {
   {{#each DataCtorParameters}}

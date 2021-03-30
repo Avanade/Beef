@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Beef.Entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace Beef.Data.Database.Cdc
 {
@@ -40,6 +42,49 @@ namespace Beef.Data.Database.Cdc
                 services.AddHostedService<TCdcService>();
 
             return services;
+        }
+
+        /// <summary>
+        /// Creates the formatted key (as a <see cref="string"/>) for the <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The key for the <paramref name="value"/>.</returns>
+        public static string CreateFormattedKey(this object value)
+        {
+            var sb = new StringBuilder();
+            switch (value ?? throw new ArgumentNullException(nameof(value)))
+            {
+                case IIntIdentifier ii:
+                    sb.Append(ii.Id);
+                    break;
+
+                case IGuidIdentifier gi:
+                    sb.Append(gi.Id);
+                    break;
+
+                case IStringIdentifier si:
+                    sb.Append(si.Id);
+                    break;
+
+                case IUniqueKey uk:
+                    if (uk.UniqueKey.Args.Length == 0)
+                        throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
+
+                    for (int i = 0; i < uk.UniqueKey.Args.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append(",");
+
+                        sb.Append(uk.UniqueKey.Args[i]);
+                    }
+
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Type must implement at least one of the following: IIdentifier, IGuidIdentifier, IStringIdentifier or IUniqueKey.");
+            }
+
+            return sb.ToString();
         }
     }
 }

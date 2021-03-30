@@ -16,6 +16,9 @@ using Newtonsoft.Json;
 {{/ifeq}}
 using System;
 using System.Collections.Generic;
+{{#if UsesGlobalIdentifier}}
+using System.Threading.Tasks;
+{{/if}}
 
 namespace {{Root.NamespaceCdc}}.Entities
 {
@@ -25,7 +28,7 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}
+    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
     {
 {{#if IdentifierMapping}}
         /// <summary>
@@ -151,6 +154,55 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+{{#if UsesGlobalIdentifier}}
+
+        /// <summary>
+        /// Link any new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+        public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+        {
+  {{#if IdentifierMapping}}
+            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{Name}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+  {{/if}}
+  {{#each SelectedEntityColumns}}
+    {{#ifval IdentifierMappingParent}}
+            coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
+    {{/ifval}}
+  {{/each}}
+  {{#each JoinCdcChildren}}
+    {{#ifeq JoinCardinality 'OneToMany'}}
+            {{PropertyName}}?.ForEach(async item => await item.LinkIdentifierMappingsAsync(coll, idGen).ConfigureAwait(false));
+    {{else}}
+            await ({{PropertyName}}?.LinkIdentifierMappingsAsync(coll, idGen) ?? Task.CompletedTask).ConfigureAwait(false);
+    {{/ifeq}}
+  {{/each}}
+        }
+
+        /// <summary>
+        /// Re-link the new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+        {
+  {{#if IdentifierMapping}}
+            coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+  {{/if}}
+  {{#each SelectedEntityColumns}}
+    {{#ifval IdentifierMappingParent}}
+            coll.Invoke({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, () => {{NameAlias}} = coll.GetGlobalId(this, nameof({{NameAlias}})));
+    {{/ifval}}
+  {{/each}}
+  {{#each JoinCdcChildren}}
+    {{#ifeq JoinCardinality 'OneToMany'}}
+            {{PropertyName}}?.ForEach(item => item.RelinkIdentifierMappings(coll));
+    {{else}}
+            {{PropertyName}}?.RelinkIdentifierMappings(coll);
+    {{/ifeq}}
+  {{/each}}
+        }
+{{/if}}
 {{#each CdcJoins}}
 
         #region {{ModelName}}Cdc
@@ -161,7 +213,7 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}
+        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
         {
   {{#if IdentifierMapping}}
             /// <summary>
@@ -254,6 +306,31 @@ namespace {{Root.NamespaceCdc}}.Entities
       {{/each}}
     {{/unless}}
   {{/each}}
+  {{#if Parent.UsesGlobalIdentifier}}
+
+            /// <summary>
+            /// Link any new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+            public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+            {
+    {{#if IdentifierMapping}}
+                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{TableName}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+    {{/if}}
+            }
+
+            /// <summary>
+            /// Re-link the new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+            {
+    {{#if IdentifierMapping}}
+                coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+    {{/if}}
+            }
+  {{/if}}
         }
 
         /// <summary>

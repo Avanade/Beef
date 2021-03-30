@@ -8,6 +8,7 @@
 using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
+using Beef.Entities;
 using Beef.Events;
 using Beef.Mapper;
 using Microsoft.Extensions.Logging;
@@ -38,8 +39,9 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public ContactCdcData(IDatabase db, IEventPublisher evtPub, ILogger<ContactCdcData> logger) :
-            base(db, "[DemoCdc].[spExecuteContactCdcOutbox]", "[DemoCdc].[spCompleteContactCdcOutbox]", evtPub, logger) => ContactCdcDataCtor();
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+        public ContactCdcData(IDatabase db, IEventPublisher evtPub, ILogger<ContactCdcData> logger, IStringIdentifierGenerator idGen) :
+            base(db, "[DemoCdc].[spExecuteContactCdcOutbox]", "[DemoCdc].[spCompleteContactCdcOutbox]", evtPub, logger, "[DemoCdc].[spCreateCdcIdentifierMapping]", idGen, new CdcIdentifierMappingDbMapper()) => ContactCdcDataCtor();
 
         partial void ContactCdcDataCtor(); // Enables additional functionality to be added to the constructor.
 

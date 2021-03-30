@@ -49,9 +49,6 @@ BEGIN
     -- Where there is no incomplete outbox then the next should be processed.
     IF (@OutboxId IS NULL)
     BEGIN
-      -- New outbox so force creation of a new outbox.
-      SET @OutboxId = null 
-
       -- Get the last outbox processed.
       SELECT TOP 1
           @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn]{{#ifne CdcJoins.Count 0}},{{/ifne}}
@@ -226,10 +223,15 @@ BEGIN
 {{/each}}
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+      LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
 {{#if IdentifierMapping}}
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
 {{/if}}
-      LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+{{#each SelectedColumnsExcludingPrimaryKey}}
+  {{#ifval IdentifierMappingParent}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [{{IdentifierMappingAlias}}] ON ([{{IdentifierMappingAlias}}].[Schema] = '{{IdentifierMappingSchema}}' AND [{{IdentifierMappingAlias}}].[Table] = '{{IdentifierMappingTable}}' AND [{{IdentifierMappingAlias}}].[Key] = CAST([{{IdentifierMappingParent.Parent.Alias}}].[{{IdentifierMappingParent.Name}}] AS NVARCHAR(128))) 
+  {{/ifval}}
+{{/each}}
 {{#each JoinNonCdcChildren}}
       {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
 {{/each}}
@@ -261,7 +263,7 @@ BEGIN
       INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
   {{#if IdentifierMapping}}
-      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
   {{/if}}
   {{#each JoinNonCdcChildren}}
       {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})

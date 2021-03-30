@@ -42,9 +42,6 @@ BEGIN
     -- Where there is no incomplete outbox then the next should be processed.
     IF (@OutboxId IS NULL)
     BEGIN
-      -- New outbox so force creation of a new outbox.
-      SET @OutboxId = null 
-
       -- Get the last outbox processed.
       SELECT TOP 1
           @ContactMinLsn = [_outbox].[ContactMaxLsn],
@@ -190,12 +187,13 @@ BEGIN
         [c].[DontCallList] AS [DontCallList],
         [c].[AddressId] AS [AddressId],
         [c].[AlternateContactId] AS [AlternateContactId],
-        [_im1].[GlobalAlternateContactId] AS [GlobalAlternateContactId],
+        [_im1].[GlobalId] AS [GlobalAlternateContactId],
         [cm].[UniqueId] AS [UniqueId]
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
-      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Contact' AND [_im].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
+      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Contact' AND [_im].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
+      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im1] ON ([_im1].[Schema] = 'Legacy' AND [_im1].[Table] = 'Contact' AND [_im1].[Key] = CAST([c].[AlternateContactId] AS NVARCHAR(128))) 
       LEFT OUTER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
 
     -- Related table: Address (Legacy.Address) - only use INNER JOINS to get what is actually there right now.
@@ -210,7 +208,7 @@ BEGIN
       FROM #_changes AS [_chg]
       INNER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
       INNER JOIN [Legacy].[Address] AS [a] ON ([a].[Id] = [c].[AddressId])
-      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Address' AND [_im].[Key] = CAST([_chg].[Id] AS NVARCHAR(128)))
+      LEFT OUTER JOIN [DemoCdc].[CdcIdentifierMapping] AS [_im] ON ([_im].[Schema] = 'Legacy' AND [_im].[Table] = 'Address' AND [_im].[Key] = CAST([a].[Id] AS NVARCHAR(128)))
       WHERE [_chg].[_Op] <> 1
 
     -- Commit the transaction.

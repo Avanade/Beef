@@ -469,10 +469,13 @@ namespace Beef.CodeGen.Config.Database
                 {
                     cc = new CdcColumnConfig
                     {
-                        Name = "Global" + c.Name,
+                        Name = "GlobalId",
                         DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = c.DbColumn!.DbTable },
                         NameAlias = "Global" + c.NameAlias,
-                        IdentifierMappingAlias = c.IdentifierMappingAlias
+                        IdentifierMappingAlias = c.IdentifierMappingAlias,
+                        IdentifierMappingSchema = c.IdentifierMappingSchema,
+                        IdentifierMappingTable = c.IdentifierMappingTable,
+                        IdentifierMappingParent = cc
                     };
 
                     cc.Prepare(Root!, this);

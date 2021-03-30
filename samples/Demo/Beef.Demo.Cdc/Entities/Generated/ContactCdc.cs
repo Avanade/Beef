@@ -11,6 +11,7 @@ using Beef.Mapper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Demo.Cdc.Entities
 {
@@ -18,7 +19,7 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (primary) database table 'Legacy.Contact'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class ContactCdc : IUniqueKey, IETag
+    public partial class ContactCdc : IUniqueKey, IETag, ICdcLinkIdentifierMapping
     {
         /// <summary>
         /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
@@ -73,7 +74,7 @@ namespace Beef.Demo.Cdc.Entities
         public int? AlternateContactId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'GlobalAlternateContactId' column value.
+        /// Gets or sets the 'GlobalId' column value.
         /// </summary>
         [JsonProperty("globalAlternateContactId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? GlobalAlternateContactId { get; set; }
@@ -115,6 +116,29 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(ContactId) };
+
+        /// <summary>
+        /// Link any new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+        public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+        {
+            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Contact", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
+            coll.AddAsync(GlobalAlternateContactId == default && AlternateContactId != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalAlternateContactId), Schema = "Legacy", Table = "Contact", Key = AlternateContactId.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
+            await (Address?.LinkIdentifierMappingsAsync(coll, idGen) ?? Task.CompletedTask).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Re-link the new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+        {
+            coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+            coll.Invoke(GlobalAlternateContactId == default && AlternateContactId != default, () => GlobalAlternateContactId = coll.GetGlobalId(this, nameof(GlobalAlternateContactId)));
+            Address?.RelinkIdentifierMappings(coll);
+        }
 
         #region AddressCdc
 
@@ -182,6 +206,25 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(Id) };
+
+            /// <summary>
+            /// Link any new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+            public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+            {
+                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Address", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
+            }
+
+            /// <summary>
+            /// Re-link the new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+            {
+                coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+            }
         }
 
         /// <summary>

@@ -417,6 +417,11 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the identifier mapping alias.
         /// </summary>
         public string? IdentifierMappingAlias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping parent column configuration.
+        /// </summary>
+        public CdcColumnConfig? IdentifierMappingParent { get; set; }
     }
 
     /// <summary>

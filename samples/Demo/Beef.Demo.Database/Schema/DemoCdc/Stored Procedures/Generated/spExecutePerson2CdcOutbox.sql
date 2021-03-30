@@ -38,9 +38,6 @@ BEGIN
     -- Where there is no incomplete outbox then the next should be processed.
     IF (@OutboxId IS NULL)
     BEGIN
-      -- New outbox so force creation of a new outbox.
-      SET @OutboxId = null 
-
       -- Get the last outbox processed.
       SELECT TOP 1
           @Person2MinLsn = [_outbox].[Person2MaxLsn]

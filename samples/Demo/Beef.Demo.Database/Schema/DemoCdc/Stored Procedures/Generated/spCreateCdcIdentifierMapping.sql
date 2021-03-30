@@ -16,7 +16,7 @@ BEGIN
     INSERT INTO [DemoCdc].[CdcIdentifierMapping]
         ([Schema], [Table], [Key], [GlobalId])
       SELECT [n].[Schema], [n].[Table], [n].[Key], [n].[GlobalId]
-        FROM [DemoCdc].[CdcIdentifierMapping] AS [n]
+        FROM @IdentifierList AS [n]
         WHERE NOT EXISTS (SELECT 0 FROM [DemoCdc].[CdcIdentifierMapping] AS [o]
                             WHERE [n].[Schema] = [o].[Schema] AND [n].[Table] = [o].[Table] AND [n].[Key] = [o].[Key])
 
