@@ -82,6 +82,24 @@
       "title": "The table name for the `Cdc`-Tracking.",
       "description": "Defaults to `CdcTracking` (literal)."
     },
+    "hasCdcIdentifierMapping": {
+      "type": "string",
+      "title": "The option to exclude the generation of the generic `Cdc`-IdentifierMapping database capabilities.",
+      "enum": [
+        "No",
+        "Yes"
+      ]
+    },
+    "cdcIdentifierMappingTableName": {
+      "type": "string",
+      "title": "The table name for the `Cdc`-IdentifierMapping.",
+      "description": "Defaults to `CdcIdentifierMapping` (literal)."
+    },
+    "cdcIdentifierMappingStoredProcedureName": {
+      "type": "string",
+      "title": "The table name for the `Cdc`-IdentifierMapping.",
+      "description": "Defaults to `spCreateCdcIdentifierMapping` (literal)."
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
@@ -1028,6 +1046,22 @@
                 "Yes"
               ]
             },
+            "identifierMapping": {
+              "type": "boolean",
+              "title": "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.",
+              "description": "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s)."
+            },
+            "identifierMappingColumns": {
+              "type": "array",
+              "title": "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.",
+              "description": "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
             "columnNameIsDeleted": {
               "type": "string",
               "title": "The column name for the `IsDeleted` capability.",
@@ -1142,6 +1176,22 @@
                       "type": "array",
                       "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
                       "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "identifierMapping": {
+                      "type": "boolean",
+                      "title": "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.",
+                      "description": "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s)."
+                    },
+                    "identifierMappingColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.",
+                      "description": "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.",
                       "items": [
                         {
                           "type": "string",

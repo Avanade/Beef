@@ -23,6 +23,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CategorySchema("IdentifierMapping", Title = "Provides the _identifier mapping_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumns
     {
@@ -84,14 +85,6 @@ namespace Beef.CodeGen.Config.Database
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
         public List<string>? AliasColumns { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
-        /// </summary>
-        [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
-            Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
-        public List<string>? IdentifierMappingColumns { get; set; }
 
         #endregion
 
@@ -188,13 +181,25 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
         public string? ExcludeBackgroundService { get; set; }
 
+        #endregion
+
+        #region IdentifierMapping
+
         /// <summary>
-        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) on the primary key.
+        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.
         /// </summary>
         [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+        [PropertySchema("IdentifierMapping", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
            Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
         public bool? IdentifierMapping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
+        /// </summary>
+        [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("IdentifierMapping", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
+            Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
+        public List<string>? IdentifierMappingColumns { get; set; }
 
         #endregion
 
@@ -409,7 +414,7 @@ namespace Beef.CodeGen.Config.Database
 
             PrepareJoins();
 
-            UsesGlobalIdentifier = IdentifierMapping == true || Joins.Any(x => x.IdentifierMapping == true);
+            UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
 
             foreach (var c in DbTable.Columns)
             {
@@ -424,7 +429,6 @@ namespace Beef.CodeGen.Config.Database
                 else if (IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!))
                     cc.IncludeColumnOnDelete = true;
 
-                MapIdentityMappingColumn(cc);
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
                     var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
@@ -437,6 +441,7 @@ namespace Beef.CodeGen.Config.Database
 
                     if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
                     {
+                        MapIdentityMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                         cc.Prepare(Root!, this);
                         Columns.Add(cc);
                     }
@@ -533,32 +538,32 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Check whether column is selected for identity mapping and map accordingly.
         /// </summary>
-        private void MapIdentityMappingColumn(CdcColumnConfig cc)
+        internal static void MapIdentityMappingColumn<T>(CodeGenConfig root, ConfigBase config, string schema, List<string>? identifierMappingColumns, IIdentifierMappingColumn<T> cc) where T : class
         {
-            if (IdentifierMappingColumns == null)
+            if (identifierMappingColumns == null)
                 return;
 
-            var imc = IdentifierMappingColumns.FirstOrDefault(x => x.StartsWith(cc.Name + "^", StringComparison.Ordinal));
+            var imc = identifierMappingColumns.FirstOrDefault(x => x.StartsWith(cc.Name + "^", StringComparison.Ordinal));
             if (imc == null)
                 return;
 
             if (cc.DbColumn!.IsPrimaryKey)
-                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' cannot be configured using IdentityMappingColumns as it is part of the primary key; use the IdentityMapping feature instead.");
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' cannot be configured using IdentityMappingColumns as it is part of the primary key; use the IdentityMapping feature instead.");
 
             var parts = imc.Split("^");
             if (parts.Length < 2 || parts.Length > 3)
-                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' configuration '{imc}' that is not correctly formatted.");
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' configuration '{imc}' that is not correctly formatted.");
 
-            cc.IdentifierMappingSchema = parts.Length == 3 ? parts[1] : Schema;
+            cc.IdentifierMappingSchema = parts.Length == 3 ? parts[1] : schema;
             cc.IdentifierMappingTable = parts.Length == 2 ? parts[1] : parts[2];
-            cc.IdentifierMappingAlias = $"_im{IdentifierMappingColumns.IndexOf(imc) + 1}";
+            cc.IdentifierMappingAlias = $"_im{identifierMappingColumns.IndexOf(imc) + 1}";
 
-            var t = Root!.DbTables.FirstOrDefault(x => x.Schema == cc.IdentifierMappingSchema && x.Name == cc.IdentifierMappingTable);
+            var t = root!.DbTables.FirstOrDefault(x => x.Schema == cc.IdentifierMappingSchema && x.Name == cc.IdentifierMappingTable);
             if (t == null)
-                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' that does not exist.");
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' that does not exist.");
 
             if (t.Columns.Count(x => x.IsPrimaryKey) != 1)
-                throw new CodeGenException(this, nameof(IdentifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' which must only have a single column representing the primary key.");
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' which must only have a single column representing the primary key.");
         }
     }
 }

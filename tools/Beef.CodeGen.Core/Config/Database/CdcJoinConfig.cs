@@ -23,6 +23,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CategorySchema("IdentifierMapping", Title = "Provides the _identifier mapping_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcJoinConfig : ConfigBase<CodeGenConfig, CdcConfig>, ITableReference, ISpecialColumns
     {
@@ -166,13 +167,25 @@ namespace Beef.CodeGen.Config.Database
            Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
         public List<string>? IncludeColumnsOnDelete { get; set; }
 
+        #endregion
+
+        #region IdentifierMapping
+
         /// <summary>
-        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) on the primary key.
+        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.
         /// </summary>
         [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+        [PropertySchema("IdentifierMapping", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
            Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
         public bool? IdentifierMapping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
+        /// </summary>
+        [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("IdentifierMapping", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
+            Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
+        public List<string>? IdentifierMappingColumns { get; set; }
 
         #endregion
 
@@ -414,8 +427,29 @@ namespace Beef.CodeGen.Config.Database
                             cc.NameAlias = parts[1];
                     }
 
+                    CdcConfig.MapIdentityMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                     cc.Prepare(Root!, this);
                     Columns.Add(cc);
+
+                    if (cc.IdentifierMappingTable != null)
+                    {
+                        var cc2 = new CdcJoinColumnConfig
+                        {
+                            Name = "GlobalId",
+                            DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = cc.DbColumn!.DbTable },
+                            NameAlias = "Global" + cc.NameAlias,
+                            IdentifierMappingAlias = cc.IdentifierMappingAlias,
+                            IdentifierMappingSchema = cc.IdentifierMappingSchema,
+                            IdentifierMappingTable = cc.IdentifierMappingTable,
+                            IdentifierMappingParent = cc
+                        };
+
+                        cc.IdentifierMappingAlias = null;
+                        cc.IdentifierMappingParent = null;
+
+                        cc2.Prepare(Root!, this);
+                        Columns.Add(cc2);
+                    }
                 }
             }
         }
@@ -444,7 +478,9 @@ namespace Beef.CodeGen.Config.Database
                 Root = Root,
                 Parent = Parent,
                 IndentIndex = indentIndex,
-                HierarchyParent = hierarchyParent
+                HierarchyParent = hierarchyParent,
+                IdentifierMapping = IdentifierMapping,
+                IdentifierMappingColumns = IdentifierMappingColumns
             };
 
             foreach (var item in On!)

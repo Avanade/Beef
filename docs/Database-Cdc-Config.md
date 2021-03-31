@@ -22,6 +22,7 @@ Category | Description
 [`Database`](#Database) | Provides the _database_ configuration.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
+[`IdentifierMapping`](#IdentifierMapping) | Provides the _identifier mapping_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -81,6 +82,16 @@ Property | Description
 -|-
 `columnNameIsDeleted` | The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.
 `columnNameRowVersion` | The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.
+
+<br/>
+
+## IdentifierMapping
+Provides the _identifier mapping_ configuration.
+
+Property | Description
+-|-
+**`identifierMapping`** | Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key. This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).
+**`identifierMappingColumns`** | The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping. Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.
 
 <br/>
 

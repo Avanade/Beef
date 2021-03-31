@@ -168,7 +168,7 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{/if}}
   {{#each SelectedEntityColumns}}
     {{#ifval IdentifierMappingParent}}
-            coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
+            coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<{{Parent.ModelName}}Cdc>().ConfigureAwait(false) });
     {{/ifval}}
   {{/each}}
   {{#each JoinCdcChildren}}
@@ -318,6 +318,11 @@ namespace {{Root.NamespaceCdc}}.Entities
     {{#if IdentifierMapping}}
                 coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{TableName}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
     {{/if}}
+    {{#each Columns}}
+      {{#ifval IdentifierMappingParent}}
+                coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<{{Parent.ModelName}}Cdc>().ConfigureAwait(false) });
+      {{/ifval}}
+    {{/each}}
             }
 
             /// <summary>
@@ -329,6 +334,11 @@ namespace {{Root.NamespaceCdc}}.Entities
     {{#if IdentifierMapping}}
                 coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
     {{/if}}
+    {{#each Columns}}
+      {{#ifval IdentifierMappingParent}}
+                coll.Invoke({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, () => {{NameAlias}} = coll.GetGlobalId(this, nameof({{NameAlias}})));
+      {{/ifval}}
+    {{/each}}
             }
   {{/if}}
         }

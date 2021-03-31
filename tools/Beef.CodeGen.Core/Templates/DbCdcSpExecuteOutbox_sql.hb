@@ -237,7 +237,7 @@ BEGIN
 {{/each}}
 
 {{#each CdcJoins}}
-    -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now.
+    -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now (where applicable).
     SELECT
   {{#if IdentifierMapping}}
         [_im].[GlobalId] AS [GlobalId],
@@ -250,7 +250,7 @@ BEGIN
     {{/unless}}
   {{/each}}
   {{#each Columns}}
-        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
+        [{{#ifval IdentifierMappingAlias}}{{IdentifierMappingAlias}}{{else}}{{Parent.Alias}}{{/ifval}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
   {{/each}}
   {{#each JoinNonCdcChildren}}
     {{#each Columns}}
@@ -265,6 +265,11 @@ BEGIN
   {{#if IdentifierMapping}}
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
   {{/if}}
+  {{#each Columns}}
+    {{#ifval IdentifierMappingParent}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [{{IdentifierMappingAlias}}] ON ([{{IdentifierMappingAlias}}].[Schema] = '{{IdentifierMappingSchema}}' AND [{{IdentifierMappingAlias}}].[Table] = '{{IdentifierMappingTable}}' AND [{{IdentifierMappingAlias}}].[Key] = CAST([{{IdentifierMappingParent.Parent.Alias}}].[{{IdentifierMappingParent.Name}}] AS NVARCHAR(128))) 
+    {{/ifval}}
+  {{/each}}
   {{#each JoinNonCdcChildren}}
       {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}

@@ -754,6 +754,16 @@
                       <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="IdentifierMapping" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key. This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="IdentifierMappingColumns" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping. Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
             </xs:choice>
@@ -855,6 +865,16 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="IdentifierMapping" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key. This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IdentifierMappingColumns" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping. Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
@@ -946,6 +966,27 @@
       <xs:attribute name="CdcAuditTableName" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The table name for the `Cdc`-Tracking. Defaults to `CdcTracking` (literal).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="HasCdcIdentifierMapping" use="optional">
+        <xs:annotation>
+          <xs:documentation>The option to exclude the generation of the generic `Cdc`-IdentifierMapping database capabilities.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="No" />
+            <xs:enumeration value="Yes" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CdcIdentifierMappingTableName" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The table name for the `Cdc`-IdentifierMapping. Defaults to `CdcIdentifierMapping` (literal).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CdcIdentifierMappingStoredProcedureName" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The table name for the `Cdc`-IdentifierMapping. Defaults to `spCreateCdcIdentifierMapping` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">

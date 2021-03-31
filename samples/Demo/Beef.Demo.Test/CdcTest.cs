@@ -65,7 +65,7 @@ namespace Beef.Demo.Test
                     "INSERT INTO [Legacy].[Contact] ([Name], [Phone], [Active]) VALUES ('Name1', '123', 1)" + Environment.NewLine +
                     "INSERT INTO [Legacy].[Contact] ([Name], [Phone], [Active]) VALUES ('Name2', '456', 1)" + Environment.NewLine +
                     "INSERT INTO [Legacy].[Contact] ([Name], [Phone], [Active]) VALUES ('Name3', '789', 1)" + Environment.NewLine +
-                    "INSERT INTO [Legacy].[Address] ([Street1]) VALUES ('Petherick')";
+                    "INSERT INTO [Legacy].[Address] ([Street1], [AlternateAddressId]) VALUES ('Petherick', 88)";
 
                 await db.SqlStatement(script).NonQueryAsync().ConfigureAwait(false);
                 var ci = await db.SqlStatement("SELECT TOP 1 [ContactId] FROM [Legacy].[Contact] WHERE [Name] = 'Name1'").ScalarAsync<int>().ConfigureAwait(false);
@@ -114,6 +114,7 @@ namespace Beef.Demo.Test
                 Assert.NotNull(cdor.Result[1].Address);
                 Assert.NotNull(cdor.Result[1].Address.GlobalId);
                 Assert.AreNotEqual(cdor.Result[1].Address.GlobalId, cdor.Result[1].GlobalId);
+                Assert.NotNull(cdor.Result[1].Address.GlobalAlternateAddressId);
 
                 var cgi = cdor.Result[1].GlobalId;
                 var agi = cdor.Result[1].Address.GlobalId;
@@ -187,6 +188,8 @@ namespace Beef.Demo.Test
                 Assert.AreEqual(cdor2.Result[0].GlobalId, cgi); // Global id's should not have been regenerated.
                 Assert.AreEqual(cdor2.Result[0].GlobalAlternateContactId, cgi);
                 Assert.AreEqual(cdor2.Result[0].Address.GlobalId, agi);
+                Assert.IsNotNull(cdor2.Result[0].Address.GlobalAlternateAddressId);
+                Assert.AreNotEqual(cdor2.Result[0].Address.GlobalAlternateAddressId, cdor2.Result[0].Address.GlobalId);
 
                 // Update so it looks like the lsn's are out of whack; i.e. data loss situation - should fail.
                 script = $"UPDATE [DemoCdc].[ContactOutbox] SET [IsComplete] = 0, [ContactMinLsn] = 0x00000000000045B80003 WHERE [OutboxId] = {cdor.Outbox.Id}";

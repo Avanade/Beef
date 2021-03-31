@@ -260,7 +260,7 @@ BEGIN
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
 
-    -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now.
+    -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now (where applicable).
     SELECT
         [c].[CommentsId] AS [CommentsId],
         [c].[PostsId] AS [PostsId],
@@ -271,7 +271,7 @@ BEGIN
       INNER JOIN [Legacy].[Comments] AS [c] ON ([c].[PostsId] = [p].[PostsId])
       WHERE [_chg].[_Op] <> 1
 
-    -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
+    -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
     SELECT
         [p].[PostsId] AS [Posts_PostsId],  -- Additional joining column (informational).
         [ct].[TagsId] AS [TagsId],
@@ -283,7 +283,7 @@ BEGIN
       INNER JOIN [Legacy].[Tags] AS [ct] ON ([ct].[ParentType] = 'C' AND [ct].[ParentId] = [c].[CommentsId])
       WHERE [_chg].[_Op] <> 1
 
-    -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
+    -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
     SELECT
         [pt].[TagsId] AS [TagsId],
         [pt].[ParentId] AS [PostsId],

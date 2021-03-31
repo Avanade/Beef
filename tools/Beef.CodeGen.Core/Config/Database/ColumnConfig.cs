@@ -399,9 +399,35 @@ namespace Beef.CodeGen.Config.Database
     public class QueryJoinColumnConfig : ColumnConfigBase<CodeGenConfig, QueryJoinConfig> { }
 
     /// <summary>
+    /// Enables the Identifier Mapping column configuration.
+    /// </summary>
+    public interface IIdentifierMappingColumn<T> : IColumnConfig where T : class
+    {
+        /// <summary>
+        /// Gets or sets the identifier mapping schema name.
+        /// </summary>
+        string? IdentifierMappingSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping table name.
+        /// </summary>
+        string? IdentifierMappingTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping alias.
+        /// </summary>
+        string? IdentifierMappingAlias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping parent column configuration.
+        /// </summary>
+        T? IdentifierMappingParent { get; set; }
+    }
+
+    /// <summary>
     /// Represents the <see cref="QueryConfig"/> column configuration.
     /// </summary>
-    public class CdcColumnConfig : ColumnConfigBase<CodeGenConfig, CdcConfig> 
+    public class CdcColumnConfig : ColumnConfigBase<CodeGenConfig, CdcConfig>, IIdentifierMappingColumn<CdcColumnConfig>
     {
         /// <summary>
         /// Gets or sets the identifier mapping schema name.
@@ -427,5 +453,26 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the <see cref="QueryJoinConfig"/> column configuration.
     /// </summary>
-    public class CdcJoinColumnConfig : ColumnConfigBase<CodeGenConfig, CdcJoinConfig> { }
+    public class CdcJoinColumnConfig : ColumnConfigBase<CodeGenConfig, CdcJoinConfig>, IIdentifierMappingColumn<CdcJoinColumnConfig>
+    {
+        /// <summary>
+        /// Gets or sets the identifier mapping schema name.
+        /// </summary>
+        public string? IdentifierMappingSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping table name.
+        /// </summary>
+        public string? IdentifierMappingTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping alias.
+        /// </summary>
+        public string? IdentifierMappingAlias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier mapping parent column configuration.
+        /// </summary>
+        public CdcJoinColumnConfig? IdentifierMappingParent { get; set; }
+    }
 }

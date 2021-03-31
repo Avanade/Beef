@@ -190,6 +190,18 @@ namespace Beef.Demo.Cdc.Entities
             public string? PostalZipCode { get; set; }
 
             /// <summary>
+            /// Gets or sets the 'AlternateAddressId' (Address.AlternateAddressId) column value.
+            /// </summary>
+            [JsonProperty("alternateAddressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public int? AlternateAddressId { get; set; }
+
+            /// <summary>
+            /// Gets or sets the 'GlobalAlternateAddressId' (Address.GlobalId) column value.
+            /// </summary>
+            [JsonProperty("globalAlternateAddressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public string? GlobalAlternateAddressId { get; set; }
+
+            /// <summary>
             /// <inheritdoc/>
             /// </summary>
             [MapperIgnore()]
@@ -215,6 +227,7 @@ namespace Beef.Demo.Cdc.Entities
             public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
             {
                 coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Address", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
+                coll.AddAsync(GlobalAlternateAddressId == default && AlternateAddressId != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalAlternateAddressId), Schema = "Legacy", Table = "Address", Key = AlternateAddressId.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
             }
 
             /// <summary>
@@ -224,6 +237,7 @@ namespace Beef.Demo.Cdc.Entities
             public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
             {
                 coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+                coll.Invoke(GlobalAlternateAddressId == default && AlternateAddressId != default, () => GlobalAlternateAddressId = coll.GetGlobalId(this, nameof(GlobalAlternateAddressId)));
             }
         }
 

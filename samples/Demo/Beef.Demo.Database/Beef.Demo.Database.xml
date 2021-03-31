@@ -21,7 +21,7 @@
   <Cdc Name="Contact" Schema="Legacy" EventSubject="Legacy.Contact" IdentifierMapping="true" IdentifierMappingColumns="AlternateContactId^Contact" >
     <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
          Join on Address.Id = Contact.AddressId. -->
-    <CdcJoin Name="Address" JoinCardinality="OneToOne" IdentifierMapping="true">
+    <CdcJoin Name="Address" JoinCardinality="OneToOne" IdentifierMapping="true" IdentifierMappingColumns="AlternateAddressId^Address">
       <CdcJoinOn Name="Id" ToColumn="AddressId" />
     </CdcJoin>
     
