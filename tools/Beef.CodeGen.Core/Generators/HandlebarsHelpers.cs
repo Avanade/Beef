@@ -124,6 +124,8 @@ namespace Beef.CodeGen.Generators
             // Converts a value to lowercase.
             Handlebars.RegisterHelper("lower", (writer, context, parameters) => writer.WriteSafeString(parameters.FirstOrDefault()?.ToString()?.ToLowerInvariant() ?? ""));
 
+            // NOTE: Any ending in 'x' are to explicitly ignore special names!!!
+
             // Converts a value to camelcase.
             Handlebars.RegisterHelper("camel", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToCamelCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
             Handlebars.RegisterHelper("camelx", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToCamelCase(parameters.FirstOrDefault()?.ToString(), true) ?? ""));
@@ -135,6 +137,9 @@ namespace Beef.CodeGen.Generators
             // Converts a value to private case.
             Handlebars.RegisterHelper("private", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPrivateCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
             Handlebars.RegisterHelper("privatex", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPrivateCase(parameters.FirstOrDefault()?.ToString(), true) ?? ""));
+
+            Handlebars.RegisterHelper("sentence", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToSentenceCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
+            Handlebars.RegisterHelper("sentencex", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToSentenceCase(parameters.FirstOrDefault()?.ToString(), true) ?? ""));
 
             // Converts a value to the c# '<see cref="value"/>' comments equivalent.
             Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(ConfigBase.ToSeeComments(parameters.FirstOrDefault()?.ToString())));

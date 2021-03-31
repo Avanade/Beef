@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Beef.Demo.Cdc.Entities
 {
     /// <summary>
-    /// Represents the CDC model for the root (primary) database table 'Legacy.Contact'.
+    /// Represents the CDC model for the root (parent) database table 'Legacy.Contact'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class ContactCdc : IUniqueKey, IETag, ICdcLinkIdentifierMapping
@@ -28,56 +28,62 @@ namespace Beef.Demo.Cdc.Entities
         public string? GlobalId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'ContactId' column value.
+        /// Gets or sets the 'Contact Id' (Legacy.Contact.ContactId) column value.
         /// </summary>
         public int ContactId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Name' column value.
+        /// Gets or sets the 'Name' (Legacy.Contact.Name) column value.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Phone' column value.
+        /// Gets or sets the 'Phone' (Legacy.Contact.Phone) column value.
         /// </summary>
         [JsonProperty("phone", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Phone { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Email' column value.
+        /// Gets or sets the 'Email' (Legacy.Contact.Email) column value.
         /// </summary>
         [JsonProperty("email", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Email { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Active' column value.
+        /// Gets or sets the 'Active' (Legacy.Contact.Active) column value.
         /// </summary>
         [JsonProperty("active", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool? Active { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'DontCallList' column value.
+        /// Gets or sets the 'Dont Call List' (Legacy.Contact.DontCallList) column value.
         /// </summary>
         [JsonProperty("dontCallList", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool? DontCallList { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'AddressId' column value.
+        /// Gets or sets the 'Address Id' (Legacy.Contact.AddressId) column value.
         /// </summary>
         [JsonProperty("addressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? AddressId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'AlternateContactId' column value.
+        /// Gets or sets the 'Alternate Contact Id' (Legacy.Contact.AlternateContactId) column value.
         /// </summary>
         public int? AlternateContactId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'GlobalId' column value.
+        /// Gets or sets the 'Global Alternate Contact Id' (Legacy.Contact.AlternateContactId) mapped identifier value.
         /// </summary>
         [JsonProperty("globalAlternateContactId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? GlobalAlternateContactId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'Legacy System Code' (Legacy.Contact.legacy-system-code) column value.
+        /// </summary>
+        [JsonProperty("legacySystemCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? LegacySystemCode { get; set; }
 
         /// <summary>
         /// Gets or sets the 'UniqueId' column value (join table 'Legacy.ContactMapping').
@@ -155,48 +161,48 @@ namespace Beef.Demo.Cdc.Entities
             public string? GlobalId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Id' (Address.Id) column value.
+            /// Gets or sets the 'Id' (Legacy.Address.Id) column value.
             /// </summary>
             public int Id { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Street1' (Address.Street1) column value.
+            /// Gets or sets the 'Street1' (Legacy.Address.Street1) column value.
             /// </summary>
             [JsonProperty("street1", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Street1 { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Street2' (Address.Street2) column value.
+            /// Gets or sets the 'Street2' (Legacy.Address.Street2) column value.
             /// </summary>
             [JsonProperty("street2", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Street2 { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'City' (Address.City) column value.
+            /// Gets or sets the 'City' (Legacy.Address.City) column value.
             /// </summary>
             [JsonProperty("city", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? City { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'State' (Address.State) column value.
+            /// Gets or sets the 'State' (Legacy.Address.State) column value.
             /// </summary>
             [JsonProperty("state", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? State { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'PostalZipCode' (Address.PostalZipCode) column value.
+            /// Gets or sets the 'Postal Zip Code' (Legacy.Address.PostalZipCode) column value.
             /// </summary>
             [JsonProperty("postalZipCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? PostalZipCode { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'AlternateAddressId' (Address.AlternateAddressId) column value.
+            /// Gets or sets the 'Alternate Address Id' (Legacy.Address.AlternateAddressId) column value.
             /// </summary>
             [JsonProperty("alternateAddressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int? AlternateAddressId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'GlobalAlternateAddressId' (Address.GlobalId) column value.
+            /// Gets or sets the 'Global Alternate Address Id' (Legacy.Address.AlternateAddressId) mapped identifier value.
             /// </summary>
             [JsonProperty("globalAlternateAddressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? GlobalAlternateAddressId { get; set; }

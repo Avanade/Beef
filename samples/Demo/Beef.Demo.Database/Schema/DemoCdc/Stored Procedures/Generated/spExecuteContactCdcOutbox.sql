@@ -188,6 +188,7 @@ BEGIN
         [c].[AddressId] AS [AddressId],
         [c].[AlternateContactId] AS [AlternateContactId],
         [_im1].[GlobalId] AS [GlobalAlternateContactId],
+        [c].[legacy-system-code] AS [LegacySystemCode],
         [cm].[UniqueId] AS [UniqueId]
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))

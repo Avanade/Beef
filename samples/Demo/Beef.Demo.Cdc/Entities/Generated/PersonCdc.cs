@@ -14,13 +14,13 @@ using System.Collections.Generic;
 namespace Beef.Demo.Cdc.Entities
 {
     /// <summary>
-    /// Represents the CDC model for the root (primary) database table 'Demo.Person'.
+    /// Represents the CDC model for the root (parent) database table 'Demo.Person'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class PersonCdc : IUniqueKey, IETag
     {
         /// <summary>
-        /// Gets or sets the 'PersonId' column value.
+        /// Gets or sets the 'Person Id' (Demo.Person.PersonId) column value.
         /// </summary>
         [JsonProperty("personId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Guid PersonId { get; set; }

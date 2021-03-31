@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace {{Root.NamespaceCdc}}.Entities
 {
     /// <summary>
-    /// Represents the CDC model for the root (primary) database table '{{Schema}}.{{Name}}'.
+    /// Represents the CDC model for the root (parent) database table '{{Schema}}.{{Name}}'.
     /// </summary>
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -40,7 +40,7 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{/if}}
 {{#each SelectedEntityColumns}}
         /// <summary>
-        /// Gets or sets the '{{Name}}' column value.
+        /// Gets or sets the '{{sentence NameAlias}}' ({{Parent.Schema}}.{{Parent.Name}}.{{#ifval IdentifierMappingParent}}{{IdentifierMappingParent.Name}}{{else}}{{Name}}{{/ifval}}) {{#ifval IdentifierMappingParent}}mapped identifier{{else}}column{{/ifval}} value.
         /// </summary>
   {{#unless IgnoreSerialization}}
     {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
@@ -225,7 +225,7 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{/if}}
   {{#each Columns}}
             /// <summary>
-            /// Gets or sets the '{{NameAlias}}' ({{Parent.TableName}}.{{Name}}) column value.
+            /// Gets or sets the '{{sentence NameAlias}}' ({{Parent.Schema}}.{{Parent.Name}}.{{#ifval IdentifierMappingParent}}{{IdentifierMappingParent.Name}}{{else}}{{Name}}{{/ifval}}) {{#ifval IdentifierMappingParent}}mapped identifier{{else}}column{{/ifval}} value.
             /// </summary>
     {{#unless IgnoreSerialization}}
       {{#ifeq Root.JsonSerializer 'Newtonsoft'}}

@@ -25,6 +25,7 @@
     <None Remove="Migrations\20210219-081012-create-Test-Table2.sql" />
     <None Remove="Migrations\20210219-120345-create-Test-Table3.sql" />
     <None Remove="Migrations\20210330-151108-alter-legacy-address.sql" />
+    <None Remove="Migrations\20210331-100536-alter-legacy-contact.sql" />
     <None Remove="Schema\Sec\Functions\fnGetUserHasPermission.sql" />
     <None Remove="Schema\Sec\Functions\fnGetUserOrgUnits.sql" />
     <None Remove="Schema\Sec\Stored Procedures\spCheckUserHasPermission.sql" />

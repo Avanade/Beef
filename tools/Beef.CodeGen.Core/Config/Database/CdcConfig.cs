@@ -403,7 +403,7 @@ namespace Beef.CodeGen.Config.Database
             CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
-            ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
+            ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
