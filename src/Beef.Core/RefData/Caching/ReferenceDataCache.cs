@@ -60,6 +60,7 @@ namespace Beef.RefData.Caching
 
                 if (!(policy is NoCachePolicy))
                 {
+                    policy.Refresh();
                     _coll = GetCollectionInternal();
                     policy.Reset();
                     return _coll;
