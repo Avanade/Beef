@@ -19,7 +19,7 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (parent) database table 'Legacy.Contact'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class ContactCdc : IUniqueKey, IETag, ICdcLinkIdentifierMapping
+    public partial class ContactCdc : IUniqueKey, IETag, IGlobalIdentifier, ICdcLinkIdentifierMapping
     {
         /// <summary>
         /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
@@ -152,7 +152,7 @@ namespace Beef.Demo.Cdc.Entities
         /// Represents the CDC model for the related (child) database table 'Legacy.Address' (known uniquely as 'Address').
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class AddressCdc : IUniqueKey
+        public partial class AddressCdc : IUniqueKey, IGlobalIdentifier
         {
             /// <summary>
             /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.

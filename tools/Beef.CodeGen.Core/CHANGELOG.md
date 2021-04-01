@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.22
+- *Enhancement:* Added standardized identifier mapping for change-data-capture (CDC) from local (internal) to global (external) where required.
+- *Enhancement:* Added additional statistics information to console output.
+
 ## v4.1.21
 - *Enhancement:* Issue [116](https://github.com/Avanade/Beef/issues/116). Add capability to set the HTTP `Location` Header value.
 

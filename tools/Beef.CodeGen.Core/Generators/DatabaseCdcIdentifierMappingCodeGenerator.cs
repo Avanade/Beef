@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the Database Change Data Capture (CDC) <c>IdentityMapping</c> generator.
+    /// Represents the Database Change Data Capture (CDC) <c>IdentifierMapping</c> generator.
     /// </summary>
     public class DatabaseCdcIdentifierMappingCodeGenerator : CodeGeneratorBase<CodeGenConfig, CodeGenConfig>
     {
@@ -16,6 +16,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => IsNoOption(Check.NotNull(config, nameof(config)).ExcludeCdcIdentifierMapping) ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+            => IsTrue(Check.NotNull(config, nameof(config)).CdcIdentifierMapping) && config!.Cdc!.Count > 0 ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
     }
 }

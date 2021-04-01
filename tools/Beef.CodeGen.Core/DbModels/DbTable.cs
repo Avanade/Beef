@@ -180,9 +180,7 @@ namespace Beef.CodeGen.DbModels
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-#pragma warning disable CA1308 // Normalize strings to uppercase; by-design, a lowercase is required.
-            return new string(StringConversion.ToSentenceCase(name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
-#pragma warning restore CA1308 
+            return new string(StringConversion.ToSentenceCase(name.Replace(" ", ""))!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
         }
 
         /// <summary>

@@ -3,7 +3,6 @@
 using Beef.Data.Database;
 using System;
 using System.Text;
-using System.Xml.Linq;
 
 namespace Beef.CodeGen.DbModels
 {
@@ -121,6 +120,7 @@ namespace Beef.CodeGen.DbModels
             {
                 case "ROWVERSION":
                 case "TIMESTAMP":
+                case "BINARY": return "byte[]";
                 case "VARBINARY": return "byte[]";
                 case "BIT": return "bool";
                 case "DATETIMEOFFSET": return "DateTimeOffset";
@@ -150,7 +150,8 @@ namespace Beef.CodeGen.DbModels
                 "STRING" => typeof(string),
                 "DECIMAL" => typeof(decimal),
                 "DATETIME" => typeof(DateTime),
-                "BYTE[]" => typeof(byte[]),
+                "BINARY" => typeof(byte[]),
+                "VARBINARY" => typeof(byte[]),
                 "BOOL" => typeof(bool),
                 "DATETIMEOFFSET" => typeof(DateTimeOffset),
                 "DOUBLE" => typeof(double),

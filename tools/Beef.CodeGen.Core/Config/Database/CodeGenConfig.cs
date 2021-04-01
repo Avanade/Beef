@@ -166,11 +166,11 @@ namespace Beef.CodeGen.Config.Database
         public string? CdcTrackingTableName { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the generic `Cdc`-IdentifierMapping capabilities.
+        /// Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
         /// </summary>
-        [JsonProperty("hasCdcIdentifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The option to exclude the generation of the generic `Cdc`-IdentifierMapping database capabilities.", Options = new string[] { NoOption, YesOption })]
-        public string? ExcludeCdcIdentifierMapping { get; set; }
+        [JsonProperty("cdcIdentifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.")]
+        public bool? CdcIdentifierMapping { get; set; }
 
         /// <summary>
         /// Gets or sets the table name for the `Cdc`-IdentifierMapping.
@@ -470,7 +470,6 @@ namespace Beef.CodeGen.Config.Database
             CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
             CdcIdentifierMappingTableName = DefaultWhereNull(CdcIdentifierMappingTableName, () => "CdcIdentifierMapping");
             CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
-            ExcludeCdcIdentifierMapping = DefaultWhereNull(ExcludeCdcIdentifierMapping, () => NoOption);
             HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
@@ -509,8 +508,12 @@ namespace Beef.CodeGen.Config.Database
             Logger.Default.Log(LogLevel.Information, string.Empty);
             Logger.Default.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
 
-            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs))
-                throw new CodeGenException("ConnectionString must be specified as a RuntimeParameter.");
+            var evn = $"{Company?.Replace(".", "_", StringComparison.InvariantCulture)}_{AppName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs) || string.IsNullOrEmpty(cs))
+                cs = Environment.GetEnvironmentVariable(evn);
+
+            if (string.IsNullOrEmpty(cs))
+                throw new CodeGenException($"ConnectionString must be explicitly specified as a RuntimeParameter or using Environment Variable '{evn}'.");
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlServerDb(cs);

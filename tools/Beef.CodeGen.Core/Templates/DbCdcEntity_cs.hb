@@ -28,7 +28,7 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
+    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
     {
 {{#if IdentifierMapping}}
         /// <summary>
@@ -213,7 +213,7 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentityMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
+        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
         {
   {{#if IdentifierMapping}}
             /// <summary>

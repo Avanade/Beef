@@ -441,7 +441,7 @@ namespace Beef.CodeGen.Config.Database
 
                     if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
                     {
-                        MapIdentityMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
+                        MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                         cc.Prepare(Root!, this);
                         Columns.Add(cc);
                     }
@@ -538,7 +538,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Check whether column is selected for identity mapping and map accordingly.
         /// </summary>
-        internal static void MapIdentityMappingColumn<T>(CodeGenConfig root, ConfigBase config, string schema, List<string>? identifierMappingColumns, IIdentifierMappingColumn<T> cc) where T : class
+        internal static void MapIdentifierMappingColumn<T>(CodeGenConfig root, ConfigBase config, string schema, List<string>? identifierMappingColumns, IIdentifierMappingColumn<T> cc) where T : class
         {
             if (identifierMappingColumns == null)
                 return;
@@ -548,7 +548,7 @@ namespace Beef.CodeGen.Config.Database
                 return;
 
             if (cc.DbColumn!.IsPrimaryKey)
-                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' cannot be configured using IdentityMappingColumns as it is part of the primary key; use the IdentityMapping feature instead.");
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' cannot be configured using {nameof(IdentifierMappingColumns)} as it is part of the primary key; use the {nameof(IdentifierMapping)} feature instead.");
 
             var parts = imc.Split("^");
             if (parts.Length < 2 || parts.Length > 3)

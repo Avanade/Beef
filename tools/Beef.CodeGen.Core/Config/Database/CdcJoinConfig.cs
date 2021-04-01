@@ -427,7 +427,7 @@ namespace Beef.CodeGen.Config.Database
                             cc.NameAlias = parts[1];
                     }
 
-                    CdcConfig.MapIdentityMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
+                    CdcConfig.MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                     cc.Prepare(Root!, this);
                     Columns.Add(cc);
 
