@@ -211,5 +211,18 @@ namespace Beef.Test.NUnit
             var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
             return logger;
         }
+
+        /// <summary>
+        /// Creates a <see cref="Mock{T}"/> and updates the <see cref="Factory"/> (see <see cref="Factory.SetLocal{T}(T)"/>) with the mock instance.
+        /// </summary>
+        /// <typeparam name="T">The type to mock.</typeparam>
+        /// <typeparam name="mockBehavior">Behavior of the mock.</typeparam>
+        /// <returns>The <see cref="Mock{T}"/> instance.</returns>
+        public static Mock<T> CreateMock<T>(MockBehavior mockBehavior) where T : class
+        {
+            var mock = new Mock<T>(mockBehavior);
+            Factory.SetLocal<T>(mock.Object);
+            return mock;
+        }
     }
 }
