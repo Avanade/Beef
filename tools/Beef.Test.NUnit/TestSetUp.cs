@@ -303,7 +303,7 @@ namespace Beef.Test.NUnit
             Check.NotNull(valueType, nameof(valueType));
 
             if (valueType.GetInterface(typeof(IUniqueKey).Name) != null)
-                comparisonConfig.MembersToIgnore.AddRange(new string[] { "UniqueKey", "HasUniqueKey", "UniqueKeyProperties" });
+                comparisonConfig.MembersToIgnore.AddRange(new string[] { "UniqueKey", "UniqueKeyProperties" });
 
             if (valueType.GetInterface(typeof(IChangeTrackingLogging).Name) != null)
                 comparisonConfig.MembersToIgnore.Add("ChangeTracking");

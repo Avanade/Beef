@@ -5,6 +5,7 @@
 #nullable enable
 #pragma warning disable
 
+using Beef.Data.Database.Cdc;
 using Beef.Entities;
 using Beef.Mapper;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (parent) database table 'Legacy.Posts'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PostsCdc : IUniqueKey, IETag
+    public partial class PostsCdc : ITableKey, IETag
     {
         /// <summary>
         /// Gets or sets the 'Posts Id' (Legacy.Posts.PostsId) column value.
@@ -62,12 +63,6 @@ namespace Beef.Demo.Cdc.Entities
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public bool HasUniqueKey => true;
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey(PostsId);
 
         /// <summary>
@@ -75,6 +70,18 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(PostsId) };
+
+        /// <summary>
+        /// Gets or sets the 'Posts Id' <i>primary key</i> (Legacy.Posts.PostsId) column value (from the actual database table primary key; not from the change-data-capture source).
+        /// </summary>
+        /// <remarks>Will have a <c>default</c> value when the record no longer exists within the database (i.e. has been physically deleted).</remarks>
+        public int TableKey_PostsId { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public UniqueKey TableKey => new UniqueKey(TableKey_PostsId);
 
         #region CommentsCdc
 
@@ -114,12 +121,6 @@ namespace Beef.Demo.Cdc.Entities
             [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
             [MapperIgnore()]
             public PostsCdc.CommentsTagsCdcCollection? Tags { get; set; }
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
-            public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
@@ -171,12 +172,6 @@ namespace Beef.Demo.Cdc.Entities
             /// <inheritdoc/>
             /// </summary>
             [MapperIgnore()]
-            public bool HasUniqueKey => true;
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey(TagsId);
 
             /// <summary>
@@ -223,12 +218,6 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Text { get; set; }
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
-            public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>

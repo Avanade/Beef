@@ -133,11 +133,11 @@ namespace Beef.Demo.Test
                 Assert.NotNull(cdor.Events);
                 Assert.AreEqual(3, cdor.Events.Length); // There was a create/update/delete of row - not sent as only (very) short lived.
 
-                Assert.AreEqual($"Legacy.Contact.{cdor.Result[1].ContactId}", cdor.Events[0].Subject);
+                Assert.AreEqual($"Legacy.Contact.{cdor.Result[1].GlobalId}", cdor.Events[0].Subject);
                 Assert.AreEqual("Updated", cdor.Events[0].Action);
-                Assert.AreEqual($"Legacy.Contact.{cdor.Result[3].ContactId}", cdor.Events[1].Subject);
+                Assert.AreEqual($"Legacy.Contact.{cdor.Result[3].GlobalId}", cdor.Events[1].Subject);
                 Assert.AreEqual("Created", cdor.Events[1].Action);
-                Assert.AreEqual($"Legacy.Contact.{cdor.Result[5].ContactId}", cdor.Events[2].Subject);
+                Assert.AreEqual($"Legacy.Contact.{cdor.Result[5].GlobalId}", cdor.Events[2].Subject);
                 Assert.AreEqual("Deleted", cdor.Events[2].Action);
 
                 // Now execute again to get the final changes.
@@ -154,7 +154,7 @@ namespace Beef.Demo.Test
 
                 Assert.NotNull(cdor.Events);
                 Assert.AreEqual(1, cdor.Events.Length);
-                Assert.AreEqual($"Legacy.Contact.{cdor.Result[0].ContactId}", cdor.Events[0].Subject);
+                Assert.AreEqual($"Legacy.Contact.{cdor.Result[0].GlobalId}", cdor.Events[0].Subject);
                 Assert.AreEqual("Deleted", cdor.Events[0].Action);
 
                 // Let's now make that last outbox incomplete.

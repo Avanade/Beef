@@ -108,7 +108,7 @@ The [`EntityBase`](./Entities/EntityBase.cs) provides the rich entity capabiliti
 - Implements [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject) for `BeginEdit`, `EndEdit` and `CancelEdit`.
 - Implements [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1) for `Equals` and `GetHashCode`. 
 - Implements [`ICleanUp`](./Entities/ICleanUp.cs) for `CleanUp` and `IsInitial`.
-- Implements [`IUniqueKey`](./Entities/ICleanUp.cs) for `HasUniqueKey` and `UniqueKey`.
+- Implements [`IUniqueKey`](./Entities/ICleanUp.cs) for `UniqueKey`.
 - Implements [`IChangeTrackingLogging`](./Entities/IChangeTrackingLogging.cs) for `TrackChanges` and `ChangeTracking`.
 - Implements [`ICopyFrom`](./Entities/ICopyFrom.cs) and [`ICloneable`](./Entities/ICloneable.cs) for `CopyFrom` and `Clone` respectively.
 

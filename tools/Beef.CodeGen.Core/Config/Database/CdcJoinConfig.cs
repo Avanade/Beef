@@ -373,6 +373,59 @@ namespace Beef.CodeGen.Config.Database
             else
                 JoinToAlias = Parent!.Alias;
 
+            // Deal with the columns.
+            foreach (var c in DbTable.Columns)
+            {
+                CdcJoinColumnConfig? cc = null;
+                if (c.IsPrimaryKey)
+                {
+                    cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
+                    cc.IgnoreSerialization = IdentifierMapping == true;
+                    cc.Prepare(Root!, this);
+                    PrimaryKeyColumns.Add(cc);
+                }
+
+                if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
+                {
+                    if (cc == null)
+                        cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
+
+                    cc.IgnoreSerialization = c.IsPrimaryKey && IdentifierMapping == true;
+                    var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
+                    if (ca != null)
+                    {
+                        var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length == 2)
+                            cc.NameAlias = parts[1];
+                    }
+
+                    CdcConfig.MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
+                    cc.Prepare(Root!, this);
+                    Columns.Add(cc);
+
+                    if (cc.IdentifierMappingTable != null)
+                    {
+                        var cc2 = new CdcJoinColumnConfig
+                        {
+                            Name = "GlobalId",
+                            DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = cc.DbColumn!.DbTable },
+                            NameAlias = "Global" + cc.NameAlias,
+                            IdentifierMappingAlias = cc.IdentifierMappingAlias,
+                            IdentifierMappingSchema = cc.IdentifierMappingSchema,
+                            IdentifierMappingTable = cc.IdentifierMappingTable,
+                            IdentifierMappingParent = cc
+                        };
+
+                        cc.IdentifierMappingAlias = null;
+                        cc.IdentifierMappingParent = null;
+                        cc.IgnoreSerialization = true;
+
+                        cc2.Prepare(Root!, this);
+                        Columns.Add(cc2);
+                    }
+                }
+            }
+
             // Update the Join ons.
             if (On == null)
                 On = new List<CdcJoinOnConfig>();
@@ -402,55 +455,6 @@ namespace Beef.CodeGen.Config.Database
             {
                 jhr.HierarchyChild = jhp;
                 jhp = jhr;
-            }
-
-            // Deal with the columns.
-            foreach (var c in DbTable.Columns)
-            {
-                if (c.IsPrimaryKey)
-                {
-                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
-                    cc.IgnoreSerialization = IdentifierMapping == true;
-                    cc.Prepare(Root!, this);
-                    PrimaryKeyColumns.Add(cc);
-                }
-
-                if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
-                {
-                    var cc = new CdcJoinColumnConfig { Name = c.Name, DbColumn = c, IncludeColumnOnDelete = IncludeColumnsOnDelete != null && IncludeColumnsOnDelete.Contains(c.Name!) };
-                    cc.IgnoreSerialization = c.IsPrimaryKey && IdentifierMapping == true;
-                    var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
-                    if (ca != null)
-                    {
-                        var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length == 2)
-                            cc.NameAlias = parts[1];
-                    }
-
-                    CdcConfig.MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
-                    cc.Prepare(Root!, this);
-                    Columns.Add(cc);
-
-                    if (cc.IdentifierMappingTable != null)
-                    {
-                        var cc2 = new CdcJoinColumnConfig
-                        {
-                            Name = "GlobalId",
-                            DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = cc.DbColumn!.DbTable },
-                            NameAlias = "Global" + cc.NameAlias,
-                            IdentifierMappingAlias = cc.IdentifierMappingAlias,
-                            IdentifierMappingSchema = cc.IdentifierMappingSchema,
-                            IdentifierMappingTable = cc.IdentifierMappingTable,
-                            IdentifierMappingParent = cc
-                        };
-
-                        cc.IdentifierMappingAlias = null;
-                        cc.IdentifierMappingParent = null;
-
-                        cc2.Prepare(Root!, this);
-                        Columns.Add(cc2);
-                    }
-                }
             }
         }
 
@@ -488,7 +492,9 @@ namespace Beef.CodeGen.Config.Database
                 var jo = new CdcJoinOnConfig
                 {
                     Name = item.Name,
+                    NameAlias = item.NameAlias,
                     ToColumn = item.ToColumn,
+                    ToColumnAlias = item.ToColumnAlias,
                     ToStatement = item.ToStatement,
                     ToDbColumn = item.ToDbColumn,
                     Root = j.Root,

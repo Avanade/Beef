@@ -142,10 +142,11 @@ BEGIN
         [_chg].[_Lsn] AS [_Lsn],
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PersonId] AS [PersonId],
+        [p].[PersonId] AS [TableKey_PersonId],
         [p].[RowVersion] AS [RowVersion]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Demo].[Person] AS [p] ON ([p].[PersonId] = [_chg].[PersonId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
 
     -- Commit the transaction.
     COMMIT TRANSACTION

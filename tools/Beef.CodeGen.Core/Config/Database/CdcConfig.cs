@@ -412,13 +412,17 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
 
-            PrepareJoins();
-
-            UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
-
             foreach (var c in DbTable.Columns)
             {
                 var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
+                var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
+                if (ca != null)
+                {
+                    var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                        cc.NameAlias = parts[1];
+                }
+
                 if (c.IsPrimaryKey)
                 {
                     cc.IncludeColumnOnDelete = true;
@@ -431,14 +435,6 @@ namespace Beef.CodeGen.Config.Database
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
-                    var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
-                    if (ca != null)
-                    {
-                        var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length == 2)
-                            cc.NameAlias = parts[1];
-                    }
-
                     if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
                     {
                         MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
@@ -497,6 +493,11 @@ namespace Beef.CodeGen.Config.Database
                 ctor.Prepare(Root!, Root!);
                 DataCtorParameters.Add(ctor);
             }
+
+            PrepareJoins();
+
+
+            UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
         }
 
         /// <summary>

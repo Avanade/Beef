@@ -254,14 +254,15 @@ BEGIN
         [_chg].[_Lsn] AS [_Lsn],
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PostsId] AS [PostsId],
+        [p].[PostsId] AS [TableKey_PostsId],
         [p].[Text] AS [Text],
         [p].[Date] AS [Date]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
 
     -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now (where applicable).
-    SELECT
+    SELECT DISTINCT
         [c].[CommentsId] AS [CommentsId],
         [c].[PostsId] AS [PostsId],
         [c].[Text] AS [Text],
@@ -272,7 +273,7 @@ BEGIN
       WHERE [_chg].[_Op] <> 1
 
     -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
-    SELECT
+    SELECT DISTINCT
         [p].[PostsId] AS [Posts_PostsId],  -- Additional joining column (informational).
         [ct].[TagsId] AS [TagsId],
         [ct].[ParentId] AS [CommentsId],
@@ -284,7 +285,7 @@ BEGIN
       WHERE [_chg].[_Op] <> 1
 
     -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
-    SELECT
+    SELECT DISTINCT
         [pt].[TagsId] AS [TagsId],
         [pt].[ParentId] AS [PostsId],
         [pt].[Text] AS [Text]

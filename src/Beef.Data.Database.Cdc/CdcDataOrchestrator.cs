@@ -20,7 +20,7 @@ namespace Beef.Data.Database.Cdc
     /// <typeparam name="TCdcEntityWrapper">The <typeparamref name="TCdcEntity"/> wrapper <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcTrackingMapper">The tracking database mapper <see cref="Type"/>.</typeparam>
     public abstract class CdcDataOrchestrator<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper, TCdcTrackingMapper> : ICdcDataOrchestrator
-        where TCdcEntity : class, IUniqueKey, IETag, new() 
+        where TCdcEntity : class, ITableKey, IETag, new() 
         where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() 
         where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new() 
         where TCdcTrackingMapper : ITrackingTvp, new()
@@ -254,7 +254,13 @@ namespace Beef.Data.Database.Cdc
 
                 // Where there is no delete then just use the first.
                 if (item == null)
+                {
                     item = grp.First();
+
+                    // Where the primary key is initial (being the actual table primary key columns versus from CDC) then it has been _subsequently_ deleted (physically) so skip.
+                    if (item is ITableKey tk && tk.TableKey.IsInitial)
+                        continue;
+                }
 
                 // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
                 if (item is ILogicallyDeleted ild && ild.IsDeleted)

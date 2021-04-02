@@ -18,10 +18,10 @@
   <Table Name="Table3" Schema="Test" Get="true" Create="true" Update="true" Delete="true" Upsert="true" />
 
   <!-- Set up CDC for primary table Legacy.Contact. -->
-  <Cdc Name="Contact" Schema="Legacy" EventSubject="Legacy.Contact" IdentifierMapping="true" IdentifierMappingColumns="AlternateContactId^Contact">
+  <Cdc Name="Contact" Schema="Legacy" EventSubject="Legacy.Contact" IdentifierMapping="true" IdentifierMappingColumns="AlternateContactId^Contact" AliasColumns="ContactId^CID">
     <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
          Join on Address.Id = Contact.AddressId. -->
-    <CdcJoin Name="Address" JoinCardinality="OneToOne" IdentifierMapping="true" IdentifierMappingColumns="AlternateAddressId^Address">
+    <CdcJoin Name="Address" JoinCardinality="OneToOne" IdentifierMapping="true" IdentifierMappingColumns="AlternateAddressId^Address" AliasColumns="Id^AID">
       <CdcJoinOn Name="Id" ToColumn="AddressId" />
     </CdcJoin>
     

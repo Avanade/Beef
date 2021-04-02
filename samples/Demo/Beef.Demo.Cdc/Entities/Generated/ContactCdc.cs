@@ -19,7 +19,7 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (parent) database table 'Legacy.Contact'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class ContactCdc : IUniqueKey, IETag, IGlobalIdentifier, ICdcLinkIdentifierMapping
+    public partial class ContactCdc : ITableKey, IETag, IGlobalIdentifier, ICdcLinkIdentifierMapping
     {
         /// <summary>
         /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
@@ -28,9 +28,9 @@ namespace Beef.Demo.Cdc.Entities
         public string? GlobalId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Contact Id' (Legacy.Contact.ContactId) column value.
+        /// Gets or sets the 'CID' (Legacy.Contact.ContactId) column value.
         /// </summary>
-        public int ContactId { get; set; }
+        public int CID { get; set; }
 
         /// <summary>
         /// Gets or sets the 'Name' (Legacy.Contact.Name) column value.
@@ -80,7 +80,7 @@ namespace Beef.Demo.Cdc.Entities
         public string? GlobalAlternateContactId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Legacy System Code' (Legacy.Contact.legacy-system-code) column value.
+        /// Gets or sets the 'Legacy System Code' (Legacy.Contact.legacy_system_code) column value.
         /// </summary>
         [JsonProperty("legacySystemCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? LegacySystemCode { get; set; }
@@ -109,19 +109,25 @@ namespace Beef.Demo.Cdc.Entities
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public bool HasUniqueKey => true;
+        public UniqueKey UniqueKey => new UniqueKey(CID);
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public UniqueKey UniqueKey => new UniqueKey(ContactId);
+        public string[] UniqueKeyProperties => new string[] { nameof(CID) };
+
+        /// <summary>
+        /// Gets or sets the 'CID' <i>primary key</i> (Legacy.Contact.ContactId) column value (from the actual database table primary key; not from the change-data-capture source).
+        /// </summary>
+        /// <remarks>Will have a <c>default</c> value when the record no longer exists within the database (i.e. has been physically deleted).</remarks>
+        public int TableKey_CID { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [MapperIgnore()]
-        public string[] UniqueKeyProperties => new string[] { nameof(ContactId) };
+        /// <remarks><inheritdoc/></remarks>
+        public UniqueKey TableKey => new UniqueKey(TableKey_CID);
 
         /// <summary>
         /// Link any new global identifiers.
@@ -161,9 +167,9 @@ namespace Beef.Demo.Cdc.Entities
             public string? GlobalId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Id' (Legacy.Address.Id) column value.
+            /// Gets or sets the 'AID' (Legacy.Address.Id) column value.
             /// </summary>
-            public int Id { get; set; }
+            public int AID { get; set; }
 
             /// <summary>
             /// Gets or sets the 'Street1' (Legacy.Address.Street1) column value.
@@ -198,7 +204,6 @@ namespace Beef.Demo.Cdc.Entities
             /// <summary>
             /// Gets or sets the 'Alternate Address Id' (Legacy.Address.AlternateAddressId) column value.
             /// </summary>
-            [JsonProperty("alternateAddressId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int? AlternateAddressId { get; set; }
 
             /// <summary>
@@ -211,19 +216,13 @@ namespace Beef.Demo.Cdc.Entities
             /// <inheritdoc/>
             /// </summary>
             [MapperIgnore()]
-            public bool HasUniqueKey => true;
+            public UniqueKey UniqueKey => new UniqueKey(AID);
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
             [MapperIgnore()]
-            public UniqueKey UniqueKey => new UniqueKey(Id);
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
-            public string[] UniqueKeyProperties => new string[] { nameof(Id) };
+            public string[] UniqueKeyProperties => new string[] { nameof(AID) };
 
             /// <summary>
             /// Link any new global identifiers.

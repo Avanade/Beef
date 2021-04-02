@@ -142,6 +142,7 @@ BEGIN
         [_chg].[_Lsn] AS [_Lsn],
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PersonId] AS [PersonId],
+        [p].[PersonId] AS [TableKey_PersonId],
         [p].[FirstName] AS [FirstName],
         [p].[LastName] AS [LastName],
         [p].[Birthday] AS [Birthday],
@@ -155,8 +156,8 @@ BEGIN
         [p].[UpdatedDate] AS [UpdatedDate],
         [p].[IsDeleted] AS [IsDeleted]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person2' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Demo].[Person2] AS [p] ON ([p].[PersonId] = [_chg].[PersonId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person2' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
 
     -- Commit the transaction.
     COMMIT TRANSACTION

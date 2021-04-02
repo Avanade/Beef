@@ -57,9 +57,9 @@ namespace Beef.Demo.Cdc.Data
                 new MultiSetCollArgs<ContactCdcWrapperCollection, ContactCdcWrapper>(_contactCdcWrapperMapper, r => cColl = r, stopOnNull: true), // Root table: Legacy.Contact
                 new MultiSetCollArgs<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>(_addressCdcMapper, r =>
                 {
-                    foreach (var a in r.GroupBy(x => new { x.Id }).Select(g => new { g.Key.Id, Coll = g.ToCollection<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>() })) // Join table: Address (Legacy.Address)
+                    foreach (var a in r.GroupBy(x => new { x.AID }).Select(g => new { g.Key.AID, Coll = g.ToCollection<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>() })) // Join table: Address (Legacy.Address)
                     {
-                        cColl.Single(x => x.AddressId == a.Id).Address = a.Coll.SingleOrDefault();
+                        cColl.Where(x => x.AddressId == a.AID).ForEach(x => x.Address = a.Coll.SingleOrDefault());
                     }
                 }) // Related table: Address (Legacy.Address)
                 ).ConfigureAwait(false);

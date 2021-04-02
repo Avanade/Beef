@@ -106,7 +106,7 @@ BEGIN
           [_cdc].[__$start_lsn] AS [_Lsn],
           [_cdc].[__$operation] AS [_Op],
 {{#each PrimaryKeyColumns}}
-          [_cdc].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+          [_cdc].[{{Name}}] AS [{{Name}}]{{#unless @last}},{{/unless}}
 {{/each}}
         INTO #_changes
         FROM cdc.fn_cdc_get_all_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
@@ -127,7 +127,7 @@ BEGIN
           [_cdc].[__$start_lsn] AS [_Lsn],
           4 AS [_Op],
   {{#each Parent.PrimaryKeyColumns}}
-          [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+          [{{Parent.Alias}}].[{{Name}}] AS [{{Name}}]{{#unless @last}},{{/unless}}
   {{/each}}
         INTO #{{Alias}}
         FROM cdc.fn_cdc_get_all_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
@@ -211,7 +211,10 @@ BEGIN
         [_im].[GlobalId] AS [GlobalId],
 {{/if}}
 {{#each PrimaryKeyColumns}}
-        [_chg].[{{Name}}] AS [{{NameAlias}}]{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}
+        [_chg].[{{Name}}] AS [{{NameAlias}}],
+{{/each}}
+{{#each PrimaryKeyColumns}}
+        [{{Parent.Alias}}].[{{Name}}] AS [TableKey_{{NameAlias}}]{{#if @last}}{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}{{else}},{{/if}}
 {{/each}}
 {{#each SelectedColumnsExcludingPrimaryKey}}
         [{{#ifval IdentifierMappingAlias}}{{IdentifierMappingAlias}}{{else}}{{Parent.Alias}}{{/ifval}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
@@ -222,8 +225,10 @@ BEGIN
   {{/each}}
 {{/each}}
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
       LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+{{#each JoinNonCdcChildren}}
+      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+{{/each}}
 {{#if IdentifierMapping}}
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
 {{/if}}
@@ -232,13 +237,11 @@ BEGIN
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [{{IdentifierMappingAlias}}] ON ([{{IdentifierMappingAlias}}].[Schema] = '{{IdentifierMappingSchema}}' AND [{{IdentifierMappingAlias}}].[Table] = '{{IdentifierMappingTable}}' AND [{{IdentifierMappingAlias}}].[Key] = CAST([{{IdentifierMappingParent.Parent.Alias}}].[{{IdentifierMappingParent.Name}}] AS NVARCHAR(128))) 
   {{/ifval}}
 {{/each}}
-{{#each JoinNonCdcChildren}}
-      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
-{{/each}}
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#if IdentifierMapping}}_im.GlobalId){{else}}{{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}{{/if}}
 
 {{#each CdcJoins}}
     -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now (where applicable).
-    SELECT
+    SELECT DISTINCT
   {{#if IdentifierMapping}}
         [_im].[GlobalId] AS [GlobalId],
   {{/if}}
@@ -262,6 +265,9 @@ BEGIN
   {{#each JoinHierarchyReverse}}
       INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
+  {{#each JoinNonCdcChildren}}
+      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+  {{/each}}
   {{#if IdentifierMapping}}
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [_im] ON ([_im].[Schema] = '{{Schema}}' AND [_im].[Table] = '{{Name}}' AND [_im].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([{{Parent.Alias}}].[{{Name}}] AS NVARCHAR(128))){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
   {{/if}}
@@ -269,9 +275,6 @@ BEGIN
     {{#ifval IdentifierMappingParent}}
       LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingTableName}}] AS [{{IdentifierMappingAlias}}] ON ([{{IdentifierMappingAlias}}].[Schema] = '{{IdentifierMappingSchema}}' AND [{{IdentifierMappingAlias}}].[Table] = '{{IdentifierMappingTable}}' AND [{{IdentifierMappingAlias}}].[Key] = CAST([{{IdentifierMappingParent.Parent.Alias}}].[{{IdentifierMappingParent.Name}}] AS NVARCHAR(128))) 
     {{/ifval}}
-  {{/each}}
-  {{#each JoinNonCdcChildren}}
-      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
       WHERE [_chg].[_Op] <> 1
 

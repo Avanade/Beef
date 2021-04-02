@@ -6,9 +6,7 @@
 #nullable enable
 #pragma warning disable
 
-{{#ifor ColumnIsDeleted UsesGlobalIdentifier}}
 using Beef.Data.Database.Cdc;
-{{/ifor}}
 using Beef.Entities;
 using Beef.Mapper;
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
@@ -28,7 +26,7 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
+    public partial class {{ModelName}}Cdc : ITableKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
     {
 {{#if IdentifierMapping}}
         /// <summary>
@@ -141,12 +139,6 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public bool HasUniqueKey => true;
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
 
         /// <summary>
@@ -154,6 +146,20 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+{{#each PrimaryKeyColumns}}
+
+        /// <summary>
+        /// Gets or sets the '{{sentence NameAlias}}' <i>primary key</i> ({{Parent.Schema}}.{{Parent.Name}}.{{Name}}) column value (from the actual database table primary key; not from the change-data-capture source).
+        /// </summary>
+        /// <remarks>Will have a <c>default</c> value when the record no longer exists within the database (i.e. has been physically deleted).</remarks>
+        public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} TableKey_{{pascal NameAlias}} { get; set; }
+{{/each}}
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public UniqueKey TableKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}TableKey_{{pascal NameAlias}}{{/each}});
 {{#if UsesGlobalIdentifier}}
 
         /// <summary>
@@ -277,12 +283,6 @@ namespace {{Root.NamespaceCdc}}.Entities
             public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
     {{/ifeq}}
   {{/each}}
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
-            public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
