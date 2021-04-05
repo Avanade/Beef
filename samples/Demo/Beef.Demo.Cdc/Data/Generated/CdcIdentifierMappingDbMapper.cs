@@ -15,36 +15,12 @@ namespace Beef.Demo.Cdc.Data
     /// <summary>
     /// Provides the <see cref="CdcIdentifierMapping"/> data mapper.
     /// </summary>
-    public class CdcIdentifierMappingDbMapper : DatabaseMapper<CdcIdentifierMapping>, IIdentifierMappingTvp
+    public class CdcIdentifierMappingDbMapper : CdcIdentifierMappingDbMapperBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcIdentifierMappingDbMapper"/> class.
         /// </summary>
-        public CdcIdentifierMappingDbMapper()
-        {
-            Property(s => s.Schema);
-            Property(s => s.Table);
-            Property(s => s.Key);
-            Property(s => s.GlobalId);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="TableValuedParameter"/> for the <paramref name="list"/>.
-        /// </summary>
-        /// <param name="list">The <see cref="CdcIdentifierMapping"/> list.</param>
-        /// <returns>The Table-Valued Parameter.</returns>
-        public TableValuedParameter CreateTableValuedParameter(IEnumerable<CdcIdentifierMapping> list)
-        {        
-            var dt = new DataTable();
-            dt.Columns.Add("Schema", typeof(string));
-            dt.Columns.Add("Table", typeof(string));
-            dt.Columns.Add("Key", typeof(string));
-            dt.Columns.Add("GlobalId", typeof(string));
-
-            var tvp = new TableValuedParameter("[DemoCdc].[udtCdcIdentifierMappingList]", dt);
-            AddToTableValuedParameter(tvp, list);
-            return tvp;
-        }
+        public CdcIdentifierMappingDbMapper() : base("[DemoCdc].[udtCdcIdentifierMappingList]") { }
     }
 }
 

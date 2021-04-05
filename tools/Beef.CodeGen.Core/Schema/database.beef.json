@@ -82,13 +82,9 @@
       "title": "The table name for the `Cdc`-Tracking.",
       "description": "Defaults to `CdcTracking` (literal)."
     },
-    "hasCdcIdentifierMapping": {
-      "type": "string",
-      "title": "The option to exclude the generation of the generic `Cdc`-IdentifierMapping database capabilities.",
-      "enum": [
-        "No",
-        "Yes"
-      ]
+    "cdcIdentifierMapping": {
+      "type": "boolean",
+      "title": "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities."
     },
     "cdcIdentifierMappingTableName": {
       "type": "string",
@@ -104,6 +100,15 @@
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
       "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
+    },
+    "eventSubjectFormat": {
+      "type": "string",
+      "title": "The default formatting for the Subject when an Event is published.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey"
+      ]
     },
     "eventActionFormat": {
       "type": "string",
@@ -133,6 +138,16 @@
       "type": "boolean",
       "title": "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
       "description": "Defaults to `true`."
+    },
+    "autoDotNetRename": {
+      "type": "string",
+      "title": "The option to automatically rename the SQL Tables and Columns for use in .NET.",
+      "description": "Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.",
+      "enum": [
+        "None",
+        "PascalCase",
+        "SnakeKebabToPascalCase"
+      ]
     },
     "pathBase": {
       "type": "string",
@@ -1024,8 +1039,17 @@
             },
             "eventSubject": {
               "type": "string",
-              "title": "The event subject.",
+              "title": "The Event Subject.",
               "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified."
+            },
+            "eventSubjectFormat": {
+              "type": "string",
+              "title": "The default formatting for the Subject when an Event is published.",
+              "description": "Defaults to `CodeGeneration.EventSubjectFormat`.",
+              "enum": [
+                "NameOnly",
+                "NameAndKey"
+              ]
             },
             "includeColumnsOnDelete": {
               "type": "array",

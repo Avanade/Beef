@@ -336,13 +336,13 @@ namespace Beef.Demo.Test
                 Assert.IsTrue(cdor.IsSuccessful);
                 Assert.AreEqual(3, cdor.Result.Count);
 
-                Assert.AreEqual($"Legacy.Post.{cdor.Result[0].PostsId}", cdor.Events[0].Subject);
+                Assert.AreEqual($"Legacy.Post", cdor.Events[0].Subject);
                 Assert.AreEqual("Created", cdor.Events[0].Action);
 
-                Assert.AreEqual($"Legacy.Post.{cdor.Result[1].PostsId}", cdor.Events[1].Subject);
+                Assert.AreEqual($"Legacy.Post", cdor.Events[1].Subject);
                 Assert.AreEqual("Updated", cdor.Events[1].Action);
 
-                Assert.AreEqual($"Legacy.Post.{cdor.Result[2].PostsId}", cdor.Events[2].Subject);
+                Assert.AreEqual($"Legacy.Post", cdor.Events[2].Subject);
                 Assert.AreEqual("Updated", cdor.Events[2].Action);
             });
         }

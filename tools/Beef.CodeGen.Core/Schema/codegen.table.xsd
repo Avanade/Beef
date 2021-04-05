@@ -846,8 +846,19 @@
             </xs:attribute>
             <xs:attribute name="EventSubject" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
+                <xs:documentation>The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EventSubjectFormat" use="optional">
+              <xs:annotation>
+                <xs:documentation>The default formatting for the Subject when an Event is published. Defaults to `CodeGeneration.EventSubjectFormat`.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="NameOnly" />
+                  <xs:enumeration value="NameAndKey" />
+                </xs:restriction>
+              </xs:simpleType>
             </xs:attribute>
             <xs:attribute name="IncludeColumnsOnDelete" use="optional">
               <xs:annotation>
@@ -968,16 +979,10 @@
           <xs:documentation>The table name for the `Cdc`-Tracking. Defaults to `CdcTracking` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="HasCdcIdentifierMapping" use="optional">
+      <xs:attribute name="CdcIdentifierMapping" use="optional" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>The option to exclude the generation of the generic `Cdc`-IdentifierMapping database capabilities.</xs:documentation>
+          <xs:documentation>Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.</xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="No" />
-            <xs:enumeration value="Yes" />
-          </xs:restriction>
-        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="CdcIdentifierMappingTableName" use="optional" type="xs:string">
         <xs:annotation>
@@ -993,6 +998,17 @@
         <xs:annotation>
           <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSubjectFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default formatting for the Subject when an Event is published. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NameOnly" />
+            <xs:enumeration value="NameAndKey" />
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">
         <xs:annotation>
@@ -1027,6 +1043,18 @@
         <xs:annotation>
           <xs:documentation>Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects. Defaults to `true`.</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="AutoDotNetRename" use="optional">
+        <xs:annotation>
+          <xs:documentation>The option to automatically rename the SQL Tables and Columns for use in .NET. Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="PascalCase" />
+            <xs:enumeration value="SnakeKebabToPascalCase" />
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">
         <xs:annotation>

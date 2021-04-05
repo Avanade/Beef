@@ -69,7 +69,7 @@ Property | Description
 `modelName` | The .NET model name. Defaults to `Name`.
 `dataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `databaseName` | The .NET database interface name. Defaults to `IDatabase`.
-`eventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
+`eventSubject` | The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
 `includeColumnsOnDelete` | The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.
 **`excludeBackgroundService`** | The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`). Valid options are: `No`, `Yes`.
 

@@ -1,6 +1,6 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePostsCdcOutbox]
-  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,       -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT = 0  -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*

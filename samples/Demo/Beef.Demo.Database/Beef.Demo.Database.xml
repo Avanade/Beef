@@ -38,7 +38,7 @@
                               - Legacy.Comments (1:n)
                                  - Legacy.Tags (1:n)
                               - Legacy.Tags (1:n). -->
-  <Cdc Name="Posts" Schema="Legacy" EventSubject="Legacy.Post">
+  <Cdc Name="Posts" Schema="Legacy" EventSubject="Legacy.Post" EventSubjectFormat="NameOnly">
     <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Comments (1:n).
          Join on Comments.PostsId = Posts.PostsId. -->
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">

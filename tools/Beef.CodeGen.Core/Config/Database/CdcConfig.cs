@@ -162,9 +162,17 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The event subject.",
+        [PropertySchema("DotNet", Title = "The Event Subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
+        public string? EventSubjectFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names that should be included (in addition to the primary key) for a logical delete.
@@ -362,11 +370,6 @@ namespace Beef.CodeGen.Config.Database
         public DbTable? DbTable { get; private set; }
 
         /// <summary>
-        /// Gets or sets the event subject format.
-        /// </summary>
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
         public List<CtorParameterConfig> DataCtorParameters { get; } = new List<CtorParameterConfig>();
@@ -405,6 +408,7 @@ namespace Beef.CodeGen.Config.Database
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Root!.EventSubjectFormat);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             ExcludeBackgroundService = DefaultWhereNull(ExcludeBackgroundService, () => NoOption);

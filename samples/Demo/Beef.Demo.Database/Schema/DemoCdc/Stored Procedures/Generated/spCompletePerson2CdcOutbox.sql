@@ -1,5 +1,5 @@
 CREATE PROCEDURE [DemoCdc].[spCompletePerson2CdcOutbox]
-  @OutboxId INT NULL = NULL,
+  @OutboxId INT,
   @TrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
 AS
 BEGIN

@@ -260,7 +260,7 @@ operations: [
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "The event subject template and corresponding event action pair (separated by a colon).",
-            Description = "The event subject template defaults to `{AppName}.{Entity.Name}` plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}`. " +
+            Description = "The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). " +
             "The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
             "E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.")]
         public string? EventSubject { get; set; }
@@ -739,12 +739,23 @@ operations: [
             });
 
             EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
-            EventSubject = DefaultWhereNull(EventSubject, () => Type switch
+            EventSubject = DefaultWhereNull(EventSubject, () =>
             {
-                "Create" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
-                "Update" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
-                "Delete" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
-                _ => null
+                var key = Parent!.EventSubjectFormat == "NameOnly" ? null : Type switch
+                {
+                    "Create" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
+                    "Update" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
+                    "Delete" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}")),
+                    _ => null
+                };
+
+                return Type switch
+                {
+                    "Create" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
+                    "Update" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
+                    "Delete" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
+                    _ => null
+                };
             });
 
             PrepareEvents();

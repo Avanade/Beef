@@ -20,9 +20,9 @@ namespace Beef.Data.Database.Cdc
     /// <typeparam name="TCdcEntityWrapper">The <typeparamref name="TCdcEntity"/> wrapper <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcTrackingMapper">The tracking database mapper <see cref="Type"/>.</typeparam>
     public abstract class CdcDataOrchestrator<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper, TCdcTrackingMapper> : ICdcDataOrchestrator
-        where TCdcEntity : class, ITableKey, IETag, new() 
-        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() 
-        where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new() 
+        where TCdcEntity : class, ITableKey, IETag, new()
+        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new()
+        where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new()
         where TCdcTrackingMapper : ITrackingTvp, new()
     {
         private const string MaxQuerySizeParamName = "MaxQuerySize";
@@ -126,6 +126,11 @@ namespace Beef.Data.Database.Cdc
         /// Gets the <see cref="EventData.Subject"/>.
         /// </summary>
         protected abstract string EventSubject { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected virtual EventSubjectFormat EventSubjectFormat { get; } = EventSubjectFormat.NameAndKey;
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.
@@ -273,6 +278,12 @@ namespace Beef.Data.Database.Cdc
             }
 
             // Where performing identifier mapping then enact as required.
+            if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
+            {
+                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
+            }
+
             if (IdentifierMappingStoredProcedureName != null)
                 await AssignIdentityMappingAsync(coll, cancellationToken.Value).ConfigureAwait(false);
 
@@ -292,6 +303,12 @@ namespace Beef.Data.Database.Cdc
                     coll2.Add(item);
                     tracking.Add(new CdcTracker { Key = CreateValueKey(entity), Hash = entity.ETag });
                 }
+            }
+
+            if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
+            {
+                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
             }
 
             // Publish & send the events.
@@ -344,9 +361,6 @@ namespace Beef.Data.Database.Cdc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         protected async Task AssignIdentityMappingAsync(TCdcEntityWrapperColl coll, CancellationToken cancellationToken)
         {
-            if (cancellationToken.IsCancellationRequested)
-                await Task.FromCanceled(cancellationToken).ConfigureAwait(false);
-
             // Find all the instances where there is currently no global identifier assigned.
             var vimc = new CdcValueIdentifierMappingCollection();
             coll.OfType<ICdcLinkIdentifierMapping>().ForEach(async item => await item.LinkIdentifierMappingsAsync(vimc, IdentifierGenerator!).ConfigureAwait(false));
@@ -378,31 +392,31 @@ namespace Beef.Data.Database.Cdc
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
-        protected EventData<T> CreateValueEvent<T>(T value, string subjectPrefix, OperationType operationType) where T : class
-            => EventData.CreateValueEvent(value, CreateValueFullyQualifiedSubject(value, subjectPrefix), EventActionFormatter.Format(operationType, EventActionFormat));
+        protected EventData<T> CreateValueEvent<T>(T value, string subjectName, OperationType operationType) where T : class
+            => EventData.CreateValueEvent(value, CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat));
 
         /// <summary>
         /// Creates an <see cref="EventData"/> with the specified <paramref name="key"/>.
         /// </summary>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        protected EventData CreateEvent(string subjectPrefix, OperationType operationType, params IComparable?[] key)
-            => EventData.CreateEvent(CreateFullyQualifiedSubject(subjectPrefix, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
+        protected EventData CreateEvent(string subjectName, OperationType operationType, params IComparable?[] key)
+            => EventData.CreateEvent(CreateFormattedSubject(subjectName, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
 
         /// <summary>
-        /// Creates a fully qualified event subject by appending the <paramref name="value"/> <i>key</i> to the <paramref name="subjectPrefix"/>.
+        /// Creates a fully qualified event subject as per <see cref="EventSubjectFormat"/>.
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name.</param>
         /// <returns>The fully qualified subject.</returns>
         /// <remarks><typeparamref name="T"/> must implement at least one of the following: <see cref="IIdentifier"/>, <see cref="IGuidIdentifier"/>, <see cref="IStringIdentifier"/> or <see cref="IUniqueKey"/>.</remarks>
-        protected string CreateValueFullyQualifiedSubject<T>(T value, string subjectPrefix) where T : class => subjectPrefix + "." + CreateValueKey(value);
+        protected string CreateValueFormattedSubject<T>(T value, string subjectName) where T : class => EventSubjectFormat == EventSubjectFormat.NameOnly ? subjectName : subjectName + "." + CreateValueKey(value);
 
         /// <summary>
         /// Creates the key (as a <see cref="string"/>) for the <paramref name="value"/>.
@@ -413,14 +427,17 @@ namespace Beef.Data.Database.Cdc
         protected static string CreateValueKey<T>(T value) where T : class => value is IGlobalIdentifier gi && gi.GlobalId != null ? gi.GlobalId : value.CreateFormattedKey();
 
         /// <summary>
-        /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectPrefix"/>.
+        /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectName"/>.
         /// </summary>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> prefix.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The fully qualified subject.</returns>
-        protected string CreateFullyQualifiedSubject(string subjectPrefix, params IComparable?[] key)
+        protected string CreateFormattedSubject(string subjectName, params IComparable?[] key)
         {
-            var sb = new StringBuilder(subjectPrefix + ".");
+            if (EventSubjectFormat == EventSubjectFormat.NameOnly)
+                return subjectName;
+
+            var sb = new StringBuilder(subjectName + ".");
             if (key == null || key.Length == 0)
                 throw new ArgumentException("There must be at least a single key value specified.", nameof(key));
 
