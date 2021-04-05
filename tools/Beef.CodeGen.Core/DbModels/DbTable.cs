@@ -180,7 +180,7 @@ namespace Beef.CodeGen.DbModels
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return new string(StringConversion.ToSentenceCase(name.Replace(" ", ""))!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
+            return new string(StringConversion.ToSentenceCase(name.Replace(" ", "").Replace("_", "").Replace("-", ""))!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
         }
 
         /// <summary>

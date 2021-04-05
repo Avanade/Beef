@@ -397,7 +397,7 @@ namespace Beef.CodeGen.Config.Database
             if (DbTable.IsAView)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' cannot be a view.");
 
-            Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Alias = DefaultWhereNull(Alias, () => DbTable.Alias);
 
             ExecuteStoredProcedureName = DefaultWhereNull(ExecuteStoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConversion.ToPascalCase(Name)}CdcOutbox");
@@ -496,7 +496,6 @@ namespace Beef.CodeGen.Config.Database
 
             PrepareJoins();
 
-
             UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
         }
 
@@ -512,11 +511,11 @@ namespace Beef.CodeGen.Config.Database
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
             foreach (var join in Joins)
             {
-                join.Alias = DefaultWhereNull(join.Alias, () => new string(StringConversion.ToSentenceCase(join.Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+                join.Alias = DefaultWhereNull(join.Alias, () => DbTable.CreateAlias(join.Name!));
 
                 if (dict.TryGetValue(join.Alias!, out var val))
                 {
-                    dict[join.Alias!] = val++;
+                    dict[join.Alias!] = ++val;
                     join.Alias = $"{join.Alias}{val}";
                 }
                 else
