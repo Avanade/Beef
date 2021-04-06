@@ -84,6 +84,14 @@ namespace Beef.Demo.Cdc.Data
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
 
         /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected override string[]? ExcludePropertiesFromETag => new string[] 
+            { 
+                "LegacySystemCode"
+            };
+
+        /// <summary>
         /// Represents a <see cref="ContactCdc"/> wrapper to append the required (additional) database properties.
         /// </summary>
         public class ContactCdcWrapper : ContactCdc, ICdcWrapper

@@ -144,10 +144,10 @@ namespace Beef.Demo.Test
                 cdor = await cdc.ExecuteAsync().ConfigureAwait(false);
                 WriteResult(cdor);
 
-                // The final update did not change any data, so there was no corresponding log.
+                // Get the last update being the delete.
                 Assert.NotNull(cdor);
                 Assert.IsTrue(cdor.IsSuccessful);
-                Assert.AreEqual(1, cdor.Result.Count); // The update did not change data, so there is no corresponding log.
+                Assert.AreEqual(1, cdor.Result.Count); 
 
                 Assert.IsNull(cdor.Result[0].Name);
                 Assert.AreEqual(OperationType.Delete, cdor.Result[0].DatabaseOperationType);

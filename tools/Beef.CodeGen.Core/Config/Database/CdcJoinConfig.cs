@@ -167,6 +167,14 @@ namespace Beef.CodeGen.Config.Database
            Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
         public List<string>? IncludeColumnsOnDelete { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
+        /// </summary>
+        [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+            Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
+        public List<string>? ExcludeColumnsFromETag { get; set; }
+
         #endregion
 
         #region IdentifierMapping
@@ -356,6 +364,8 @@ namespace Beef.CodeGen.Config.Database
             JoinToSchema = DefaultWhereNull(JoinToSchema, () => Parent!.Schema);
             JoinCardinality = DefaultWhereNull(JoinCardinality, () => "OneToMany");
             PropertyName = DefaultWhereNull(PropertyName, () => StringConversion.ToPascalCase(CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{TableName!}{(TableName!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : TableName));
+            if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
+                ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 
             // Get the JoinTo CdcJoinConfig.
             CdcJoinConfig? jtc = null;

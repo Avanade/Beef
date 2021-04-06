@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Events;
+using Beef.Json;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -136,6 +137,11 @@ namespace Beef.Data.Database.Cdc
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
+
+        /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected virtual string[]? ExcludePropertiesFromETag { get; }
 
         /// <summary>
         /// Gets or sets the maximum query size to limit the number of CDC (Change Data Capture) rows that are batched in a <see cref="CdcOutbox"/>.
@@ -285,7 +291,7 @@ namespace Beef.Data.Database.Cdc
             }
 
             if (IdentifierMappingStoredProcedureName != null)
-                await AssignIdentityMappingAsync(coll, cancellationToken.Value).ConfigureAwait(false);
+                await AssignIdentityMappingAsync(coll).ConfigureAwait(false);
 
             // Determine whether anything may have been sent before and exclude (i.e. do not send again).
             var coll2 = new TCdcEntityWrapperColl();
@@ -295,7 +301,15 @@ namespace Beef.Data.Database.Cdc
                 // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
                 if (entity.ETag == null)
-                    entity.ETag = ETagGenerator.Generate(entity);
+                {
+                    if (ExcludePropertiesFromETag == null || ExcludePropertiesFromETag.Length == 0)
+                        entity.ETag = ETagGenerator.Generate(entity);
+                    else
+                    {
+                        var json = JsonPropertyFilter.Apply(entity, null, ExcludePropertiesFromETag);
+                        entity.ETag = ETagGenerator.Generate(json!.ToString(Newtonsoft.Json.Formatting.None));
+                    }
+                }
 
                 // Where the ETag and TrackingHash match then skip (has already been published).
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)
@@ -358,8 +372,7 @@ namespace Beef.Data.Database.Cdc
         /// Assigns the identity mapping by adding <i>new</i> for those items that do not currentyly have a global identifier currently assigned.
         /// </summary>
         /// <param name="coll">The wrapper entity collection.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        protected async Task AssignIdentityMappingAsync(TCdcEntityWrapperColl coll, CancellationToken cancellationToken)
+        protected async Task AssignIdentityMappingAsync(TCdcEntityWrapperColl coll)
         {
             // Find all the instances where there is currently no global identifier assigned.
             var vimc = new CdcValueIdentifierMappingCollection();

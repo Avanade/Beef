@@ -117,6 +117,18 @@ namespace {{Root.NamespaceCdc}}.Data
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
+{{#ifne ExcludePropertiesFromETag.Count 0}}
+        /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected override string[]? ExcludePropertiesFromETag => new string[] 
+            { 
+  {{#each ExcludePropertiesFromETag}}
+                "{{.}}"{{#unless @last}}, {{/unless}}
+  {{/each}} 
+            };
+
+{{/ifne}}
         /// <summary>
         /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database properties.
         /// </summary>

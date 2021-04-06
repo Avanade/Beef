@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -188,6 +189,14 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("excludeBackgroundService", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
         public string? ExcludeBackgroundService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
+        /// </summary>
+        [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+            Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
+        public List<string>? ExcludeColumnsFromETag { get; set; }
 
         #endregion
 
@@ -385,6 +394,11 @@ namespace Beef.CodeGen.Config.Database
         public bool UsesGlobalIdentifier { get; private set; }
 
         /// <summary>
+        /// Gets the list of properties to exlcude from the ETag.
+        /// </summary>
+        public List<string> ExcludePropertiesFromETag { get; set; } = new List<string>();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -412,6 +426,8 @@ namespace Beef.CodeGen.Config.Database
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             ExcludeBackgroundService = DefaultWhereNull(ExcludeBackgroundService, () => NoOption);
+            if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
+                ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
@@ -501,6 +517,7 @@ namespace Beef.CodeGen.Config.Database
             PrepareJoins();
 
             UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
+            SetUpExcludePropertiesFromETag();
         }
 
         /// <summary>
@@ -568,6 +585,42 @@ namespace Beef.CodeGen.Config.Database
 
             if (t.Columns.Count(x => x.IsPrimaryKey) != 1)
                 throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' which must only have a single column representing the primary key.");
+        }
+
+        /// <summary>
+        /// Sets up the <see cref="ExcludePropertiesFromETag"/> list.
+        /// </summary>
+        private void SetUpExcludePropertiesFromETag()
+        {
+            if (ExcludeColumnsFromETag != null)
+            {
+                foreach (var ec in ExcludeColumnsFromETag)
+                {
+                    var c = Columns.Where(x => x.Name == ec).FirstOrDefault();
+                    if (c != null)
+                        ExcludePropertiesFromETag.Add(c.NameAlias!);
+                }
+            }
+
+            if (Joins != null)
+            {
+                foreach (var j in Joins)
+                {
+                    if (j.ExcludeColumnsFromETag != null)
+                    {
+                        var p = string.Join('.', j.JoinHierarchyReverse.Select(x => x.PropertyName));
+                        foreach (var ec in j.ExcludeColumnsFromETag)
+                        {
+                            var c = j.Columns.Where(x => x.Name == ec).FirstOrDefault();
+                            if (c != null)
+                                ExcludePropertiesFromETag.Add(p + '.' + c.NameAlias!);
+                        }
+                    }
+                }
+            }
+
+            if (ExcludePropertiesFromETag != null && ExcludePropertiesFromETag.Count > 0)
+                ExcludePropertiesFromETag = ExcludePropertiesFromETag.Distinct().ToList();
         }
     }
 }

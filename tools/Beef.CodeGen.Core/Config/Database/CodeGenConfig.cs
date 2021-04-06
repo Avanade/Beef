@@ -189,6 +189,13 @@ namespace Beef.CodeGen.Config.Database
         public string? CdcIdentifierMappingStoredProcedureName { get; set; }
 
         /// <summary>
+        /// Gets or sets the default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
+        /// </summary>
+        [JsonProperty("cdcExcludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
+        public List<string>? CdcExcludeColumnsFromETag { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]

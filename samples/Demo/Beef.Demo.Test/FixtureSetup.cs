@@ -20,7 +20,7 @@ namespace Beef.Demo.Test
             TestSetUp.RegisterSetUp(async (count, data) =>
             {
                 var args = new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.DropAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"],
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"],
                     typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly)
                 { UseBeefDbo = true }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
 
