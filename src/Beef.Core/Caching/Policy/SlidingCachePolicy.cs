@@ -10,7 +10,7 @@ namespace Beef.Caching.Policy
     /// </summary>
     public sealed class SlidingCachePolicy : ICachePolicy
     {
-        private TimeSpan _duration = new TimeSpan(1, 0, 0);
+        private TimeSpan _duration = new(1, 0, 0);
         private TimeSpan? _randomizerOffset;
         private TimeSpan _maxDuration;
         private DateTime? _maxExpiry;
@@ -116,6 +116,9 @@ namespace Beef.Caching.Policy
         public void Reset()
         {
             DateTime now = Entities.Cleaner.Clean(DateTime.Now);
+            if (_maxExpiry.HasValue && _maxExpiry <= now)
+                _maxExpiry = null;
+
             DateTime? expiry = now.Add(_duration);
 
             if (!_maxExpiry.HasValue && _maxDuration.TotalMilliseconds > 0)

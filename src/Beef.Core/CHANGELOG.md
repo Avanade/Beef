@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.9
+- *Fixed:* Issue [121](https://github.com/Avanade/Beef/issues/121). `SlidingCachePolicy` will now cache correctly after first expiry.
+
 ## v4.1.8
 - *Enhancement:* Added new `InvokerBase<TParam, TResult>` to enable the ability to specifically define the return `Type`.
 
