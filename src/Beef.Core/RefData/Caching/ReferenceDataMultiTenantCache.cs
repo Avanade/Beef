@@ -88,10 +88,10 @@ namespace Beef.RefData.Caching
 
                 var coll = GetCollectionInternal();
 
-                var policy = (ICachePolicy)GetPolicy().Clone();
+                var policy = cv.Policy ?? (ICachePolicy)GetPolicy().Clone();
                 policy.Reset();
 
-                cv = _dict.GetOrAdd(tenantId, new CacheValue<TColl> { Policy = policy, Value = coll });
+                cv = _dict.GetOrAdd(tenantId, t => new CacheValue<TColl> { Policy = policy, Value = coll });
                 return cv.Value;
             }
         }

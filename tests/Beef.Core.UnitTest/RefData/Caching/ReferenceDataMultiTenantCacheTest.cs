@@ -183,5 +183,74 @@ namespace Beef.Core.UnitTest.RefData.Caching
             sw.Stop();
             TestContext.WriteLine($"{System.Threading.Thread.CurrentThread.ManagedThreadId}: {number}, {key}, {sw.ElapsedMilliseconds}");
         }
+
+        [Test]
+        public void Exercise_SlidingCache()
+        {
+            UnitTest.Caching.Policy.CachePolicyManagerTest.TestSetUp();
+
+            var coll = new TestRdCollection
+                {
+                    new TestRd { Id = 1, Code = "A" },
+                    new TestRd { Id = 2, Code = "B" }
+                };
+
+            var policy = new SlidingCachePolicy
+            {
+                Duration = new TimeSpan(0, 0, 3),
+                MaxDuration = new TimeSpan(0, 0, 4)
+            };
+
+            int dataRequests = 0;
+            var rdc = new ReferenceDataMultiTenantCache<TestRdCollection, TestRd>(() => { dataRequests++; return GetData(); });
+
+            CachePolicyManager.Current.Set(rdc.PolicyKey, policy);
+            ExecutionContext.Current.TenantId = GetGuid(08);
+
+            // Nothing loaded.
+            Assert.AreEqual(0, dataRequests);
+            Assert.AreEqual(0, rdc.Count);
+            Assert.IsTrue(rdc.IsExpired);
+
+            // Now loaded.
+            var c = rdc.GetCollection();
+            Assert.AreEqual(1, dataRequests);
+            Assert.IsNotNull(c);
+            Assert.AreEqual(2, c.ActiveList.Count);
+            Assert.AreEqual(1, rdc.Count);
+            Assert.IsFalse(rdc.IsExpired);
+
+            // Multiple cycles to test Max cache
+            for (int cycle = 0; cycle < 3; cycle++)
+            {
+                // Running till max cache expires.
+                while (!rdc.IsExpired)
+                {
+                    c = rdc.GetCollection();
+                    Assert.AreEqual(1 + cycle, dataRequests);
+                    Assert.IsNotNull(c);
+                    Assert.AreEqual(2, c.ActiveList.Count);
+                    Assert.AreEqual(1, rdc.Count);
+                    Assert.IsFalse(rdc.IsExpired);
+                    System.Threading.Thread.Sleep((int)Math.Floor(policy.Duration.TotalSeconds / 2));
+                }
+
+                // reload collection cached.
+                c = rdc.GetCollection();
+                Assert.AreEqual(2 + cycle, dataRequests);
+                Assert.IsNotNull(c);
+                Assert.AreEqual(2, c.ActiveList.Count);
+                Assert.AreEqual(1, rdc.Count);
+                Assert.IsFalse(rdc.IsExpired);
+
+                // New collection cached.
+                c = rdc.GetCollection();
+                Assert.AreEqual(2 + cycle, dataRequests);
+                Assert.IsNotNull(c);
+                Assert.AreEqual(2, c.ActiveList.Count);
+                Assert.AreEqual(1, rdc.Count);
+                Assert.IsFalse(rdc.IsExpired);
+            }
+        }
     }
 }
