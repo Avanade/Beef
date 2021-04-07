@@ -13,34 +13,14 @@ using Beef.Data.Database.Cdc;
 namespace Beef.Demo.Cdc.Data
 {
     /// <summary>
-    /// Provides the <see cref="CdcTracker"/> data access.
+    /// Provides the <see cref="CdcTracker"/> data mapper.
     /// </summary>
-    public class CdcTrackingDbMapper : DatabaseMapper<CdcTracker>, ITrackingTvp
+    public class CdcTrackingDbMapper : CdcTrackingDbMapperBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcTrackingDbMapper"/> class.
         /// </summary>
-        public CdcTrackingDbMapper()
-        {
-            Property(s => s.Key);
-            Property(s => s.Hash);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="TableValuedParameter"/> for the <paramref name="list"/>.
-        /// </summary>
-        /// <param name="list">The <see cref="CdcTracker"/> list.</param>
-        /// <returns>The Table-Valued Parameter.</returns>
-        public TableValuedParameter CreateTableValuedParameter(IEnumerable<CdcTracker> list)
-        {        
-            var dt = new DataTable();
-            dt.Columns.Add("Key", typeof(string));
-            dt.Columns.Add("Hash", typeof(string));
-
-            var tvp = new TableValuedParameter("[DemoCdc].[udtCdcTrackingList]", dt);
-            AddToTableValuedParameter(tvp, list);
-            return tvp;
-        }
+        public CdcTrackingDbMapper() : base("[DemoCdc].[udtCdcTrackingList]") { }
     }
 }
 

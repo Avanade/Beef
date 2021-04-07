@@ -1,6 +1,6 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePostsCdcOutbox]
-  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,       -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT = 0  -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -50,9 +50,6 @@ BEGIN
     -- Where there is no incomplete outbox then the next should be processed.
     IF (@OutboxId IS NULL)
     BEGIN
-      -- New outbox so force creation of a new outbox.
-      SET @OutboxId = null 
-
       -- Get the last outbox processed.
       SELECT TOP 1
           @PostsMinLsn = [_outbox].[PostsMaxLsn],
@@ -253,18 +250,19 @@ BEGIN
 
     -- Root table: Legacy.Posts - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
-        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
+        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PostsId] AS [PostsId],
+        [p].[PostsId] AS [TableKey_PostsId],
         [p].[Text] AS [Text],
         [p].[Date] AS [Date]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
 
-    -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now.
-    SELECT
+    -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now (where applicable).
+    SELECT DISTINCT
         [c].[CommentsId] AS [CommentsId],
         [c].[PostsId] AS [PostsId],
         [c].[Text] AS [Text],
@@ -274,8 +272,8 @@ BEGIN
       INNER JOIN [Legacy].[Comments] AS [c] ON ([c].[PostsId] = [p].[PostsId])
       WHERE [_chg].[_Op] <> 1
 
-    -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
-    SELECT
+    -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
+    SELECT DISTINCT
         [p].[PostsId] AS [Posts_PostsId],  -- Additional joining column (informational).
         [ct].[TagsId] AS [TagsId],
         [ct].[ParentId] AS [CommentsId],
@@ -286,8 +284,8 @@ BEGIN
       INNER JOIN [Legacy].[Tags] AS [ct] ON ([ct].[ParentType] = 'C' AND [ct].[ParentId] = [c].[CommentsId])
       WHERE [_chg].[_Op] <> 1
 
-    -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
-    SELECT
+    -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now (where applicable).
+    SELECT DISTINCT
         [pt].[TagsId] AS [TagsId],
         [pt].[ParentId] AS [PostsId],
         [pt].[Text] AS [Text]

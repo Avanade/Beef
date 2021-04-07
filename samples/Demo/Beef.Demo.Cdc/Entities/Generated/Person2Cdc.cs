@@ -15,73 +15,73 @@ using System.Collections.Generic;
 namespace Beef.Demo.Cdc.Entities
 {
     /// <summary>
-    /// Represents the CDC model for the root (primary) database table 'Demo.Person2'.
+    /// Represents the CDC model for the root (parent) database table 'Demo.Person2'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person2Cdc : IUniqueKey, IETag, ILogicallyDeleted
+    public partial class Person2Cdc : ITableKey, IETag, ILogicallyDeleted
     {
         /// <summary>
-        /// Gets or sets the 'PersonId' column value.
+        /// Gets or sets the 'Person Id' (Demo.Person2.PersonId) column value.
         /// </summary>
         [JsonProperty("personId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Guid PersonId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'FirstName' column value.
+        /// Gets or sets the 'First Name' (Demo.Person2.FirstName) column value.
         /// </summary>
         [JsonProperty("firstName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? FirstName { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'LastName' column value.
+        /// Gets or sets the 'Last Name' (Demo.Person2.LastName) column value.
         /// </summary>
         [JsonProperty("lastName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Birthday' column value.
+        /// Gets or sets the 'Birthday' (Demo.Person2.Birthday) column value.
         /// </summary>
         [JsonProperty("birthday", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? Birthday { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'GenderId' column value.
+        /// Gets or sets the 'Gender Id' (Demo.Person2.GenderId) column value.
         /// </summary>
         [JsonProperty("genderId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Guid? GenderId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Street' column value.
+        /// Gets or sets the 'Street' (Demo.Person2.Street) column value.
         /// </summary>
         [JsonProperty("street", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Street { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'City' column value.
+        /// Gets or sets the 'City' (Demo.Person2.City) column value.
         /// </summary>
         [JsonProperty("city", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? City { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'CreatedBy' column value.
+        /// Gets or sets the 'Created By' (Demo.Person2.CreatedBy) column value.
         /// </summary>
         [JsonProperty("createdBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? CreatedBy { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'CreatedDate' column value.
+        /// Gets or sets the 'Created Date' (Demo.Person2.CreatedDate) column value.
         /// </summary>
         [JsonProperty("createdDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? CreatedDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'UpdatedBy' column value.
+        /// Gets or sets the 'Updated By' (Demo.Person2.UpdatedBy) column value.
         /// </summary>
         [JsonProperty("updatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? UpdatedBy { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'UpdatedDate' column value.
+        /// Gets or sets the 'Updated Date' (Demo.Person2.UpdatedDate) column value.
         /// </summary>
         [JsonProperty("updatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? UpdatedDate { get; set; }
@@ -121,12 +121,6 @@ namespace Beef.Demo.Cdc.Entities
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public bool HasUniqueKey => true;
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey(PersonId);
 
         /// <summary>
@@ -134,6 +128,18 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(PersonId) };
+
+        /// <summary>
+        /// Gets or sets the 'Person Id' <i>primary key</i> (Demo.Person2.PersonId) column value (from the actual database table primary key; not from the change-data-capture source).
+        /// </summary>
+        /// <remarks>Will have a <c>default</c> value when the record no longer exists within the database (i.e. has been physically deleted).</remarks>
+        public Guid TableKey_PersonId { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public UniqueKey TableKey => new UniqueKey(TableKey_PersonId);
     }
 }
 

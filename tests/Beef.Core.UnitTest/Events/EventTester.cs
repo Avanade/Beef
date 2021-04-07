@@ -87,8 +87,6 @@ namespace Beef.Core.UnitTest.Events
             public int A { get; set; }
             public string B { get; set; }
 
-            public bool HasUniqueKey => true;
-
             public UniqueKey UniqueKey => new UniqueKey(A, B);
 
             public string[] UniqueKeyProperties => throw new NotImplementedException();

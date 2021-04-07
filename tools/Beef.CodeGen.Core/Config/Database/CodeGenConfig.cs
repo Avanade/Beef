@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -22,6 +23,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
+    [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
@@ -164,12 +166,50 @@ namespace Beef.CodeGen.Config.Database
         public string? CdcTrackingTableName { get; set; }
 
         /// <summary>
+        /// Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
+        /// </summary>
+        [JsonProperty("cdcIdentifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.")]
+        public bool? CdcIdentifierMapping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name for the `Cdc`-IdentifierMapping.
+        /// </summary>
+        [JsonProperty("cdcIdentifierMappingTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
+            Description = "Defaults to `CdcIdentifierMapping` (literal).")]
+        public string? CdcIdentifierMappingTableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stored procedure name for the `Cdc`-IdentifierMapping.
+        /// </summary>
+        [JsonProperty("cdcIdentifierMappingStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
+            Description = "Defaults to `spCreateCdcIdentifierMapping` (literal).")]
+        public string? CdcIdentifierMappingStoredProcedureName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
+        /// </summary>
+        [JsonProperty("cdcExcludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
+        public List<string>? CdcExcludeColumnsFromETag { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The root for the event name by prepending to all event subject names.",
             Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).", IsImportant = true)]
         public string? EventSubjectRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSubjectFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the formatting for the Action when an Event is published.
@@ -201,6 +241,18 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("CDC", Title = "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
             Description = "Defaults to `true`.")]
         public bool? HasBeefDbo { get; set; }
+
+        #endregion
+
+        #region DotNet
+
+        /// <summary>
+        /// Gets or sets the option to automatically rename the SQL Tables and Columns for use in .NET.
+        /// </summary>
+        [JsonProperty("autoDotNetRename", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
+            Description = "Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.")]
+        public string? AutoDotNetRename { get; set; }
 
         #endregion
 
@@ -431,9 +483,13 @@ namespace Beef.CodeGen.Config.Database
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
             CdcSchema = DefaultWhereNull(CdcSchema, () => "Cdc");
             CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
+            CdcIdentifierMappingTableName = DefaultWhereNull(CdcIdentifierMappingTableName, () => "CdcIdentifierMapping");
+            CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
             HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
+            AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "PascalCase");
 
             if (Queries == null)
                 Queries = new List<QueryConfig>();
@@ -468,8 +524,12 @@ namespace Beef.CodeGen.Config.Database
             Logger.Default.Log(LogLevel.Information, string.Empty);
             Logger.Default.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
 
-            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs))
-                throw new CodeGenException("ConnectionString must be specified as a RuntimeParameter.");
+            var evn = $"{Company?.Replace(".", "_", StringComparison.InvariantCulture)}_{AppName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs) || string.IsNullOrEmpty(cs))
+                cs = Environment.GetEnvironmentVariable(evn);
+
+            if (string.IsNullOrEmpty(cs))
+                throw new CodeGenException($"ConnectionString must be explicitly specified as a RuntimeParameter or using Environment Variable '{evn}'.");
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlServerDb(cs);
@@ -486,6 +546,25 @@ namespace Beef.CodeGen.Config.Database
         private class SqlServerDb : DatabaseBase
         {
             public SqlServerDb(string connectionString) : base(connectionString, Microsoft.Data.SqlClient.SqlClientFactory.Instance) { }
+        }
+
+        /// <summary>
+        /// Renames for usage in .NET using the <see cref="AutoDotNetRename"/> option.
+        /// </summary>
+        /// <param name="name">The value to rename.</param>
+        /// <returns>The renamed value.</returns>
+        public string? RenameForDotNet(string? name)
+        {
+            if (string.IsNullOrEmpty(name) || AutoDotNetRename == "None")
+                return name;
+
+            if (AutoDotNetRename == "PascalCase")
+                return StringConversion.ToPascalCase(name);
+
+            // That only leaves SnakeKebabToPascalCase.
+            var sb = new StringBuilder();
+            name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConversion.ToPascalCase(part)));
+            return sb.ToString();
         }
     }
 }

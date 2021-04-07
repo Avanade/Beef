@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
+<!-- This is intended for DbUp Migration Script use only; executed directly as: dotnet run codegen ... -->
+<Script ConfigType="Database">
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcIdentifierMappingCodeGenerator" Template="DbCdcIdentifierMappingTableCreate_sql.hb" FileName="{{Root.UtcDateTimeStamp}}-create-{{lower CdcSchema}}-{{lower Root.CdcIdentifierMappingTableName}}.sql" OutDir="{{Root.PathDatabaseMigrations}}" HelpText="DatabaseCdcIdentifierMappingCodeGenerator: Database/Migrations" />
+</Script>

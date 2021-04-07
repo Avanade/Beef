@@ -14,6 +14,7 @@ Category | Description
 [`Database`](#Database) | Provides the _database_ configuration.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
+[`IdentifierMapping`](#IdentifierMapping) | Provides the _identifier mapping_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -60,7 +61,7 @@ Property | Description
 `ModelName` | The .NET model name. Defaults to `Name`.
 `DataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `DatabaseName` | The .NET database interface name. Defaults to `IDatabase`.
-`EventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
+`EventSubject` | The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
 `IncludeColumnsOnDelete` | The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.
 **`ExcludeBackgroundService`** | The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`). Valid options are: `No`, `Yes`.
 
@@ -73,6 +74,16 @@ Property | Description
 -|-
 `ColumnNameIsDeleted` | The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.
 `ColumnNameRowVersion` | The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.
+
+<br/>
+
+## IdentifierMapping
+Provides the _identifier mapping_ configuration.
+
+Property | Description
+-|-
+**`IdentifierMapping`** | Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key. This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).
+**`IdentifierMappingColumns`** | The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping. Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.
 
 <br/>
 

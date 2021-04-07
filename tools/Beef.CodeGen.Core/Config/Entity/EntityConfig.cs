@@ -543,6 +543,14 @@ entities:
         public bool? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
+        public string? EventSubjectFormat { get; set; }
+
+        /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]

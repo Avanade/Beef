@@ -8,6 +8,7 @@
 using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
+using Beef.Entities;
 using Beef.Events;
 using Beef.Mapper;
 using Microsoft.Extensions.Logging;
@@ -38,8 +39,9 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public ContactCdcData(IDatabase db, IEventPublisher evtPub, ILogger<ContactCdcData> logger) :
-            base(db, "[DemoCdc].[spExecuteContactCdcOutbox]", "[DemoCdc].[spCompleteContactCdcOutbox]", evtPub, logger) => ContactCdcDataCtor();
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+        public ContactCdcData(IDatabase db, IEventPublisher evtPub, ILogger<ContactCdcData> logger, IStringIdentifierGenerator idGen) :
+            base(db, "[DemoCdc].[spExecuteContactCdcOutbox]", "[DemoCdc].[spCompleteContactCdcOutbox]", evtPub, logger, "[DemoCdc].[spCreateCdcIdentifierMapping]", idGen, new CdcIdentifierMappingDbMapper()) => ContactCdcDataCtor();
 
         partial void ContactCdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -55,9 +57,9 @@ namespace Beef.Demo.Cdc.Data
                 new MultiSetCollArgs<ContactCdcWrapperCollection, ContactCdcWrapper>(_contactCdcWrapperMapper, r => cColl = r, stopOnNull: true), // Root table: Legacy.Contact
                 new MultiSetCollArgs<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>(_addressCdcMapper, r =>
                 {
-                    foreach (var a in r.GroupBy(x => new { x.Id }).Select(g => new { g.Key.Id, Coll = g.ToCollection<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>() })) // Join table: Address (Legacy.Address)
+                    foreach (var a in r.GroupBy(x => new { x.AID }).Select(g => new { g.Key.AID, Coll = g.ToCollection<ContactCdc.AddressCdcCollection, ContactCdc.AddressCdc>() })) // Join table: Address (Legacy.Address)
                     {
-                        cColl.Single(x => x.AddressId == a.Id).Address = a.Coll.SingleOrDefault();
+                        cColl.Where(x => x.AddressId == a.AID).ForEach(x => x.Address = a.Coll.SingleOrDefault());
                     }
                 }) // Related table: Address (Legacy.Address)
                 ).ConfigureAwait(false);
@@ -67,7 +69,12 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.NameAndKey;
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected override string EventSubject => "Legacy.Contact";
 
@@ -75,6 +82,14 @@ namespace Beef.Demo.Cdc.Data
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
+
+        /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected override string[]? ExcludePropertiesFromETag => new string[] 
+            { 
+                "LegacySystemCode"
+            };
 
         /// <summary>
         /// Represents a <see cref="ContactCdc"/> wrapper to append the required (additional) database properties.

@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.1.21</Version>
+    <Version>4.1.22</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -38,6 +38,7 @@
   <ItemGroup>
     <None Remove="Scripts\DatabaseCdc.xml" />
     <None Remove="Scripts\DatabaseCdcDacpac.xml" />
+    <None Remove="Scripts\DatabaseCdcIdentifierMapping.xml" />
     <None Remove="Scripts\DatabaseCdcOutbox.xml" />
     <None Remove="Scripts\DatabaseCdcTracking.xml" />
     <None Remove="Scripts\DatabaseWithCdc.xml" />
@@ -46,8 +47,12 @@
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEntity_cs.hb" />
+    <None Remove="Templates\DbCdcIdentifierMappingTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcIdentifierMappingTvp_cs.hb" />
+    <None Remove="Templates\DbCdcIdentifierMappingUdt_sql.hb" />
     <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcSpCompleteOutbox_sql.hb" />
+    <None Remove="Templates\DbCdcSpCreateIdentifierMapping_sql.hb" />
     <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
@@ -103,6 +108,7 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcIdentifierMapping.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
@@ -119,8 +125,12 @@
     <EmbeddedResource Include="Templates\DbCdcBackgroundService_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpCreateIdentifierMapping_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcSpCompleteOutbox_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingTableCreate_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingTvp_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />

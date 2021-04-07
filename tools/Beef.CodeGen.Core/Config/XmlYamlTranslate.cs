@@ -100,6 +100,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "CdcExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
             (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
@@ -128,12 +129,16 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Cdc, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Cdc, "DataCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "IdentifierMappingColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumnsOnDelete", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumnsOnDelete", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]")
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IdentifierMappingColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumnsOnDelete", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]")
         });
 
         private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);

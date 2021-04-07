@@ -6,9 +6,7 @@
 #nullable enable
 #pragma warning disable
 
-{{#ifval ColumnIsDeleted}}
 using Beef.Data.Database.Cdc;
-{{/ifval}}
 using Beef.Entities;
 using Beef.Mapper;
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
@@ -16,24 +14,37 @@ using Newtonsoft.Json;
 {{/ifeq}}
 using System;
 using System.Collections.Generic;
+{{#if UsesGlobalIdentifier}}
+using System.Threading.Tasks;
+{{/if}}
 
 namespace {{Root.NamespaceCdc}}.Entities
 {
     /// <summary>
-    /// Represents the CDC model for the root (primary) database table '{{Schema}}.{{Name}}'.
+    /// Represents the CDC model for the root (parent) database table '{{Schema}}.{{Name}}'.
     /// </summary>
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}
+    public partial class {{ModelName}}Cdc : ITableKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
     {
+{{#if IdentifierMapping}}
+        /// <summary>
+        /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+        /// </summary>
+        [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? GlobalId { get; set; }
+
+{{/if}}
 {{#each SelectedEntityColumns}}
         /// <summary>
-        /// Gets or sets the '{{Name}}' column value.
+        /// Gets or sets the '{{sentence NameAlias}}' ({{Parent.Schema}}.{{Parent.Name}}.{{#ifval IdentifierMappingParent}}{{IdentifierMappingParent.Name}}{{else}}{{Name}}{{/ifval}}) {{#ifval IdentifierMappingParent}}mapped identifier{{else}}column{{/ifval}} value.
         /// </summary>
-  {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+  {{#unless IgnoreSerialization}}
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-  {{/ifeq}}
+    {{/ifeq}}
+  {{/unless}}
         public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
   {{#unless @last}}
 
@@ -128,12 +139,6 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
-        public bool HasUniqueKey => true;
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
 
         /// <summary>
@@ -141,6 +146,69 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+{{#each PrimaryKeyColumns}}
+
+        /// <summary>
+        /// Gets or sets the '{{sentence NameAlias}}' <i>primary key</i> ({{Parent.Schema}}.{{Parent.Name}}.{{Name}}) column value (from the actual database table primary key; not from the change-data-capture source).
+        /// </summary>
+        /// <remarks>Will have a <c>default</c> value when the record no longer exists within the database (i.e. has been physically deleted).</remarks>
+        public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} TableKey_{{pascal NameAlias}} { get; set; }
+{{/each}}
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public UniqueKey TableKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}TableKey_{{pascal NameAlias}}{{/each}});
+{{#if UsesGlobalIdentifier}}
+
+        /// <summary>
+        /// Link any new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+        public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+        {
+  {{#if IdentifierMapping}}
+            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{Name}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+  {{/if}}
+  {{#each SelectedEntityColumns}}
+    {{#ifval IdentifierMappingParent}}
+            coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<{{Parent.ModelName}}Cdc>().ConfigureAwait(false) });
+    {{/ifval}}
+  {{/each}}
+  {{#each JoinCdcChildren}}
+    {{#ifeq JoinCardinality 'OneToMany'}}
+            {{PropertyName}}?.ForEach(async item => await item.LinkIdentifierMappingsAsync(coll, idGen).ConfigureAwait(false));
+    {{else}}
+            await ({{PropertyName}}?.LinkIdentifierMappingsAsync(coll, idGen) ?? Task.CompletedTask).ConfigureAwait(false);
+    {{/ifeq}}
+  {{/each}}
+        }
+
+        /// <summary>
+        /// Re-link the new global identifiers.
+        /// </summary>
+        /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+        public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+        {
+  {{#if IdentifierMapping}}
+            coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+  {{/if}}
+  {{#each SelectedEntityColumns}}
+    {{#ifval IdentifierMappingParent}}
+            coll.Invoke({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, () => {{NameAlias}} = coll.GetGlobalId(this, nameof({{NameAlias}})));
+    {{/ifval}}
+  {{/each}}
+  {{#each JoinCdcChildren}}
+    {{#ifeq JoinCardinality 'OneToMany'}}
+            {{PropertyName}}?.ForEach(item => item.RelinkIdentifierMappings(coll));
+    {{else}}
+            {{PropertyName}}?.RelinkIdentifierMappings(coll);
+    {{/ifeq}}
+  {{/each}}
+        }
+{{/if}}
 {{#each CdcJoins}}
 
         #region {{ModelName}}Cdc
@@ -151,15 +219,25 @@ namespace {{Root.NamespaceCdc}}.Entities
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}Cdc : IUniqueKey
+        public partial class {{ModelName}}Cdc : IUniqueKey{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
         {
+  {{#if IdentifierMapping}}
+            /// <summary>
+            /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
+            /// </summary>
+            [JsonProperty("globalId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public string? GlobalId { get; set; }
+
+  {{/if}}
   {{#each Columns}}
             /// <summary>
-            /// Gets or sets the '{{NameAlias}}' ({{Parent.TableName}}.{{Name}}) column value.
+            /// Gets or sets the '{{sentence NameAlias}}' ({{Parent.Schema}}.{{Parent.Name}}.{{#ifval IdentifierMappingParent}}{{IdentifierMappingParent.Name}}{{else}}{{Name}}{{/ifval}}) {{#ifval IdentifierMappingParent}}mapped identifier{{else}}column{{/ifval}} value.
             /// </summary>
-    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+    {{#unless IgnoreSerialization}}
+      {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
             [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-    {{/ifeq}}
+      {{/ifeq}}
+    {{/unless}}
             public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
     {{#unless @last}}
 
@@ -210,12 +288,6 @@ namespace {{Root.NamespaceCdc}}.Entities
             /// <inheritdoc/>
             /// </summary>
             [MapperIgnore()]
-            public bool HasUniqueKey => true;
-
-            /// <summary>
-            /// <inheritdoc/>
-            /// </summary>
-            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
 
             /// <summary>
@@ -234,6 +306,41 @@ namespace {{Root.NamespaceCdc}}.Entities
       {{/each}}
     {{/unless}}
   {{/each}}
+  {{#if Parent.UsesGlobalIdentifier}}
+
+            /// <summary>
+            /// Link any new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+            public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
+            {
+    {{#if IdentifierMapping}}
+                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{TableName}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+    {{/if}}
+    {{#each Columns}}
+      {{#ifval IdentifierMappingParent}}
+                coll.AddAsync({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof({{NameAlias}}), Schema = "{{IdentifierMappingSchema}}", Table = "{{IdentifierMappingTable}}", Key = {{IdentifierMappingParent.NameAlias}}.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<{{Parent.ModelName}}Cdc>().ConfigureAwait(false) });
+      {{/ifval}}
+    {{/each}}
+            }
+
+            /// <summary>
+            /// Re-link the new global identifiers.
+            /// </summary>
+            /// <param name="coll">The <see cref="CdcValueIdentifierMappingCollection"/>.</param>
+            public void RelinkIdentifierMappings(CdcValueIdentifierMappingCollection coll)
+            {
+    {{#if IdentifierMapping}}
+                coll.Invoke(GlobalId == default, () => GlobalId = coll.GetGlobalId(this, nameof(GlobalId)));
+    {{/if}}
+    {{#each Columns}}
+      {{#ifval IdentifierMappingParent}}
+                coll.Invoke({{NameAlias}} == default && {{IdentifierMappingParent.NameAlias}} != default, () => {{NameAlias}} = coll.GetGlobalId(this, nameof({{NameAlias}})));
+      {{/ifval}}
+    {{/each}}
+            }
+  {{/if}}
         }
 
         /// <summary>

@@ -143,9 +143,30 @@ namespace Beef.CodeGen
     public class CodeGenExecutor
     {
         private readonly CodeGenExecutorArgs _args;
-        private int CreatedCount;
-        private int UpdatedCount;
-        private int NotChangedCount;
+        private int _createdCount;
+        private int _updatedCount;
+        private int _notChangedCount;
+        private int _linesOfCodeCount;
+
+        /// <summary>
+        /// Gets the overall created count.
+        /// </summary>
+        public int OverallCreatedCount { get; private set; }
+
+        /// <summary>
+        /// Gets the overall updated count.
+        /// </summary>
+        public int OverallUpdatedCount { get; private set; }
+
+        /// <summary>
+        /// Gets the overall not changed count.
+        /// </summary>
+        public int OverallNotChangedCount { get; private set; }
+
+        /// <summary>
+        /// Gets the overall lines of code count.
+        /// </summary>
+        public int OverallLinesOfCodeCount { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenExecutor"/> class.
@@ -158,9 +179,6 @@ namespace Beef.CodeGen
         /// </summary>
         public async Task<bool> RunAsync()
         {
-            var overallCreatedCount = 0;
-            var overallUpdatedCount = 0;
-
             try
             {
                 // Load the script configuration.
@@ -180,9 +198,10 @@ namespace Beef.CodeGen
                 // Execute each of the script instructions.
                 foreach (var script in sc.Scripts)
                 {
-                    NotChangedCount = 0;
-                    UpdatedCount = 0;
-                    CreatedCount = 0;
+                    _notChangedCount = 0;
+                    _updatedCount = 0;
+                    _createdCount = 0;
+                    _linesOfCodeCount = 0;
 
                     // Log progress.
                     _args.Logger.LogInformation("  Template: {0} {1}", script.Template!, script.HelpText == null ? string.Empty : $"({script.HelpText})");
@@ -206,11 +225,13 @@ namespace Beef.CodeGen
                     });
 
                     // Provide statistics.
-                    _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
+                    _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", _notChangedCount, _updatedCount, _createdCount);
 
                     // Keep track of overall counts.
-                    overallCreatedCount += CreatedCount;
-                    overallUpdatedCount += UpdatedCount;
+                    OverallCreatedCount += _createdCount;
+                    OverallUpdatedCount += _updatedCount;
+                    OverallNotChangedCount += _notChangedCount;
+                    OverallLinesOfCodeCount += _linesOfCodeCount;
                 }
             }
             catch (CodeGenException gcex)
@@ -223,7 +244,7 @@ namespace Beef.CodeGen
                 return false;
             }
 
-            if (_args.ExpectNoChange && (overallCreatedCount != 0 || overallUpdatedCount != 0))
+            if (_args.ExpectNoChange && (OverallCreatedCount != 0 || OverallUpdatedCount != 0))
             {
                 _args.Logger.LogError("Unexpected changes detected; one or more files were created and/or updated.");
                 return false;
@@ -419,21 +440,22 @@ namespace Beef.CodeGen
 
                 var prevContent = File.ReadAllText(fi.FullName);
                 if (string.Compare(e.Content, prevContent, StringComparison.InvariantCulture) == 0)
+                    _notChangedCount++;
+                else
                 {
-                    NotChangedCount++;
-                    return;
+                    _updatedCount++;
+                    File.WriteAllText(fi.FullName, e.Content);
+                    _args.Logger.LogWarning("    Updated -> {0}", fi.FullName[outputDir.Length..]);
                 }
-
-                UpdatedCount++;
-                File.WriteAllText(fi.FullName, e.Content);
-                _args.Logger.LogWarning("    Updated -> {0}", fi.FullName[outputDir.Length..]);
             }
             else
             {
-                CreatedCount++;
+                _createdCount++;
                 File.WriteAllText(fi.FullName, e.Content);
                 _args.Logger.LogWarning("    Created -> {0}", fi.FullName[outputDir.Length..]);
             }
+
+            _linesOfCodeCount += File.ReadAllLines(fi.FullName).Length;
         }
     }
 }

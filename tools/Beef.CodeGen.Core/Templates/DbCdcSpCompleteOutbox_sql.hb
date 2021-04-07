@@ -1,6 +1,6 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{CdcSchema}}].[{{CompleteStoredProcedureName}}]
-  @OutboxId INT NULL = NULL,
+  @OutboxId INT,
   @TrackingList AS [{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List] READONLY
 AS
 BEGIN

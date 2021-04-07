@@ -59,7 +59,7 @@ namespace Beef.Demo.Cdc.Data
                 {
                     foreach (var c in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.CommentsCdcCollection, PostsCdc.CommentsCdc>() })) // Join table: Comments (Legacy.Comments)
                     {
-                        pColl.Single(x => x.PostsId == c.PostsId).Comments = c.Coll;
+                        pColl.Where(x => x.PostsId == c.PostsId).ForEach(x => x.Comments = c.Coll);
                     }
                 }), // Related table: Comments (Legacy.Comments)
                 new MultiSetCollArgs<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>(_commentsTagsCdcMapper, r =>
@@ -69,7 +69,7 @@ namespace Beef.Demo.Cdc.Data
                         var pItem = pColl.Single(x => x.PostsId == c.Posts_PostsId).Comments;
                         foreach (var ct in c.Coll.GroupBy(x => new { x.CommentsId }).Select(g => new { g.Key.CommentsId, Coll = g.ToCollection<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>() })) // Join table: CommentsTags (Legacy.Tags)
                         {
-                            pItem.Single(x => x.CommentsId == ct.CommentsId).Tags = ct.Coll;
+                            pItem.Where(x => x.CommentsId == ct.CommentsId).ForEach(x => x.Tags = ct.Coll);
                         }
                     }
                 }), // Related table: CommentsTags (Legacy.Tags)
@@ -77,7 +77,7 @@ namespace Beef.Demo.Cdc.Data
                 {
                     foreach (var pt in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.PostsTagsCdcCollection, PostsCdc.PostsTagsCdc>() })) // Join table: PostsTags (Legacy.Tags)
                     {
-                        pColl.Single(x => x.PostsId == pt.PostsId).Tags = pt.Coll;
+                        pColl.Where(x => x.PostsId == pt.PostsId).ForEach(x => x.Tags = pt.Coll);
                     }
                 }) // Related table: PostsTags (Legacy.Tags)
                 ).ConfigureAwait(false);
@@ -87,7 +87,12 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.NameOnly;
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected override string EventSubject => "Legacy.Post";
 

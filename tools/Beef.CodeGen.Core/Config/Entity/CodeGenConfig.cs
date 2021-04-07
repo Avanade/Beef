@@ -275,12 +275,20 @@ entities:
         public bool? EventPublish { get; set; }
 
         /// <summary>
-        /// Gets or sets the root for the event name by prepending to all event subject names.
+        /// Gets or sets the root for the event Subject name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The root for the event name by prepending to all event subject names.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).", IsImportant = true)]
+        [PropertySchema("DataSvc", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventSubjectRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSubjectFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the formatting for the Action when an Event is published.
@@ -551,6 +559,7 @@ entities:
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
             RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventPublish = DefaultWhereNull(EventPublish, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");

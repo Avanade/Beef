@@ -82,10 +82,33 @@
       "title": "The table name for the `Cdc`-Tracking.",
       "description": "Defaults to `CdcTracking` (literal)."
     },
+    "cdcIdentifierMapping": {
+      "type": "boolean",
+      "title": "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities."
+    },
+    "cdcIdentifierMappingTableName": {
+      "type": "string",
+      "title": "The table name for the `Cdc`-IdentifierMapping.",
+      "description": "Defaults to `CdcIdentifierMapping` (literal)."
+    },
+    "cdcIdentifierMappingStoredProcedureName": {
+      "type": "string",
+      "title": "The table name for the `Cdc`-IdentifierMapping.",
+      "description": "Defaults to `spCreateCdcIdentifierMapping` (literal)."
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
       "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
+    },
+    "eventSubjectFormat": {
+      "type": "string",
+      "title": "The default formatting for the Subject when an Event is published.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey"
+      ]
     },
     "eventActionFormat": {
       "type": "string",
@@ -115,6 +138,16 @@
       "type": "boolean",
       "title": "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
       "description": "Defaults to `true`."
+    },
+    "autoDotNetRename": {
+      "type": "string",
+      "title": "The option to automatically rename the SQL Tables and Columns for use in .NET.",
+      "description": "Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.",
+      "enum": [
+        "None",
+        "PascalCase",
+        "SnakeKebabToPascalCase"
+      ]
     },
     "pathBase": {
       "type": "string",
@@ -1006,8 +1039,17 @@
             },
             "eventSubject": {
               "type": "string",
-              "title": "The event subject.",
+              "title": "The Event Subject.",
               "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified."
+            },
+            "eventSubjectFormat": {
+              "type": "string",
+              "title": "The default formatting for the Subject when an Event is published.",
+              "description": "Defaults to `CodeGeneration.EventSubjectFormat`.",
+              "enum": [
+                "NameOnly",
+                "NameAndKey"
+              ]
             },
             "includeColumnsOnDelete": {
               "type": "array",
@@ -1026,6 +1068,22 @@
               "enum": [
                 "No",
                 "Yes"
+              ]
+            },
+            "identifierMapping": {
+              "type": "boolean",
+              "title": "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.",
+              "description": "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s)."
+            },
+            "identifierMappingColumns": {
+              "type": "array",
+              "title": "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.",
+              "description": "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
               ]
             },
             "columnNameIsDeleted": {
@@ -1142,6 +1200,22 @@
                       "type": "array",
                       "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
                       "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "identifierMapping": {
+                      "type": "boolean",
+                      "title": "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.",
+                      "description": "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s)."
+                    },
+                    "identifierMappingColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.",
+                      "description": "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.",
                       "items": [
                         {
                           "type": "string",

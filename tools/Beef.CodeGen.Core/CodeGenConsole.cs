@@ -147,7 +147,7 @@ namespace Beef.CodeGen
             var result = await cge.RunAsync().ConfigureAwait(false);
 
             sw.Stop();
-            WriteFooter(_logger, sw);
+            WriteFooter(_logger, sw, cge);
             return result ? 0 : -1;
         }
 
@@ -242,10 +242,10 @@ namespace Beef.CodeGen
         /// <summary>
         /// Write the footer information.
         /// </summary>
-        public static void WriteFooter(ILogger logger, Stopwatch sw)
+        public static void WriteFooter(ILogger logger, Stopwatch sw, CodeGenExecutor cge)
         {
             logger.LogInformation(string.Empty);
-            logger.LogInformation($"Beef Code-Gen Tool complete [{sw?.ElapsedMilliseconds}ms].");
+            logger.LogInformation($"Beef Code-Gen Tool complete [{sw?.ElapsedMilliseconds}ms, Unchanged = {cge.OverallNotChangedCount}, Updated = {cge.OverallUpdatedCount}, Created = {cge.OverallCreatedCount}, TotalLines = {cge.OverallLinesOfCodeCount}].");
             logger.LogInformation(string.Empty);
         }
     }

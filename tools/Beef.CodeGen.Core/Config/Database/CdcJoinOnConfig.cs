@@ -53,9 +53,19 @@ namespace Beef.CodeGen.Config.Database
         #endregion
 
         /// <summary>
+        /// Gets or sets the <see cref="Name"/> alias.
+        /// </summary>
+        public string? NameAlias { get; set; }
+
+        /// <summary>
         /// Gets the <see cref="ToColumn"/> <see cref="DbColumn"/>.
         /// </summary>
         public DbColumn? ToDbColumn { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ToColumn"/> alias.
+        /// </summary>
+        public string? ToColumnAlias { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -72,6 +82,8 @@ namespace Beef.CodeGen.Config.Database
             if (c == null)
                 throw new CodeGenException(this, nameof(Name), $"JoinOn '{Name}' (Schema.Table '{Parent!.Schema}.{Parent!.Name}') not found in database.");
 
+            NameAlias = Parent!.Columns.Where(x => x.Name == Name).SingleOrDefault()?.NameAlias ?? Name;
+
             if (string.IsNullOrEmpty(ToStatement))
             {
                 ToColumn = DefaultWhereNull(ToColumn, () => Name);
@@ -83,12 +95,16 @@ namespace Beef.CodeGen.Config.Database
                 {
                     if (Parent!.Parent!.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() == null)
                         throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{Parent.JoinToSchema}.{Parent.JoinTo}') not found in Table/Join configuration.");
+
+                    ToColumnAlias = Parent!.Parent!.Columns.SingleOrDefault(x => x.Name == ToColumn)?.NameAlias ?? Name;
                 }
                 else
                 {
                     var t = Parent!.Parent!.Joins!.Where(x => Parent.JoinToSchema == x.Schema && Parent.JoinTo == x.Name).SingleOrDefault();
                     if (t == null || t.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() == null)
                         throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{Parent.JoinToSchema}.{Parent.JoinTo}') not found in Table/Join configuration.");
+
+                    ToColumnAlias = t.Columns.SingleOrDefault(x => x.Name == ToColumn)?.NameAlias ?? Name;
                 }
             }
         }

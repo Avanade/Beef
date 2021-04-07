@@ -90,14 +90,14 @@ BEGIN
       END
 
 {{/ifval}}
-{{#ifor Parent.ColumnRowVersion}}
+{{#if Parent.ColumnRowVersion}}
       -- Check concurrency (where provided).
       IF @RowVersion IS NULL OR @PrevRowVersion <> @RowVersion
       BEGIN
         EXEC spThrowConcurrencyException
       END
 
-{{/ifor}}
+{{/if}}
 {{#if Parent.HasAuditUpdated}}
       -- Set audit details.
   {{#ifval Parent.ColumnUpdatedDate}}

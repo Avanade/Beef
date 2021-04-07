@@ -66,7 +66,12 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.NameAndKey;
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected override string EventSubject => "Demo.Cdc.Person";
 

@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Events;
+using Beef.Json;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,15 +21,16 @@ namespace Beef.Data.Database.Cdc
     /// <typeparam name="TCdcEntityWrapper">The <typeparamref name="TCdcEntity"/> wrapper <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcTrackingMapper">The tracking database mapper <see cref="Type"/>.</typeparam>
     public abstract class CdcDataOrchestrator<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper, TCdcTrackingMapper> : ICdcDataOrchestrator
-        where TCdcEntity : class, IUniqueKey, IETag, new() 
-        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() 
-        where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new() 
+        where TCdcEntity : class, ITableKey, IETag, new()
+        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new()
+        where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new()
         where TCdcTrackingMapper : ITrackingTvp, new()
     {
         private const string MaxQuerySizeParamName = "MaxQuerySize";
-        private const string ContinueWithDataLossParamName = "@ContinueWithDataLoss";
+        private const string ContinueWithDataLossParamName = "ContinueWithDataLoss";
         private const string OutboxIdParamName = "OutboxId";
-        private const string TrackingListParamName = "@TrackingList";
+        private const string TrackingListParamName = "TrackingList";
+        private const string IdentifierListParamName = "IdentifierList";
 
         private static readonly DatabaseMapper<CdcOutbox> _outboxMapper = DatabaseMapper.CreateAuto<CdcOutbox>();
         private static readonly TCdcTrackingMapper _trackingMapper = new TCdcTrackingMapper();
@@ -36,7 +38,7 @@ namespace Beef.Data.Database.Cdc
         private int _maxQuerySize = 100;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class.
+        /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class with no identifier mapping support.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="executeStoredProcedureName">The name of the execute outbox stored procedure.</param>
@@ -50,6 +52,29 @@ namespace Beef.Data.Database.Cdc
             CompleteStoredProcedureName = Check.NotEmpty(completeStoredProcedureName, nameof(completeStoredProcedureName));
             EventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
             Logger = Check.NotNull(logger, nameof(logger));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class that requires identifier mapping support.
+        /// </summary>
+        /// <param name="db">The <see cref="IDatabase"/>.</param>
+        /// <param name="executeStoredProcedureName">The name of the execute outbox stored procedure.</param>
+        /// <param name="completeStoredProcedureName">The name of the complete outbox stored procedure.</param>
+        /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        /// <param name="identifierMappingStoredProcedureName">The name of the optional identifier mapping stored procedure.</param>
+        /// <param name="identifierGenerator">The <see cref="IStringIdentifierGenerator"/>.</param>
+        /// <param name="identifierMappingTvp">The <see cref="IIdentifierMappingTvp"/>.</param>
+        public CdcDataOrchestrator(IDatabase db, string executeStoredProcedureName, string completeStoredProcedureName, IEventPublisher eventPublisher, ILogger logger, string identifierMappingStoredProcedureName, IStringIdentifierGenerator identifierGenerator, IIdentifierMappingTvp identifierMappingTvp)
+        {
+            Db = Check.NotNull(db, nameof(db));
+            ExecuteStoredProcedureName = Check.NotEmpty(executeStoredProcedureName, nameof(executeStoredProcedureName));
+            CompleteStoredProcedureName = Check.NotEmpty(completeStoredProcedureName, nameof(completeStoredProcedureName));
+            EventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
+            Logger = Check.NotNull(logger, nameof(logger));
+            IdentifierMappingStoredProcedureName = Check.NotEmpty(identifierMappingStoredProcedureName, nameof(identifierMappingStoredProcedureName));
+            IdentifierGenerator = Check.NotNull(identifierGenerator, nameof(identifierGenerator));
+            IdentifierMappingTvp = Check.NotNull(identifierMappingTvp, nameof(identifierMappingTvp));
         }
 
         /// <summary>
@@ -68,6 +93,12 @@ namespace Beef.Data.Database.Cdc
         public string CompleteStoredProcedureName { get; private set; }
 
         /// <summary>
+        /// Gets the name of the <b>identifier mapping</b> outbox stored procedure.
+        /// </summary>
+        /// <remarks>A <c>null</c> value indicates that no <b>identifier mapping</b> support is required.</remarks>
+        public string? IdentifierMappingStoredProcedureName { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="IEventPublisher"/>.
         /// </summary>
         public IEventPublisher EventPublisher { get; private set; }
@@ -76,6 +107,16 @@ namespace Beef.Data.Database.Cdc
         /// Gets the <see cref="ILogger"/>.
         /// </summary>
         public ILogger Logger { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IStringIdentifierGenerator"/>.
+        /// </summary>
+        public IStringIdentifierGenerator? IdentifierGenerator { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IIdentifierMappingTvp"/>.
+        /// </summary>
+        public IIdentifierMappingTvp? IdentifierMappingTvp { get; private set; }
 
         /// <summary>
         /// Gets the service name (used for logging).
@@ -88,9 +129,19 @@ namespace Beef.Data.Database.Cdc
         protected abstract string EventSubject { get; }
 
         /// <summary>
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected virtual EventSubjectFormat EventSubjectFormat { get; } = EventSubjectFormat.NameAndKey;
+
+        /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
+
+        /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected virtual string[]? ExcludePropertiesFromETag { get; }
 
         /// <summary>
         /// Gets or sets the maximum query size to limit the number of CDC (Change Data Capture) rows that are batched in a <see cref="CdcOutbox"/>.
@@ -203,9 +254,8 @@ namespace Beef.Data.Database.Cdc
                 return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
             }
 
-            // Determine whether anything may have been sent before and exclude (i.e. do not send again).
+            // Consolidate the results to the set that is to be sent (i.e. ignore unneccessary).
             var coll = new TCdcEntityWrapperColl();
-            var tracking = new List<CdcTracker>();
             foreach (var grp in result.Result.GroupBy(x => new { x.UniqueKey }))
             {
                 // Find delete and use.
@@ -215,7 +265,13 @@ namespace Beef.Data.Database.Cdc
 
                 // Where there is no delete then just use the first.
                 if (item == null)
+                {
                     item = grp.First();
+
+                    // Where the primary key is initial (being the actual table primary key columns versus from CDC) then it has been _subsequently_ deleted (physically) so skip.
+                    if (item is ITableKey tk && tk.TableKey.IsInitial)
+                        continue;
+                }
 
                 // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
                 if (item is ILogicallyDeleted ild && ild.IsDeleted)
@@ -224,23 +280,55 @@ namespace Beef.Data.Database.Cdc
                     ild.ClearWhereDeleted();
                 }
 
+                coll.Add(item);
+            }
+
+            // Where performing identifier mapping then enact as required.
+            if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
+            {
+                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
+            }
+
+            if (IdentifierMappingStoredProcedureName != null)
+                await AssignIdentityMappingAsync(coll).ConfigureAwait(false);
+
+            // Determine whether anything may have been sent before and exclude (i.e. do not send again).
+            var coll2 = new TCdcEntityWrapperColl();
+            var tracking = new List<CdcTracker>();
+            foreach (var item in coll)
+            {
                 // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
                 if (entity.ETag == null)
-                    entity.ETag = ETagGenerator.Generate(entity);
+                {
+                    if (ExcludePropertiesFromETag == null || ExcludePropertiesFromETag.Length == 0)
+                        entity.ETag = ETagGenerator.Generate(entity);
+                    else
+                    {
+                        var json = JsonPropertyFilter.Apply(entity, null, ExcludePropertiesFromETag);
+                        entity.ETag = ETagGenerator.Generate(json!.ToString(Newtonsoft.Json.Formatting.None));
+                    }
+                }
 
                 // Where the ETag and TrackingHash match then skip (has already been published).
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)
                 {
-                    coll.Add(item);
+                    coll2.Add(item);
                     tracking.Add(new CdcTracker { Key = CreateValueKey(entity), Hash = entity.ETag });
                 }
             }
 
-            // Publish & send the events.
-            if (coll.Count > 0)
+            if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
             {
-                result.Events = (await CreateEventsAsync(coll, cancellationToken.Value).ConfigureAwait(false)).ToArray();
+                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
+            }
+
+            // Publish & send the events.
+            if (coll2.Count > 0)
+            {
+                result.Events = (await CreateEventsAsync(coll2, cancellationToken.Value).ConfigureAwait(false)).ToArray();
                 await EventPublisher.Publish(result.Events).SendAsync().ConfigureAwait(false);
                 Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully.");
             }
@@ -281,35 +369,67 @@ namespace Beef.Data.Database.Cdc
         protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetOutboxEntityDataAsync();
 
         /// <summary>
+        /// Assigns the identity mapping by adding <i>new</i> for those items that do not currentyly have a global identifier currently assigned.
+        /// </summary>
+        /// <param name="coll">The wrapper entity collection.</param>
+        protected async Task AssignIdentityMappingAsync(TCdcEntityWrapperColl coll)
+        {
+            // Find all the instances where there is currently no global identifier assigned.
+            var vimc = new CdcValueIdentifierMappingCollection();
+            coll.OfType<ICdcLinkIdentifierMapping>().ForEach(async item => await item.LinkIdentifierMappingsAsync(vimc, IdentifierGenerator!).ConfigureAwait(false));
+
+            if (vimc.Count == 0)
+                return;
+
+            // There could be multiple references to same Schema/Table/Key; these need to filtered out; i.e. send only a distinct list.
+            var imcd = new Dictionary<(string?, string?, string?), CdcIdentifierMapping>();
+            vimc.ForEach(item => imcd.TryAdd((item.Schema, item.Table, item.Key), item));
+            var tvp = IdentifierMappingTvp!.CreateTableValuedParameter(imcd.Values);
+
+            // Execute the stored procedure and get the updated list.
+            var imc = await Db.StoredProcedure(IdentifierMappingStoredProcedureName!)
+                .TableValuedParam(IdentifierListParamName, tvp)
+                .SelectQueryAsync(DatabaseMapper.CreateAuto<CdcIdentifierMapping>())
+                .ConfigureAwait(false);
+
+            if (imc.Count() != imcd.Count())
+                throw new InvalidOperationException($"Stored procedure '{IdentifierMappingStoredProcedureName}' returned an unexpected result.");
+
+            // Re-link the identifier mappings with the final value.
+            vimc.ForEach(item => item.GlobalId = imc.Single(x => x.Schema == item.Schema && x.Table == item.Table && x.Key == item.Key).GlobalId);
+            coll.OfType<ICdcLinkIdentifierMapping>().ForEach(item => item.RelinkIdentifierMappings(vimc));
+        }
+
+        /// <summary>
         /// Creates an <see cref="EventData{T}"/> for the specified <paramref name="value"/>.
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
-        protected EventData<T> CreateValueEvent<T>(T value, string subjectPrefix, OperationType operationType) where T : class
-            => EventData.CreateValueEvent(value, CreateValueFullyQualifiedSubject(value, subjectPrefix), EventActionFormatter.Format(operationType, EventActionFormat));
+        protected EventData<T> CreateValueEvent<T>(T value, string subjectName, OperationType operationType) where T : class
+            => EventData.CreateValueEvent(value, CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat));
 
         /// <summary>
         /// Creates an <see cref="EventData"/> with the specified <paramref name="key"/>.
         /// </summary>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        protected EventData CreateEvent(string subjectPrefix, OperationType operationType, params IComparable?[] key)
-            => EventData.CreateEvent(CreateFullyQualifiedSubject(subjectPrefix, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
+        protected EventData CreateEvent(string subjectName, OperationType operationType, params IComparable?[] key)
+            => EventData.CreateEvent(CreateFormattedSubject(subjectName, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
 
         /// <summary>
-        /// Creates a fully qualified event subject by appending the <paramref name="value"/> <i>key</i> to the <paramref name="subjectPrefix"/>.
+        /// Creates a fully qualified event subject as per <see cref="EventSubjectFormat"/>.
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> name.</param>
         /// <returns>The fully qualified subject.</returns>
         /// <remarks><typeparamref name="T"/> must implement at least one of the following: <see cref="IIdentifier"/>, <see cref="IGuidIdentifier"/>, <see cref="IStringIdentifier"/> or <see cref="IUniqueKey"/>.</remarks>
-        protected string CreateValueFullyQualifiedSubject<T>(T value, string subjectPrefix) where T : class => subjectPrefix + "." + CreateValueKey(value);
+        protected string CreateValueFormattedSubject<T>(T value, string subjectName) where T : class => EventSubjectFormat == EventSubjectFormat.NameOnly ? subjectName : subjectName + "." + CreateValueKey(value);
 
         /// <summary>
         /// Creates the key (as a <see cref="string"/>) for the <paramref name="value"/>.
@@ -317,53 +437,20 @@ namespace Beef.Data.Database.Cdc
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The key for the <paramref name="value"/>.</returns>
-        protected string CreateValueKey<T>(T value) where T : class
-        {
-            var sb = new StringBuilder();
-            switch (value ?? throw new ArgumentNullException(nameof(value)))
-            {
-                case IIntIdentifier ii:
-                    sb.Append(ii.Id);
-                    break;
-
-                case IGuidIdentifier gi:
-                    sb.Append(gi.Id);
-                    break;
-
-                case IStringIdentifier si:
-                    sb.Append(si.Id);
-                    break;
-
-                case IUniqueKey uk:
-                    if (uk.UniqueKey.Args.Length == 0)
-                        throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
-
-                    for (int i = 0; i < uk.UniqueKey.Args.Length; i++)
-                    {
-                        if (i > 0)
-                            sb.Append(",");
-
-                        sb.Append(uk.UniqueKey.Args[i]);
-                    }
-
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Type must implement at least one of the following: IIdentifier, IGuidIdentifier, IStringIdentifier or IUniqueKey.");
-            }
-
-            return sb.ToString();
-        }
+        protected static string CreateValueKey<T>(T value) where T : class => value is IGlobalIdentifier gi && gi.GlobalId != null ? gi.GlobalId : value.CreateFormattedKey();
 
         /// <summary>
-        /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectPrefix"/>.
+        /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectName"/>.
         /// </summary>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventData.Subject"/> prefix.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The fully qualified subject.</returns>
-        protected string CreateFullyQualifiedSubject(string subjectPrefix, params IComparable?[] key)
+        protected string CreateFormattedSubject(string subjectName, params IComparable?[] key)
         {
-            var sb = new StringBuilder(subjectPrefix + ".");
+            if (EventSubjectFormat == EventSubjectFormat.NameOnly)
+                return subjectName;
+
+            var sb = new StringBuilder(subjectName + ".");
             if (key == null || key.Length == 0)
                 throw new ArgumentException("There must be at least a single key value specified.", nameof(key));
 

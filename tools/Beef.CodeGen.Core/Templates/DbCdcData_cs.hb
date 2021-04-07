@@ -9,6 +9,9 @@
 using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
+{{#if UsesGlobalIdentifier}}
+using Beef.Entities;
+{{/if}}
 using Beef.Events;
 using Beef.Mapper;
 using Microsoft.Extensions.Logging;
@@ -47,11 +50,14 @@ namespace {{Root.NamespaceCdc}}.Data
         /// <param name="db">The <see cref="{{DatabaseName}}"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
+{{#if UsesGlobalIdentifier}}
+        /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
+{{/if}}
 {{#each DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
-            base(db, "[{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]", "[{{CdcSchema}}].[{{CompleteStoredProcedureName}}]", evtPub, logger){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
+        {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#if UsesGlobalIdentifier}}, IStringIdentifierGenerator idGen{{/if}}{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
+            base(db, "[{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]", "[{{CdcSchema}}].[{{CompleteStoredProcedureName}}]", evtPub, logger{{#if UsesGlobalIdentifier}}, "[{{Root.CdcSchema}}].[{{Root.CdcIdentifierMappingStoredProcedureName}}]", idGen, new CdcIdentifierMappingDbMapper(){{/if}}){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
 {{#ifne DataCtorParameters.Count 0}}
         {
   {{#each DataCtorParameters}}
@@ -77,12 +83,12 @@ namespace {{Root.NamespaceCdc}}.Data
                 new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>
                 {
   {{#each JoinHierarchyReverse}}
-                    {{indent IndentIndex}}foreach (var {{Alias}} in {{#if @first}}r{{else}}{{HierarchyChild.Alias}}{{/if}}{{#unless @first}}.Coll{{/unless}}.GroupBy(x => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}x.{{#if @../../first}}{{Name}}{{else}}{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/if}}{{/each}} }).Select(g => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}g.Key.{{#if @../../first}}{{Name}}{{else}}{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/if}}{{/each}}, Coll = g.{{#if @last}}ToCollection<{{../Parent.ModelName}}Cdc.{{../ModelName}}CdcCollection, {{../Parent.ModelName}}Cdc.{{../ModelName}}Cdc>{{else}}ToList{{/if}}() })) // Join table: {{Name}} ({{Schema}}.{{TableName}})
+                    {{indent IndentIndex}}foreach (var {{Alias}} in {{#if @first}}r{{else}}{{HierarchyChild.Alias}}{{/if}}{{#unless @first}}.Coll{{/unless}}.GroupBy(x => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}x.{{#if @../../first}}{{NameAlias}}{{else}}{{#if @../last}}{{ToColumnAlias}}{{else}}{{pascal Parent.JoinTo}}_{{NameAlias}}{{/if}}{{/if}}{{/each}} }).Select(g => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}g.Key.{{#if @../../first}}{{NameAlias}}{{else}}{{#if @../last}}{{ToColumnAlias}}{{else}}{{pascal Parent.JoinTo}}_{{NameAlias}}{{/if}}{{/if}}{{/each}}, Coll = g.{{#if @last}}ToCollection<{{../Parent.ModelName}}Cdc.{{../ModelName}}CdcCollection, {{../Parent.ModelName}}Cdc.{{../ModelName}}Cdc>{{else}}ToList{{/if}}() })) // Join table: {{Name}} ({{Schema}}.{{TableName}})
                    {{indent IndentIndex}} {
     {{#unless @last}}
-                   {{indent IndentIndex}}     var {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Item = {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Coll.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}};
+                   {{indent IndentIndex}}     var {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Item = {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Coll.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumnAlias}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumnAlias}}{{else}}{{pascal Parent.JoinTo}}_{{NameAlias}}{{/if}}{{/each}}).{{PropertyName}};
     {{else}}
-                   {{indent IndentIndex}}     {{#if @first}}{{Parent.Alias}}Coll{{else}}{{#ifnull HierarchyChild.HierarchyChild}}{{Parent.Alias}}{{else}}HierarchyChild.HierarchyChild.Alias{{/ifnull}}Item{{/if}}.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../../first}}{{Name}}{{else}}{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/if}}{{/each}}).{{PropertyName}} = {{Alias}}.Coll{{#ifeq JoinCardinality 'OneToOne'}}.SingleOrDefault(){{/ifeq}};
+                   {{indent IndentIndex}}     {{#if @first}}{{Parent.Alias}}Coll{{else}}{{#ifnull HierarchyChild.HierarchyChild}}{{Parent.Alias}}{{else}}HierarchyChild.HierarchyChild.Alias{{/ifnull}}Item{{/if}}.Where(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumnAlias}} == {{Parent.Alias}}.{{#if @../../first}}{{NameAlias}}{{else}}{{#if @../last}}{{ToColumnAlias}}{{else}}{{pascal Parent.JoinTo}}_{{NameAlias}}{{/if}}{{/if}}{{/each}}).ForEach(x => x.{{PropertyName}} = {{Alias}}.Coll{{#ifeq JoinCardinality 'OneToOne'}}.SingleOrDefault(){{/ifeq}});
     {{/unless}}
   {{/each}}
   {{#each JoinHierarchy}}
@@ -97,7 +103,12 @@ namespace {{Root.NamespaceCdc}}.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// </summary>
+        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.{{EventSubjectFormat}};
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected override string EventSubject => "{{#ifval Root.EventSubjectRoot}}{{Root.EventSubjectRoot}}.{{/ifval}}{{EventSubject}}";
 
@@ -106,6 +117,18 @@ namespace {{Root.NamespaceCdc}}.Data
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
+{{#ifne ExcludePropertiesFromETag.Count 0}}
+        /// <summary>
+        /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
+        /// </summary>
+        protected override string[]? ExcludePropertiesFromETag => new string[] 
+            { 
+  {{#each ExcludePropertiesFromETag}}
+                "{{.}}"{{#unless @last}}, {{/unless}}
+  {{/each}} 
+            };
+
+{{/ifne}}
         /// <summary>
         /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database properties.
         /// </summary>

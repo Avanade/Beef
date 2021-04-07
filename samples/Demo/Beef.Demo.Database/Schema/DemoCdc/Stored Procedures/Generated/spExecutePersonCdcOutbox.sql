@@ -1,6 +1,6 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePersonCdcOutbox]
-  @MaxQuerySize INT NULL = 100,             -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @ContinueWithDataLoss BIT NULL = 0        -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,       -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @ContinueWithDataLoss BIT = 0  -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -38,9 +38,6 @@ BEGIN
     -- Where there is no incomplete outbox then the next should be processed.
     IF (@OutboxId IS NULL)
     BEGIN
-      -- New outbox so force creation of a new outbox.
-      SET @OutboxId = null 
-
       -- Get the last outbox processed.
       SELECT TOP 1
           @PersonMinLsn = [_outbox].[PersonMaxLsn]
@@ -141,14 +138,15 @@ BEGIN
 
     -- Root table: Demo.Person - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
-        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[_Lsn] AS [_Lsn],
+        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PersonId] AS [PersonId],
+        [p].[PersonId] AS [TableKey_PersonId],
         [p].[RowVersion] AS [RowVersion]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Demo].[Person] AS [p] ON ([p].[PersonId] = [_chg].[PersonId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))
 
     -- Commit the transaction.
     COMMIT TRANSACTION

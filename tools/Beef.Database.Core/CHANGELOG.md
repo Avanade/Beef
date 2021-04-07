@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Enhancement:* Added additional statistics information to console output.
+
 ## v4.1.4
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 - *Fixed:* The `DeleteAllAndReset.sql` updated to ignore schema `cdc`.

@@ -251,11 +251,11 @@ namespace Beef.Database.Core
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
                     CodeGenConsole.LogCodeGenExecutionArgs(_args.CodeGenArgs!);
 
+                    var cge = new CodeGenExecutor(_args.CodeGenArgs!);
                     if (!await TimeExecutionAsync(async () =>
                     {
-                        var cge = new CodeGenExecutor(_args.CodeGenArgs!);
                         return await cge.RunAsync().ConfigureAwait(false);
-                    }, true).ConfigureAwait(false))
+                    }, true, () => $", Unchanged = { cge.OverallNotChangedCount}, Updated = { cge.OverallUpdatedCount}, Created = { cge.OverallCreatedCount}, TotalLines = { cge.OverallLinesOfCodeCount}").ConfigureAwait(false))
                     {
                         return false;
                     }
@@ -323,7 +323,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Times the execution and reports result.
         /// </summary>
-        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action, bool addEmptyLineBeforeComplete = false)
+        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action, bool addEmptyLineBeforeComplete = false, Func<string>? summaryText = null)
         {
             try
             {
@@ -333,7 +333,7 @@ namespace Beef.Database.Core
                 if (addEmptyLineBeforeComplete)
                     _logger.LogInformation(string.Empty);
 
-                _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms].");
+                _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms{summaryText?.Invoke() ?? ""}].");
                 return result;
             }
             catch (Exception ex)

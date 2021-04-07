@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Enhancement:* Added standardized identifier mapping from local (internal) to global (external) where required.
+
 ## v4.1.4
 - *Enhancement:* Added `ILogicallyDeleted.ClearWhereDeleted()` to clear all properties that should not have a value where logically deleted; as the data is technically considered as non-existing.
 

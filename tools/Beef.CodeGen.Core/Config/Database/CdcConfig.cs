@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -23,6 +24,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CategorySchema("IdentifierMapping", Title = "Provides the _identifier mapping_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumns
     {
@@ -161,9 +163,17 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The event subject.",
+        [PropertySchema("DotNet", Title = "The Event Subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
+        public string? EventSubjectFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names that should be included (in addition to the primary key) for a logical delete.
@@ -179,6 +189,34 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("excludeBackgroundService", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
         public string? ExcludeBackgroundService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
+        /// </summary>
+        [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+            Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
+        public List<string>? ExcludeColumnsFromETag { get; set; }
+
+        #endregion
+
+        #region IdentifierMapping
+
+        /// <summary>
+        /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.
+        /// </summary>
+        [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("IdentifierMapping", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+           Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
+        public bool? IdentifierMapping { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
+        /// </summary>
+        [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("IdentifierMapping", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
+            Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
+        public List<string>? IdentifierMappingColumns { get; set; }
 
         #endregion
 
@@ -341,14 +379,24 @@ namespace Beef.CodeGen.Config.Database
         public DbTable? DbTable { get; private set; }
 
         /// <summary>
-        /// Gets or sets the event subject format.
-        /// </summary>
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
         public List<CtorParameterConfig> DataCtorParameters { get; } = new List<CtorParameterConfig>();
+
+        /// <summary>
+        /// Gets the fully qualified name schema.table name.
+        /// </summary>
+        public string? QualifiedName => DbTable!.QualifiedName;
+
+        /// <summary>
+        /// Indicates whether there is at least one global identifier being used somewhere.
+        /// </summary>
+        public bool UsesGlobalIdentifier { get; private set; }
+
+        /// <summary>
+        /// Gets the list of properties to exlcude from the ETag.
+        /// </summary>
+        public List<string> ExcludePropertiesFromETag { get; set; } = new List<string>();
 
         /// <summary>
         /// <inheritdoc/>
@@ -366,29 +414,39 @@ namespace Beef.CodeGen.Config.Database
             if (DbTable.IsAView)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' cannot be a view.");
 
-            Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Alias = DefaultWhereNull(Alias, () => DbTable.Alias);
 
             ExecuteStoredProcedureName = DefaultWhereNull(ExecuteStoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
-            ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
+            ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Root!.EventSubjectFormat);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             ExcludeBackgroundService = DefaultWhereNull(ExcludeBackgroundService, () => NoOption);
+            if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
+                ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
 
-            PrepareJoins();
-
             foreach (var c in DbTable.Columns)
             {
                 var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
+                var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
+                if (ca != null)
+                {
+                    var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                        cc.NameAlias = parts[1];
+                }
+
                 if (c.IsPrimaryKey)
                 {
                     cc.IncludeColumnOnDelete = true;
+                    cc.IgnoreSerialization = IdentifierMapping == true;
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
@@ -397,16 +455,9 @@ namespace Beef.CodeGen.Config.Database
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
-                    var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
-                    if (ca != null)
-                    {
-                        var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length == 2)
-                            cc.NameAlias = parts[1];
-                    }
-
                     if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
                     {
+                        MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                         cc.Prepare(Root!, this);
                         Columns.Add(cc);
                     }
@@ -423,9 +474,34 @@ namespace Beef.CodeGen.Config.Database
             // Build up the selected columns list.
             foreach (var c in Columns)
             {
-                var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias, IncludeColumnOnDelete = c.IncludeColumnOnDelete };
+                var cc = new CdcColumnConfig
+                {
+                    Name = c.Name,
+                    DbColumn = c.DbColumn,
+                    NameAlias = c.NameAlias,
+                    IncludeColumnOnDelete = c.IncludeColumnOnDelete,
+                    IgnoreSerialization = c.IgnoreSerialization || c.IdentifierMappingTable != null
+                };
+
                 cc.Prepare(Root!, this);
                 SelectedColumns.Add(cc);
+
+                if (c.IdentifierMappingTable != null)
+                {
+                    cc = new CdcColumnConfig
+                    {
+                        Name = "GlobalId",
+                        DbColumn = new DbColumn { Name = c.Name, Type = "NVARCHAR", DbTable = c.DbColumn!.DbTable },
+                        NameAlias = "Global" + c.NameAlias,
+                        IdentifierMappingAlias = c.IdentifierMappingAlias,
+                        IdentifierMappingSchema = c.IdentifierMappingSchema,
+                        IdentifierMappingTable = c.IdentifierMappingTable,
+                        IdentifierMappingParent = cc
+                    };
+
+                    cc.Prepare(Root!, this);
+                    SelectedColumns.Add(cc);
+                }
             }
 
             // Data constructors. 
@@ -437,12 +513,12 @@ namespace Beef.CodeGen.Config.Database
                 ctor.Prepare(Root!, Root!);
                 DataCtorParameters.Add(ctor);
             }
-        }
 
-        /// <summary>
-        /// Gets the fully qualified name schema.table name.
-        /// </summary>
-        public string? QualifiedName => DbTable!.QualifiedName;
+            PrepareJoins();
+
+            UsesGlobalIdentifier = IdentifierMapping == true || (IdentifierMappingColumns != null && IdentifierMappingColumns.Count > 1) || Joins.Any(x => x.IdentifierMapping == true || (x.IdentifierMappingColumns != null && x.IdentifierMappingColumns.Count > 1));
+            SetUpExcludePropertiesFromETag();
+        }
 
         /// <summary>
         /// Prepares the joins.
@@ -456,11 +532,11 @@ namespace Beef.CodeGen.Config.Database
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
             foreach (var join in Joins)
             {
-                join.Alias = DefaultWhereNull(join.Alias, () => new string(StringConversion.ToSentenceCase(join.Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+                join.Alias = DefaultWhereNull(join.Alias, () => DbTable.CreateAlias(join.Name!));
 
                 if (dict.TryGetValue(join.Alias!, out var val))
                 {
-                    dict[join.Alias!] = val++;
+                    dict[join.Alias!] = ++val;
                     join.Alias = $"{join.Alias}{val}";
                 }
                 else
@@ -478,6 +554,73 @@ namespace Beef.CodeGen.Config.Database
                 if (Joins.Any(x => x != j && x.Name == j.Name))
                     throw new CodeGenException(this, nameof(Joins), $"The Name '{j.Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to correct.");
             }
+        }
+
+        /// <summary>
+        /// Check whether column is selected for identity mapping and map accordingly.
+        /// </summary>
+        internal static void MapIdentifierMappingColumn<T>(CodeGenConfig root, ConfigBase config, string schema, List<string>? identifierMappingColumns, IIdentifierMappingColumn<T> cc) where T : class
+        {
+            if (identifierMappingColumns == null)
+                return;
+
+            var imc = identifierMappingColumns.FirstOrDefault(x => x.StartsWith(cc.Name + "^", StringComparison.Ordinal));
+            if (imc == null)
+                return;
+
+            if (cc.DbColumn!.IsPrimaryKey)
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' cannot be configured using {nameof(IdentifierMappingColumns)} as it is part of the primary key; use the {nameof(IdentifierMapping)} feature instead.");
+
+            var parts = imc.Split("^");
+            if (parts.Length < 2 || parts.Length > 3)
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' configuration '{imc}' that is not correctly formatted.");
+
+            cc.IdentifierMappingSchema = parts.Length == 3 ? parts[1] : schema;
+            cc.IdentifierMappingTable = parts.Length == 2 ? parts[1] : parts[2];
+            cc.IdentifierMappingAlias = $"_im{identifierMappingColumns.IndexOf(imc) + 1}";
+
+            var t = root!.DbTables.FirstOrDefault(x => x.Schema == cc.IdentifierMappingSchema && x.Name == cc.IdentifierMappingTable);
+            if (t == null)
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' that does not exist.");
+
+            if (t.Columns.Count(x => x.IsPrimaryKey) != 1)
+                throw new CodeGenException(config, nameof(identifierMappingColumns), $"Column '{cc.Name}' references table '{cc.IdentifierMappingSchema}.{cc.IdentifierMappingTable}' which must only have a single column representing the primary key.");
+        }
+
+        /// <summary>
+        /// Sets up the <see cref="ExcludePropertiesFromETag"/> list.
+        /// </summary>
+        private void SetUpExcludePropertiesFromETag()
+        {
+            if (ExcludeColumnsFromETag != null)
+            {
+                foreach (var ec in ExcludeColumnsFromETag)
+                {
+                    var c = Columns.Where(x => x.Name == ec).FirstOrDefault();
+                    if (c != null)
+                        ExcludePropertiesFromETag.Add(c.NameAlias!);
+                }
+            }
+
+            if (Joins != null)
+            {
+                foreach (var j in Joins)
+                {
+                    if (j.ExcludeColumnsFromETag != null)
+                    {
+                        var p = string.Join('.', j.JoinHierarchyReverse.Select(x => x.PropertyName));
+                        foreach (var ec in j.ExcludeColumnsFromETag)
+                        {
+                            var c = j.Columns.Where(x => x.Name == ec).FirstOrDefault();
+                            if (c != null)
+                                ExcludePropertiesFromETag.Add(p + '.' + c.NameAlias!);
+                        }
+                    }
+                }
+            }
+
+            if (ExcludePropertiesFromETag != null && ExcludePropertiesFromETag.Count > 0)
+                ExcludePropertiesFromETag = ExcludePropertiesFromETag.Distinct().ToList();
         }
     }
 }
