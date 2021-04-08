@@ -49,9 +49,6 @@ namespace Beef.Caching.Policy
         /// </summary>
         bool ICachePolicy.HasExpired()
         {
-            if (IsExpired)
-                return true;
-
             Hits++;
             return IsExpired;
         }

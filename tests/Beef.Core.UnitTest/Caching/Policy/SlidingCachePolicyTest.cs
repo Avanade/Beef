@@ -11,20 +11,54 @@ namespace Beef.Core.UnitTest.Caching.Policy
     public class SlidingCachePolicyTest
     {
         [Test]
-        public void Slide()
+        public void SlideNoMax()
         {
             var scp = new SlidingCachePolicy { Duration = new TimeSpan(0, 0, 1) };
             scp.Reset();
 
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
-            Thread.Sleep(500);
+            Thread.Sleep(450);
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
-            Thread.Sleep(500);
+            Thread.Sleep(450);
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
-            Thread.Sleep(500);
+            Thread.Sleep(450);
+            Assert.IsTrue(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsTrue(((ICachePolicy)scp).HasExpired());
+        }
+
+        [Test]
+        public void SlideWithMax()
+        {
+            var scp = new SlidingCachePolicy { Duration = new TimeSpan(0, 0, 1), MaxDuration = new TimeSpan(0, 0, 2) };
+            scp.Reset();
+
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
-            Thread.Sleep(1500);
-            Assert.IsTrue(scp.IsExpired);
+            Thread.Sleep(450);
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsTrue(((ICachePolicy)scp).HasExpired());
+        }
+
+        [Test]
+        public void SlideWithMaxGap()
+        {
+            var scp = new SlidingCachePolicy { Duration = new TimeSpan(0, 0, 1), MaxDuration = new TimeSpan(0, 0, 2) };
+            scp.Reset();
+
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(350);
+            Assert.IsFalse(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(1100);
+            Assert.IsTrue(((ICachePolicy)scp).HasExpired());
+            Thread.Sleep(450);
+            Assert.IsTrue(((ICachePolicy)scp).HasExpired());
         }
 
         [Test]
