@@ -84,8 +84,14 @@ namespace Beef.Caching.Policy
         bool ICachePolicy.HasExpired()
         {
             var isExpired = IsExpired;
-            if (!isExpired)
-                Reset();
+            if (!isExpired && _maxDuration.TotalMilliseconds > 0)
+            {
+                var expiry = Entities.Cleaner.Clean(DateTime.Now).Add(_duration);
+                if (_maxExpiry.HasValue && expiry > _maxExpiry.Value)
+                    expiry = _maxExpiry.Value;
+
+                Expiry = expiry;
+            }
 
             Hits++;
             return isExpired;
@@ -107,7 +113,6 @@ namespace Beef.Caching.Policy
         public void Refresh()
         {
             Expiry = null;
-            _maxExpiry = null;
         }
 
         /// <summary>
@@ -116,16 +121,12 @@ namespace Beef.Caching.Policy
         public void Reset()
         {
             DateTime now = Entities.Cleaner.Clean(DateTime.Now);
-            if (_maxExpiry.HasValue && _maxExpiry <= now)
-                _maxExpiry = null;
-
             DateTime? expiry = now.Add(_duration);
 
-            if (!_maxExpiry.HasValue && _maxDuration.TotalMilliseconds > 0)
+            if (_maxDuration.TotalMilliseconds > 0)
                 _maxExpiry = now.Add(_maxDuration);
-
-            if (_maxExpiry.HasValue && Expiry > _maxExpiry.Value)
-                expiry = _maxExpiry;
+            else
+                _maxExpiry = null;
 
             if (_randomizerOffset.HasValue)
                 expiry = CachePolicyManager.AddRandomizedOffsetToTime(expiry.Value, _randomizerOffset.Value);

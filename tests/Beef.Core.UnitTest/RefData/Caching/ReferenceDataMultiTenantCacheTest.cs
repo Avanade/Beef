@@ -232,7 +232,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
                     Assert.AreEqual(2, c.ActiveList.Count);
                     Assert.AreEqual(1, rdc.Count);
                     Assert.IsFalse(rdc.IsExpired);
-                    System.Threading.Thread.Sleep((int)Math.Floor(policy.Duration.TotalSeconds / 2));
+                    System.Threading.Thread.Sleep((int)Math.Floor(policy.Duration.TotalMilliseconds / 2));
                 }
 
                 // reload collection cached.
