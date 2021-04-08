@@ -121,7 +121,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
                     Assert.AreEqual(3 + cycle, c.ActiveList.Count);
                     Assert.AreEqual(3 + cycle, rdc.Count);
                     Assert.IsFalse(rdc.IsExpired);
-                    System.Threading.Thread.Sleep((int)Math.Floor(policy.Duration.TotalSeconds / 2));
+                    System.Threading.Thread.Sleep((int)Math.Floor(policy.Duration.TotalMilliseconds / 2));
                 }
 
                 // reload collection cached.

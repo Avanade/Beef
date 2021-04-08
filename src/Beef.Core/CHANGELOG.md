@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.10
+- *Fixed:* Issue [121](https://github.com/Avanade/Beef/issues/121). `SlidingCachePolicy` sliding logic functions as expected.
+
 ## v4.1.9
 - *Fixed:* Issue [121](https://github.com/Avanade/Beef/issues/121). `SlidingCachePolicy` will now cache correctly after first expiry.
 
