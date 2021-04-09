@@ -1473,14 +1473,12 @@
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">
         <xs:annotation>
-          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required)`.</xs:documentation>
+          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required, i.e. as-is)`.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
-            <xs:enumeration value="UpperCase" />
             <xs:enumeration value="PastTense" />
-            <xs:enumeration value="PastTenseUpperCase" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

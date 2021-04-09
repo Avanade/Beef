@@ -20,6 +20,17 @@ namespace Beef.Events
         public LoggerEventPublisher(ILogger<LoggerEventPublisher> logger) => _logger = Check.NotNull(logger, nameof(logger));
 
         /// <summary>
+        /// Sets both the <see cref="EventPublisherBase.SubjectFormat"/> and <see cref="EventPublisherBase.ActionFormat"/> to the specified <paramref name="format"/>.
+        /// </summary>
+        /// <param name="format">The <see cref="EventStringFormat"/>.</param>
+        /// <returns>This <see cref="LoggerEventPublisher"/> instance to support fluent-style method-chaining.</returns>
+        public LoggerEventPublisher Format(EventStringFormat format)
+        {
+            SubjectFormat = ActionFormat = format;
+            return this;
+        }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="events"><inheritdoc/></param>

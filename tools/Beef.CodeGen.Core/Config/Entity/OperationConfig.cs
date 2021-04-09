@@ -256,6 +256,15 @@ operations: [
         public bool? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The Event Source.",
+            Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+        public string? EventSource { get; set; }
+
+        /// <summary>
         /// Gets or sets the event subject template and corresponding event action pair (separated by a colon).
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -503,9 +512,30 @@ operations: [
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
 
         /// <summary>
+        /// The operation event properties.
+        /// </summary>
+        public class OperationEvent
+        {
+            /// <summary>
+            /// Gets or sets the event subject.
+            /// </summary>
+            public string? Subject { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event action.
+            /// </summary>
+            public string? Action { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event source.
+            /// </summary>
+            public string? Source { get; set; }
+        }
+
+        /// <summary>
         /// Gets the list of events derived from the <see cref="EventSubject"/>.
         /// </summary>
-        public List<EventData> Events { get; } = new List<EventData>();
+        public List<OperationEvent> Events { get; } = new List<OperationEvent>();
 
         /// <summary>
         /// Gets the formatted summary text.
@@ -601,6 +631,16 @@ operations: [
         /// Gets or sets the gRPC mapper for the return value.
         /// </summary>
         public string? GrpcReturnMapper { get; set; }
+
+        /// <summary>
+        /// Gets the event source URI.
+        /// </summary>
+        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+
+        /// <summary>
+        /// Gets the event format key code.
+        /// </summary>
+        public string? EventFormatKey { get; private set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -738,24 +778,23 @@ operations: [
                 _ => "Unspecified"
             });
 
+            EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
             EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
-            EventSubject = DefaultWhereNull(EventSubject, () =>
-            {
-                var key = Parent!.EventSubjectFormat == "NameOnly" ? null : Type switch
-                {
-                    "Create" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
-                    "Update" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
-                    "Delete" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}")),
-                    _ => null
-                };
 
-                return Type switch
-                {
-                    "Create" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    "Update" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    "Delete" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    _ => null
-                };
+            EventFormatKey = Type switch
+            {
+                "Create" => "{_evtPub.FormatKey(__result)}",
+                "Update" => "{_evtPub.FormatKey(__result)}",
+                "Delete" => $"{{_evtPub.FormatKey({string.Join(", ", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{x.ArgumentName}"))})}}",
+                _ => null
+            };
+
+            EventSubject = DefaultWhereNull(EventSubject, () => Type switch
+            {
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                _ => null
             });
 
             PrepareEvents();
@@ -823,9 +862,7 @@ operations: [
         /// </summary>
         private string ConvertEventAction(string action) => Root!.EventActionFormat switch
         {
-            "UpperCase" => action.ToUpperInvariant(),
             "PastTense" => StringConversion.ToPastTense(action)!,
-            "PastTenseUpperCase" => StringConversion.ToPastTense(action)!.ToUpperInvariant(),
             _ => action
         };
 
@@ -869,7 +906,7 @@ operations: [
 
             foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))
             {
-                var ed = new EventData();
+                var ed = new OperationEvent();
                 var parts = @event.Split(":");
                 if (parts.Length > 0)
                     ed.Subject = parts[0];
@@ -881,6 +918,9 @@ operations: [
 
                 if (Root!.EventSubjectRoot != null)
                     ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
+
+                if (Root!.EventSourceKind != "None")
+                    ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);
 
                 Events.Add(ed);
             }

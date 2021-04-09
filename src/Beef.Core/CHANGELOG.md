@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.11
+- *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.
+- *Enhancement:* Added `IEventPublisher.SubjectFormat` and `IEventPublisher.ActionFormat` to enable optional uppercase or lowercase formatting.
+
 ## v4.1.10
 - *Fixed:* Issue [121](https://github.com/Avanade/Beef/issues/121). `SlidingCachePolicy` sliding logic functions as expected.
 

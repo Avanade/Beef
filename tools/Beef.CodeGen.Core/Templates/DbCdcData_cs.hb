@@ -102,8 +102,15 @@ namespace {{Root.NamespaceCdc}}.Data
             return result;
         }
 
+{{#ifne Root.EventSourceKind 'None'}}
         /// <summary>
-        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// Gets the <see cref="EventData.Source"/>.
+        /// </summary>
+        protected override Uri? EventSource => new Uri("{{EventSourceUri}}", UriKind.{{Root.EventSourceKind}});
+
+{{/ifne}}
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
         /// </summary>
         protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.{{EventSubjectFormat}};
 
@@ -113,7 +120,7 @@ namespace {{Root.NamespaceCdc}}.Data
         protected override string EventSubject => "{{#ifval Root.EventSubjectRoot}}{{Root.EventSubjectRoot}}.{{/ifval}}{{EventSubject}}";
 
         /// <summary>
-        /// Gets the <see cref="Events.EventActionFormat"/>.
+        /// Gets the <see cref="EventData.Action"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 

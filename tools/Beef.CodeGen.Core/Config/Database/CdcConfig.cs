@@ -160,6 +160,14 @@ namespace Beef.CodeGen.Config.Database
         public string? DatabaseName { get; set; }
 
         /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The Event Source.",
+            Description = "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.")]
+        public string? EventSource { get; set; }
+
+        /// <summary>
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -194,7 +202,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
             Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
         public List<string>? ExcludeColumnsFromETag { get; set; }
 
@@ -389,6 +397,11 @@ namespace Beef.CodeGen.Config.Database
         public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
+        /// Gets the event source URI.
+        /// </summary>
+        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+
+        /// <summary>
         /// Indicates whether there is at least one global identifier being used somewhere.
         /// </summary>
         public bool UsesGlobalIdentifier { get; private set; }
@@ -421,6 +434,7 @@ namespace Beef.CodeGen.Config.Database
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));
+            EventSource = DefaultWhereNull(EventSource, () => ModelName!.ToLowerInvariant());
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Root!.EventSubjectFormat);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");

@@ -64,6 +64,7 @@ Property | Description
 `EventSubject` | The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
 `IncludeColumnsOnDelete` | The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.
 **`ExcludeBackgroundService`** | The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`). Valid options are: `No`, `Yes`.
+`ExcludeColumnsFromETag` | The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking). Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.
 
 <br/>
 

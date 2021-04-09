@@ -124,17 +124,22 @@ namespace Beef.Data.Database.Cdc
         protected virtual string ServiceName => _name ??= GetType().Name;
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/>.
+        /// Gets the <see cref="EventData.Source"/>.
+        /// </summary>
+        protected virtual Uri? EventSource { get; }
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected abstract string EventSubject { get; }
 
         /// <summary>
-        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
         /// </summary>
         protected virtual EventSubjectFormat EventSubjectFormat { get; } = EventSubjectFormat.NameAndKey;
 
         /// <summary>
-        /// Gets the <see cref="Events.EventActionFormat"/>.
+        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
 

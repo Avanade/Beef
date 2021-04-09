@@ -183,12 +183,10 @@
     "eventActionFormat": {
       "type": "string",
       "title": "The formatting for the Action when an Event is published.",
-      "description": "Defaults to `None` (no formatting required)`.",
+      "description": "Defaults to `None` (no formatting required, i.e. as-is)`.",
       "enum": [
         "None",
-        "UpperCase",
-        "PastTense",
-        "PastTenseUpperCase"
+        "PastTense"
       ]
     },
     "eventTransaction": {

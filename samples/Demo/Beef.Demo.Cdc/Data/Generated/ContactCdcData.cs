@@ -69,7 +69,12 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
+        /// Gets the <see cref="EventData.Source"/>.
+        /// </summary>
+        protected override Uri? EventSource => new Uri("/cdc/contact", UriKind.Relative);
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
         /// </summary>
         protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.NameAndKey;
 
@@ -79,7 +84,7 @@ namespace Beef.Demo.Cdc.Data
         protected override string EventSubject => "Legacy.Contact";
 
         /// <summary>
-        /// Gets the <see cref="Events.EventActionFormat"/>.
+        /// Gets the <see cref="EventData.Action"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
 

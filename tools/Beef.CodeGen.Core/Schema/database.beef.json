@@ -96,6 +96,16 @@
       "title": "The table name for the `Cdc`-IdentifierMapping.",
       "description": "Defaults to `spCreateCdcIdentifierMapping` (literal)."
     },
+    "cdcExcludeColumnsFromETag": {
+      "type": "array",
+      "title": "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)",
+      "items": [
+        {
+          "type": "string",
+          "uniqueItems": true
+        }
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
@@ -113,12 +123,10 @@
     "eventActionFormat": {
       "type": "string",
       "title": "The formatting for the Action when an Event is published.",
-      "description": "Defaults to `None` (no formatting required).",
+      "description": "Defaults to `None` (no formatting required, i.e. as-is).",
       "enum": [
         "None",
-        "UpperCase",
-        "PastTense",
-        "PastTenseUpperCase"
+        "PastTense"
       ]
     },
     "jsonSerializer": {
@@ -1070,6 +1078,17 @@
                 "Yes"
               ]
             },
+            "excludeColumnsFromETag": {
+              "type": "array",
+              "title": "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+              "description": "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
             "identifierMapping": {
               "type": "boolean",
               "title": "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.",
@@ -1200,6 +1219,17 @@
                       "type": "array",
                       "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
                       "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumnsFromETag": {
+                      "type": "array",
+                      "title": "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+                      "description": "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.",
                       "items": [
                         {
                           "type": "string",
