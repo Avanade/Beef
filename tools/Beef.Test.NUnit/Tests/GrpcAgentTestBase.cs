@@ -78,15 +78,28 @@ namespace Beef.Test.NUnit.Tests
                 TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
             TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS SENT (Send invocation count: {Events.ExpectEvent.GetSendCount(CorrelationId)}) >");
-            var events = ExpectEvent.GetSentEvents();
+            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
+            var events = ExpectEvent.GetPublishedEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
             {
                 foreach (var e in events)
                 {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
+                }
+            }
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS SENT (Send invocation count: {Events.ExpectEvent.GetSendCount(CorrelationId)}) >");
+            events = ExpectEvent.GetSentEvents(CorrelationId);
+            if (events.Count == 0)
+                TestContext.Out.WriteLine("  None.");
+            else
+            {
+                foreach (var e in events)
+                {
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
                 }
             }
 

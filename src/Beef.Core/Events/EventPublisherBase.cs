@@ -17,9 +17,9 @@ namespace Beef.Events
         private readonly Lazy<ConcurrentQueue<EventData>> _queue = new();
 
         /// <summary>
-        /// Gets or sets the prefix for an <see cref="EventData.Subject"/> when creating an <see cref="EventData"/> or <see cref="EventData{T}"/>. <i>Note:</i> the <see cref="PathSeparator"/> will automatically be applied.
+        /// Gets or sets the default source <see cref="Uri"/> to be used where not otherwise specified.
         /// </summary>
-        public string? EventSubjectPrefix { get; set; }
+        public Uri? DefaultSource { get; set; }
 
         /// <summary>
         /// Gets or sets the path seperator <see cref="string"/>.
@@ -62,24 +62,20 @@ namespace Beef.Events
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> objects.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        /// <remarks>This method will also perform the appropriate <see cref="SubjectFormat"/> and <see cref="ActionFormat"/> on the <paramref name="events"/>, as well as applying the <see cref="EventSubjectPrefix"/>.</remarks>
+        /// <remarks>This method will also perform the appropriate <see cref="SubjectFormat"/> and <see cref="ActionFormat"/> on the <paramref name="events"/>.</remarks>
         public virtual IEventPublisher Publish(params EventData[] events)
         {
             Check.IsFalse(events.Any(x => string.IsNullOrEmpty(x.Subject)), nameof(events), "EventData must have a Subject.");
             foreach (var ed in events)
             {
-                ed.Subject = Format(PrependPrefix(Check.NotEmpty(ed.Subject, nameof(EventData.Subject))), SubjectFormat);
+                ed.Subject = Format(Check.NotEmpty(ed.Subject, nameof(EventData.Subject)), SubjectFormat);
                 ed.Action = Format(ed.Action, ActionFormat);
+                ed.Source ??= DefaultSource;
                 _queue.Value.Enqueue(ed);
             }
 
             return this;
         }
-
-        /// <summary>
-        /// Prepends the <see cref="IEventPublisher.EventSubjectPrefix"/> to the <paramref name="subject"/> where specified before creating the <see cref="EventData"/>.
-        /// </summary>
-        protected virtual string PrependPrefix(string subject) => string.IsNullOrEmpty(EventSubjectPrefix) ? subject : EventSubjectPrefix + PathSeparator + subject;
 
         /// <summary>
         /// Format the string.

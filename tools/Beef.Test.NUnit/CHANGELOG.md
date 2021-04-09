@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.8
+- *Enhancement:* Added `EventData.Source` to the test output log.
+
 ## v4.1.7
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

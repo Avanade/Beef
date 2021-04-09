@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" EventSourceKind="Relative" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <Entity Name="Person" Text="Person" Implements="IETag, IChangeLog" Collection="true" CollectionResult="true" Grpc="true" Validator="PersonValidator" WebApiAuthorize="false" WebApiRoutePrefix="api/v1/persons" WebApiAutoLocation="true" Create="true" Delete="true" AutoImplement="Database" DatabaseSchema="Demo" EntityFrameworkEntity="EfModel.Person" DataCtorParams="Microsoft.Extensions.Logging.ILogger&lt;PersonData&gt;^Logger, Common.Agents.IPersonAgent" ManagerExtensions="true" DataSvcExtensions="true" DataExtensions="true" EventTransaction="true" TestCodeGen="true" TestExtra="Unknown-Config">
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" GrpcFieldNo="1" UniqueKey="true" IdentifierGenerator="IGuidIdentifierGenerator^GuidIdGen" DataName="PersonId" />
     <Property Name="FirstName" Type="string" GrpcFieldNo="2" />
@@ -119,7 +119,7 @@
   </Entity>
 
   <!-- CosmosDb -->
-  <Entity Name="Robot" Grpc="true" Text="Robot" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" ManagerCtorParams="Beef.Events.IEventPublisher" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
+  <Entity Name="Robot" Grpc="true" Text="Robot" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" ManagerCtorParams="Beef.Events.IEventPublisher" EventSource="/robots/{$key}" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
     <Property Name="Id" Text="{{Robot}} identifier" Type="Guid" UniqueKey="true" IdentifierGenerator="IGuidIdentifierGenerator" GrpcFieldNo="1" />
     <Property Name="ModelNo" Text="Model number" Type="string" GrpcFieldNo="2" />
     <Property Name="SerialNo" Text="Unique serial number" Type="string" GrpcFieldNo="3" />

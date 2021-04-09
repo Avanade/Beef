@@ -150,7 +150,7 @@ namespace Beef.Test.NUnit.Tests
             {
                 foreach (var e in events)
                 {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Beef.Test.NUnit.Tests
             {
                 foreach (var e in events)
                 {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
                 }
             }
 
