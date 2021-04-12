@@ -5,10 +5,10 @@ CREATE TABLE [DemoCdc].[ContactOutbox] (
 
   [OutboxId] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY CLUSTERED ([OutboxId] ASC),
   [CreatedDate] DATETIME NOT NULL,
-  [ContactMinLsn] BINARY(10) NOT NULL,  -- Primary table: Legacy.Contact
-  [ContactMaxLsn] BINARY(10) NOT NULL,
-  [AddressMinLsn] BINARY(10) NOT NULL,  -- Related table: Legacy.Address
-  [AddressMaxLsn] BINARY(10) NOT NULL,
+  [ContactMinLsn] BINARY(10) NULL,  -- Primary table: Legacy.Contact
+  [ContactMaxLsn] BINARY(10) NULL,
+  [AddressMinLsn] BINARY(10) NULL,  -- Related table: Legacy.Address
+  [AddressMaxLsn] BINARY(10) NULL,
   [IsComplete] BIT NOT NULL,
   [CompletedDate] DATETIME NULL,
   [HasDataLoss] BIT NOT NULL

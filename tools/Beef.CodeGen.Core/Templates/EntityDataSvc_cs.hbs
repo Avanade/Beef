@@ -48,11 +48,13 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 
   {{/if}}
 {{/each}}
-{{#if DataSvcExtensions}}
+{{#if HasDataSvcExtensions}}
         #region Extensions
 
   {{#each DataSvcAutoOperations}}
+    {{#if DataSvcExtensions}}
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
+    {{/if}}
   {{/each}}
 
         #endregion
@@ -104,8 +106,8 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{/ifeq}}
     {{/if}}         
                 {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
-    {{#if Parent.DataSvcExtensions}}
-                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+    {{#if DataSvcExtensions}}
+                await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
     {{/if}}
     {{#if EventPublish}}
       {{#ifeq Events.Count 1}}
@@ -130,11 +132,12 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{#ifeq Type 'Delete'}}
                 _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
       {{else}}
-                _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}(__result as IUniqueKey).UniqueKey{{/ifeq}}, __result);
+                return _cache.SetAndReturnValue({{#ifeq Type 'Get'}}__key, {{/ifeq}}__result);
       {{/ifeq}}
-    {{/if}}   
-    {{#if HasReturnValue}}
+    {{else}}   
+      {{#if HasReturnValue}}
                 return __result;
+      {{/if}}
     {{/if}}
             }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
         }

@@ -3,7 +3,6 @@
 using Beef.Entities;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -18,7 +17,7 @@ namespace Beef.RefData
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, Active = {IsActive}, IsValid = {IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
 #pragma warning disable CA1036 // Override methods on comparable types; support for <, <=, > and >= not supported by-design.
-    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IEquatable<ReferenceDataBase>, IETag, IChangeLog, IIdentifier
+    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IEquatable<ReferenceDataBase>, IETag, IChangeLog, IIdentifier, IUniqueKey
 #pragma warning restore CA1036
     {
         #region RefDataKey
@@ -857,6 +856,20 @@ namespace Beef.RefData
         ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException();
 
 #pragma warning restore CA1033
+
+        #endregion
+
+        #region IUniqueKey
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public UniqueKey UniqueKey => new(Id);
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         #endregion
     }

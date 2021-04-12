@@ -5,6 +5,7 @@ Represents the **NuGet** versions.
 ## v4.1.23
 - *Enhancement:* Added support for YAML files with a `.yml` suffix.
 - *Enhancement:* Added support for `EventDasta.Source` to both entity and database (CDC) code-gen.
+- *Enhancement:* Added `Operation.ManagerExtensions`, `Operation.DataSvcExtensions` and `Operation.DataExtensions` to further control extensions code-gen output versus all for the `Entity`.
 
 ## v4.1.22
 - *Enhancement:* Added standardized identifier mapping for change-data-capture (CDC) from local (internal) to global (external) where required.

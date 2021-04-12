@@ -12,9 +12,9 @@
     <Property Name="ETag" Type="string" GrpcFieldNo="500" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="501" />
 
-    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
-    <Operation Name="Update" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="{id}" DataSvcTransaction="true" />
-    <Operation Name="UpdateWithRollback" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="withRollback/{id}" DataSvcTransaction="true" DatabaseStoredProc="spPersonUpdate" />
+    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" ManagerExtensions="false" DataSvcExtensions="false" DataExtensions="false" />
+    <Operation Name="Update" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="{id}" DataSvcTransaction="true" ManagerExtensions="false" DataSvcExtensions="false" DataExtensions="false" />
+    <Operation Name="UpdateWithRollback" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="withRollback/{id}" DataSvcTransaction="true" DatabaseStoredProc="spPersonUpdate" ManagerExtensions="false" DataSvcExtensions="false" DataExtensions="false" />
     <Operation Name="Patch" OperationType="Patch" UniqueKey="true" WebApiRoute="{id}" />
 
     <Operation Name="GetAll" OperationType="GetColl" PagingArgs="true" WebApiRoute="all" />

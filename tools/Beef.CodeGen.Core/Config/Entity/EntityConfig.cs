@@ -351,7 +351,8 @@ entities:
         /// Indicates whether the `Data` extensions logic should be generated.
         /// </summary>
         [JsonProperty("dataExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates whether the `Data` extensions logic should be generated.")]
+        [PropertySchema("Data", Title = "Indicates whether the `Data` extensions logic should be generated.",
+            Description = "This can be overridden using `Operation.DataExtensions`.")]
         public bool? DataExtensions { get; set; }
 
         #endregion
@@ -590,7 +591,8 @@ entities:
         /// Indicates whether the `DataSvc` extensions logic should be generated.
         /// </summary>
         [JsonProperty("dataSvcExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.")]
+        [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
+            Description = "This can be overridden using `Operation.DataSvcExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
 
         #endregion
@@ -618,7 +620,8 @@ entities:
         /// Indicates whether the `Manager` extensions logic should be generated.
         /// </summary>
         [JsonProperty("managerExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Manager", Title = "Indicates whether the `Manager` extensions logic should be generated.")]
+        [PropertySchema("Manager", Title = "Indicates whether the `Manager` extensions logic should be generated.", 
+            Description = "This can be overridden using `Operation.ManagerExtensions`.")]
         public bool? ManagerExtensions { get; set; }
 
         /// <summary>
@@ -902,6 +905,21 @@ entities:
         public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsNoOption(x.ExcludeDataSvc) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
 
         /// <summary>
+        /// Indicates where there are any <see cref="OperationConfig.ManagerExtensions"/>.
+        /// </summary>
+        public bool HasManagerExtensions => Operations.Any(x => x.ManagerExtensions == true);
+
+        /// <summary>
+        /// Indicates where there are any <see cref="OperationConfig.DataSvcExtensions"/>.
+        /// </summary>
+        public bool HasDataSvcExtensions => Operations.Any(x => x.DataSvcExtensions == true);
+
+        /// <summary>
+        /// Indicates where there are any <see cref="OperationConfig.DataExtensions"/>.
+        /// </summary>
+        public bool HasDataExtensions => Operations.Any(x => x.DataExtensions == true);
+
+        /// <summary>
         /// Gets the Manager constructor parameters.
         /// </summary>
         public List<ParameterConfig> ManagerCtorParameters { get; } = new List<ParameterConfig>();
@@ -1051,7 +1069,7 @@ entities:
         /// <summary>
         /// Indicates whether the data extensions section is required.
         /// </summary>
-        public bool DataExtensionsRequired => CompareValue(DataExtensions, true) || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
+        public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
 
         /// <summary>
         /// Gets the reference data qualified Entity name.

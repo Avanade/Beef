@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -156,6 +155,14 @@ operations: [
         public string? DataEntityMapper { get; set; }
 
         /// <summary>
+        /// Indicates whether the `Data` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("dataExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "Indicates whether the `Data` extensions logic should be generated.",
+            Description = "Defaults to `Entity.DataExtensions`.")]
+        public bool? DataExtensions { get; set; }
+
+        /// <summary>
         /// Gets or sets the database stored procedure name.
         /// </summary>
         [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -206,6 +213,14 @@ operations: [
         public bool? ManagerTransaction { get; set; }
 
         /// <summary>
+        /// Indicates whether the `Manager` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("managerExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "Indicates whether the `Manager` extensions logic should be generated.",
+            Description = "Defaults to `Entity.ManagerExtensions`.")]
+        public bool? ManagerExtensions { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the .NET Type that will perform the validation.
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -246,6 +261,14 @@ operations: [
         [JsonProperty("dataSvcTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.")]
         public bool? DataSvcTransaction { get; set; }
+
+        /// <summary>
+        /// Indicates whether the `DataSvc` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("dataSvcExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
+            Description = "Defaults to `Entity.ManagerExtensions`.")]
+        public bool? DataSvcExtensions { get; set; }
 
         /// <summary>
         /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
@@ -731,6 +754,8 @@ operations: [
             if (Type == "Custom")
                 AutoImplement = "None";
 
+            ManagerExtensions = DefaultWhereNull(ManagerExtensions, () => Parent!.ManagerExtensions);
+            DataExtensions = DefaultWhereNull(DataExtensions, () => Parent!.DataExtensions);
             DataEntityMapperCreate = string.IsNullOrEmpty(DataEntityMapper);
             DataEntityMapper = DefaultWhereNull(DataEntityMapper, () => AutoImplement switch
             {
@@ -800,6 +825,7 @@ operations: [
             PrepareEvents();
 
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
+            DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);

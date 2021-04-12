@@ -74,7 +74,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/if}}
   {{/each}}
   {{#if DataExtensionsRequired}}
-    {{#if DataExtensions}}
+    {{#if HasDataExtensions}}
         #region Extensions
 
     {{/if}}
@@ -100,7 +100,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         private Func<Soc.IBoundClient<{{Parent.ODataModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, Soc.IBoundClient<{{Parent.ODataModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}} 
       {{/ifeq}}
-      {{#if Parent.DataExtensions}}
+      {{#if DataExtensions}}
         {{#ifne AutoImplement 'None'}}
         private Func<{{#each PagingLessDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, Task>? {{PrivateName}}OnBeforeAsync;
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
@@ -109,7 +109,7 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
     {{/each}}
 
-    {{#if DataExtensions}}
+    {{#if HasDataExtensions}}
         #endregion
 
     {{/if}}
@@ -146,7 +146,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/if}}
         public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
     {{#ifeq AutoImplement 'None'}}
-      {{#if Parent.DataExtensions}}
+      {{#if DataExtensions}}
             => DataInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}), new BusinessInvokerArgs { ExceptionHandler = {{PrivateName}}OnException{{#if DataTransaction}}, IncludeTransactionScope = true{{/if}} });
       {{else}}
             => DataInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}){{#if DataTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
@@ -158,7 +158,7 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq Type 'GetColl'}}
                 {{OperationReturnType}} __result = new {{OperationReturnType}}({{#if Paging}}paging{{/if}});
       {{else}}
-        {{#if Parent.DataExtensions}}
+        {{#if DataExtensions}}
           {{#if HasReturnValue}}
                 {{OperationReturnType}} __result;
           {{/if}}
@@ -176,39 +176,39 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq AutoImplement 'OData'}}
                 var __dataArgs = {{DataEntityMapper}}.Default.CreateArgs({{#if Paging}}__result.Paging!{{/if}}{{#ifval ODataCollectionName}}{{#if Paging}}, {{/if}}"{{ODataCollectionName}}"{{/ifval}});
       {{/ifeq}}
-      {{#if Parent.DataExtensions}}
-                if ({{PrivateName}}OnBeforeAsync != null) await {{PrivateName}}OnBeforeAsync({{#each PagingLessDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs).ConfigureAwait(false);
+      {{#if DataExtensions}}
+                await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each PagingLessDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? Task.CompletedTask).ConfigureAwait(false);
       {{/if}}
       {{#ifeq AutoImplement 'Database'}}
         {{#ifeq Type 'GetColl'}}
                 __result.Result = await {{DataArgs.Name}}.Query(__dataArgs, p => {{PrivateName}}OnQuery?.Invoke(p, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs)).SelectQueryAsync<{{Parent.EntityCollectionName}}>().ConfigureAwait(false);
         {{else}}
-                {{#if Parent.DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+                {{#if DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'EntityFramework'}}
         {{#ifeq Type 'GetColl'}}
                 __result.Result = {{DataArgs.Name}}.Query(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-                {{#if Parent.DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+                {{#if DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
                 __result.Result = {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-                {{#if Parent.DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+                {{#if DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}
         {{#ifeq Type 'GetColl'}}
                 __result.Result = {{DataArgs.Name}}.Query(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-                {{#if Parent.DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+                {{#if DataExtensions}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
-      {{#if Parent.DataExtensions}}
-                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each CoreDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{ArgumentName}}{{/each}}).ConfigureAwait(false);
+      {{#if DataExtensions}}
+                await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each CoreDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{ArgumentName}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
         {{#if HasReturnValue}}
                 return __result;
         {{/if}}
