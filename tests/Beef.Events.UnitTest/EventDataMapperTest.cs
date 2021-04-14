@@ -1,8 +1,7 @@
 ﻿using Beef.Entities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Beef.Events.UnitTest
 {
@@ -10,17 +9,17 @@ namespace Beef.Events.UnitTest
     public class EventDataMapperTest
     {
         [Test]
-        public void SubjectOnly()
+        public async Task SubjectOnly()
         {
             var ed = EventData.CreateEvent("Subject");
-            var eh = ed.ToEventHubsEventData();
+            var eh = await new EventHubs.AzureEventHubsEventConverter().ConvertToAsync(ed);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.KeyPropertyName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.ActionPropertyName));
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.KeyPropertyName));
 
-            ed = eh.ToBeefEventData();
+            ed = await new EventHubs.AzureEventHubsEventConverter().ConvertFromAsync(eh);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", ed.Subject);
             Assert.AreEqual(null, ed.Action);
@@ -29,17 +28,17 @@ namespace Beef.Events.UnitTest
         }
 
         [Test]
-        public void SubjectAndAction()
+        public async Task SubjectAndAction()
         {
             var ed = EventData.CreateEvent("Subject", "Action");
-            var eh = ed.ToEventHubsEventData();
+            var eh = await new EventHubs.AzureEventHubsEventConverter().ConvertToAsync(ed);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
             Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.KeyPropertyName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.KeyPropertyName));
 
-            ed = eh.ToBeefEventData();
+            ed = await new EventHubs.AzureEventHubsEventConverter().ConvertFromAsync(eh);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", ed.Subject);
             Assert.AreEqual("Action", ed.Action);
@@ -48,22 +47,22 @@ namespace Beef.Events.UnitTest
         }
 
         [Test]
-        public void SubjectActionAndKey()
+        public async Task SubjectActionAndKey()
         {
             var id = Guid.NewGuid();
 
             var ed = EventData.CreateEvent("Subject", "Action", id);
             Assert.IsNotNull(ed.EventId);
             var eid = ed.EventId;
-            var eh = ed.ToEventHubsEventData();
+            var eh = await new EventHubs.AzureEventHubsEventConverter().ConvertToAsync(ed);
             Assert.IsNotNull(eh);
             Assert.AreEqual(eid, eh.Properties[EventMetadata.EventIdPropertyName]);
             Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
             Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
             Assert.AreEqual(id, eh.Properties[EventMetadata.KeyPropertyName]);
 
-            ed = eh.ToBeefEventData();
+            ed = await new EventHubs.AzureEventHubsEventConverter().ConvertFromAsync(eh);
             Assert.IsNotNull(eh);
             Assert.AreEqual(eid, ed.EventId);
             Assert.AreEqual("Subject", ed.Subject);
@@ -73,21 +72,21 @@ namespace Beef.Events.UnitTest
         }
 
         [Test]
-        public void SubjectActionAndArrayKey()
+        public async Task SubjectActionAndArrayKey()
         {
             var id = Guid.NewGuid();
             var no = 123;
 
             var ed = EventData.CreateEvent("Subject", "Action", id, no);
-            var eh = ed.ToEventHubsEventData();
+            var eh = await new EventHubs.AzureEventHubsEventConverter().ConvertToAsync(ed);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
             Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
             Assert.AreEqual(id, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[0]);
             Assert.AreEqual(no, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[1]);
 
-            ed = eh.ToBeefEventData();
+            ed = await new EventHubs.AzureEventHubsEventConverter().ConvertFromAsync(eh);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", ed.Subject);
             Assert.AreEqual("Action", ed.Action);
@@ -103,19 +102,19 @@ namespace Beef.Events.UnitTest
         }
 
         [Test]
-        public void SubjectActionKeyAndValue()
+        public async Task SubjectActionKeyAndValue()
         {
             var p = new Person { Id = Guid.NewGuid(), Name = "Caleb" };
 
             var ed = EventData.CreateValueEvent(p, "Subject", "Action");
-            var eh = ed.ToEventHubsEventData();
+            var eh = await new EventHubs.AzureEventHubsEventConverter().ConvertToAsync(ed);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
             Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.AreEqual(null, eh.Properties[EventMetadata.TenantIdPropertyName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
             Assert.AreEqual(p.Id, eh.Properties[EventMetadata.KeyPropertyName]);
 
-            ed = eh.ToBeefEventData<Person>();
+            ed = (EventData<Person>) await new EventHubs.AzureEventHubsEventConverter().ConvertFromAsync(typeof(Person), eh);
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", ed.Subject);
             Assert.AreEqual("Action", ed.Action);

@@ -14,17 +14,24 @@ namespace Beef.Events.ServiceBus
     public class ServiceBusSender : EventPublisherBase
     {
         private readonly AzureServiceBus.ServiceBusClient _client;
+        private readonly bool _removeKeyFromSubject;
+        private readonly IEventDataConverter<AzureServiceBus.ServiceBusMessage> _eventDataConverter;
         private readonly ServiceBusSenderInvoker _invoker;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceBusSender"/> using the specified <see cref="AzureServiceBus.ServiceBusClient"/> where the queue will be inferred from the <see cref="EventData.Subject"/>
+        /// Initializes a new instance of the <see cref="ServiceBusSender"/> using the specified <see cref="AzureServiceBus.ServiceBusClient"/> where the queue will be inferred from the <see cref="EventMetadata.Subject"/>
         /// using <see cref="CreateQueueName"/> (consider setting the underlying <see cref="AzureServiceBus.ServiceBusClientOptions.RetryOptions"/>) to allow for transient errors).
         /// </summary>
         /// <param name="client">The <see cref="AzureServiceBus.ServiceBusClient"/>.</param>
-        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ServiceBusSenderInvoker"/>.</param>
-        public ServiceBusSender(AzureServiceBus.ServiceBusClient client, ServiceBusSenderInvoker? invoker = null)
+        /// <param name="removeKeyFromSubject">Indicates whether to remove the key queue name from the <see cref="EventMetadata.Subject"/>. This is achieved by removing the last part (typically the key) to provide the base path;
+        /// for example a Subject of <c>Beef.Demo.Person.1234</c> would result in <c>Beef.Demo.Person</c>.</param>
+        /// <param name="eventDataConverter">The <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureServiceBusMessageConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.</param>
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden. Defaults to <see cref="ServiceBusSenderInvoker"/>.</param>
+        public ServiceBusSender(AzureServiceBus.ServiceBusClient client, bool removeKeyFromSubject = false, IEventDataConverter<AzureServiceBus.ServiceBusMessage>? eventDataConverter = null, ServiceBusSenderInvoker? invoker = null)
         {
             _client = Check.NotNull(client, nameof(client));
+            _removeKeyFromSubject = removeKeyFromSubject;
+            _eventDataConverter = eventDataConverter ?? new AzureServiceBusMessageConverter(new NewtonsoftJsonCloudEventSerializer());
             _invoker = invoker ?? new ServiceBusSenderInvoker();
         }
 
@@ -34,8 +41,10 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="client">The <see cref="AzureServiceBus.ServiceBusClient"/>.</param>
         /// <param name="queueName">The queue name.</param>
+        /// <param name="eventDataConverter">The <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureServiceBusMessageConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.</param>
         /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ServiceBusSenderInvoker"/>.</param>
-        public ServiceBusSender(AzureServiceBus.ServiceBusClient client, string queueName, ServiceBusSenderInvoker? invoker = null) : this(client, invoker) => QueueName = Check.NotEmpty(queueName, nameof(queueName));
+        public ServiceBusSender(AzureServiceBus.ServiceBusClient client, string queueName, IEventDataConverter<AzureServiceBus.ServiceBusMessage>? eventDataConverter = null, ServiceBusSenderInvoker? invoker = null) 
+            : this(client, false, eventDataConverter, invoker) => QueueName = Check.NotEmpty(queueName, nameof(queueName));
 
         /// <summary>
         /// Gets the queue name. Where <c>null</c> this indicates that the queue name will be <see cref="CreateQueueName">created</see> (inferred) at runtime
@@ -58,11 +67,11 @@ namespace Beef.Events.ServiceBus
             {
                 var queueName = QueueName ?? CreateQueueName(@event);
                 if (dict.TryGetValue(queueName, out var list))
-                    list.Enqueue(@event.ToAzureServiceBusMessage());
+                    list.Enqueue(await _eventDataConverter.ConvertToAsync(@event).ConfigureAwait(false));
                 else
                 {
                     var queue = new Queue<AzureServiceBus.ServiceBusMessage>();
-                    queue.Enqueue(@event.ToAzureServiceBusMessage());
+                    queue.Enqueue(await _eventDataConverter.ConvertToAsync(@event).ConfigureAwait(false));
                     dict.Add(queueName, queue);
                 }
             }
@@ -92,7 +101,7 @@ namespace Beef.Events.ServiceBus
         }
 
         /// <summary>
-        /// Creates the queue name from the <see cref="EventData.Subject"/>. This is achieved by removing the last part (typically the key) to provide the base path; for example a Subject of
+        /// Creates the queue name from the <see cref="EventMetadata.Subject"/>. This is achieved by removing the last part (typically the key) to provide the base path; for example a Subject of
         /// <c>Beef.Demo.Person.1234</c> would result in <c>Beef.Demo.Person</c>.
         /// </summary>
         /// <param name="event">The <see cref="EventData"/>.</param>
@@ -104,6 +113,9 @@ namespace Beef.Events.ServiceBus
 
             if (string.IsNullOrEmpty(@event.Subject))
                 throw new ArgumentException("The Subject property must be specified.", nameof(@event));
+
+            if (!_removeKeyFromSubject)
+                return @event.Subject;
 
             var parts = @event.Subject.Split(PathSeparator);
             if (parts.Length <= 1)

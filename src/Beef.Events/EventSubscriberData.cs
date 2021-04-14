@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
+
 namespace Beef.Events
 {
     /// <summary>
@@ -19,9 +21,15 @@ namespace Beef.Events
         int Attempt { get; }
 
         /// <summary>
-        /// Gets the <see cref="EventMetadata"/>.
+        /// Gets or sets the <see cref="EventMetadata"/>.
         /// </summary>
         EventMetadata Metadata { get; }
+
+        /// <summary>
+        /// Sets the <see cref="EventMetadata"/>.
+        /// </summary>
+        /// <param name="metadata">The <see cref="EventMetadata"/>.</param>
+        void SetMetadata(EventMetadata metadata);
     }
 
     /// <summary>
@@ -54,13 +62,14 @@ namespace Beef.Events
         public int Attempt { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="EventMetadata"/>.
+        /// Gets or sets the <see cref="EventMetadata"/>.
         /// </summary>
-        public EventMetadata Metadata => _metadata ??= GetEventMetadata();
+        public EventMetadata Metadata => _metadata ?? throw new InvalidOperationException("Metadata property must not be accessed prior to being set.");
 
         /// <summary>
-        /// Gets the <see cref="EventMetadata"/> metadata.
+        /// Sets the <see cref="EventMetadata"/>.
         /// </summary>
-        protected abstract EventMetadata GetEventMetadata();
+        /// <param name="metadata">The <see cref="EventMetadata"/>.</param>
+        void IEventSubscriberData.SetMetadata(EventMetadata metadata) => _metadata = Check.NotNull(metadata, nameof(metadata));
     }
 }

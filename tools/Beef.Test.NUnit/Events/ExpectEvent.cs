@@ -70,8 +70,8 @@ namespace Beef.Test.NUnit.Events
         }
 
         /// <summary>
-        /// Verifies that the <paramref name="expectedEvents"/> are sent (in order specified). The expected events can use wildcards for <see cref="EventData.Subject"/> and
-        /// optionally define <see cref="EventData.Action"/>. Use <see cref="EventData{T}"/> where <see cref="EventData{T}.Value"/> comparisons are required (otherwise no comparison will occur). 
+        /// Verifies that the <paramref name="expectedEvents"/> are sent (in order specified). The expected events can use wildcards for <see cref="EventMetadata.Subject"/> and
+        /// optionally define <see cref="EventMetadata.Action"/>. Use <see cref="EventData{T}"/> where <see cref="EventData{T}.Value"/> comparisons are required (otherwise no comparison will occur). 
         /// Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="correlationId">The correlation identifier.</param>

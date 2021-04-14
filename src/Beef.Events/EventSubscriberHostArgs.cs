@@ -295,12 +295,12 @@ namespace Beef.Events
             }
 
             /// <summary>
-            /// Gets the <see cref="EventData.Subject"/> template for the event required (subscribing to).
+            /// Gets the <see cref="EventMetadata.Subject"/> template for the event required (subscribing to).
             /// </summary>
             public string SubjectTemplate { get; private set; }
 
             /// <summary>
-            /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates <i>all</i>.
+            /// Gets the <see cref="EventMetadata.Action"/>(s); where none specified this indicates <i>all</i>.
             /// </summary>
             public List<string> Actions { get; private set; } = new List<string>();
 

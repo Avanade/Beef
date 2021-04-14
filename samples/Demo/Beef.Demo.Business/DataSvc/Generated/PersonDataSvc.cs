@@ -33,6 +33,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private Func<Person, Task>? _createOnAfterAsync;
         private Func<Guid, Task>? _deleteOnAfterAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
         private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
         private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
@@ -139,6 +140,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateWithRollbackAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await (_updateWithRollbackOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });

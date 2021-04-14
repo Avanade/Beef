@@ -40,6 +40,16 @@ namespace Beef.Demo.Business
         private Func<Guid, Task>? _deleteOnBeforeAsync;
         private Func<Guid, Task>? _deleteOnAfterAsync;
 
+        private Func<Person, Guid, Task>? _updateOnPreValidateAsync;
+        private Action<MultiValidator, Person, Guid>? _updateOnValidate;
+        private Func<Person, Guid, Task>? _updateOnBeforeAsync;
+        private Func<Person, Guid, Task>? _updateOnAfterAsync;
+
+        private Func<Person, Guid, Task>? _updateWithRollbackOnPreValidateAsync;
+        private Action<MultiValidator, Person, Guid>? _updateWithRollbackOnValidate;
+        private Func<Person, Guid, Task>? _updateWithRollbackOnBeforeAsync;
+        private Func<Person, Guid, Task>? _updateWithRollbackOnAfterAsync;
+
         private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
         private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
         private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
@@ -233,11 +243,17 @@ namespace Beef.Demo.Business
             {
                 value.Id = id;
                 Cleaner.CleanUp(value);
+                await (_updateOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+
                 (await MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                    .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
+                await (_updateOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+                var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
+                await (_updateOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+                return Cleaner.Clean(__result);
             }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
@@ -255,11 +271,17 @@ namespace Beef.Demo.Business
             {
                 value.Id = id;
                 Cleaner.CleanUp(value);
+                await (_updateWithRollbackOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+
                 (await MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                    .Additional((__mv) => _updateWithRollbackOnValidate?.Invoke(__mv, value, id))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-                return Cleaner.Clean(await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false));
+                await (_updateWithRollbackOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+                var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
+                await (_updateWithRollbackOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+                return Cleaner.Clean(__result);
             }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 

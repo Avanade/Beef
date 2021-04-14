@@ -2,6 +2,7 @@
 
 using Beef.Events;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -30,6 +31,23 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
+        /// Gets the <see cref="EventMetadata"/> from the <see cref="IEventSubscriberData"/>.
+        /// </summary>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
+        /// <returns>The <see cref="EventMetadata"/>.</returns>
+        protected override Task<(EventMetadata? Metadata, Exception? Exception)> GetMetadataAsync(IEventSubscriberData data)
+        {
+            try
+            {
+                return Task.FromResult<(EventMetadata?, Exception?)>(((EventMetadata?)data.Originating, null));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<(EventMetadata?, Exception?)>((null, ex));
+            }
+        }
+
+        /// <summary>
         /// Performs the receive processing for <see cref="EventData"/> instance.
         /// </summary>
         /// <param name="event">The <see cref="EventData"/> instance to receive/process.</param>
@@ -42,7 +60,7 @@ namespace Beef.Test.NUnit.Tests
 
             try
             {
-                Result = await ReceiveAsync(new EventDataSubscriberData(@event), (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
+                Result = await ReceiveAsync(new EventDataSubscriberData(@event), (subscriber) => { WasSubscribed = true; return Task.FromResult(@event); }).ConfigureAwait(false);
             }
             catch (EventSubscriberUnhandledException essex)
             {

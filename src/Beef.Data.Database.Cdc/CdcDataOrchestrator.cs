@@ -124,22 +124,22 @@ namespace Beef.Data.Database.Cdc
         protected virtual string ServiceName => _name ??= GetType().Name;
 
         /// <summary>
-        /// Gets the <see cref="EventData.Source"/>.
+        /// Gets the <see cref="EventMetadata.Source"/>.
         /// </summary>
         protected virtual Uri? EventSource { get; }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
+        /// Gets the <see cref="EventMetadata.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected abstract string EventSubject { get; }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
+        /// Gets the <see cref="EventMetadata.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
         /// </summary>
         protected virtual EventSubjectFormat EventSubjectFormat { get; } = EventSubjectFormat.NameAndKey;
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventActionFormat"/>.
+        /// Gets the <see cref="EventMetadata.Subject"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
 
@@ -410,8 +410,8 @@ namespace Beef.Data.Database.Cdc
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
-        /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
+        /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
+        /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventMetadata.Action"/>.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
         protected EventData<T> CreateValueEvent<T>(T value, string subjectName, OperationType operationType) where T : class
             => EventData.CreateValueEvent(value, CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat));
@@ -419,8 +419,8 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Creates an <see cref="EventData"/> with the specified <paramref name="key"/>.
         /// </summary>
-        /// <param name="subjectName">The <see cref="EventData.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
-        /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
+        /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> name (will be formated as per <see cref="EventSubjectFormat"/>).</param>
+        /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventMetadata.Action"/>.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
         protected EventData CreateEvent(string subjectName, OperationType operationType, params IComparable?[] key)
@@ -431,7 +431,7 @@ namespace Beef.Data.Database.Cdc
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="subjectName">The <see cref="EventData.Subject"/> name.</param>
+        /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> name.</param>
         /// <returns>The fully qualified subject.</returns>
         /// <remarks><typeparamref name="T"/> must implement at least one of the following: <see cref="IIdentifier"/>, <see cref="IGuidIdentifier"/>, <see cref="IStringIdentifier"/> or <see cref="IUniqueKey"/>.</remarks>
         protected string CreateValueFormattedSubject<T>(T value, string subjectName) where T : class => EventSubjectFormat == EventSubjectFormat.NameOnly ? subjectName : subjectName + "." + CreateValueKey(value);
@@ -447,7 +447,7 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectName"/>.
         /// </summary>
-        /// <param name="subjectName">The <see cref="EventData.Subject"/> prefix.</param>
+        /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> prefix.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The fully qualified subject.</returns>
         protected string CreateFormattedSubject(string subjectName, params IComparable?[] key)

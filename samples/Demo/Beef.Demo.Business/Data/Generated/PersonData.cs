@@ -40,6 +40,9 @@ namespace Beef.Demo.Business.Data
         private Func<Guid, IDatabaseArgs, Task>? _deleteOnBeforeAsync;
         private Func<Guid, Task>? _deleteOnAfterAsync;
         private Action<Exception>? _deleteOnException;
+        private Func<Person, IDatabaseArgs, Task>? _updateWithRollbackOnBeforeAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
+        private Action<Exception>? _updateWithRollbackOnException;
         private Action<DatabaseParameters, IDatabaseArgs>? _getAllOnQuery;
         private Func<IDatabaseArgs, Task>? _getAllOnBeforeAsync;
         private Func<PersonCollectionResult, Task>? _getAllOnAfterAsync;
@@ -169,9 +172,13 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
+                Person __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonUpdate]");
-                return await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            });
+                await (_updateWithRollbackOnBeforeAsync?.Invoke(value, __dataArgs) ?? Task.CompletedTask).ConfigureAwait(false);
+                __result = await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await (_updateWithRollbackOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+                return __result;
+            }, new BusinessInvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
         }
 
         /// <summary>

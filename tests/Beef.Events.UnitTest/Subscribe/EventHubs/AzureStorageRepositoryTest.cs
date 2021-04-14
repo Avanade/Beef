@@ -30,13 +30,15 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             return _config;
         }
 
-        private static EventHubData CreateEventData(string offset, long seqNo)
+        private static async Task<EventHubData> CreateEventDataAsync(string offset, long seqNo)
         {
-            var e = new EventData
+            var ed = new EventData
             {
                 Subject = "Unit.Test",
                 Action = "Verify",
-            }.ToEventHubsEventData();
+            };
+
+            var e = await new MicrosoftEventHubsEventConverter().ConvertToAsync(ed);
 
             var type = typeof(AzureEventHubs.EventData);
             var pi = type.GetProperty("SystemProperties");
@@ -48,7 +50,9 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             dict.Add("x-opt-sequence-number", seqNo);
             dict.Add("x-opt-partition-key", "0");
 
-            return new EventHubData("testhub", "$Default", "0", e);
+            var ehd = new EventHubData("testhub", "$Default", "0", e);
+            ((IEventSubscriberData)ehd).SetMetadata(ed);
+            return ehd;
         }
 
         public static async Task<List<EventHubAuditRecord>> GetAuditRecords(CloudTable ct)
@@ -94,7 +98,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = CreateEventData("100", 1);
+            var ed = await CreateEventDataAsync("100", 1);
 
             // Checking and removing with unknown is a-ok.
             var ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
@@ -214,7 +218,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = CreateEventData("100", 1);
+            var ed = await CreateEventDataAsync("100", 1);
 
             // Add events as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found.")), 3).ConfigureAwait(false);
@@ -269,7 +273,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = CreateEventData("100", 1);
+            var ed = await CreateEventDataAsync("100", 1);
 
             // Add an event as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found."))).ConfigureAwait(false);
@@ -295,7 +299,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual(1, ear.Attempts);
 
             // Pretend to check a different event to that poisoned.
-            ed = CreateEventData("200", 2);
+            ed = await CreateEventDataAsync("200", 2);
             ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
             Assert.AreEqual(PoisonMessageAction.NotPoison, ar.Action);
             Assert.AreEqual(0, ar.Attempts);

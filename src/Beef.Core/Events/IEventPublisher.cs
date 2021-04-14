@@ -15,7 +15,7 @@ namespace Beef.Events
     public interface IEventPublisher
     {
         /// <summary>
-        /// Gets the default source <see cref="Uri"/> to be used where not otherwise specified (see <see cref="EventData.Source"/>).
+        /// Gets the default source <see cref="Uri"/> to be used where not otherwise specified (see <see cref="EventMetadata.Source"/>).
         /// </summary>
         Uri? DefaultSource { get; }
 
@@ -35,12 +35,12 @@ namespace Beef.Events
         string TemplateWildcard { get; }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> format.
+        /// Gets the <see cref="EventMetadata.Subject"/> format.
         /// </summary>
         EventStringFormat SubjectFormat => EventStringFormat.None;
 
         /// <summary>
-        /// Gets the <see cref="EventData.Action"/> format.
+        /// Gets the <see cref="EventMetadata.Action"/> format.
         /// </summary>
         EventStringFormat ActionFormat => EventStringFormat.None;
 

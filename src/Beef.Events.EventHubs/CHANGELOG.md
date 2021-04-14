@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* Support new `IEventDataContentSerializer` and `IEventDataConverter`.
+
 ## v4.1.2
 - *Enhancement:* Leverage the new `Beef.Events.EventMetadata` class that houses the _Beef_ metadata property names.
 

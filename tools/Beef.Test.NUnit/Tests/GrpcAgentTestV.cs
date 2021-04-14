@@ -200,8 +200,8 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
-        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventMetadata.Subject"/> and optionally define
+        /// <see cref="EventMetadata.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
@@ -213,8 +213,8 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
-        /// <see cref="EventData.Action"/>. The <paramref name="eventValue"/> will be compared against the <see cref="EventData{T}.Value"/>. Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventMetadata.Subject"/> and optionally define
+        /// <see cref="EventMetadata.Action"/>. The <paramref name="eventValue"/> will be compared against the <see cref="EventData{T}.Value"/>. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <typeparam name="T">The event value <see cref="Type"/>.</typeparam>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
@@ -229,8 +229,8 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
-        /// <see cref="EventData.Action"/>. The returned value (<typeparamref name="TValue"/>) will be compared against the <see cref="EventData{TValue}.Value"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventMetadata.Subject"/> and optionally define
+        /// <see cref="EventMetadata.Action"/>. The returned value (<typeparamref name="TValue"/>) will be compared against the <see cref="EventData{TValue}.Value"/>.
         /// Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>

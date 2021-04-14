@@ -48,7 +48,7 @@ namespace Beef.Events.ServiceBus
         }
 
         /// <summary>
-        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="ServiceBusSender"/> instance where the quere will be inferred from the <see cref="EventData.Subject"/>.
+        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="ServiceBusSender"/> instance where the quere will be inferred from the <see cref="EventMetadata.Subject"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="connectionString">The connection string.</param>

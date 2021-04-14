@@ -32,12 +32,12 @@ namespace Beef.Events
         public string TemplateWildcard { get; set; } = "*";
 
         /// <summary>
-        /// Gets or sets the <see cref="EventData.Subject"/> format.
+        /// Gets or sets the <see cref="EventMetadata.Subject"/> format.
         /// </summary>
         public EventStringFormat SubjectFormat { get; set; } = EventStringFormat.None;
 
         /// <summary>
-        /// Gets or sets the <see cref="EventData.Action"/> format.
+        /// Gets or sets the <see cref="EventMetadata.Action"/> format.
         /// </summary>
         public EventStringFormat ActionFormat { get; set; } = EventStringFormat.None;
 
