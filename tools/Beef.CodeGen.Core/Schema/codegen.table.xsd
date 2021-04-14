@@ -849,6 +849,11 @@
                 <xs:documentation>The .NET database interface name. Defaults to `IDatabase`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="EventSource" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The Event Source. Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="EventSubject" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
@@ -1009,9 +1014,27 @@
           <xs:documentation>The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="EventSourceRoot" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSourceKind" use="optional">
+        <xs:annotation>
+          <xs:documentation>The URI kind for the event source URIs. Defaults to `None` (being the event source is not updated).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Absolute" />
+            <xs:enumeration value="Relative" />
+            <xs:enumeration value="RelativeOrAbsolute" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventSubjectFormat" use="optional">

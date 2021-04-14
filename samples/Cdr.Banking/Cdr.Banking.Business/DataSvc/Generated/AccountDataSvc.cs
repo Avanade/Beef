@@ -66,8 +66,7 @@ namespace Cdr.Banking.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
-                return __result;
+                return _cache.SetAndReturnValue(__key, __result);
             });
         }
 
@@ -85,8 +84,7 @@ namespace Cdr.Banking.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
-                return __result;
+                return _cache.SetAndReturnValue(__key, __result);
             });
         }
     }

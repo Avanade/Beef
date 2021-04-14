@@ -166,6 +166,22 @@
       "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
       "description": "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
     },
+    "eventSourceRoot": {
+      "type": "string",
+      "title": "The URI root for the event source by prepending to all event source URIs.",
+      "description": "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s)."
+    },
+    "eventSourceKind": {
+      "type": "string",
+      "title": "The URI kind for the event source URIs.",
+      "description": "Defaults to `None` (being the event source is not updated).",
+      "enum": [
+        "None",
+        "Absolute",
+        "Relative",
+        "RelativeOrAbsolute"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event Subject name by prepending to all event subject names.",
@@ -179,6 +195,11 @@
         "NameOnly",
         "NameAndKey"
       ]
+    },
+    "eventSubjectSeparator": {
+      "type": "string",
+      "title": "The subject path separator.",
+      "description": "Defaults to `.`. Used only where the subject is automatically inferred."
     },
     "eventActionFormat": {
       "type": "string",
@@ -452,7 +473,8 @@
             },
             "dataExtensions": {
               "type": "boolean",
-              "title": "Indicates whether the `Data` extensions logic should be generated."
+              "title": "Indicates whether the `Data` extensions logic should be generated.",
+              "description": "This can be overridden using `Operation.DataExtensions`."
             },
             "databaseName": {
               "type": "string",
@@ -556,6 +578,11 @@
               "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
               "description": "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc."
             },
+            "eventSource": {
+              "type": "string",
+              "title": "The Event Source.",
+              "description": "Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`."
+            },
             "eventSubjectFormat": {
               "type": "string",
               "title": "The default formatting for the Subject when an Event is published.",
@@ -593,7 +620,8 @@
             },
             "dataSvcExtensions": {
               "type": "boolean",
-              "title": "Indicates whether the `DataSvc` extensions logic should be generated."
+              "title": "Indicates whether the `DataSvc` extensions logic should be generated.",
+              "description": "This can be overridden using `Operation.DataSvcExtensions`."
             },
             "managerCtor": {
               "type": "string",
@@ -618,7 +646,8 @@
             },
             "managerExtensions": {
               "type": "boolean",
-              "title": "Indicates whether the `Manager` extensions logic should be generated."
+              "title": "Indicates whether the `Manager` extensions logic should be generated.",
+              "description": "This can be overridden using `Operation.ManagerExtensions`."
             },
             "validator": {
               "type": "string",
@@ -1132,6 +1161,11 @@
                       "title": "The override for the data entity `Mapper`.",
                       "description": "Used where the default generated `Mapper` is not applicable."
                     },
+                    "dataExtensions": {
+                      "type": "boolean",
+                      "title": "Indicates whether the `Data` extensions logic should be generated.",
+                      "description": "Defaults to `Entity.DataExtensions`."
+                    },
                     "databaseStoredProc": {
                       "type": "string",
                       "title": "The database stored procedure name used where `Operation.AutoImplement` is `Database`.",
@@ -1159,6 +1193,11 @@
                     "managerTransaction": {
                       "type": "boolean",
                       "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer."
+                    },
+                    "managerExtensions": {
+                      "type": "boolean",
+                      "title": "Indicates whether the `Manager` extensions logic should be generated.",
+                      "description": "Defaults to `Entity.ManagerExtensions`."
                     },
                     "validator": {
                       "type": "string",
@@ -1190,10 +1229,20 @@
                       "type": "boolean",
                       "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer."
                     },
+                    "dataSvcExtensions": {
+                      "type": "boolean",
+                      "title": "Indicates whether the `DataSvc` extensions logic should be generated.",
+                      "description": "Defaults to `Entity.ManagerExtensions`."
+                    },
                     "eventPublish": {
                       "type": "boolean",
                       "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
                       "description": "Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc."
+                    },
+                    "eventSource": {
+                      "type": "string",
+                      "title": "The Event Source.",
+                      "description": "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`."
                     },
                     "eventSubject": {
                       "type": "string",

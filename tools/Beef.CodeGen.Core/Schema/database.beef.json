@@ -106,10 +106,26 @@
         }
       ]
     },
+    "eventSourceRoot": {
+      "type": "string",
+      "title": "The URI root for the event source by prepending to all event source URIs.",
+      "description": "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s)."
+    },
+    "eventSourceKind": {
+      "type": "string",
+      "title": "The URI kind for the event source URIs.",
+      "description": "Defaults to `None` (being the event source is not updated).",
+      "enum": [
+        "None",
+        "Absolute",
+        "Relative",
+        "RelativeOrAbsolute"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
-      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s)."
     },
     "eventSubjectFormat": {
       "type": "string",
@@ -1044,6 +1060,11 @@
               "type": "string",
               "title": "The .NET database interface name.",
               "description": "Defaults to `IDatabase`."
+            },
+            "eventSource": {
+              "type": "string",
+              "title": "The Event Source.",
+              "description": "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified."
             },
             "eventSubject": {
               "type": "string",
