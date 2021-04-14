@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.1.8
 - *Enhancement:* Added `EventData.Source` to the test output log.
+- *Enhancement:* Updated the event testing to support new `IEventDataContentSerializer` and `IEventDataConverter`. 
 
 ## v4.1.7
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.

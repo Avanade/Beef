@@ -4,7 +4,8 @@ Represents the **NuGet** versions.
 
 ## v4.1.7
 - *Enhancement:* Added new `IEventDataContentSerializer` and `IEventDataConverter` to more easily facilitate multiple serializers and converters over time.
-- Leverage `IEventDataContentSerializer` to support [CloudEvents](https://github.com/cloudevents/sdk-csharp) with new `NewtonsoftJsonCloudEventSerializer`.
+- *Enhancement:* Leverage `IEventDataContentSerializer` to support [CloudEvents](https://github.com/cloudevents/sdk-csharp) with new `NewtonsoftJsonCloudEventSerializer`. This is the default.
+- *Enhancement:* Leverage `IEventDataContentSerializer` to support existing `EventData` format with `NewtonsoftJsonEventDataSerializer` for backwards compatibility.
 
 ## v4.1.6
 - *Enhancement:* Added new `EventMetadata` class to house the _Beef_ metadata property names.

@@ -43,6 +43,7 @@
     <None Remove="Scripts\DatabaseCdcTracking.xml" />
     <None Remove="Scripts\DatabaseWithCdc.xml" />
     <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
+    <None Remove="Templates\DbCdcBackgroundExtensions_cs.hb" />
     <None Remove="Templates\DbCdcBackgroundService_cs.hb" />
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
@@ -122,6 +123,7 @@
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
+    <EmbeddedResource Include="Templates\DbCdcBackgroundExtensions_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcBackgroundService_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
