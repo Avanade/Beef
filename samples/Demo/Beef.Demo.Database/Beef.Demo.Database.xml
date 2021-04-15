@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration CdcSchema="DemoCdc" EventSourceKind="Relative" EventSourceRoot="/cdc" EventActionFormat="PastTense" HasBeefDbo="false" CdcIdentifierMapping="true" AutoDotNetRename="SnakeKebabToPascalCase" CdcExcludeColumnsFromETag="legacy_system_code" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Avanade/Beef/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration CdcSchema="DemoCdc" EventSubjectFormat="NameOnly" EventSourceKind="Relative" EventSourceRoot="/cdc" EventActionFormat="PastTense" HasBeefDbo="false" CdcIdentifierMapping="true" AutoDotNetRename="SnakeKebabToPascalCase" CdcExcludeColumnsFromETag="legacy_system_code" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Avanade/Beef/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- New "Query" configuration. -->
   <Query Name="Table" Schema="Test" View="true" ViewName="vwTestQuery" ExcludeColumns="CreatedBy, UpdatedBy" Permission="TestSec">
     <QueryJoin Name="Person" Schema="Demo" ExcludeColumns="CreatedDate, UpdatedDate" AliasColumns="RowVersion^RowVersionP">

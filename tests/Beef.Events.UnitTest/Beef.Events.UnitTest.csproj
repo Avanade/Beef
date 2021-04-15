@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
+    <ProjectReference Include="..\..\src\Beef.Events.ServiceBus\Beef.Events.ServiceBus.csproj" />
     <ProjectReference Include="..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
   </ItemGroup>

@@ -30,9 +30,9 @@ namespace Beef.Events.ServiceBus
         public AzureServiceBusMessageConverter(IEventDataContentSerializer? contentSerializer = null, bool useAttributes = true) => _contentSerializer = contentSerializer ?? new NewtonsoftJsonCloudEventSerializer();
 
         /// <summary>
-        /// Indicates whether to write to the <see cref="AzureServiceBus.ServiceBusMessage.ApplicationProperties"/> for the <see cref="EventMetadata"/>. Defaults to <c>true</c>.
+        /// Indicates whether to write to the <see cref="AzureServiceBus.ServiceBusMessage.ApplicationProperties"/> for the <see cref="EventMetadata"/>.
         /// </summary>
-        public bool UseMessagingPropertiesForMetadata { get; set; } = true;
+        public bool UseMessagingPropertiesForMetadata { get; set; }
 
         /// <summary>
         /// Converts a <see cref="AzureServiceBus.ServiceBusMessage"/> to an <see cref="EventData"/>.
@@ -177,7 +177,7 @@ namespace Beef.Events.ServiceBus
                     TenantId = (message.ApplicationProperties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
                     Subject = (string?)subject ?? message.Subject,
                     Action = (string?)action,
-                    Source = (message.ApplicationProperties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)tid : null,
+                    Source = (message.ApplicationProperties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
                     Key = key,
                     ETag = (string)etag,
                     Username = (string?)username,

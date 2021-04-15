@@ -28,9 +28,9 @@ namespace Beef.Events.EventHubs
         public AzureEventHubsEventConverter(IEventDataContentSerializer? contentSerializer = null) => _contentSerializer = contentSerializer ?? new NewtonsoftJsonCloudEventSerializer();
 
         /// <summary>
-        /// Indicates whether to write to the <see cref="AzureEventHubs.EventData.Properties"/> for the <see cref="EventMetadata"/>. Defaults to <c>true</c>.
+        /// Indicates whether to write to the <see cref="AzureEventHubs.EventData.Properties"/> for the <see cref="EventMetadata"/>.
         /// </summary>
-        public bool UseMessagingPropertiesForMetadata { get; set; } = true;
+        public bool UseMessagingPropertiesForMetadata { get; set; }
 
         /// <summary>
         /// Converts a <see cref="AzureEventHubs.EventData"/> to an <see cref="EventData"/>.
@@ -160,7 +160,7 @@ namespace Beef.Events.EventHubs
                     TenantId = (message.Properties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
                     Subject = (string?)subject,
                     Action = (string?)action,
-                    Source = (message.Properties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)tid : null,
+                    Source = (message.Properties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
                     Key = key,
                     ETag = (string)etag,
                     Username = (string?)username,

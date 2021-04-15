@@ -9,6 +9,7 @@ namespace Beef.Template.Solution.UnitTest
     [TestFixture]
     public class TemplateTest
     {
+        private static bool _firstTime = true;
         private static DirectoryInfo _rootDir;
         private static DirectoryInfo _unitTests;
 
@@ -45,7 +46,7 @@ namespace Beef.Template.Solution.UnitTest
             while (!reader.EndOfStream)
             {
                 string line = reader.ReadLine();
-                TestContext.WriteLine(line);
+                TestContext.Error.WriteLine(line);
             }
 
             process.WaitForExit();
@@ -55,9 +56,13 @@ namespace Beef.Template.Solution.UnitTest
             return (process.ExitCode, sb.ToString());
         }
 
-        [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            if (!_firstTime)
+                return;
+
+            _firstTime = false;
+
             // Determine directories.
             _rootDir = new DirectoryInfo(TestContext.CurrentContext.WorkDirectory);
             while (_rootDir.Name != "Beef")
@@ -85,28 +90,31 @@ namespace Beef.Template.Solution.UnitTest
             }
 
             // Build Beef and package (nuget) - only local package, no deployment.
-            Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} packageonly").exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} packageonly").exitCode, "nuget publish");
 
             // Install the Beef template solution from local package.
             // dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "nuget-publish")}").exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "nuget-publish")}").exitCode, "install beef.template.solution");
         }
 
         [Test]
         public void Database()
         {
+            OneTimeSetUp();
             SolutionCreateGenerateTest("Foo.Db", "Bar", "Database");
         }
 
         [Test]
         public void EntityFramework()
         {
+            OneTimeSetUp();
             SolutionCreateGenerateTest("Foo.Ef", "Bar", "EntityFramework");
         }
 
         [Test]
         public void CosmosDb()
         {
+            OneTimeSetUp();
             SolutionCreateGenerateTest("Foo.Co", "Bar", "Cosmos");
         }
 
