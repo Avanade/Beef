@@ -47,6 +47,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Identifier")]
+        [System.Xml.Serialization.XmlElement("Id")]
         public Guid Id
         {
             get => _id;

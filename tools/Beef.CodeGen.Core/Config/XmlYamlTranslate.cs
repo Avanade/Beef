@@ -329,14 +329,14 @@ namespace Beef.CodeGen.Config
         /// </summary>
         internal static string? FormatYamlValue(string? value)
         {
-            if (value != null)
-            {
-                if (value.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
-                    value = $"'{value.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+            if (string.IsNullOrEmpty(value))
+                return null;
 
-                if (string.Compare(value, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
-                    value = $"'{value}'";
-            }
+            if (value.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
+                value = $"'{value.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+
+            if (string.Compare(value, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
+                value = $"'{value}'";
 
             return value;
         }
@@ -355,7 +355,9 @@ namespace Beef.CodeGen.Config
             foreach (var part in value.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 sb.Append(sb.Length == 0 ? "[ " : ", ");
-                sb.Append(FormatYamlValue(part));
+                var yaml = FormatYamlValue(part);
+                if (!string.IsNullOrEmpty(yaml))
+                    sb.Append(FormatYamlValue(part));
             }
 
             sb.Append(" ]");
