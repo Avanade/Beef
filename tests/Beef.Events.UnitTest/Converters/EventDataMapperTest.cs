@@ -14,9 +14,9 @@ namespace Beef.Events.UnitTest.Converters
             var ed = EventData.CreateEvent("Subject");
             var eh = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertToAsync(ed);
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.ActionPropertyName));
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectAttributeName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.ActionAttributeName));
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdAttributeName));
             Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.KeyPropertyName));
 
             ed = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertFromAsync(eh);
@@ -33,9 +33,9 @@ namespace Beef.Events.UnitTest.Converters
             var ed = EventData.CreateEvent("Subject", "Action");
             var eh = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertToAsync(ed);
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectAttributeName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionAttributeName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdAttributeName));
             Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.KeyPropertyName));
 
             ed = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertFromAsync(eh);
@@ -56,10 +56,10 @@ namespace Beef.Events.UnitTest.Converters
             var eid = ed.EventId;
             var eh = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertToAsync(ed);
             Assert.IsNotNull(eh);
-            Assert.AreEqual(eid, eh.Properties[EventMetadata.EventIdPropertyName]);
-            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.AreEqual(eid, eh.Properties[EventMetadata.EventIdAttributeName]);
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectAttributeName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionAttributeName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdAttributeName));
             Assert.AreEqual(id, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertFromAsync(eh);
@@ -80,9 +80,9 @@ namespace Beef.Events.UnitTest.Converters
             var ed = EventData.CreateEvent("Subject", "Action", id, no);
             var eh = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertToAsync(ed);
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectAttributeName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionAttributeName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdAttributeName));
             Assert.AreEqual(id, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[0]);
             Assert.AreEqual(no, ((object[])eh.Properties[EventMetadata.KeyPropertyName])[1]);
 
@@ -109,9 +109,9 @@ namespace Beef.Events.UnitTest.Converters
             var ed = EventData.CreateValueEvent(p, "Subject", "Action");
             var eh = await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertToAsync(ed);
             Assert.IsNotNull(eh);
-            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectPropertyName]);
-            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionPropertyName]);
-            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdPropertyName));
+            Assert.AreEqual("Subject", eh.Properties[EventMetadata.SubjectAttributeName]);
+            Assert.AreEqual("Action", eh.Properties[EventMetadata.ActionAttributeName]);
+            Assert.IsFalse(eh.Properties.ContainsKey(EventMetadata.TenantIdAttributeName));
             Assert.AreEqual(p.Id, eh.Properties[EventMetadata.KeyPropertyName]);
 
             ed = (EventData<Person>) await new EventHubs.AzureEventHubsEventConverter { UseMessagingPropertiesForMetadata = true }.ConvertFromAsync(typeof(Person), eh);

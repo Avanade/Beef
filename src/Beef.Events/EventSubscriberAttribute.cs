@@ -8,8 +8,8 @@ namespace Beef.Events
     /// <summary>
     /// Details the <see cref="SubjectTemplate"/> and <see cref="Actions"/> for an <see cref="EventSubscriberBase"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class EventSubscriberAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    public sealed class EventSubscriberAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberAttribute"/> class.

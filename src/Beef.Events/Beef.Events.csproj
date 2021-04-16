@@ -34,6 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.12" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.12" />
+    <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
 
   <ItemGroup>

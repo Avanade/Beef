@@ -46,11 +46,11 @@ namespace Beef.Events
 
             foreach (var type in (subscribersAssembly ?? throw new ArgumentNullException(nameof(subscribersAssembly))).GetTypes().Where(x => typeof(IEventSubscriber).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract))
             {
-                var esa = type.GetCustomAttribute<EventSubscriberAttribute>();
-                if (esa == null)
+                var esa = type.GetCustomAttributes<EventSubscriberAttribute>();
+                if (esa == null || esa.Count() == 0)
                     throw new ArgumentException($"Assembly contains Type '{type.Name}' that implements IEventSubscriber but is not decorated with the required EventSubscriberAttribute.", nameof(subscribersAssembly));
 
-                subscribers.Add(new EventSubscriberConfig(esa.SubjectTemplate, esa.Actions, type));
+                esa.ForEach(x => subscribers.Add(new EventSubscriberConfig(x.SubjectTemplate, x.Actions, type)));
             }
 
             return subscribers;
@@ -80,11 +80,11 @@ namespace Beef.Events
             {
                 if (typeof(IEventSubscriber).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 {
-                    var esa = type.GetCustomAttribute<EventSubscriberAttribute>();
-                    if (esa == null)
+                    var esa = type.GetCustomAttributes<EventSubscriberAttribute>();
+                    if (esa == null || esa.Count() == 0)
                         throw new ArgumentException($"Type '{type.Name}' implements IEventSubscriber but is not decorated with the required EventSubscriberAttribute.", nameof(eventSubscriberTypes));
 
-                    _subscribers.Add(new EventSubscriberConfig(esa.SubjectTemplate, esa.Actions, type));
+                    esa.ForEach(x => _subscribers.Add(new EventSubscriberConfig(x.SubjectTemplate, x.Actions, type)));
                 }
                 else
                     throw new ArgumentException($"Type 'type.name' must implement IEventSubscriber and be decorated with the required EventSubscriberAttribute.");

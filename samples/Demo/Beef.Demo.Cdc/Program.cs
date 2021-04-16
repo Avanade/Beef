@@ -58,7 +58,7 @@ namespace Beef.Demo.Cdc
 
                     services.AddBeefLoggerEventPublisher();
                     services.AddGeneratedCdcDataServices();
-                    services.AddGeneratedCdcBackgroundServices(hostContext.Configuration);
+                    services.AddGeneratedCdcHostedServices(hostContext.Configuration);
                 });
     }
 }

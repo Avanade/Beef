@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -124,11 +123,6 @@ namespace Beef.Data.Database.Cdc
         protected virtual string ServiceName => _name ??= GetType().Name;
 
         /// <summary>
-        /// Gets the <see cref="EventMetadata.Source"/>.
-        /// </summary>
-        protected virtual Uri? EventSource { get; }
-
-        /// <summary>
         /// Gets the <see cref="EventMetadata.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected abstract string EventSubject { get; }
@@ -142,6 +136,16 @@ namespace Beef.Data.Database.Cdc
         /// Gets the <see cref="EventMetadata.Subject"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Source"/>.
+        /// </summary>
+        protected virtual Uri? EventSource { get; }
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Source"/> <see cref="Cdc.EventSourceFormat"/>.
+        /// </summary>
+        protected virtual EventSourceFormat EventSourceFormat { get; } = EventSourceFormat.NameAndKey;
 
         /// <summary>
         /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.
@@ -320,7 +324,7 @@ namespace Beef.Data.Database.Cdc
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)
                 {
                     coll2.Add(item);
-                    tracking.Add(new CdcTracker { Key = CreateValueKey(entity), Hash = entity.ETag });
+                    tracking.Add(new CdcTracker { Key = CreateTrackingKey(entity), Hash = entity.ETag });
                 }
             }
 
@@ -414,7 +418,18 @@ namespace Beef.Data.Database.Cdc
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventMetadata.Action"/>.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
         protected EventData<T> CreateValueEvent<T>(T value, string subjectName, OperationType operationType) where T : class
-            => EventData.CreateValueEvent(value, CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat));
+        {
+            var gid = value as IGlobalIdentifier;
+            var ed = EventSource == null
+                ? EventData.CreateValueEvent(value, CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat))
+                : EventData.CreateValueEvent(value, CreateFormattedUri(EventSource!, EventSourceFormat == EventSourceFormat.NameAndGlobalId && gid?.GlobalId != null ? gid.GlobalId : EventPublisher.FormatKey(value)),
+                    CreateValueFormattedSubject(value, subjectName), EventActionFormatter.Format(operationType, EventActionFormat));
+
+            if (gid != null)
+                ed.Key = gid.GlobalId;
+
+            return ed;
+        }
 
         /// <summary>
         /// Creates an <see cref="EventData"/> with the specified <paramref name="key"/>.
@@ -423,8 +438,9 @@ namespace Beef.Data.Database.Cdc
         /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventMetadata.Action"/>.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        protected EventData CreateEvent(string subjectName, OperationType operationType, params IComparable?[] key)
-            => EventData.CreateEvent(CreateFormattedSubject(subjectName, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
+        protected EventData CreateEvent(string subjectName, OperationType operationType, params IComparable?[] key) => EventSource == null
+            ? EventData.CreateEvent(CreateFormattedSubject(subjectName, key), EventActionFormatter.Format(operationType, EventActionFormat), key)
+            : EventData.CreateEvent(CreateFormattedUri(EventSource!, EventPublisher.FormatKey(key)), CreateFormattedSubject(subjectName, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
 
         /// <summary>
         /// Creates a fully qualified event subject as per <see cref="EventSubjectFormat"/>.
@@ -434,15 +450,23 @@ namespace Beef.Data.Database.Cdc
         /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> name.</param>
         /// <returns>The fully qualified subject.</returns>
         /// <remarks><typeparamref name="T"/> must implement at least one of the following: <see cref="IIdentifier"/>, <see cref="IGuidIdentifier"/>, <see cref="IStringIdentifier"/> or <see cref="IUniqueKey"/>.</remarks>
-        protected string CreateValueFormattedSubject<T>(T value, string subjectName) where T : class => EventSubjectFormat == EventSubjectFormat.NameOnly ? subjectName : subjectName + "." + CreateValueKey(value);
+        protected string CreateValueFormattedSubject<T>(T value, string subjectName) where T : class => EventSubjectFormat == EventSubjectFormat.NameOnly ? subjectName : subjectName + "." + CreateValueFormattedSubjectKey(value);
 
         /// <summary>
-        /// Creates the key (as a <see cref="string"/>) for the <paramref name="value"/>.
+        /// Creates the event subject key (as a <see cref="string"/>) for the <paramref name="value"/>.
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The key for the <paramref name="value"/>.</returns>
-        protected static string CreateValueKey<T>(T value) where T : class => value is IGlobalIdentifier gi && gi.GlobalId != null ? gi.GlobalId : value.CreateFormattedKey();
+        protected string CreateValueFormattedSubjectKey<T>(T value) where T : class => value is IGlobalIdentifier gi && gi.GlobalId != null ? gi.GlobalId : EventPublisher.FormatKey(value)!;
+
+        /// <summary>
+        /// Creates the formatted <i>tracking</i> key (as a <see cref="string"/>) for the <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns>The formatted <i>tracking</i> key.</returns>
+        protected string CreateTrackingKey<T>(T value) where T : class => value is IGlobalIdentifier gi && gi.GlobalId != null ? gi.GlobalId : value.CreateIdentifierMappingKey()!;
 
         /// <summary>
         /// Creates a fully qualified event subject by appending the <paramref name="key"/> to the <paramref name="subjectName"/>.
@@ -450,25 +474,14 @@ namespace Beef.Data.Database.Cdc
         /// <param name="subjectName">The <see cref="EventMetadata.Subject"/> prefix.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The fully qualified subject.</returns>
-        protected string CreateFormattedSubject(string subjectName, params IComparable?[] key)
-        {
-            if (EventSubjectFormat == EventSubjectFormat.NameOnly)
-                return subjectName;
+        private string CreateFormattedSubject(string subjectName, params IComparable?[] key) 
+            => (EventSubjectFormat == EventSubjectFormat.NameOnly) ?  subjectName :  $"{subjectName}{EventPublisher.PathSeparator}{EventPublisher.FormatKey(key)}";
 
-            var sb = new StringBuilder(subjectName + ".");
-            if (key == null || key.Length == 0)
-                throw new ArgumentException("There must be at least a single key value specified.", nameof(key));
-
-            for (int i = 0; i < key.Length; i++)
-            {
-                if (i > 0)
-                    sb.Append(",");
-
-                sb.Append(key[i]);
-            }
-
-            return sb.ToString();
-        }
+        /// <summary>
+        /// Creates new, or returns, the Uri based on the EventSourceFormat.
+        /// </summary>
+        private Uri CreateFormattedUri(Uri uri, string? path)
+            => (EventSourceFormat == EventSourceFormat.NameOnly || string.IsNullOrEmpty(path)) ? uri : new Uri($"{uri.ToString().TrimEnd('/')}/{path}", uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
 
         /// <summary>
         /// Creates none or more <see cref="EventData">events</see> from the entity <paramref name="coll">collection.</paramref>.

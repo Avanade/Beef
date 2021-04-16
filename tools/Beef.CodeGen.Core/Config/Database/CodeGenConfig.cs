@@ -212,6 +212,14 @@ namespace Beef.CodeGen.Config.Database
         public string? EventSourceKind { get; set; }
 
         /// <summary>
+        /// Gets or sets the default formatting for the Source when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSourceFormat { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -503,6 +511,7 @@ namespace Beef.CodeGen.Config.Database
             CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
             HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
+            EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");

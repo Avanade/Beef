@@ -2,8 +2,7 @@
   "profiles": {
     "My.Hr.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "entity",
-      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\My.Hr\\My.Hr.CodeGen"
+      "commandLineArgs": "all"
     }
   }
 }

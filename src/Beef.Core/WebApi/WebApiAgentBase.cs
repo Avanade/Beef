@@ -46,7 +46,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Creates the <see cref="HttpRequestMessage"/> and invokes the <see cref="IWebApiAgentArgs.BeforeRequest"/>.
         /// </summary>
-        private HttpRequestMessage CreateRequestMessage(HttpMethod method, Uri uri, StringContent? content = null, WebApiRequestOptions? requestOptions = null)
+        private async Task<HttpRequestMessage> CreateRequestMessageAsync(HttpMethod method, Uri uri, StringContent? content = null, WebApiRequestOptions? requestOptions = null)
         {
             var req = new HttpRequestMessage(method, uri);
             if (content != null)
@@ -58,6 +58,7 @@ namespace Beef.WebApi
             ApplyWebApiOptions(req, requestOptions);
 
             Args.BeforeRequest?.Invoke(req);
+            await (Args.BeforeRequestAsync?.Invoke(req) ?? Task.CompletedTask).ConfigureAwait(false);
             return req;
         }
 
@@ -95,7 +96,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -118,7 +119,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -187,7 +188,7 @@ namespace Beef.WebApi
 
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -216,7 +217,7 @@ namespace Beef.WebApi
 
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -238,7 +239,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -261,7 +262,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -289,7 +290,7 @@ namespace Beef.WebApi
 
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -318,7 +319,7 @@ namespace Beef.WebApi
 
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -341,7 +342,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -365,7 +366,7 @@ namespace Beef.WebApi
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -386,7 +387,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
             {
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(HttpMethod.Delete, uri, requestOptions: requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Delete, uri, requestOptions: requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -420,7 +421,7 @@ namespace Beef.WebApi
             {
                 var content = new StringContent(json.ToString());
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse(patchOption == WebApiPatchOption.JsonPatch ? "application/json-patch+json" : "application/merge-patch+json");
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(new HttpMethod("PATCH"), uri, content, requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(new HttpMethod("PATCH"), uri, content, requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
             }, json, memberName, filePath, lineNumber).ConfigureAwait(false);
@@ -452,7 +453,7 @@ namespace Beef.WebApi
             {
                 var content = new StringContent(json.ToString());
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse(patchOption == WebApiPatchOption.JsonPatch ? "application/json-patch+json" : "application/merge-patch+json");
-                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(CreateRequestMessage(new HttpMethod("PATCH"), uri, content, requestOptions)).ConfigureAwait(false));
+                var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(new HttpMethod("PATCH"), uri, content, requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
             }, json, memberName, filePath, lineNumber).ConfigureAwait(false);

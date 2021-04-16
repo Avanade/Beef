@@ -136,7 +136,7 @@ namespace Beef.Demo.Cdc.Entities
         /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
         public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
         {
-            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Contact", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
+            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Contact", Key = this.CreateIdentifierMappingKey(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
             coll.AddAsync(GlobalAlternateContactId == default && AlternateContactId != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalAlternateContactId), Schema = "Legacy", Table = "Contact", Key = AlternateContactId.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<ContactCdc>().ConfigureAwait(false) });
             await (Address?.LinkIdentifierMappingsAsync(coll, idGen) ?? Task.CompletedTask).ConfigureAwait(false);
         }
@@ -231,7 +231,7 @@ namespace Beef.Demo.Cdc.Entities
             /// <param name="idGen">The <see cref="IStringIdentifierGenerator"/>.</param>
             public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
             {
-                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Address", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
+                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "Legacy", Table = "Address", Key = this.CreateIdentifierMappingKey(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
                 coll.AddAsync(GlobalAlternateAddressId == default && AlternateAddressId != default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalAlternateAddressId), Schema = "Legacy", Table = "Address", Key = AlternateAddressId.ToString(), GlobalId = await idGen.GenerateIdentifierAsync<AddressCdc>().ConfigureAwait(false) });
             }
 

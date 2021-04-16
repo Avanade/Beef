@@ -112,7 +112,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish($"My.Hr.PerformanceReview.{_evtPub.FormatKey(id)}", "Deleted", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new PerformanceReview { Id = id }, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(id)}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<PerformanceReview>(new UniqueKey(id));
             });
         }

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Newtonsoft.Json;
+using NUnit.Framework;
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,23 @@ namespace Beef.Events.UnitTest.ContentSerializers
     [TestFixture]
     public class NewtonsoftJsonCloudEventSerializerTest
     {
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class Person
+        {
+            [JsonProperty("first")]
+            public string FirstName;
+            [JsonProperty("last")]
+            public string LastName;
+
+            public string Private;
+
+            public static Person Create() => new Person { FirstName = "Rebecca", LastName = "Brown", Private = "Top secret" };
+        }
+
         [Test]
         public async Task EventDataEndToEndWithBeef()
         {
-            var eds = new NewtonsoftJsonCloudEventSerializer();
+            var eds = new NewtonsoftJsonCloudEventSerializer { IncludeEventMetadataProperties = null };
             var bytes = await eds.SerializeAsync(new EventData(NewtonsoftJsonEventDataSerializerTest.CreateEventMetadata()));
             Assert.Greater(bytes.Length, 0);
 
@@ -22,15 +36,17 @@ namespace Beef.Events.UnitTest.ContentSerializers
   ""source"": ""/test"",
   ""id"": ""00000001-0000-0000-0000-000000000000"",
   ""time"": ""2001-01-15T12:48:16"",
-  ""beef_subject"": ""Test.Subject"",
-  ""beef_action"": ""Created"",
-  ""beef_tenantid"": ""00000002-0000-0000-0000-000000000000"",
-  ""beef_key"": 1,
-  ""beef_etag"": ""YYY"",
-  ""beef_username"": ""Bob"",
-  ""beef_userid"": ""123"",
-  ""beef_correlationid"": ""XXX"",
-  ""beef_partitionkey"": ""PK""
+  ""beef"": {
+    ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
+    ""subject"": ""Test.Subject"",
+    ""action"": ""Created"",
+    ""key"": 1,
+    ""username"": ""Bob"",
+    ""userid"": ""123"",
+    ""correlationId"": ""XXX"",
+    ""etag"": ""YYY"",
+    ""partitionKey"": ""PK""
+  }
 }", json);
 
             var ed = await eds.DeserializeAsync(bytes);
@@ -41,7 +57,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
         public async Task EventDataTEndToEndWithBeef()
         {
             var eds = new NewtonsoftJsonCloudEventSerializer();
-            var bytes = await eds.SerializeAsync(new EventData<int>(NewtonsoftJsonEventDataSerializerTest.CreateEventMetadata()) { Value = 88 });
+            var bytes = await eds.SerializeAsync(new EventData<Person>(NewtonsoftJsonEventDataSerializerTest.CreateEventMetadata()) { Value = Person.Create() });
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
@@ -52,22 +68,32 @@ namespace Beef.Events.UnitTest.ContentSerializers
   ""id"": ""00000001-0000-0000-0000-000000000000"",
   ""time"": ""2001-01-15T12:48:16"",
   ""datacontenttype"": ""application/json"",
-  ""data"": ""88"",
-  ""beef_subject"": ""Test.Subject"",
-  ""beef_action"": ""Created"",
-  ""beef_tenantid"": ""00000002-0000-0000-0000-000000000000"",
-  ""beef_key"": 1,
-  ""beef_etag"": ""YYY"",
-  ""beef_username"": ""Bob"",
-  ""beef_userid"": ""123"",
-  ""beef_correlationid"": ""XXX"",
-  ""beef_partitionkey"": ""PK""
+  ""data"": {
+    ""first"": ""Rebecca"",
+    ""last"": ""Brown""
+  },
+  ""beef"": {
+    ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
+    ""subject"": ""Test.Subject"",
+    ""action"": ""Created"",
+    ""key"": 1,
+    ""username"": ""Bob"",
+    ""userid"": ""123"",
+    ""correlationId"": ""XXX"",
+    ""etag"": ""YYY"",
+    ""partitionKey"": ""PK""
+  }
 }", json);
 
-            var ed = await eds.DeserializeAsync(typeof(int), bytes);
+            var ed = await eds.DeserializeAsync(typeof(Person), bytes);
             NewtonsoftJsonEventDataSerializerTest.AssertEventMetadata(ed);
-            Assert.AreEqual(88, ed.GetValue());
-            Assert.AreEqual(88, ((EventData<int>)ed).Value);
+            Assert.NotNull(ed.GetValue());
+
+            var p = ((EventData<Person>)ed).Value;
+            Assert.NotNull(p);
+            Assert.AreEqual("Rebecca", p.FirstName);
+            Assert.AreEqual("Brown", p.LastName);
+            Assert.Null(p.Private);
         }
 
         [Test]
@@ -105,7 +131,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
   ""id"": ""00000001-0000-0000-0000-000000000000"",
   ""time"": ""2001-01-15T12:48:16"",
   ""datacontenttype"": ""application/json"",
-  ""data"": ""88""
+  ""data"": 88
 }", json);
 
             var ed = await eds.DeserializeAsync(typeof(int), bytes);

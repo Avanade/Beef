@@ -15,7 +15,6 @@ namespace Beef.Events.EventHubs
     public class EventHubProducer : EventPublisherBase
     {
         private readonly EventHubProducerClient _client;
-        private readonly IEventDataConverter<AzureEventHubs.EventData> _eventDataConverter;
         private readonly EventHubProducerInvoker _invoker;
 
         /// <summary>
@@ -23,13 +22,38 @@ namespace Beef.Events.EventHubs
         /// <see cref="EventHubProducerClientOptions.RetryOptions"/>) to allow for transient errors).
         /// </summary>
         /// <param name="client">The <see cref="EventHubProducerClient"/>.</param>
-        /// <param name="eventDataConverter">The <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureEventHubsEventConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.</param>
         /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="EventHubProducerInvoker"/>.</param>
-        public EventHubProducer(EventHubProducerClient client, IEventDataConverter<AzureEventHubs.EventData>? eventDataConverter = null, EventHubProducerInvoker? invoker = null)
+        public EventHubProducer(EventHubProducerClient client, EventHubProducerInvoker? invoker = null)
         {
             _client = Check.NotNull(client, nameof(client));
-            _eventDataConverter = eventDataConverter ?? new AzureEventHubsEventConverter(new NewtonsoftJsonCloudEventSerializer());
             _invoker = invoker ?? new EventHubProducerInvoker();
+        }
+
+        /// <summary>
+        /// Sets both the <see cref="EventPublisherBase.SubjectFormat"/> and <see cref="EventPublisherBase.ActionFormat"/> to the specified <paramref name="format"/>.
+        /// </summary>
+        /// <param name="format">The <see cref="EventStringFormat"/>.</param>
+        /// <returns>This <see cref="EventHubProducer"/> instance to support fluent-style method-chaining.</returns>
+        public EventHubProducer Format(EventStringFormat format)
+        {
+            SubjectFormat = ActionFormat = format;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureEventHubsEventConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.
+        /// </summary>
+        public IEventDataConverter<AzureEventHubs.EventData>? EventDataConverter { get; set; }
+
+        /// <summary>
+        /// Sets the <see cref="EventDataConverter"/>.
+        /// </summary>
+        /// <param name="eventDataConverter">The <see cref="IEventDataConverter{T}"/></param>
+        /// <returns>This <see cref="EventHubProducer"/> instance to support fluent-style method-chaining.</returns>
+        public EventHubProducer SetEventDataConverter(IEventDataConverter<AzureEventHubs.EventData>? eventDataConverter)
+        {
+            EventDataConverter = eventDataConverter;
+            return this;
         }
 
         /// <summary>
@@ -42,6 +66,8 @@ namespace Beef.Events.EventHubs
             if (events == null || events.Length == 0)
                 return;
 
+            EventDataConverter ??= new AzureEventHubsEventConverter(new NewtonsoftJsonCloudEventSerializer());
+
             // Why this logic: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/eventhub/Azure.Messaging.EventHubs/samples/Sample04_PublishingEvents.md
             EventDataBatch batch = null!;
             var batches = new List<EventDataBatch>();
@@ -53,7 +79,7 @@ namespace Beef.Events.EventHubs
                     batches.Add(batch = pk.Key == null ? await _client.CreateBatchAsync().ConfigureAwait(false) : await _client.CreateBatchAsync(new CreateBatchOptions { PartitionKey = pk.Key }).ConfigureAwait(false));
                     foreach (var ed in pk)
                     {
-                        var eh = await _eventDataConverter.ConvertToAsync(ed).ConfigureAwait(false);
+                        var eh = await EventDataConverter.ConvertToAsync(ed).ConfigureAwait(false);
                         if (!batch.TryAdd(eh))
                         {
                             batches.Add(batch = pk.Key == null ? await _client.CreateBatchAsync().ConfigureAwait(false) : await _client.CreateBatchAsync(new CreateBatchOptions { PartitionKey = pk.Key }).ConfigureAwait(false));

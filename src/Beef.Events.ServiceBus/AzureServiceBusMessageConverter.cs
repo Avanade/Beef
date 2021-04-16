@@ -109,40 +109,40 @@ namespace Beef.Events.ServiceBus
 
             if (UseMessagingPropertiesForMetadata)
             {
-                msg.ApplicationProperties.Add(EventMetadata.SubjectPropertyName, @event.Subject);
+                msg.ApplicationProperties.Add(EventMetadata.SubjectAttributeName, @event.Subject);
 
                 if (@event.EventId != null)
-                    msg.ApplicationProperties.Add(EventMetadata.EventIdPropertyName, @event.EventId);
+                    msg.ApplicationProperties.Add(EventMetadata.EventIdAttributeName, @event.EventId);
 
                 if (@event.Action != null)
-                    msg.ApplicationProperties.Add(EventMetadata.ActionPropertyName, @event.Action);
+                    msg.ApplicationProperties.Add(EventMetadata.ActionAttributeName, @event.Action);
 
                 if (@event.TenantId != null)
-                    msg.ApplicationProperties.Add(EventMetadata.TenantIdPropertyName, @event.TenantId);
+                    msg.ApplicationProperties.Add(EventMetadata.TenantIdAttributeName, @event.TenantId);
 
                 if (@event.Source != null)
-                    msg.ApplicationProperties.Add(EventMetadata.SourcePropertyName, @event.Source);
+                    msg.ApplicationProperties.Add(EventMetadata.SourceAttributeName, @event.Source);
 
                 if (@event.Key != null)
                     msg.ApplicationProperties.Add(EventMetadata.KeyPropertyName, @event.Key);
 
                 if (@event.ETag != null)
-                    msg.ApplicationProperties.Add(EventMetadata.ETagPropertyName, @event.ETag);
+                    msg.ApplicationProperties.Add(EventMetadata.ETagAttributeName, @event.ETag);
 
                 if (@event.Username != null)
-                    msg.ApplicationProperties.Add(EventMetadata.UsernamePropertyName, @event.Username);
+                    msg.ApplicationProperties.Add(EventMetadata.UsernameAttributeName, @event.Username);
 
                 if (@event.UserId != null)
-                    msg.ApplicationProperties.Add(EventMetadata.UserIdPropertyName, @event.UserId);
+                    msg.ApplicationProperties.Add(EventMetadata.UserIdAttributeName, @event.UserId);
 
                 if (@event.Timestamp != null)
-                    msg.ApplicationProperties.Add(EventMetadata.TimestampPropertyName, @event.Timestamp);
+                    msg.ApplicationProperties.Add(EventMetadata.TimestampAttributeName, @event.Timestamp);
 
                 if (@event.CorrelationId != null)
-                    msg.ApplicationProperties.Add(EventMetadata.CorrelationIdPropertyName, @event.CorrelationId);
+                    msg.ApplicationProperties.Add(EventMetadata.CorrelationIdAttributeName, @event.CorrelationId);
 
                 if (@event.PartitionKey != null)
-                    msg.ApplicationProperties.Add(EventMetadata.PartitionKeyPropertyName, @event.PartitionKey);
+                    msg.ApplicationProperties.Add(EventMetadata.PartitionKeyAttributeName, @event.PartitionKey);
             }
 
             return msg;
@@ -158,31 +158,31 @@ namespace Beef.Events.ServiceBus
             if (message == null)
                 return null;
 
-            message.ApplicationProperties.TryGetValue(EventMetadata.SubjectPropertyName, out var subject);
+            message.ApplicationProperties.TryGetValue(EventMetadata.SubjectAttributeName, out var subject);
 
             // Where the Subject metadata is defined assume it is correctly configured.
             if (subject != null)
             {
-                message.ApplicationProperties.TryGetValue(EventMetadata.ActionPropertyName, out var action);
-                message.ApplicationProperties.TryGetValue(EventMetadata.CorrelationIdPropertyName, out var correlationId);
-                message.ApplicationProperties.TryGetValue(EventMetadata.PartitionKeyPropertyName, out var partitionKey);
+                message.ApplicationProperties.TryGetValue(EventMetadata.ActionAttributeName, out var action);
+                message.ApplicationProperties.TryGetValue(EventMetadata.CorrelationIdAttributeName, out var correlationId);
+                message.ApplicationProperties.TryGetValue(EventMetadata.PartitionKeyAttributeName, out var partitionKey);
                 message.ApplicationProperties.TryGetValue(EventMetadata.KeyPropertyName, out var key);
-                message.ApplicationProperties.TryGetValue(EventMetadata.ETagPropertyName, out var etag);
-                message.ApplicationProperties.TryGetValue(EventMetadata.UsernamePropertyName, out var username);
-                message.ApplicationProperties.TryGetValue(EventMetadata.UserIdPropertyName, out var userId);
+                message.ApplicationProperties.TryGetValue(EventMetadata.ETagAttributeName, out var etag);
+                message.ApplicationProperties.TryGetValue(EventMetadata.UsernameAttributeName, out var username);
+                message.ApplicationProperties.TryGetValue(EventMetadata.UserIdAttributeName, out var userId);
 
                 return new EventMetadata
                 {
-                    EventId = (message.ApplicationProperties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : Guid.TryParse(message.MessageId, out var mid) ? mid : (Guid?)null,
-                    TenantId = (message.ApplicationProperties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
+                    EventId = (message.ApplicationProperties.TryGetValue(EventMetadata.EventIdAttributeName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : Guid.TryParse(message.MessageId, out var mid) ? mid : (Guid?)null,
+                    TenantId = (message.ApplicationProperties.TryGetValue(EventMetadata.TenantIdAttributeName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
                     Subject = (string?)subject ?? message.Subject,
                     Action = (string?)action,
-                    Source = (message.ApplicationProperties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
+                    Source = (message.ApplicationProperties.TryGetValue(EventMetadata.SourceAttributeName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
                     Key = key,
                     ETag = (string)etag,
                     Username = (string?)username,
                     UserId = (string?)userId,
-                    Timestamp = (message.ApplicationProperties.TryGetValue(EventMetadata.TimestampPropertyName, out var time) && time != null && time is DateTime?) ? (DateTime?)time : null,
+                    Timestamp = (message.ApplicationProperties.TryGetValue(EventMetadata.TimestampAttributeName, out var time) && time != null && time is DateTime?) ? (DateTime?)time : null,
                     CorrelationId = (string?)correlationId ?? message.CorrelationId,
                     PartitionKey = (string?)partitionKey ?? message.PartitionKey
                 }; 

@@ -87,9 +87,9 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Source"/>.
+        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
-        protected override Uri? EventSource => new Uri("/cdc/posts", UriKind.Relative);
+        protected override string EventSubject => "Legacy.Post";
 
         /// <summary>
         /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
@@ -97,14 +97,19 @@ namespace Beef.Demo.Cdc.Data
         protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.NameOnly;
 
         /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
-        /// </summary>
-        protected override string EventSubject => "Legacy.Post";
-
-        /// <summary>
         /// Gets the <see cref="EventData.Action"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Source"/>.
+        /// </summary>
+        protected override Uri? EventSource => new Uri("/cdc/posts", UriKind.Relative);
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Source"/> <see cref="Cdc.EventSourceFormat"/>.
+        /// </summary>
+        protected override EventSourceFormat EventSourceFormat { get; } = EventSourceFormat.NameAndKey;
 
         /// <summary>
         /// Represents a <see cref="PostsCdc"/> wrapper to append the required (additional) database properties.

@@ -86,40 +86,40 @@ namespace Beef.Events.EventHubs
 
             if (UseMessagingPropertiesForMetadata)
             {
-                ehed.Properties.Add(EventMetadata.SubjectPropertyName, @event.Subject);
+                ehed.Properties.Add(EventMetadata.SubjectAttributeName, @event.Subject);
 
                 if (@event.EventId != null)
-                    ehed.Properties.Add(EventMetadata.EventIdPropertyName, @event.EventId);
+                    ehed.Properties.Add(EventMetadata.EventIdAttributeName, @event.EventId);
 
                 if (@event.Action != null)
-                    ehed.Properties.Add(EventMetadata.ActionPropertyName, @event.Action);
+                    ehed.Properties.Add(EventMetadata.ActionAttributeName, @event.Action);
 
                 if (@event.TenantId != null)
-                    ehed.Properties.Add(EventMetadata.TenantIdPropertyName, @event.TenantId);
+                    ehed.Properties.Add(EventMetadata.TenantIdAttributeName, @event.TenantId);
 
                 if (@event.Source != null)
-                    ehed.Properties.Add(EventMetadata.SourcePropertyName, @event.Source);
+                    ehed.Properties.Add(EventMetadata.SourceAttributeName, @event.Source);
 
                 if (@event.Key != null)
                     ehed.Properties.Add(EventMetadata.KeyPropertyName, @event.Key);
 
                 if (@event.ETag != null)
-                    ehed.Properties.Add(EventMetadata.ETagPropertyName, @event.ETag);
+                    ehed.Properties.Add(EventMetadata.ETagAttributeName, @event.ETag);
 
                 if (@event.Username != null)
-                    ehed.Properties.Add(EventMetadata.UsernamePropertyName, @event.Username);
+                    ehed.Properties.Add(EventMetadata.UsernameAttributeName, @event.Username);
 
                 if (@event.UserId != null)
-                    ehed.Properties.Add(EventMetadata.UserIdPropertyName, @event.UserId);
+                    ehed.Properties.Add(EventMetadata.UserIdAttributeName, @event.UserId);
 
                 if (@event.Timestamp != null)
-                    ehed.Properties.Add(EventMetadata.TimestampPropertyName, @event.Timestamp);
+                    ehed.Properties.Add(EventMetadata.TimestampAttributeName, @event.Timestamp);
 
                 if (@event.CorrelationId != null)
-                    ehed.Properties.Add(EventMetadata.CorrelationIdPropertyName, @event.CorrelationId);
+                    ehed.Properties.Add(EventMetadata.CorrelationIdAttributeName, @event.CorrelationId);
 
                 if (@event.PartitionKey != null)
-                    ehed.Properties.Add(EventMetadata.PartitionKeyPropertyName, @event.PartitionKey);
+                    ehed.Properties.Add(EventMetadata.PartitionKeyAttributeName, @event.PartitionKey);
             }
 
             return ehed;
@@ -137,27 +137,27 @@ namespace Beef.Events.EventHubs
 
             if (UseMessagingPropertiesForMetadata)
             {
-                message.Properties.TryGetValue(EventMetadata.SubjectPropertyName, out var subject);
-                message.Properties.TryGetValue(EventMetadata.ActionPropertyName, out var action);
-                message.Properties.TryGetValue(EventMetadata.CorrelationIdPropertyName, out var correlationId);
-                message.Properties.TryGetValue(EventMetadata.PartitionKeyPropertyName, out var partitionKey);
+                message.Properties.TryGetValue(EventMetadata.SubjectAttributeName, out var subject);
+                message.Properties.TryGetValue(EventMetadata.ActionAttributeName, out var action);
+                message.Properties.TryGetValue(EventMetadata.CorrelationIdAttributeName, out var correlationId);
+                message.Properties.TryGetValue(EventMetadata.PartitionKeyAttributeName, out var partitionKey);
                 message.Properties.TryGetValue(EventMetadata.KeyPropertyName, out var key);
-                message.Properties.TryGetValue(EventMetadata.ETagPropertyName, out var etag);
-                message.Properties.TryGetValue(EventMetadata.UsernamePropertyName, out var username);
-                message.Properties.TryGetValue(EventMetadata.UserIdPropertyName, out var userId);
+                message.Properties.TryGetValue(EventMetadata.ETagAttributeName, out var etag);
+                message.Properties.TryGetValue(EventMetadata.UsernameAttributeName, out var username);
+                message.Properties.TryGetValue(EventMetadata.UserIdAttributeName, out var userId);
 
                 return new EventMetadata
                 {
-                    EventId = (message.Properties.TryGetValue(EventMetadata.EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null,
-                    TenantId = (message.Properties.TryGetValue(EventMetadata.TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
+                    EventId = (message.Properties.TryGetValue(EventMetadata.EventIdAttributeName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null,
+                    TenantId = (message.Properties.TryGetValue(EventMetadata.TenantIdAttributeName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null,
                     Subject = (string?)subject,
                     Action = (string?)action,
-                    Source = (message.Properties.TryGetValue(EventMetadata.SourcePropertyName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
+                    Source = (message.Properties.TryGetValue(EventMetadata.SourceAttributeName, out var src) && src != null && src is Uri) ? (Uri?)src : null,
                     Key = key,
                     ETag = (string)etag,
                     Username = (string?)username,
                     UserId = (string?)userId,
-                    Timestamp = (message.Properties.TryGetValue(EventMetadata.TimestampPropertyName, out var time) && time != null && time is DateTime?) ? (DateTime?)time : null,
+                    Timestamp = (message.Properties.TryGetValue(EventMetadata.TimestampAttributeName, out var time) && time != null && time is DateTime?) ? (DateTime?)time : null,
                     CorrelationId = (string?)correlationId,
                     PartitionKey = (string?)partitionKey
                 }; 

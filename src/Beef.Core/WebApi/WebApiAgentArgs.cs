@@ -2,6 +2,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Beef.WebApi
 {
@@ -15,10 +16,12 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="httpClient">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The optional <see cref="BeforeRequest"/> action.</param>
-        public WebApiAgentArgs(HttpClient httpClient, Action<HttpRequestMessage>? beforeRequest = null)
+        /// <param name="beforeRequestAsync">The optional <see cref="BeforeRequestAsync"/> asynchronous function.</param>
+        public WebApiAgentArgs(HttpClient httpClient, Action<HttpRequestMessage>? beforeRequest = null, Func<HttpRequestMessage, Task>? beforeRequestAsync = null)
         {
             HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             BeforeRequest = beforeRequest;
+            BeforeRequestAsync = beforeRequestAsync;
         }
 
         /// <summary>
@@ -30,5 +33,10 @@ namespace Beef.WebApi
         /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is invoked.
         /// </summary>
         public Action<HttpRequestMessage>? BeforeRequest { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Func{HttpRequestMessage, Task}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is invoked (asynchronously).
+        /// </summary>
+        public Func<HttpRequestMessage, Task>? BeforeRequestAsync { get; }
     }
 }

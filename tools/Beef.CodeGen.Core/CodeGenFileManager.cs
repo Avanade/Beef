@@ -39,20 +39,39 @@ namespace Beef.CodeGen
         public static List<string> DatabaseFilenames { get; } = new List<string>(new string[] { "database.beef.yaml", "database.beef.yml", "database.beef.json", "database.beef.xml", "{{Company}}.{{AppName}}.Database.xml" });
 
         /// <summary>
+        /// Gets the executable directory. Uses <see cref="Environment.CurrentDirectory"/> and removes <c>bin/debug</c> and <c>bin/release</c> where found to get back to root directory where configuration etc. should reside.
+        /// </summary>
+        /// <returns>The executable directory path.</returns>
+        public static string GetExeDirectory()
+        {
+            var exeDir = Environment.CurrentDirectory;
+            var i = exeDir.IndexOf(Path.Combine("bin", "debug"), StringComparison.InvariantCultureIgnoreCase);
+            if (i > 0)
+                exeDir = exeDir[0..i];
+
+            i = exeDir.IndexOf(Path.Combine("bin", "release"), StringComparison.InvariantCultureIgnoreCase);
+            if (i > 0)
+                exeDir = exeDir[0..i];
+
+            return exeDir;
+        }
+
+        /// <summary>
         /// Get the configuration filename.
         /// </summary>
+        /// <param name="directory">The directory/path.</param>
         /// <param name="type">The <see cref="CommandType"/>.</param>
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application name.</param>
         /// <returns>The filename</returns>
-        public static string GetConfigFilename(CommandType type, string company, string appName)
+        public static string GetConfigFilename(string directory, CommandType type, string company, string appName)
         {
             List<string> files = new List<string>();
             foreach (var n in GetConfigFilenames(type))
             {
-                var fi = new FileInfo(n.Replace("{{Company}}", company, StringComparison.OrdinalIgnoreCase).Replace("{{AppName}}", appName, StringComparison.OrdinalIgnoreCase));
+                var fi = new FileInfo(Path.Combine(directory, n.Replace("{{Company}}", company, StringComparison.OrdinalIgnoreCase).Replace("{{AppName}}", appName, StringComparison.OrdinalIgnoreCase)));
                 if (fi.Exists)
-                    return fi.Name;
+                    return fi.FullName;
 
                 files.Add(fi.Name);
             }

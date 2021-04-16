@@ -97,7 +97,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish(new Uri($"/robots/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Robot.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Robot { Id = id }, new Uri($"/robots/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Robot.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Robot>(new UniqueKey(id));
             });
         }

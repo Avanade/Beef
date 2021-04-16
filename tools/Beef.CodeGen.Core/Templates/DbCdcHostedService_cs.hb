@@ -16,17 +16,17 @@ using {{Root.NamespaceCdc}}.Data;
 namespace {{Root.NamespaceCdc}}.Services
 {
     /// <summary>
-    /// Provides the CDC background service for database object '{{Schema}}.{{Name}}'.
+    /// Provides the <see cref="CdcHostedService"/> capabilities for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{ModelName}}CdcBackgroundService : CdcBackgroundService<I{{ModelName}}CdcData>
+    public partial class {{ModelName}}CdcHostedService : CdcHostedService<I{{ModelName}}CdcData>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="{{ModelName}}CdcBackgroundService"/> class.
+        /// Initializes a new instance of the <see cref="{{ModelName}}CdcHostedService"/> class.
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public {{ModelName}}CdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger<{{ModelName}}CdcBackgroundService> logger) : base(serviceProvider, config, logger) { }
+        public {{ModelName}}CdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger<{{ModelName}}CdcHostedService> logger) : base(serviceProvider, config, logger) { }
     }
 }
 

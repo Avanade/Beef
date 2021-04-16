@@ -53,16 +53,19 @@ namespace Beef.Events.EventHubs
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="clientOptions">The optional <see cref="EventHubProducerClientOptions"/>.</param>
+        /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="EventHubProducer"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventHubEventProducer(this IServiceCollection services, string connectionString, EventHubProducerClientOptions? clientOptions = null)
+        public static IServiceCollection AddBeefEventHubEventProducer(this IServiceCollection services, string connectionString, EventHubProducerClientOptions? clientOptions = null, Action<EventHubProducer>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddScoped<IEventPublisher>(_ =>
             {
-                var ehc =  new EventHubProducerClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
-                return new EventHubProducer(ehc);
+                var ehc = new EventHubProducerClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
+                var ehp = new EventHubProducer(ehc);
+                additional?.Invoke(ehp);
+                return ehp;
             });
         }
     }

@@ -110,7 +110,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish(new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Contact>(new UniqueKey(id));
             });
         }

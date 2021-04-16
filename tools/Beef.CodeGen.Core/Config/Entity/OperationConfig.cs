@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -553,6 +554,11 @@ operations: [
             /// Gets or sets the event source.
             /// </summary>
             public string? Source { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event value (if any).
+            /// </summary>
+            public string? Value { get; set; }
         }
 
         /// <summary>
@@ -822,8 +828,6 @@ operations: [
                 _ => null
             });
 
-            PrepareEvents();
-
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -840,6 +844,7 @@ operations: [
                 ExcludeIData = ExcludeData = ExcludeIDataSvc = ExcludeDataSvc = ExcludeIManager = ExcludeManager = YesOption;
 
             PrepareParameters();
+            PrepareEvents();
 
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
             {
@@ -947,6 +952,25 @@ operations: [
 
                 if (Root!.EventSourceKind != "None")
                     ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);
+
+                if (HasReturnValue)
+                    ed.Value = "__result";
+                else if (Type == "Delete" && UniqueKey == true)
+                {
+                    var sb = new StringBuilder();
+                    foreach (var dp in DataParameters)
+                    {
+                        if (sb.Length == 0)
+                            sb.Append($"new {Parent!.Name} {{ ");
+                        else
+                            sb.Append(", ");
+
+                        sb.Append($"{dp.Name} = {dp.ArgumentName}");
+                    }
+
+                    sb.Append(" }");
+                    ed.Value = sb.ToString();
+                }
 
                 Events.Add(ed);
             }

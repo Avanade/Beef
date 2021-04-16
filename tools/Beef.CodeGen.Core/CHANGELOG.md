@@ -3,10 +3,13 @@
 Represents the **NuGet** versions.
 
 ## v4.1.23
-- *Enhancement:* Added support for YAML files with a `.yml` suffix.
+- *Enhancement:* Added support for _YAML_ files with a `.yml` suffix.
 - *Enhancement:* Added support for `EventData.Source` to both entity and database (CDC) code-gen.
 - *Enhancement:* Added `Operation.ManagerExtensions`, `Operation.DataSvcExtensions` and `Operation.DataExtensions` to further control extensions code-gen output versus all for the `Entity`.
 - *Enhancement:* Added `CdcBackgroundServiceExtensions` to CDC code-gen.
+- *Enhancement:* An entity instance with the key will be instantiated for a `Delete` event within the `XxxDataSvc` to include as the event value.
+- *Fixed:* Code-gen for `ServiceCollectionsValidationExtension` was generating errant code when there are no validators.
+- *Enhancement:* Will strip out `bin/debug` and `bin/release` folders from default directory path to find the output directory; meaning the path does not need to be explicity set when running/debugging from Visual Studio.
 
 ## v4.1.22
 - *Enhancement:* Added standardized identifier mapping for change-data-capture (CDC) from local (internal) to global (external) where required.

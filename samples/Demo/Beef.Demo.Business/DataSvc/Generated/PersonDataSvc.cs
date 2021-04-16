@@ -92,7 +92,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.Publish(new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -442,7 +442,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
                 await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.Publish(new Uri($"/person", UriKind.Relative), $"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person", UriKind.Relative), $"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }

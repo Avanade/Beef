@@ -10,7 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 {{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
+{{#ifne Validators.Count 0}}
 using {{Root.NamespaceBusiness}}.Validation;
+{{/ifne}}
 {{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
@@ -32,6 +34,9 @@ namespace {{Root.NamespaceBusiness}}
 {{#each Validators}}
             {{#if @first}}return services{{else}}               {{/if}}.AddScoped<{{Type}}, {{Name}}>(){{#if @last}};{{/if}}
 {{/each}}
+{{#ifeq Validators.Count 0}}
+            return services;
+{{/ifeq}}
         }
     }
 }

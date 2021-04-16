@@ -13,21 +13,21 @@ using Microsoft.Extensions.DependencyInjection;
 namespace {{Root.NamespaceCdc}}.Services
 {
     /// <summary>
-    /// Provides the generated CDC background services.
+    /// Provides the generated <see cref="CdcHostedService"/> extensions.
     /// </summary>
-    public static class CdcBackgroundServiceExtensions
+    public static class CdcHostedServiceExtensions
     {
         /// <summary>
-        /// Adds the generated CDC background services.
+        /// Adds the generated CDC hosted services.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="services">The <see cref="IConfiguration"/>.</param>
+        /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedCdcBackgroundServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddGeneratedCdcHostedServices(this IServiceCollection services, IConfiguration config)
         {
 {{#each Cdc}}
-  {{#ifne ExcludeBackgroundService 'Yes'}}
-            services.AddCdcHostedService<{{ModelName}}CdcBackgroundService>(config);
+  {{#ifne ExcludeHostedService 'Yes'}}
+            services.AddCdcHostedService<{{ModelName}}CdcHostedService>(config);
   {{/ifne}}
 {{/each}}
             return services;

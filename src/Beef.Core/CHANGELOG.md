@@ -8,6 +8,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Added `IEventPublisher.SubjectFormat` and `IEventPublisher.ActionFormat` to enable optional uppercase or lowercase formatting.
 - *Enhancement:* Added additional overloads and methods to `IRequestCache` to simplify usage (and code-gen output).
 - *Enhancement:* Added `IUniqueKey` support to `ReferenceDataBase`.
+- *Enhancement:* Added `BeforeRequestAsync` to `IWebApiAgentArgs` to support asynchronous scenarios.
 
 ## v4.1.10
 - *Fixed:* Issue [121](https://github.com/Avanade/Beef/issues/121). `SlidingCachePolicy` sliding logic functions as expected.

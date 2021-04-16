@@ -16,19 +16,19 @@ namespace Beef.Events.UnitTest.Converters
     {
         [Test]
         public Task EndToEndWithMessagingProperties() => new EventDataConverterTester<AzureEventHubsEventConverter, AzureEventHubs.EventData>().EndToEnd(new AzureEventHubsEventConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndValueWithMessagingProperties() => new EventDataConverterTester<AzureEventHubsEventConverter, AzureEventHubs.EventData>().EndToEndValue(new AzureEventHubsEventConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndWithoutMessagingProperties() => new EventDataConverterTester<AzureEventHubsEventConverter, AzureEventHubs.EventData>().EndToEnd(new AzureEventHubsEventConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectAttributeName)));
 
         [Test]
         public Task EndToEndValueWithoutMessagingProperties() => new EventDataConverterTester<AzureEventHubsEventConverter, AzureEventHubs.EventData>().EndToEndValue(new AzureEventHubsEventConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectAttributeName)));
     }
 
     [TestFixture]
@@ -36,19 +36,19 @@ namespace Beef.Events.UnitTest.Converters
     {
         [Test]
         public Task EndToEndWithMessagingProperties() => new EventDataConverterTester<MicrosoftEventHubsEventConverter, MicrosoftEventHubs.EventData>().EndToEnd(new MicrosoftEventHubsEventConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndValueWithMessagingProperties() => new EventDataConverterTester<MicrosoftEventHubsEventConverter, MicrosoftEventHubs.EventData>().EndToEndValue(new MicrosoftEventHubsEventConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.Properties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndWithoutMessagingProperties() => new EventDataConverterTester<MicrosoftEventHubsEventConverter, MicrosoftEventHubs.EventData>().EndToEnd(new MicrosoftEventHubsEventConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectAttributeName)));
 
         [Test]
         public Task EndToEndValueWithoutMessagingProperties() => new EventDataConverterTester<MicrosoftEventHubsEventConverter, MicrosoftEventHubs.EventData>().EndToEndValue(new MicrosoftEventHubsEventConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.Properties.ContainsKey(EventMetadata.SubjectAttributeName)));
     }
 
     [TestFixture]
@@ -56,19 +56,19 @@ namespace Beef.Events.UnitTest.Converters
     {
         [Test]
         public Task EndToEndWithMessagingProperties() => new EventDataConverterTester<AzureServiceBusMessageConverter, AzureServiceBus.ServiceBusMessage>().EndToEnd(new AzureServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.ApplicationProperties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.ApplicationProperties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndValueWithMessagingProperties() => new EventDataConverterTester<AzureServiceBusMessageConverter, AzureServiceBus.ServiceBusMessage>().EndToEndValue(new AzureServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.ApplicationProperties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.ApplicationProperties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndWithoutMessagingProperties() => new EventDataConverterTester<AzureServiceBusMessageConverter, AzureServiceBus.ServiceBusMessage>().EndToEnd(new AzureServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.ApplicationProperties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.ApplicationProperties.ContainsKey(EventMetadata.SubjectAttributeName)));
 
         [Test]
         public Task EndToEndValueWithoutMessagingProperties() => new EventDataConverterTester<AzureServiceBusMessageConverter, AzureServiceBus.ServiceBusMessage>().EndToEndValue(new AzureServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.ApplicationProperties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.ApplicationProperties.ContainsKey(EventMetadata.SubjectAttributeName)));
     }
 
     [TestFixture]
@@ -76,19 +76,19 @@ namespace Beef.Events.UnitTest.Converters
     {
         [Test]
         public Task EndToEndWithMessagingProperties() => new EventDataConverterTester<MicrosoftServiceBusMessageConverter, MicrosoftServiceBus.Message>().EndToEnd(new MicrosoftServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.UserProperties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.UserProperties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndValueWithMessagingProperties() => new EventDataConverterTester<MicrosoftServiceBusMessageConverter, MicrosoftServiceBus.Message>().EndToEndValue(new MicrosoftServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = true },
-            ce => Assert.AreEqual("Test.Subject", ce.UserProperties[EventMetadata.SubjectPropertyName]));
+            ce => Assert.AreEqual("Test.Subject", ce.UserProperties[EventMetadata.SubjectAttributeName]));
 
         [Test]
         public Task EndToEndWithoutMessagingProperties() => new EventDataConverterTester<MicrosoftServiceBusMessageConverter, MicrosoftServiceBus.Message>().EndToEnd(new MicrosoftServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.UserProperties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.UserProperties.ContainsKey(EventMetadata.SubjectAttributeName)));
 
         [Test]
         public Task EndToEndValueWithoutMessagingProperties() => new EventDataConverterTester<MicrosoftServiceBusMessageConverter, MicrosoftServiceBus.Message>().EndToEndValue(new MicrosoftServiceBusMessageConverter() { UseMessagingPropertiesForMetadata = false },
-            ce => Assert.False(ce.UserProperties.ContainsKey(EventMetadata.SubjectPropertyName)));
+            ce => Assert.False(ce.UserProperties.ContainsKey(EventMetadata.SubjectAttributeName)));
     }
 
     public class EventDataConverterTester<T, CT> where T : IEventDataConverter<CT> where CT : class

@@ -12,67 +12,67 @@ namespace Beef.Events
     [JsonObject(MemberSerialization.OptIn)]
     public class EventMetadata : IETag
     {
-        #region PropertyNames
+        #region AttributeNames
 
         /// <summary>
-        /// Gets or sets the <b>EventId</b> property name.
+        /// Gets or sets the <b>EventId</b> attribute name.
         /// </summary>
-        public static string EventIdPropertyName { get; set; } = "Beef.EventId";
+        public static string EventIdAttributeName { get; set; } = "Beef.EventId";
 
         /// <summary>
-        /// Gets or sets the <b>Subject</b> property name.
+        /// Gets or sets the <b>Subject</b> attribute name.
         /// </summary>
-        public static string SubjectPropertyName { get; set; } = "Beef.Subject";
+        public static string SubjectAttributeName { get; set; } = "Beef.Subject";
 
         /// <summary>
-        /// Gets or sets the <b>Action</b> property name.
+        /// Gets or sets the <b>Action</b> attribute name.
         /// </summary>
-        public static string ActionPropertyName { get; set; } = "Beef.Action";
+        public static string ActionAttributeName { get; set; } = "Beef.Action";
 
         /// <summary>
-        /// Gets or sets the <b>Source</b> property name.
+        /// Gets or sets the <b>Source</b> attribute name.
         /// </summary>
-        public static string SourcePropertyName { get; set; } = "Beef.Source";
+        public static string SourceAttributeName { get; set; } = "Beef.Source";
 
         /// <summary>
-        /// Gets or sets the <b>TenantId</b> property name.
+        /// Gets or sets the <b>TenantId</b> attribute name.
         /// </summary>
-        public static string TenantIdPropertyName { get; set; } = "Beef.TenantId";
+        public static string TenantIdAttributeName { get; set; } = "Beef.TenantId";
 
         /// <summary>
-        /// Gets or sets the <b>Key</b> property name.
+        /// Gets or sets the <b>Key</b> attribute name.
         /// </summary>
         public static string KeyPropertyName { get; set; } = "Beef.Key";
 
         /// <summary>
-        /// Gets or sets the <b>ETag</b> property name.
+        /// Gets or sets the <b>ETag</b> attribute name.
         /// </summary>
-        public static string ETagPropertyName { get; set; } = "Beef.ETag";
+        public static string ETagAttributeName { get; set; } = "Beef.ETag";
 
         /// <summary>
-        /// Gets or sets the <b>TenantId</b> property name.
+        /// Gets or sets the <b>TenantId</b> attribute name.
         /// </summary>
-        public static string UsernamePropertyName { get; set; } = "Beef.Username";
+        public static string UsernameAttributeName { get; set; } = "Beef.Username";
 
         /// <summary>
-        /// Gets or sets the <b>TenantId</b> property name.
+        /// Gets or sets the <b>TenantId</b> attribute name.
         /// </summary>
-        public static string UserIdPropertyName { get; set; } = "Beef.UserId";
+        public static string UserIdAttributeName { get; set; } = "Beef.UserId";
 
         /// <summary>
-        /// Gets or sets the <b>TenantId</b> property name.
+        /// Gets or sets the <b>TenantId</b> attribute name.
         /// </summary>
-        public static string TimestampPropertyName { get; set; } = "Beef.Timestamp";
+        public static string TimestampAttributeName { get; set; } = "Beef.Timestamp";
 
         /// <summary>
-        /// Gets or sets the <b>CorrelationId</b> property name.
+        /// Gets or sets the <b>CorrelationId</b> attribute name.
         /// </summary>
-        public static string CorrelationIdPropertyName { get; set; } = "Beef.CorrelationId";
+        public static string CorrelationIdAttributeName { get; set; } = "Beef.CorrelationId";
 
         /// <summary>
-        /// Gets or sets the <b>PartitionKey</b> property name.
+        /// Gets or sets the <b>PartitionKey</b> attribute name.
         /// </summary>
-        public static string PartitionKeyPropertyName { get; set; } = "Beef.PartitionKey";
+        public static string PartitionKeyAttributeName { get; set; } = "Beef.PartitionKey";
 
         #endregion
 
@@ -175,6 +175,26 @@ namespace Beef.Events
         /// </summary>
         /// <returns>The <see cref="Guid"/> where valid; otherwise, <c>null</c>.</returns>
         public string? KeyAsString => Key == null ? null : (Key is string s ? s : (string)Key);
+
+        /// <summary>
+        /// Creates (clones) a new instance copying the existing values.
+        /// </summary>
+        /// <returns></returns>
+        public EventMetadata CopyMetadata() => new EventMetadata
+        {
+            EventId = EventId,
+            TenantId = TenantId,
+            Subject = Subject,
+            Action = Action,
+            Source = Source,
+            Key = Key,
+            ETag = ETag,
+            Username = Username,
+            UserId = UserId,
+            Timestamp = Timestamp,
+            CorrelationId = CorrelationId,
+            PartitionKey = PartitionKey
+        };
     }
 
     /// <summary>

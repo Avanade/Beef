@@ -53,16 +53,19 @@ namespace Beef.Events.ServiceBus
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="clientOptions">The optional <see cref="ServiceBusClientOptions"/>.</param>
+        /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="ServiceBusSender"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, string connectionString, ServiceBusClientOptions? clientOptions = null)
+        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, string connectionString, ServiceBusClientOptions? clientOptions = null, Action<ServiceBusSender>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddScoped<IEventPublisher>(_ =>
             {
-                var sbc =  new ServiceBusClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
-                return new ServiceBusSender(sbc);
+                var sbc = new ServiceBusClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
+                var sbs = new ServiceBusSender(sbc);
+                additional?.Invoke(sbs);
+                return sbs;
             });
         }
 
@@ -73,8 +76,9 @@ namespace Beef.Events.ServiceBus
         /// <param name="connectionString">The connection string.</param>
         /// <param name="queueName">The queue name.</param>
         /// <param name="clientOptions">The optional <see cref="ServiceBusClientOptions"/>.</param>
+        /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="ServiceBusSender"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, string connectionString, string queueName, ServiceBusClientOptions? clientOptions = null)
+        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, string connectionString, string queueName, ServiceBusClientOptions? clientOptions = null, Action<ServiceBusSender>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -82,7 +86,9 @@ namespace Beef.Events.ServiceBus
             return services.AddScoped<IEventPublisher>(_ =>
             {
                 var sbc = new ServiceBusClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
-                return new ServiceBusSender(sbc, queueName);
+                var sbs = new ServiceBusSender(sbc, queueName);
+                additional?.Invoke(sbs);
+                return sbs;
             });
         }
     }
