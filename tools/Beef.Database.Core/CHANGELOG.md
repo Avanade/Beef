@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.1.5
 - *Enhancement:* Added additional statistics information to console output.
+- *Enhancement:* Will strip out `bin/debug` and `bin/release` folders from default directory path to find the output directory; meaning the path does not need to be explicity set when running/debugging from Visual Studio.
 
 ## v4.1.4
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.

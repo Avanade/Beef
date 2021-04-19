@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Provides the base capabilities for the Change Data Capture (CDC) background services.
+    /// Provides the base (non-generics) capabilities for the Change Data Capture (CDC) <see cref="IHostedService"/> services.
     /// </summary>
-    public abstract class CdcBackgroundService : IDisposable
+    public abstract class CdcHostedService : IDisposable
     {
         private string? _name;
         private int? _intervalSeconds;
@@ -41,12 +41,12 @@ namespace Beef.Data.Database.Cdc
         public static int DefaultIntervalSeconds { get; set; } = 60;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
+        /// Initializes a new instance of the <see cref="CdcHostedService"/> class.
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger logger)
+        public CdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger logger)
         {
             ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             Config = config ?? throw new ArgumentNullException(nameof(config));
@@ -122,16 +122,16 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="CdcHostedService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing) { }
     }
 
     /// <summary>
-    /// Represents the base class for Change Data Capture (CDC) background services.
+    /// Represents the base class for Change Data Capture (CDC) <see cref="IHostedService"/> services.
     /// </summary>
-    public abstract class CdcBackgroundService<TCdcDataOrchestrator> : CdcBackgroundService, IHostedService where TCdcDataOrchestrator : ICdcDataOrchestrator
+    public abstract class CdcHostedService<TCdcDataOrchestrator> : CdcHostedService, IHostedService where TCdcDataOrchestrator : ICdcDataOrchestrator
     {
         private static readonly Random _random = new Random();
 
@@ -141,12 +141,12 @@ namespace Beef.Data.Database.Cdc
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
+        /// Initializes a new instance of the <see cref="CdcHostedService"/> class.
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger logger) : base(serviceProvider, config, logger) { }
+        public CdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger logger) : base(serviceProvider, config, logger) { }
 
         /// <summary>
         /// Triggered when the application host is ready to start the service.
@@ -156,7 +156,7 @@ namespace Beef.Data.Database.Cdc
         /// <remarks>The underlying timer start is randomized between zero and one thousand milliseconds; this will minimize multiple services within the host all starting at once.</remarks>
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            Logger.LogInformation($"{ServiceName} service started.");
+            Logger.LogInformation($"{ServiceName} service started. Execution interval {IntervalTimespan}.");
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _timer = new Timer(Execute, null, TimeSpan.FromMilliseconds(_random.Next(0, 1000)), IntervalTimespan);
             return Task.CompletedTask;
@@ -169,12 +169,12 @@ namespace Beef.Data.Database.Cdc
         {
             // Stop the timer as no more work should be initiated until after complete.
             _timer!.Change(Timeout.Infinite, Timeout.Infinite);
-            Logger.LogInformation($"{ServiceName} execution triggered by timer.");
+            Logger.LogTrace($"{ServiceName} execution triggered by timer.");
 
             _executeTask = Task.Run(async () => await ScopedExecuteAsync(_cts!.Token).ConfigureAwait(false));
             _executeTask.Wait();
 
-            Logger.LogInformation($"{ServiceName} execution completed. Retry in {IntervalTimespan}.");
+            Logger.LogTrace($"{ServiceName} execution completed. Retry in {IntervalTimespan}.");
             _timer?.Change(IntervalTimespan, IntervalTimespan);
         }
 
@@ -213,7 +213,7 @@ namespace Beef.Data.Database.Cdc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>. Defaults to <see cref="CancellationToken.None"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
         /// <remarks>This method is provided where a single invocation is required versus executing as a background service using the <see cref="IHostedService"/> capabilties. Note that the
-        /// <see cref="CdcBackgroundService.IntervalSeconds"/> is not used when running directly via this method.</remarks>
+        /// <see cref="CdcHostedService.IntervalSeconds"/> is not used when running directly via this method.</remarks>
         public async Task<CdcDataOrchestratorResult> RunAsync(CancellationToken? cancellationToken = null)
         {
             // Set up the execution context.
@@ -240,7 +240,7 @@ namespace Beef.Data.Database.Cdc
             if (cwdl.HasValue)
                 cdo.ContinueWithDataLoss = cwdl.Value;
 
-            // Keep executing until unsucessful or reached end of CDC data.
+            // Keep executing until unsuccessful or reached end of CDC data.
             while (true)
             {
                 var result = await cdo.ExecuteAsync(cancellationToken).ConfigureAwait(false);
@@ -276,7 +276,7 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="CdcHostedService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)

@@ -192,15 +192,39 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("cdcExcludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
+        [PropertyCollectionSchema("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
         public List<string>? CdcExcludeColumnsFromETag { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI root for the event source by prepending to all event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The URI root for the event source by prepending to all event source URIs.",
+            Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
+        public string? EventSourceRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI kind for the event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+            Description = "Defaults to `None` (being the event source is not updated).")]
+        public string? EventSourceKind { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Source when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSourceFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The root for the event name by prepending to all event subject names.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).", IsImportant = true)]
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).", IsImportant = true)]
         public string? EventSubjectRoot { get; set; }
 
         /// <summary>
@@ -215,8 +239,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "UpperCase", "PastTense", "PastTenseUpperCase" }, IsImportant = true,
-            Description = "Defaults to `None` (no formatting required).")]
+        [PropertySchema("CDC", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+            Description = "Defaults to `None` (no formatting required, i.e. as-is).")]
         public string? EventActionFormat { get; set; }
 
         /// <summary>
@@ -486,6 +510,8 @@ namespace Beef.CodeGen.Config.Database
             CdcIdentifierMappingTableName = DefaultWhereNull(CdcIdentifierMappingTableName, () => "CdcIdentifierMapping");
             CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
             HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
+            EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
+            EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");

@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -156,6 +156,14 @@ operations: [
         public string? DataEntityMapper { get; set; }
 
         /// <summary>
+        /// Indicates whether the `Data` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("dataExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "Indicates whether the `Data` extensions logic should be generated.",
+            Description = "Defaults to `Entity.DataExtensions`.")]
+        public bool? DataExtensions { get; set; }
+
+        /// <summary>
         /// Gets or sets the database stored procedure name.
         /// </summary>
         [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -206,6 +214,14 @@ operations: [
         public bool? ManagerTransaction { get; set; }
 
         /// <summary>
+        /// Indicates whether the `Manager` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("managerExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "Indicates whether the `Manager` extensions logic should be generated.",
+            Description = "Defaults to `Entity.ManagerExtensions`.")]
+        public bool? ManagerExtensions { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the .NET Type that will perform the validation.
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -248,12 +264,29 @@ operations: [
         public bool? DataSvcTransaction { get; set; }
 
         /// <summary>
+        /// Indicates whether the `DataSvc` extensions logic should be generated.
+        /// </summary>
+        [JsonProperty("dataSvcExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
+            Description = "Defaults to `Entity.ManagerExtensions`.")]
+        public bool? DataSvcExtensions { get; set; }
+
+        /// <summary>
         /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
             Description = "Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
         public bool? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The Event Source.",
+            Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+        public string? EventSource { get; set; }
 
         /// <summary>
         /// Gets or sets the event subject template and corresponding event action pair (separated by a colon).
@@ -503,9 +536,35 @@ operations: [
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
 
         /// <summary>
+        /// The operation event properties.
+        /// </summary>
+        public class OperationEvent
+        {
+            /// <summary>
+            /// Gets or sets the event subject.
+            /// </summary>
+            public string? Subject { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event action.
+            /// </summary>
+            public string? Action { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event source.
+            /// </summary>
+            public string? Source { get; set; }
+
+            /// <summary>
+            /// Gets or sets the event value (if any).
+            /// </summary>
+            public string? Value { get; set; }
+        }
+
+        /// <summary>
         /// Gets the list of events derived from the <see cref="EventSubject"/>.
         /// </summary>
-        public List<EventData> Events { get; } = new List<EventData>();
+        public List<OperationEvent> Events { get; } = new List<OperationEvent>();
 
         /// <summary>
         /// Gets the formatted summary text.
@@ -603,6 +662,16 @@ operations: [
         public string? GrpcReturnMapper { get; set; }
 
         /// <summary>
+        /// Gets the event source URI.
+        /// </summary>
+        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+
+        /// <summary>
+        /// Gets the event format key code.
+        /// </summary>
+        public string? EventFormatKey { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -691,6 +760,8 @@ operations: [
             if (Type == "Custom")
                 AutoImplement = "None";
 
+            ManagerExtensions = DefaultWhereNull(ManagerExtensions, () => Parent!.ManagerExtensions);
+            DataExtensions = DefaultWhereNull(DataExtensions, () => Parent!.DataExtensions);
             DataEntityMapperCreate = string.IsNullOrEmpty(DataEntityMapper);
             DataEntityMapper = DefaultWhereNull(DataEntityMapper, () => AutoImplement switch
             {
@@ -738,29 +809,27 @@ operations: [
                 _ => "Unspecified"
             });
 
+            EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
             EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
-            EventSubject = DefaultWhereNull(EventSubject, () =>
-            {
-                var key = Parent!.EventSubjectFormat == "NameOnly" ? null : Type switch
-                {
-                    "Create" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
-                    "Update" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}")),
-                    "Delete" => string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}")),
-                    _ => null
-                };
 
-                return Type switch
-                {
-                    "Create" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    "Update" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    "Delete" => $"{Root!.AppName}.{Parent!.Name}{(key == null ? "" : "." + key)}:{ConvertEventAction(ManagerOperationType!)}",
-                    _ => null
-                };
+            EventFormatKey = Type switch
+            {
+                "Create" => "{_evtPub.FormatKey(__result)}",
+                "Update" => "{_evtPub.FormatKey(__result)}",
+                "Delete" => $"{{_evtPub.FormatKey({string.Join(", ", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{x.ArgumentName}"))})}}",
+                _ => null
+            };
+
+            EventSubject = DefaultWhereNull(EventSubject, () => Type switch
+            {
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                _ => null
             });
 
-            PrepareEvents();
-
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
+            DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -775,6 +844,7 @@ operations: [
                 ExcludeIData = ExcludeData = ExcludeIDataSvc = ExcludeDataSvc = ExcludeIManager = ExcludeManager = YesOption;
 
             PrepareParameters();
+            PrepareEvents();
 
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
             {
@@ -823,9 +893,7 @@ operations: [
         /// </summary>
         private string ConvertEventAction(string action) => Root!.EventActionFormat switch
         {
-            "UpperCase" => action.ToUpperInvariant(),
             "PastTense" => StringConversion.ToPastTense(action)!,
-            "PastTenseUpperCase" => StringConversion.ToPastTense(action)!.ToUpperInvariant(),
             _ => action
         };
 
@@ -869,7 +937,7 @@ operations: [
 
             foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))
             {
-                var ed = new EventData();
+                var ed = new OperationEvent();
                 var parts = @event.Split(":");
                 if (parts.Length > 0)
                     ed.Subject = parts[0];
@@ -881,6 +949,28 @@ operations: [
 
                 if (Root!.EventSubjectRoot != null)
                     ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
+
+                if (Root!.EventSourceKind != "None")
+                    ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);
+
+                if (HasReturnValue)
+                    ed.Value = "__result";
+                else if (Type == "Delete" && UniqueKey == true)
+                {
+                    var sb = new StringBuilder();
+                    foreach (var dp in DataParameters)
+                    {
+                        if (sb.Length == 0)
+                            sb.Append($"new {Parent!.Name} {{ ");
+                        else
+                            sb.Append(", ");
+
+                        sb.Append($"{dp.Name} = {dp.ArgumentName}");
+                    }
+
+                    sb.Append(" }");
+                    ed.Value = sb.ToString();
+                }
 
                 Events.Add(ed);
             }

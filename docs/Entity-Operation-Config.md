@@ -114,7 +114,9 @@ Property | Description
 -|-
 **`dataSvcCustom`** | Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `dataSvcTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
+`dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.
 `eventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
+`eventSource` | The Event Source. Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.
 `eventSubject` | The event subject template and corresponding event action pair (separated by a colon). The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
 <br/>
@@ -126,9 +128,11 @@ Property | Description
 -|-
 **`autoImplement`** | The operation override for the `Entity.AutoImplement`. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.
 `dataEntityMapper` | The override for the data entity `Mapper`. Used where the default generated `Mapper` is not applicable.
+`dataExtensions` | Indicates whether the `Data` extensions logic should be generated. Defaults to `Entity.DataExtensions`.
 `databaseStoredProc` | The database stored procedure name used where `Operation.AutoImplement` is `Database`. Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.
 `cosmosContainerId` | The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosContainerId`.
 `cosmosPartitionKey` | The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosPartitionKey`.
+`managerExtensions` | Indicates whether the `Manager` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.
 
 <br/>
 

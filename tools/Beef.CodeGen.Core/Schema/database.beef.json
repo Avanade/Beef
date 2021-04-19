@@ -96,10 +96,46 @@
       "title": "The table name for the `Cdc`-IdentifierMapping.",
       "description": "Defaults to `spCreateCdcIdentifierMapping` (literal)."
     },
+    "cdcExcludeColumnsFromETag": {
+      "type": "array",
+      "title": "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)",
+      "items": [
+        {
+          "type": "string",
+          "uniqueItems": true
+        }
+      ]
+    },
+    "eventSourceRoot": {
+      "type": "string",
+      "title": "The URI root for the event source by prepending to all event source URIs.",
+      "description": "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s)."
+    },
+    "eventSourceKind": {
+      "type": "string",
+      "title": "The URI kind for the event source URIs.",
+      "description": "Defaults to `None` (being the event source is not updated).",
+      "enum": [
+        "None",
+        "Absolute",
+        "Relative",
+        "RelativeOrAbsolute"
+      ]
+    },
+    "eventSourceFormat": {
+      "type": "string",
+      "title": "The default formatting for the Source when an Event is published.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey",
+        "NameAndGlobalId"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
-      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s)."
     },
     "eventSubjectFormat": {
       "type": "string",
@@ -113,12 +149,10 @@
     "eventActionFormat": {
       "type": "string",
       "title": "The formatting for the Action when an Event is published.",
-      "description": "Defaults to `None` (no formatting required).",
+      "description": "Defaults to `None` (no formatting required, i.e. as-is).",
       "enum": [
         "None",
-        "UpperCase",
-        "PastTense",
-        "PastTenseUpperCase"
+        "PastTense"
       ]
     },
     "jsonSerializer": {
@@ -1037,6 +1071,21 @@
               "title": "The .NET database interface name.",
               "description": "Defaults to `IDatabase`."
             },
+            "eventSource": {
+              "type": "string",
+              "title": "The Event Source.",
+              "description": "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified."
+            },
+            "eventSourceFormat": {
+              "type": "string",
+              "title": "The default formatting for the Source when an Event is published.",
+              "description": "Defaults to `CodeGeneration.EventSourceFormat`.",
+              "enum": [
+                "NameOnly",
+                "NameAndKey",
+                "NameAndGlobalId"
+              ]
+            },
             "eventSubject": {
               "type": "string",
               "title": "The Event Subject.",
@@ -1062,12 +1111,23 @@
                 }
               ]
             },
-            "excludeBackgroundService": {
+            "excludeHostedService": {
               "type": "string",
-              "title": "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).",
+              "title": "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).",
               "enum": [
                 "No",
                 "Yes"
+              ]
+            },
+            "excludeColumnsFromETag": {
+              "type": "array",
+              "title": "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+              "description": "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
               ]
             },
             "identifierMapping": {
@@ -1200,6 +1260,17 @@
                       "type": "array",
                       "title": "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
                       "description": "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumnsFromETag": {
+                      "type": "array",
+                      "title": "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+                      "description": "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.",
                       "items": [
                         {
                           "type": "string",

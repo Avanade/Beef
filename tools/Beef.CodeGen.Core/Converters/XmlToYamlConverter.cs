@@ -226,15 +226,6 @@ namespace Beef.CodeGen.Converters
                 if (needsComma)
                     args.Writer.Write(", ");
 
-                if (!(val.StartsWith("[", StringComparison.OrdinalIgnoreCase) && val.EndsWith("]", StringComparison.OrdinalIgnoreCase)))
-                {
-                    if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
-                        val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
-
-                    if (string.Compare(val, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
-                        val = $"'{val}'";
-                }
-
                 args.HasAttributes = true;
                 args.Writer.Write($"{jname}: {val}");
 

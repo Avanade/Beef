@@ -170,7 +170,7 @@ namespace {{Root.NamespaceCdc}}.Entities
         public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
         {
   {{#if IdentifierMapping}}
-            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{Name}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+            coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{Name}}", Key = this.CreateIdentifierMappingKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
   {{/if}}
   {{#each SelectedEntityColumns}}
     {{#ifval IdentifierMappingParent}}
@@ -316,7 +316,7 @@ namespace {{Root.NamespaceCdc}}.Entities
             public async Task LinkIdentifierMappingsAsync(CdcValueIdentifierMappingCollection coll, IStringIdentifierGenerator idGen)
             {
     {{#if IdentifierMapping}}
-                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{TableName}}", Key = this.CreateFormattedKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
+                coll.AddAsync(GlobalId == default, async () => new CdcValueIdentifierMapping { Value = this, Property = nameof(GlobalId), Schema = "{{Schema}}", Table = "{{TableName}}", Key = this.CreateIdentifierMappingKey(), GlobalId = await idGen.GenerateIdentifierAsync<{{ModelName}}Cdc>().ConfigureAwait(false) });
     {{/if}}
     {{#each Columns}}
       {{#ifval IdentifierMappingParent}}

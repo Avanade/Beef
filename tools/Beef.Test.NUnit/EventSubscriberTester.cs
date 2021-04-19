@@ -106,8 +106,8 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
-        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventMetadata.Subject"/> and optionally define
+        /// <see cref="EventMetadata.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
@@ -314,7 +314,7 @@ namespace Beef.Test.NUnit
             {
                 foreach (var e in events)
                 {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
                 }
             }
 
@@ -327,7 +327,7 @@ namespace Beef.Test.NUnit
             {
                 foreach (var e in events)
                 {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject ?? "<null>"}, Action: {e.Action ?? "<null>"}, Source: {e.Source?.ToString() ?? "<null>"}");
                 }
             }
 

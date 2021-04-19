@@ -47,10 +47,5 @@ namespace Beef.Events.EventHubs
         /// Gets or sets the Event Hubs partition identifier.
         /// </summary>
         public string PartitionId { get; }
-
-        /// <summary>
-        /// Gets the <see cref="EventMetadata"/> metadata.
-        /// </summary>
-        protected override EventMetadata GetEventMetadata() => Originating.GetEventMetadata();
     }
 }

@@ -754,6 +754,11 @@
                       <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="ExcludeColumnsFromETag" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking). Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="IdentifierMapping" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key. This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).</xs:documentation>
@@ -844,6 +849,23 @@
                 <xs:documentation>The .NET database interface name. Defaults to `IDatabase`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="EventSource" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The Event Source. Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EventSourceFormat" use="optional">
+              <xs:annotation>
+                <xs:documentation>The default formatting for the Source when an Event is published. Defaults to `CodeGeneration.EventSourceFormat`.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="NameOnly" />
+                  <xs:enumeration value="NameAndKey" />
+                  <xs:enumeration value="NameAndGlobalId" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
             <xs:attribute name="EventSubject" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
@@ -865,9 +887,9 @@
                 <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="ExcludeBackgroundService" use="optional">
+            <xs:attribute name="ExcludeHostedService" use="optional">
               <xs:annotation>
-                <xs:documentation>The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).</xs:documentation>
+                <xs:documentation>The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">
@@ -875,6 +897,11 @@
                   <xs:enumeration value="Yes" />
                 </xs:restriction>
               </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ExcludeColumnsFromETag" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking). Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.</xs:documentation>
+              </xs:annotation>
             </xs:attribute>
             <xs:attribute name="IdentifierMapping" use="optional" type="xs:boolean">
               <xs:annotation>
@@ -994,9 +1021,44 @@
           <xs:documentation>The table name for the `Cdc`-IdentifierMapping. Defaults to `spCreateCdcIdentifierMapping` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="CdcExcludeColumnsFromETag" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSourceRoot" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSourceKind" use="optional">
+        <xs:annotation>
+          <xs:documentation>The URI kind for the event source URIs. Defaults to `None` (being the event source is not updated).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Absolute" />
+            <xs:enumeration value="Relative" />
+            <xs:enumeration value="RelativeOrAbsolute" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventSourceFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default formatting for the Source when an Event is published. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NameOnly" />
+            <xs:enumeration value="NameAndKey" />
+            <xs:enumeration value="NameAndGlobalId" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="EventSubjectFormat" use="optional">
@@ -1012,14 +1074,12 @@
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">
         <xs:annotation>
-          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required).</xs:documentation>
+          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required, i.e. as-is).</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
-            <xs:enumeration value="UpperCase" />
             <xs:enumeration value="PastTense" />
-            <xs:enumeration value="PastTenseUpperCase" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

@@ -275,6 +275,22 @@ entities:
         public bool? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the URI root for the event source by prepending to all event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The URI root for the event source by prepending to all event source URIs.",
+            Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
+        public string? EventSourceRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI kind for the event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+            Description = "Defaults to `None` (being the event source is not updated).")]
+        public string? EventSourceKind { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event Subject name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -291,11 +307,19 @@ entities:
         public string? EventSubjectFormat { get; set; }
 
         /// <summary>
+        /// Gets or sets the subject path separator.
+        /// </summary>
+        [JsonProperty("eventSubjectSeparator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The subject path separator.",
+            Description = "Defaults to `.`. Used only where the subject is automatically inferred.")]
+        public string? EventSubjectSeparator { get; set; }
+
+        /// <summary>
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "UpperCase", "PastTense", "PastTenseUpperCase" }, IsImportant = true,
-            Description = "Defaults to `None` (no formatting required)`.")]
+        [PropertySchema("DataSvc", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+            Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
 
         /// <summary>
@@ -559,7 +583,9 @@ entities:
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
             RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
+            EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
+            EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
             EventPublish = DefaultWhereNull(EventPublish, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");

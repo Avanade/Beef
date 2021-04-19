@@ -9,7 +9,7 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the Database Change Data Capture (CDC) <c>BackgroundService</c> generator.
     /// </summary>
-    public class DatabaseCdcBackgroundServiceCodeGenerator : CodeGeneratorBase<CodeGenConfig, CdcConfig>
+    public class DatabaseCdcHostedServiceCodeGenerator : CodeGeneratorBase<CodeGenConfig, CdcConfig>
     {
         /// <summary>
         /// <inheritdoc/>
@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CdcConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Cdc!.Where(x => IsNoOption(x.ExcludeBackgroundService));
+            => Check.NotNull(config, nameof(config)).Cdc!.Where(x => IsNoOption(x.ExcludeHostedService));
     }
 }

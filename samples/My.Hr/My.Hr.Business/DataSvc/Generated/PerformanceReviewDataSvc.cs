@@ -54,8 +54,7 @@ namespace My.Hr.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
-                return __result;
+                return _cache.SetAndReturnValue(__key, __result);
             });
         }
 
@@ -84,9 +83,8 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Created").SendAsync().ConfigureAwait(false);
-                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
-                return __result;
+                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(__result)}", "Created").SendAsync().ConfigureAwait(false);
+                return _cache.SetAndReturnValue(__result);
             });
         }
 
@@ -100,9 +98,8 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{__result.Id}", "Updated").SendAsync().ConfigureAwait(false);
-                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
-                return __result;
+                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(__result)}", "Updated").SendAsync().ConfigureAwait(false);
+                return _cache.SetAndReturnValue(__result);
             });
         }
 
@@ -115,7 +112,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish($"My.Hr.PerformanceReview.{id}", "Deleted", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new PerformanceReview { Id = id }, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(id)}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<PerformanceReview>(new UniqueKey(id));
             });
         }

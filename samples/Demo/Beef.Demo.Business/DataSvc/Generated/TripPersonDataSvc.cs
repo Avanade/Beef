@@ -54,8 +54,7 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
-                return __result;
+                return _cache.SetAndReturnValue(__key, __result);
             });
         }
 
@@ -69,9 +68,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"Demo.TripPerson.{__result.Id}", "Create").SendAsync().ConfigureAwait(false);
-                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
-                return __result;
+                await _evtPub.PublishValue(__result, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
+                return _cache.SetAndReturnValue(__result);
             });
         }
 
@@ -85,9 +83,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"Demo.TripPerson.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
-                return __result;
+                await _evtPub.PublishValue(__result, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                return _cache.SetAndReturnValue(__result);
             });
         }
 
@@ -100,7 +97,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish($"Demo.TripPerson.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new TripPerson { Id = id }, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<TripPerson>(new UniqueKey(id));
             });
         }

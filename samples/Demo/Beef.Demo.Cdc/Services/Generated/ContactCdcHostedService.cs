@@ -15,17 +15,17 @@ using Beef.Demo.Cdc.Data;
 namespace Beef.Demo.Cdc.Services
 {
     /// <summary>
-    /// Provides the CDC background service for database object 'Legacy.Posts'.
+    /// Provides the <see cref="CdcHostedService"/> capabilities for database object 'Legacy.Contact'.
     /// </summary>
-    public partial class PostsCdcBackgroundService : CdcBackgroundService<IPostsCdcData>
+    public partial class ContactCdcHostedService : CdcHostedService<IContactCdcData>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PostsCdcBackgroundService"/> class.
+        /// Initializes a new instance of the <see cref="ContactCdcHostedService"/> class.
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public PostsCdcBackgroundService(IServiceProvider serviceProvider, IConfiguration config, ILogger<PostsCdcBackgroundService> logger) : base(serviceProvider, config, logger) { }
+        public ContactCdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger<ContactCdcHostedService> logger) : base(serviceProvider, config, logger) { }
     }
 }
 

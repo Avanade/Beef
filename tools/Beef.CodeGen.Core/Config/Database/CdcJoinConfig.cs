@@ -171,7 +171,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
             Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
         public List<string>? ExcludeColumnsFromETag { get; set; }
 

@@ -103,20 +103,32 @@ namespace {{Root.NamespaceCdc}}.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="Beef.Events.EventData.Subject"/> format.
-        /// </summary>
-        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.{{EventSubjectFormat}};
-
-        /// <summary>
         /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
         protected override string EventSubject => "{{#ifval Root.EventSubjectRoot}}{{Root.EventSubjectRoot}}.{{/ifval}}{{EventSubject}}";
 
         /// <summary>
-        /// Gets the <see cref="Events.EventActionFormat"/>.
+        /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
+        /// </summary>
+        protected override EventSubjectFormat EventSubjectFormat => EventSubjectFormat.{{EventSubjectFormat}};
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Action"/> <see cref="Cdc.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
+{{#ifne Root.EventSourceKind 'None'}}
+        /// <summary>
+        /// Gets the <see cref="EventData.Source"/>.
+        /// </summary>
+        protected override Uri? EventSource => new Uri("{{EventSourceUri}}", UriKind.{{Root.EventSourceKind}});
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Source"/> <see cref="Cdc.EventSourceFormat"/>.
+        /// </summary>
+        protected override EventSourceFormat EventSourceFormat { get; } = EventSourceFormat.{{EventSourceFormat}};
+
+{{/ifne}}
 {{#ifne ExcludePropertiesFromETag.Count 0}}
         /// <summary>
         /// Gets the list of property names that should be excluded from the serialized JSON <see cref="IETag"/> generation.

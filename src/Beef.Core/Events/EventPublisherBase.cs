@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Entities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,12 +14,12 @@ namespace Beef.Events
     /// <remarks>The key reason for queuing the published events it to promote a single atomic send operation; i.e. all events should be sent together, and either succeed or fail together.</remarks>
     public abstract class EventPublisherBase : IEventPublisher
     {
-        private readonly Lazy<ConcurrentQueue<EventData>> _queue = new Lazy<ConcurrentQueue<EventData>>();
+        private readonly Lazy<ConcurrentQueue<EventData>> _queue = new();
 
         /// <summary>
-        /// Gets or sets the prefix for an <see cref="EventData.Subject"/> when creating an <see cref="EventData"/> or <see cref="EventData{T}"/>. <i>Note:</i> the <see cref="PathSeparator"/> will automatically be applied.
+        /// Gets or sets the default source <see cref="Uri"/> to be used where not otherwise specified.
         /// </summary>
-        public string? EventSubjectPrefix { get; set; }
+        public Uri? DefaultSource { get; set; }
 
         /// <summary>
         /// Gets or sets the path seperator <see cref="string"/>.
@@ -31,6 +30,16 @@ namespace Beef.Events
         /// Gets or sets the template wildcard <see cref="string"/>.
         /// </summary>
         public string TemplateWildcard { get; set; } = "*";
+
+        /// <summary>
+        /// Gets or sets the <see cref="EventMetadata.Subject"/> format.
+        /// </summary>
+        public EventStringFormat SubjectFormat { get; set; } = EventStringFormat.None;
+
+        /// <summary>
+        /// Gets or sets the <see cref="EventMetadata.Action"/> format.
+        /// </summary>
+        public EventStringFormat ActionFormat { get; set; } = EventStringFormat.None;
 
         /// <summary>
         /// Gets the published/queued events.
@@ -49,105 +58,34 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Prepends the <see cref="IEventPublisher.EventSubjectPrefix"/> to the <paramref name="subject"/> where specified before creating the <see cref="EventData"/>.
-        /// </summary>
-        protected virtual string PrependPrefix(string subject) => string.IsNullOrEmpty(EventSubjectPrefix) ? subject : EventSubjectPrefix + PathSeparator + subject;
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance with no <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        public EventData CreateEvent(string subject, string? action = null)
-            => EventData.CreateEvent(PrependPrefix(Check.NotEmpty(subject, nameof(subject))), action);
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance with the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        public EventData CreateEvent(string subject, string? action = null, params IComparable?[] key)
-            => EventData.CreateEvent(PrependPrefix(Check.NotEmpty(subject, nameof(subject))), action, key);
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance using the <paramref name="value"/> (infers the <see cref="EventData.Key"/> from either <see cref="IIdentifier"/> or <see cref="IUniqueKey"/>).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        public EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null) where T : class
-            => EventData.CreateValueEvent(value, PrependPrefix(Check.NotEmpty(subject, nameof(subject))), action); 
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance with the specified <paramref name="value"/> <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        public EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null, params IComparable?[] key)
-            => EventData.CreateValueEvent(value, PrependPrefix(Check.NotEmpty(subject, nameof(subject))), action, key);
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance (with no <see cref="EventData.Key"/>).
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public IEventPublisher Publish(string subject, string? action = null) => Publish(new EventData[] { CreateEvent(subject, action) });
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public IEventPublisher Publish(string subject, string? action = null, params IComparable?[] key) => Publish(new EventData[] { CreateEvent(subject, action, key) });
-
-        /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public IEventPublisher PublishValue<T>(T value, string subject, string? action = null) where T : class => Publish(new EventData[] { CreateValueEvent(value, subject, action) });
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public IEventPublisher PublishValue<T>(T value, string subject, string? action = null, params IComparable?[] key) => Publish(new EventData[] { CreateValueEvent(value, subject, action, key) });
-
-        /// <summary>
         /// Publishes (queues) one of more <see cref="EventData"/> objects.
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> objects.</param>
         /// <returns>The <see cref="Task"/>.</returns>
+        /// <remarks>This method will also perform the appropriate <see cref="SubjectFormat"/> and <see cref="ActionFormat"/> on the <paramref name="events"/>.</remarks>
         public virtual IEventPublisher Publish(params EventData[] events)
         {
             Check.IsFalse(events.Any(x => string.IsNullOrEmpty(x.Subject)), nameof(events), "EventData must have a Subject.");
             foreach (var ed in events)
             {
+                ed.Subject = Format(Check.NotEmpty(ed.Subject, nameof(EventData.Subject)), SubjectFormat);
+                ed.Action = Format(ed.Action, ActionFormat);
+                ed.Source ??= DefaultSource;
                 _queue.Value.Enqueue(ed);
             }
 
             return this;
         }
+
+        /// <summary>
+        /// Format the string.
+        /// </summary>
+        private static string? Format(string? text, EventStringFormat? format) => string.IsNullOrEmpty(text) ? text : format switch
+        {
+            EventStringFormat.Uppercase => text.ToUpperInvariant()!,
+            EventStringFormat.Lowercase => text.ToLowerInvariant()!,
+            _ => text
+        };
 
         /// <summary>
         /// Sends all previously (queued) published events.

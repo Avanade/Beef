@@ -14,7 +14,7 @@ namespace Beef.Events
         /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        public EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        public EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args, new EventDataConverter()) { }
 
         /// <summary>
         /// Performs the receive processing for one or more <see cref="EventData"/> instances.
@@ -33,16 +33,8 @@ namespace Beef.Events
 
             foreach (var @event in events)
             {
-                await ReceiveAsync(new EventDataSubscriberData(@event), (_) => @event).ConfigureAwait(false);
+                await ReceiveAsync(new EventDataSubscriberData(@event), (_) => Task.FromResult(@event)).ConfigureAwait(false);
             }
         }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="data">The event/message data.</param>
-        /// <param name="subscriber">The <see cref="IEventSubscriber"/> identified to process.</param>
-        /// <returns><inheritdoc/></returns>
-        protected override EventData GetBeefEventData(EventDataSubscriberData data, IEventSubscriber subscriber) => data.Originating;
     }
 }

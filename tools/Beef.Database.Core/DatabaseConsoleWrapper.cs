@@ -4,6 +4,7 @@ using Beef.CodeGen;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,8 @@ namespace Beef.Database.Core
     {
         private readonly List<Assembly> _assemblies = new List<Assembly>();
         private readonly List<string> _schemaOrder = new List<string>();
-        private string _outDir = "./..";
+        private string _exeDir;
+        private string _outDir;
         private string _script = "Database.xml";
         private DatabaseExecutorCommand _supports = DatabaseExecutorCommand.All;
 
@@ -26,7 +28,7 @@ namespace Beef.Database.Core
         /// Gets the command line template.
         /// </summary>
         public static string CommandLineTemplate { get; set; }
-            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{ConfigFile}} -s {{Script}} -o {{OutDir}} -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c \"{{ConfigFile}}\" -s {{Script}} -o \"{{OutDir}}\" -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets the command line assembly portion template.
@@ -66,6 +68,9 @@ namespace Beef.Database.Core
             }
 
             OverrideConnectionString();
+
+            _exeDir = CodeGenFileManager.GetExeDirectory();
+            _outDir = new DirectoryInfo(_exeDir).Parent.FullName;
         }
 
         /// <summary>
@@ -178,7 +183,7 @@ namespace Beef.Database.Core
                         throw new CommandParsingException(app, $"Command '{cmd.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
 
                     DatabaseConsole.WriteMasthead();
-                    return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName)).ConfigureAwait(false);
+                    return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)).ConfigureAwait(false);
                 }
 
                 var script = so.HasValue() ? so.Value() : _script;
@@ -222,7 +227,7 @@ namespace Beef.Database.Core
         private string ReplaceMoustache(string text, string command, string connectionString, string assembly, string script)
         {
             text = text.Replace("{{Command}}", command, StringComparison.OrdinalIgnoreCase);
-            text = text.Replace("{{ConfigFile}}", CodeGen.CodeGenFileManager.GetConfigFilename(CodeGen.CommandType.Database, Company, AppName), StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{ConfigFile}}", CodeGen.CodeGenFileManager.GetConfigFilename(_exeDir, CodeGen.CommandType.Database, Company, AppName), StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{ConnectionString}}", connectionString, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Assembly}}", assembly, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Company}}", Company, StringComparison.OrdinalIgnoreCase);

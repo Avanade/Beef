@@ -8,7 +8,7 @@ namespace Beef.Events
     public enum RunAsUser
     {
         /// <summary>
-        /// Run as the originating user (see <see cref="EventData.Username"/>) for the message.
+        /// Run as the originating user (see <see cref="EventMetadata.Username"/>) for the message.
         /// </summary>
         Originating,
 

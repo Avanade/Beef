@@ -93,9 +93,12 @@ Provides the _Data Services-layer_ configuration.
 Property | Description
 -|-
 **`eventPublish`** | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
+`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
+`eventSourceKind` | The URI kind for the event source URIs. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`. Defaults to `None` (being the event source is not updated).
 **`eventSubjectRoot`** | The root for the event Subject name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
 `eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
-**`eventActionFormat`** | The formatting for the Action when an Event is published. Valid options are: `None`, `UpperCase`, `PastTense`, `PastTenseUpperCase`. Defaults to `None` (no formatting required)`.
+`eventSubjectSeparator` | The subject path separator. Defaults to `.`. Used only where the subject is automatically inferred.
+**`eventActionFormat`** | The formatting for the Action when an Event is published. Valid options are: `None`, `PastTense`. Defaults to `None` (no formatting required, i.e. as-is)`.
 **`eventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified.
 
 <br/>

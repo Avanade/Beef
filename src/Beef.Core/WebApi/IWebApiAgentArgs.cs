@@ -2,6 +2,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Beef.WebApi
 {
@@ -19,5 +20,10 @@ namespace Beef.WebApi
         /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is invoked.
         /// </summary>
         Action<HttpRequestMessage>? BeforeRequest { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is invoked (asynchronously).
+        /// </summary>
+        Func<HttpRequestMessage, Task>? BeforeRequestAsync { get; }
     }
 }

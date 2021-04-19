@@ -8,6 +8,7 @@
 using Beef.WebApi;
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace My.Hr.Common.Agents
 {
@@ -26,7 +27,8 @@ namespace My.Hr.Common.Agents
         /// </summary>
         /// <param name="httpClient">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The optional <see cref="WebApiAgentArgs.BeforeRequest"/> action.</param>
-        public HrWebApiAgentArgs(HttpClient httpClient, Action<HttpRequestMessage>? beforeRequest = null) : base(httpClient, beforeRequest) { }
+        /// <param name="beforeRequestAsync">The optional <see cref="WebApiAgentArgs.BeforeRequestAsync"/> asynchronous function.</param>
+        public HrWebApiAgentArgs(HttpClient httpClient, Action<HttpRequestMessage>? beforeRequest = null, Func<HttpRequestMessage, Task>? beforeRequestAsync = null) : base(httpClient, beforeRequest, beforeRequestAsync) { }
     }
 }
 

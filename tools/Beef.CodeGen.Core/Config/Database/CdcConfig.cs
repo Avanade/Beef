@@ -160,6 +160,22 @@ namespace Beef.CodeGen.Config.Database
         public string? DatabaseName { get; set; }
 
         /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The Event Source.",
+            Description = "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.")]
+        public string? EventSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Source when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+            Description = "Defaults to `CodeGeneration.EventSourceFormat`.")]
+        public string? EventSourceFormat { get; set; }
+
+        /// <summary>
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -184,17 +200,17 @@ namespace Beef.CodeGen.Config.Database
         public List<string>? IncludeColumnsOnDelete { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>Background Service</c> class (<c>XxxBackgroundService.cs</c>).
+        /// The option to exclude the generation of the <c>CdcHostedService</c> (background) class (<c>XxxHostedService.cs</c>).
         /// </summary>
-        [JsonProperty("excludeBackgroundService", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
-        public string? ExcludeBackgroundService { get; set; }
+        [JsonProperty("excludeHostedService", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeHostedService { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
             Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
         public List<string>? ExcludeColumnsFromETag { get; set; }
 
@@ -389,6 +405,11 @@ namespace Beef.CodeGen.Config.Database
         public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
+        /// Gets the event source URI.
+        /// </summary>
+        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+
+        /// <summary>
         /// Indicates whether there is at least one global identifier being used somewhere.
         /// </summary>
         public bool UsesGlobalIdentifier { get; private set; }
@@ -421,11 +442,13 @@ namespace Beef.CodeGen.Config.Database
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));
+            EventSource = DefaultWhereNull(EventSource, () => ModelName!.ToLowerInvariant());
+            EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => Root!.EventSourceFormat);
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Root!.EventSubjectFormat);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
-            ExcludeBackgroundService = DefaultWhereNull(ExcludeBackgroundService, () => NoOption);
+            ExcludeHostedService = DefaultWhereNull(ExcludeHostedService, () => NoOption);
             if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
                 ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 

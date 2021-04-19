@@ -26,7 +26,13 @@ namespace Beef.Events
         /// Initializes a new instance of the <see cref="EventSubscriberHost{TOriginating, TData, THost}"/> with the specified <see cref="EventSubscriberHostArgs"/>.
         /// </summary>
         /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
-        public EventSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        /// <param name="eventDataConverter">The <see cref="IEventDataConverter{TOriginating}"/>.</param>
+        public EventSubscriberHost(EventSubscriberHostArgs args, IEventDataConverter<TOriginating> eventDataConverter) : base(args) => EventDataConverter = Check.NotNull(eventDataConverter, nameof(eventDataConverter));
+
+        /// <summary>
+        /// Gets the <see cref="IEventDataConverter{TOriginating}"/>.
+        /// </summary>
+        public IEventDataConverter<TOriginating> EventDataConverter { get; }
 
         /// <summary>
         /// Gets or sets the <see cref="InvokerBase{TData, Result}"/>.
@@ -56,6 +62,23 @@ namespace Beef.Events
         }
 
         /// <summary>
+        /// Gets the <see cref="EventMetadata"/> from the <see cref="IEventSubscriberData"/>.
+        /// </summary>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
+        /// <returns>The <see cref="EventMetadata"/>.</returns>
+        protected override async Task<(EventMetadata? Metadata, Exception? Exception)> GetMetadataAsync(IEventSubscriberData data)
+        {
+            try
+            {
+                return (await EventDataConverter.GetMetadataAsync((TOriginating)data.Originating).ConfigureAwait(false), null);
+            }
+            catch (Exception ex)
+            {
+                return (null, ex);
+            }
+        }
+
+        /// <summary>
         /// Receives the message and processes.
         /// </summary>
         /// <param name="data">The event data.</param>
@@ -67,25 +90,19 @@ namespace Beef.Events
             return Invoker.InvokeAsync(this, async () =>
             {
                 // Invoke the base EventSubscriberHost.ReceiveAsync to do the actual work!
-                return await ReceiveAsync(data, (subscriber) =>
+                return await ReceiveAsync(data, async (subscriber) =>
                 {
                     // Convert/get the beef event data.
                     try
                     {
-                        return GetBeefEventData(data, subscriber);
+                        return subscriber.ValueType == null 
+                            ? await EventDataConverter.ConvertFromAsync(data.Originating).ConfigureAwait(false) 
+                            : await EventDataConverter.ConvertFromAsync(subscriber.ValueType, data.Originating).ConfigureAwait(false);
                     }
                     catch (Exception ex) { throw new EventSubscriberUnhandledException(CreateInvalidEventDataResult(ex)); }
                 }).ConfigureAwait(false);
             }, data);
         }
-
-        /// <summary>
-        /// Gets the <see cref="EventData"/> from the <paramref name="data"/>.
-        /// </summary>
-        /// <param name="data">The event/message data.</param>
-        /// <param name="subscriber">The <see cref="IEventSubscriber"/> identified to process.</param>
-        /// <returns>The corresponding <see cref="EventData"/>.</returns>
-        protected abstract EventData GetBeefEventData(TData data, IEventSubscriber subscriber);
     }
 
     /// <summary>
@@ -148,13 +165,20 @@ namespace Beef.Events
         public int? MaxAttempts => Args.MaxAttempts;
 
         /// <summary>
+        /// Gets the <see cref="EventMetadata"/> from the <see cref="IEventSubscriberData"/>.
+        /// </summary>
+        /// <param name="data">The <see cref="IEventSubscriberData"/>.</param>
+        /// <returns>The <see cref="EventMetadata"/>; a <c>null</c> indicates that there was a conversion error.</returns>
+        protected abstract Task<(EventMetadata? Metadata, Exception? Exception)> GetMetadataAsync(IEventSubscriberData data);
+
+        /// <summary>
         /// Receives the message and processes when the <see cref="EventMetadata.Subject"/> and <see cref="EventMetadata.Action"/> has been subscribed.
         /// </summary>
         /// <param name="data">The originating <see cref="IEventSubscriberData"/> (required to enable <see cref="IAuditWriter.WriteAuditAsync(IEventSubscriberData, Result)"/>).</param>
         /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
         /// <returns>The <see cref="Result"/>.</returns>
         /// <remarks>This method also manages the Dependency Injection (DI) scope for each event execution (see <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)"/>).</remarks>
-        protected async Task<Result> ReceiveAsync(IEventSubscriberData data, Func<IEventSubscriber, EventData> getEventData)
+        protected async Task<Result> ReceiveAsync(IEventSubscriberData data, Func<IEventSubscriber, Task<EventData>> getEventData)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -162,6 +186,11 @@ namespace Beef.Events
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
 
+            var md = await GetMetadataAsync(data).ConfigureAwait(false);
+            if (md.Metadata == null)
+                return await CheckResultAsync(data, CreateInvalidEventDataResult(md.Exception, "EventData is invalid; unable to convert EventData from the originating value."), null).ConfigureAwait(false);
+
+            data.SetMetadata(md.Metadata);
             if (string.IsNullOrEmpty(data.Metadata.Subject))
                 return await CheckResultAsync(data, CreateInvalidEventDataResult(null, "EventData is invalid; Subject is required."), null).ConfigureAwait(false);
 
@@ -179,7 +208,7 @@ namespace Beef.Events
                 EventData @event;
                 try
                 {
-                    @event = getEventData(subscriber);
+                    @event = await getEventData(subscriber).ConfigureAwait(false);
                     if (@event == null)
                         return await CheckResultAsync(data, CreateInvalidEventDataResult(null, $"EventData is invalid; is required."), subscriber).ConfigureAwait(false);
                 }
@@ -297,11 +326,15 @@ namespace Beef.Events
                 Reason = reason ?? $"EventData was identified as Poison and has been configured to automatically SkipMessage after {attempts} attempts; this event is skipped (i.e. not processed)."
             };
 
+
         /// <summary>
         /// Checks the <see cref="Result"/> and handles accordingly.
         /// </summary>
         private async Task<Result> CheckResultAsync(IEventSubscriberData data, Result result, IEventSubscriber? subscriber = null)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 

@@ -2,8 +2,7 @@
   "profiles": {
     "Beef.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "--GenerateEntityJsonSchema",
-      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\tools\\Beef.CodeGen.Core"
+      "commandLineArgs": "entity"
     }
   }
 }

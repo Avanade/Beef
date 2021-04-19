@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Beef.Events
@@ -14,9 +15,9 @@ namespace Beef.Events
     public interface IEventPublisher
     {
         /// <summary>
-        /// Gets the prefix for an <see cref="EventData.Subject"/> when creating an <see cref="EventData"/> or <see cref="EventData{T}"/>. <i>Note:</i> the <see cref="PathSeparator"/> will automatically be applied.
+        /// Gets the default source <see cref="Uri"/> to be used where not otherwise specified (see <see cref="EventMetadata.Source"/>).
         /// </summary>
-        string? EventSubjectPrefix { get; }
+        Uri? DefaultSource { get; }
 
         /// <summary>
         /// Gets the path seperator <see cref="string"/>.
@@ -24,9 +25,24 @@ namespace Beef.Events
         string PathSeparator { get; }
 
         /// <summary>
+        /// Gets the key seperator <see cref="string"/>.
+        /// </summary>
+        string KeySeparator => ",";
+
+        /// <summary>
         /// Gets the template wildcard <see cref="string"/>.
         /// </summary>
         string TemplateWildcard { get; }
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Subject"/> format.
+        /// </summary>
+        EventStringFormat SubjectFormat => EventStringFormat.None;
+
+        /// <summary>
+        /// Gets the <see cref="EventMetadata.Action"/> format.
+        /// </summary>
+        EventStringFormat ActionFormat => EventStringFormat.None;
 
         /// <summary>
         /// Gets the published/queued events.
@@ -35,87 +51,41 @@ namespace Beef.Events
         EventData[] GetEvents();
 
         /// <summary>
-        /// Creates an <see cref="EventData"/> instance with no <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        EventData CreateEvent(string subject, string? action = null);
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance with the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        EventData CreateEvent(string subject, string? action = null, params IComparable?[] key);
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance using the <paramref name="value"/> (infers the <see cref="EventData.Key"/> from either <see cref="IIdentifier"/> or <see cref="IUniqueKey"/>).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null) where T : class;
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance with the specified <paramref name="value"/> <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="EventData"/>.</returns>
-        EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null, params IComparable?[] key);
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance (with no <see cref="EventData.Key"/>).
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
-        IEventPublisher Publish(string subject, string? action = null);
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
-        IEventPublisher Publish(string subject, string? action = null, params IComparable?[] key);
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
-        IEventPublisher PublishValue<T>(T value, string subject, string? action = null) where T : class;
-
-        /// <summary>
-        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
-        IEventPublisher PublishValue<T>(T value, string subject, string? action = null, params IComparable?[] key);
-
-        /// <summary>
         /// Publishes (queues) one of more <see cref="EventData"/> objects.
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> objects.</param>
         /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
         IEventPublisher Publish(params EventData[] events);
+
+        /// <summary>
+        /// Formats a <paramref name="value"/> as its formatted key representation.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The formatted key.</returns>
+        string? FormatKey(object? value)
+        {
+            if (value == null)
+                return null;
+            
+            if (value is string s)
+                return s;
+
+            return value switch
+            {
+                IIntIdentifier ii => ii.Id.ToString(),
+                IGuidIdentifier gi => gi.Id.ToString(),
+                IStringIdentifier si => si.Id,
+                IUniqueKey uk => uk.UniqueKey.Args.Length == 1 ? FormatKey(uk.UniqueKey.Args[0]) : FormatKey(uk.UniqueKey.Args),
+                _ => value.ToString(),
+            };
+        }
+
+        /// <summary>
+        /// Formats one or more <paramref name="values"/> as its formatted key representation.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The formatted key.</returns>
+        string? FormatKey(IEnumerable<object?> values) => string.Join(KeySeparator, values);
 
         /// <summary>
         /// Sends all previously published events.

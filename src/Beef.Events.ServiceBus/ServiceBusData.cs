@@ -30,10 +30,5 @@ namespace Beef.Events.ServiceBus
         /// Gets the Service Bus Queue name.
         /// </summary>
         public string QueueName { get; }
-
-        /// <summary>
-        /// Gets the <see cref="EventMetadata"/> metadata.
-        /// </summary>
-        protected override EventMetadata GetEventMetadata() => Originating.GetEventMetadata();
     }
 }

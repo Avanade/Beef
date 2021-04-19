@@ -1,4 +1,5 @@
 ﻿using Beef.Demo.Common.Entities;
+using Beef.Events;
 using System;
 using System.Threading.Tasks;
 

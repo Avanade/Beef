@@ -40,7 +40,7 @@ namespace Beef.Demo.Test
                 TestContext.WriteLine();
                 foreach (var ed in result.Events)
                 {
-                    TestContext.WriteLine($"{ed.Subject} {ed.Action}");
+                    TestContext.WriteLine($"Subject: {ed.Subject}, Action: {ed.Action}, Source: {ed.Source}");
                     TestContext.WriteLine(JsonConvert.SerializeObject(ed.GetValue(), Formatting.Indented));
                 }
             }

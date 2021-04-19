@@ -163,9 +163,10 @@ namespace Beef.Demo.Test
 
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), beforeRequestAsync: async r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + p.ETag + "\""));
+                    await Task.CompletedTask;
                 })).GetAsync(3.ToGuid()));
         }
 

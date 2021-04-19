@@ -1,35 +1,25 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-namespace Beef.Events
+namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Defines the event action format.
+    /// Defines the event subject format.
     /// </summary>
     public enum EventActionFormat
     {
         /// <summary>
-        /// No formatting; as-is (default).
+        /// No formatting, leave action as-is.
         /// </summary>
         None,
 
         /// <summary>
-        /// Format as upper case.
+        /// The action as past-tense.
         /// </summary>
-        UpperCase,
-
-        /// <summary>
-        /// Format as past tense.
-        /// </summary>
-        PastTense,
-
-        /// <summary>
-        /// Format as past tense upper case.
-        /// </summary>
-        PastTenseUpperCase
+        PastTense
     }
 
     /// <summary>
-    /// Provides the event action formatting capability. 
+    /// Provides the <see cref="EventActionFormat"/> formatting capability. 
     /// </summary>
     public static class EventActionFormatter
     {
@@ -41,9 +31,7 @@ namespace Beef.Events
         /// <returns>The formatted action.</returns>
         public static string Format(string action, EventActionFormat? format) => format switch
         {
-            EventActionFormat.UpperCase => Check.NotEmpty(action, nameof(action)).ToUpperInvariant()!,
             EventActionFormat.PastTense => StringConversion.ToPastTense(Check.NotEmpty(action, nameof(action)))!,
-            EventActionFormat.PastTenseUpperCase => StringConversion.ToPastTense(Check.NotEmpty(action, nameof(action)))!.ToUpperInvariant(),
             _ => Check.NotEmpty(action, nameof(action))
         };
 

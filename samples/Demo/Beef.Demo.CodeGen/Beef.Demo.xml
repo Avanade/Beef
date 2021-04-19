@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" EventSourceKind="Relative" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <Entity Name="Person" Text="Person" Implements="IETag, IChangeLog" Collection="true" CollectionResult="true" Grpc="true" Validator="PersonValidator" WebApiAuthorize="false" WebApiRoutePrefix="api/v1/persons" WebApiAutoLocation="true" Create="true" Delete="true" AutoImplement="Database" DatabaseSchema="Demo" EntityFrameworkEntity="EfModel.Person" DataCtorParams="Microsoft.Extensions.Logging.ILogger&lt;PersonData&gt;^Logger, Common.Agents.IPersonAgent" ManagerExtensions="true" DataSvcExtensions="true" DataExtensions="true" EventTransaction="true" TestCodeGen="true" TestExtra="Unknown-Config">
-    <Property Name="Id" Text="{{Person}} identifier" Type="Guid" GrpcFieldNo="1" UniqueKey="true" IdentifierGenerator="IGuidIdentifierGenerator^GuidIdGen" DataName="PersonId" />
+    <Property Name="Id" Text="{{Person}} identifier" Type="Guid" GrpcFieldNo="1" UniqueKey="true" IdentifierGenerator="IGuidIdentifierGenerator^GuidIdGen" DataName="PersonId" Annotation1="[System.Xml.Serialization.XmlElement(&quot;Id&quot;)]" />
     <Property Name="FirstName" Type="string" GrpcFieldNo="2" />
     <Property Name="LastName" Type="string" GrpcFieldNo="3" />
     <Property Name="UniqueCode" Type="string" GrpcFieldNo="4" />
@@ -12,8 +12,8 @@
     <Property Name="ETag" Type="string" GrpcFieldNo="500" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="501" />
 
-    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
-    <Operation Name="Update" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="{id}" DataSvcTransaction="true" />
+    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" ManagerExtensions="false" DataSvcExtensions="false" DataExtensions="false" />
+    <Operation Name="Update" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="{id}" DataSvcTransaction="true" ManagerExtensions="true" DataSvcExtensions="false" DataExtensions="false" />
     <Operation Name="UpdateWithRollback" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="withRollback/{id}" DataSvcTransaction="true" DatabaseStoredProc="spPersonUpdate" />
     <Operation Name="Patch" OperationType="Patch" UniqueKey="true" WebApiRoute="{id}" />
 
@@ -119,7 +119,7 @@
   </Entity>
 
   <!-- CosmosDb -->
-  <Entity Name="Robot" Grpc="true" Text="Robot" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" ManagerCtorParams="Beef.Events.IEventPublisher" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
+  <Entity Name="Robot" Grpc="true" Text="Robot" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" ManagerCtorParams="Beef.Events.IEventPublisher" EventSource="/robots/{$key}" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
     <Property Name="Id" Text="{{Robot}} identifier" Type="Guid" UniqueKey="true" IdentifierGenerator="IGuidIdentifierGenerator" GrpcFieldNo="1" />
     <Property Name="ModelNo" Text="Model number" Type="string" GrpcFieldNo="2" />
     <Property Name="SerialNo" Text="Unique serial number" Type="string" GrpcFieldNo="3" />

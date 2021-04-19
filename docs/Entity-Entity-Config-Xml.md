@@ -130,7 +130,7 @@ Property | Description
 -|-
 `ManagerConstructor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 **`ManagerCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
-`ManagerExtensions` | Indicates whether the `Manager` extensions logic should be generated.
+`ManagerExtensions` | Indicates whether the `Manager` extensions logic should be generated. This can be overridden using `Operation.ManagerExtensions`.
 **`Validator`** | The name of the .NET `Type` that will perform the validation. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `IValidator` | The name of the .NET Interface that the `Validator` implements/inherits. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 
@@ -143,11 +143,12 @@ Property | Description
 -|-
 `DataSvcCaching` | Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.
 `EventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
+`EventSource` | The Event Source. Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.
 `EventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `CodeGeneration.EventSubjectFormat`.
 **`EventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.
 `DataSvcConstructor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 **`DataSvcCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
-`DataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.
+`DataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated. This can be overridden using `Operation.DataSvcExtensions`.
 
 <br/>
 
@@ -160,7 +161,7 @@ Property | Description
 `MapperAddStandardProperties` | Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`. Defaults to `true`.
 `DataConstructor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 **`DataCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
-`DataExtensions` | Indicates whether the `Data` extensions logic should be generated.
+`DataExtensions` | Indicates whether the `Data` extensions logic should be generated. This can be overridden using `Operation.DataExtensions`.
 
 <br/>
 

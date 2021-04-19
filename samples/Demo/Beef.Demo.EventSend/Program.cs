@@ -1,4 +1,5 @@
 ﻿using Beef.Entities;
+using Beef.Events;
 using Beef.Events.EventHubs;
 using Beef.Events.ServiceBus;
 using System;
@@ -74,7 +75,7 @@ namespace Beef.Demo.EventSend
                         break;
 
                     case "6":
-                        var ed = ehp.CreateValueEvent("N", "Demo.Robot.1", "PowerSourceChange");
+                        var ed = EventData.CreateValueEvent("N", "Demo.Robot.1", "PowerSourceChange");
                         ed.Key = new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         ed.PartitionKey = PartitionKeyGenerator.Generate(Guid.NewGuid());
                         ehp.Publish(ed);
@@ -107,7 +108,7 @@ namespace Beef.Demo.EventSend
                         break;
 
                     case "16":
-                        ed = sbs.CreateValueEvent("N", "Demo.Robot.1", "PowerSourceChange");
+                        ed = EventData.CreateValueEvent("N", "Demo.Robot.1", "PowerSourceChange");
                         ed.Key = new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         ed.PartitionKey = PartitionKeyGenerator.Generate(Guid.NewGuid());
                         sbs.Publish(ed);

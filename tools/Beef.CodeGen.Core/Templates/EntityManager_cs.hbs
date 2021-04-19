@@ -44,17 +44,19 @@ namespace {{Root.NamespaceBusiness}}
 
   {{/if}}
 {{/each}}
-{{#if ManagerExtensions}}
+{{#if HasManagerExtensions}}
         #region Extensions
 
   {{#each ManagerAutoOperations}}
-    {{#unless SingleValidateParameters}}
+    {{#if ManagerExtensions}}
+      {{#unless SingleValidateParameters}}
         private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnPreValidateAsync;
         private Action<MultiValidator{{#each Parameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnValidate;
-    {{/unless}}
+      {{/unless}}
         private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnBeforeAsync;
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
 
+    {{/if}}
   {{/each}}
         #endregion
 
@@ -127,9 +129,9 @@ namespace {{Root.NamespaceBusiness}}
     {{#ifne CleanerParameters.Count 0}}
                 Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
     {{/ifne}}
-    {{#if Parent.ManagerExtensions}}
+    {{#if ManagerExtensions}}
       {{#unless SingleValdiateParameters}}
-                if ({{PrivateName}}OnPreValidateAsync != null) await {{PrivateName}}OnPreValidateAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+                await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}
@@ -142,7 +144,7 @@ namespace {{Root.NamespaceBusiness}}
       {{#each ValidateParameters}}
                     .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
-      {{#if Parent.ManagerExtensions}}
+      {{#if ManagerExtensions}}
         {{#unless SingleValidateParameters}}
                     .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
@@ -150,10 +152,10 @@ namespace {{Root.NamespaceBusiness}}
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
     {{/if}}
-    {{#if Parent.ManagerExtensions}}
-                if ({{PrivateName}}OnBeforeAsync != null) await {{PrivateName}}OnBeforeAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+    {{#if ManagerExtensions}}
+                await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
                 {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
-                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+                await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
       {{#if HasReturnValue}}
                 return Cleaner.Clean(__result);
       {{/if}}

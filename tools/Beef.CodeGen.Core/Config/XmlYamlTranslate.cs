@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Beef.CodeGen.Config
 {
@@ -61,84 +62,84 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.Parameter, "IsCollection", "collection")
         });
 
-        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToYamlConvert = new List<(ConfigType, ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigType, ConfigurationEntity, string, Func<string?, string?>)[]
+        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, bool IsArray, Func<string?, string?>? Converter)> _xmlToYamlConvert = new List<(ConfigType, ConfigurationEntity, string, bool, Func<string?, string?>?)>(new (ConfigType, ConfigurationEntity, string, bool, Func<string?, string?>?)[]
         {
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xmlns", (xml) => NullValue()),
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xsi", (xml) => NullValue()),
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeEntity", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeAll", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIData", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : "RequiresMapper")),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIDataSvc", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeDataSvc", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIManager", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeManager", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApi", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApiAgent", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", true, null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", true, null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", true, null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", true, null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeEntity", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeAll", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIData", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeData", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : "RequiresMapper")),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIDataSvc", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeDataSvc", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIManager", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeManager", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApi", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApiAgent", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIData", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeData", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIDataSvc", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeDataSvc", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIManager", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeManager", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeWebApi", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeWebApiAgent", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", (xml) => throw new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType.")),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIData", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeData", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIDataSvc", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeDataSvc", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIManager", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeManager", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeWebApi", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeWebApiAgent", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", false, (xml) => throw new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType.")),
 
-            (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", (xml) => NullValue()),
-            (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", (xml) => NullValue()),
-            (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
-            (ConfigType.Database, ConfigurationEntity.CodeGen, "CdcExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "CdcExcludeColumnsFromETag", true, null),
 
-            (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Query, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Query, "AliasColumns", true, null),
 
-            (ConfigType.Database, ConfigurationEntity.QueryJoin, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.QueryJoin, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.QueryJoin, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "AliasColumns", true, null),
 
-            (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Table, "View", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
-            (ConfigType.Database, ConfigurationEntity.Table, "ViewName", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
-            (ConfigType.Database, ConfigurationEntity.Table, "ViewSchema", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
+            (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", true, null),
+            (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Table, "View", false, (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
+            (ConfigType.Database, ConfigurationEntity.Table, "ViewName", false, (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
+            (ConfigType.Database, ConfigurationEntity.Table, "ViewSchema", false, (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
 
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "Type", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", true, null),
 
-            (ConfigType.Database, ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending")),
+            (ConfigType.Database, ConfigurationEntity.OrderBy, "Order", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending")),
 
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "DataCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IdentifierMappingColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumnsOnDelete", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "AliasColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "DataCtorParams", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "IdentifierMappingColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumnsOnDelete", true, null),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumnsFromETag", true, null),
 
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IdentifierMappingColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumnsOnDelete", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumnsFromETag", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]")
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "AliasColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IdentifierMappingColumns", true, null),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumnsOnDelete", true, null),
+            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumnsFromETag", true, null)
         });
 
         private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);
@@ -319,7 +320,48 @@ namespace Beef.CodeGen.Config
         internal static string? GetYamlValue(ConfigType convertType, ConfigurationEntity entity, string xmlName, string? xmlValue)
         {
             var item = _xmlToYamlConvert.FirstOrDefault(x => x.ConvertType == convertType && x.Entity == entity && x.XmlName == xmlName);
-            return item.Converter == null ? xmlValue : item.Converter(xmlValue);
+            var yaml = item.Converter == null ? xmlValue : item.Converter(xmlValue);
+            return item.IsArray ? FormatYamlArray(yaml) : FormatYamlValue(yaml);
+        }
+
+        /// <summary>
+        /// Check YAML for special characters and format accordingly.
+        /// </summary>
+        internal static string? FormatYamlValue(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return null;
+
+            if (value.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
+                value = $"'{value.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+
+            if (string.Compare(value, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
+                value = $"'{value}'";
+
+            return value;
+        }
+
+        /// <summary>
+        /// Splits the string on a comma, and then formats each part and then bookends with square brackets.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal static string? FormatYamlArray(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return null;
+
+            var sb = new StringBuilder();
+            foreach (var part in value.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                sb.Append(sb.Length == 0 ? "[ " : ", ");
+                var yaml = FormatYamlValue(part);
+                if (!string.IsNullOrEmpty(yaml))
+                    sb.Append(FormatYamlValue(part));
+            }
+
+            sb.Append(" ]");
+            return sb.ToString();
         }
 
         /// <summary>

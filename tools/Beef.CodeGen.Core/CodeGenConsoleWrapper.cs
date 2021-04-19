@@ -3,6 +3,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -17,30 +18,31 @@ namespace Beef.CodeGen
         private string _refDataScript = "RefDataCoreCrud.xml";
         private string _dataModelScript = "DataModelOnly.xml";
         private string _databaseScript = "Database.xml";
+        private string _exeDir;
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
         /// </summary>
         public static string EntityCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Database"/> command line template.
         /// </summary>
         public static string DatabaseCommandLineTemplate { get; set; } 
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.RefData"/> command line template.
         /// </summary>
         public static string RefDataCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.DataModel"/> command line template.
         /// </summary>
         public static string DataModelCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="Assembly"/> portion command line template.
@@ -55,7 +57,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> instance.</returns>
-        public static CodeGenConsoleWrapper Create(string company, string appName, string apiName = "Api", string outDir = "./..")
+        public static CodeGenConsoleWrapper Create(string company, string appName, string apiName = "Api", string? outDir = null)
         {
             return new CodeGenConsoleWrapper(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outDir);
         }
@@ -69,7 +71,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> instance.</returns>
-        public static CodeGenConsoleWrapper Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = "./..")
+        public static CodeGenConsoleWrapper Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string? outDir = null)
         {
             return new CodeGenConsoleWrapper(assemblies, company, appName, apiName, outDir);
         }
@@ -82,12 +84,14 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="assemblies">Optional list of assemblies to probe for resources.</param>
-        private CodeGenConsoleWrapper(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = "./..")
+        private CodeGenConsoleWrapper(Assembly[] assemblies, string company, string appName, string apiName = "Api", string? outDir = null)
         {
             Company = Check.NotEmpty(company, nameof(company));
             AppName = Check.NotEmpty(appName, nameof(appName));
             ApiName = Check.NotEmpty(apiName, nameof(apiName));
-            OutDir = Check.NotEmpty(outDir, nameof(outDir));
+
+            _exeDir = CodeGenFileManager.GetExeDirectory();
+            OutDir = string.IsNullOrEmpty(outDir) ? new DirectoryInfo(_exeDir).Parent.FullName : outDir;
             Assemblies = new List<Assembly>(assemblies ?? Array.Empty<Assembly>());
         }
 
@@ -244,23 +248,23 @@ namespace Beef.CodeGen
                         throw new CommandParsingException(app, "Command 'All' is not compatible with --xmlToYaml; the command must be more specific when converting XML configuration to YAML.");
 
                     CodeGenConsole.WriteMasthead();
-                    return await CodeGenFileManager.ConvertXmlToYamlAsync(ct, cfn ?? CodeGenFileManager.GetConfigFilename(ct, Company, AppName)).ConfigureAwait(false);
+                    return await CodeGenFileManager.ConvertXmlToYamlAsync(ct, cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, ct, Company, AppName)).ConfigureAwait(false);
                 }
 
                 var encArg = enc.HasValue() ? " --expectNoChanges" : string.Empty;
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName) + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)}\"" + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.RefData, Company, AppName) + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName)}\"" + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Entity, Company, AppName) + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Entity, Company, AppName)}\"" + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.DataModel, Company, AppName) + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.DataModel, Company, AppName)}\"" + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
 
                 return rc;
             });
