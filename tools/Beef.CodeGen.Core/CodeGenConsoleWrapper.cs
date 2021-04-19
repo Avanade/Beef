@@ -24,25 +24,25 @@ namespace Beef.CodeGen
         /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
         /// </summary>
         public static string EntityCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Database"/> command line template.
         /// </summary>
         public static string DatabaseCommandLineTemplate { get; set; } 
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.RefData"/> command line template.
         /// </summary>
         public static string RefDataCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.DataModel"/> command line template.
         /// </summary>
         public static string DataModelCommandLineTemplate { get; set; }
-            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}}";
+            = "-s {{Script}} -o \"{{OutDir}}\" -p Company={{Company}} -p AppName={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="Assembly"/> portion command line template.
@@ -255,16 +255,16 @@ namespace Beef.CodeGen
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName) + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)}\"" + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName) + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName)}\"" + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Entity, Company, AppName) + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Entity, Company, AppName)}\"" + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.DataModel, Company, AppName) + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.DataModel, Company, AppName)}\"" + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
 
                 return rc;
             });

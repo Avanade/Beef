@@ -10,7 +10,7 @@ namespace Beef.Events.EventHubs
     /// <summary>
     /// Provides the extensions methods for the events capabilities.
     /// </summary>
-    public static class EventExtensions
+    public static class EventHubExtensions
     {
         /// <summary>
         /// Adds a transient service to instantiate a new <see cref="EventHubConsumerHost"/> instance using the specified <paramref name="args"/>.
@@ -51,19 +51,17 @@ namespace Beef.Events.EventHubs
         /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="EventHubProducer"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="connectionString">The connection string.</param>
-        /// <param name="clientOptions">The optional <see cref="EventHubProducerClientOptions"/>.</param>
+        /// <param name="client">The <see cref="EventHubProducerClient"/>.</param>
         /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="EventHubProducer"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventHubEventProducer(this IServiceCollection services, string connectionString, EventHubProducerClientOptions? clientOptions = null, Action<EventHubProducer>? additional = null)
+        public static IServiceCollection AddBeefEventHubEventProducer(this IServiceCollection services, EventHubProducerClient client, Action<EventHubProducer>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddScoped<IEventPublisher>(_ =>
             {
-                var ehc = new EventHubProducerClient(Check.NotEmpty(connectionString, nameof(connectionString)), clientOptions);
-                var ehp = new EventHubProducer(ehc);
+                var ehp = new EventHubProducer(Check.NotNull(client, nameof(client)));
                 additional?.Invoke(ehp);
                 return ehp;
             });

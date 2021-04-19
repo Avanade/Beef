@@ -141,6 +141,8 @@ namespace Beef.Test.NUnit.Tests
             else
                 TestContext.Out.WriteLine($"{(string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}");
 
+            var content = $"Content: {json ?? (string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}";
+
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = ExpectEvent.GetPublishedEvents(CorrelationId);
@@ -186,13 +188,13 @@ namespace Beef.Test.NUnit.Tests
 
             // Perform checks.
             if (_expectedStatusCode.HasValue && _expectedStatusCode != result.StatusCode)
-                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).");
+                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).{Environment.NewLine}{Environment.NewLine}{content}");
 
             if (_expectedErrorType.HasValue && _expectedErrorType != result.ErrorType)
-                Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.");
+                Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.{Environment.NewLine}{Environment.NewLine}{content}");
 
             if (_expectedErrorMessage != null && _expectedErrorMessage != result.ErrorMessage)
-                Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.");
+                Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.{Environment.NewLine}{Environment.NewLine}{content}");
 
             if (_expectedMessages != null)
                 TesterBase.CompareExpectedVsActualMessages(_expectedMessages, result.Messages);

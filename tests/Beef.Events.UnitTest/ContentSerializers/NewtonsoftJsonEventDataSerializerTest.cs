@@ -85,21 +85,37 @@ namespace Beef.Events.UnitTest.ContentSerializers
             };
         }
 
-        public static void AssertEventMetadata(EventMetadata metadata)
+        public static void AssertEventMetadata(EventMetadata metadata, bool defaultPropertiesOnly = false)
         {
             Assert.IsNotNull(metadata);
             Assert.AreEqual("Test.Subject", metadata.Subject);
             Assert.AreEqual("Created", metadata.Action);
-            Assert.AreEqual(new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.EventId);
-            Assert.AreEqual("XXX", metadata.CorrelationId);
-            Assert.AreEqual(new Uri("/test", UriKind.Relative), metadata.Source);
-            Assert.AreEqual(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.TenantId);
-            Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16), metadata.Timestamp);
-            Assert.AreEqual("YYY", metadata.ETag);
-            Assert.AreEqual(1, metadata.Key);
-            Assert.AreEqual("PK", metadata.PartitionKey);
-            Assert.AreEqual("123", metadata.UserId);
-            Assert.AreEqual("Bob", metadata.Username);
+            if (defaultPropertiesOnly)
+            {
+                Assert.AreEqual(new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.EventId);
+                Assert.AreEqual("XXX", metadata.CorrelationId);
+                Assert.AreEqual(new Uri("/test", UriKind.Relative), metadata.Source);
+                Assert.AreEqual(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.TenantId);
+                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16), metadata.Timestamp);
+                Assert.Null(metadata.ETag);
+                Assert.Null(metadata.Key);
+                Assert.Null(metadata.PartitionKey);
+                Assert.AreEqual("123", metadata.UserId);
+                Assert.AreEqual("Bob", metadata.Username);
+            }
+            else
+            {
+                Assert.AreEqual(new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.EventId);
+                Assert.AreEqual("XXX", metadata.CorrelationId);
+                Assert.AreEqual(new Uri("/test", UriKind.Relative), metadata.Source);
+                Assert.AreEqual(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.TenantId);
+                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16), metadata.Timestamp);
+                Assert.AreEqual("YYY", metadata.ETag);
+                Assert.AreEqual(1, metadata.Key);
+                Assert.AreEqual("PK", metadata.PartitionKey);
+                Assert.AreEqual("123", metadata.UserId);
+                Assert.AreEqual("Bob", metadata.Username);
+            }
         }
     }
 }

@@ -37,12 +37,15 @@ namespace Beef.Events.UnitTest.ContentSerializers
   ""id"": ""00000001-0000-0000-0000-000000000000"",
   ""time"": ""2001-01-15T12:48:16"",
   ""beef"": {
+    ""eventId"": ""00000001-0000-0000-0000-000000000000"",
     ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
     ""subject"": ""Test.Subject"",
     ""action"": ""Created"",
+    ""source"": ""/test"",
     ""key"": 1,
     ""username"": ""Bob"",
     ""userid"": ""123"",
+    ""timestamp"": ""2001-01-15T12:48:16"",
     ""correlationId"": ""XXX"",
     ""etag"": ""YYY"",
     ""partitionKey"": ""PK""
@@ -56,7 +59,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
         [Test]
         public async Task EventDataTEndToEndWithBeef()
         {
-            var eds = new NewtonsoftJsonCloudEventSerializer();
+            var eds = new NewtonsoftJsonCloudEventSerializer { IncludeEventMetadataProperties = null };
             var bytes = await eds.SerializeAsync(new EventData<Person>(NewtonsoftJsonEventDataSerializerTest.CreateEventMetadata()) { Value = Person.Create() });
             Assert.Greater(bytes.Length, 0);
 
@@ -73,12 +76,15 @@ namespace Beef.Events.UnitTest.ContentSerializers
     ""last"": ""Brown""
   },
   ""beef"": {
+    ""eventId"": ""00000001-0000-0000-0000-000000000000"",
     ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
     ""subject"": ""Test.Subject"",
     ""action"": ""Created"",
+    ""source"": ""/test"",
     ""key"": 1,
     ""username"": ""Bob"",
     ""userid"": ""123"",
+    ""timestamp"": ""2001-01-15T12:48:16"",
     ""correlationId"": ""XXX"",
     ""etag"": ""YYY"",
     ""partitionKey"": ""PK""

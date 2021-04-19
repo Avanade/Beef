@@ -348,7 +348,7 @@ namespace Beef.CodeGen.Config
         /// <returns></returns>
         internal static string? FormatYamlArray(string? value)
         {
-            if (value == null)
+            if (string.IsNullOrEmpty(value))
                 return null;
 
             var sb = new StringBuilder();

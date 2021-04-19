@@ -1,4 +1,5 @@
-﻿using Beef.AspNetCore.WebApi;
+﻿using Azure.Messaging.EventHubs.Producer;
+using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
 using Beef.Data.Cosmos;
 using Beef.Data.Database;
@@ -70,7 +71,7 @@ namespace Beef.Demo.Api
             // Add event publishing.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");
             if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventProducer(ehcs);
+                services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
             else
                 services.AddBeefNullEventPublisher();
 

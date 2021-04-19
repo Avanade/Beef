@@ -122,6 +122,16 @@
         "RelativeOrAbsolute"
       ]
     },
+    "eventSourceFormat": {
+      "type": "string",
+      "title": "The default formatting for the Source when an Event is published.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey",
+        "NameAndGlobalId"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names.",
@@ -1066,6 +1076,16 @@
               "title": "The Event Source.",
               "description": "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified."
             },
+            "eventSourceFormat": {
+              "type": "string",
+              "title": "The default formatting for the Source when an Event is published.",
+              "description": "Defaults to `CodeGeneration.EventSourceFormat`.",
+              "enum": [
+                "NameOnly",
+                "NameAndKey",
+                "NameAndGlobalId"
+              ]
+            },
             "eventSubject": {
               "type": "string",
               "title": "The Event Subject.",
@@ -1091,9 +1111,9 @@
                 }
               ]
             },
-            "excludeBackgroundService": {
+            "excludeHostedService": {
               "type": "string",
-              "title": "The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).",
+              "title": "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).",
               "enum": [
                 "No",
                 "Yes"

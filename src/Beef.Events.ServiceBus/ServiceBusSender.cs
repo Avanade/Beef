@@ -11,6 +11,7 @@ namespace Beef.Events.ServiceBus
     /// <summary>
     /// <see cref="SendEventsAsync(EventData[])">Send</see> the <see cref="EventData"/> array (converted to <see cref="AzureServiceBus.ServiceBusMessage"/>) in multiple batches based on <see cref="QueueName"/>.
     /// </summary>
+    /// <remarks>The <see cref="EventPublisherBase.SubjectFormat"/> and <see cref="EventPublisherBase.ActionFormat"/> default to <see cref="EventStringFormat.Lowercase"/>.</remarks>
     public class ServiceBusSender : EventPublisherBase
     {
         private readonly AzureServiceBus.ServiceBusClient _client;
@@ -30,6 +31,7 @@ namespace Beef.Events.ServiceBus
             _client = Check.NotNull(client, nameof(client));
             _removeKeyFromSubject = removeKeyFromSubject;
             _invoker = invoker ?? new ServiceBusSenderInvoker();
+            SubjectFormat = ActionFormat = EventStringFormat.Lowercase;
         }
 
         /// <summary>

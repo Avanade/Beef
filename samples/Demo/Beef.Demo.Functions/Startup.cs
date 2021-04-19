@@ -1,4 +1,5 @@
-﻿using Beef.Caching.Policy;
+﻿using Azure.Messaging.EventHubs.Producer;
+using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
@@ -60,7 +61,7 @@ namespace Beef.Demo.Functions
                             .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
 
             // Add event publishing.
-            builder.Services.AddBeefEventHubEventProducer(config.GetValue<string>("EventHubConnectionString"));
+            builder.Services.AddBeefEventHubEventProducer(new EventHubProducerClient(config.GetValue<string>("EventHubConnectionString")));
 
             // Add logging.
             builder.Services.AddLogging();

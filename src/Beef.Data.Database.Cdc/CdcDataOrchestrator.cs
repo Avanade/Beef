@@ -6,6 +6,7 @@ using Beef.Json;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -226,11 +227,14 @@ namespace Beef.Data.Database.Cdc
         {
             // Get the requested outbox data.
             CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> result;
-            Logger.LogInformation($"{ServiceName} Query for next (new) Change Data Capture outbox (MaxQuerySize = {MaxQuerySize}, ContinueWithDataLoss = {ContinueWithDataLoss}).");
+            Logger.LogTrace($"{ServiceName} Query for next (new) Change Data Capture outbox. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}]");
+
+            var sw = Stopwatch.StartNew();
 
             try
             {
                 result = await GetOutboxEntityDataAsync().ConfigureAwait(false);
+                sw.Stop();
             }
             catch (Exception ex)
             {
@@ -252,11 +256,11 @@ namespace Beef.Data.Database.Cdc
 
             if (result.Outbox == null)
             {
-                Logger.LogInformation($"{ServiceName} Outbox 'none': No new Change Data Capture data was found.");
+                Logger.LogTrace($"{ServiceName} Outbox 'none': No new Change Data Capture data was found.");
                 return result;
             }
 
-            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Result.Count} entity(s) were found.");
+            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Result.Count} entity(s) were found. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}, {sw.ElapsedMilliseconds}ms]");
             if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
             {
                 Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
@@ -300,7 +304,12 @@ namespace Beef.Data.Database.Cdc
             }
 
             if (IdentifierMappingStoredProcedureName != null)
+            {
+                sw = Stopwatch.StartNew();
                 await AssignIdentityMappingAsync(coll).ConfigureAwait(false);
+                sw.Stop();
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Global identifier mapping assignment. [{sw.ElapsedMilliseconds}ms]");
+            }
 
             // Determine whether anything may have been sent before and exclude (i.e. do not send again).
             var coll2 = new TCdcEntityWrapperColl();
@@ -337,16 +346,23 @@ namespace Beef.Data.Database.Cdc
             // Publish & send the events.
             if (coll2.Count > 0)
             {
+                sw = Stopwatch.StartNew();
                 result.Events = (await CreateEventsAsync(coll2, cancellationToken.Value).ConfigureAwait(false)).ToArray();
                 await EventPublisher.Publish(result.Events).SendAsync().ConfigureAwait(false);
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully.");
+                sw.Stop();
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully. [{sw.ElapsedMilliseconds}ms]");
             }
             else
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found.");
+            {
+                sw.Stop();
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found. [{sw.ElapsedMilliseconds}ms]");
+            }
 
             // Complete the outbox (ignore any further 'cancel' as event(s) have been published and we *must* complete to minimise chance of sending more than once).
+            sw = Stopwatch.StartNew();
             await CompleteAsync(result.Outbox.Id, tracking).ConfigureAwait(false);
-            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed.");
+            sw.Stop();
+            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed. [{sw.ElapsedMilliseconds}ms]");
 
             return result;
         }

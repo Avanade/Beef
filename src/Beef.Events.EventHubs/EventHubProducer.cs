@@ -12,6 +12,7 @@ namespace Beef.Events.EventHubs
     /// <summary>
     /// <see cref="SendEventsAsync(EventData[])">Send</see> the <see cref="EventData"/> array (converted to <see cref="AzureEventHubs.EventData"/>) in multiple batches based on <see cref="EventMetadata.PartitionKey"/>.
     /// </summary>
+    /// <remarks>The <see cref="EventPublisherBase.SubjectFormat"/> and <see cref="EventPublisherBase.ActionFormat"/> default to <see cref="EventStringFormat.Lowercase"/>.</remarks>
     public class EventHubProducer : EventPublisherBase
     {
         private readonly EventHubProducerClient _client;
@@ -27,6 +28,7 @@ namespace Beef.Events.EventHubs
         {
             _client = Check.NotNull(client, nameof(client));
             _invoker = invoker ?? new EventHubProducerInvoker();
+            SubjectFormat = ActionFormat = EventStringFormat.Lowercase;
         }
 
         /// <summary>

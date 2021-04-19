@@ -854,6 +854,18 @@
                 <xs:documentation>The Event Source. Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="EventSourceFormat" use="optional">
+              <xs:annotation>
+                <xs:documentation>The default formatting for the Source when an Event is published. Defaults to `CodeGeneration.EventSourceFormat`.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="NameOnly" />
+                  <xs:enumeration value="NameAndKey" />
+                  <xs:enumeration value="NameAndGlobalId" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
             <xs:attribute name="EventSubject" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The Event Subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
@@ -875,9 +887,9 @@
                 <xs:documentation>The list of `Column` names that should be included (in addition to the primary key) for a logical delete. Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="ExcludeBackgroundService" use="optional">
+            <xs:attribute name="ExcludeHostedService" use="optional">
               <xs:annotation>
-                <xs:documentation>The option to exclude the generation of the `BackgroundService` class (`XxxBackgroundService.cs`).</xs:documentation>
+                <xs:documentation>The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">
@@ -1029,6 +1041,18 @@
             <xs:enumeration value="Absolute" />
             <xs:enumeration value="Relative" />
             <xs:enumeration value="RelativeOrAbsolute" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventSourceFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default formatting for the Source when an Event is published. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NameOnly" />
+            <xs:enumeration value="NameAndKey" />
+            <xs:enumeration value="NameAndGlobalId" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

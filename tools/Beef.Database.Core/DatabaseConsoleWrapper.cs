@@ -28,7 +28,7 @@ namespace Beef.Database.Core
         /// Gets the command line template.
         /// </summary>
         public static string CommandLineTemplate { get; set; }
-            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{ConfigFile}} -s {{Script}} -o {{OutDir}} -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c \"{{ConfigFile}}\" -s {{Script}} -o \"{{OutDir}}\" -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets the command line assembly portion template.
