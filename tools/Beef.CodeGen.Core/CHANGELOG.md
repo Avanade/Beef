@@ -10,6 +10,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* An entity instance with the key will be instantiated for a `Delete` event within the `XxxDataSvc` to include as the event value.
 - *Fixed:* Code-gen for `ServiceCollectionsValidationExtension` was generating errant code when there are no validators.
 - *Enhancement:* Will strip out `bin/debug` and `bin/release` folders from default directory path to find the output directory; meaning the path does not need to be explicity set when running/debugging from Visual Studio.
+- *Fixed:* Issue [124](https://github.com/Avanade/Beef/issues/124) fixed. Corrected XML to YAML code-gen to handle values that start with `[` and end with `]` characters; including where used to represent arrays.
 
 ## v4.1.22
 - *Enhancement:* Added standardized identifier mapping for change-data-capture (CDC) from local (internal) to global (external) where required.
