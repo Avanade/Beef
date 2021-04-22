@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Fixed:* `DatabaseRowVersionConverter.ConvertToSrce` will now return `null` when the `byte[]` is empty; versus, an empty string.
+
 ## v4.1.4
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

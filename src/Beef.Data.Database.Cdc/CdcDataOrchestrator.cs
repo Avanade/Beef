@@ -27,6 +27,7 @@ namespace Beef.Data.Database.Cdc
         where TCdcTrackingMapper : ITrackingTvp, new()
     {
         private const string MaxQuerySizeParamName = "MaxQuerySize";
+        private const string CorrelationIdParamName = "@CorrelationId";
         private const string ContinueWithDataLossParamName = "ContinueWithDataLoss";
         private const string OutboxIdParamName = "OutboxId";
         private const string TrackingListParamName = "TrackingList";
@@ -52,6 +53,7 @@ namespace Beef.Data.Database.Cdc
             CompleteStoredProcedureName = Check.NotEmpty(completeStoredProcedureName, nameof(completeStoredProcedureName));
             EventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
             Logger = Check.NotNull(logger, nameof(logger));
+            ExecutionContext.Current.CorrelationId = CorrelationId;
         }
 
         /// <summary>
@@ -66,12 +68,8 @@ namespace Beef.Data.Database.Cdc
         /// <param name="identifierGenerator">The <see cref="IStringIdentifierGenerator"/>.</param>
         /// <param name="identifierMappingTvp">The <see cref="IIdentifierMappingTvp"/>.</param>
         public CdcDataOrchestrator(IDatabase db, string executeStoredProcedureName, string completeStoredProcedureName, IEventPublisher eventPublisher, ILogger logger, string identifierMappingStoredProcedureName, IStringIdentifierGenerator identifierGenerator, IIdentifierMappingTvp identifierMappingTvp)
+            : this(db, executeStoredProcedureName, completeStoredProcedureName, eventPublisher, logger)
         {
-            Db = Check.NotNull(db, nameof(db));
-            ExecuteStoredProcedureName = Check.NotEmpty(executeStoredProcedureName, nameof(executeStoredProcedureName));
-            CompleteStoredProcedureName = Check.NotEmpty(completeStoredProcedureName, nameof(completeStoredProcedureName));
-            EventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
-            Logger = Check.NotNull(logger, nameof(logger));
             IdentifierMappingStoredProcedureName = Check.NotEmpty(identifierMappingStoredProcedureName, nameof(identifierMappingStoredProcedureName));
             IdentifierGenerator = Check.NotNull(identifierGenerator, nameof(identifierGenerator));
             IdentifierMappingTvp = Check.NotNull(identifierMappingTvp, nameof(identifierMappingTvp));
@@ -117,6 +115,11 @@ namespace Beef.Data.Database.Cdc
         /// Gets the <see cref="IIdentifierMappingTvp"/>.
         /// </summary>
         public IIdentifierMappingTvp? IdentifierMappingTvp { get; private set; }
+
+        /// <summary>
+        /// Gets the correlation identifier for the instance.
+        /// </summary>
+        public string CorrelationId { get; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Gets the service name (used for logging).
@@ -227,7 +230,7 @@ namespace Beef.Data.Database.Cdc
         {
             // Get the requested outbox data.
             CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> result;
-            Logger.LogTrace($"{ServiceName} Query for next (new) Change Data Capture outbox. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}]");
+            Logger.LogTrace($"{ServiceName} Query for next (new) Change Data Capture outbox. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}, CorrelationId={CorrelationId}]");
 
             var sw = Stopwatch.StartNew();
 
@@ -260,7 +263,7 @@ namespace Beef.Data.Database.Cdc
                 return result;
             }
 
-            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Result.Count} entity(s) were found. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}, {sw.ElapsedMilliseconds}ms]");
+            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Result.Count} entity(s) were found. [MaxQuerySize={MaxQuerySize}, ContinueWithDataLoss={ContinueWithDataLoss}, CorrelationId={CorrelationId}, {sw.ElapsedMilliseconds}ms]");
             if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
             {
                 Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
@@ -308,7 +311,7 @@ namespace Beef.Data.Database.Cdc
                 sw = Stopwatch.StartNew();
                 await AssignIdentityMappingAsync(coll).ConfigureAwait(false);
                 sw.Stop();
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Global identifier mapping assignment. [{sw.ElapsedMilliseconds}ms]");
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Global identifier mapping assignment. [CorrelationId={CorrelationId}, {sw.ElapsedMilliseconds}ms]");
             }
 
             // Determine whether anything may have been sent before and exclude (i.e. do not send again).
@@ -316,17 +319,15 @@ namespace Beef.Data.Database.Cdc
             var tracking = new List<CdcTracker>();
             foreach (var item in coll)
             {
-                // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
-                if (entity.ETag == null)
+
+                // Calculate the serialized hash for the ETag.
+                if (ExcludePropertiesFromETag == null || ExcludePropertiesFromETag.Length == 0)
+                    entity.ETag = ETagGenerator.Generate(entity);
+                else
                 {
-                    if (ExcludePropertiesFromETag == null || ExcludePropertiesFromETag.Length == 0)
-                        entity.ETag = ETagGenerator.Generate(entity);
-                    else
-                    {
-                        var json = JsonPropertyFilter.Apply(entity, null, ExcludePropertiesFromETag);
-                        entity.ETag = ETagGenerator.Generate(json!.ToString(Newtonsoft.Json.Formatting.None));
-                    }
+                    var json = JsonPropertyFilter.Apply(entity, null, ExcludePropertiesFromETag);
+                    entity.ETag = ETagGenerator.Generate(json!.ToString(Newtonsoft.Json.Formatting.None));
                 }
 
                 // Where the ETag and TrackingHash match then skip (has already been published).
@@ -339,7 +340,7 @@ namespace Beef.Data.Database.Cdc
 
             if ((cancellationToken ??= CancellationToken.None).IsCancellationRequested)
             {
-                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation.");
+                Logger.LogWarning($"{ServiceName} Outbox '{result.Outbox.Id}': Incomplete as a result of Cancellation. [CorrelationId={CorrelationId}]");
                 return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken.Value).ConfigureAwait(false);
             }
 
@@ -350,19 +351,19 @@ namespace Beef.Data.Database.Cdc
                 result.Events = (await CreateEventsAsync(coll2, cancellationToken.Value).ConfigureAwait(false)).ToArray();
                 await EventPublisher.Publish(result.Events).SendAsync().ConfigureAwait(false);
                 sw.Stop();
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully. [{sw.ElapsedMilliseconds}ms]");
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {result.Events.Length} event(s) were published/sent successfully. [CorrelationId={CorrelationId}, {sw.ElapsedMilliseconds}ms]");
             }
             else
             {
                 sw.Stop();
-                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found. [{sw.ElapsedMilliseconds}ms]");
+                Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': No event(s) were published; no unique tracking hash found. [CorrelationId={CorrelationId}, {sw.ElapsedMilliseconds}ms]");
             }
 
             // Complete the outbox (ignore any further 'cancel' as event(s) have been published and we *must* complete to minimise chance of sending more than once).
             sw = Stopwatch.StartNew();
             await CompleteAsync(result.Outbox.Id, tracking).ConfigureAwait(false);
             sw.Stop();
-            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed. [{sw.ElapsedMilliseconds}ms]");
+            Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': Marked as Completed. [CorrelationId={CorrelationId}, {sw.ElapsedMilliseconds}ms]");
 
             return result;
         }
@@ -380,6 +381,7 @@ namespace Beef.Data.Database.Cdc
 
             await Db.StoredProcedure(ExecuteStoredProcedureName)
                 .Param(MaxQuerySizeParamName, MaxQuerySize)
+                .Param(CorrelationIdParamName, CorrelationId)
                 .Param(ContinueWithDataLossParamName, ContinueWithDataLoss)
                 .SelectQueryMultiSetWithValueAsync(msa.ToArray())
                 .ConfigureAwait(false);

@@ -1,6 +1,7 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePersonCdcOutbox]
-  @MaxQuerySize INT = 100,       -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @ContinueWithDataLoss BIT = 0  -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,                 -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @CorrelationId NVARCHAR(64) NULL = NULL, -- Correlation identifier to aid tracking of outbox execution and corresponding events.
+  @ContinueWithDataLoss BIT = 0            -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -101,6 +102,7 @@ BEGIN
           [PersonMaxLsn],
           [CreatedDate],
           [IsComplete],
+          [CorrelationId],
           [HasDataLoss]
         ) 
         OUTPUT inserted.OutboxId INTO @InsertedOutboxId
@@ -109,6 +111,7 @@ BEGIN
           @PersonMaxLsn,
           GETUTCDATE(),
           0,
+          @CorrelationId,
           @hasDataLoss
         )
 
@@ -119,13 +122,14 @@ BEGIN
       IF (@OutboxId IS NOT NULL AND @hasDataLoss = 1)
       BEGIN
         UPDATE [DemoCdc].[PersonOutbox] 
-          SET [HasDataLoss] = @hasDataLoss
+          SET [HasDataLoss] = @hasDataLoss,
+              [CorrelationId] = @CorrelationId
           WHERE [OutboxId] = @OutboxId
       END
     END
 
     -- Return the *latest* outbox data.
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outBox].[HasDataLoss]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outbox].[CorrelationId], [_outBox].[HasDataLoss]
       FROM [DemoCdc].[PersonOutbox] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId 
 
@@ -142,8 +146,7 @@ BEGIN
         [_chg].[_Lsn] AS [_Lsn],
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[PersonId] AS [PersonId],
-        [p].[PersonId] AS [TableKey_PersonId],
-        [p].[RowVersion] AS [RowVersion]
+        [p].[PersonId] AS [TableKey_PersonId]
       FROM #_changes AS [_chg]
       LEFT OUTER JOIN [Demo].[Person] AS [p] ON ([p].[PersonId] = [_chg].[PersonId])
       LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Demo' AND [_ct].[Table] = 'Person' AND [_ct].[Key] = CAST([_chg].[PersonId] AS NVARCHAR(128)))

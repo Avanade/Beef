@@ -1,6 +1,7 @@
 CREATE PROCEDURE [DemoCdc].[spExecuteContactCdcOutbox]
-  @MaxQuerySize INT = 100,       -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @ContinueWithDataLoss BIT = 0  -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,                 -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @CorrelationId NVARCHAR(64) NULL = NULL, -- Correlation identifier to aid tracking of outbox execution and corresponding events.
+  @ContinueWithDataLoss BIT = 0            -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*
@@ -136,6 +137,7 @@ BEGIN
           [AddressMaxLsn],
           [CreatedDate],
           [IsComplete],
+          [CorrelationId],
           [HasDataLoss]
         ) 
         OUTPUT inserted.OutboxId INTO @InsertedOutboxId
@@ -146,6 +148,7 @@ BEGIN
           @AddressMaxLsn,
           GETUTCDATE(),
           0,
+          @CorrelationId,
           @hasDataLoss
         )
 
@@ -156,13 +159,14 @@ BEGIN
       IF (@OutboxId IS NOT NULL AND @hasDataLoss = 1)
       BEGIN
         UPDATE [DemoCdc].[ContactOutbox] 
-          SET [HasDataLoss] = @hasDataLoss
+          SET [HasDataLoss] = @hasDataLoss,
+              [CorrelationId] = @CorrelationId
           WHERE [OutboxId] = @OutboxId
       END
     END
 
     -- Return the *latest* outbox data.
-    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outBox].[HasDataLoss]
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate], [_outbox].[CorrelationId], [_outBox].[HasDataLoss]
       FROM [DemoCdc].[ContactOutbox] AS [_outbox]
       WHERE [_outbox].OutboxId = @OutboxId 
 

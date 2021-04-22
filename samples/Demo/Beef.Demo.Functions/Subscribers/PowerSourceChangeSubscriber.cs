@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Beef.Demo.Functions.Subscribers
 {
     [EventSubscriber("Demo.Robot.*", "PowerSourceChange")]
-    public class PowerSourceChangeSubscriber : EventSubscriber<string>
+    public class PowerSourceChangeSubscriber : EventSubscriber<Guid>
     {
         private readonly IRobotManager _mgr;
 
@@ -18,23 +18,24 @@ namespace Beef.Demo.Functions.Subscribers
             MaxAttempts = 5;
         }
 
-        public override async Task<Result> ReceiveAsync(EventData<string> @event)
+        public override async Task<Result> ReceiveAsync(EventData<Guid> @event)
         {
-            var id = @event.KeyAsGuid;
-            if (!id.HasValue)
+            if (@event.Value == null)
                 return Result.InvalidData($"Key '{@event.Key ?? "null"}' must be a GUID.", ResultHandling.ContinueWithAudit);
 
-            if (id == new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+            if (@event.Value == new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
                 throw new DivideByZeroException("The mystery 88 guid can't be divided by zero.");
 
-            var robot = await _mgr.GetAsync(id.Value);
+            var id = @event.Value == new Guid(99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) ? new Guid(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) : @event.Value;
+
+            var robot = await _mgr.GetAsync(id);
             if (robot == null)
                 return Result.DataNotFound();
 
             robot.AcceptChanges();
-            robot.PowerSource = @event.Value;
+            robot.PowerSource = id == new Guid(99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) ? "Q" : "N";
             if (robot.IsChanged)
-                await _mgr.UpdateAsync(robot, id.Value);
+                await _mgr.UpdateAsync(robot, @event.Value);
 
             Logger.LogInformation("A trace message to prove it works!");
 

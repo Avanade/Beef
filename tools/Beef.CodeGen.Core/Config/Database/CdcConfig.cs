@@ -44,11 +44,11 @@ namespace Beef.CodeGen.Config.Database
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the schema name of the primary table of the view.
+        /// Gets or sets the default schema name used where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The schema name of the primary table.",
-            Description = "Defaults to `dbo`.")]
+        [PropertySchema("Key", Title = "The default schema name used where not otherwise explicitly specified.",
+            Description = "Defaults to `CodeGeneration.Schema`.")]
         public string? Schema { get; set; }
 
         /// <summary>
@@ -246,14 +246,6 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
-        /// <summary>
-        /// Gets or sets the column name for the `RowVersion` capability.
-        /// </summary>
-        [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
-            Description = "Defaults to `CodeGeneration.RowVersion`.")]
-        public string? ColumnNameRowVersion { get; set; }
-
         #endregion
 
         #region Collections
@@ -288,7 +280,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the related RowVersion column.
         /// </summary>
-        public IColumnConfig? ColumnRowVersion => GetSpecialColumn(ColumnNameRowVersion);
+        public IColumnConfig? ColumnRowVersion => null;
 
         /// <summary>
         /// Gets the related CreatedBy column.
@@ -355,9 +347,9 @@ namespace Beef.CodeGen.Config.Database
         public List<CdcColumnConfig> SelectedColumnsExcludingPrimaryKey => SelectedColumns.Where(x => !(x.DbColumn!.DbTable == DbTable && x.DbColumn.IsPrimaryKey)).ToList();
 
         /// <summary>
-        /// Gets the SQL formatted selected columns for the .NET Entity (sans IsDeleted and RowVersion columns).
+        /// Gets the SQL formatted selected columns for the .NET Entity (sans IsDeleted).
         /// </summary>
-        public List<CdcColumnConfig> SelectedEntityColumns => SelectedColumns.Where(x => !x.IsIsDeletedColumn && !x.IsRowVersionColumn).ToList();
+        public List<CdcColumnConfig> SelectedEntityColumns => SelectedColumns.Where(x => !x.IsIsDeletedColumn).ToList();
 
         /// <summary>
         /// Gets the selected column configurations.
@@ -427,7 +419,7 @@ namespace Beef.CodeGen.Config.Database
             CheckKeyHasValue(Name);
             CheckOptionsProperties();
 
-            Schema = DefaultWhereNull(Schema, () => "dbo");
+            Schema = DefaultWhereNull(Schema, () => Root!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
@@ -453,7 +445,6 @@ namespace Beef.CodeGen.Config.Database
                 ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
-            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
 
             foreach (var c in DbTable.Columns)
             {
@@ -478,7 +469,7 @@ namespace Beef.CodeGen.Config.Database
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
-                    if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
+                    if (cc.Name != ColumnIsDeleted?.Name)
                     {
                         MapIdentifierMappingColumn(Root!, this, Schema!, IdentifierMappingColumns, cc);
                         cc.Prepare(Root!, this);
@@ -486,8 +477,8 @@ namespace Beef.CodeGen.Config.Database
                     }
                 }
 
-                // Always include IsDeleted and RowVersion!
-                if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
+                // Always include IsDeleted!
+                if (cc.Name == ColumnIsDeleted?.Name)
                 {
                     cc.Prepare(Root!, this);
                     Columns.Add(cc);

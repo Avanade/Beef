@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.8
+- *Fixed:* Corrected issue where converting JSON deserialized `EventData.Value` to an intrinsic type such as a `Guid`.
+
 ## v4.1.7
 - *Enhancement:* Added new `IEventDataContentSerializer` and `IEventDataConverter` to more easily facilitate multiple serializers and converters over time.
 - *Enhancement:* Leverage `IEventDataContentSerializer` to support [CloudEvents](https://github.com/cloudevents/sdk-csharp) with new `NewtonsoftJsonCloudEventSerializer`. This is the default.

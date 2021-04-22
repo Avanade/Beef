@@ -25,7 +25,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`Name`** | The name of the primary table.
-`Schema` | The schema name of the primary table. Defaults to `dbo`.
+`Schema` | The default schema name used where not otherwise explicitly specified. Defaults to `CodeGeneration.Schema`.
 `Alias` | The `Schema.Table` alias name. Will automatically default where not specified.
 
 <br/>
@@ -74,7 +74,6 @@ Provides the _special Column Name inference_ configuration.
 Property | Description
 -|-
 `ColumnNameIsDeleted` | The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.
-`ColumnNameRowVersion` | The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.
 
 <br/>
 

@@ -33,7 +33,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The unique name.
-`schema` | The schema name of the table to join. Defaults to `Table.Schema`; i.e. same schema.
+`schema` | The schema name of the table to join. Defaults to `Cdc.Schema`; i.e. same schema.
 `tableName` | The name of the table to join. Defaults to `Name`. This is used to specify the actual underlying database table name (where the `Name` has been changed to enable uniqueness).
 `alias` | The `Schema.Table` alias name. Will automatically default where not specified.
 **`type`** | The SQL join type. Valid options are: `Cdc`, `Inner`, `Left`, `Right`, `Full`. Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.

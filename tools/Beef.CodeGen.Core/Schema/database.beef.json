@@ -979,8 +979,8 @@
             },
             "schema": {
               "type": "string",
-              "title": "The schema name of the primary table.",
-              "description": "Defaults to `dbo`."
+              "title": "The default schema name used where not otherwise explicitly specified.",
+              "description": "Defaults to `CodeGeneration.Schema`."
             },
             "alias": {
               "type": "string",
@@ -1151,11 +1151,6 @@
               "title": "The column name for the `IsDeleted` capability.",
               "description": "Defaults to `CodeGeneration.IsDeleted`."
             },
-            "columnNameRowVersion": {
-              "type": "string",
-              "title": "The column name for the `RowVersion` capability.",
-              "description": "Defaults to `CodeGeneration.RowVersion`."
-            },
             "joins": {
               "type": "array",
               "title": "The corresponding `Join` collection.",
@@ -1170,7 +1165,7 @@
                     "schema": {
                       "type": "string",
                       "title": "The schema name of the table to join.",
-                      "description": "Defaults to `Table.Schema`; i.e. same schema."
+                      "description": "Defaults to `Cdc.Schema`; i.e. same schema."
                     },
                     "tableName": {
                       "type": "string",

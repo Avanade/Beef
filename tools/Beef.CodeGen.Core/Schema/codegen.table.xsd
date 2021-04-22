@@ -676,7 +676,7 @@
                   </xs:attribute>
                   <xs:attribute name="Schema" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>The schema name of the table to join. Defaults to `Table.Schema`; i.e. same schema.</xs:documentation>
+                      <xs:documentation>The schema name of the table to join. Defaults to `Cdc.Schema`; i.e. same schema.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="TableName" use="optional" type="xs:string">
@@ -779,7 +779,7 @@
             </xs:attribute>
             <xs:attribute name="Schema" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The schema name of the primary table. Defaults to `dbo`.</xs:documentation>
+                <xs:documentation>The default schema name used where not otherwise explicitly specified. Defaults to `CodeGeneration.Schema`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="Alias" use="optional" type="xs:string">
@@ -916,11 +916,6 @@
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
-              <xs:annotation>
-                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
           </xs:complexType>

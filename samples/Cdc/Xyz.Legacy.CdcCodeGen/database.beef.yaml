@@ -1,0 +1,42 @@
+﻿# Global configuration
+schema: Legacy                                 # Defaults the schema for the non-CDC related artefacts.
+cdcSchema: XCdc                                # Specifies the schema for all the CDC related artefacts.
+cdcIdentifierMapping: true                     # Indicates to include the generation of the global identifier mapping artefacts.
+cdcExcludeColumnsFromETag: [ rowversion ]      # Default list of columns to exclude from the generated ETag (duplicate send tracking).
+pathDatabaseSchema: Xyz.Legacy.CdcDatabase     # Path (directory) for the database-related artefacts (relative to parent).
+pathCdc: Xyz.Legacy.CdcPublisher               # Path (directory) for the CDC service-related artefacts (relative to parent).
+namespaceCdc: Xyz.Legacy.CdcPublisher          # .NET namespace for the CDC service-related artefacts.
+hasBeefDbo: false                              # Indicates that the database does not contain the standard _Beef_ dbo schema artefacts.
+eventSubjectFormat: NameOnly                   # Event subject should include name only; not append the key.
+eventSubjectRoot: Xyz.Legacy                   # Event subject root prepended to all published events.
+eventActionFormat: PastTense                   # Event action should be formatted in the past tense.
+eventSourceRoot: /legacy_db                    # Event source URI root prepended to all published events.
+eventSourceKind: Relative                      # Event source URI is relative versus absolute.
+cdc:                                           # Zero or more CDC entities.
+
+# CDC entity configuration for primary table 'Legacy.Person':
+# - name - the name of the table (uses default schema above).
+# - identifierMapping - indicates that a global identifier is to be mapped/assigned to the primary key.
+# - excludeColumns - lists the columns that should not be part of the entity published.
+# - joins - zero or more joins to be included within the entity.
+- { name: Person, identifierMapping: true, excludeColumns: [ SapId, RowVersion ],
+    joins: [
+
+      # CDC-related join for secondary table 'Legacy.PersonAddress':
+      # - name - the name of the table (uses default schema above).
+      # - propertyName - the .NET property name so it feels more natural within the entity.
+      # - excludeColumns - lists the columns that should not be part of the entity published.
+      # - on - List the column(s) that should be used for the join:
+      #   - name - the name of the column from this join table to use for the join; 'toColumn' defaults where not explicitly specified.
+      { name: PersonAddress, propertyName: Addresses, excludeColumns: [ RowVersion ], on: [ { name: PersonId } ] },
+
+      # Non CDC-related join for secondary table 'Legacy.AddressType':
+      # - name - the name of the table (uses default schema above).
+      # - type - specifies the type of join, in this case Left Outer.
+      # - joinTo - specifies the table name (previously defined) to join to; defaults to primarty table unless explicitly specified.
+      # - includeColumns - list the columns that should be included in the entity published (versus 'excludeColumns'.
+      # - on - List the column(s) that should be used for the join:
+      #   - name - the name of the column from this join table to use for the join; 'toColumn' defaults where not explicitly specified.
+      { name: AddressType, type: Left, joinTo: PersonAddress, includeColumns: [ Code ], on: [ { name: AddressTypeId } ] }
+    ]
+  }

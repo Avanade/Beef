@@ -52,7 +52,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The schema name of the table to join.",
-            Description = "Defaults to `Table.Schema`; i.e. same schema.")]
+            Description = "Defaults to `Cdc.Schema`; i.e. same schema.")]
         public string? Schema { get; set; }
 
         /// <summary>

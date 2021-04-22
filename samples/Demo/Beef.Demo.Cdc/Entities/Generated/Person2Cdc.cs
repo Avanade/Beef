@@ -63,6 +63,12 @@ namespace Beef.Demo.Cdc.Entities
         public string? City { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'Row Version' (Demo.Person2.RowVersion) column value.
+        /// </summary>
+        [JsonProperty("rowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public byte[]? RowVersion { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'Created By' (Demo.Person2.CreatedBy) column value.
         /// </summary>
         [JsonProperty("createdBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -87,10 +93,10 @@ namespace Beef.Demo.Cdc.Entities
         public DateTime? UpdatedDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the entity tag ('RowVersion' column).
+        /// Gets or sets the entity tag (calculated as a JSON serialized hash value).
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [MapperProperty("RowVersion", ConverterType = typeof(Beef.Data.Database.DatabaseRowVersionConverter))]
+        [MapperIgnore()]
         public string? ETag { get; set; }
 
         /// <summary>
@@ -113,6 +119,7 @@ namespace Beef.Demo.Cdc.Entities
             GenderId = default!;
             Street = default!;
             City = default!;
+            RowVersion = default!;
             CreatedBy = default!;
             CreatedDate = default!;
         }

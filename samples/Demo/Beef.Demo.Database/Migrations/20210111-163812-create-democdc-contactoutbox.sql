@@ -11,5 +11,6 @@ CREATE TABLE [DemoCdc].[ContactOutbox] (
   [AddressMaxLsn] BINARY(10) NULL,
   [IsComplete] BIT NOT NULL,
   [CompletedDate] DATETIME NULL,
+  [CorrelationId] NVARCHAR(64) NULL,
   [HasDataLoss] BIT NOT NULL
 );
