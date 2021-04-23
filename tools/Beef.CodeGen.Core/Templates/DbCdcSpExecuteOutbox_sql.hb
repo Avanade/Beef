@@ -1,8 +1,8 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{CdcSchema}}].[{{ExecuteStoredProcedureName}}]
-  @MaxQuerySize INT = 100,                 -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
-  @CorrelationId NVARCHAR(64) NULL = NULL, -- Correlation identifier to aid tracking of outbox execution and corresponding events.
-  @ContinueWithDataLoss BIT = 0            -- Ignores data loss and continues; versus throwing an error.
+  @MaxQuerySize INT = 100,            -- Maximum size of query to limit the number of changes to a manageable batch (performance vs failure trade-off).
+  @CorrelationId NVARCHAR(64) = NULL, -- Correlation identifier to aid tracking of outbox execution and corresponding events.
+  @ContinueWithDataLoss BIT = 0       -- Ignores data loss and continues; versus throwing an error.
 AS
 BEGIN
   /*

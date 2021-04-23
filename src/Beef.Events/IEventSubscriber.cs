@@ -53,6 +53,16 @@ namespace Beef.Events
         Type? ValueType { get; }
 
         /// <summary>
+        /// Indicates whether a <c>null</c> value is considered invalid data and a corresponding <see cref="Result.InvalidData(BusinessException, ResultHandling?)"/> should automatically result.
+        /// </summary>
+        bool ConsiderNullValueAsInvalidData { get; }
+
+        /// <summary>
+        /// Gets or sets the originating <see cref="IEventSubscriberData"/> (intended for internal use only).
+        /// </summary>
+        IEventSubscriberData? OriginatingData { get; set; }
+
+        /// <summary>
         /// Receive and process the subscribed <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>

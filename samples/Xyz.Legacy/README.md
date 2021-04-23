@@ -293,6 +293,22 @@ cdc:                                           # Zero or more CDC entities...
   }
 ```
 
+There are many additional options within the YAML to further fine-tune the CDC code-gen; see the documentation as follows.
+
+```
+CodeGeneration
+└── Cdc(s)
+  └── CdcJoin(s)
+    └── CdcJoinOn(s)
+```
+
+Configuration details for each of the above are as follows:
+- CodeGeneration - [YAML/JSON](../../docs/Database-CodeGeneration-Config.md) or [XML](../../docs/Database-CodeGeneration-Config-Xml.md)
+- Cdc - [YAML/JSON](../../docs/Database-Cdc-Config.md) or [XML](../../docs/Database-Cdc-Config-Xml.md)
+- CdcJoin - [YAML/JSON](../../docs/Database-CdcJoin-Config.md) or [XML](../../docs/Database-CdcJoin-Config-Xml.md)
+- CdcJoinOn - [YAML/JSON](../../docs/Database-CdcJoinOn-Config.md) or [XML](../../docs/Database-CdcJoinOn-Config-Xml.md)
+
+
 <br/>
 
 ### Execute code-gen
@@ -448,7 +464,7 @@ info: Xyz.Legacy.CdcPublisher.Services.PersonCdcHostedService[0]
 
 ### Execute using Azure Service Bus
 
-Next step is to publish the event to the likes of Azure Service Bus so one of more independent services can consume and process accordingly. The beef [`ServiceBusSender`](../../src/Beef.Events.ServiceBus/ServiceBusSender.cs) can accept either a specified queue name, or can infer from the event subject (i.e. a queue per entity). The second option is the approach that will be used here.
+Next step is to publish the event to the likes of Azure Service Bus so one of more independent services can consume and process accordingly. The _Beef_ [`ServiceBusSender`](../../src/Beef.Events.ServiceBus/ServiceBusSender.cs) can accept either a specified queue name, or can infer from the event subject (i.e. a queue per entity). The second option is the approach that will be used here.
 
 An Azure Service Bus Namespace with a queue name `xyz.legacy.person` is required to be set up. Once configured get the [_Shared access policy_](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas) for the Service Bus Namespace (not the queue itself) that has _Send_ and _Listen_ permissions (required for this sample for simplicity).
 

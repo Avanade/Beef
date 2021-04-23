@@ -13,6 +13,7 @@ namespace Beef.Events
     public abstract class EventSubscriberBase : IEventSubscriber
     {
         private ILogger? _logger;
+        private IEventSubscriberData? _originatingData;
 
         /// <summary>
         /// Gets or sets the <see cref="ILogger"/>.
@@ -60,6 +61,21 @@ namespace Beef.Events
         public abstract Type? ValueType { get; }
 
         /// <summary>
+        /// Indicates whether a <c>null</c> value is considered invalid data and a corresponding <see cref="Result.InvalidData(BusinessException, ResultHandling?)"/> should automatically result.
+        /// </summary>
+        public abstract bool ConsiderNullValueAsInvalidData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the originating <see cref="IEventSubscriberData"/> (for internal use only).
+        /// </summary>
+        IEventSubscriberData? IEventSubscriber.OriginatingData { get => _originatingData; set => _originatingData = value ?? throw new ArgumentNullException(nameof(IEventSubscriber.OriginatingData)); }
+
+        /// <summary>
+        /// Gets the originating <see cref="IEventSubscriberData"/>.
+        /// </summary>
+        public IEventSubscriberData GetOriginatingData() => _originatingData ?? throw new InvalidOperationException("The OriginatingData currently does not have a value; this must be configured prior to access.");
+
+        /// <summary>
         /// Receive and process the <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
@@ -80,6 +96,12 @@ namespace Beef.Events
         public override Type? ValueType { get => null; }
 
         /// <summary>
+        /// Indicates whether a <c>null</c> value is considered invalid data and a corresponding <see cref="Result.InvalidData(BusinessException, ResultHandling?)"/> should automatically result.
+        /// </summary>
+        /// <remarks>Always is <c>false</c> as there is no <see cref="ValueType"/>.</remarks>
+        public override bool ConsiderNullValueAsInvalidData { get => false; set => _ = value ? throw new NotSupportedException("Must always be 'false' where no underlying Value is supported.") : value; }
+
+        /// <summary>
         /// Receive and process the <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
@@ -98,6 +120,12 @@ namespace Beef.Events
         /// Gets the value <see cref="Type"/>.
         /// </summary>
         public override Type? ValueType { get => typeof(T); }
+
+        /// <summary>
+        /// Indicates whether a <c>null</c> value is considered invalid data and a corresponding <see cref="Result.InvalidData(BusinessException, ResultHandling?)"/> should automatically result.
+        /// </summary>
+        /// <remarks>Defaults to <c>true</c>.</remarks>
+        public override bool ConsiderNullValueAsInvalidData { get; set; } = true;
 
         /// <summary>
         /// Receive and process the <see cref="EventData"/> (internally casts the <paramref name="eventData"/> to <see cref="EventData{T}"/> and invokes <see cref="ReceiveAsync(EventData{T})"/>).

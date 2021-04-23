@@ -55,27 +55,27 @@ namespace Beef.Demo.EventSend
                         break;
 
                     case "2":
-                        ehp.PublishValue((Guid?)null, "Demo.Robot.Null", "PowerSourceChange");
+                        ehp.Publish("Demo.Robot.Null", "PowerSourceChange");
                         await ehp.SendAsync();
                         break;
 
                     case "3":
-                        ehp.PublishValue(Guid.NewGuid(), "Demo.Robot.???", "PowerSourceChange");
+                        ehp.PublishValue(new PowerSourceChangeData { RobotId = Guid.NewGuid(), PowerSource = "N" }, "Demo.Robot.???", "PowerSourceChange");
                         await ehp.SendAsync();
                         break;
 
                     case "4":
-                        ehp.PublishValue(new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.88", "PowerSourceChange");
+                        ehp.PublishValue(new PowerSourceChangeData { RobotId = new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "N" }, "Demo.Robot.88", "PowerSourceChange");
                         await ehp.SendAsync();
                         break;
 
                     case "5":
-                        ehp.PublishValue(new Guid(99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.99", "PowerSourceChange");
+                        ehp.PublishValue(new PowerSourceChangeData { RobotId = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "!" }, "Demo.Robot.2", "PowerSourceChange");
                         await ehp.SendAsync();
                         break;
 
                     case "6":
-                        var ed = EventData.CreateValueEvent(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.2", "PowerSourceChange");
+                        var ed = EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "N" }, "Demo.Robot.2", "PowerSourceChange");
                         ed.Key = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         ed.PartitionKey = PartitionKeyGenerator.Generate(Guid.NewGuid());
                         ehp.Publish(ed);
@@ -88,27 +88,27 @@ namespace Beef.Demo.EventSend
                         break;
 
                     case "12":
-                        sbs.PublishValue((Guid?)null, "Demo.Robot.Null", "PowerSourceChange");
+                        sbs.Publish("Demo.Robot.Null", "PowerSourceChange");
                         await sbs.SendAsync();
                         break;
 
                     case "13":
-                        sbs.PublishValue(Guid.NewGuid(), "Demo.Robot.???", "PowerSourceChange");
+                        sbs.PublishValue(new PowerSourceChangeData { RobotId = Guid.NewGuid(), PowerSource = "N" }, "Demo.Robot.???", "PowerSourceChange");
                         await sbs.SendAsync();
                         break;
 
                     case "14":
-                        sbs.PublishValue(new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.88", "PowerSourceChange");
+                        sbs.PublishValue(new PowerSourceChangeData { RobotId = new Guid(88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "N" }, "Demo.Robot.88", "PowerSourceChange");
                         await sbs.SendAsync();
                         break;
 
                     case "15":
-                        sbs.PublishValue(new Guid(99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.99", "PowerSourceChange");
+                        sbs.PublishValue(new PowerSourceChangeData { RobotId = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "!" }, "Demo.Robot.2", "PowerSourceChange");
                         await sbs.SendAsync();
                         break;
 
                     case "16":
-                        ed = EventData.CreateValueEvent(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Demo.Robot.2", "PowerSourceChange");
+                        ed = EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), PowerSource = "N" }, "Demo.Robot.2", "PowerSourceChange");
                         ed.Key = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         ed.PartitionKey = PartitionKeyGenerator.Generate(Guid.NewGuid());
                         sbs.Publish(ed);
@@ -120,5 +120,12 @@ namespace Beef.Demo.EventSend
                 sbs.Reset();
             }
         }
+    }
+
+    public class PowerSourceChangeData
+    {
+        public Guid RobotId { get; set; }
+
+        public string PowerSource { get; set; }
     }
 }

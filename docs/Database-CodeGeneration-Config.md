@@ -13,6 +13,7 @@ Category | Description
 [`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
+[`Event`](#Event) | Provides the _Event_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
@@ -49,10 +50,6 @@ Property | Description
 `cdcIdentifierMapping` | Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
 `cdcIdentifierMappingTableName` | The table name for the `Cdc`-IdentifierMapping. Defaults to `CdcIdentifierMapping` (literal).
 `cdcIdentifierMappingStoredProcedureName` | The table name for the `Cdc`-IdentifierMapping. Defaults to `spCreateCdcIdentifierMapping` (literal).
-`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
-`eventSourceKind` | The URI kind for the event source URIs. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`. Defaults to `None` (being the event source is not updated).
-**`eventSubjectRoot`** | The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).
-**`eventActionFormat`** | The formatting for the Action when an Event is published. Valid options are: `None`, `PastTense`. Defaults to `None` (no formatting required, i.e. as-is).
 `jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`. Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
 `pluralizeCollectionProperties` | Indicates whether the .NET collection properties should be pluralized.
 `hasBeefDbo` | Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects. Defaults to `true`.
@@ -78,7 +75,21 @@ Provides the _.NET_ configuration.
 Property | Description
 -|-
 `cdcExcludeColumnsFromETag` | The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)
-`autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`. Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.
+`autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`. Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
+
+<br/>
+
+## Event
+Provides the _Event_ configuration.
+
+Property | Description
+-|-
+**`eventSubjectRoot`** | The root for the event name by prepending to all event subject names via CDC. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).
+`eventSubjectFormat` | The default formatting for the Subject when an Event is published via CDC. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
+**`eventActionFormat`** | The formatting for the Action when an Event is published via CDC. Valid options are: `None`, `PastTense`. Defaults to `None` (no formatting required, i.e. as-is).
+`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs for CDC. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
+`eventSourceKind` | The URI kind for the event source URIs for CDC. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`. Defaults to `None` (being the event source is not updated).
+`eventSourceFormat` | The default formatting for the Source when an Event is published via CDC. Valid options are: `NameOnly`, `NameAndKey`, `NameAndGlobalId`. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
 
 <br/>
 

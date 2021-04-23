@@ -24,6 +24,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CategorySchema("Event", Title = "Provides the _Event_ configuration.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
@@ -196,54 +197,6 @@ namespace Beef.CodeGen.Config.Database
         public List<string>? CdcExcludeColumnsFromETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the URI root for the event source by prepending to all event source URIs.
-        /// </summary>
-        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The URI root for the event source by prepending to all event source URIs.",
-            Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
-        public string? EventSourceRoot { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URI kind for the event source URIs.
-        /// </summary>
-        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
-            Description = "Defaults to `None` (being the event source is not updated).")]
-        public string? EventSourceKind { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Source when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
-            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
-        public string? EventSourceFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the root for the event name by prepending to all event subject names.
-        /// </summary>
-        [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The root for the event name by prepending to all event subject names.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).", IsImportant = true)]
-        public string? EventSubjectRoot { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the formatting for the Action when an Event is published.
-        /// </summary>
-        [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
-            Description = "Defaults to `None` (no formatting required, i.e. as-is).")]
-        public string? EventActionFormat { get; set; }
-
-        /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -275,8 +228,60 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("autoDotNetRename", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
-            Description = "Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.")]
+            Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
+
+        #endregion
+
+        #region Event
+
+        /// <summary>
+        /// Gets or sets the root for the event name by prepending to all event subject names.
+        /// </summary>
+        [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The root for the event name by prepending to all event subject names via CDC.",
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).", IsImportant = true)]
+        public string? EventSubjectRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The default formatting for the Subject when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSubjectFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the formatting for the Action when an Event is published.
+        /// </summary>
+        [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The formatting for the Action when an Event is published via CDC.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+            Description = "Defaults to `None` (no formatting required, i.e. as-is).")]
+        public string? EventActionFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI root for the event source by prepending to all event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The URI root for the event source by prepending to all event source URIs for CDC.",
+            Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
+        public string? EventSourceRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI kind for the event source URIs.
+        /// </summary>
+        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The URI kind for the event source URIs for CDC.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+            Description = "Defaults to `None` (being the event source is not updated).")]
+        public string? EventSourceKind { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Source when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Event", Title = "The default formatting for the Source when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
+        public string? EventSourceFormat { get; set; }
 
         #endregion
 
@@ -515,7 +520,7 @@ namespace Beef.CodeGen.Config.Database
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
-            AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "PascalCase");
+            AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "SnakeKebabToPascalCase");
 
             if (Queries == null)
                 Queries = new List<QueryConfig>();

@@ -1021,63 +1021,6 @@
           <xs:documentation>The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="EventSourceRoot" use="optional" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="EventSourceKind" use="optional">
-        <xs:annotation>
-          <xs:documentation>The URI kind for the event source URIs. Defaults to `None` (being the event source is not updated).</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="None" />
-            <xs:enumeration value="Absolute" />
-            <xs:enumeration value="Relative" />
-            <xs:enumeration value="RelativeOrAbsolute" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="EventSourceFormat" use="optional">
-        <xs:annotation>
-          <xs:documentation>The default formatting for the Source when an Event is published. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="NameOnly" />
-            <xs:enumeration value="NameAndKey" />
-            <xs:enumeration value="NameAndGlobalId" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="EventSubjectFormat" use="optional">
-        <xs:annotation>
-          <xs:documentation>The default formatting for the Subject when an Event is published. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="NameOnly" />
-            <xs:enumeration value="NameAndKey" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="EventActionFormat" use="optional">
-        <xs:annotation>
-          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required, i.e. as-is).</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="None" />
-            <xs:enumeration value="PastTense" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
       <xs:attribute name="JsonSerializer" use="optional">
         <xs:annotation>
           <xs:documentation>The JSON Serializer to use for JSON property attribution. Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).</xs:documentation>
@@ -1101,13 +1044,70 @@
       </xs:attribute>
       <xs:attribute name="AutoDotNetRename" use="optional">
         <xs:annotation>
-          <xs:documentation>The option to automatically rename the SQL Tables and Columns for use in .NET. Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.</xs:documentation>
+          <xs:documentation>The option to automatically rename the SQL Tables and Columns for use in .NET. Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
             <xs:enumeration value="PascalCase" />
             <xs:enumeration value="SnakeKebabToPascalCase" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root for the event name by prepending to all event subject names via CDC. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSubjectFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default formatting for the Subject when an Event is published via CDC. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NameOnly" />
+            <xs:enumeration value="NameAndKey" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventActionFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The formatting for the Action when an Event is published via CDC. Defaults to `None` (no formatting required, i.e. as-is).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="PastTense" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventSourceRoot" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The URI root for the event source by prepending to all event source URIs for CDC. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventSourceKind" use="optional">
+        <xs:annotation>
+          <xs:documentation>The URI kind for the event source URIs for CDC. Defaults to `None` (being the event source is not updated).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Absolute" />
+            <xs:enumeration value="Relative" />
+            <xs:enumeration value="RelativeOrAbsolute" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventSourceFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>The default formatting for the Source when an Event is published via CDC. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="NameOnly" />
+            <xs:enumeration value="NameAndKey" />
+            <xs:enumeration value="NameAndGlobalId" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

@@ -106,55 +106,6 @@
         }
       ]
     },
-    "eventSourceRoot": {
-      "type": "string",
-      "title": "The URI root for the event source by prepending to all event source URIs.",
-      "description": "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s)."
-    },
-    "eventSourceKind": {
-      "type": "string",
-      "title": "The URI kind for the event source URIs.",
-      "description": "Defaults to `None` (being the event source is not updated).",
-      "enum": [
-        "None",
-        "Absolute",
-        "Relative",
-        "RelativeOrAbsolute"
-      ]
-    },
-    "eventSourceFormat": {
-      "type": "string",
-      "title": "The default formatting for the Source when an Event is published.",
-      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
-      "enum": [
-        "NameOnly",
-        "NameAndKey",
-        "NameAndGlobalId"
-      ]
-    },
-    "eventSubjectRoot": {
-      "type": "string",
-      "title": "The root for the event name by prepending to all event subject names.",
-      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s)."
-    },
-    "eventSubjectFormat": {
-      "type": "string",
-      "title": "The default formatting for the Subject when an Event is published.",
-      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
-      "enum": [
-        "NameOnly",
-        "NameAndKey"
-      ]
-    },
-    "eventActionFormat": {
-      "type": "string",
-      "title": "The formatting for the Action when an Event is published.",
-      "description": "Defaults to `None` (no formatting required, i.e. as-is).",
-      "enum": [
-        "None",
-        "PastTense"
-      ]
-    },
     "jsonSerializer": {
       "type": "string",
       "title": "The JSON Serializer to use for JSON property attribution.",
@@ -176,11 +127,60 @@
     "autoDotNetRename": {
       "type": "string",
       "title": "The option to automatically rename the SQL Tables and Columns for use in .NET.",
-      "description": "Defaults to `PascalCase` which will capatilize the first character. The `SnakeKebabToPascalCase` option will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`.",
+      "description": "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.",
       "enum": [
         "None",
         "PascalCase",
         "SnakeKebabToPascalCase"
+      ]
+    },
+    "eventSubjectRoot": {
+      "type": "string",
+      "title": "The root for the event name by prepending to all event subject names via CDC.",
+      "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s)."
+    },
+    "eventSubjectFormat": {
+      "type": "string",
+      "title": "The default formatting for the Subject when an Event is published via CDC.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey"
+      ]
+    },
+    "eventActionFormat": {
+      "type": "string",
+      "title": "The formatting for the Action when an Event is published via CDC.",
+      "description": "Defaults to `None` (no formatting required, i.e. as-is).",
+      "enum": [
+        "None",
+        "PastTense"
+      ]
+    },
+    "eventSourceRoot": {
+      "type": "string",
+      "title": "The URI root for the event source by prepending to all event source URIs for CDC.",
+      "description": "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s)."
+    },
+    "eventSourceKind": {
+      "type": "string",
+      "title": "The URI kind for the event source URIs for CDC.",
+      "description": "Defaults to `None` (being the event source is not updated).",
+      "enum": [
+        "None",
+        "Absolute",
+        "Relative",
+        "RelativeOrAbsolute"
+      ]
+    },
+    "eventSourceFormat": {
+      "type": "string",
+      "title": "The default formatting for the Source when an Event is published via CDC.",
+      "description": "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.",
+      "enum": [
+        "NameOnly",
+        "NameAndKey",
+        "NameAndGlobalId"
       ]
     },
     "pathBase": {

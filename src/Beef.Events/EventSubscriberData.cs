@@ -5,7 +5,7 @@ using System;
 namespace Beef.Events
 {
     /// <summary>
-    /// Enables the base event/message data.
+    /// Enables the base originating event/message data.
     /// </summary>
     public interface IEventSubscriberData
     {
@@ -33,7 +33,7 @@ namespace Beef.Events
     }
 
     /// <summary>
-    /// Provides for the base event/message data.
+    /// Provides for the base originating event/message data.
     /// </summary>
     public abstract class EventSubscriberData<TOriginating> : IEventSubscriberData where TOriginating : class
     {
