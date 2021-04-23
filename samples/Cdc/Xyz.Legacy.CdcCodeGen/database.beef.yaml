@@ -34,7 +34,7 @@ cdc:                                           # Zero or more CDC entities.
       # - name - the name of the table (uses default schema above).
       # - type - specifies the type of join, in this case Left Outer.
       # - joinTo - specifies the table name (previously defined) to join to; defaults to primarty table unless explicitly specified.
-      # - includeColumns - list the columns that should be included in the entity published (versus 'excludeColumns'.
+      # - includeColumns - list the columns that should be included in the entity published (versus 'excludeColumns').
       # - on - List the column(s) that should be used for the join:
       #   - name - the name of the column from this join table to use for the join; 'toColumn' defaults where not explicitly specified.
       { name: AddressType, type: Left, joinTo: PersonAddress, includeColumns: [ Code ], on: [ { name: AddressTypeId } ] }

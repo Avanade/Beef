@@ -2,6 +2,21 @@
 
 The purpose of this sample is to demonstrate the usage of _Beef_ CDC on an existing database. In this scenario, we intend to leverage CDC to monitor table changes and send a corresponding event to Azure Service Bus so a downstream system can process.
 
+The following will be covered in this sample:
+- [Scope](#Scope)
+- [Legacy database](#Legacy-database)
+- [Solution structure](#Solution-structure)
+- [Xyz.Legacy.CdcDatabase project](#Xyz.Legacy.CdcDatabase)
+- [Xyz.Legacy.CdcPublisher project](#Xyz.Legacy.CdcPublisher)
+- [Xyz.Legacy.CdcCodeGen project](#Xyz.Legacy.CdcCodeGen)
+- [Database artefact publish](#Database-artefact-publish)
+- [Execute the publisher](#Execute-the-publisher)
+
+Where required (optional) a sample event/message receiver is also covered:
+- [Xyz.Legacy.CdcReceiver project](#Xyz.Legacy.CdcReceiver)
+
+Enjoy!
+
 <br/>
 
 ## Scope
@@ -62,7 +77,7 @@ The remainder of the CDC related artefacts will be created and updated using [co
 
 Before CDC can be leveraged it first needs to be set up in the database. First step is to turn it on for the database, then set it up for each of the tables that are to be monitored, being `Person` and `PersonAddress`. The `AddressType` table does not require CDC as it will be referenced only; i.e. no monitoring of changes to the data is needed.
 
-To perform, a _new_ script will need to be created. Within Visual Studio, add _Script..._ using the _Pre-deployment Script_ template, and rename as [`Script.PreDeployment.CdcSetup.sql`](./Xyz.Legacy.CdcDatabase/Script.PreDeployment.CdcSetup.sql). The contents should be as follows.
+To perform, a new SQL script will need to be created. Within Visual Studio, add _Script..._ using the _Pre-deployment Script_ template, and rename as [`Script.PreDeployment.CdcSetup.sql`](./Xyz.Legacy.CdcDatabase/Script.PreDeployment.CdcSetup.sql). The contents should be as follows.
 
 ``` sql
 -- Enable for the database.
@@ -107,7 +122,7 @@ CREATE SCHEMA [XCdc]
 
 ## Xyz.Legacy.CdcPublisher
 
-Create new using the _C# Console Application_ template within Visual Studio and name `Xyz.Legacy.CdcPublisher`. Once created, add the `Beef.Data.Database.Cdc` and `Beef.Events.ServiceBus` NuGet packages to the project. Replace the contents of `Program.cs` with the following.
+Create new using the _C# Console Application_ template within Visual Studio and name `Xyz.Legacy.CdcPublisher`. Once created, add the [`Beef.Data.Database.Cdc`](../../src/Beef.Data.Database.Cdc) and [`Beef.Events.ServiceBus`](../../src/Beef.Events.ServiceBus) NuGet packages to the project. Replace the contents of `Program.cs` with the following.
 
 ``` csharp
 using Azure.Messaging.ServiceBus;
@@ -160,7 +175,7 @@ At this point it will look like there are code errors (i.e. it will not compile)
 
 ### Database.cs
 
-To enable database access, a _Beef_ [IDatabase](../../src/Beef.Data.Database/IDatabase.cs) instance is required. This functionality is enabled via the [DatabaseBase](../../src/Beef.Data.Database/DatabaseBase.cs) 
+To enable database access, a _Beef_ [IDatabase](../../src/Beef.Data.Database/IDatabase.cs) instance is required. This functionality is enabled via the [DatabaseBase](../../src/Beef.Data.Database/DatabaseBase.cs).
 
 First, create a new `Data` folder in the project and add a `Database.cs` file. The contents should be as follows.
 
@@ -189,7 +204,7 @@ namespace Xyz.Legacy.CdcPublisher.Data
 
 ## Xyz.Legacy.CdcCodeGen
 
-Create new using the _C# Console Application_ template within Visual Studio and name `Xyz.Legacy.CdcCodeGen`. Once created, add the `Beef.CodeGen.Core` NuGet package to the project.
+Create new using the _C# Console Application_ template within Visual Studio and name `Xyz.Legacy.CdcCodeGen`. Once created, add the [`Beef.CodeGen.Core`](../../src/Beef.CodeGen.Core) NuGet package to the project.
 
 The key steps that need to be performed are:
 - [Program.cs](#Program.cs) implements the code to execute the _Beef_ code generator.
@@ -229,9 +244,9 @@ namespace Xyz.Legacy.CdcCodeGen
 
 ### YAML configuration
 
-The YAML configuration provides the input that drives the code-generation. Create a new `database.beef.yaml` file. If you use an editor, such as Visual Studio Code, that supports YAML and related JSON schemas this will automatically support intellisense. Unfortunately, Visual Studio 2019 or lower does not
+The YAML configuration provides the input that drives the code-generation. Create a new `database.beef.yaml` file. If you use an editor, such as Visual Studio Code, that supports YAML and related JSON schemas this will automatically support intellisense. Unfortunately, Visual Studio 2019 or lower does not.
 
-Replace the contents of database.beef.yaml` with the following. The comments have been added to aid the reader and are not neccessary for the code generation to function; as such they can be removed.
+Replace the contents of `database.beef.yaml` with the following. The comments have been added to aid the reader and are not neccessary for the code generation to function; as such they can be removed.
 
 ``` yaml
 # CDC global configuration
@@ -248,7 +263,7 @@ eventSubjectRoot: Xyz.Legacy                   # Event subject root prepended to
 eventActionFormat: PastTense                   # Event action should be formatted in the past tense.
 eventSourceRoot: /legacy_db                    # Event source URI root prepended to all published events.
 eventSourceKind: Relative                      # Event source URI is relative versus absolute.
-cdc:                                           # Zero or more CDC entities.
+cdc:                                           # Zero or more CDC entities...
 
 # CDC entity configuration for primary table 'Legacy.Person':
 # - name - the name of the table (uses default schema above).
@@ -270,7 +285,7 @@ cdc:                                           # Zero or more CDC entities.
       # - name - the name of the table (uses default schema above).
       # - type - specifies the type of join, in this case Left Outer.
       # - joinTo - specifies the table name (previously defined) to join to; defaults to primarty table unless explicitly specified.
-      # - includeColumns - list the columns that should be included in the entity published (versus 'excludeColumns'.
+      # - includeColumns - list the columns that should be included in the entity published (versus 'excludeColumns').
       # - on - List the column(s) that should be used for the join:
       #   - name - the name of the column from this join table to use for the join; 'toColumn' defaults where not explicitly specified.
       { name: AddressType, type: Left, joinTo: Person_Address, includeColumns: [ Code ], on: [ { name: AddressTypeId } ] }
@@ -280,9 +295,9 @@ cdc:                                           # Zero or more CDC entities.
 
 <br/>
 
-## Execute code-gen
+### Execute code-gen
 
-Once the YAML configuration is complete the code-gen can be executed. As the _Beef_ code-gen is _gen-many_ the configuration can continue to be maintained and the corresponding code-gen executed as many times are required over the lifetime of the code base.
+Once the YAML configuration is complete the code-gen can be executed. As the _Beef_ code-gen is _gen-many_ the configuration can continue to be maintained and the corresponding code-gen executed as many times are required over the lifetime of the code base. For example, if there is a schema change to add a new column, then executing again will automatically pick that column up for inclusion (unless excluded).
 
 To execute using the debugger, open the project properties, and then navigate to the _Debug_ tab. Set the _Application arguments_ as follows. Then run the application.
 
@@ -295,7 +310,7 @@ Alternatively, the application can be run directly from the command line as foll
 ```
 dotnet run database --connectionString "Data Source=.;Initial Catalog=XyzLegacy;Integrated Security=True"
 
--- Otherwise, set an Environment Variable named 'Xyz_Legacy_ConnectionString' to the connection string value and tun:
+-- Otherwise, set an Environment Variable named 'Xyz_Legacy_ConnectionString' to the connection string value and run:
 dotnet run database
 ```
 
@@ -378,13 +393,17 @@ Beef Code-Gen Tool complete [2850ms, Unchanged = 0, Updated = 0, Created = 15, T
 
 _Tip:_ If any of the generated files are not automatically added to the Visual Studio Project structure, the _Show All Files_ in the _Solution Explorer_ can be used to view, and then added by selecting and using the _Include In Project_ function.
 
-The database artefacts must now be deployed to the `XyzLegacy` database using the DACPAC _Build_ and then _Publish..._ functions. Ensure that the publish complete successfully before continuing.
+The database artefacts must now be deployed to the `XyzLegacy` database using the DACPAC _Build_ and then _Publish..._ functions. Ensure that the publish completes successfully before continuing.
 
 </br>
 
 ## Execute the publisher
 
 Now that the code generation has completed successfully, the required artefacts needed to compile the `Xyz.Legacy.CdcPublisher` project should now exist. Build the project and ensure it compiles successfully.
+
+The key steps that need to be performed are:
+- [Execute with logged events](#Execute-with-logged-events) to validate functioning without Azure Service Bus integration.
+- [Execute using Azure Service Bus](#Execute-using-Azure-Service-Bus) to validate the event send/publish.
 
 <br/>
 
@@ -431,7 +450,7 @@ info: Xyz.Legacy.CdcPublisher.Services.PersonCdcHostedService[0]
 
 Next step is to publish the event to the likes of Azure Service Bus so one of more independent services can consume and process accordingly. The beef [`ServiceBusSender`](../../src/Beef.Events.ServiceBus/ServiceBusSender.cs) can accept either a specified queue name, or can infer from the event subject (i.e. a queue per entity). The second option is the approach that will be used here.
 
-An Azure Service Bus Namespace with a queue name `Xyz.Legacy.Person` is required to be set up. Once configured get the _Shared access policy_ for the Service Bus Namespace (not the queue itself as we are inferring/overridding at runtime) that gives _Send_ permissions.
+An Azure Service Bus Namespace with a queue name `xyz.legacy.person` is required to be set up. Once configured get the [_Shared access policy_](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas) for the Service Bus Namespace (not the queue itself) that has _Send_ and _Listen_ permissions (required for this sample for simplicity).
 
 Make the following change to `Program.cs` (effectively reversing out the commented out code):
 
@@ -447,7 +466,7 @@ To execute using the debugger, open the project properties, and then navigate to
 ContinueWithDataLoss=true IntervalSeconds=3 MaxQuerySize=50 CdcDb="Data Source=.;Initial Catalog=XyzLegacy;Integrated Security=True" ServiceBus="azure_secret_key"
 ```
 
-The program output will not have logged the event. Log back into _Azure Portal_ and navigate to the `Xyz.Legacy.Person` queue. Select the _Service Bus Explorer_ and _Peek_ the messages. The message content type should be `application/json` with the content similar to as follows. Note that the `type` is the event subject and action combined, the _globalId_ is the assigned identifier, with the `source` having the existing identifier. Additionally, _Beef_ adds additional [`EventMetadata`](../../src/Beef.Core/Events/EventData.cs) (selectable properties) as an extension; there is an option to turn this off where not required.
+The program output will not have logged the event JSON explicity like before. Log back into _Azure Portal_ and navigate to the `xyz.legacy.person` queue. Select the _Service Bus Explorer_ and _Peek_ the messages. The message content type should be `application/json` with the content similar to as follows. Note that the `type` is the event subject and action combined, the _globalId_ is the assigned identifier, with the `source` having the existing identifier. Additionally, _Beef_ adds additional [`EventMetadata`](../../src/Beef.Core/Events/EventData.cs) (selectable properties) as an extension such as a `CorrelationId`; there is an option to turn this off where not required.
 
 ``` json
 {
@@ -499,9 +518,20 @@ The program output will not have logged the event. Log back into _Azure Portal_ 
 
 <br/>
 
-## Xyz.Legacy.CdcReceiver (Optional)
+## Xyz.Legacy.CdcReceiver
 
-Create new using the `Azure Functions template` template (select `Empty` on the second screen of the wizard) within Visual Studio and name `Xyz.Legacy.CdcReceiver`. Once created, add the `Beef.Events.ServiceBus` and `Microsoft.Azure.WebJobs.Extensions.ServiceBus` NuGet packages to the project. Also, add a project reference to `Xyz.Legacy.CdcPublisher` as the `PersonCdc` entity will be used when receiving the data. This project now provides the basic foundation to build out the message receiving capability.
+Create new using the `Azure Functions template` template (select `Empty` on the second screen of the wizard) within Visual Studio and name `Xyz.Legacy.CdcReceiver`. Once created, add the [`Beef.Events.ServiceBus`](../../src/Beef.Events.ServiceBus) and `Microsoft.Azure.WebJobs.Extensions.ServiceBus` NuGet packages to the project. Also, add a project reference to `Xyz.Legacy.CdcPublisher` as the `PersonCdc` entity will be used when receiving the data. This project now provides the basic foundation to build out the message receiving capability.
+
+The key steps that need to be performed are:
+- [Startup.cs](#Startup.cs) to provide the Dependency Injection (DI).
+- [PersonReceiver.cs](#PersonReceiver.cs) to act as the Azure Service Bus _Receiver_.
+- [PersonEditSubscriber.cs](#PersonEditSubscriber.cs) to act as the `created` and `updated` event/message subscriber (handler).
+- [PersonDeleteSubscriber.cs](#PersonDeleteSubscriber.cs) to act as the `deleted` event/message subscriber (handler).
+- [Execute receiver](#Execute-receiver) to demonstrate the receiving of an event/message and execution of the appropriate subscriber.
+
+To assist with understanding, consider the following:
+- _Receiver_ - responsible for receiving a message from a messaging system (i.e. Azure Service Bus) and orchestrating its processing via a message _Subscriber_.
+- _Subscriber_ - responsible for the processing of a message, largely independent of how it was orginally received. The _Receiver_ will determine which _Subscriber_ if any should be invoked for a message based on the underlying event subject (and optionally action). There must only be a single _Subscriber_ per subject and action combination; otherwise, a runtime exception will be thrown. An advantage of this separation is that the _Subscriber_ can be easily unit tested without the need for a _Subscriber_ and its required for the likes of Azure Service Bus, etc. 
 
 <br/>
 
@@ -537,13 +567,13 @@ namespace Xyz.Legacy.CdcReceiver
 
 ### PersonReceiver.cs
 
-This is the actual Azure Function itself that is responsible for receiving the messages from Azure Service Bus.
+This is the actual Azure Function itself that is responsible for receiving the messages from Azure Service Bus. In the context of this sample, this is optional - this provides a how-to using _Beef_ to receive and process an event/message.
 
 Code of note:
 - The constructor leverages Dependency Injection (DI) to get the [`ServiceBusReceiverHost`](../../src/Beef.Events.ServiceBus/ServiceBusReceiverHost.cs) instance which was configured within the `Startup.cs`. This is required to receive and process the message via the `ReceiveAsync` method.
 - The `UseLogger` is used to pass the `ILogger` parameter to be used by the receiver. 
 - The `CreateServiceBusData` uses the same approach to get the queue name and connection string as the `ServiceBusTriggerAttribute`; these are needed and used for auditing and logging where applicable (therefore, the values must be the same).
-- The `ReceiveAsync` will receive the message and based on the underlying subject and action will invoke the appropriate subscriber (discussed in next section).
+- The `ReceiveAsync` will receive the message and based on the underlying subject and action will invoke the appropriate subscriber (discussed in next [sub-section](#PersonEditSubscriber.cs)).
 
 Add a `PersonReceiver.cs` file with the following contents.
 
@@ -574,10 +604,6 @@ namespace Xyz.Legacy.CdcReceiver
 </br>
 
 ### PersonEditSubscriber.cs
-
-To assist with understanding, consider the following:
-- _Receiver_ - responsible for receiving a message from a messaging system (i.e. Azure Service Bus) and orchestrating its processing via a message _Subscriber_.
-- _Subscriber_ - responsible for the processing of a message, largely independent of how it was orginally received. The _Receiver_ will determine which _Subscriber_ if any should be invoked for a message based on the underlying event subject (and optionally action). The must only be a single _Subscriber_ per subject and action combination. 
 
 To logically separate the message subscriber(s) from the message recevier(s) it is recommended that these are housed in a `Subscribers` folder. Therefore, add a new folder within the project named `Subscribers`. Then add a `PersonEditSubscriber.cs` file with the following contents that will subscribe to either a `created` or `updated` action.
 
@@ -612,7 +638,7 @@ namespace Xyz.Legacy.CdcReceiver.Subscribers
 
 ### PersonDeleteSubscriber.cs
 
-To further demonstrate separation a delete specific subscriber is required. Add a `PersonDeleteSubscriber.cs` file with the following contents that will subscribe to the `deleted` action.
+To further demonstrate separation a delete specific subscriber is provided. Add a `PersonDeleteSubscriber.cs` file with the following contents that will subscribe to the `deleted` action.
 
 ``` csharp
 using Beef.Events;
@@ -640,7 +666,9 @@ namespace Xyz.Legacy.CdcReceiver.Subscribers
 }
 ```
 
-### Execute
+<br/>
+
+### Execute receiver
 
 The final requirement is to add the `ServiceBusConnectionString` configuration as referenced within the `PersonReceiver`. Within the `local.settings.json` file, add the `ServiceBusConnectionString` setting similar to following. The `azure_secret_key` must be replaced with the _Connection String_ from the Azure Service Bus _Shared access policy_.
 
