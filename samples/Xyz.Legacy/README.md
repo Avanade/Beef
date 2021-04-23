@@ -683,7 +683,7 @@ The final requirement is to add the `ServiceBusConnectionString` configuration a
 }
 ``` 
 
-Finally, execute (debug) the Azure Function from Visual Studio. The Azure Function runtime output should look similar as follows.
+Finally, execute (debug) the Azure Function from Visual Studio. The Azure Function runtime output should look similar as follows. _Note:_ the `CorrelationId` has flowed all the way from the publisher, into the `[XCdc].[PersonOutbox]` table, housed within the event metadata, and finally into the subcriber to enable end-to-end tracing.
 
 ```
 Executing 'PersonReceiver' (Reason='(null)', Id=10685d5e-e1e0-4f60-b21e-33a41b868d41)
