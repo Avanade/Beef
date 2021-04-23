@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.24
+- *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.
+- *Fixed:* The `CdcConfig` special `RowVersion` treatment was removed as it was unnecessary and meant column could not be explicitly excluded.
+- *Enhancement:* Added `CorrelationId` support within CDC.
+
 ## v4.1.23
 - *Enhancement:* Added support for _YAML_ files with a `.yml` suffix.
 - *Enhancement:* Added support for `EventData.Source` to both entity and database (CDC) code-gen.

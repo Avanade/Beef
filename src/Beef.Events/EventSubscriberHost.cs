@@ -211,6 +211,9 @@ namespace Beef.Events
                     @event = await getEventData(subscriber).ConfigureAwait(false);
                     if (@event == null)
                         return await CheckResultAsync(data, CreateInvalidEventDataResult(null, $"EventData is invalid; is required."), subscriber).ConfigureAwait(false);
+
+                    if (subscriber.ConsiderNullValueAsInvalidData && @event.GetValue() == null)
+                        return await CheckResultAsync(data, CreateInvalidEventDataResult(null, $"EventData is invalid; Value must not be null."), subscriber).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -233,6 +236,7 @@ namespace Beef.Events
                     ExecutionContext.SetCurrent(ec);
 
                     // Process the event.
+                    subscriber.OriginatingData = data;
                     return await CheckResultAsync(data, await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subscriber).ConfigureAwait(false);
                 }
                 catch (InvalidEventDataException iedex) { return await CheckResultAsync(data, CreateInvalidEventDataResult(iedex), subscriber).ConfigureAwait(false); }

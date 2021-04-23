@@ -27,10 +27,10 @@ namespace Beef.Demo.Cdc.Entities
         public Guid PersonId { get; set; }
 
         /// <summary>
-        /// Gets or sets the entity tag ('RowVersion' column).
+        /// Gets or sets the entity tag (calculated as a JSON serialized hash value).
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [MapperProperty("RowVersion", ConverterType = typeof(Beef.Data.Database.DatabaseRowVersionConverter))]
+        [MapperIgnore()]
         public string? ETag { get; set; }
 
         /// <summary>

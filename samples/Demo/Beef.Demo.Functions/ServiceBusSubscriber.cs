@@ -16,7 +16,7 @@ namespace Beef.Demo.Functions
         // We also invoke the UseLogger() to get the correct logger instance into the subscriber, etc. for correct output logging.
         [FunctionName("ServiceBusSubscriber")]
         [ExponentialBackoffRetry(-1, "00:00:05", "00:00:30")] // https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-error-pages?tabs=csharp
-        public async Task Run([ServiceBusTrigger("default", Connection = "ServiceBusConnectionString")] Message message, ILogger logger) 
-            => await _subscriber.UseLogger(logger).ReceiveAsync(new ServiceBusData("BeefServiceBus", "default", message));
+        public async Task Run([ServiceBusTrigger("%QueueName%", Connection = "ServiceBusConnectionString")] Message message, ILogger logger)
+            => await _subscriber.UseLogger(logger).ReceiveAsync(_subscriber.CreateServiceBusData(message, "%QueueName%", "ServiceBusConnectionString"));
     }
 }

@@ -235,8 +235,9 @@ See the following for example end-to-end solution/project creation; each demonst
 
 Otherwise, follow along with the following sample tutorials that will provide a more in-depth walkthrough solving a defined functional problem:
 
-- [`My.Hr`](./samples/My.Hr)
-- [`Cdr.Banking`](./samples/Cdr.Banking)
+- [`My.Hr`](./samples/My.Hr) - microservice against a SQL Database using both stored procedures and entity framework.
+- [`Cdr.Banking`](./samples/Cdr.Banking) - microservice against an Azure CosmosDB data source.
+- [`Xyz.Legacy`](./samples/Xyz.Legacy) - CDC implementation against a legacy database publishing messages to Azure Service Bus.
 
 <br/>
 

@@ -4,6 +4,7 @@ using CloudNative.CloudEvents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -108,7 +109,9 @@ namespace Beef.Events
                 throw new InvalidOperationException($"CloudEvent DataContentType.MediaType is '{d.CloudEvent.DataContentType.Name}', it must be '{MediaTypeNames.Application.Json}' to use the '{nameof(NewtonsoftJsonCloudEventSerializer)}'.");
 
             var ed = (EventData)Activator.CreateInstance(NewtonsoftJsonEventDataSerializer.CreateValueEventDataType(valueType), new object[] { d.Metadata! });
-            ed.SetValue(d.CloudEvent.Data is JToken json ? json.ToObject(valueType) : Convert.ChangeType(d.CloudEvent.Data, valueType));
+            ed.SetValue(d.CloudEvent.Data is JToken json ? json.ToObject(valueType) 
+                : (d.CloudEvent.Data is string str ? TypeDescriptor.GetConverter(valueType).ConvertFromInvariantString(str) : Convert.ChangeType(d.CloudEvent.Data, valueType)));
+
             return Task.FromResult<EventData?>(ed);
         }
 

@@ -48,29 +48,20 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((string)value!);
-        }
+        object? IPropertyMapperConverter.ConvertToDest(object? value) => ConvertToDest((string)value!);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public string? ConvertToSrce(byte[] value)
-        {
-            return Convert.ToBase64String(value);
-        }
+        public string? ConvertToSrce(byte[] value) => value == null || value.Length == 0 ? null : Convert.ToBase64String(value);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
-        {
-            return ConvertToSrce((byte[])value!);
-        }
+        object? IPropertyMapperConverter.ConvertToSrce(object? value) => ConvertToSrce((byte[])value!);
     }
 }

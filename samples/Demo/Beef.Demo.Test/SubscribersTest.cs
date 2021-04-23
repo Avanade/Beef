@@ -34,7 +34,7 @@ namespace Beef.Demo.Test
             await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectNoEvents()
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = r.Id, PowerSource = r.PowerSourceSid }, $"Demo.Robot.{r.Id}", "PowerSourceChange"));
 
             await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -54,7 +54,7 @@ namespace Beef.Demo.Test
             await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectEvent($"Demo.Robot.{r.Id}", "Update")
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = r.Id, PowerSource = r.PowerSourceSid }, $"Demo.Robot.{r.Id}", "PowerSourceChange"));
 
             await AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -69,27 +69,19 @@ namespace Beef.Demo.Test
         {
             await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.DataNotFound)
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.{404.ToGuid()}", "PowerSourceChange", 404.ToGuid()));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = 404.ToGuid(), PowerSource = "N" }, $"Demo.Robot.{404.ToGuid()}", "PowerSourceChange"));
         }
 
         [Test, TestSetUp]
-        public async Task A140_PowerSourceChangeSubscriber_InvalidData_Key()
+        public async Task A140_PowerSourceChangeSubscriber_InvalidData_Value()
         {
             await EventSubscriberTester.Create<Startup>()
                 .ExpectResult(SubscriberStatus.InvalidData)
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.Xyz", "PowerSourceChange", "Xyz"));
-        }
-
-        [Test, TestSetUp]
-        public async Task A150_PowerSourceChangeSubscriber_InvalidData_Value()
-        {
-            await EventSubscriberTester.Create<Startup>()
-                .ExpectResult(SubscriberStatus.InvalidData)
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("!", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = 1.ToGuid(), PowerSource = "!" }, $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange"));
         }
 
         [Test]
-        public async Task A160_PowerSourceChangeSubscriber_ManagerFailure()
+        public async Task A150_PowerSourceChangeSubscriber_ManagerFailure()
         {
             var rm = new Mock<IRobotManager>();
             rm.Setup(x => x.GetAsync(1.ToGuid())).Throws(new InvalidOperationException("Get method failed!"));
@@ -97,7 +89,7 @@ namespace Beef.Demo.Test
             await EventSubscriberTester.Create<Startup>()
                 .ExpectUnhandledException<InvalidOperationException>("*")
                 .AddScopedService(rm.Object)
-                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent("N", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
+                .RunAsync<PowerSourceChangeSubscriber>(EventData.CreateValueEvent(new PowerSourceChangeData { RobotId = 1.ToGuid(), PowerSource = "N" }, $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange"));
         }
     }
 }

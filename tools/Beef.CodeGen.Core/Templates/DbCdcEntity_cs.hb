@@ -92,14 +92,10 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{/each}}
 
         /// <summary>
-        /// Gets or sets the entity tag {{#ifval ColumnRowVersion}}('{{ColumnRowVersion.Name}}' column){{else}}(calculated as JSON serialized hash value){{/ifval}}.
+        /// Gets or sets the entity tag (calculated as a JSON serialized hash value).
         /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-  {{#ifval ColumnRowVersion}}
-        [MapperProperty("{{ColumnRowVersion.Name}}", ConverterType = typeof(Beef.Data.Database.DatabaseRowVersionConverter))]
-  {{else}}
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
-  {{/ifval}}
         public string? ETag { get; set; }
 
   {{#ifval ColumnIsDeleted}}

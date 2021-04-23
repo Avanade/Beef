@@ -52,16 +52,18 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="client">The <see cref="ServiceBusClient"/>.</param>
+        /// <param name="removeKeyFromSubject">Indicates whether to remove the key queue name from the <see cref="EventMetadata.Subject"/>. This is achieved by removing the last part (typically the key) to provide the base path;
+        /// for example a Subject of <c>Beef.Demo.Person.1234</c> would result in <c>Beef.Demo.Person</c>.</param>
         /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="ServiceBusSender"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, ServiceBusClient client, Action<ServiceBusSender>? additional = null)
+        public static IServiceCollection AddBeefServiceBusSender(this IServiceCollection services, ServiceBusClient client, bool removeKeyFromSubject = false, Action<ServiceBusSender>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddScoped<IEventPublisher>(_ =>
             {
-                var sbs = new ServiceBusSender(Check.NotNull(client, nameof(client)));
+                var sbs = new ServiceBusSender(Check.NotNull(client, nameof(client)), removeKeyFromSubject);
                 additional?.Invoke(sbs);
                 return sbs;
             });
@@ -75,7 +77,7 @@ namespace Beef.Events.ServiceBus
         /// <param name="queueName">The queue name.</param>
         /// <param name="additional">Optyional (additional) opportunity to further configure the instantiated <see cref="ServiceBusSender"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventServiceBusSender(this IServiceCollection services, ServiceBusClient client, string queueName, Action<ServiceBusSender>? additional = null)
+        public static IServiceCollection AddBeefServiceBusSender(this IServiceCollection services, ServiceBusClient client, string queueName, Action<ServiceBusSender>? additional = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));

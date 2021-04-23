@@ -262,3 +262,6 @@ __pycache__/
 
 # Any unittest under special folders
 .unittests/
+
+# Debug launch settings
+launchSettings.json

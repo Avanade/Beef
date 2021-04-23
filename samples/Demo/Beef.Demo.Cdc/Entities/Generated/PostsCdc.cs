@@ -53,7 +53,7 @@ namespace Beef.Demo.Cdc.Entities
         public PostsCdc.PostsTagsCdcCollection? Tags { get; set; }
 
         /// <summary>
-        /// Gets or sets the entity tag (calculated as JSON serialized hash value).
+        /// Gets or sets the entity tag (calculated as a JSON serialized hash value).
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
