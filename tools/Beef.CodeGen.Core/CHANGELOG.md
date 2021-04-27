@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.25
+- *Enhancement:* Added support for Database Event Outbox via new configuration and templates.
+- *Enhancement:* The `EventPublish` property changed from `bool` to string (values are `None`, `DataSvc` and `DataOutbox`.
+
 ## v4.1.24
 - *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.
 - *Fixed:* The `CdcConfig` special `RowVersion` treatment was removed as it was unnecessary and meant column could not be explicitly excluded.

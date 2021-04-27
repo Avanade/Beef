@@ -34,6 +34,7 @@ entities:
     [CategorySchema("Collection", Title = "Provides the _Entity collection class_ configuration.")]
     [CategorySchema("Operation", Title = "Provides the _Operation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `Create`, `Update` and `Delete` operations (versus having to specify directly).")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
@@ -536,41 +537,6 @@ entities:
         public bool? DataSvcCaching { get; set; }
 
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
-        /// </summary>
-        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
-            Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
-        public bool? EventPublish { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URI event source.
-        /// </summary>
-        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The Event Source.",
-            Description = "Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
-        public string? EventSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
-        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
-        /// </summary>
-        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
-            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
-                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
-                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.")]
-        public bool? EventTransaction { get; set; }
-
-        /// <summary>
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
         [JsonProperty("dataSvcCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -594,6 +560,45 @@ entities:
         [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
             Description = "This can be overridden using `Operation.DataSvcExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// </summary>
+        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).")]
+        public string? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The Event Source.",
+            Description = "Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+        public string? EventSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
+        public string? EventSubjectFormat { get; set; }
+
+        /// <summary>
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
+        /// </summary>
+        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
+                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
+                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.")]
+        public bool? EventTransaction { get; set; }
 
         #endregion
 

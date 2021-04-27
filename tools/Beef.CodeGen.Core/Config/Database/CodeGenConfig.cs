@@ -25,6 +25,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Event", Title = "Provides the _Event_ configuration.")]
+    [CategorySchema("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
@@ -32,10 +33,11 @@ namespace Beef.CodeGen.Config.Database
         #region Key
 
         /// <summary>
-        /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
+        /// Gets or sets the name of the `Schema` where the artefacts are defined in the database.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `Schema` where the artefacts are defined in, or should be created in, the database.", IsImportant = true,
+            Description = "This is used as the default `Schema` for all child objects.")]
         public string? Schema { get; set; }
 
         #endregion
@@ -155,7 +157,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
-            Description = "Defaults to `Cdc` (literal).")]
+            Description = "Defaults to `XCdc` (literal).")]
         public string? CdcSchema { get; set; }
 
         /// <summary>
@@ -282,6 +284,25 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("Event", Title = "The default formatting for the Source when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
             Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
         public string? EventSourceFormat { get; set; }
+
+        #endregion
+
+        #region Outbox
+
+        /// <summary>
+        /// Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Outbox", Title = "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.")]
+        public bool? EventOutbox { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name for the `EventOutbox`.
+        /// </summary>
+        [JsonProperty("eventOutboxTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Outbox", Title = "The table name for the `EventOutbox`.",
+            Description = "Defaults to `EventOutbox` (literal).")]
+        public string? EventOutboxTableName { get; set; }
 
         #endregion
 
@@ -510,7 +531,7 @@ namespace Beef.CodeGen.Config.Database
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
-            CdcSchema = DefaultWhereNull(CdcSchema, () => "Cdc");
+            CdcSchema = DefaultWhereNull(CdcSchema, () => "XCdc");
             CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
             CdcIdentifierMappingTableName = DefaultWhereNull(CdcIdentifierMappingTableName, () => "CdcIdentifierMapping");
             CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
@@ -519,6 +540,7 @@ namespace Beef.CodeGen.Config.Database
             EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
+            EventOutboxTableName = DefaultWhereNull(EventOutboxTableName, () => "EventOutbox");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "SnakeKebabToPascalCase");
 

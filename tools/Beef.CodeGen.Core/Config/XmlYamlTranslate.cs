@@ -68,6 +68,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", true, null),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", true, null),
@@ -85,6 +86,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApiAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIData", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeData", false, (xml) => ConvertBoolToYesNo(xml)),
@@ -97,6 +99,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", false, (xml) => throw new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType.")),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
@@ -145,6 +148,20 @@ namespace Beef.CodeGen.Config
         private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);
 
         private static string? NullValue() => (string?)null!;
+
+        private static string? ConvertEventPublish(string? xml)
+        {
+            if (string.IsNullOrEmpty(xml))
+                return null;
+
+            if (string.Compare(xml, "true", StringComparison.InvariantCultureIgnoreCase) == 0)
+                return "DataSvc";
+
+            if (string.Compare(xml, "false", StringComparison.InvariantCultureIgnoreCase) == 0)
+                return "None";
+
+            return xml;
+        }
 
         private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Type OverrideType, PropertySchemaAttribute Attribute)> _xmlSpecificPropertySchema = new List<(ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)>(new (ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)[]
         {

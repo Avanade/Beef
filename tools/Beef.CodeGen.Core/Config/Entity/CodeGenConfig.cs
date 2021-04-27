@@ -23,9 +23,9 @@ entities:
 ```")]
     [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
     [CategorySchema("Entity", Title = "Provides the _Entity class_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the _Web API (Controller)_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
-    [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
     [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CategorySchema("Database", Title = "Provides the _Database Data-layer_ configuration.")]
     [CategorySchema("EntityFramework", Title = "Provides the _Entity Framewotrk (EF) Data-layer_ configuration.")]
@@ -264,21 +264,21 @@ entities:
 
         #endregion
 
-        #region DataSvc
+        #region Events
 
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.", IsImportant = true,
-            Description = "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
-        public bool? EventPublish { get; set; }
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to `DataSvc`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
+        public string? EventPublish { get; set; }
 
         /// <summary>
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
         /// </summary>
         [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The URI root for the event source by prepending to all event source URIs.",
+        [PropertySchema("Events", Title = "The URI root for the event source by prepending to all event source URIs.",
             Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
         public string? EventSourceRoot { get; set; }
 
@@ -286,7 +286,7 @@ entities:
         /// Gets or sets the URI kind for the event source URIs.
         /// </summary>
         [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+        [PropertySchema("Events", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
             Description = "Defaults to `None` (being the event source is not updated).")]
         public string? EventSourceKind { get; set; }
 
@@ -294,7 +294,7 @@ entities:
         /// Gets or sets the root for the event Subject name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
+        [PropertySchema("Events", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
             Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventSubjectRoot { get; set; }
 
@@ -302,7 +302,7 @@ entities:
         /// Gets or sets the default formatting for the Subject when an Event is published.
         /// </summary>
         [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+        [PropertySchema("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
             Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
         public string? EventSubjectFormat { get; set; }
 
@@ -310,7 +310,7 @@ entities:
         /// Gets or sets the subject path separator.
         /// </summary>
         [JsonProperty("eventSubjectSeparator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The subject path separator.",
+        [PropertySchema("Event", Title = "The subject path separator.",
             Description = "Defaults to `.`. Used only where the subject is automatically inferred.")]
         public string? EventSubjectSeparator { get; set; }
 
@@ -318,7 +318,7 @@ entities:
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+        [PropertySchema("Event", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
 
@@ -326,10 +326,10 @@ entities:
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+        [PropertySchema("Event", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
             Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
                 "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
-                "Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified.")]
+                "Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.")]
         public bool? EventTransaction { get; set; }
 
         #endregion
@@ -586,7 +586,7 @@ entities:
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
-            EventPublish = DefaultWhereNull(EventPublish, () => true);
+            EventPublish = DefaultWhereNull(EventPublish, () => "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");

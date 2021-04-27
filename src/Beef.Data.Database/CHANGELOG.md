@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Enhancement:* Added Event Outbox support with `DatabaseEventOutboxBase`, `DatabaseEventOutboxItem` and `DatabaseEventOutboxInvoker`.
+
 ## v4.1.5
 - *Fixed:* `DatabaseRowVersionConverter.ConvertToSrce` will now return `null` when the `byte[]` is empty; versus, an empty string.
 

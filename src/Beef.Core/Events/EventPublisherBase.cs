@@ -42,9 +42,10 @@ namespace Beef.Events
         public EventStringFormat ActionFormat { get; set; } = EventStringFormat.None;
 
         /// <summary>
-        /// Gets the published/queued events.
+        /// Gets the published/queued events (dequeues).
         /// </summary>
         /// <returns>An <see cref="EventData"/> array.</returns>
+        /// <remarks>As the events are dequeued the results of this method are not idempotent.</remarks>
         public EventData[] GetEvents()
         {
             var list = new List<EventData>();
@@ -108,6 +109,6 @@ namespace Beef.Events
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void Reset() => _queue.Value.Clear();
+        public virtual void Reset() => _queue.Value.Clear();
     }
 }

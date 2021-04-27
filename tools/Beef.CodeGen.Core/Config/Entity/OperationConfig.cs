@@ -40,6 +40,7 @@ operations: [
 ```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
@@ -271,19 +272,23 @@ operations: [
             Description = "Defaults to `Entity.ManagerExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
 
+        #endregion
+
+        #region Events
+
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
-            Description = "Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
-        public bool? EventPublish { get; set; }
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
+        public string? EventPublish { get; set; }
 
         /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The Event Source.",
+        [PropertySchema("Events", Title = "The Event Source.",
             Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
             "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
         public string? EventSource { get; set; }
@@ -292,7 +297,7 @@ operations: [
         /// Gets or sets the event subject template and corresponding event action pair (separated by a colon).
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The event subject template and corresponding event action pair (separated by a colon).",
+        [PropertySchema("Events", Title = "The event subject template and corresponding event action pair (separated by a colon).",
             Description = "The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). " +
             "The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
             "E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.")]
@@ -810,7 +815,7 @@ operations: [
             });
 
             EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
-            EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
+            EventPublish = DefaultWhereNull(EventPublish, () => new string[] { "Create", "Update", "Delete" }.Contains(Type) ? Parent!.EventPublish : "None");
 
             EventFormatKey = Type switch
             {
@@ -828,7 +833,7 @@ operations: [
                 _ => null
             });
 
-            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
+            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -932,7 +937,7 @@ operations: [
         /// </summary>
         private void PrepareEvents()
         {
-            if (string.IsNullOrEmpty(EventSubject) || CompareNullOrValue(Parent!.EventPublish, false))
+            if (string.IsNullOrEmpty(EventSubject) || !CompareNullOrValue(Parent!.EventPublish, "None"))
                 return;
 
             foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))

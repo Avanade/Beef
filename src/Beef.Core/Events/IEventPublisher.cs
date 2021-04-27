@@ -45,9 +45,10 @@ namespace Beef.Events
         EventStringFormat ActionFormat => EventStringFormat.None;
 
         /// <summary>
-        /// Gets the published/queued events.
+        /// Gets the published/queued events (dequeues).
         /// </summary>
         /// <returns>An <see cref="EventData"/> array.</returns>
+        /// <remarks>Note to implementers: this should act as a dequeue; in that this method should not be considered idempotent.</remarks>
         EventData[] GetEvents();
 
         /// <summary>
