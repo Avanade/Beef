@@ -53,6 +53,12 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         Task DeleteAsync(Guid id);
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        Task RaiseEventAsync(bool throwError);
     }
 }
 

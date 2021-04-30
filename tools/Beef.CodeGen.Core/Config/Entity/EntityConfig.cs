@@ -574,6 +574,14 @@ entities:
         public string? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
+            Description = "Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
+        public string? EventOutbox { get; set; }
+
+        /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -1047,9 +1055,14 @@ entities:
         public bool RequiresData => (CompareValue(ExcludeData, "None") && IsYesOption(ExcludeIData)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
 
         /// <summary>
-        /// Indicates whether any of the operations will raise an event. 
+        /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 
         /// </summary>
-        public bool SupportsEvents => Operations.Any(x => x.Events.Count > 0);
+        public bool SupportsDataSvcEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "DataSvc");
+
+        /// <summary>
+        /// Indicates whether any of the operations will raise an event within the Data-layer.
+        /// </summary>
+        public bool SupportsDataEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "Data");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Database'.
@@ -1116,6 +1129,7 @@ entities:
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventSource = DefaultWhereNull(EventSource, () => Name!.ToLowerInvariant());
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+            EventOutbox = DefaultWhereNull(EventOutbox, () => Parent!.EventOutbox);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
@@ -1380,7 +1394,7 @@ entities:
             if (RequiresData)
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
 
-            if (SupportsEvents)
+            if (SupportsDataSvcEvents)
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
@@ -1406,6 +1420,9 @@ entities:
 
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            if (SupportsDataEvents)
+                DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)

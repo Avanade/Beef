@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Added new `IEfDbContext` to enable access to the underlying `IDatabase` instance.
+- *Enhancement:* Added `IEfDb.EventOutboxInvoker` to access the corresponding event outbox capability.
+
 ## v4.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

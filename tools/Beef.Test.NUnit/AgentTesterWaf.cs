@@ -8,6 +8,7 @@ using Beef.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
@@ -26,9 +27,11 @@ namespace Beef.Test.NUnit
         /// Initializes a new instance of the <see cref="WebApplicationFactory{TStartup}"/> class enabling configuration of the <see cref="IWebHostBuilder"/>.
         /// </summary>
         /// <param name="configuration">The <see cref="IWebHostBuilder"/>.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Class has a Dispose method.")]
-        internal AgentTesterWaf(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true) : base(configureLocalRefData)
+        internal AgentTesterWaf(Action<IWebHostBuilder> configuration, string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, bool configureLocalRefData = true) : base(configureLocalRefData)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -36,9 +39,20 @@ namespace Beef.Test.NUnit
             var action = new Action<IWebHostBuilder>(whb =>
             {
                 configuration(whb);
+
+                whb.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddConfiguration(AgentTester.BuildConfiguration<TStartup>(environmentVariablePrefix, environment));
+                });
+
                 whb.ConfigureServices(sc =>
                 {
                     sc.AddLogging(configure => configure.AddCorrelationId());
+                });
+
+                whb.ConfigureTestServices(sc =>
+                {
+                    //sc.AddLogging(configure => configure.AddCorrelationId());
                     ReplaceEventPublisher(sc);
                 });
             }); 
@@ -50,9 +64,12 @@ namespace Beef.Test.NUnit
         /// Initializes a new instance of the <see cref="WebApplicationFactory{TStartup}"/> class with default <see cref="IWebHostBuilder"/> configuration optionally enabling specific
         /// <b>API</b> <paramref name="services"/> to be configured/replaced (dependency injection).
         /// </summary>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        internal AgentTesterWaf(Action<IServiceCollection>? services = null, bool configureLocalRefData = true) : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), configureLocalRefData) { }
+        internal AgentTesterWaf(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, Action<IServiceCollection>? services = null, bool configureLocalRefData = true) 
+            : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), environmentVariablePrefix, environment, configureLocalRefData) { }
 
         /// <summary>
         /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="TesterBase.LocalServiceProvider"/>).

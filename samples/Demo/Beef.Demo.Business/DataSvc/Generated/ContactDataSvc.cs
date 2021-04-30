@@ -13,7 +13,6 @@ using Beef;
 using Beef.Business;
 using Beef.Caching;
 using Beef.Entities;
-using Beef.Events;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
@@ -26,17 +25,15 @@ namespace Beef.Demo.Business.DataSvc
     public partial class ContactDataSvc : IContactDataSvc
     {
         private readonly IContactData _data;
-        private readonly IEventPublisher _evtPub;
         private readonly IRequestCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IContactData"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public ContactDataSvc(IContactData data, IEventPublisher evtPub, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); ContactDataSvcCtor(); }
+        public ContactDataSvc(IContactData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ContactDataSvcCtor(); }
 
         partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -81,7 +78,6 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -96,7 +92,6 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -110,8 +105,19 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Contact>(new UniqueKey(id));
+            });
+        }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        public Task RaiseEventAsync(bool throwError)
+        {
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
+            {
+                await _data.RaiseEventAsync(throwError).ConfigureAwait(false);
             });
         }
     }

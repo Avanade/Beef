@@ -271,8 +271,16 @@ entities:
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
-            Description = "Defaults to `DataSvc`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
+            Description = "Defaults to `DataSvc`; unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
+            Description = "Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
+        public string? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
@@ -586,6 +594,7 @@ entities:
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
+            EventOutbox = DefaultWhereNull(EventOutbox, () => EventOutbox == "Database" ? "Data" :"None");
             EventPublish = DefaultWhereNull(EventPublish, () => "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");

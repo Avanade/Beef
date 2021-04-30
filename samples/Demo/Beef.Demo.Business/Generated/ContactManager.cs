@@ -109,6 +109,19 @@ namespace Beef.Demo.Business
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        public async Task RaiseEventAsync(bool throwError)
+        {
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Cleaner.CleanUp(throwError);
+                await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }
     }
 }
 

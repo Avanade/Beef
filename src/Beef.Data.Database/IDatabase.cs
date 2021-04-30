@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Events;
 using Beef.RefData;
 using System;
 using System.Data;
@@ -95,5 +96,11 @@ namespace Beef.Data.Database
             Func<DatabaseRecord, TItem, bool>? confirmItemIsToBeAdded = null)
                 where TColl : ReferenceDataCollectionBase<TItem>
                 where TItem : ReferenceDataBase, new();
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseEventOutboxInvoker"/> for the <see cref="IDatabase"/>.
+        /// </summary>
+        /// <returns>The <see cref="DatabaseEventOutboxInvoker"/>.</returns>
+        DatabaseEventOutboxInvoker EventOutboxInvoker { get; }
     }
 }

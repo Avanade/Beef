@@ -14,6 +14,7 @@ using Beef;
 using Beef.Business;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Beef.Demo.Common.Entities;
@@ -27,6 +28,7 @@ namespace Beef.Demo.Business.Data
     public partial class ContactData : IContactData
     {
         private readonly IEfDb _ef;
+        private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
 
@@ -34,8 +36,9 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="ContactData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public ContactData(IEfDb ef)
-            { _ef = Check.NotNull(ef, nameof(ef)); ContactDataCtor(); }
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        public ContactData(IEfDb ef, IEventPublisher evtPub)
+            { _ef = Check.NotNull(ef, nameof(ef)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); ContactDataCtor(); }
 
         partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -75,10 +78,12 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="Contact"/>.</returns>
         public Task<Contact> CreateAsync(Contact value)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create");
+                return __result;
             });
         }
 
@@ -89,10 +94,12 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update");
+                return __result;
             });
         }
 
@@ -102,12 +109,20 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+                _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id);
             });
         }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        public Task RaiseEventAsync(bool throwError)
+            => _ef.EventOutboxInvoker.InvokeAsync(this, () => RaiseEventOnImplementationAsync(throwError));
 
         /// <summary>
         /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> property mapping.

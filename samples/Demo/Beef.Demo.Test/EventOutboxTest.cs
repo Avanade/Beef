@@ -1,4 +1,5 @@
-﻿using Beef.Demo.Api;
+﻿using Beef.Data.Database;
+using Beef.Demo.Api;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using Beef.Events;
@@ -19,13 +20,12 @@ namespace Beef.Demo.Test
             var db = new Beef.Demo.Business.Data.Database(BuildConfiguration()["ConnectionStrings:BeefDemo"]);
             var ep = new ExpectEventPublisher();
             var eo = new DatabaseEventOutbox();
-            var di = Beef.Data.Database.DatabaseEventOutboxInvoker.Create(db, ep, eo);
 
-            await di.InvokeAsync(new object(), () => 
+            await db.EventOutboxInvoker.InvokeAsync(new object(), () => 
             {
                 ep.Publish(new EventData { Subject = "xxx" }, new EventData<int> { Subject = "yyy", Value = 88 }, new EventData<Person> { Subject = "zzz", Value = new Person { FirstName = "Josh" } });
                 return Task.CompletedTask;
-            });
+            }, new DatabaseEventOutboxInvokerArgs { EventOutbox = eo, EventPublisher = ep });
 
             var eois = await eo.DequeueAsync(db, 2);
             Assert.IsNotNull(eois);

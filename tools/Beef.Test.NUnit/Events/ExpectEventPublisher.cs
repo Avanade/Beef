@@ -69,10 +69,11 @@ namespace Beef.Test.NUnit.Events
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="events"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override Task SendEventsAsync(params EventData[] events)
+        public override EventData[] GetEvents()
         {
+            var events = base.GetEvents();
+
             if (ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null)
             {
                 var list = _sentEventDict.GetOrAdd(ExecutionContext.Current.CorrelationId, new List<EventData>());
@@ -81,7 +82,15 @@ namespace Beef.Test.NUnit.Events
                 _sentCountDict.AddOrUpdate(ExecutionContext.Current.CorrelationId, 1, (_, count) => count++);
             }
 
-            return Task.CompletedTask;
+            return events;
         }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        /// <remarks>The <b>sending</b> is determined by the use of <see cref="GetEvents"/>; this is required given the likes of the event outbox capability that leverage.</remarks>
+        protected override Task SendEventsAsync(params EventData[] events) => Task.CompletedTask;
     }
 }

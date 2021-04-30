@@ -12,12 +12,10 @@ using System.Threading.Tasks;
 namespace Beef.Data.EntityFrameworkCore
 {
     /// <summary>
-    /// Represents the base class for encapsulating the database access layer using an entity framework <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
+    /// Represents the core base class for encapsulating the database access layer using entity framework.
     /// </summary>
-    /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public abstract class EfDbBase<TDbContext> : IEfDb<TDbContext> where TDbContext : DbContext
+    public abstract class EfDbBase
     {
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for a <see cref="SqlException"/>.
         /// </summary>
@@ -55,8 +53,14 @@ namespace Beef.Data.EntityFrameworkCore
         /// Gets or sets the list of known <see cref="SqlException.Number"/> values for the <see cref="ThrowTransformedSqlException(SqlException)"/> method.
         /// </summary>
         public static List<int> SqlDuplicateErrorNumbers { get; } = new List<int>(new int[] { 2601, 2627 });
-#pragma warning restore CA1000
+    }
 
+    /// <summary>
+    /// Represents the base class for encapsulating the database access layer using an entity framework <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
+    /// </summary>
+    /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
+    public abstract class EfDbBase<TDbContext> : EfDbBase, IEfDb<TDbContext> where TDbContext : DbContext, IEfDbContext
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="EfDbBase{TDbContext}"/> class.
         /// </summary>
@@ -80,12 +84,18 @@ namespace Beef.Data.EntityFrameworkCore
         public EfDbInvoker<TDbContext> Invoker { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="DatabaseEventOutboxInvoker"/> from the <see cref="IEfDbContext.BaseDatabase"/>.
+        /// </summary>
+        /// <returns>The <see cref="IDatabase.EventOutboxInvoker"/>.</returns>
+        public DatabaseEventOutboxInvoker EventOutboxInvoker => DbContext.BaseDatabase.EventOutboxInvoker;
+
+        /// <summary>
         /// Gets or sets the <see cref="DatabaseWildcard"/> to enable wildcard replacement.
         /// </summary>
         public DatabaseWildcard Wildcard { get; set; } = new DatabaseWildcard();
 
         /// <summary>
-        /// Gets or sets the <see cref="SqlException"/> handler (by default set up to execute <see cref="ThrowTransformedSqlException(SqlException)"/>).
+        /// Gets or sets the <see cref="SqlException"/> handler (by default set up to execute <see cref="EfDbBase.ThrowTransformedSqlException(SqlException)"/>).
         /// </summary>
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
 

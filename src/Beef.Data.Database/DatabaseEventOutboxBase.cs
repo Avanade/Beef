@@ -11,6 +11,10 @@ namespace Beef.Data.Database
 {
     /// <summary>
     /// Provides the base <see cref="EnqueueAsync(IDatabase, IEnumerable{DatabaseEventOutboxItem})">enqueue</see> and <see cref="DequeueAsync(IDatabase, int)">dequeue</see> of <see cref="DatabaseEventOutboxItem"/>(s).
+    /// <para>This capability is required to support the <i>transaction outbox pattern</i>; whereby to quarantee the delivery of any events associated with a database update they must occur transactionally. As we want
+    /// to avoid the likes of two-phase commits (2PC) within a distributed application architecture, and the fact most messaging systems do not support, an alternative approach to achieve guaranteed resiliency is
+    /// required. The <see cref="DatabaseEventOutboxInvoker"/> provides the associated/required database event outbox transactional orchestrator abilities.</para>
+    /// <para>See also: https://microservices.io/patterns/data/transactional-outbox.html </para>
     /// </summary>
     public abstract class DatabaseEventOutboxBase : DatabaseMapper<DatabaseEventOutboxItem>
     {
@@ -93,7 +97,16 @@ namespace Beef.Data.Database
                 .StoredProcedure(DbEnqueueStoredProcedureName)
                 .Param(EventListParamName, CreateTableValuedParameter(list))
                 .NonQueryAsync().ConfigureAwait(false);
+
+            OnEnqueue?.Invoke(this, EventArgs.Empty);
         }
+
+        /// <summary>
+        /// Occurs on an <see cref="EnqueueAsync(IDatabase, IEnumerable{DatabaseEventOutboxItem})"/>.
+        /// </summary>
+        /// <remarks>Will be raised directly after the successful <see cref="EnqueueAsync(IDatabase, IEnumerable{DatabaseEventOutboxItem})"/>; however, this does not guarantee that the enqueud events have been
+        /// committed to the database as any database transaction coordination is performed outside of this enqueue execution.</remarks>
+        public event EventHandler? OnEnqueue;
 
         /// <summary>
         /// Dequeues the <see cref="DatabaseEventOutboxItem"/>(s) from the database.

@@ -54,7 +54,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberTester{TStartup}"/> class.
         /// </summary>
-        internal EventSubscriberTester() : base(configureLocalRefData: true, useCorrelationIdLogger: true)
+        internal EventSubscriberTester() : base(configureLocalRefData: true)
         {
             // TODO: Come back and revisit.
             // string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string environment = TestSetUp.DefaultEnvironment, Action<ConfigurationBuilder>? configurationBuilder = null, Action<IServiceCollection>? services = null
@@ -362,7 +362,7 @@ namespace Beef.Test.NUnit
         {
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"LOGGING >");
-            var messages = CorrelationIdLogger.GetMessages(CorrelationId);
+            var messages = CorrelationIdLogger.GetMessages(CorrelationId, true);
             if (messages.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else

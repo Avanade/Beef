@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.9
+- *Fixed:* The `AgentTesterWaf` was not correctly applying the test configuration (`AgentTester.BuildConfiguration<TStartup>`) which excluded any test specific configurations. 
+
 ## v4.1.8
 - *Enhancement:* Added `EventData.Source` to the test output log.
 - *Enhancement:* Updated the event testing to support new `IEventDataContentSerializer` and `IEventDataConverter`. 

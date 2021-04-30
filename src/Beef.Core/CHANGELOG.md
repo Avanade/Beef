@@ -6,6 +6,7 @@ Represents the **NuGet** versions.
 - *Fixed:* The `EntityBasicBase.NotifyChangesWhenSameValue` should not be included within entity mappings, the `MapperIgnoreAttribute` has been added to the property to exclude/ignore.
 - *Enhancement:* Added a `GetProperies` to the `EntityReflector` to enable access to all properties.
 - *Enhancement:* Added a readonly `ValueType` property to `EventData` to get the `Type` of the underlying value.
+- *Enhancement:* Added a `TimerHostedServiceBase` to provide a timer-based `IHostedService` that is `ExecutionContext` and `ServiceProvider` enabled.
 
 ## v4.1.11
 - *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.

@@ -13,8 +13,8 @@
     <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.1.5" />
     <PackageReference Include="Beef.Events.EventHubs" Version="4.1.3" />
     <PackageReference Include="Beef.Events.ServiceBus" Version="4.1.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.7" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Business\Company.AppName.Business.csproj" />

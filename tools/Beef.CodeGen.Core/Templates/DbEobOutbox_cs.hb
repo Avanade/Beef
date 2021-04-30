@@ -35,7 +35,7 @@ namespace {{NamespaceBusiness}}.Data
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDatabaseEventOutbox(this IServiceCollection services) => services.AddSingleton(new DatabaseEventOutbox());
+        public static IServiceCollection AddGeneratedDatabaseEventOutbox(this IServiceCollection services) => services.AddSingleton<DatabaseEventOutboxBase>(new DatabaseEventOutbox());
     }
 }
 

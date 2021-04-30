@@ -102,6 +102,18 @@ namespace Beef.Demo.Api.Controllers
             return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        [HttpPost("raise")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult RaiseEvent(bool throwError)
+        {
+            return new WebApiPost(this, () => _manager.RaiseEventAsync(throwError),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        }
     }
 }
 

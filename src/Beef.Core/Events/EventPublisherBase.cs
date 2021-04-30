@@ -46,7 +46,7 @@ namespace Beef.Events
         /// </summary>
         /// <returns>An <see cref="EventData"/> array.</returns>
         /// <remarks>As the events are dequeued the results of this method are not idempotent.</remarks>
-        public EventData[] GetEvents()
+        public virtual EventData[] GetEvents()
         {
             var list = new List<EventData>();
 

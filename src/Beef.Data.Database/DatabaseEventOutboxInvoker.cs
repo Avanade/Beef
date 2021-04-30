@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Business;
+using Beef.Diagnostics;
 using Beef.Events;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -16,25 +18,16 @@ namespace Beef.Data.Database
     public class DatabaseEventOutboxInvokerArgs
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="DatabaseEventOutboxInvokerArgs"/> class.
+        /// Gets or sets the <see cref="IEventPublisher"/>.
         /// </summary>
-        /// <param name="database">The <see cref="IDatabase"/>.</param>
-        /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
-        public DatabaseEventOutboxInvokerArgs(IDatabase database, IEventPublisher? eventPublisher)
-        {
-            Database = Check.NotNull(database, nameof(database));
-            EventPublisher = eventPublisher;
-        }
+        /// <remarks>Where <c>null</c> will attempt to get instance from <see cref="ExecutionContext.GetService{T}(bool)"/>; where this then results in <c>null</c> assumes that <i>no</i> publishing is required.</remarks>
+        public IEventPublisher? EventPublisher { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDatabase"/>.
+        /// Gets or sets the <see cref="DatabaseEventOutboxBase"/>.
         /// </summary>
-        public IDatabase Database { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="IEventPublisher"/>.
-        /// </summary>
-        public IEventPublisher? EventPublisher { get; private set; }
+        /// <remarks>Where <c>null</c> will attempt to get instance from <see cref="ExecutionContext.GetService{T}(bool)"/>; where this then results in <c>null</c> a runtime exception will be thrown.</remarks>
+        public DatabaseEventOutboxBase? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the unhandled <see cref="Exception"/> handler.
@@ -48,31 +41,19 @@ namespace Beef.Data.Database
     /// </summary>
     public class DatabaseEventOutboxInvoker : InvokerBase<DatabaseEventOutboxInvokerArgs>
     {
-        private readonly IDatabase _database;
-        private readonly IEventPublisher? _eventPublisher;
-        private readonly DatabaseEventOutboxBase? _outboxMapper;
-
-        /// <summary>
-        /// Creates a new <see cref="DatabaseEventOutboxInvoker"/> for the specified <paramref name="database"/>.
-        /// </summary>
-        /// <param name="database">The <see cref="IEventPublisher"/>; where <c>null</c> will automatically </param>
-        /// <param name="eventPublisher">The <see cref="IEventPublisher"/>; where <c>null</c> will attempt to get instance from <see cref="ExecutionContext.GetService{T}(bool)"/>.
-        /// Where this results in <c>null</c> assumes that <i>no</i> publishing is required.</param>
-        /// <param name="outboxMapper">The <see cref="DatabaseEventOutboxBase"/>; where <c>null</c> will attempt to get instance from <see cref="ExecutionContext.GetService{T}(bool)"/>.
-        /// Where this results in <c>null</c> an exception will be thrown.</param>
-        /// <returns></returns>
-        public static DatabaseEventOutboxInvoker Create(IDatabase database, IEventPublisher? eventPublisher = null, DatabaseEventOutboxBase? outboxMapper = null)
-            => new DatabaseEventOutboxInvoker(database, eventPublisher, outboxMapper);
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseEventOutboxInvoker"/>.
         /// </summary>
-        private DatabaseEventOutboxInvoker(IDatabase database, IEventPublisher? eventPublisher, DatabaseEventOutboxBase? outboxMapper)
+        /// <param name="database">The <see cref="IDatabase"/>.</param>
+        public DatabaseEventOutboxInvoker(IDatabase database)
         {
-            _database = Check.NotNull(database, nameof(database));
-            _eventPublisher = eventPublisher ?? ExecutionContext.GetService<IEventPublisher>(false);
-            _outboxMapper = outboxMapper;
+            Database = Check.NotNull(database, nameof(database));
         }
+
+        /// <summary>
+        /// Gets the <see cref="IDatabase"/>.
+        /// </summary>
+        public IDatabase Database { get; }
 
         #region NoResult
 
@@ -96,7 +77,7 @@ namespace Beef.Data.Database
                 txn = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
 
                 action();
-                PublishEventsToOutboxAsync(param!).GetAwaiter().GetResult();
+                PublishEventsToOutboxAsync(param).GetAwaiter().GetResult();
 
                 txn?.Complete();
             }
@@ -131,7 +112,7 @@ namespace Beef.Data.Database
                 txn = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
 
                 await func().ConfigureAwait(false);
-                await PublishEventsToOutboxAsync(param!).ConfigureAwait(false);
+                await PublishEventsToOutboxAsync(param).ConfigureAwait(false);
 
                 txn?.Complete();
             }
@@ -172,7 +153,7 @@ namespace Beef.Data.Database
                 txn = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
 
                 var result = func();
-                PublishEventsToOutboxAsync(param!).GetAwaiter().GetResult();
+                PublishEventsToOutboxAsync(param).GetAwaiter().GetResult();
 
                 txn?.Complete();
                 return result;
@@ -210,7 +191,7 @@ namespace Beef.Data.Database
                 txn = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
 
                 var result = await func().ConfigureAwait(false);
-                await PublishEventsToOutboxAsync(param!).ConfigureAwait(false);
+                await PublishEventsToOutboxAsync(param).ConfigureAwait(false);
 
                 txn?.Complete();
                 return result;
@@ -233,14 +214,15 @@ namespace Beef.Data.Database
         /// </summary>
         private async Task PublishEventsToOutboxAsync(DatabaseEventOutboxInvokerArgs? param)
         {
-            if (_eventPublisher == null)
+            var ep = param?.EventPublisher ?? ExecutionContext.GetService<IEventPublisher>(false);
+            if (ep == null)
                 return;
 
-            var events = _eventPublisher.GetEvents();
+            var events = ep.GetEvents();
             if (events.Length == 0)
                 return;
 
-            _eventPublisher.Reset();
+            ep.Reset();
 
             var list = new List<DatabaseEventOutboxItem>();
             foreach (var ed in events)
@@ -248,7 +230,9 @@ namespace Beef.Data.Database
                 list.Add(new DatabaseEventOutboxItem(ed));
             }
 
-            await (_outboxMapper ?? ExecutionContext.GetService<DatabaseEventOutboxBase>(true)!).EnqueueAsync(_database, list).ConfigureAwait(false);
+            await (param?.EventOutbox ?? ExecutionContext.GetService<DatabaseEventOutboxBase>(true)!).EnqueueAsync(Database, list).ConfigureAwait(false);
+
+            Logger.Create<DatabaseEventOutboxInvoker>().LogDebug("There were {count} event(s) enqueued within the database event outbox.", list.Count);
         }
     }
 }
