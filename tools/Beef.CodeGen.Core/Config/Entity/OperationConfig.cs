@@ -306,7 +306,7 @@ operations: [
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Events", Title = "The Event Source.",
             Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.")]
         public string? EventSource { get; set; }
 
         /// <summary>
@@ -685,7 +685,7 @@ operations: [
         /// <summary>
         /// Gets the event source URI.
         /// </summary>
-        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+        public string EventSourceUri => Root!.EventSourceRoot?.ToLowerInvariant() + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource.ToLowerInvariant() : ("/" + EventSource.ToLowerInvariant()));
 
         /// <summary>
         /// Gets the event format key code.
@@ -695,7 +695,7 @@ operations: [
         /// <summary>
         /// Indicates whether the manual (OnImplementation) can be implemened as shorthand - minimal amount of code.
         /// </summary>
-        public bool IsManualShorthand => AutoImplement == "None";
+        public bool IsManualShorthand => AutoImplement == "None" && !HasDataEvents;
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the Data-layer.
@@ -869,9 +869,9 @@ operations: [
 
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
-                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
                 _ => null
             });
 

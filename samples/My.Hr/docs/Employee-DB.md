@@ -20,6 +20,7 @@ erDiagram
     Employee }|..|{ USState : "refers (via JSON)" 
     EmergencyContact }|..|{ RelationshipType : refers
 ```
+
 <br/>
 
 ## Clean up existing migrations
@@ -32,6 +33,27 @@ Within the `Migrations` folder there will three entries that were created during
   └── 20190101-000002-create-Hr-gender.sql     <- remove
   └── 20190101-000003-create-Hr-person.sql     <- remove
 ```
+
+<br/>
+
+## Event outbox
+
+To support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) there is the need to have the backing event queue tables. The migration scripts to create these can be code generated using the following.
+
+```
+dotnet run codegen --script DatabaseEventOutbox.xml
+```
+
+This should create two migrations script files with names similar as follows.
+
+```
+└── Migrations
+  └── 20210430-170605-create-hr-eventoutbox.sql
+  └── 20210430-170605-create-hr-eventoutboxdata.sql
+```
+
+
+The corresponding stored procedures and user defined types will be automatically code-generated as a result of the `EventOutbox="true"` configuration property already set within the code-gen XML configuration file.
 
 <br/>
 

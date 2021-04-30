@@ -82,7 +82,7 @@ namespace Beef.Demo.Business.Data
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create");
+                _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create");
                 return __result;
             });
         }
@@ -98,7 +98,7 @@ namespace Beef.Demo.Business.Data
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _evtPub.PublishValue(__result, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update");
+                _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update");
                 return __result;
             });
         }
@@ -113,7 +113,7 @@ namespace Beef.Demo.Business.Data
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-                _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id);
+                _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id);
             });
         }
 

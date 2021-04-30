@@ -110,7 +110,7 @@ namespace My.Hr.Test
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v, "EmployeeId")
-                .ExpectEvent("My.Hr.PerformanceReview.*", "Created")
+                .ExpectEvent("My.Hr.PerformanceReview", "Created")
                 .Run(a => a.CreateAsync(v, 3.ToGuid())).Value!;
 
             Assert.AreEqual(3.ToGuid(), v.EmployeeId);
@@ -180,7 +180,7 @@ namespace My.Hr.Test
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.PerformanceReview.{id}", "Updated")
+                .ExpectEvent($"My.Hr.PerformanceReview", "Updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -207,7 +207,7 @@ namespace My.Hr.Test
             // Delete value.
             AgentTester.Test<PerformanceReviewAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"My.Hr.PerformanceReview.{id}", "Deleted")
+                .ExpectEvent($"My.Hr.PerformanceReview", "Deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.

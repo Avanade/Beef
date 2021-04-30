@@ -178,7 +178,7 @@ namespace Company.AppName.Test
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("Company.AppName.Person.*", "Created")
+                .ExpectEvent("Company.AppName.Person", "Created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
@@ -247,7 +247,7 @@ namespace Company.AppName.Test
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person.{id}", "Updated")
+                .ExpectEvent($"Company.AppName.Person", "Updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -315,7 +315,7 @@ namespace Company.AppName.Test
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person.{id}", "Updated")
+                .ExpectEvent($"Company.AppName.Person", "Updated")
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value!;
 
             // Check the value was updated properly.
@@ -341,7 +341,7 @@ namespace Company.AppName.Test
             // Delete value.
             AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Company.AppName.Person.{id}", "Deleted")
+                .ExpectEvent($"Company.AppName.Person", "Deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.

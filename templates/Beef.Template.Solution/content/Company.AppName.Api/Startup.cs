@@ -94,6 +94,12 @@ namespace Company.AppName.Api
             // Add GUID identifier generator service.
             services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>();
 
+#if (implement_database || implement_entityframework)
+            // Add transactional event outbox services.
+            services.AddGeneratedDatabaseEventOutbox();
+            services.AddBeefDatabaseEventOutboxPublisherService();
+
+#endif
             // Add event publishing services.
             var ehcs = _config.GetValue<string>("EventHubConnectionString");
             if (!string.IsNullOrEmpty(ehcs))

@@ -13,7 +13,6 @@ using Beef;
 using Beef.Business;
 using Beef.Caching;
 using Beef.Entities;
-using Beef.Events;
 using My.Hr.Business.Data;
 using My.Hr.Common.Entities;
 using RefDataNamespace = My.Hr.Common.Entities;
@@ -26,17 +25,15 @@ namespace My.Hr.Business.DataSvc
     public partial class PerformanceReviewDataSvc : IPerformanceReviewDataSvc
     {
         private readonly IPerformanceReviewData _data;
-        private readonly IEventPublisher _evtPub;
         private readonly IRequestCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IPerformanceReviewData"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public PerformanceReviewDataSvc(IPerformanceReviewData data, IEventPublisher evtPub, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); PerformanceReviewDataSvcCtor(); }
+        public PerformanceReviewDataSvc(IPerformanceReviewData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); PerformanceReviewDataSvcCtor(); }
 
         partial void PerformanceReviewDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -83,7 +80,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(__result)}", "Created").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -98,7 +94,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(__result)}", "Updated").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -112,7 +107,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishValue(new PerformanceReview { Id = id }, $"My.Hr.PerformanceReview.{_evtPub.FormatKey(id)}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<PerformanceReview>(new UniqueKey(id));
             });
         }

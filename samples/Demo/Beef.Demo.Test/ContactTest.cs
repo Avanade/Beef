@@ -38,9 +38,10 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A120_Update()
+        public void A120_UpdateAndCheckEventOutboxDequeue()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
+
             var r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
@@ -48,6 +49,9 @@ namespace Beef.Demo.Test
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
+
+            var db = new Beef.Demo.Business.Data.Database(agentTester.WebApplicationFactory.Services.GetService<IConfiguration>()["ConnectionStrings:BeefDemo"]);
+            db.SqlStatement("DELETE FROM [Demo].[EventOutbox]").NonQueryAsync().GetAwaiter().GetResult();
 
             var v = r.Value;
             v.LastName += "X";
@@ -60,6 +64,21 @@ namespace Beef.Demo.Test
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r.Response.Headers?.ETag?.Tag);
+
+            // Make sure the event is sent from the outbox.
+            var count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutbox]").ScalarAsync<int>().GetAwaiter().GetResult();
+            Assert.AreEqual(1, count);
+
+            for (int i = 0; i < 10; i++)
+            {
+                count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutbox] WHERE [DequeuedDate] IS NULL").ScalarAsync<int>().GetAwaiter().GetResult();
+                if (count == 0)
+                    return;
+
+                System.Threading.Thread.Sleep(1000);
+            }
+
+            Assert.Fail("It would appear that the event was not dequeued by the hosted service.");
         }
 
         [Test, TestSetUp]
@@ -95,7 +114,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A200_RaiseEvent_Failure()
+        public void A200_RaiseEvent_EventOutboxFailure()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -109,7 +128,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A210_RaiseEvent_Success()
+        public void A210_RaiseEvent_EventOutboxSuccess()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 

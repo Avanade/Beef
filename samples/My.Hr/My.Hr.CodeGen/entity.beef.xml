@@ -1,5 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration RefDataNamespace="My.Hr.Common.Entities" RefDataText="true" EventSubjectRoot="My" EventActionFormat="PastTense" AppBasedAgentArgs="true" WebApiAutoLocation="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<!-- Configuring the code-generation global settings
+     - RefDataNamespace specifies the namespace for the reference data type with 'RefDataNamespace' prefix.
+     - RefDataText generates a corresponding reference data text property for '$text=true' output.
+     - EventSubjectRoot specifies the root for the event subject.
+     - EventSubjectFormat specifies the name only; i.e. not include the key.
+     - EventActionFormat specifies past tense for the event action.
+     - EventSourceRoot specifies the root for the event source.
+     - EventSourceKind will be a relative path URI.
+     - EventOutbox indicates that the code-generated event publish will occur in the Data-layer and should use the database to transactionally persist the event(s).
+     - AppBasedAgentArgs indicates to create a domain specific AgentArgs to simplify dependency injection usage.
+     - WebApiAutoLocation indicate to set the HTTP response location for a create.
+     - DatabaseSchema defaults the database schema name. -->
+<CodeGeneration RefDataNamespace="My.Hr.Common.Entities" RefDataText="true" EventSubjectRoot="My" EventSubjectFormat="NameOnly" EventActionFormat="PastTense" EventSourceRoot="My/Hr" EventSourceKind="Relative" EventOutbox="Database" AppBasedAgentArgs="true" WebApiAutoLocation="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+
   <!-- Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
        - As we will be returning more than one we need the Collection and CollectionResult.
        - Any Text with a handlebars '{{xxx}}' is a shortcut for .NET see comments; e.g. '<see cref="xxx"/>'.
@@ -70,7 +83,7 @@
          - EventSubject is overridden so that the action component will be Terminated. 
          - AutoImplement is None as this will be implemented by the developer.
          - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers. -->
-    <Operation Name="Terminate" Text="Terminates an existing {{Employee}}" OperationType="Update" ValueType="TerminationDetail" Validator="TerminationDetailValidator" WebApiRoute="{id}/terminate" WebApiMethod="HttpPost" EventSubject="Hr.Employee.{id}:Terminated" AutoImplement="None">
+    <Operation Name="Terminate" Text="Terminates an existing {{Employee}}" OperationType="Update" ValueType="TerminationDetail" Validator="TerminationDetailValidator" WebApiRoute="{id}/terminate" WebApiMethod="HttpPost" EventSubject="Hr.Employee:Terminated" AutoImplement="None">
       <Parameter Name="Id" Type="Guid" Text="{{Employee}} identifier" />
     </Operation>
   </Entity>

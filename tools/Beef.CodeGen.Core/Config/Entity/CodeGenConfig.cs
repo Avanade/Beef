@@ -594,8 +594,8 @@ entities:
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
-            EventOutbox = DefaultWhereNull(EventOutbox, () => EventOutbox == "Database" ? "Data" :"None");
-            EventPublish = DefaultWhereNull(EventPublish, () => "DataSvc");
+            EventOutbox = DefaultWhereNull(EventOutbox, () => "None");
+            EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");

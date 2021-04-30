@@ -81,7 +81,7 @@ namespace Beef.Demo.Api
 
             // Add event outbox services.
             services.AddGeneratedDatabaseEventOutbox();
-            services.AddBeefDatabaseEventOutboxPublisherService((_, ops) => ops.Interval = new TimeSpan(0, 5, 0));
+            services.AddBeefDatabaseEventOutboxPublisherService();
 
             // Add custom services; in this instance to allow it to call itself for testing purposes.
             services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));

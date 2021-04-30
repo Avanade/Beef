@@ -124,7 +124,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
         {{lower DataCtor}} {{Name}}Data({{#each DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-{{#ifle DataCtorParameters.Count 2}}
+{{#ifle DataCtorParameters.Count 3}}
             { {{#each DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
 {{else}}
         {
@@ -183,7 +183,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each PagingLessDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? Task.CompletedTask).ConfigureAwait(false);
       {{/if}}
       {{#ifeq AutoImplement 'None'}}
-                {{#if HasReturnValue}}var __result = {{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}})
+                {{#if HasReturnValue}}var __result = {{/if}}await {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
       {{/ifeq}}
       {{#ifeq AutoImplement 'Database'}}
         {{#ifeq Type 'GetColl'}}

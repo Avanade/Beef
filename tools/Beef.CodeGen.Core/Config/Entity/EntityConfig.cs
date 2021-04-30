@@ -586,8 +586,8 @@ entities:
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Events", Title = "The Event Source.",
-            Description = "Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+            Description = "Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.")]
         public string? EventSource { get; set; }
 
         /// <summary>
@@ -1127,7 +1127,8 @@ entities:
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
-            EventSource = DefaultWhereNull(EventSource, () => Name!.ToLowerInvariant());
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
+            EventSource = DefaultWhereNull(EventSource, () => $"{Name!.ToLowerInvariant()}/{{$key}}");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
             EventOutbox = DefaultWhereNull(EventOutbox, () => Parent!.EventOutbox);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);

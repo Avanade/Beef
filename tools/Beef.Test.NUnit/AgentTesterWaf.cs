@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
 
@@ -47,12 +48,11 @@ namespace Beef.Test.NUnit
 
                 whb.ConfigureServices(sc =>
                 {
-                    sc.AddLogging(configure => configure.AddCorrelationId());
+                    sc.AddLogging(configure => { configure.ClearProviders(); configure.AddCorrelationId(); }); 
                 });
 
                 whb.ConfigureTestServices(sc =>
                 {
-                    //sc.AddLogging(configure => configure.AddCorrelationId());
                     ReplaceEventPublisher(sc);
                 });
             }); 

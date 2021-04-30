@@ -15,6 +15,7 @@ using Beef.Business;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using My.Hr.Common.Entities;
@@ -29,6 +30,7 @@ namespace My.Hr.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
+        private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IEfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
 
@@ -37,8 +39,9 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public EmployeeData(IDatabase db, IEfDb ef)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); EmployeeDataCtor(); }
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher evtPub)
+            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); EmployeeDataCtor(); }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -56,7 +59,14 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
         public Task<Employee> CreateAsync(Employee value)
-            => DataInvoker.Current.InvokeAsync(this, () => CreateOnImplementationAsync(Check.NotNull(value, nameof(value))));
+        {
+            return _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+            {
+                var __result = await CreateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Created");
+                return __result;
+            });
+        }
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -64,7 +74,14 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> UpdateAsync(Employee value)
-            => DataInvoker.Current.InvokeAsync(this, () => UpdateOnImplementationAsync(Check.NotNull(value, nameof(value))));
+        {
+            return _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+            {
+                var __result = await UpdateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Updated");
+                return __result;
+            });
+        }
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -72,10 +89,11 @@ namespace My.Hr.Business.Data
         /// <param name="id">The Id.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _db.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Hr].[spEmployeeDelete]");
                 await _db.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+                _evtPub.Publish(new Uri($"my/hr/employee/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.Employee", "Deleted", id);
             });
         }
 
@@ -103,7 +121,14 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id)
-            => DataInvoker.Current.InvokeAsync(this, () => TerminateOnImplementationAsync(Check.NotNull(value, nameof(value)), id));
+        {
+            return _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+            {
+                var __result = await TerminateOnImplementationAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Terminated", id);
+                return __result;
+            });
+        }
 
         /// <summary>
         /// Provides the <see cref="Employee"/> property and database column mapping.
