@@ -25,7 +25,7 @@ namespace Beef.Demo.Cdc.Services
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public PersonCdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger<PersonCdcHostedService> logger) : base(serviceProvider, config, logger) { }
+        public PersonCdcHostedService(IServiceProvider serviceProvider, ILogger<PersonCdcHostedService> logger, IConfiguration? config = null) : base(serviceProvider, logger, config) { }
     }
 }
 

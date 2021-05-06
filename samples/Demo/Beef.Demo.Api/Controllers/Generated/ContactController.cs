@@ -15,7 +15,7 @@ using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
 using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
+using Beef.Demo.Business.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Api.Controllers

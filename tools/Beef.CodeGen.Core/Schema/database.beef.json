@@ -5,7 +5,8 @@
   "properties": {
     "schema": {
       "type": "string",
-      "title": "The name of the `Schema` where the `Table` is defined in the database."
+      "title": "The name of the `Schema` where the artefacts are defined in, or should be created in, the database.",
+      "description": "This is used as the default `Schema` for all child objects."
     },
     "columnNameIsDeleted": {
       "type": "string",
@@ -75,7 +76,7 @@
     "cdcSchema": {
       "type": "string",
       "title": "The schema name for the generated `CDC`-related database artefacts.",
-      "description": "Defaults to `Cdc` (literal)."
+      "description": "Defaults to `XCdc` (literal)."
     },
     "cdcAuditTableName": {
       "type": "string",
@@ -182,6 +183,15 @@
         "NameAndKey",
         "NameAndGlobalId"
       ]
+    },
+    "eventOutbox": {
+      "type": "boolean",
+      "title": "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required."
+    },
+    "eventOutboxTableName": {
+      "type": "string",
+      "title": "The table name for the `EventOutbox`.",
+      "description": "Defaults to `EventOutbox` (literal)."
     },
     "pathBase": {
       "type": "string",

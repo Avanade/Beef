@@ -1,32 +1,41 @@
 ﻿using Beef.Test.NUnit;
 using Beef.Validation;
-using Company.AppName.Business;
-using Company.AppName.Business.Validation;
-using Company.AppName.Common.Agents;
-using Company.AppName.Common.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using Company.AppName.Business;
+using Company.AppName.Business.Data;
+using Company.AppName.Business.DataSvc;
+using Company.AppName.Business.Entities;
+using Company.AppName.Business.Validation;
 
 namespace Company.AppName.Test.Validators
 {
     [TestFixture]
     public class PersonValidatorTest
     {
-        private readonly Mock<IReferenceDataAgent> _referenceData = new Mock<IReferenceDataAgent>();
+        private Func<IServiceCollection, IServiceCollection>? _testSetup;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _referenceData.Setup(x => x.GenderGetAllAsync(null, null)).ReturnsWebApiAgentResultAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+            var rd = new Mock<IReferenceDataData>();
+            rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+
+            _testSetup = sc => sc
+                .AddGeneratedValidationServices()
+                .AddGeneratedReferenceDataManagerServices()
+                .AddGeneratedReferenceDataDataSvcServices()
+                .AddScoped(_ => rd.Object);
         }
 
         [Test, TestSetUp]
         public async Task A110_Validation_Empty()
         {
             await ValidationTester.Test()
-                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ConfigureServices(_testSetup!)
                 .ExpectMessages(
                     "First Name is required.",
                     "Last Name is required.",
@@ -47,8 +56,7 @@ namespace Company.AppName.Test.Validators
             };
 
             await ValidationTester.Test()
-                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
-                .AddScopedService(_referenceData)
+                .ConfigureServices(_testSetup!)
                 .ExpectMessages(
                     "First Name must not exceed 100 characters in length.",
                     "Last Name must not exceed 100 characters in length.",
@@ -69,8 +77,7 @@ namespace Company.AppName.Test.Validators
             };
 
             await ValidationTester.Test()
-                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
-                .AddScopedService(_referenceData)
+                .ConfigureServices(_testSetup!)
                 .CreateAndRunAsync<IValidator<Person>, Person>(p);
         }
     }

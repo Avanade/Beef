@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Enhancement:* `CdcHostedService` now inherits from `Beef.Hosting.TimerHostedServiceBase`.
+
 ## v4.1.5
 - *Enhancement:* Added standardized identifier mapping from local (internal) to global (external) where required.
 - *Enhancement:* `CdcBackgroundService` renamed to `CdcHostedService`.

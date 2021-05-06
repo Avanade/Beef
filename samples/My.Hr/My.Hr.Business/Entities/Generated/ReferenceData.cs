@@ -8,9 +8,9 @@
 using System;
 using System.Threading.Tasks;
 using Beef.RefData;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
-namespace My.Hr.Common.Entities
+namespace My.Hr.Business.Entities
 {
     /// <summary>
     /// Provides a standard mechanism for accessing the <b>ReferenceData</b>. 

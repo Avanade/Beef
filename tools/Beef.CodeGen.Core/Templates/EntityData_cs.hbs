@@ -46,10 +46,10 @@ using Beef.Events;
 {{/if}}
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-{{#ifeq Root.EntityUsing 'Common' 'All'}}
+{{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
-{{#ifeq Root.EntityUsing 'Business' 'All'}}
+{{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}

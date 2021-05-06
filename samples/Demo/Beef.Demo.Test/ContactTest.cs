@@ -109,6 +109,10 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, v.Id));
 
+            r = agentTester.Test<ContactAgent, ContactCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAllAsync());
+
             Assert.NotNull(r2.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r2.Response.Headers?.ETag?.Tag);
         }

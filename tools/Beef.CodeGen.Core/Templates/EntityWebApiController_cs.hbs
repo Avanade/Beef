@@ -16,10 +16,10 @@ using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
 using {{Root.NamespaceBusiness}};
-{{#ifeq Root.EntityUsing 'Business' 'All'}}
+{{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
-{{#ifeq Root.EntityUsing 'Common' 'All'}}
+{{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}

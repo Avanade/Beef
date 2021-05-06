@@ -7,9 +7,9 @@
 
 using System;
 using Beef.RefData;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
-namespace My.Hr.Common.Entities
+namespace My.Hr.Business.Entities
 {
     /// <summary>
     /// Provides for the required <b>ReferenceData</b> capabilities. 

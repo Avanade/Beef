@@ -26,7 +26,7 @@ namespace {{Root.NamespaceCdc}}.Services
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public {{ModelName}}CdcHostedService(IServiceProvider serviceProvider, IConfiguration config, ILogger<{{ModelName}}CdcHostedService> logger) : base(serviceProvider, config, logger) { }
+        public {{ModelName}}CdcHostedService(IServiceProvider serviceProvider, ILogger<{{ModelName}}CdcHostedService> logger, IConfiguration? config = null) : base(serviceProvider, logger, config) { }
     }
 }
 

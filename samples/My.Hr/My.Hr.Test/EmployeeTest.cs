@@ -39,7 +39,7 @@ namespace My.Hr.Test
                     Email = "w.jones@org.com",
                     FirstName = "Wendy",
                     LastName = "Jones",
-                    GenderSid = "F",
+                    Gender = "F",
                     Birthday = new DateTime(1985, 03, 18),
                     StartDate = new DateTime(2000, 12, 11),
                     PhoneNo = "(425) 612 8113"
@@ -60,12 +60,12 @@ namespace My.Hr.Test
                     Email = "w.smither@org.com",
                     FirstName = "Waylon",
                     LastName = "Smithers",
-                    GenderSid = "M",
+                    Gender = "M",
                     Birthday = new DateTime(1952, 02, 21),
                     StartDate = new DateTime(2001, 01, 22),
                     PhoneNo = "(428) 893 2793",
-                    Address = new Address { Street1 = "8365 851 PL NE", City = "Redmond", StateSid = "WA", PostCode = "98052" },
-                    EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { Id = 401.ToGuid(), FirstName = "Michael", LastName = "Manners", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" } }
+                    Address = new Address { Street1 = "8365 851 PL NE", City = "Redmond", State = "WA", PostCode = "98052" },
+                    EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { Id = 401.ToGuid(), FirstName = "Michael", LastName = "Manners", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
                 })
                 .Run(a => a.GetAsync(4.ToGuid()));
         }
@@ -158,7 +158,7 @@ namespace My.Hr.Test
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { GendersSids = new List<string> { "F" } })).Value;
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string> { "F" } })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -171,7 +171,7 @@ namespace My.Hr.Test
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", GendersSids = new List<string> { "F" } })).Value;
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", Genders = new List<string> { "F" } })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -183,7 +183,7 @@ namespace My.Hr.Test
         {
             var r = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { GendersSids = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
 
             Assert.IsNotNull(r.Value);
             Assert.IsNotNull(r.Value.Result);
@@ -198,7 +198,7 @@ namespace My.Hr.Test
         {
             var r = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { GendersSids = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions { IncludeRefDataText = true }));
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions { IncludeRefDataText = true }));
 
             Assert.IsNotNull(r.Value);
             Assert.IsNotNull(r.Value.Result);
@@ -220,12 +220,12 @@ namespace My.Hr.Test
                 Email = "j.smith@org.com",
                 FirstName = "Jill",
                 LastName = "Smith",
-                GenderSid = "F",
+                Gender = "F",
                 Birthday = new DateTime(1955, 10, 28),
                 StartDate = DateTime.Today,
                 PhoneNo = "(456) 789 0123",
-                Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", StateSid = "WA", PostCode = "98101" },
-                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" } }
+                Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", State = "WA", PostCode = "98101" },
+                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
             };
 
             // Create value.
@@ -253,7 +253,7 @@ namespace My.Hr.Test
                 Email = "w.jones@org.com",
                 FirstName = "Wendy",
                 LastName = "Jones",
-                GenderSid = "F",
+                Gender = "F",
                 Birthday = new DateTime(1985, 03, 18),
                 StartDate = new DateTime(2000, 12, 11),
                 PhoneNo = "(425) 612 8113"
@@ -318,7 +318,7 @@ namespace My.Hr.Test
             v.LastName += "Y";
             v.Address!.Street2 = "Street 2";
             v.EmergencyContacts![0].FirstName += "Y";
-            v.EmergencyContacts.Add(new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" });
+            v.EmergencyContacts.Add(new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" });
 
             // Update the value.
             v = AgentTester.Test<EmployeeAgent, Employee>()
@@ -439,12 +439,12 @@ namespace My.Hr.Test
                 Email = "j.jones@org.com",
                 FirstName = "Jarrod",
                 LastName = "Jones",
-                GenderSid = "M",
+                Gender = "M",
                 Birthday = new DateTime(1928, 10, 28),
                 StartDate = DateTime.UtcNow.AddDays(1),
                 PhoneNo = "(456) 789 0123",
-                Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", StateSid = "WA", PostCode = "98101" },
-                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" } }
+                Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", State = "WA", PostCode = "98101" },
+                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
             };
 
             // Create an employee in the future.
@@ -479,7 +479,7 @@ namespace My.Hr.Test
         {
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, ReasonSid = "RD" }, 404.ToGuid()));
+                .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, Reason = "RD" }, 404.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -488,7 +488,7 @@ namespace My.Hr.Test
             var r = AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated more than once.")
-                .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, ReasonSid = "RD" }, 2.ToGuid()));
+                .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, Reason = "RD" }, 2.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -497,7 +497,7 @@ namespace My.Hr.Test
             var r = AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated prior to their start date.")
-                .Run(a => a.TerminateAsync(new TerminationDetail { Date = new DateTime(1999, 12, 31), ReasonSid = "RD" }, 1.ToGuid()));
+                .Run(a => a.TerminateAsync(new TerminationDetail { Date = new DateTime(1999, 12, 31), Reason = "RD" }, 1.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -507,7 +507,7 @@ namespace My.Hr.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value!;
 
-            v.Termination = new TerminationDetail { Date = DateTime.Now, ReasonSid = "RD" };
+            v.Termination = new TerminationDetail { Date = Cleaner.Clean(DateTime.Now, DateTimeTransform.DateOnly), Reason = "RD" };
 
             v = AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.OK)

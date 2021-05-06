@@ -14,10 +14,10 @@ using Beef;
 using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
-{{#ifeq Root.EntityUsing 'Common' 'All'}}
+{{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
-{{#ifeq Root.EntityUsing 'Business' 'All'}}
+{{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 using {{Root.NamespaceBusiness}}.DataSvc;

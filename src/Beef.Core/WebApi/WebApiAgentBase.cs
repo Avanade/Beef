@@ -139,9 +139,9 @@ namespace Beef.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
         public async Task<WebApiAgentResult<TResult>> GetCollectionResultAsync<TResult, TColl, TEntity>(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
-            where TResult : EntityCollectionResult<TColl, TEntity>, new()
-            where TColl : EntityBaseCollection<TEntity>, new()
-            where TEntity : EntityBase
+            where TResult : IEntityCollectionResult<TColl, TEntity>, new()
+            where TColl : IEnumerable<TEntity>, new()
+            where TEntity : class
         {
             var result = await GetAsync<TColl>(urlSuffix, requestOptions, args, memberName, filePath, lineNumber).ConfigureAwait(false);
             if (!result.Response.IsSuccessStatusCode)

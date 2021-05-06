@@ -1,15 +1,14 @@
 ﻿using Beef;
 using Beef.Test.NUnit;
 using Beef.WebApi;
-using Company.AppName.Api;
-using Company.AppName.Business.Validation;
-using Company.AppName.Common.Agents;
-using Company.AppName.Common.Entities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Company.AppName.Api;
+using Company.AppName.Common.Agents;
+using Company.AppName.Common.Entities;
 
 namespace Company.AppName.Test
 {
@@ -38,7 +37,7 @@ namespace Company.AppName.Test
                     Id = 1.ToGuid(),
                     FirstName = "Wendy",
                     LastName = "Jones",
-                    GenderSid = "F",
+                    Gender = "F",
                     Birthday = new DateTime(1985, 03, 18)
                 })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -106,7 +105,7 @@ namespace Company.AppName.Test
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new PersonArgs { GendersSids = new List<string> { "F" } })).Value!;
+                .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } })).Value!;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -119,7 +118,7 @@ namespace Company.AppName.Test
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", GendersSids = new List<string> { "F" } })).Value!;
+                .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", Genders = new List<string> { "F" } })).Value!;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -131,7 +130,7 @@ namespace Company.AppName.Test
         {
             var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new PersonArgs { GendersSids = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
+                .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
 
             Assert.IsNotNull(r.Value);
             Assert.IsNotNull(r.Value.Result);
@@ -146,7 +145,7 @@ namespace Company.AppName.Test
         {
             var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new PersonArgs { GendersSids = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions { IncludeRefDataText = true }));
+                .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions { IncludeRefDataText = true }));
 
             Assert.IsNotNull(r.Value);
             Assert.IsNotNull(r.Value.Result);
@@ -167,7 +166,7 @@ namespace Company.AppName.Test
             {
                 FirstName = "Jill",
                 LastName = "Smith",
-                GenderSid = "F",
+                Gender = "F",
                 Birthday = new DateTime(1955, 10, 28)
             };
 

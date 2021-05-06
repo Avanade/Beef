@@ -14,6 +14,7 @@ Category | Description
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Event`](#Event) | Provides the _Event_ configuration.
+[`Outbox`](#Outbox) | Provides the _Event Outbox_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
@@ -45,7 +46,7 @@ Provides the _Change Data Capture (CDC)_ configuration.
 
 Property | Description
 -|-
-`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `Cdc` (literal).
+`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `XCdc` (literal).
 `cdcAuditTableName` | The table name for the `Cdc`-Tracking. Defaults to `CdcTracking` (literal).
 `cdcIdentifierMapping` | Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
 `cdcIdentifierMappingTableName` | The table name for the `Cdc`-IdentifierMapping. Defaults to `CdcIdentifierMapping` (literal).
@@ -90,6 +91,16 @@ Property | Description
 `eventSourceRoot` | The URI root for the event source by prepending to all event source URIs for CDC. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
 `eventSourceKind` | The URI kind for the event source URIs for CDC. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`. Defaults to `None` (being the event source is not updated).
 `eventSourceFormat` | The default formatting for the Source when an Event is published via CDC. Valid options are: `NameOnly`, `NameAndKey`, `NameAndGlobalId`. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
+
+<br/>
+
+## Outbox
+Provides the _Event Outbox_ configuration.
+
+Property | Description
+-|-
+`eventOutbox` | Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+`eventOutboxTableName` | The table name for the `EventOutbox`. Defaults to `EventOutbox` (literal).
 
 <br/>
 

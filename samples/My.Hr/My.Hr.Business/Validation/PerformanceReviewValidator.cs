@@ -1,6 +1,6 @@
 ﻿using Beef;
 using Beef.Validation;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using System.Threading.Tasks;
 
 namespace My.Hr.Business.Validation

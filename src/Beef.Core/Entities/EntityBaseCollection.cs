@@ -56,7 +56,7 @@ namespace Beef.Entities
     public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection, IEquatable<EntityBaseCollection<TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;
-        private readonly Lazy<bool> _hasUniqueKey = new Lazy<bool>(() => typeof(IUniqueKey).IsAssignableFrom(typeof(TEntity)));
+        private readonly Lazy<bool> _hasUniqueKey = new(() => typeof(IUniqueKey).IsAssignableFrom(typeof(TEntity)));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.

@@ -4,7 +4,6 @@ using NUnit.Framework;
 using System.Reflection;
 using My.Hr.Api;
 using My.Hr.Common.Agents;
-using My.Hr.Common.Entities;
 
 namespace My.Hr.Test
 {
@@ -15,7 +14,6 @@ namespace My.Hr.Test
         public void OneTimeSetUp()
         {
             TestSetUp.DefaultEnvironmentVariablePrefix = "Hr";
-            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.AddWebApiAgentArgsType<IHrWebApiAgentArgs, HrWebApiAgentArgs>();
             TestSetUp.DefaultExpectNoEvents = true;
             var config = AgentTester.BuildConfiguration<Startup>();

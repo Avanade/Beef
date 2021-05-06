@@ -16,9 +16,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Company.AppName.Api;
 using Company.AppName.Common.Agents;
-using Company.AppName.Common.Entities;
 #if (implement_cosmos)
 using Company.AppName.Business.Data;
+using Company.AppName.Business.Entities;
 #endif
 
 namespace Company.AppName.Test
@@ -31,7 +31,6 @@ namespace Company.AppName.Test
         public void OneTimeSetUp()
         {
             TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
-            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
             TestSetUp.DefaultExpectNoEvents = false;
 
@@ -57,7 +56,6 @@ namespace Company.AppName.Test
         public void OneTimeSetUp()
         {
             TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
-            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
             TestSetUp.DefaultExpectNoEvents = false;
 

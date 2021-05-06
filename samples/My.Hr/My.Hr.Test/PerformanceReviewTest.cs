@@ -39,7 +39,7 @@ namespace My.Hr.Test
                     Id = 2.ToGuid(),
                     EmployeeId = 1.ToGuid(),
                     Date = new DateTime(2016, 11, 12),
-                    OutcomeSid = "EE",
+                    Outcome = "EE",
                     Reviewer = "r.Browne@org.com",
                     Notes = "They are awesome!"
                 })
@@ -98,7 +98,7 @@ namespace My.Hr.Test
             var v = new PerformanceReview
             {
                 Date = new DateTime(2020, 06, 15),
-                OutcomeSid = "ME",
+                Outcome = "ME",
                 Notes = "Solid performance :-)",
                 Reviewer = "the.boss@org.com",
             };

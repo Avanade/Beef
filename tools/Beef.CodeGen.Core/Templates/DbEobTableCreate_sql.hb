@@ -7,5 +7,5 @@ CREATE TABLE [{{Schema}}].[{{EventOutboxTableName}}] (
   [EventOutboxId] BIGINT IDENTITY (1, 1) NOT NULL PRIMARY KEY NONCLUSTERED ([EventOutboxId] ASC),
   [EnqueuedDate] DATETIME2 NOT NULL,
   [DequeuedDate] DATETIME2 NULL,
-  CONSTRAINT [IX_{{Schema}}_{{EventOutboxName}}_DequeuedDate] UNIQUE CLUSTERED ([DequeuedDate], [EventOutboxId])
+  CONSTRAINT [IX_{{Schema}}_{{EventOutboxTableName}}_DequeuedDate] UNIQUE CLUSTERED ([DequeuedDate], [EventOutboxId])
 );

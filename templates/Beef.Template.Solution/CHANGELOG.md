@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.9
+- *Enhancement:* Changed the default entity code-gen behaviour to be the new `EntityScope = "Autonomous"`.
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v4.1.8
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 

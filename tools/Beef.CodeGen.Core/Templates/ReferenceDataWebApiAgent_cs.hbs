@@ -13,8 +13,8 @@ using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.WebApi;
 using {{Root.NamespaceCommon}}.Entities;
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
+{{#ifval Root.RefDataCommonNamespace}}
+using RefDataNamespace = {{Root.RefDataCommonNamespace}};
 {{/ifval}}
 
 namespace {{Root.NamespaceCommon}}.Agents

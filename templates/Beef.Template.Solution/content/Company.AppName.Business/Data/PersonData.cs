@@ -11,7 +11,7 @@ using System.Linq;
 using Beef.Data.Cosmos;
 using System.Linq;
 #endif
-using Company.AppName.Common.Entities;
+using Company.AppName.Business.Entities;
 
 namespace Company.AppName.Business.Data
 {

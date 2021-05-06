@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Entities;
-using Beef.Demo.Common.Entities;
+using Beef.Demo.Business.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business

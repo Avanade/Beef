@@ -40,11 +40,20 @@ entities:
         #region RefData
 
         /// <summary>
-        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Common`.
+        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement).
         /// </summary>
         [JsonProperty("refDataNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.", IsImportant = true)]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement).", IsImportant = true,
+            Description = "Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).")]
         public string? RefDataNamespace { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the Reference Data common entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("refDataCommonNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data common entities (adds as a c# `using` statement).", IsImportant = true,
+            Description = "Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).")]
+        public string? RefDataCommonNamespace { get; set; }
 
         /// <summary>
         /// Indicates whether a corresponding <i>text</i> property is added by default when generating a Reference Data `Property` for an `Entity`.
@@ -78,15 +87,32 @@ entities:
         public string? RefDataAppendToNamespace { get; set; }
 
         /// <summary>
-        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Business`.
+        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) for additional business-layer inclusion where requried.
         /// </summary>
         [JsonProperty("refDataBusNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Business`.")]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.")]
         public string? RefDataBusNamespace { get; set; }
 
         #endregion
 
         #region Entity
+
+        /// <summary>
+        /// Gets or sets the entity scope option.
+        /// </summary>
+        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+            Description = "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
+            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
+        public string? EntityScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
+            Description = "Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally , `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.")]
+        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
@@ -103,14 +129,6 @@ entities:
         [PropertySchema("Entity", Title = "The default JSON name for the `ETag` property.", Options = new string[] { "etag", "eTag", "_etag", "_eTag", "ETag" },
             Description = "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.")]
         public string? ETagJsonName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
-        /// </summary>
-        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
-            Description = "Defaults to `Common` which will add `.Common.Entities`. Otherwise, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
-        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Entity</c> code.
@@ -545,7 +563,7 @@ entities:
         /// <summary>
         /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
-        public string EntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
+        public string RuntimeEntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
 
         /// <summary>
         /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="RuntimeParameters"/>).
@@ -597,7 +615,10 @@ entities:
             EventOutbox = DefaultWhereNull(EventOutbox, () => "None");
             EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
-            EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");
+            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
+            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : "Common");
+            RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.{EntityUsing}.Entities");
+            RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Configuring the code-generation global settings
-     - RefDataNamespace specifies the namespace for the reference data type with 'RefDataNamespace' prefix.
+     - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
      - RefDataText generates a corresponding reference data text property for '$text=true' output.
      - EventSubjectRoot specifies the root for the event subject.
      - EventSubjectFormat specifies the name only; i.e. not include the key.
@@ -11,7 +11,7 @@
      - AppBasedAgentArgs indicates to create a domain specific AgentArgs to simplify dependency injection usage.
      - WebApiAutoLocation indicate to set the HTTP response location for a create.
      - DatabaseSchema defaults the database schema name. -->
-<CodeGeneration RefDataNamespace="My.Hr.Common.Entities" RefDataText="true" EventSubjectRoot="My" EventSubjectFormat="NameOnly" EventActionFormat="PastTense" EventSourceRoot="My/Hr" EventSourceKind="Relative" EventOutbox="Database" AppBasedAgentArgs="true" WebApiAutoLocation="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration EntityScope="Autonomous" RefDataText="true" EventSubjectRoot="My" EventSubjectFormat="NameOnly" EventActionFormat="PastTense" EventSourceRoot="My/Hr" EventSourceKind="Relative" EventOutbox="Database" AppBasedAgentArgs="true" WebApiAutoLocation="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
 
   <!-- Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
        - As we will be returning more than one we need the Collection and CollectionResult.

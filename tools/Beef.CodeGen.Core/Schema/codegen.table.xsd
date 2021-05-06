@@ -923,7 +923,7 @@
       </xs:choice>
       <xs:attribute name="Schema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
+          <xs:documentation>The name of the `Schema` where the artefacts are defined in, or should be created in, the database. This is used as the default `Schema` for all child objects.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
@@ -993,7 +993,7 @@
       </xs:attribute>
       <xs:attribute name="CdcSchema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `Cdc` (literal).</xs:documentation>
+          <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `XCdc` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="CdcAuditTableName" use="optional" type="xs:string">
@@ -1110,6 +1110,16 @@
             <xs:enumeration value="NameAndGlobalId" />
           </xs:restriction>
         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventOutbox" use="optional" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventOutboxTableName" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The table name for the `EventOutbox`. Defaults to `EventOutbox` (literal).</xs:documentation>
+        </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">
         <xs:annotation>

@@ -84,9 +84,18 @@ entities:
         /// Gets or sets the entity scope option.
         /// </summary>
         [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business" },
-            Description = "Determines whether the entity is considered `Common` (default) or should be scoped to the `Business` namespace/assembly only (i.e. not externally visible).")]
+        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+            Description = "Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
+            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
         public string? EntityScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
+            Description = "Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
+        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding private name.
@@ -1025,6 +1034,11 @@ entities:
         public string? EntityCollectionInherits { get; set; }
 
         /// <summary>
+        /// Gets or sets the computed entity collection result inherits.
+        /// </summary>
+        public string? EntityCollectionResultInherits { get; set; }
+
+        /// <summary>
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityImplements { get; set; }
@@ -1097,7 +1111,7 @@ entities:
         /// <summary>
         /// Gets the reference data qualified Entity name.
         /// </summary>
-        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamesapce" : "RefDataNamespace")}.{Name}";
+        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamespace" : "RefDataNamespace")}.{Name}";
 
         /// <summary>
         /// <inheritdoc/>
@@ -1108,7 +1122,8 @@ entities:
             CheckOptionsProperties();
             Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
-            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
+            EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
+            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : EntityScope);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");
@@ -1177,7 +1192,7 @@ entities:
             {
                 "int" => "ReferenceDataBaseInt",
                 "Guid" => "ReferenceDataBaseGuid",
-                _ => null
+                _ => EntityInherits == "EntityBase" ? null : EntityInherits
             };
 
             EntityCollectionInherits = CollectionInherits;
@@ -1189,8 +1204,11 @@ entities:
                     return $"ReferenceDataCollectionBase<{EntityName}>";
             });
 
+            EntityCollectionResultInherits = CollectionResultInherits;
+            EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
+
             CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
-            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
+            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"CollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
         /// <summary>
@@ -1337,7 +1355,10 @@ entities:
             }
 
             if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+            {
                 implements.Insert(i++, "IUniqueKey");
+                modelImplements.Insert(m++, "IUniqueKey");
+            }
 
             if (Properties.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
                 implements.Insert(i++, "IPartitionKey");

@@ -69,6 +69,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "EntityUsing", false, (xml) => throw new CodeGenException("CodeGeneration.EntityUsing has been deprecated; is replaced by CodeGeneration.EntityScope, Entity.EntityScope and Entity.EntityUsing.")),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", true, null),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", true, null),

@@ -26,7 +26,7 @@ using {{Root.UsingNamespace2}};
 {{#if Root.UsingNamespace3}}
 using {{Root.UsingNamespace3}};
 {{/if}}
-{{#ifeq Root.EntityUsing 'Common' 'All'}}
+{{#ifeq EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
 using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
@@ -39,7 +39,7 @@ using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
 {{! ===== Class ===== }}
-namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
     /// <summary>
     /// Represents the {{{Text}}} entity.
@@ -255,7 +255,7 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
 
   {{/ifne}}
 {{/unless}}
-{{! ===== UniqueKey ===== }}
+{{! ===== PartitionKey ===== }}
 {{#unless RefDataType}}
   {{#ifne PartitionKeyProperties.Count 0}}
         #region IPartitionKey
@@ -555,7 +555,7 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection result.
     /// </summary>
-    public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
+    public class {{{EntityCollectionResultName}}} : {{{EntityCollectionResultInherits}}}
     {
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class.

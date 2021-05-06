@@ -15,8 +15,8 @@ using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using {{Root.NamespaceCommon}}.Entities;
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
+{{#ifval Root.RefDataCommonNamespace}}
+using RefDataNamespace = {{Root.RefDataCommonNamespace}};
 {{/ifval}}
 
 namespace {{Root.NamespaceCommon}}.Agents

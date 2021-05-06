@@ -70,7 +70,7 @@ namespace Beef.Hosting
         /// Gets or sets the timer interval <see cref="TimeSpan"/>.
         /// </summary>
         /// <remarks>Defaults to one hour.</remarks>
-        public TimeSpan Interval { get; set; } = TimeSpan.FromMinutes(60);
+        public virtual TimeSpan Interval { get; set; } = TimeSpan.FromMinutes(60);
 
         /// <summary>
         /// Provides an opportunity to make a one-off change to the underlying timer to trigger using the specified interval.
