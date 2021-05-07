@@ -135,6 +135,16 @@
         "SnakeKebabToPascalCase"
       ]
     },
+    "entityScope": {
+      "type": "string",
+      "title": "The entity scope option.",
+      "description": "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).",
+      "enum": [
+        "Common",
+        "Business",
+        "Autonomous"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names via CDC.",
@@ -213,7 +223,7 @@
       "title": "The path (directory) for the Business-related (.NET) artefacts.",
       "description": "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
-    "pathCdc": {
+    "PathCdcPublisher": {
       "type": "string",
       "title": "The path (directory) for the CDC-related (.NET) artefacts.",
       "description": "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
@@ -233,10 +243,10 @@
       "title": "The Namespace (root) for the Business-related .NET artefacts.",
       "description": "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
-    "namespaceCdc": {
+    "NamespaceCdcPublisher": {
       "type": "string",
-      "title": "The Namespace (root) for the CDC-related .NET artefacts.",
-      "description": "Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+      "title": "The Namespace (root) for the CDC-related publisher .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`."
     },
     "tables": {
       "type": "array",
@@ -349,6 +359,16 @@
             "tvp": {
               "type": "string",
               "title": "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`."
+            },
+            "entityScope": {
+              "type": "string",
+              "title": "The entity scope option.",
+              "description": "Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).",
+              "enum": [
+                "Common",
+                "Business",
+                "Autonomous"
+              ]
             },
             "permission": {
               "type": "string",

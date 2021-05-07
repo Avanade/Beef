@@ -8,7 +8,8 @@ Represents the **NuGet** versions.
 - *Enhancement:* Added a readonly `ValueType` property to `EventData` to get the `Type` of the underlying value.
 - *Enhancement:* Added a `TimerHostedServiceBase` to provide a timer-based `IHostedService` that is `ExecutionContext` and `ServiceProvider` enabled.
 - *Enhancement:* Added `CollectionResult` to act similar to `EntityCollectionResult` without the `EntityBase` constraint. New `IEntityCollectionResult<TColl, TEntity>` also added to enable.
-- *Enhancement:* Extended `WebApiAgentBase.GetCollectionResultAsync` to support `CollectionResult` in addition to `EntityCollectionResult` (new ).
+- *Enhancement:* Extended `WebApiAgentBase.GetCollectionResultAsync` to support `CollectionResult` in addition to `EntityCollectionResult`.
+- *Enhancement:* Split timer-based flush from `CachePolicyManager` and moved into new `CachePolicyManagerServiceHost` (inherits from `TimerHostedServiceBase`). This now represents the background process to periodically flush the caches.
 
 ## v4.1.11
 - *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.

@@ -11,7 +11,7 @@ using System.Data;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 
-namespace {{Root.NamespaceCdc}}.Data
+namespace {{Root.NamespaceCdcPublisher}}.Data
 {
     /// <summary>
     /// Provides the <see cref="CdcTracker"/> data mapper.

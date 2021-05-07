@@ -67,6 +67,12 @@ namespace Beef.Hosting
         public virtual string ServiceName => _name ??= GetType().Name;
 
         /// <summary>
+        /// Gets or sets the <i>first</i> timer start interval. 
+        /// </summary>
+        /// <remarks>Defaults to <see cref="Interval"/>.</remarks>
+        public virtual TimeSpan? FirstInterval { get; set; }
+
+        /// <summary>
         /// Gets or sets the timer interval <see cref="TimeSpan"/>.
         /// </summary>
         /// <remarks>Defaults to one hour.</remarks>
@@ -104,12 +110,12 @@ namespace Beef.Hosting
         /// Triggered when the application host is ready to start the service.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <remarks>The underlying timer start is the <see cref="Interval"/> plus a randomized value between zero and one thousand milliseconds; this will minimize multiple services within the host all starting at once.</remarks>
+        /// <remarks>The underlying timer start is the <see cref="FirstInterval"/> plus a randomized value between zero and one thousand milliseconds; this will minimize multiple services within the host potentially all starting at once.</remarks>
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            Logger.LogDebug($"{ServiceName} service started. Timer interval {Interval}.");
+            Logger.LogDebug($"{ServiceName} service started. Timer first/interval {FirstInterval ?? Interval}/{Interval}.");
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _timer = new Timer(Execute, null, Interval.Add(TimeSpan.FromMilliseconds(_random.Next(0, 1000))), Interval);
+            _timer = new Timer(Execute, null, (FirstInterval ?? Interval).Add(TimeSpan.FromMilliseconds(_random.Next(0, 1000))), Interval);
             return Task.CompletedTask;
         }
 

@@ -20,7 +20,6 @@ namespace Beef.Core.UnitTest.Caching
         public void CreateAndGetWithInstanceFlush()
         {
             Policy.CachePolicyManagerTest.TestSetUp();
-            CachePolicyManager.Current.IsInternalTracingEnabled = true;
 
             // Initialize the cache.
             var mtc = new MultiTenantCache<KeyValueCache<int, string>>((g, p) =>
@@ -85,7 +84,6 @@ namespace Beef.Core.UnitTest.Caching
         public void CreateAndGetWithForceFlush()
         {
             Policy.CachePolicyManagerTest.TestSetUp();
-            CachePolicyManager.Current.IsInternalTracingEnabled = true;
 
             // Initialize the cache.
             var mtc = new MultiTenantCache<KeyValueCache<int, string>>((g, p) =>

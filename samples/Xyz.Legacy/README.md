@@ -225,16 +225,17 @@ namespace Xyz.Legacy.CdcCodeGen
 {
     class Program
     {
-        // Uses the connection string defined in Environment Variable: Xyz_Legacy_ConnectionString
         // To run execute command line: dotnet run database
         static Task<int> Main(string[] args) => CodeGenConsoleWrapper
             // Code generation configuration as follows:
             // - Create - creates the code-generator instance and sets the `Company` and `AppName` parameters.
             // - Supports - turns off the default `entity` support, and turns on `database` code-gen support only.
             // - DatabaseScript - configures the code-gen to use the `DatabaseCdcDacpac.xml` that drives the code-gen templates to be used; this is a CDC-only script designed for DACPAC output.
+            // - DatabaseConnectionString - defaults the database connection string; will be overridden by command line arguments '-cs|--connectionString' or environment variable: Xyz_Legacy_ConnectionString
             .Create("Xyz", "Legacy")
             .Supports(entity: false, database: true)
             .DatabaseScript("DatabaseCdcDacpac.xml")
+            .DatabaseConnectionString("Data Source=.;Initial Catalog=XyzLegacy;Integrated Security=True")
             .RunAsync(args);
     }
 }
@@ -255,8 +256,6 @@ cdcSchema: XCdc                                # Specifies the schema for all th
 cdcIdentifierMapping: true                     # Indicates to include the generation of the global identifier mapping artefacts.
 cdcExcludeColumnsFromETag: [ rowversion ]      # Default list of columns to exclude from the generated ETag (duplicate send tracking).
 pathDatabaseSchema: Xyz.Legacy.CdcDatabase     # Path (directory) for the database-related artefacts (relative to parent).
-pathCdc: Xyz.Legacy.CdcPublisher               # Path (directory) for the CDC service-related artefacts (relative to parent).
-namespaceCdc: Xyz.Legacy.CdcPublisher          # .NET namespace for the CDC service-related artefacts.
 hasBeefDbo: false                              # Indicates that the database does not contain the standard _Beef_ dbo schema artefacts.
 eventSubjectFormat: NameOnly                   # Event subject should include name only; not append the key.
 eventSubjectRoot: Xyz.Legacy                   # Event subject root prepended to all published events.

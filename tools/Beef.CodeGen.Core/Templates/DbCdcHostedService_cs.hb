@@ -11,9 +11,9 @@ using Beef.Data.Database.Cdc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using {{Root.NamespaceCdc}}.Data;
+using {{Root.NamespaceCdcPublisher}}.Data;
 
-namespace {{Root.NamespaceCdc}}.Services
+namespace {{Root.NamespaceCdcPublisher}}.Services
 {
     /// <summary>
     /// Provides the <see cref="CdcHostedService"/> capabilities for database object '{{Schema}}.{{Name}}'.
