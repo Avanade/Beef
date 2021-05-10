@@ -11,3 +11,4 @@ Demo:
     - { WorkHistoryId: 4, PersonId: 4, Name: Amazon, StartDate: 2016-04-16 }
   - Contact:
     - { ContactId: 1, FirstName: Jenny, LastName: Cuthbert }
+    - { ContactId: 2, FirstName: Brian, LastName: Missing, IsDeleted: true }

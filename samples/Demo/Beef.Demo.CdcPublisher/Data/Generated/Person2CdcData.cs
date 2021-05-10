@@ -15,50 +15,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Beef.Demo.Cdc.Entities;
+using Beef.Demo.CdcPublisher.Entities;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Demo.CdcPublisher.Data
 {
     /// <summary>
-    /// Enables the CDC data access for database object 'Demo.Person'.
+    /// Enables the CDC data access for database object 'Demo.Person2'.
     /// </summary>
-    public partial interface IPersonCdcData : ICdcDataOrchestrator { }
+    public partial interface IPerson2CdcData : ICdcDataOrchestrator { }
 
     /// <summary>
-    /// Provides the CDC data access for database object 'Demo.Person'.
+    /// Provides the CDC data access for database object 'Demo.Person2'.
     /// </summary>
-    public partial class PersonCdcData : CdcDataOrchestrator<PersonCdc, PersonCdcData.PersonCdcWrapperCollection, PersonCdcData.PersonCdcWrapper, CdcTrackingDbMapper>, IPersonCdcData
+    public partial class Person2CdcData : CdcDataOrchestrator<Person2Cdc, Person2CdcData.Person2CdcWrapperCollection, Person2CdcData.Person2CdcWrapper, CdcTrackingDbMapper>, IPerson2CdcData
     {
-        private static readonly DatabaseMapper<PersonCdcWrapper> _personCdcWrapperMapper = DatabaseMapper.CreateAuto<PersonCdcWrapper>();
-
-        private readonly Beef.Demo.Business.IPersonManager _personManager;
+        private static readonly DatabaseMapper<Person2CdcWrapper> _person2CdcWrapperMapper = DatabaseMapper.CreateAuto<Person2CdcWrapper>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCdcData"/> class.
+        /// Initializes a new instance of the <see cref="Person2CdcData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        /// <param name="personManager"></param>
-        public PersonCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PersonCdcData> logger, Beef.Demo.Business.IPersonManager personManager) :
-            base(db, "[DemoCdc].[spExecutePersonCdcOutbox]", "[DemoCdc].[spCompletePersonCdcOutbox]", evtPub, logger)
-        {
-            _personManager = Check.NotNull(personManager, nameof(personManager));
-            PersonCdcDataCtor();
-        }
+        public Person2CdcData(IDatabase db, IEventPublisher evtPub, ILogger<Person2CdcData> logger) :
+            base(db, "[DemoCdc].[spExecutePerson2CdcOutbox]", "[DemoCdc].[spCompletePerson2CdcOutbox]", evtPub, logger) => Person2CdcDataCtor();
 
-        partial void PersonCdcDataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void Person2CdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets the outbox entity data from the database.
         /// </summary>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<PersonCdcWrapperCollection, PersonCdcWrapper>> GetOutboxEntityDataAsync()
+        protected override async Task<CdcDataOrchestratorResult<Person2CdcWrapperCollection, Person2CdcWrapper>> GetOutboxEntityDataAsync()
         {
-            var pColl = new PersonCdcWrapperCollection();
+            var pColl = new Person2CdcWrapperCollection();
 
             var result = await SelectQueryMultiSetAsync(
-                new MultiSetCollArgs<PersonCdcWrapperCollection, PersonCdcWrapper>(_personCdcWrapperMapper, r => pColl = r, stopOnNull: true) // Root table: Demo.Person
+                new MultiSetCollArgs<Person2CdcWrapperCollection, Person2CdcWrapper>(_person2CdcWrapperMapper, r => pColl = r, stopOnNull: true) // Root table: Demo.Person2
                 ).ConfigureAwait(false);
 
             result.Result.AddRange(pColl);
@@ -68,7 +61,7 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Gets the <see cref="EventData.Subject"/> (to be further formatted as per <see cref="EventSubjectFormat"/>).
         /// </summary>
-        protected override string EventSubject => "Demo.Cdc.Person";
+        protected override string EventSubject => "Demo.Cdc.Person2";
 
         /// <summary>
         /// Gets the <see cref="EventData.Subject"/> <see cref="Cdc.EventSubjectFormat"/>.
@@ -83,7 +76,7 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Gets the <see cref="EventData.Source"/>.
         /// </summary>
-        protected override Uri? EventSource => new Uri("/cdc/person", UriKind.Relative);
+        protected override Uri? EventSource => new Uri("/cdc/person2", UriKind.Relative);
 
         /// <summary>
         /// Gets the <see cref="EventMetadata.Source"/> <see cref="Cdc.EventSourceFormat"/>.
@@ -91,9 +84,9 @@ namespace Beef.Demo.Cdc.Data
         protected override EventSourceFormat EventSourceFormat { get; } = EventSourceFormat.NameAndKey;
 
         /// <summary>
-        /// Represents a <see cref="PersonCdc"/> wrapper to append the required (additional) database properties.
+        /// Represents a <see cref="Person2Cdc"/> wrapper to append the required (additional) database properties.
         /// </summary>
-        public class PersonCdcWrapper : PersonCdc, ICdcWrapper
+        public class Person2CdcWrapper : Person2Cdc, ICdcWrapper
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.
@@ -115,9 +108,9 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Represents a <see cref="PersonCdcWrapper"/> collection.
+        /// Represents a <see cref="Person2CdcWrapper"/> collection.
         /// </summary>
-        public class PersonCdcWrapperCollection : List<PersonCdcWrapper> { }
+        public class Person2CdcWrapperCollection : List<Person2CdcWrapper> { }
     }
 }
 

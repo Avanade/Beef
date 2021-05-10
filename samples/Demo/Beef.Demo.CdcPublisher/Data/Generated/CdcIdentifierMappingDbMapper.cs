@@ -10,7 +10,7 @@ using System.Data;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Demo.CdcPublisher.Data
 {
     /// <summary>
     /// Provides the <see cref="CdcIdentifierMapping"/> data mapper.

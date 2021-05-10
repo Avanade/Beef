@@ -10,9 +10,9 @@ using Beef.Data.Database.Cdc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using Beef.Demo.Cdc.Data;
+using Beef.Demo.CdcPublisher.Data;
 
-namespace Beef.Demo.Cdc.Services
+namespace Beef.Demo.CdcPublisher.Services
 {
     /// <summary>
     /// Provides the <see cref="CdcHostedService"/> capabilities for database object 'Demo.Person'.

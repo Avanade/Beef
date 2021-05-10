@@ -10,6 +10,7 @@ CREATE TABLE [Legacy].[Contact] (
   [Active]       BIT            NULL,
   [DontCallList] BIT            NULL,
   [AddressId]    INT            NULL,
+  [IsDeleted]    BIT            NULL, 
   CONSTRAINT [PK_Contact] PRIMARY KEY CLUSTERED ([ContactId] ASC),
   CONSTRAINT [FK_Contact_Address] FOREIGN KEY ([AddressId]) REFERENCES [Legacy].[Address] ([Id])
 );

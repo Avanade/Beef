@@ -171,7 +171,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the base column configuration.
     /// </summary>
     /// <typeparam name="TParent">The parent <see cref="Type"/>.</typeparam>
-    public abstract class ColumnConfigBase<TParent> : ConfigBase<CodeGenConfig, TParent>, IColumnConfig where TParent : ConfigBase, ITableReference, ISpecialColumns
+    public abstract class ColumnConfigBase<TParent> : ConfigBase<CodeGenConfig, TParent>, IColumnConfig where TParent : ConfigBase, ITableReference, ISpecialColumns, ISpecialColumnNames
     {
         /// <summary>
         /// Gets or sets the column name.
@@ -229,6 +229,7 @@ namespace Beef.CodeGen.Config.Database
         public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
             ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
             : (DbColumn.TypeIsInteger(DbColumn!.Type) || DbColumn.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+
 
         /// <summary>
         /// Indicates where the column is the "TenantId" column.

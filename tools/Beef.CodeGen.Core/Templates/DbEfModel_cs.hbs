@@ -15,7 +15,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{EfModelName}}
+    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}}: ILogicallyDeleted{{/ifval}}
     {
 {{#each CoreColumns}}
         /// <summary>
@@ -24,6 +24,13 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
         public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{Name}} { get; set; }
 
 {{/each}}
+{{#ifval ColumnIsDeleted}}
+        /// <summary>
+        /// Gets or sets the '{{Name}}' column value.
+        /// </summary>
+        public {{ColumnIsDeleted.DotNetType}}{{#if ColumnIsDeleted.IsDotNetNullable}}?{{/if}} IsDeleted { get; set; }
+
+{{/ifval}}
         /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
         /// </summary>
@@ -40,6 +47,10 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {{#each CoreColumns}}
                 entity.Property(p => p.{{Name}}).HasColumnType("{{EfSqlType}}"){{#if DbColumn.IsComputed}}.ValueGeneratedOnAddOrUpdate(){{/if}}{{#if IsRowVersionColumn}}.IsRowVersion(){{/if}}{{#if IsCreated}}.ValueGeneratedOnUpdate(){{/if}}{{#if IsUpdated}}.ValueGeneratedOnAdd(){{/if}};
 {{/each}}
+{{#ifval ColumnIsDeleted}}
+                entity.Property(p => p.IsDeleted).HasColumnType("{{ColumnIsDeleted.EfSqlType}}");
+                entity.HasQueryFilter(v => v.IsDeleted != true);
+{{/ifval}}
                 AddToModel(entity);
             });
         }

@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace Beef.Demo.Cdc.Entities
+namespace Beef.Demo.CdcPublisher.Entities
 {
     /// <summary>
     /// Represents the CDC model for the root (parent) database table 'Legacy.Posts'.

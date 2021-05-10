@@ -15,9 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Beef.Demo.Cdc.Entities;
+using Beef.Demo.CdcPublisher.Entities;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Demo.CdcPublisher.Data
 {
     /// <summary>
     /// Enables the CDC data access for database object 'Legacy.Posts'.

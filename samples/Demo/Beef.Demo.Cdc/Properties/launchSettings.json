@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Beef.Demo.Cdc": {
-      "commandName": "Project",
-      "commandLineArgs": "--Services PersonCdc --ContinueWithDataLoss true"
-    }
-  }
-}

@@ -9,7 +9,7 @@ using Beef.Data.Database.Cdc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Beef.Demo.Cdc.Services
+namespace Beef.Demo.CdcPublisher.Services
 {
     /// <summary>
     /// Provides the generated <see cref="CdcHostedService"/> extensions.

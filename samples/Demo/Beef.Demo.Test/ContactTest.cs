@@ -38,6 +38,16 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void A125_Get_Deleted()
+        {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(2.ToGuid()));
+        }
+
+        [Test, TestSetUp]
         public void A120_UpdateAndCheckEventOutboxDequeue()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();

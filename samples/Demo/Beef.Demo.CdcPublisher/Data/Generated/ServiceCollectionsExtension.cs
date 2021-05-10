@@ -7,7 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Demo.CdcPublisher.Data
 {
     /// <summary>
     /// Provides the generated CDC <b>Data</b>-layer services.

@@ -13,13 +13,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Beef.Demo.Cdc.Entities
+namespace Beef.Demo.CdcPublisher.Entities
 {
     /// <summary>
     /// Represents the CDC model for the root (parent) database table 'Legacy.Contact'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class ContactCdc : ITableKey, IETag, IGlobalIdentifier, ICdcLinkIdentifierMapping
+    public partial class ContactCdc : ITableKey, IETag, ILogicallyDeleted, IGlobalIdentifier, ICdcLinkIdentifierMapping
     {
         /// <summary>
         /// Gets or sets the <see cref="IGlobalIdentifier.GlobalId"/>.
@@ -104,6 +104,33 @@ namespace Beef.Demo.Cdc.Entities
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
         public string? ETag { get; set; }
+
+        /// <summary>
+        /// Indicates whether the entity is logically deleted ('IsDeleted' column).
+        /// </summary>
+        [MapperProperty("IsDeleted")]
+        public bool IsDeleted { get; set; }
+
+        /// <summary>
+        /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
+        /// </summary>
+        public void ClearWhereDeleted()
+        {
+            if (!IsDeleted)
+                return;
+
+            Name = default!;
+            Phone = default!;
+            Email = default!;
+            Active = default!;
+            DontCallList = default!;
+            AddressId = default!;
+            AlternateContactId = default!;
+            GlobalAlternateContactId = default!;
+            LegacySystemCode = default!;
+            UniqueId = default;
+            Address = default!;
+        }
 
         /// <summary>
         /// <inheritdoc/>
