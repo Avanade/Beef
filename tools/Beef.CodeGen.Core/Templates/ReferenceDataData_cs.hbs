@@ -118,7 +118,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         public static EfDbMapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}> {{Name}}Mapper => EfDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>()
             .HasProperty(s => s.Id, d => d.{{Name}}Id)
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, => p.{{#ifne DataOperationTypes 'Any'}}SetOperationTypes(OperationTypes.{{DataOperationTypes}}{{/ifne}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
+            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
           {{/each}}
             .AddStandardProperties();
     {{/unless}}
@@ -131,7 +131,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// </summary>
         public static CosmosDbMapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}> {{Name}}Mapper => CosmosDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>()
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
+            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval CosmosMapper}}.SetMapper({{CosmosMapper}}.Default!){{/ifval}})
           {{/each}}
             .AddStandardProperties();
     {{/unless}}

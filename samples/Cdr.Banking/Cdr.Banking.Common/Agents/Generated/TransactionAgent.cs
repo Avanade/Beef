@@ -27,7 +27,7 @@ namespace Cdr.Banking.Common.Agents
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -49,7 +49,7 @@ namespace Cdr.Banking.Common.Agents
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>

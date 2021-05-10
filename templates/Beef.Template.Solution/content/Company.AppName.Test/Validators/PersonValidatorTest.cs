@@ -31,7 +31,7 @@ namespace Company.AppName.Test.Validators
                 .AddScoped(_ => rd.Object);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public async Task A110_Validation_Empty()
         {
             await ValidationTester.Test()
@@ -44,7 +44,7 @@ namespace Company.AppName.Test.Validators
                 .CreateAndRunAsync<IValidator<Person>, Person>(new Person());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public async Task A120_Validation_Invalid()
         {
             var p = new Person
@@ -65,7 +65,7 @@ namespace Company.AppName.Test.Validators
                 .CreateAndRunAsync<IValidator<Person>, Person>(p);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public async Task A130_Validation_OK()
         {
             var p = new Person

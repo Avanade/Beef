@@ -6,6 +6,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Added Event Outbox support with `DatabaseEventOutboxBase`, `DatabaseEventOutboxItem` and `DatabaseEventOutboxInvoker` (enqueue events to the database on publish/send).
 - *Enhancement:* Added `IDatabase.EventOutboxInvoker` to access the corresponding event outbox capability.
 - *Enhancement:* Added `DatabaseEventOutboxPublisherService` that is the `IHostedService` to dequeue events from the databade and publish/send.
+- *Enhancement:* Added supported for `bool?` on `DatabaseParameters.When`.
 
 ## v4.1.5
 - *Fixed:* `DatabaseRowVersionConverter.ConvertToSrce` will now return `null` when the `byte[]` is empty; versus, an empty string.

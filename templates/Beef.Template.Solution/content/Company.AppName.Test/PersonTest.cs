@@ -289,10 +289,9 @@ namespace Company.AppName.Test
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the value with an eTag header (json payload eTag is ignored).
-            v.ETag = TestSetUp.ConcurrencyErrorETag;
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
+                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
         }
 
         [Test, TestSetUp]

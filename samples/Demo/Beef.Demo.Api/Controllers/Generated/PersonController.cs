@@ -279,7 +279,7 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         [HttpPost("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public IActionResult Add([FromBody] Person person)

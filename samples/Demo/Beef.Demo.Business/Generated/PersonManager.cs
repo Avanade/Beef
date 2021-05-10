@@ -331,7 +331,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -356,7 +356,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -426,7 +426,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public async Task<MapCoordinates> MapAsync(MapArgs? args)
         {
@@ -522,7 +522,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         public async Task AddAsync(Person person)
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -617,7 +617,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)

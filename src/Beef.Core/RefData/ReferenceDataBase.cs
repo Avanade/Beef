@@ -547,7 +547,7 @@ namespace Beef.RefData
         /// <param name="a">A <see cref="ReferenceDataBase"/>.</param>
         /// <param name="b">B <see cref="ReferenceDataBase"/>.</param>
         /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator !=(ReferenceDataBase a, ReferenceDataBase b)
+        public static bool operator !=(ReferenceDataBase? a, ReferenceDataBase? b)
         {
             return !(a == b);
         }

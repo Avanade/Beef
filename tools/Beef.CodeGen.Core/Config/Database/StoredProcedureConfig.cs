@@ -339,6 +339,9 @@ tables:
             {
                 settable.Prepare(Root!, this);
             }
+
+            if (Paging == true && OrderBy.Count < 1)
+                throw new CodeGenException(this, nameof(OrderBy), $"At least one OrderBy column must be specified when using Paging.");
         }
 
         /// <summary>
