@@ -100,6 +100,18 @@ Demo:
     - { PersonId: 2, Name: Optus, StartDate: 2016-04-16 }
 ```
 
+Additionally, to use an [`IIdentifierGenerator`](../../src/Beef.Core/Entities/IIdentifierGenerator.cs) to generate the identifiers, an [`IIdentifierGenerators`](./IIdentifierGenerators.cs) implementation is required (see `DefaultIdentifierGenerators` for an example). To specify the type at runtime it must be specified in the YAML using `^Type: typeName`. Then for this to be used the `^` prefix must be specified for each corresponding table (must opt-in). Example as follows.
+
+``` yaml
+^Type: Beef.Database.Core.DefaultIdentifierGenerators
+Ref:
+  - $^Gender:
+    - { Code: M, Text: Male, TripCode: Male }
+Demo:
+  - ^Person:
+    - { FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18 }
+```
+
 <br/>
 
 ### Other considerations
