@@ -302,7 +302,7 @@ namespace Beef.Test.NUnit
                     errorTypeOK = true;
                     if (_expectedMessages != null)
                         CompareExpectedVsActualMessages(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
-                    else
+                    else if (!_expectedErrorType.HasValue)
                         Assert.Fail($"Expected success; however, {ex.GetType().Name} was thrown.");
                 }
 

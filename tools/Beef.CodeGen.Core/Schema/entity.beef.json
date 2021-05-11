@@ -973,6 +973,11 @@
                       "type": "boolean",
                       "title": "Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method."
                     },
+                    "internalOnly": {
+                      "type": "boolean",
+                      "title": "Indicates whether the property is for internal use only; declared in Business entities only.",
+                      "description": "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration."
+                    },
                     "refDataType": {
                       "type": "string",
                       "title": "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).",

@@ -14,6 +14,7 @@
     </StoredProcedure>
   </Table>
 
+  <Table Name="Table" Schema="Test" EfModel="true"/>
   <Table Name="Table2" Schema="Test" Get="true" Create="true" Update="true" Delete="true" Upsert="true" />
   <Table Name="Table3" Schema="Test" Get="true" Create="true" Update="true" Delete="true" Upsert="true" />
 

@@ -21,7 +21,7 @@ using Company.AppName.Business.Data;
 using Company.AppName.Business.Entities;
 #endif
 
-namespace Company.AppName.Test
+namespace Company.AppName.Test.Apis
 {
     [SetUpFixture]
     public class FixtureSetUp

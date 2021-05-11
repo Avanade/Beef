@@ -847,7 +847,7 @@ entities:
         /// <summary>
         /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
-        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value)).ToList();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && !(x.InternalOnly == true && Root!.RuntimeEntityScope == "Common" && Root.IsDataModel == false)).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key.

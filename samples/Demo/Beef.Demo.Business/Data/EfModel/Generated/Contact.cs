@@ -33,7 +33,7 @@ namespace Beef.Demo.Business.Data.EfModel
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Contact' column value.
+        /// Gets or sets the 'IsDeleted' column value.
         /// </summary>
         public bool? IsDeleted { get; set; }
 

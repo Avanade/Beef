@@ -197,6 +197,14 @@ properties: [
         [PropertySchema("Property", Title = "Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.")]
         public bool? ExcludeCleanup { get; set; }
 
+        /// <summary>
+        /// Indicates whether the property is for internal use only; declared in the Business entities only.
+        /// </summary>
+        [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
+            Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.")]
+        public bool? InternalOnly { get; set; }
+
         #endregion
 
         #region RefData

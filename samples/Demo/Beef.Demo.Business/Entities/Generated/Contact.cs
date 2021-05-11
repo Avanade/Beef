@@ -28,6 +28,7 @@ namespace Beef.Demo.Business.Entities
         private Guid _id;
         private string? _firstName;
         private string? _lastName;
+        private string? _internalCode;
 
         #endregion
 
@@ -64,6 +65,17 @@ namespace Beef.Demo.Business.Entities
         {
             get => _lastName;
             set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName));
+        }
+
+        /// <summary>
+        /// Gets or sets the Internal Code.
+        /// </summary>
+        [JsonProperty("internalCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Internal Code")]
+        public string? InternalCode
+        {
+            get => _internalCode;
+            set => SetValue(ref _internalCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(InternalCode));
         }
 
         #endregion
@@ -113,7 +125,8 @@ namespace Beef.Demo.Business.Entities
             return base.Equals((object)value)
                 && Equals(Id, value.Id)
                 && Equals(FirstName, value.FirstName)
-                && Equals(LastName, value.LastName);
+                && Equals(LastName, value.LastName)
+                && Equals(InternalCode, value.InternalCode);
         }
 
         /// <summary>
@@ -142,6 +155,7 @@ namespace Beef.Demo.Business.Entities
             hash.Add(Id);
             hash.Add(FirstName);
             hash.Add(LastName);
+            hash.Add(InternalCode);
             return base.GetHashCode() ^ hash.ToHashCode();
         }
     
@@ -172,6 +186,7 @@ namespace Beef.Demo.Business.Entities
             Id = from.Id;
             FirstName = from.FirstName;
             LastName = from.LastName;
+            InternalCode = from.InternalCode;
 
             OnAfterCopyFrom(from);
         }
@@ -204,6 +219,7 @@ namespace Beef.Demo.Business.Entities
             Id = Cleaner.Clean(Id);
             FirstName = Cleaner.Clean(FirstName, StringTrim.UseDefault, StringTransform.UseDefault);
             LastName = Cleaner.Clean(LastName, StringTrim.UseDefault, StringTransform.UseDefault);
+            InternalCode = Cleaner.Clean(InternalCode, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

@@ -197,6 +197,11 @@ namespace Beef.Data.EntityFrameworkCore
             return await Invoker.InvokeAsync(this, async () =>
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
+
+                // On create the tenant id must have a value specified.
+                if (model is IMultiTenant mt)
+                    mt.TenantId = ExecutionContext.Current.TenantId;
+
                 DbContext.Add(model);
 
                 if (saveArgs.SaveChanges)

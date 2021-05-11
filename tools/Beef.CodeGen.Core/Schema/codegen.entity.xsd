@@ -139,6 +139,11 @@
                       <xs:documentation>Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="InternalOnly" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property is for internal use only; declared in Business entities only. This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="RefDataType" use="optional">
                     <xs:annotation>
                       <xs:documentation>The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.</xs:documentation>

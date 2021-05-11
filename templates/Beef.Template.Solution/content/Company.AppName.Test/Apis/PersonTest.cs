@@ -10,17 +10,19 @@ using Company.AppName.Api;
 using Company.AppName.Common.Agents;
 using Company.AppName.Common.Entities;
 
-namespace Company.AppName.Test
+namespace Company.AppName.Test.Apis
 {
     [TestFixture, NonParallelizable]
-    public class PersonTest : UsingAgentTesterServer<Startup>
+    public class PersonTest
     {
         #region Get
 
         [Test, TestSetUp]
         public void A110_Get_NotFound()
         {
-            AgentTester.Test<PersonAgent, Person?>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
@@ -28,7 +30,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A120_Get_Found()
         {
-            AgentTester.Test<PersonAgent, Person?>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -46,13 +50,15 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A120_Get_Modified_NotModified()
         {
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid(), new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag })).Value!;
 
             Assert.NotNull(v);
 
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetAsync(1.ToGuid(), new WebApiRequestOptions { ETag = v.ETag }));
         }
@@ -64,7 +70,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A210_GetByArgs_All()
         {
-            var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(null)).Value!;
 
@@ -77,7 +85,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A220_GetByArgs_FirstName()
         {
-            var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { FirstName = "*a*" })).Value!;
 
@@ -90,7 +100,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A230_GetByArgs_LastName()
         {
-            var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*" })).Value!;
 
@@ -103,7 +115,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A240_GetByArgs_Gender()
         {
-            var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } })).Value!;
 
@@ -116,7 +130,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A250_GetByArgs_Empty()
         {
-            var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", Genders = new List<string> { "F" } })).Value!;
 
@@ -128,7 +144,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A260_GetByArgs_FieldSelection()
         {
-            var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
 
@@ -143,7 +161,9 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A270_GetByArgs_RefDataText()
         {
-            var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions { IncludeRefDataText = true }));
 
@@ -162,6 +182,8 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void B110_Create()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             var v = new Person
             {
                 FirstName = "Jill",
@@ -171,7 +193,7 @@ namespace Company.AppName.Test
             };
 
             // Create value.
-            v = AgentTester.Test<PersonAgent, Person>()
+            v = agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
@@ -181,7 +203,7 @@ namespace Company.AppName.Test
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(v.Id));
@@ -194,13 +216,15 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void C110_Update_NotFound()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(2.ToGuid())).Value!;
 
             // Try updating with an invalid identifier.
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
@@ -208,20 +232,22 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void C120_Update_Concurrency()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
             var id = 2.ToGuid();
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
             // Try updating the value with an invalid eTag (if-match).
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the value with an invalid eTag.
             v.ETag = TestSetUp.ConcurrencyErrorETag;
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id));
         }
@@ -229,9 +255,11 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void C130_Update()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
             var id = 2.ToGuid();
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -240,7 +268,7 @@ namespace Company.AppName.Test
             v.LastName += "Y";
 
             // Update the value.
-            v = AgentTester.Test<PersonAgent, Person>()
+            v = agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -250,7 +278,7 @@ namespace Company.AppName.Test
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(id));
@@ -263,13 +291,15 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void D110_Patch_NotFound()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(2.ToGuid())).Value!;
 
             // Try patching with an invalid identifier.
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404.ToGuid()));
         }
@@ -277,19 +307,21 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void D120_Patch_Concurrency()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
             var id = 2.ToGuid();
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
             // Try updating the value with an invalid eTag (if-match).
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the value with an eTag header (json payload eTag is ignored).
-            AgentTester.Test<PersonAgent, Person>()
+            agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
         }
@@ -297,9 +329,11 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void D130_Patch()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Get an existing value.
             var id = 2.ToGuid();
-            var v = AgentTester.Test<PersonAgent, Person?>()
+            var v = agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -307,7 +341,7 @@ namespace Company.AppName.Test
             v.LastName = "Smithers";
 
             // Update the value.
-            v = AgentTester.Test<PersonAgent, Person>()
+            v = agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -317,7 +351,7 @@ namespace Company.AppName.Test
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value!;
 
             // Check the value was updated properly.
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(id));
@@ -330,25 +364,27 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void E110_Delete()
         {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
             // Check value exists.
             var id = 4.ToGuid();
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id));
 
             // Delete value.
-            AgentTester.Test<PersonAgent>()
+            agentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .ExpectEvent($"Company.AppName.Person", "Deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.
-            AgentTester.Test<PersonAgent, Person?>()
+            agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(id));
 
             // Delete again (should still be successful as a Delete is idempotent); but no event should be raised. 
-            AgentTester.Test<PersonAgent>()
+            agentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(id));
         }

@@ -57,6 +57,7 @@ Property | Description
 `SecondaryPropertyChanged` | The names of the secondary property(s), comma delimited, that are to be notified on a property change.
 `BubblePropertyChanges` | Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself. Note that the `IsEntity` property is also required to enable.
 `ExcludeCleanup` | Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.
+`InternalOnly` | Indicates whether the property is for internal use only; declared in Business entities only. This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.
 
 <br/>
 

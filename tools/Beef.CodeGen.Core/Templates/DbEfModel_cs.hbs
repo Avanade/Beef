@@ -7,8 +7,15 @@
 #pragma warning disable
 
 using System;
+{{#ifval ColumnTenantId}}
+using Beef;
+{{/ifval}}
 {{#ifval ColumnIsDeleted}}
 using Beef.Data.EntityFrameworkCore;
+{{else}}
+  {{#ifval ColumnTenantId}}
+using Beef.Data.EntityFrameworkCore;
+  {{/ifval}}
 {{/ifval}}
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +25,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{/ifval}}
+    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{#ifval ColumnTenantId}}, IMultiTenant{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : IMultiTenant{{/ifval}}{{/ifval}}
     {
 {{#each CoreColumns}}
         /// <summary>
@@ -29,9 +36,16 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {{/each}}
 {{#ifval ColumnIsDeleted}}
         /// <summary>
-        /// Gets or sets the '{{Name}}' column value.
+        /// Gets or sets the '{{ColumnIsDeleted.Name}}' column value.
         /// </summary>
         public {{ColumnIsDeleted.DotNetType}}{{#if ColumnIsDeleted.IsDotNetNullable}}?{{/if}} IsDeleted { get; set; }
+
+{{/ifval}}
+{{#ifval ColumnTenantId}}
+        /// <summary>
+        /// Gets or sets the '{{ColumnTenantId.Name}}' column value.
+        /// </summary>
+        public {{ColumnTenantId.DotNetType}}{{#if ColumnTenantId.IsDotNetNullable}}?{{/if}} TenantId { get; set; }
 
 {{/ifval}}
         /// <summary>
@@ -53,6 +67,10 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {{#ifval ColumnIsDeleted}}
                 entity.Property(p => p.IsDeleted).HasColumnType("{{ColumnIsDeleted.EfSqlType}}");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
+{{/ifval}}
+{{#ifval ColumnTenantId}}
+                entity.Property(p => p.TenantId).HasColumnType("{{ColumnTenantId.EfSqlType}}");
+                entity.HasQueryFilter(v => v.TenantId == ExecutionContext.Current.TenantId);
 {{/ifval}}
                 AddToModel(entity);
             });
