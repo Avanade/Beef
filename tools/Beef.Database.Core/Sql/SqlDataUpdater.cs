@@ -98,6 +98,11 @@ namespace Beef.Database.Core.Sql
         public List<SqlDataTable> Tables { get; } = new List<SqlDataTable>();
 
         /// <summary>
+        /// Gets the configured <see cref="IIdentifierGenerators"/>.
+        /// </summary>
+        public IIdentifierGenerators? IdentifierGenerators { get; set; }
+
+        /// <summary>
         /// Parses the data operations generating the underlying SQL.
         /// </summary>
         private void Parse()
@@ -105,9 +110,31 @@ namespace Beef.Database.Core.Sql
             if (DbTables == null)
                 throw new InvalidOperationException("RegisterDatabase must be invoked before parsing can occur.");
 
+            // Get the identifier generator configuration where applicable.
+            var idjson = _json["^Type"];
+            if (idjson != null)
+            {
+                var typeName = idjson.ToObject<string>();
+                if (string.IsNullOrEmpty(typeName))
+                    throw new SqlDataUpdaterException($"Identifier generators property '^Type' is not a valid string.");
+
+                var type = Type.GetType(typeName, false);
+                if (type == null || type.GetConstructor(Array.Empty<Type>()) == null)
+                    throw new SqlDataUpdaterException($"Identifier generators Type '{typeName}' does not exist or have a default (parameter-lesss) constructor.");
+
+                var idgen = Activator.CreateInstance(type)!;
+                IdentifierGenerators = idgen as IIdentifierGenerators;
+                if (IdentifierGenerators == null)
+                    throw new SqlDataUpdaterException($"Identifier generators Type '{typeName}' does not implement IIdentifierGenerators.");
+            }
+
             // Loop through all the schemas.
             foreach (var js in _json.Children<JProperty>())
             {
+                // Reserved; ignore.
+                if (js.Name == "^Type")
+                    continue;
+
                 // Loop through the collection of tables.
                 foreach (var jto in GetChildObjects(js))
                 {
@@ -156,7 +183,7 @@ namespace Beef.Database.Core.Sql
 
                         if (sdt.Columns.Count > 0)
                         {
-                            sdt.Prepare();
+                            sdt.Prepare(IdentifierGenerators);
                             Tables.Add(sdt);
                         }
                     }

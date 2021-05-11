@@ -139,6 +139,9 @@ namespace Beef.CodeGen.DbModels
                 {
                     c.DbTable = t;
 
+                    if (c.IsPrimaryKey)
+                        t.PrimaryKeyColumns.Add(c);
+
                     if (c.ForeignTable == null)
                     {
                         if (c.Name!.Length > 2 && c.Name!.EndsWith("Id", StringComparison.InvariantCulture))
@@ -227,6 +230,11 @@ namespace Beef.CodeGen.DbModels
         /// Gets or sets the <see cref="DbColumn"/> list.
         /// </summary>
         public List<DbColumn> Columns { get; private set; } = new List<DbColumn>();
+
+        /// <summary>
+        /// Gets the primary key <see cref="DbColumn"/> list.
+        /// </summary>
+        public List<DbColumn> PrimaryKeyColumns { get; private set; } = new List<DbColumn>();
     }
 
     /// <summary>

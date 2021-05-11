@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.6
+- *Enhancement:* Added ability to specify within the data YAML the `IIdentifierGenerators` type using global `^Type` property. Where a table is prefixed with a `^` or `$^` then the identifier value will be generated and set using the appropriate `IIdentifierGenerator`.
+
 ## v4.1.5
 - *Enhancement:* Added additional statistics information to console output.
 - *Enhancement:* Will strip out `bin/debug` and `bin/release` folders from default directory path to find the output directory; meaning the path does not need to be explicity set when running/debugging from Visual Studio.
