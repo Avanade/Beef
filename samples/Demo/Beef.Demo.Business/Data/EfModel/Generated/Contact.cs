@@ -6,6 +6,7 @@
 #pragma warning disable
 
 using System;
+using Beef.Data.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,7 +15,7 @@ namespace Beef.Demo.Business.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Demo.Contact'.
     /// </summary>
-    public partial class Contact
+    public partial class Contact : ILogicallyDeleted
     {
         /// <summary>
         /// Gets or sets the 'ContactId' column value.
@@ -32,6 +33,11 @@ namespace Beef.Demo.Business.Data.EfModel
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'Contact' column value.
+        /// </summary>
+        public bool? IsDeleted { get; set; }
+
+        /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
         /// </summary>
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
@@ -47,6 +53,8 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.ContactId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.FirstName).HasColumnType("NVARCHAR(50)");
                 entity.Property(p => p.LastName).HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.IsDeleted).HasColumnType("BIT");
+                entity.HasQueryFilter(v => v.IsDeleted != true);
                 AddToModel(entity);
             });
         }

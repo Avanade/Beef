@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Demo.CdcPublisher.Data
 {
     public partial class PersonCdcData
     {

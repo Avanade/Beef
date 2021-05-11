@@ -191,7 +191,6 @@ BEGIN
         [c].[Active] AS [Active],
         [c].[DontCallList] AS [DontCallList],
         [c].[AddressId] AS [AddressId],
-        [c].[IsDeleted] AS [IsDeleted],
         [c].[AlternateContactId] AS [AlternateContactId],
         [_im1].[GlobalId] AS [GlobalAlternateContactId],
         [c].[legacy_system_code] AS [LegacySystemCode],

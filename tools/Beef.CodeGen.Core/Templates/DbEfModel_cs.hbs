@@ -7,6 +7,9 @@
 #pragma warning disable
 
 using System;
+{{#ifval ColumnIsDeleted}}
+using Beef.Data.EntityFrameworkCore;
+{{/ifval}}
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,7 +18,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}}: ILogicallyDeleted{{/ifval}}
+    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{/ifval}}
     {
 {{#each CoreColumns}}
         /// <summary>

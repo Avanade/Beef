@@ -41,6 +41,8 @@ namespace Beef.Test.NUnit
             {
                 configuration(whb);
 
+                whb.UseSolutionRelativeContentRoot("");
+
                 whb.ConfigureAppConfiguration((context, config) =>
                 {
                     config.AddConfiguration(AgentTester.BuildConfiguration<TStartup>(environmentVariablePrefix, environment));

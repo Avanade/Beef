@@ -10,6 +10,6 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Indicates whether the columns is logically deleted.
         /// </summary>
-        bool IsDeleted { get; set; }
+        bool? IsDeleted { get; set; }
     }
 }

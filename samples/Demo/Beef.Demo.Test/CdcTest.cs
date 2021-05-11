@@ -1,7 +1,7 @@
 ﻿using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Demo.Api;
-using Beef.Demo.Cdc.Data;
+using Beef.Demo.CdcPublisher.Data;
 using Beef.Entities;
 using Beef.Events;
 using Beef.Test.NUnit;

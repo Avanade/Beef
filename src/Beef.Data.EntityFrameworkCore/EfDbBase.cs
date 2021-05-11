@@ -265,6 +265,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
+        /// <remarks>Where the model implements <see cref="ILogicallyDeleted"/> then this will update the <see cref="ILogicallyDeleted.IsDeleted"/> with <c>true</c> versus perform a physical deletion.</remarks>
         public async Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
             CheckSaveArgs(saveArgs);
@@ -278,11 +279,17 @@ namespace Beef.Data.EntityFrameworkCore
             await Invoker.InvokeAsync(this, async () =>
             {
                 // A pre-read is required to get the row version for concurrency.
-                var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
-                if (em == null)
+                var model = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                if (model == null)
                     throw new NotFoundException();
 
-                DbContext.Remove(em);
+                if (model is ILogicallyDeleted emld)
+                {
+                    emld.IsDeleted = true;
+                    DbContext.Update(model);
+                }
+                else
+                    DbContext.Remove(model);
 
                 if (saveArgs.SaveChanges)
                     await DbContext.SaveChangesAsync(true).ConfigureAwait(false);

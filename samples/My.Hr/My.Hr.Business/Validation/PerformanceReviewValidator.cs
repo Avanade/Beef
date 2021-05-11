@@ -35,7 +35,7 @@ namespace My.Hr.Business.Validation
         {
             if (!context.HasError(x => x.EmployeeId))
             {
-                // Ensure that the EmployeeId has not be changed (change back) as it is immutable.
+                // Ensure that the EmployeeId has not be changed as it is immutable.
                 if (ExecutionContext.Current.OperationType == OperationType.Update)
                 {
                     var prv = await _performanceReviewManager.GetAsync(context.Value.Id).ConfigureAwait(false);

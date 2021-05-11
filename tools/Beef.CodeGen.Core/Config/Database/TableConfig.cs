@@ -335,17 +335,17 @@ tables:
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
+        public IColumnConfig? ColumnIsDeleted { get; set; }
 
         /// <summary>
         /// Gets the related TenantId column.
         /// </summary>
-        public IColumnConfig? ColumnTenantId => GetSpecialColumn(ColumnNameTenantId);
+        public IColumnConfig? ColumnTenantId { get; set; }
 
         /// <summary>
         /// Gets the related OrgUnitId column.
         /// </summary>
-        public IColumnConfig? ColumnOrgUnitId => GetSpecialColumn(ColumnNameOrgUnitId);
+        public IColumnConfig? ColumnOrgUnitId { get; set; }
 
         /// <summary>
         /// Gets the related RowVersion column.
@@ -494,8 +494,21 @@ tables:
                 cc.Prepare(Root!, this);
 
                 // Certain special columns have to always be included.
-                if (cc.IsTenantIdColumn || cc.IsOrgUnitIdColumn || cc.IsIsDeletedColumn)
+                if (cc.Name == ColumnNameTenantId)
+                {
+                    ColumnTenantId = cc;
                     Columns.Add(cc);
+                }
+                else if (cc.Name == ColumnNameOrgUnitId)
+                {
+                    ColumnOrgUnitId = cc;
+                    Columns.Add(cc);
+                }
+                else if (cc.Name == ColumnNameIsDeleted)
+                {
+                    ColumnIsDeleted = cc;
+                    Columns.Add(cc);
+                }
                 else if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                     Columns.Add(cc);
                 else if (cc.IsAudit && StoredProcedures!.Any(x => x.Type == "Create" || x.Type == "Update" || x.Type == "Upsert" || x.Type == "Delete" || x.Type == "Merge"))

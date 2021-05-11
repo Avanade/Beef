@@ -38,7 +38,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A125_Get_Deleted()
+        public void A120_Get_Deleted()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -48,7 +48,17 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A120_UpdateAndCheckEventOutboxDequeue()
+        public void A130_Update_Deleted()
+        {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.UpdateAsync(new Contact { Id = 2.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" }, 2.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void A140_UpdateAndCheckEventOutboxDequeue()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -92,7 +102,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A130_GetAll()
+        public void A150_GetAll()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -125,6 +135,24 @@ namespace Beef.Demo.Test
 
             Assert.NotNull(r2.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r2.Response.Headers?.ETag?.Tag);
+        }
+
+        [Test, TestSetUp]
+        public void A160_Delete()
+        {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            agentTester.Test<ContactAgent>()
+                .ExpectStatusCode(HttpStatusCode.NoContent)
+                .Run(a => a.DeleteAsync(1.ToGuid()));
+
+            var r = agentTester.Test<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(1.ToGuid()));
+
+            agentTester.Test<ContactAgent>()
+                .ExpectStatusCode(HttpStatusCode.NoContent)
+                .Run(a => a.DeleteAsync(1.ToGuid()));
         }
 
         [Test, TestSetUp]

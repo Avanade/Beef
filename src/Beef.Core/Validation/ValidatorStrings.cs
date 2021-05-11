@@ -13,27 +13,27 @@ namespace Beef.Validation
         public static readonly LText CompareEqualFormat = new LText("Beef.CompareEqualFormat");
 
         /// <summary>
-        /// Gets the format string for the compare equal error message.
+        /// Gets the format string for the compare not equal error message.
         /// </summary>
         public static readonly LText CompareNotEqualFormat = new LText("Beef.CompareNotEqualFormat");
 
         /// <summary>
-        /// Gets the format string for the compare equal error message.
+        /// Gets the format string for the compare less than error message.
         /// </summary>
         public static readonly LText CompareLessThanFormat = new LText("Beef.CompareLessThanFormat");
 
         /// <summary>
-        /// Gets the format string for the compare equal error message.
+        /// Gets the format string for the compare less than or equal error message.
         /// </summary>
         public static readonly LText CompareLessThanEqualFormat = new LText("Beef.CompareLessThanEqualFormat");
 
         /// <summary>
-        /// Gets the format string for the compare equal error message.
+        /// Gets the format string for the compare greater than error message.
         /// </summary>
         public static readonly LText CompareGreaterThanFormat = new LText("Beef.CompareGreaterThanFormat");
 
         /// <summary>
-        /// Gets the format string for the compare equal error message.
+        /// Gets the format string for the compare greater than or equal error message.
         /// </summary>
         public static readonly LText CompareGreaterThanEqualFormat = new LText("Beef.CompareGreaterThanEqualFormat");
 
@@ -48,7 +48,7 @@ namespace Beef.Validation
         public static readonly LText DecimalPlacesFormat = new LText("Beef.DecimalPlacesFormat");
 
         /// <summary>
-        /// Gets the format string for the must error message.
+        /// Gets the format string for the duplicate error message.
         /// </summary>
         public static readonly LText DuplicateFormat = new LText("Beef.DuplicateFormat");
 
@@ -73,7 +73,7 @@ namespace Beef.Validation
         public static readonly LText MaxCountFormat = new LText("Beef.MaxCountFormat");
 
         /// <summary>
-        /// Gets the format string for the must error message.
+        /// Gets the format string for the exists error message.
         /// </summary>
         public static readonly LText ExistsFormat = new LText("Beef.ExistsFormat");
 
@@ -98,7 +98,7 @@ namespace Beef.Validation
         public static readonly LText AllowNegativesFormat = new LText("Beef.AllowNegativesFormat");
 
         /// <summary>
-        /// Gets the format string for the Mandatory error message.
+        /// Gets the format string for the invalid error message.
         /// </summary>
         public static readonly LText InvalidFormat = new LText("Beef.InvalidFormat");
 
