@@ -186,15 +186,18 @@ namespace Beef.Test.NUnit.Tests
             TestContext.Out.WriteLine(new string('=', 80));
             TestContext.Out.WriteLine("");
 
+            var context = string.IsNullOrEmpty(result.Content)
+                 ? string.Empty
+                 : string.Format("\r\nContent:{0}", json == null ? result.Content : json);
+            context = $"\r\nRequest: {result.Request.Method} {result.Request.RequestUri}{context}";
+
             // Perform checks.
             if (_expectedStatusCode.HasValue && _expectedStatusCode != result.StatusCode)
-                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).{Environment.NewLine}{Environment.NewLine}{content}");
-
+                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).{context}");
             if (_expectedErrorType.HasValue && _expectedErrorType != result.ErrorType)
-                Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.{Environment.NewLine}{Environment.NewLine}{content}");
-
+                Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.{context}");
             if (_expectedErrorMessage != null && _expectedErrorMessage != result.ErrorMessage)
-                Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.{Environment.NewLine}{Environment.NewLine}{content}");
+                Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.{context}");
 
             if (_expectedMessages != null)
                 TesterBase.CompareExpectedVsActualMessages(_expectedMessages, result.Messages);
