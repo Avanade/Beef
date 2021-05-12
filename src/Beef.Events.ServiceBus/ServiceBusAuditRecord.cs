@@ -29,9 +29,14 @@ namespace Beef.Events.ServiceBus
         public string? ServiceBusName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Service Bus Queue name.
+        /// Gets or sets the Service Bus Queue (or Topic) name.
         /// </summary>
         public string? QueueName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Service Bus Queue Topic Subscription name.
+        /// </summary>
+        public string? SubscriptionName { get; set; }
 
         /// <summary>
         /// Gets or sets the logical sequence number of the message within Service Bus.

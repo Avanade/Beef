@@ -35,17 +35,17 @@ namespace Beef.Events.ServiceBus
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceBusSender"/> using the specified <see cref="AzureServiceBus.ServiceBusClient"/> and queue name (consider setting the underlying 
+        /// Initializes a new instance of the <see cref="ServiceBusSender"/> using the specified <see cref="AzureServiceBus.ServiceBusClient"/> and queue (or topic) name (consider setting the underlying 
         /// <see cref="AzureServiceBus.ServiceBusClientOptions.RetryOptions"/>) to allow for transient errors).
         /// </summary>
         /// <param name="client">The <see cref="AzureServiceBus.ServiceBusClient"/>.</param>
-        /// <param name="queueName">The queue name.</param>
+        /// <param name="queueName">The queue (or topic) name.</param>
         /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ServiceBusSenderInvoker"/>.</param>
         public ServiceBusSender(AzureServiceBus.ServiceBusClient client, string queueName, ServiceBusSenderInvoker? invoker = null) 
             : this(client, false, invoker) => QueueName = Check.NotEmpty(queueName, nameof(queueName));
 
         /// <summary>
-        /// Gets the queue name. Where <c>null</c> this indicates that the queue name will be <see cref="CreateQueueName">created</see> (inferred) at runtime
+        /// Gets the queue (or topic) name. Where <c>null</c> this indicates that the queue name will be <see cref="CreateQueueName">created</see> (inferred) at runtime.
         /// </summary>
         public string? QueueName { get; private set; }
 
