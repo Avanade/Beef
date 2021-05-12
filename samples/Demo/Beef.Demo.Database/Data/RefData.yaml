@@ -62,3 +62,6 @@ Ref:
     - WV: West Virginia
     - WI: Wisconsin
     - WY: Wyoming
+  - $^Status:
+    - I: Inactive
+    - P: Pending

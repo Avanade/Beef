@@ -28,6 +28,8 @@ namespace Beef.Demo.Business.Entities
         private Guid _id;
         private string? _firstName;
         private string? _lastName;
+        private string? _statusSid;
+        private string? _statusText;
         private string? _internalCode;
 
         #endregion
@@ -65,6 +67,34 @@ namespace Beef.Demo.Business.Entities
         {
             get => _lastName;
             set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName));
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Status"/> using the underlying Serialization Identifier (SID).
+        /// </summary>
+        [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Status")]
+        public string? StatusSid
+        {
+            get => _statusSid;
+            set => SetValue(ref _statusSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Status));
+        }
+
+        /// <summary>
+        /// Gets the corresponding {{Status}} text (read-only where selected).
+        /// </summary>
+        [JsonProperty("statusText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? StatusText { get => _statusText ?? GetRefDataText(() => Status); set => _statusText = value; }
+
+        /// <summary>
+        /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Display(Name="Status")]
+        public RefDataNamespace.Status? Status
+        {
+            get => _statusSid;
+            set => SetValue(ref _statusSid, value, false, false, nameof(Status)); 
         }
 
         /// <summary>
@@ -126,6 +156,7 @@ namespace Beef.Demo.Business.Entities
                 && Equals(Id, value.Id)
                 && Equals(FirstName, value.FirstName)
                 && Equals(LastName, value.LastName)
+                && Equals(StatusSid, value.StatusSid)
                 && Equals(InternalCode, value.InternalCode);
         }
 
@@ -155,6 +186,7 @@ namespace Beef.Demo.Business.Entities
             hash.Add(Id);
             hash.Add(FirstName);
             hash.Add(LastName);
+            hash.Add(StatusSid);
             hash.Add(InternalCode);
             return base.GetHashCode() ^ hash.ToHashCode();
         }
@@ -186,6 +218,7 @@ namespace Beef.Demo.Business.Entities
             Id = from.Id;
             FirstName = from.FirstName;
             LastName = from.LastName;
+            StatusSid = from.StatusSid;
             InternalCode = from.InternalCode;
 
             OnAfterCopyFrom(from);
@@ -219,6 +252,7 @@ namespace Beef.Demo.Business.Entities
             Id = Cleaner.Clean(Id);
             FirstName = Cleaner.Clean(FirstName, StringTrim.UseDefault, StringTransform.UseDefault);
             LastName = Cleaner.Clean(LastName, StringTrim.UseDefault, StringTransform.UseDefault);
+            StatusSid = Cleaner.Clean(StatusSid);
             InternalCode = Cleaner.Clean(InternalCode, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();

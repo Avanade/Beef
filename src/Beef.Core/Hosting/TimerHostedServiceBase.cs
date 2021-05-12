@@ -111,13 +111,19 @@ namespace Beef.Hosting
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <remarks>The underlying timer start is the <see cref="FirstInterval"/> plus a randomized value between zero and one thousand milliseconds; this will minimize multiple services within the host potentially all starting at once.</remarks>
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        async Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
             Logger.LogDebug($"{ServiceName} service started. Timer first/interval {FirstInterval ?? Interval}/{Interval}.");
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            await StartingAsync(_cts.Token).ConfigureAwait(false);
             _timer = new Timer(Execute, null, (FirstInterval ?? Interval).Add(TimeSpan.FromMilliseconds(_random.Next(0, 1000))), Interval);
-            return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Triggered when the <see cref="TimerHostedServiceBase"/> is starting (prior to initiating the timer).
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        protected virtual Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
         /// <summary>
         /// Performs the internal execution.
@@ -208,8 +214,15 @@ namespace Beef.Hosting
                 await Task.WhenAny(_executeTask ?? Task.CompletedTask, Task.Delay(Timeout.Infinite, cancellationToken)).ConfigureAwait(false);
             }
 
+            await StoppingAsync(cancellationToken).ConfigureAwait(false);
             Logger.LogInformation($"{ServiceName} service stopped.");
         }
+
+        /// <summary>
+        /// Triggered when the <see cref="TimerHostedServiceBase"/> is stopping (after <see cref="ExecuteAsync"/> has stopped).
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        protected virtual Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
         /// <summary>
         /// Dispose of resources.

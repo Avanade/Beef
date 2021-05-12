@@ -109,6 +109,16 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="cancellationToken"><inheritdoc/></param>
+        protected override Task StartingAsync(CancellationToken cancellationToken)
+        {
+            Logger.LogDebug($"{ServiceName} service started. MaxDequeueCount: {MaxDequeueCount}, Interval: {Interval}, DequeueInterval: {DequeueInterval}.");
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Executes the dequeue of the events from the database 
         /// </summary>
         /// <param name="cancellationToken"></param>

@@ -283,6 +283,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{#unless Abstract}}
         #region Operator
 
+    {{#ifne RefDataType 'string'}}
         /// <summary>
         /// An implicit cast from an <b>Id</b> to a {{{EntityNameSeeComments}}}.
         /// </summary>
@@ -290,6 +291,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
         public static implicit operator {{{EntityName}}}({{RefDataType}} id) => ConvertFromId<{{{EntityName}}}>(id);
 
+    {{/ifne}}
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a {{{EntityNameSeeComments}}}.
         /// </summary>

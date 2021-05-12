@@ -9,6 +9,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* A new `Property.InternalOnly` option enables a property to be specified for internal use only, being generated witthin the `Business`, but not `Common`, entities. Applicable only where `Entity.EntityScope` is `Autonomous`.
 - *Enhancement:* The code-generation for an EF model is now logically delete (`IsDeleted` column) aware; this will ensure that any logically deleted data is appropriately filtered.
 - *Enhancement:* The code-generation for an EF model is now logically delete (`TenantId` column) aware; this will ensure that the `TenantId` is appropriately filtered.
+- *Enhancement:* Add support for `ReferenceDataBaseString` code-generation.
 
 ## v4.1.24
 - *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.

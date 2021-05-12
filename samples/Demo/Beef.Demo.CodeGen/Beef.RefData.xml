@@ -16,4 +16,5 @@
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">
     <Property Name="ExternalCode" Type="string" RefDataMapping="true" Immutable="true" />
   </Entity>
+  <Entity Name="Status" RefDataType="string" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/statuses" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Status" />
 </CodeGeneration>

@@ -45,10 +45,7 @@ namespace Beef.Data.Database
         /// Initializes a new instance of the <see cref="DatabaseEventOutboxInvoker"/>.
         /// </summary>
         /// <param name="database">The <see cref="IDatabase"/>.</param>
-        public DatabaseEventOutboxInvoker(IDatabase database)
-        {
-            Database = Check.NotNull(database, nameof(database));
-        }
+        public DatabaseEventOutboxInvoker(IDatabase database) => Database = Check.NotNull(database, nameof(database));
 
         /// <summary>
         /// Gets the <see cref="IDatabase"/>.

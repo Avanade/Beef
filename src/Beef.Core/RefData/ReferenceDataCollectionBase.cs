@@ -322,6 +322,39 @@ namespace Beef.RefData
         }
 
         /// <summary>
+        /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
+        ReferenceDataBase IReferenceDataCollection.GetById(string? id)
+        {
+            return GetById(id);
+        }
+
+        /// <summary>
+        /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The item where found; otherwise, null.</returns>
+        public TItem GetById(string? id)
+        {
+            if (_rdcId.Contains(id))
+                return _rdcId[id];
+
+            return default!;
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
+        /// </summary>
+        /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
+        public bool ContainsId(string? id)
+        {
+            return _rdcId.Contains(id);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Code"/>.
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>

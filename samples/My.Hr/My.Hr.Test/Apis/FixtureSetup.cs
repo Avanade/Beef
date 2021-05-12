@@ -5,7 +5,7 @@ using System.Reflection;
 using My.Hr.Api;
 using My.Hr.Common.Agents;
 
-namespace My.Hr.Test
+namespace My.Hr.Test.Apis
 {
     [SetUpFixture]
     public class FixtureSetUp

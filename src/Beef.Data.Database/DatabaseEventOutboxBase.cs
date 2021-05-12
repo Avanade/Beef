@@ -24,7 +24,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets the default maximum dequeue count.
         /// </summary>
-        public const int DefaultMaxDequeueCount = 10;
+        public const int DefaultMaxDequeueCount = 25;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseEventOutboxBase"/> class.
@@ -70,12 +70,12 @@ namespace Beef.Data.Database
         public TableValuedParameter CreateTableValuedParameter(IEnumerable<DatabaseEventOutboxItem> list)
         {
             var dt = new DataTable();
-            dt.Columns.Add("EventId", typeof(Guid));
-            dt.Columns.Add("Subject", typeof(string));
-            dt.Columns.Add("Action", typeof(string));
-            dt.Columns.Add("CorrelationId", typeof(string));
-            dt.Columns.Add("TenantId", typeof(Guid));
-            dt.Columns.Add("ValueType", typeof(string));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.EventId), typeof(Guid));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.Subject), typeof(string));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.Action), typeof(string));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.CorrelationId), typeof(string));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.TenantId), typeof(Guid));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.ValueType), typeof(string));
             dt.Columns.Add("EventData", typeof(SqlBinary));
 
             var tvp = new TableValuedParameter(DbTypeName, dt);

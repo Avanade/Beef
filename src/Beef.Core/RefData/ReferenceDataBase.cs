@@ -90,16 +90,25 @@ namespace Beef.RefData
         /// <param name="id">The identifier to validate.</param>
         public static void ValidateId(ReferenceDataIdTypeCode idTypeCode, object? id)
         {
-            if (id == null)
-                throw new ArgumentNullException(nameof(id));
-
             ReferenceDataIdTypeCode typeCode;
             if (id is int)
+            {
+                if (id == null)
+                    throw new ArgumentNullException(nameof(id));
+
                 typeCode = ReferenceDataIdTypeCode.Int32;
+            }
             else if (id is Guid)
+            {
+                if (id == null)
+                    throw new ArgumentNullException(nameof(id));
+
                 typeCode = ReferenceDataIdTypeCode.Guid;
+            }
+            else if (id == null || id is string)
+                typeCode = ReferenceDataIdTypeCode.String;
             else
-                throw new ArgumentException("Id can only be of Type Int32 or Guid.", nameof(id));
+                throw new ArgumentException("Id can only be of Type Int32, Guid or String.", nameof(id));
 
             if (typeCode != idTypeCode)
                 throw new ArgumentException($"Reference Data identifier value has an invalid TypeCode '{typeCode}'; expected TypeCode '{idTypeCode}'.");
@@ -138,7 +147,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="idTypeCode">The <see cref="ReferenceDataIdTypeCode"/>.</param>
         /// <param name="defaultId">The default identifier.</param>
-        protected ReferenceDataBase(ReferenceDataIdTypeCode idTypeCode, object defaultId)
+        protected ReferenceDataBase(ReferenceDataIdTypeCode idTypeCode, object? defaultId)
         {
             IdTypeCode = idTypeCode;
             ValidateId(IdTypeCode, defaultId);
@@ -415,6 +424,28 @@ namespace Beef.RefData
         /// <returns>The corresponding <see cref="ReferenceDataBase"/>.</returns>
         /// <remarks>Where the item (<see cref="ReferenceDataBase"/>) is not found it will be created and <see cref="ReferenceDataBase.SetInvalid"/> will be invoked.</remarks>
         public static T ConvertFromId<T>(Guid id) where T : ReferenceDataBase, new()
+        {
+            IReferenceDataCollection rd = ReferenceDataManager.Current[typeof(T)];
+            T val;
+            if (rd != null)
+            {
+                val = (T)rd.GetById(id)!;
+                if (val != default!)
+                    return val;
+            }
+
+            val = new T { Id = id };
+            val.SetInvalid();
+            return val;
+        }
+
+        /// <summary>
+        /// Performs a conversion from an <see cref="ReferenceDataBase.Id"/> to a <see cref="ReferenceDataBase"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The corresponding <see cref="ReferenceDataBase"/>.</returns>
+        /// <remarks>Where the item (<see cref="ReferenceDataBase"/>) is not found it will be created and <see cref="ReferenceDataBase.SetInvalid"/> will be invoked.</remarks>
+        public static T ConvertFromId<T>(string? id) where T : ReferenceDataBase, new()
         {
             IReferenceDataCollection rd = ReferenceDataManager.Current[typeof(T)];
             T val;

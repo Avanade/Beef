@@ -214,7 +214,7 @@ properties: [
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
-            Description = "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.")]
+            Description = "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.")]
         public string? RefDataType { get; set; }
 
         /// <summary>

@@ -63,6 +63,11 @@ namespace Beef.Demo.Business
         /// </summary>
         public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
 
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.StatusCollection"/>.
+        /// </summary>
+        public override RefDataNamespace.StatusCollection Status => (RefDataNamespace.StatusCollection)this[typeof(RefDataNamespace.Status)];
+
         #endregion
 
         /// <summary>
@@ -95,6 +100,7 @@ namespace Beef.Demo.Business
                         case var n when string.Compare(n, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.EyeColor)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.PowerSource)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.Company), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Company)); break;
+                        case var n when string.Compare(n, nameof(RefDataNamespace.Status), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Status)); break;
                     }
                 }
             }

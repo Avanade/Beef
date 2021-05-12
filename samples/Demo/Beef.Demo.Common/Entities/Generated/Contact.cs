@@ -38,6 +38,12 @@ namespace Beef.Demo.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).
+        /// </summary>
+        [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? Status { get; set; }
+
+        /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public string[] UniqueKeyProperties => new string[] { nameof(Id) };

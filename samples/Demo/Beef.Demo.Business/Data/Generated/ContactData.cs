@@ -137,6 +137,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Id, d => d.ContactId).SetUniqueKey(true);
                 Property(s => s.FirstName, d => d.FirstName);
                 Property(s => s.LastName, d => d.LastName);
+                Property(s => s.StatusSid, d => d.StatusCode);
                 AddStandardProperties();
                 EfMapperCtor();
             }

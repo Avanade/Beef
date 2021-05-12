@@ -137,7 +137,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid" },
+        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
 
@@ -1185,6 +1185,7 @@ entities:
             {
                 "int" => "ReferenceDataBaseInt",
                 "Guid" => "ReferenceDataBaseGuid",
+                "string" => "ReferenceDataBaseString",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
             });
 
@@ -1192,6 +1193,7 @@ entities:
             {
                 "int" => "ReferenceDataBaseInt",
                 "Guid" => "ReferenceDataBaseGuid",
+                "string" => "ReferenceDataBaseString",
                 _ => EntityInherits == "EntityBase" ? null : EntityInherits
             };
 

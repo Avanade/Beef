@@ -8,15 +8,17 @@ using NUnit.Framework;
 using System.Linq;
 using System.Net;
 
-namespace My.Hr.Test
+namespace My.Hr.Test.Apis
 {
     [TestFixture, NonParallelizable]
-    public class ReferenceDataTest : UsingAgentTesterServer<Startup>
+    public class ReferenceDataTest
     {
         [Test, TestSetUp]
         public void A110_GendersAll()
         {
-            var v = AgentTester.Test<ReferenceDataAgent, GenderCollection>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GenderGetAllAsync()).Value;
 
@@ -28,7 +30,9 @@ namespace My.Hr.Test
         [Test, TestSetUp]
         public void A120_GendersFilter()
         {
-            var v = AgentTester.Test<ReferenceDataAgent, GenderCollection>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GenderGetAllAsync(new ReferenceDataFilter { Codes = new string[] { "F" } })).Value;
 
@@ -41,7 +45,9 @@ namespace My.Hr.Test
 
         public void A130_GetNamed()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetNamedAsync(new string[] { "Gender" }));
 

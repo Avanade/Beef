@@ -96,6 +96,7 @@
 
   <!-- Reference data entity framework -->
   <Table Name="EyeColor" Schema="Ref" EfModel="true" />
+  <Table Name="Status" Schema="Ref" EfModel="true" />
 
   <!-- Master data stored procedures. -->
   <Table Name="Person" Schema="Demo" Get="true" Create="true" Update="true" Delete="true" EfModel="true">

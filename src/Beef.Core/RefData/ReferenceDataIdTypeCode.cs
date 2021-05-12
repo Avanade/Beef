@@ -16,14 +16,19 @@ namespace Beef.RefData
         Unknown,
 
         /// <summary>
-        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="Int32"/>.
+        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="int"/>.
         /// </summary>
         Int32,
 
         /// <summary>
-        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="Guid"/>.
+        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="System.Guid"/>.
         /// </summary>
-        Guid
+        Guid,
+
+        /// <summary>
+        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="string"/>.
+        /// </summary>
+        String
 #pragma warning restore CA1720
     }
 }

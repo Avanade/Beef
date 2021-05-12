@@ -11,6 +11,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Extended `WebApiAgentBase.GetCollectionResultAsync` to support `CollectionResult` in addition to `EntityCollectionResult`.
 - *Enhancement:* Split timer-based flush from `CachePolicyManager` and moved into new `CachePolicyManagerServiceHost` (inherits from `TimerHostedServiceBase`). This now represents the background process to periodically flush the caches.
 - *Fixed:* The `!=` operator for `ReferenceDataBase` has been fixed to support nullable parameters.
+- *Enhancement:* Added `ReferenceDataBaseString` with an `Id` type of `string`.
 
 ## v4.1.11
 - *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.

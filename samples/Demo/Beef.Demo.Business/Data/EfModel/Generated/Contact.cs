@@ -33,6 +33,11 @@ namespace Beef.Demo.Business.Data.EfModel
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'StatusCode' column value.
+        /// </summary>
+        public string? StatusCode { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'IsDeleted' column value.
         /// </summary>
         public bool? IsDeleted { get; set; }
@@ -53,6 +58,7 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.ContactId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.FirstName).HasColumnType("NVARCHAR(50)");
                 entity.Property(p => p.LastName).HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.StatusCode).HasColumnType("NVARCHAR(50)");
                 entity.Property(p => p.IsDeleted).HasColumnType("BIT");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
                 AddToModel(entity);

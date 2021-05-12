@@ -22,7 +22,7 @@ namespace Beef.Demo.Test
 
             var r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
@@ -30,7 +30,7 @@ namespace Beef.Demo.Test
 
             r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
@@ -64,7 +64,7 @@ namespace Beef.Demo.Test
 
             var r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);

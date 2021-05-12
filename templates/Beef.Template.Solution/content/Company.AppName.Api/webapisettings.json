@@ -12,7 +12,7 @@
     "Database": "Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True"
   },
   "BeefDatabaseEventOutboxPublisherService": {
-    "MaxDequeueCount": 10,
+    "MaxDequeueCount": 25,
     "Interval": "00:05:00",
     "DequeueInterval": "00:00:30"
   },

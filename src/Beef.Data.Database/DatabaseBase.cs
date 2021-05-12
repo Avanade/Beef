@@ -384,7 +384,7 @@ namespace Beef.Data.Database
 
             DatabaseRecordFieldCollection? fields = null;
             var idCol = idColumnName ?? DatabaseRefDataColumns.IdColumnName;
-            var isInt = ReferenceDataBase.GetIdTypeCode(typeof(TItem)) == ReferenceDataIdTypeCode.Int32;
+            var typeCode = ReferenceDataBase.GetIdTypeCode(typeof(TItem));
 
             var list = new List<Action<DatabaseRecord>>
             {
@@ -399,7 +399,12 @@ namespace Beef.Data.Database
 
                     TItem item = new TItem()
                     {
-                        Id = isInt ? (object)dr.GetValue<int>(fields[idCol].Index) : (object)dr.GetValue<Guid>(fields[idCol].Index),
+                        Id = typeCode switch
+                        {
+                            ReferenceDataIdTypeCode.Guid => (object)dr.GetValue<Guid>(fields[idCol].Index),
+                            ReferenceDataIdTypeCode.Int32 => (object)dr.GetValue<int>(fields[idCol].Index),
+                            _ => (object)dr.GetValue<string>(fields[idCol].Index)
+                        },
                         Code = dr.GetValue<string>(fields[DatabaseRefDataColumns.CodeColumnName].Index),
                         Text = !fields.Contains(DatabaseRefDataColumns.TextColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.TextColumnName].Index),
                         Description = !fields.Contains(DatabaseRefDataColumns.DescriptionColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.DescriptionColumnName].Index),

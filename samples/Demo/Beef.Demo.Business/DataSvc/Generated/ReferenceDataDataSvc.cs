@@ -41,6 +41,7 @@ namespace Beef.Demo.Business.DataSvc
             _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.EyeColorGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.PowerSourceGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.CompanyGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.Status), new ReferenceDataCache<RefDataNamespace.StatusCollection, RefDataNamespace.Status>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.StatusGetAllAsync()))));
             ReferenceDataDataSvcCtor();
         }
 
