@@ -122,7 +122,7 @@ Within the `My.Hr.Business/Validation` folder create `EmployeeArgsValidator.cs` 
 
 ``` csharp
 using Beef.Validation;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Validation
 {

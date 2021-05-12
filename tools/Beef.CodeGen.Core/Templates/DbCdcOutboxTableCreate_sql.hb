@@ -5,7 +5,7 @@ CREATE TABLE [{{CdcSchema}}].[{{OutboxTableName}}] (
    */
 
   [OutboxId] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY CLUSTERED ([OutboxId] ASC),
-  [CreatedDate] DATETIME NOT NULL,
+  [CreatedDate] DATETIME2 NOT NULL,
   [{{pascal Name}}MinLsn] BINARY(10) NULL,  -- Primary table: {{Schema}}.{{Name}}
   [{{pascal Name}}MaxLsn] BINARY(10) NULL,
 {{#each CdcJoins}}
@@ -13,7 +13,7 @@ CREATE TABLE [{{CdcSchema}}].[{{OutboxTableName}}] (
   [{{pascal Name}}MaxLsn] BINARY(10) NULL,
 {{/each}}
   [IsComplete] BIT NOT NULL,
-  [CompletedDate] DATETIME NULL,
+  [CompletedDate] DATETIME2 NULL,
   [CorrelationId] NVARCHAR(64) NULL,
   [HasDataLoss] BIT NOT NULL
 );

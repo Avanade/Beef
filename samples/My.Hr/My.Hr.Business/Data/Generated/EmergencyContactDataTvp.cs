@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Beef.Data.Database;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
 {

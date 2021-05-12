@@ -1,37 +1,22 @@
-﻿using Microsoft.AspNetCore;
+﻿using Beef.AspNetCore.WebApi;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace Beef.Demo.Api
 {
     public static class Program
     {
-        public static void Main(string[] args)
-        {
-            //BuildWebHost(args).Run();
-            CreateHostBuilder(args).Build().Run();
-        }
+        /// <summary>
+        /// Main startup.
+        /// </summary>
+        /// <param name="args">The startup arguments.</param>
+        public static void Main(string[] args) => CreateWebHostBuilder(args).Build().Run();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(whb =>
-            {
-                whb.ConfigureAppConfiguration((hostingContext, config) => ConfigBuilder(config, hostingContext.HostingEnvironment))
-                   .UseStartup<Startup>();
-            });
-
-        //public static IWebHost BuildWebHost(string[] args) =>
-        //    WebHost.CreateDefaultBuilder(args)
-        //       .ConfigureAppConfiguration((hostingContext, config) => ConfigBuilder(config, hostingContext.HostingEnvironment))
-        //       .UseStartup<Startup>()
-        //       .Build();
-
-        private static void ConfigBuilder(IConfigurationBuilder configurationBuilder, IWebHostEnvironment hostingEnvironment) =>
-            configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.json", true, false)
-                .AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables("Beef_");
+        /// <summary>
+        /// Creates the <see cref="IWebHostBuilder"/> using the <i>Beef</i> <see cref="WebApiStartup"/> capability to create the host with the underlying configuration probing.
+        /// </summary>
+        /// <param name="args">The startup arguments.</param>
+        /// <returns>The <see cref="IWebHostBuilder"/>.</returns>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebApiStartup.CreateWebHost<Startup>(args, "Beef");
     }
 }

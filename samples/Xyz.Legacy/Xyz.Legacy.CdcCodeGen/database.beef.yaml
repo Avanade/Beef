@@ -4,8 +4,6 @@ cdcSchema: XCdc                                # Specifies the schema for all th
 cdcIdentifierMapping: true                     # Indicates to include the generation of the global identifier mapping artefacts.
 cdcExcludeColumnsFromETag: [ rowversion ]      # Default list of columns to exclude from the generated ETag (duplicate send tracking).
 pathDatabaseSchema: Xyz.Legacy.CdcDatabase     # Path (directory) for the database-related artefacts (relative to parent).
-pathCdc: Xyz.Legacy.CdcPublisher               # Path (directory) for the CDC service-related artefacts (relative to parent).
-namespaceCdc: Xyz.Legacy.CdcPublisher          # .NET namespace for the CDC service-related artefacts.
 hasBeefDbo: false                              # Indicates that the database does not contain the standard _Beef_ dbo schema artefacts.
 eventSubjectFormat: NameOnly                   # Event subject should include name only; not append the key.
 eventSubjectRoot: Xyz.Legacy                   # Event subject root prepended to all published events.

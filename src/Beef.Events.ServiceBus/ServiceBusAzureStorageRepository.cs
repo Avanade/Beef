@@ -25,7 +25,9 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="data">The <see cref="ServiceBusData"/>.</param>
         /// <returns>The partition key.</returns>
-        public override string CreatePartitionKey(ServiceBusData data) => data.ServiceBusName + "-" + data.QueueName;
+        public override string CreatePartitionKey(ServiceBusData data) => data.IsTopic 
+            ? data.ServiceBusName + "-" + data.QueueName + "-" + data.SubscriptionName 
+            : data.ServiceBusName + "-" + data.QueueName;
 
         /// <summary>
         /// Create the row key.
@@ -45,6 +47,7 @@ namespace Beef.Events.ServiceBus
             {
                 ServiceBusName = data.ServiceBusName,
                 QueueName = data.QueueName,
+                SubscriptionName = data.SubscriptionName,
                 SequenceNumber = data.Originating.SystemProperties.SequenceNumber,
                 EnqueuedTimeUtc = data.Originating.SystemProperties.EnqueuedTimeUtc,
                 EventId = data.Metadata.EventId,

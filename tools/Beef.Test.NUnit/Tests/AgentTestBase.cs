@@ -171,7 +171,7 @@ namespace Beef.Test.NUnit.Tests
 
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"LOGGING >");
-            var messages = CorrelationIdLogger.GetMessages(CorrelationId);
+            var messages = CorrelationIdLogger.GetMessages(CorrelationId, true);
             if (messages.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else

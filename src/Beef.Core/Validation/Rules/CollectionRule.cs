@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,10 +45,7 @@ namespace Beef.Validation.Rules
         /// </summary>
         /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
-        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>() where TItemEntity : class
-        {
-            return new CollectionRuleItem<TItemEntity>(null);
-        }
+        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>() where TItemEntity : class => new CollectionRuleItem<TItemEntity>(null);
 
         /// <summary>
         /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
@@ -56,20 +54,19 @@ namespace Beef.Validation.Rules
         /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
         public static CollectionRuleItem<TItemEntity> Create<TItemEntity>(IValidator<TItemEntity> validator) where TItemEntity : class
-        {
-            return new CollectionRuleItem<TItemEntity>(validator ?? throw new ArgumentNullException(nameof(validator)));
-        }
+            => new(validator ?? throw new ArgumentNullException(nameof(validator)));
 
         /// <summary>
         /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
         /// </summary>
         /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValidator">The item validator <see cref="Type"/>.</typeparam>
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>; defaults to <see cref="ExecutionContext.ServiceProvider"/> where not specified.</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
-        public static CollectionRuleItem<TItemEntity> Create<TItemEntity, TValidator>() where TItemEntity : class where TValidator : IValidator<TItemEntity>
-        {
-            return new CollectionRuleItem<TItemEntity>(ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true));
-        }
+        public static CollectionRuleItem<TItemEntity> Create<TItemEntity, TValidator>(IServiceProvider? serviceProvider = null) where TItemEntity : class where TValidator : IValidator<TItemEntity>
+            => new(serviceProvider == null
+                ? ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!
+                : (serviceProvider.GetService<TValidator>() ?? throw new InvalidOperationException($"Attempted to get service '{typeof(TValidator).FullName}' but null was returned; this would indicate that the service has not been configured correctly.")));
     }
 
     /// <summary>
@@ -87,10 +84,7 @@ namespace Beef.Validation.Rules
         /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
         /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
-        internal CollectionRuleItem(IValidator<TItemEntity>? validator)
-        {
-            Validator = validator;
-        }
+        internal CollectionRuleItem(IValidator<TItemEntity>? validator) => Validator = validator;
 
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator"/>.
@@ -183,10 +177,7 @@ namespace Beef.Validation.Rules
         /// </summary>
         /// <param name="context">The <see cref="IPropertyContext"/>.</param>
         /// <param name="items">The items to duplicate check.</param>
-        void ICollectionRuleItem.DuplicateValidation(IPropertyContext context, IEnumerable items)
-        {
-            DuplicateValidation(context, (IEnumerable<TItemEntity>)items);
-        }
+        void ICollectionRuleItem.DuplicateValidation(IPropertyContext context, IEnumerable items) => DuplicateValidation(context, (IEnumerable<TItemEntity>)items);
 
         /// <summary>
         /// Performs the duplicate validation check.
@@ -252,10 +243,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionRule{TEntity, TProperty}"/> class.
         /// </summary>
-        public CollectionRule()
-        {
-            _itemType = ComplexTypeReflector.GetItemType(typeof(TProperty));
-        }
+        public CollectionRule() => _itemType = ComplexTypeReflector.GetItemType(typeof(TProperty));
 
         /// <summary>
         /// Gets or sets the minimum count;

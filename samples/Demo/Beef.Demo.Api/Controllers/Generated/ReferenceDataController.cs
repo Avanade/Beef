@@ -117,6 +117,21 @@ namespace Beef.Demo.Api.Controllers
             async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(RefDataNamespace.ReferenceData.Current.Company, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
+        /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.Status"/> reference data items that match the specified criteria.
+        /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>A RefDataNamespace.Status collection.</returns>
+        [AllowAnonymous]
+        [HttpGet()]
+        [Route("api/v1/demo/ref/statuses")]
+        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Status>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult StatusGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Status>>(this, 
+            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.StatusCollection, RefDataNamespace.Status>(RefDataNamespace.ReferenceData.Current.Status, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
@@ -147,6 +162,7 @@ namespace Beef.Demo.Api.Controllers
                         case var s when string.Compare(s, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.EyeColor), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(RefDataNamespace.ReferenceData.Current.EyeColor, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PowerSource), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(RefDataNamespace.ReferenceData.Current.PowerSource, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.Company), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Company), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(RefDataNamespace.ReferenceData.Current.Company, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.Status), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Status), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.StatusCollection, RefDataNamespace.Status>(RefDataNamespace.ReferenceData.Current.Status, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
                     }
                 }
                 

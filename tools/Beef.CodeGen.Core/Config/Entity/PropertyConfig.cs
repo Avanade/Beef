@@ -197,6 +197,14 @@ properties: [
         [PropertySchema("Property", Title = "Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.")]
         public bool? ExcludeCleanup { get; set; }
 
+        /// <summary>
+        /// Indicates whether the property is for internal use only; declared in the Business entities only.
+        /// </summary>
+        [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
+            Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.")]
+        public bool? InternalOnly { get; set; }
+
         #endregion
 
         #region RefData
@@ -206,7 +214,7 @@ properties: [
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
-            Description = "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.")]
+            Description = "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.")]
         public string? RefDataType { get; set; }
 
         /// <summary>

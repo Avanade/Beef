@@ -13,10 +13,10 @@ using Beef;
 using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using My.Hr.Business.DataSvc;
 using My.Hr.Business.Validation;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business
 {

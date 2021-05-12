@@ -68,7 +68,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -83,7 +83,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -97,7 +97,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishValue(new TripPerson { Id = id }, new Uri($"/tripperson", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new TripPerson { Id = id }, new Uri($"/tripperson/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<TripPerson>(new UniqueKey(id));
             });
         }

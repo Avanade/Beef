@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Data.Database;
+using Beef.Events;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -77,6 +79,12 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseEventOutboxInvoker"/> for the base <see cref="IDatabase"/>.
+        /// </summary>
+        /// <returns>The <see cref="DatabaseEventOutboxInvoker"/>.</returns>
+        DatabaseEventOutboxInvoker EventOutboxInvoker { get; }
     }
 
     /// <summary>

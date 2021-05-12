@@ -40,6 +40,7 @@ Category | Description
 -|-
 [`Key`](#Key) | Provides the _key_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
+[`Events`](#Events) | Provides the _Events_ configuration.
 [`WebApi`](#WebApi) | Provides the data _Web API_ configuration.
 [`Manager`](#Manager) | Provides the _Manager-layer_ configuration.
 [`DataSvc`](#DataSvc) | Provides the _Data Services-layer_ configuration.
@@ -75,6 +76,18 @@ Property | Description
 -|-
 `authPermission` | The permission used by the `ExecutionContext.IsAuthorized(AuthPermission)` to determine whether the user is authorized.
 `authRole` | The permission used by the `ExecutionContext.IsInRole(AuthRole)` to determine whether the user is authorized.
+
+<br/>
+
+## Events
+Provides the _Events_ configuration.
+
+Property | Description
+-|-
+**`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`. Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
+**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`. Defaults to `Entity.EventOutbox` configuration property (inherits) where not specified and `EventPublish` is `Data`; otherwise, `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
+`eventSource` | The Event Source. Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.
+`eventSubject` | The event subject template and corresponding event action pair (separated by a colon). The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
 <br/>
 
@@ -115,9 +128,6 @@ Property | Description
 **`dataSvcCustom`** | Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `dataSvcTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.
-`eventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
-`eventSource` | The Event Source. Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.
-`eventSubject` | The event subject template and corresponding event action pair (separated by a colon). The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
 <br/>
 
@@ -129,6 +139,7 @@ Property | Description
 **`autoImplement`** | The operation override for the `Entity.AutoImplement`. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.
 `dataEntityMapper` | The override for the data entity `Mapper`. Used where the default generated `Mapper` is not applicable.
 `dataExtensions` | Indicates whether the `Data` extensions logic should be generated. Defaults to `Entity.DataExtensions`.
+`dataTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer. Where using an `EventOutbox` this is ignored as it is implied through its usage.
 `databaseStoredProc` | The database stored procedure name used where `Operation.AutoImplement` is `Database`. Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.
 `cosmosContainerId` | The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosContainerId`.
 `cosmosPartitionKey` | The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosPartitionKey`.

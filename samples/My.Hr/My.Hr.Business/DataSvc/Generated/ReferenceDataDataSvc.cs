@@ -16,7 +16,7 @@ using Beef.Business;
 using Beef.RefData;
 using Beef.RefData.Caching;
 using My.Hr.Business.Data;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.DataSvc
 {

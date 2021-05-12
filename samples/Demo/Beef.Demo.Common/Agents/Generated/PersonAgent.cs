@@ -93,7 +93,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -102,7 +102,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -127,7 +127,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null);
@@ -169,7 +169,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions? requestOptions = null);
@@ -194,7 +194,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -356,7 +356,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -367,7 +367,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -398,7 +398,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null) =>
@@ -450,7 +450,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions? requestOptions = null) =>
@@ -481,7 +481,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>

@@ -98,6 +98,11 @@ namespace Beef.Database.Core.Sql
         public List<SqlDataTable> Tables { get; } = new List<SqlDataTable>();
 
         /// <summary>
+        /// Gets the configured <see cref="IIdentifierGenerators"/>.
+        /// </summary>
+        public IIdentifierGenerators? IdentifierGenerators { get; set; }
+
+        /// <summary>
         /// Parses the data operations generating the underlying SQL.
         /// </summary>
         private void Parse()
@@ -105,9 +110,31 @@ namespace Beef.Database.Core.Sql
             if (DbTables == null)
                 throw new InvalidOperationException("RegisterDatabase must be invoked before parsing can occur.");
 
+            // Get the identifier generator configuration where applicable.
+            var idjson = _json["^Type"];
+            if (idjson != null)
+            {
+                var typeName = idjson.ToObject<string>();
+                if (string.IsNullOrEmpty(typeName))
+                    throw new SqlDataUpdaterException($"Identifier generators property '^Type' is not a valid string.");
+
+                var type = Type.GetType(typeName, false);
+                if (type == null || type.GetConstructor(Array.Empty<Type>()) == null)
+                    throw new SqlDataUpdaterException($"Identifier generators Type '{typeName}' does not exist or have a default (parameter-lesss) constructor.");
+
+                var idgen = Activator.CreateInstance(type)!;
+                IdentifierGenerators = idgen as IIdentifierGenerators;
+                if (IdentifierGenerators == null)
+                    throw new SqlDataUpdaterException($"Identifier generators Type '{typeName}' does not implement IIdentifierGenerators.");
+            }
+
             // Loop through all the schemas.
             foreach (var js in _json.Children<JProperty>())
             {
+                // Reserved; ignore.
+                if (js.Name == "^Type")
+                    continue;
+
                 // Loop through the collection of tables.
                 foreach (var jto in GetChildObjects(js))
                 {
@@ -156,7 +183,7 @@ namespace Beef.Database.Core.Sql
 
                         if (sdt.Columns.Count > 0)
                         {
-                            sdt.Prepare();
+                            sdt.Prepare(IdentifierGenerators);
                             Tables.Add(sdt);
                         }
                     }
@@ -191,9 +218,94 @@ namespace Beef.Database.Core.Sql
                 JTokenType.Integer => j.Value<int>(),
                 JTokenType.TimeSpan => j.Value<TimeSpan>(),
                 JTokenType.Uri => j.Value<String>(),
-                JTokenType.String => j.Value<String>(),
-                _ => null,
+                JTokenType.String => GetRuntimeParameterValue(j.Value<String>()),
+                _ => null
             };
+        }
+
+        /// <summary>
+        /// Get the runtime parameter value.
+        /// </summary>
+        private static object? GetRuntimeParameterValue(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            // Get runtime value when formatted like: ^(DateTime.UtcNow)
+            if (value.StartsWith("^(") && value.EndsWith(")"))
+            {
+                var (val, msg) = GetSystemRuntimeValue(value[2..^1]);
+                if (msg == null)
+                    return val;
+
+                // Try again adding the System namespace.
+                (val, msg) = GetSystemRuntimeValue("System." + value[2..^1]);
+                if (msg == null)
+                    return val;
+
+                throw new SqlDataUpdaterException(msg);
+            }
+            else
+                return value;
+        }
+
+        /// <summary>
+        /// Get the system runtime value.
+        /// </summary>
+        private static (object? value, string? message) GetSystemRuntimeValue(string param)
+        {
+            var ns = param.Split(",");
+            if (ns.Length > 2)
+                return (null, $"Runtime value parameter '{param}' is invalid; incorrect format.");
+
+            var parts = ns[0].Split(".");
+            if (parts.Length <= 1)
+                return (null, $"Runtime value parameter '{param}' is invalid; incorrect format.");
+
+            Type? type = null;
+            int i = parts.Length;
+            for (; i >= 0; i--)
+            {
+                if (ns.Length == 1)
+                    type = Type.GetType(string.Join('.', parts[0..^(parts.Length - i)]));
+                else
+                    type = Type.GetType(string.Join('.', parts[0..^(parts.Length - i)]) + "," + ns[1]);
+
+                if (type != null)
+                    break;
+            }
+
+            if (type == null)
+                return (null, $"Runtime value parameter '{param}' is invalid; no Type can be found.");
+
+            return GetSystemPropertyValue(param, type, null, parts[i..]);
+        }
+
+        /// <summary>
+        /// Recursively navigates the properties and values to discern the value.
+        /// </summary>
+        private static (object? value, string? message) GetSystemPropertyValue(string param, Type type, object? obj, string[] parts)
+        {
+            if (parts == null || parts.Length == 0)
+                return (obj, null);
+
+            var part = parts[0];
+            if (part.EndsWith("()"))
+            {
+                var mi = type.GetMethod(part[0..^2], Array.Empty<Type>());
+                if (mi == null || mi.GetParameters().Length != 0)
+                    return (null, $"Runtime value parameter '{param}' is invalid; specified method '{part}' is invalid.");
+
+                return GetSystemPropertyValue(param, mi.ReturnType, mi.Invoke(obj, null), parts[1..]);
+            }
+            else
+            {
+                var pi = type.GetProperty(part);
+                if (pi == null || !pi.CanRead)
+                    return (null, $"Runtime value parameter '{param}' is invalid; specified property '{part}' is invalid.");
+
+                return GetSystemPropertyValue(param, pi.PropertyType, pi.GetValue(obj, null), parts[1..]);
+            }
         }
 
         /// <summary>

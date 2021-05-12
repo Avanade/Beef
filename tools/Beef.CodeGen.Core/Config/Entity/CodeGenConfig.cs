@@ -23,9 +23,9 @@ entities:
 ```")]
     [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
     [CategorySchema("Entity", Title = "Provides the _Entity class_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the _Web API (Controller)_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
-    [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
     [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CategorySchema("Database", Title = "Provides the _Database Data-layer_ configuration.")]
     [CategorySchema("EntityFramework", Title = "Provides the _Entity Framewotrk (EF) Data-layer_ configuration.")]
@@ -40,11 +40,20 @@ entities:
         #region RefData
 
         /// <summary>
-        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Common`.
+        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement).
         /// </summary>
         [JsonProperty("refDataNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.", IsImportant = true)]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement).", IsImportant = true,
+            Description = "Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).")]
         public string? RefDataNamespace { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the Reference Data common entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("refDataCommonNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data common entities (adds as a c# `using` statement).", IsImportant = true,
+            Description = "Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).")]
+        public string? RefDataCommonNamespace { get; set; }
 
         /// <summary>
         /// Indicates whether a corresponding <i>text</i> property is added by default when generating a Reference Data `Property` for an `Entity`.
@@ -78,15 +87,32 @@ entities:
         public string? RefDataAppendToNamespace { get; set; }
 
         /// <summary>
-        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Business`.
+        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) for additional business-layer inclusion where requried.
         /// </summary>
         [JsonProperty("refDataBusNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Business`.")]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.")]
         public string? RefDataBusNamespace { get; set; }
 
         #endregion
 
         #region Entity
+
+        /// <summary>
+        /// Gets or sets the entity scope option.
+        /// </summary>
+        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+            Description = "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
+            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
+        public string? EntityScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
+            Description = "Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally , `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.")]
+        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
@@ -103,14 +129,6 @@ entities:
         [PropertySchema("Entity", Title = "The default JSON name for the `ETag` property.", Options = new string[] { "etag", "eTag", "_etag", "_eTag", "ETag" },
             Description = "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.")]
         public string? ETagJsonName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
-        /// </summary>
-        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
-            Description = "Defaults to `Common` which will add `.Common.Entities`. Otherwise, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
-        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Entity</c> code.
@@ -264,21 +282,29 @@ entities:
 
         #endregion
 
-        #region DataSvc
+        #region Events
 
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.", IsImportant = true,
-            Description = "Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
-        public bool? EventPublish { get; set; }
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to `DataSvc`; unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
+        public string? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
+            Description = "Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
+        public string? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
         /// </summary>
         [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The URI root for the event source by prepending to all event source URIs.",
+        [PropertySchema("Events", Title = "The URI root for the event source by prepending to all event source URIs.",
             Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
         public string? EventSourceRoot { get; set; }
 
@@ -286,7 +312,7 @@ entities:
         /// Gets or sets the URI kind for the event source URIs.
         /// </summary>
         [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+        [PropertySchema("Events", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
             Description = "Defaults to `None` (being the event source is not updated).")]
         public string? EventSourceKind { get; set; }
 
@@ -294,7 +320,7 @@ entities:
         /// Gets or sets the root for the event Subject name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
+        [PropertySchema("Events", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
             Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventSubjectRoot { get; set; }
 
@@ -302,7 +328,7 @@ entities:
         /// Gets or sets the default formatting for the Subject when an Event is published.
         /// </summary>
         [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+        [PropertySchema("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
             Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
         public string? EventSubjectFormat { get; set; }
 
@@ -310,7 +336,7 @@ entities:
         /// Gets or sets the subject path separator.
         /// </summary>
         [JsonProperty("eventSubjectSeparator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The subject path separator.",
+        [PropertySchema("Event", Title = "The subject path separator.",
             Description = "Defaults to `.`. Used only where the subject is automatically inferred.")]
         public string? EventSubjectSeparator { get; set; }
 
@@ -318,7 +344,7 @@ entities:
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+        [PropertySchema("Event", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
 
@@ -326,10 +352,10 @@ entities:
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+        [PropertySchema("Event", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
             Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
                 "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
-                "Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified.")]
+                "Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.")]
         public bool? EventTransaction { get; set; }
 
         #endregion
@@ -537,7 +563,7 @@ entities:
         /// <summary>
         /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
-        public string EntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
+        public string RuntimeEntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
 
         /// <summary>
         /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="RuntimeParameters"/>).
@@ -586,9 +612,13 @@ entities:
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
-            EventPublish = DefaultWhereNull(EventPublish, () => true);
+            EventOutbox = DefaultWhereNull(EventOutbox, () => "None");
+            EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
-            EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");
+            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
+            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : "Common");
+            RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.{EntityUsing}.Entities");
+            RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");

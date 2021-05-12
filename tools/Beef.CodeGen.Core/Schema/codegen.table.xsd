@@ -289,6 +289,18 @@
                 <xs:documentation>The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="EntityScope" use="optional">
+              <xs:annotation>
+                <xs:documentation>The entity scope option. Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Common" />
+                  <xs:enumeration value="Business" />
+                  <xs:enumeration value="Autonomous" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
             <xs:attribute name="Permission" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).</xs:documentation>
@@ -923,7 +935,7 @@
       </xs:choice>
       <xs:attribute name="Schema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
+          <xs:documentation>The name of the `Schema` where the artefacts are defined in, or should be created in, the database. This is used as the default `Schema` for all child objects.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
@@ -993,7 +1005,7 @@
       </xs:attribute>
       <xs:attribute name="CdcSchema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `Cdc` (literal).</xs:documentation>
+          <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `XCdc` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="CdcAuditTableName" use="optional" type="xs:string">
@@ -1054,6 +1066,18 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="EntityScope" use="optional">
+        <xs:annotation>
+          <xs:documentation>The entity scope option. Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Common" />
+            <xs:enumeration value="Business" />
+            <xs:enumeration value="Autonomous" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="EventSubjectRoot" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The root for the event name by prepending to all event subject names via CDC. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).</xs:documentation>
@@ -1111,6 +1135,16 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="EventOutbox" use="optional" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EventOutboxTableName" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The table name for the `EventOutbox`. Defaults to `EventOutbox` (literal).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
@@ -1131,7 +1165,7 @@
           <xs:documentation>The path (directory) for the Business-related (.NET) artefacts. Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="PathCdc" use="optional" type="xs:string">
+      <xs:attribute name="PathCdcPublisher" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
         </xs:annotation>
@@ -1151,9 +1185,9 @@
           <xs:documentation>The Namespace (root) for the Business-related .NET artefacts. Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="NamespaceCdc" use="optional" type="xs:string">
+      <xs:attribute name="NamespaceCdcPublisher" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The Namespace (root) for the CDC-related .NET artefacts. Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+          <xs:documentation>The Namespace (root) for the CDC-related publisher .NET artefacts. Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

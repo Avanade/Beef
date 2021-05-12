@@ -79,6 +79,10 @@ namespace Beef.Demo.Api
             services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
                     .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
 
+            // Add event outbox services.
+            services.AddGeneratedDatabaseEventOutbox();
+            services.AddBeefDatabaseEventOutboxPublisherService();
+
             // Add custom services; in this instance to allow it to call itself for testing purposes.
             services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));
             services.AddScoped<Common.Agents.IDemoWebApiAgentArgs>(sp => new Common.Agents.DemoWebApiAgentArgs(sp.GetService<System.Net.Http.IHttpClientFactory>().CreateClient("demo")));

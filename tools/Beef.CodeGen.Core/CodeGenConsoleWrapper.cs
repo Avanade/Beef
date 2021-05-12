@@ -141,6 +141,11 @@ namespace Beef.CodeGen
         public bool IsDataModelSupported { get; set; } = false;
 
         /// <summary>
+        /// Gets the default connection string.
+        /// </summary>
+        public string? ConnectionString { get; private set; }
+
+        /// <summary>
         /// Sets the <see cref="IsEntitySupported"/>, <see cref="IsDatabaseSupported"/> and <see cref="IsRefDataSupported"/> options.
         /// </summary>
         /// <param name="entity">Indicates whether the entity code generation should take place.</param>
@@ -202,6 +207,18 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
+        /// Sets (overrides) the default database connection string.
+        /// </summary>
+        /// <param name="connectionString">The database connection string.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        /// <remarks>Acts as the default; the command line option ('<c>-cs|--connectionString</c>') and environment variable take precedence.</remarks>
+        public CodeGenConsoleWrapper DatabaseConnectionString(string connectionString)
+        {
+            ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
+            return this;
+        }
+
+        /// <summary>
         /// Executes the underlying <see cref="CodeGenConsole"/> using the code generation arguments.
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
@@ -255,7 +272,8 @@ namespace Beef.CodeGen
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)}\"" + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)}\"" + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" 
+                        : (string.IsNullOrEmpty(ConnectionString) ? "" : $" -p \"ConnectionString={ConnectionString}\"")) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
                     rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName)}\"" + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);

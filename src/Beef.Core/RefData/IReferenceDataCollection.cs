@@ -6,12 +6,10 @@ using System.Collections;
 
 namespace Beef.RefData
 {
-#pragma warning disable CA1010 // Collections should implement generic interface; this is by design.
     /// <summary>
     /// Provides <b>GetById</b> and <see cref="GetByCode"/> functionality for a <see cref="ReferenceDataBase"/> collection (see <see cref="ReferenceDataCollectionBase{ReferenceDataBase}"/>).
     /// </summary>
     public interface IReferenceDataCollection : IEnumerable, IETag
-#pragma warning restore CA1010 
     {
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
@@ -26,6 +24,13 @@ namespace Beef.RefData
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
         ReferenceDataBase? GetById(Guid id);
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
+        ReferenceDataBase? GetById(string? id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Code"/>.

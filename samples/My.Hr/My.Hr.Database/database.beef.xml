@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration Schema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<!-- Configuring the code-generation global settings
+     - Schema defines the default for al tables unless explicitly defined.
+     - EventOutbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+     - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
+     -->
+<CodeGeneration Schema="Hr" EventOutbox="true" EntityScope="Autonomous" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+
   <!-- Reference data tables/models. -->
   <Table Name="Gender" EfModel="true" />
   <Table Name="TerminationReason" EfModel="true" />
@@ -9,7 +15,7 @@
   <!-- References the Employee table to infer the underlying schema, then creates stored procedures as configured:
        - Each then specifies an additional SQL statement to be executed after the primary action (as defined by Type). 
        - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure. -->
-  <Table Name="Employee" Schema="Hr">
+  <Table Name="Employee">
     <StoredProcedure Name="Get" Type="Get">
       <Execute Statement="EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId" />
     </StoredProcedure>

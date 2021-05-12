@@ -14,10 +14,11 @@ using Beef;
 using Beef.Business;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
 {
@@ -27,6 +28,7 @@ namespace My.Hr.Business.Data
     public partial class PerformanceReviewData : IPerformanceReviewData
     {
         private readonly IEfDb _ef;
+        private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.PerformanceReview>, Guid, IEfDbArgs, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
 
@@ -34,8 +36,9 @@ namespace My.Hr.Business.Data
         /// Initializes a new instance of the <see cref="PerformanceReviewData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public PerformanceReviewData(IEfDb ef)
-            { _ef = Check.NotNull(ef, nameof(ef)); PerformanceReviewDataCtor(); }
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        public PerformanceReviewData(IEfDb ef, IEventPublisher evtPub)
+            { _ef = Check.NotNull(ef, nameof(ef)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -77,10 +80,12 @@ namespace My.Hr.Business.Data
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> CreateAsync(PerformanceReview value)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+                return __result;
             });
         }
 
@@ -91,10 +96,12 @@ namespace My.Hr.Business.Data
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> UpdateAsync(PerformanceReview value)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+                return __result;
             });
         }
 
@@ -104,10 +111,11 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
+            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+                _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted", id);
             });
         }
 

@@ -10,6 +10,7 @@ namespace Beef
     /// <summary>
     /// Represents a <b>Validation</b> exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>A data validation error occurred.</i></remarks>
     public class ValidationException : Exception, IBusinessException
     {
         /// <summary>

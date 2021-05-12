@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Added new `IEfDbContext` to enable access to the underlying `IDatabase` instance.
+- *Enhancement:* Added `IEfDb.EventOutboxInvoker` to access the corresponding event outbox capability.
+- *Enhancement:* Added `ILogicallyDeleted` interface. Where implemented the `EfDbBase.Delete` will perform a logical delete versus a physical delete.
+- *Enhancement:* Added `IMultiTenant` interface. Where implemented the `EfDbBase.Create` will automatically update the `TenantId` from the `ExecutionContent.Current.TenantId`.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

@@ -280,6 +280,9 @@ namespace Beef.Test.NUnit
                 if (_expectedMessages != null)
                     CompareExpectedVsActualMessages(_expectedMessages, vc!.Messages);
 
+                if (!IsExpectingError && vc.HasErrors)
+                    Assert.Fail("Expected success yet one or more errors.");
+
                 return vc;
             }
             catch (AssertionException) { throw; }
@@ -299,6 +302,8 @@ namespace Beef.Test.NUnit
                     errorTypeOK = true;
                     if (_expectedMessages != null)
                         CompareExpectedVsActualMessages(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
+                    else if (!_expectedErrorType.HasValue)
+                        Assert.Fail($"Expected success; however, {ex.GetType().Name} was thrown.");
                 }
 
                 if (IsExpectingError && errorTypeOK)

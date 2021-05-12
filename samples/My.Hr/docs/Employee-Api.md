@@ -171,7 +171,7 @@ The following represents the initial implementation.
 using Beef;
 using Beef.Data.Database;
 using Microsoft.EntityFrameworkCore;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -283,7 +283,7 @@ using Beef;
 using Beef.Validation;
 using Beef.Validation.Rules;
 using My.Hr.Business.DataSvc;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;

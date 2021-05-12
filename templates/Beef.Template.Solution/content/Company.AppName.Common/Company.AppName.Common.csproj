@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.Core" Version="4.1.11" />
+    <PackageReference Include="Beef.Core" Version="4.1.12" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Agents\" />

@@ -82,6 +82,10 @@ namespace My.Hr.Api
             else
                 services.AddBeefNullEventPublisher();
 
+            // Add transactional event outbox services.
+            services.AddGeneratedDatabaseEventOutbox();
+            services.AddBeefDatabaseEventOutboxPublisherService();
+
             // Add additional services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();

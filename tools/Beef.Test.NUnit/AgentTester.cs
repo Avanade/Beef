@@ -58,6 +58,9 @@ namespace Beef.Test.NUnit
             else
                 cb.AddEnvironmentVariables(evp.EndsWith("_", StringComparison.InvariantCulture) ? evp : evp + "_");
 
+            var args = Environment.GetCommandLineArgs();
+            cb.AddCommandLine(args);
+
             var config = cb.Build();
             if (config.GetValue<bool>("UseUserSecrets"))
                 cb.AddUserSecrets<TStartup>();
@@ -71,6 +74,8 @@ namespace Beef.Test.NUnit
                 cb.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
 #pragma warning restore CA2000
             }
+
+            cb.AddCommandLine(args);
 
             return cb.Build();
         }
@@ -95,7 +100,7 @@ namespace Beef.Test.NUnit
         /// <param name="configuration">The <see cref="Action{IWebHostBuilder}"/>.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true) where TStartup : class => new AgentTesterWaf<TStartup>(configuration, configureLocalRefData);
+        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true) where TStartup : class => new AgentTesterWaf<TStartup>(configuration, null, null, configureLocalRefData);
 
         /// <summary>
         /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against enabling specific
@@ -105,6 +110,18 @@ namespace Beef.Test.NUnit
         /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IServiceCollection>? services = null, bool configureLocalRefData = true) where TStartup : class => new AgentTesterWaf<TStartup>(services, configureLocalRefData);
+        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IServiceCollection>? services, bool configureLocalRefData = true) where TStartup : class => new AgentTesterWaf<TStartup>(null, null, services, configureLocalRefData);
+
+        /// <summary>
+        /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.
+        /// </summary>
+        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
+        /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
+        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
+        /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
+        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, Action<IServiceCollection>? services = null, bool configureLocalRefData = true)
+            where TStartup : class => new AgentTesterWaf<TStartup>(environmentVariablePrefix, environment, services, configureLocalRefData);
     }
 }

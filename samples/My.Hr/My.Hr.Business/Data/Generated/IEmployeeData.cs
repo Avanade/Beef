@@ -11,8 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Entities;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
 {
@@ -51,7 +51,7 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.EmployeeArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
         Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging);

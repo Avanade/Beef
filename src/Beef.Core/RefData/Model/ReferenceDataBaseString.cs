@@ -2,7 +2,6 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
-using System;
 
 namespace Beef.RefData.Model
 {

@@ -2,6 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.25
+- *Enhancement:* Added support for Database Event Outbox via new configuration and templates.
+- *Enhancement:* The `EventPublish` property changed from `bool` to string (values are `None`, `DataSvc` and `DataOutbox`.
+- *Enhancement:* A new `CodeGeneration.EntityScope` and `Entity.EntityScope` has been added, this determines where and how the entities are generated. Defaults to existing behaviour of `Common`; being the `EntityBase`-inherited entities are defined in the `Common` project only. The new _recommended_ approach is to set to `Autonomous`; will create the existing `EntityBase`-inherited entities within the `Business` project, and lightweight entities (no `EntityBase` or rich reference data) within `Common` - in this case the `Business` and `Api` projects do not require a reference to `Common` - their usage is autonomous. This has the advantage of decoupling the internals from external consumption.
+- *Enhancement:* A new `Property.InternalOnly` option enables a property to be specified for internal use only, being generated witthin the `Business`, but not `Common`, entities. Applicable only where `Entity.EntityScope` is `Autonomous`.
+- *Enhancement:* The code-generation for an EF model is now logically delete (`IsDeleted` column) aware; this will ensure that any logically deleted data is appropriately filtered.
+- *Enhancement:* The code-generation for an EF model is now logically delete (`TenantId` column) aware; this will ensure that the `TenantId` is appropriately filtered.
+- *Enhancement:* Add support for `ReferenceDataBaseString` code-generation.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.24
 - *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.
 - *Fixed:* The `CdcConfig` special `RowVersion` treatment was removed as it was unnecessary and meant column could not be explicitly excluded.

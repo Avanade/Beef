@@ -68,6 +68,8 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "EntityUsing", false, (xml) => throw new CodeGenException("CodeGeneration.EntityUsing has been deprecated; is replaced by CodeGeneration.EntityScope, Entity.EntityScope and Entity.EntityUsing.")),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", true, null),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", true, null),
@@ -85,6 +87,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeWebApiAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeIData", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeData", false, (xml) => ConvertBoolToYesNo(xml)),
@@ -97,6 +100,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", false, (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", false, (xml) => throw new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType.")),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
@@ -146,12 +150,31 @@ namespace Beef.CodeGen.Config
 
         private static string? NullValue() => (string?)null!;
 
+        private static string? ConvertEventPublish(string? xml)
+        {
+            if (string.IsNullOrEmpty(xml))
+                return null;
+
+            if (string.Compare(xml, "true", StringComparison.InvariantCultureIgnoreCase) == 0)
+                return "DataSvc";
+
+            if (string.Compare(xml, "false", StringComparison.InvariantCultureIgnoreCase) == 0)
+                return "None";
+
+            return xml;
+        }
+
         private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Type OverrideType, PropertySchemaAttribute Attribute)> _xmlSpecificPropertySchema = new List<(ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)>(new (ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)[]
         {
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi") 
                 { 
                     Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
                     Description = "Defaults to `AllowAnonymous`. This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                }),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "EventPublish", typeof(string), new PropertySchemaAttribute("Events")
+                {
+                    Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", Options = new string[] { "None", "false", "DataSvc", "true", "Data" },
+                    Description = "Defaults to `DataSvc` (`true`); unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
                 }),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", typeof(string), new PropertySchemaAttribute("Manager")
@@ -203,6 +226,11 @@ namespace Beef.CodeGen.Config
                     Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
                     Description = "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also."
                 }),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "EventPublish", typeof(string), new PropertySchemaAttribute("Events")
+                {
+                    Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", Options = new string[] { "None", "false", "DataSvc", "true", "Data" },
+                    Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
+                }),
 
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeAll", typeof(bool?), new PropertySchemaAttribute("ExcludeAll")
             {
@@ -222,6 +250,11 @@ namespace Beef.CodeGen.Config
                 {
                     Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
                     Description = "Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified."
+                }),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "EventPublish", typeof(string), new PropertySchemaAttribute("Events")
+                {
+                    Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", Options = new string[] { "None", "false", "DataSvc", "true", "Data" },
+                    Description = "Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s)."
                 }),
 
             (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Columns")

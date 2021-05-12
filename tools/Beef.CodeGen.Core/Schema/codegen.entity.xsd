@@ -139,9 +139,14 @@
                       <xs:documentation>Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="InternalOnly" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property is for internal use only; declared in Business entities only. This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="RefDataType" use="optional">
                     <xs:annotation>
-                      <xs:documentation>The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.</xs:documentation>
+                      <xs:documentation>The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
@@ -531,6 +536,11 @@
                       <xs:documentation>Indicates whether the `Data` extensions logic should be generated. Defaults to `Entity.DataExtensions`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="DataTransaction" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer. Where using an `EventOutbox` this is ignored as it is implied through its usage.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="DatabaseStoredProc" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The database stored procedure name used where `Operation.AutoImplement` is `Database`. Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.</xs:documentation>
@@ -605,14 +615,34 @@
                       <xs:documentation>Indicates whether the `DataSvc` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="EventPublish" use="optional" type="xs:boolean">
+                  <xs:attribute name="EventPublish" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.</xs:documentation>
+                      <xs:documentation>The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
                     </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None" />
+                        <xs:enumeration value="false" />
+                        <xs:enumeration value="DataSvc" />
+                        <xs:enumeration value="true" />
+                        <xs:enumeration value="Data" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="EventOutbox" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Defaults to `Entity.EventOutbox` configuration property (inherits) where not specified and `EventPublish` is `Data`; otherwise, `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None" />
+                        <xs:enumeration value="Database" />
+                      </xs:restriction>
+                    </xs:simpleType>
                   </xs:attribute>
                   <xs:attribute name="EventSource" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>The Event Source. Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.</xs:documentation>
+                      <xs:documentation>The Event Source. Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="EventSubject" use="optional" type="xs:string">
@@ -794,12 +824,26 @@
             </xs:attribute>
             <xs:attribute name="EntityScope" use="optional">
               <xs:annotation>
-                <xs:documentation>The entity scope option. Determines whether the entity is considered `Common` (default) or should be scoped to the `Business` namespace/assembly only (i.e. not externally visible).</xs:documentation>
+                <xs:documentation>The entity scope option. Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">
                   <xs:enumeration value="Common" />
                   <xs:enumeration value="Business" />
+                  <xs:enumeration value="Autonomous" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="EntityUsing" use="optional">
+              <xs:annotation>
+                <xs:documentation>The namespace for the non Reference Data entities (adds as a c# &lt;c&gt;using&lt;/c&gt; statement). Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Common" />
+                  <xs:enumeration value="Business" />
+                  <xs:enumeration value="All" />
+                  <xs:enumeration value="None" />
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
@@ -838,6 +882,7 @@
                 <xs:restriction base="xs:string">
                   <xs:enumeration value="int" />
                   <xs:enumeration value="Guid" />
+                  <xs:enumeration value="string" />
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
@@ -1111,32 +1156,6 @@
                 <xs:documentation>Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="EventPublish" use="optional" type="xs:boolean">
-              <xs:annotation>
-                <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="EventSource" use="optional" type="xs:string">
-              <xs:annotation>
-                <xs:documentation>The Event Source. Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="EventSubjectFormat" use="optional">
-              <xs:annotation>
-                <xs:documentation>The default formatting for the Subject when an Event is published. Defaults to `CodeGeneration.EventSubjectFormat`.</xs:documentation>
-              </xs:annotation>
-              <xs:simpleType>
-                <xs:restriction base="xs:string">
-                  <xs:enumeration value="NameOnly" />
-                  <xs:enumeration value="NameAndKey" />
-                </xs:restriction>
-              </xs:simpleType>
-            </xs:attribute>
-            <xs:attribute name="EventTransaction" use="optional" type="xs:boolean">
-              <xs:annotation>
-                <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="DataSvcConstructor" use="optional">
               <xs:annotation>
                 <xs:documentation>The access modifier for the generated `DataSvc` constructor. Defaults to `Public`.</xs:documentation>
@@ -1157,6 +1176,52 @@
             <xs:attribute name="DataSvcExtensions" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether the `DataSvc` extensions logic should be generated. This can be overridden using `Operation.DataSvcExtensions`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EventPublish" use="optional">
+              <xs:annotation>
+                <xs:documentation>The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="None" />
+                  <xs:enumeration value="false" />
+                  <xs:enumeration value="DataSvc" />
+                  <xs:enumeration value="true" />
+                  <xs:enumeration value="Data" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="EventOutbox" use="optional">
+              <xs:annotation>
+                <xs:documentation>The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="None" />
+                  <xs:enumeration value="Database" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="EventSource" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The Event Source. Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EventSubjectFormat" use="optional">
+              <xs:annotation>
+                <xs:documentation>The default formatting for the Subject when an Event is published. Defaults to `CodeGeneration.EventSubjectFormat`.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="NameOnly" />
+                  <xs:enumeration value="NameAndKey" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="EventTransaction" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ManagerConstructor" use="optional">
@@ -1298,7 +1363,12 @@
       </xs:choice>
       <xs:attribute name="RefDataNamespace" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.</xs:documentation>
+          <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RefDataCommonNamespace" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The namespace for the Reference Data common entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="RefDataText" use="optional" type="xs:boolean">
@@ -1329,8 +1399,33 @@
       </xs:attribute>
       <xs:attribute name="RefDataBusNamespace" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Business`.</xs:documentation>
+          <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="EntityScope" use="optional">
+        <xs:annotation>
+          <xs:documentation>The entity scope option. Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Common" />
+            <xs:enumeration value="Business" />
+            <xs:enumeration value="Autonomous" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EntityUsing" use="optional">
+        <xs:annotation>
+          <xs:documentation>The namespace for the non Reference Data entities (adds as a c# &lt;c&gt;using&lt;/c&gt; statement). Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally , `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Common" />
+            <xs:enumeration value="Business" />
+            <xs:enumeration value="All" />
+            <xs:enumeration value="None" />
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="JsonSerializer" use="optional">
         <xs:annotation>
@@ -1354,19 +1449,6 @@
             <xs:enumeration value="_etag" />
             <xs:enumeration value="_eTag" />
             <xs:enumeration value="ETag" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="EntityUsing" use="optional">
-        <xs:annotation>
-          <xs:documentation>The namespace for the non Reference Data entities (adds as a c# &lt;c&gt;using&lt;/c&gt; statement). Defaults to `Common` which will add `.Common.Entities`. Otherwise, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any.</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="Common" />
-            <xs:enumeration value="Business" />
-            <xs:enumeration value="All" />
-            <xs:enumeration value="None" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -1475,10 +1557,30 @@
           <xs:documentation>additional Namespace using statement to the added to the generated `Data` code where `Operation.AutoImplement` is `OData`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="EventPublish" use="optional" type="xs:boolean">
+      <xs:attribute name="EventPublish" use="optional">
         <xs:annotation>
-          <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
+          <xs:documentation>The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Defaults to `DataSvc` (`true`); unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="false" />
+            <xs:enumeration value="DataSvc" />
+            <xs:enumeration value="true" />
+            <xs:enumeration value="Data" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventOutbox" use="optional">
+        <xs:annotation>
+          <xs:documentation>The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Database" />
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="EventSourceRoot" use="optional" type="xs:string">
         <xs:annotation>
@@ -1532,7 +1634,7 @@
       </xs:attribute>
       <xs:attribute name="EventTransaction" use="optional" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified.</xs:documentation>
+          <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Grpc" use="optional" type="xs:boolean">

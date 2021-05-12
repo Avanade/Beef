@@ -210,6 +210,14 @@ tables:
         [PropertySchema("UDT", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
         public string? Tvp { get; set; }
 
+        /// <summary>
+        /// Gets or sets the entity scope option.
+        /// </summary>
+        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("UDT", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+            Description = "Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).")]
+        public string? EntityScope { get; set; }
+
         #endregion
 
         #region Auth
@@ -327,17 +335,17 @@ tables:
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
+        public IColumnConfig? ColumnIsDeleted { get; set; }
 
         /// <summary>
         /// Gets the related TenantId column.
         /// </summary>
-        public IColumnConfig? ColumnTenantId => GetSpecialColumn(ColumnNameTenantId);
+        public IColumnConfig? ColumnTenantId { get; set; }
 
         /// <summary>
         /// Gets the related OrgUnitId column.
         /// </summary>
-        public IColumnConfig? ColumnOrgUnitId => GetSpecialColumn(ColumnNameOrgUnitId);
+        public IColumnConfig? ColumnOrgUnitId { get; set; }
 
         /// <summary>
         /// Gets the related RowVersion column.
@@ -476,6 +484,8 @@ tables:
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Root!.ColumnNameDeletedBy);
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Root!.ColumnNameDeletedDate);
 
+            EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
+
             PrepareStoredProcedures();
 
             foreach (var c in DbTable.Columns)
@@ -484,8 +494,21 @@ tables:
                 cc.Prepare(Root!, this);
 
                 // Certain special columns have to always be included.
-                if (cc.IsTenantIdColumn || cc.IsOrgUnitIdColumn || cc.IsIsDeletedColumn)
+                if (cc.Name == ColumnNameTenantId)
+                {
+                    ColumnTenantId = cc;
                     Columns.Add(cc);
+                }
+                else if (cc.Name == ColumnNameOrgUnitId)
+                {
+                    ColumnOrgUnitId = cc;
+                    Columns.Add(cc);
+                }
+                else if (cc.Name == ColumnNameIsDeleted)
+                {
+                    ColumnIsDeleted = cc;
+                    Columns.Add(cc);
+                }
                 else if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                     Columns.Add(cc);
                 else if (cc.IsAudit && StoredProcedures!.Any(x => x.Type == "Create" || x.Type == "Update" || x.Type == "Upsert" || x.Type == "Delete" || x.Type == "Merge"))

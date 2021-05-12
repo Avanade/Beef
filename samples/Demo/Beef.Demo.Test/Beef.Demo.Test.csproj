@@ -40,10 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Data.Database.Cdc\Beef.Data.Database.Cdc.csproj" />
     <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
-    <ProjectReference Include="..\Beef.Demo.Cdc\Beef.Demo.Cdc.csproj" />
+    <ProjectReference Include="..\Beef.Demo.CdcPublisher\Beef.Demo.CdcPublisher.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Functions\Beef.Demo.Functions.csproj" />
   </ItemGroup>

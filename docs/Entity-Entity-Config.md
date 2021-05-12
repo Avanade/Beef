@@ -33,6 +33,7 @@ Category | Description
 [`Collection`](#Collection) | Provides the _Entity collection class_ configuration.
 [`Operation`](#Operation) | Provides the _Operation_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
+[`Events`](#Events) | Provides the _Events_ configuration.
 [`WebApi`](#WebApi) | Provides the data _Web API_ configuration.
 [`Manager`](#Manager) | Provides the _Manager-layer_ configuration.
 [`DataSvc`](#DataSvc) | Provides the _Data Services-layer_ configuration.
@@ -56,7 +57,7 @@ Property | Description
 **`name`** | The unique entity name.
 `text` | The overriding text for use in comments. Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
 `fileName` | The overriding file name. Overrides the Name as the code-generated file name.
-`entityScope` | The entity scope option. Valid options are: `Common`, `Business`. Determines whether the entity is considered `Common` (default) or should be scoped to the `Business` namespace/assembly only (i.e. not externally visible).
+`entityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`. Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).
 `privateName` | The overriding private name. Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
 `argumentName` | The overriding argument name. Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
 `constType` | The Const .NET Type option. Valid options are: `int`, `Guid`, `string`. The .NET Type to be used for the `const` values. Defaults to `string`.
@@ -69,7 +70,7 @@ Provides the _Reference Data_ configuration.
 
 Property | Description
 -|-
-**`refDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `Guid`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
+**`refDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `Guid`, `string`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
 `refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection. This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `refDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`. Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
 `refDataStringFormat` | The Reference Data `ToString` composite format. The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.
@@ -81,6 +82,7 @@ Provides the _Entity class_ configuration.
 
 Property | Description
 -|-
+`entityUsing` | The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement). Valid options are: `Common`, `Business`, `All`, `None`. Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.
 `inherits` | The base class that the entity inherits from. Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseInt` or `ReferenceDataBaseGuid` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
 `implements` | The list of comma separated interfaces that are to be declared for the entity class.
 `implementsAutoInfer` | Indicates whether to automatically infer the interface implements for the entity from the properties declared. Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.
@@ -128,6 +130,19 @@ Property | Description
 
 <br/>
 
+## Events
+Provides the _Events_ configuration.
+
+Property | Description
+-|-
+**`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).
+**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`. Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
+`eventSource` | The Event Source. Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.
+`eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `CodeGeneration.EventSubjectFormat`.
+**`eventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.
+
+<br/>
+
 ## WebApi
 Provides the data _Web API_ configuration.
 
@@ -160,10 +175,6 @@ Provides the _Data Services-layer_ configuration.
 Property | Description
 -|-
 `dataSvcCaching` | Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.
-`eventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
-`eventSource` | The Event Source. Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.
-`eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `CodeGeneration.EventSubjectFormat`.
-**`eventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.
 `dataSvcCtor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `dataSvcCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated. This can be overridden using `Operation.DataSvcExtensions`.

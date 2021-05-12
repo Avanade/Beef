@@ -13,10 +13,10 @@ using Beef;
 using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using My.Hr.Business.DataSvc;
 using My.Hr.Business.Validation;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business
 {
@@ -104,7 +104,7 @@ namespace My.Hr.Business
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.EmployeeArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
         public async Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)

@@ -34,7 +34,7 @@ To create the _Solution_ you must first be in the directory that you intend to c
 ```
 mkdir Foo.Bar
 cd Foo.Bar
-dotnet new beef --company Foo --appname Bar --datasource EntityFramework
+dotnet run beef --company Foo --appname Bar --datasource EntityFramework
 ```
 
 The solution should now have been created; and the file system should look like the following:
@@ -64,7 +64,7 @@ Generate the configured entities and reference data:
 
 ```
 cd Foo.Bar.CodeGen
-dotnet new all
+dotnet run all
 ```
 
 This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code generation will be logged to the console showing what was added or updated.
@@ -82,10 +82,11 @@ Generate the configured tables and C# models:
 
 ```
 cd Foo.Bar.Database
-dotnet new all
+dotnet run all
+dotnet run codegen --script DatabaseEventOutbox.xml
 ```
 
-This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated.
+This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated. The final command will create the required migration scripts for the event outbox functionality.
 
 <br/>
 

@@ -25,7 +25,7 @@ namespace Cdr.Banking.Business
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);

@@ -341,6 +341,10 @@ namespace Beef.Data.Database
                 case ReferenceDataIdTypeCode.Guid:
                     _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<Guid>(_columnName))!);
                     break;
+
+                case ReferenceDataIdTypeCode.String:
+                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<string>(_columnName))!);
+                    break;
             }
         }
 

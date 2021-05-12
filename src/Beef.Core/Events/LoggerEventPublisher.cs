@@ -43,7 +43,7 @@ namespace Beef.Events
             {
                 foreach (var e in events)
                 {
-                    _logger.LogInformation($"Subject: {e.Subject}, Action: {e.Action}{(e.HasValue ? ", Value: " + JsonConvert.SerializeObject(e.GetValue()) : "")}");
+                    _logger.LogInformation($"Subject: {e.Subject}, Action: {e.Action}, Source: {e.Source}{(e.HasValue ? ", Value: " + JsonConvert.SerializeObject(e.GetValue()) : "")}");
                 }
             }
 

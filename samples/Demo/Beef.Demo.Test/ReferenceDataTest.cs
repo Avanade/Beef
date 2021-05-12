@@ -29,10 +29,10 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Test<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(new string[] { nameof(ReferenceData.Country), nameof(ReferenceData.USState), nameof(ReferenceData.Gender), nameof(ReferenceData.EyeColor), nameof(ReferenceData.PowerSource), nameof(ReferenceData.Company) }));
+                .Run(a => a.GetNamedAsync(new string[] { nameof(ReferenceData.Country), nameof(ReferenceData.USState), nameof(ReferenceData.Gender), nameof(ReferenceData.EyeColor), nameof(ReferenceData.PowerSource), nameof(ReferenceData.Company), nameof(ReferenceData.Status) }));
 
             Assert.NotNull(r.Content);
-            Assert.AreEqual(6, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
+            Assert.AreEqual(7, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
         }
 
         [Test, TestSetUp, Parallelizable]

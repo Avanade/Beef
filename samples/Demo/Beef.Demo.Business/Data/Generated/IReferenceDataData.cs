@@ -54,6 +54,12 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
         Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync();
+
+        /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.Status"/> items.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.StatusCollection"/>.</returns>
+        Task<RefDataNamespace.StatusCollection> StatusGetAllAsync();
     }
 }
 

@@ -48,6 +48,11 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         RefDataNamespace.CompanyCollection Company { get; }
 
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.StatusCollection"/>.
+        /// </summary>
+        RefDataNamespace.StatusCollection Status { get; }
+
         #endregion
     }
 }

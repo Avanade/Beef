@@ -291,12 +291,7 @@ parameters: [
                     return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
 
                 if (RelatedEntity != null)
-                {
-                    if (RelatedEntity.EntityScope == null || RelatedEntity.EntityScope == "Common")
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Common.Entities." + Type)})";
-                    else
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Business.Entities." + Type)})";
-                }
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Entities." + Type)})";
 
                 return StringConversion.ToSentenceCase(Name);
             }));

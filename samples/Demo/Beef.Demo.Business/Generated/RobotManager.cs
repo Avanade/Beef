@@ -114,7 +114,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
         public async Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)

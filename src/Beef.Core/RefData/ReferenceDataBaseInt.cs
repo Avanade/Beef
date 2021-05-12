@@ -14,7 +14,7 @@ namespace Beef.RefData
     public abstract class ReferenceDataBaseInt : ReferenceDataBase, IIntIdentifier
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataBaseGuid"/> class.
+        /// Initializes a new instance of the <see cref="ReferenceDataBaseInt"/> class.
         /// </summary>
         public ReferenceDataBaseInt() : base(ReferenceDataIdTypeCode.Int32, 0) { }
 

@@ -8,7 +8,8 @@ namespace Beef
     /// <summary>
     /// Represents a <b>Business</b> exception.
     /// </summary>
-    /// <remarks>This is typically used for a business-oriented error that should be returned to the consumer.</remarks>
+    /// <remarks>This is typically used for a business-oriented error that should be returned to the consumer.
+    /// <para>The <see cref="Exception.Message"/> defaults to: <i>A business error occurred.</i></para></remarks>
     public class BusinessException : Exception, IBusinessException
     {
         /// <summary>

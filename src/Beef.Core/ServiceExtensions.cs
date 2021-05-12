@@ -4,8 +4,10 @@ using Beef.Business;
 using Beef.Caching;
 using Beef.Caching.Policy;
 using Beef.Events;
+using Beef.Hosting;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Beef
@@ -61,28 +63,31 @@ namespace Beef
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance with the specified <paramref name="config"/>, <paramref name="flushDueTime"/> and <paramref name="flushPeriod"/>.
+        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance with the specified <paramref name="config"/> and starts the corresponding <see cref="CachePolicyManagerServiceHost"/> with the <paramref name="firstInterval"/> and <paramref name="interval"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="config">The optional <see cref="CachePolicyConfig"/>.</param>
-        /// <param name="flushDueTime">The optional amount of time to delay before <see cref="CachePolicyManager.Flush"/> is invoked for the first time (defaults to <see cref="CachePolicyManager.TenMinutes"/>).</param>
-        /// <param name="flushPeriod">The optional time interval between subsequent invocations of <see cref="CachePolicyManager.Flush"/> (defaults to <see cref="CachePolicyManager.FiveMinutes"/>).</param>
+        /// <param name="firstInterval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> before <see cref="CachePolicyManager.Flush"/> is invoked for the first time (defaults to <see cref="CachePolicyManager.TenMinutes"/>).</param>
+        /// <param name="interval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> between subsequent invocations of <see cref="CachePolicyManager.Flush"/> (defaults to <see cref="CachePolicyManager.FiveMinutes"/>).</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
         /// <remarks>The The <see cref="CachePolicyManager"/> enables the centralised management of <see cref="ICachePolicy"/> caches.</remarks>
-        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? flushDueTime = null, TimeSpan? flushPeriod = null)
+        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? firstInterval = null, TimeSpan? interval = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton(_ =>
-            {
-                var cpm = new CachePolicyManager();
-                if (config != null)
-                    cpm.SetFromCachePolicyConfig(config);
+            var cpm = new CachePolicyManager();
+            if (config != null)
+                cpm.SetFromCachePolicyConfig(config);
 
-                cpm.StartFlushTimer(flushDueTime ?? CachePolicyManager.TenMinutes, flushPeriod ?? CachePolicyManager.FiveMinutes);
-                return cpm;
+            services.AddSingleton(_ => cpm);
+            services.AddHostedService(sp => new CachePolicyManagerServiceHost(cpm, sp, sp.GetService<ILogger<CachePolicyManager>>())
+            {
+                FirstInterval = firstInterval ?? CachePolicyManager.TenMinutes,
+                Interval = interval ?? CachePolicyManager.FiveMinutes
             });
+
+            return services;
         }
 
         /// <summary>

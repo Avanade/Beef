@@ -33,7 +33,8 @@ namespace Beef.Demo.Common.Entities
                 typeof(Gender),
                 typeof(EyeColor),
                 typeof(PowerSource),
-                typeof(Company)
+                typeof(Company),
+                typeof(Status)
             };
 
         /// <summary>
@@ -87,6 +88,11 @@ namespace Beef.Demo.Common.Entities
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
         /// </summary>
         public abstract RefDataNamespace.CompanyCollection Company { get; }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.StatusCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.StatusCollection Status { get; }
 
         #endregion
     }

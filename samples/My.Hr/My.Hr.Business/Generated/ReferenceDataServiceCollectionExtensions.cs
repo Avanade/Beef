@@ -6,7 +6,7 @@
 #pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 
 namespace My.Hr.Business
 {

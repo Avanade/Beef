@@ -24,7 +24,9 @@ namespace Beef.Demo.Business.Data.EfModel
             if (modelBuilder == null)
                 throw new ArgumentNullException(nameof(modelBuilder));
 
+            Table.AddToModel(modelBuilder);
             EyeColor.AddToModel(modelBuilder);
+            Status.AddToModel(modelBuilder);
             Person.AddToModel(modelBuilder);
             Contact.AddToModel(modelBuilder);
         }

@@ -14,8 +14,8 @@ using Beef.Grpc;
 using Beef.WebApi;
 using {{Root.NamespaceCommon}}.Entities;
 using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
+{{#ifval Root.RefDataCommonNamespace}}
+using RefDataNamespace = {{Root.RefDataCommonNamespace}};
 {{/ifval}}
 
 namespace {{Root.NamespaceCommon}}.Grpc

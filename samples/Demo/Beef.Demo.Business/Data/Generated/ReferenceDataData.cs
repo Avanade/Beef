@@ -124,6 +124,17 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.Status"/> items.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.StatusCollection"/>.</returns>
+        public async Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.StatusCollection();
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(StatusMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            return __coll;
+        }
+
+        /// <summary>
         /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
         /// </summary>
         public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper => EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
@@ -135,6 +146,13 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         public static CosmosDbMapper<RefDataNamespace.PowerSource, Model.PowerSource> PowerSourceMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, Model.PowerSource>()
             .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any))
+            .AddStandardProperties();
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.Status"/> and Entity Framework <see cref="EfModel.Status"/> property mapping.
+        /// </summary>
+        public static EfDbMapper<RefDataNamespace.Status, EfModel.Status> StatusMapper => EfDbMapper.CreateAuto<RefDataNamespace.Status, EfModel.Status>()
+            .HasProperty(s => s.Id, d => d.StatusId)
             .AddStandardProperties();
     }
 }

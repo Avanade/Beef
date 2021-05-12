@@ -8,7 +8,8 @@ namespace Beef
     /// <summary>
     /// Represents an <b>Conflict</b> exception.
     /// </summary>
-    /// <remarks>An example would be where the identifier provided for a Create operation already exists.</remarks>
+    /// <remarks>An example would be where the identifier provided for a Create operation already exists.
+    /// <para>The <see cref="Exception.Message"/> defaults to: <i>A data conflict occurred.</i></para></remarks>
     public class ConflictException : Exception, IBusinessException
     {
         /// <summary>

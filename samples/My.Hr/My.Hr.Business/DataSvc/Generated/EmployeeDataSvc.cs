@@ -13,10 +13,9 @@ using Beef;
 using Beef.Business;
 using Beef.Caching;
 using Beef.Entities;
-using Beef.Events;
 using My.Hr.Business.Data;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.DataSvc
 {
@@ -26,17 +25,15 @@ namespace My.Hr.Business.DataSvc
     public partial class EmployeeDataSvc : IEmployeeDataSvc
     {
         private readonly IEmployeeData _data;
-        private readonly IEventPublisher _evtPub;
         private readonly IRequestCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IEmployeeData"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public EmployeeDataSvc(IEmployeeData data, IEventPublisher evtPub, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); EmployeeDataSvcCtor(); }
+        public EmployeeDataSvc(IEmployeeData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); EmployeeDataSvcCtor(); }
 
         partial void EmployeeDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -68,7 +65,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{_evtPub.FormatKey(__result)}", "Created").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -83,7 +79,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{_evtPub.FormatKey(__result)}", "Updated").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
@@ -97,7 +92,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.Publish($"My.Hr.Employee.{_evtPub.FormatKey(id)}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Employee>(new UniqueKey(id));
             });
         }
@@ -105,7 +99,7 @@ namespace My.Hr.Business.DataSvc
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.EmployeeArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
         public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
@@ -128,7 +122,6 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.TerminateAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{id}", "Terminated", id).SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             });
         }
