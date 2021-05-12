@@ -10,6 +10,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* The code-generation for an EF model is now logically delete (`IsDeleted` column) aware; this will ensure that any logically deleted data is appropriately filtered.
 - *Enhancement:* The code-generation for an EF model is now logically delete (`TenantId` column) aware; this will ensure that the `TenantId` is appropriately filtered.
 - *Enhancement:* Add support for `ReferenceDataBaseString` code-generation.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
 
 ## v4.1.24
 - *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.

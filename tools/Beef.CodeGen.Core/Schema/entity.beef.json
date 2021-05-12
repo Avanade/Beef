@@ -363,7 +363,8 @@
               "description": "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.",
               "enum": [
                 "int",
-                "Guid"
+                "Guid",
+                "string"
               ]
             },
             "refDataText": {
@@ -981,7 +982,7 @@
                     "refDataType": {
                       "type": "string",
                       "title": "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).",
-                      "description": "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.",
+                      "description": "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.",
                       "enum": [
                         "string",
                         "int",

@@ -8,6 +8,7 @@ namespace Beef
     /// <summary>
     /// Represents an <b>Authorization</b> exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>An authorization error occurred; you are not permitted to perform this action.</i></remarks>
     public class AuthorizationException : Exception, IBusinessException
     {
         /// <summary>

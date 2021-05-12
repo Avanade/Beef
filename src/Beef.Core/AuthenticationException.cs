@@ -8,6 +8,7 @@ namespace Beef
     /// <summary>
     /// Represents an <b>Authentication</b> exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>An authentication error occured; the credentials you provided are not valid.</i></remarks>
     public class AuthenticationException : Exception, IBusinessException
     {
         /// <summary>

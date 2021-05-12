@@ -52,7 +52,7 @@ Provides the _Reference Data_ configuration.
 
 Property | Description
 -|-
-**`RefDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `Guid`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
+**`RefDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `Guid`, `string`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
 `RefDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection. This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `RefDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`. Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
 `RefDataStringFormat` | The Reference Data `ToString` composite format. The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.

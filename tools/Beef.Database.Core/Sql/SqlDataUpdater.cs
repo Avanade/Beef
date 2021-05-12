@@ -218,9 +218,94 @@ namespace Beef.Database.Core.Sql
                 JTokenType.Integer => j.Value<int>(),
                 JTokenType.TimeSpan => j.Value<TimeSpan>(),
                 JTokenType.Uri => j.Value<String>(),
-                JTokenType.String => j.Value<String>(),
-                _ => null,
+                JTokenType.String => GetRuntimeParameterValue(j.Value<String>()),
+                _ => null
             };
+        }
+
+        /// <summary>
+        /// Get the runtime parameter value.
+        /// </summary>
+        private static object? GetRuntimeParameterValue(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            // Get runtime value when formatted like: ^(DateTime.UtcNow)
+            if (value.StartsWith("^(") && value.EndsWith(")"))
+            {
+                var (val, msg) = GetSystemRuntimeValue(value[2..^1]);
+                if (msg == null)
+                    return val;
+
+                // Try again adding the System namespace.
+                (val, msg) = GetSystemRuntimeValue("System." + value[2..^1]);
+                if (msg == null)
+                    return val;
+
+                throw new SqlDataUpdaterException(msg);
+            }
+            else
+                return value;
+        }
+
+        /// <summary>
+        /// Get the system runtime value.
+        /// </summary>
+        private static (object? value, string? message) GetSystemRuntimeValue(string param)
+        {
+            var ns = param.Split(",");
+            if (ns.Length > 2)
+                return (null, $"Runtime value parameter '{param}' is invalid; incorrect format.");
+
+            var parts = ns[0].Split(".");
+            if (parts.Length <= 1)
+                return (null, $"Runtime value parameter '{param}' is invalid; incorrect format.");
+
+            Type? type = null;
+            int i = parts.Length;
+            for (; i >= 0; i--)
+            {
+                if (ns.Length == 1)
+                    type = Type.GetType(string.Join('.', parts[0..^(parts.Length - i)]));
+                else
+                    type = Type.GetType(string.Join('.', parts[0..^(parts.Length - i)]) + "," + ns[1]);
+
+                if (type != null)
+                    break;
+            }
+
+            if (type == null)
+                return (null, $"Runtime value parameter '{param}' is invalid; no Type can be found.");
+
+            return GetSystemPropertyValue(param, type, null, parts[i..]);
+        }
+
+        /// <summary>
+        /// Recursively navigates the properties and values to discern the value.
+        /// </summary>
+        private static (object? value, string? message) GetSystemPropertyValue(string param, Type type, object? obj, string[] parts)
+        {
+            if (parts == null || parts.Length == 0)
+                return (obj, null);
+
+            var part = parts[0];
+            if (part.EndsWith("()"))
+            {
+                var mi = type.GetMethod(part[0..^2], Array.Empty<Type>());
+                if (mi == null || mi.GetParameters().Length != 0)
+                    return (null, $"Runtime value parameter '{param}' is invalid; specified method '{part}' is invalid.");
+
+                return GetSystemPropertyValue(param, mi.ReturnType, mi.Invoke(obj, null), parts[1..]);
+            }
+            else
+            {
+                var pi = type.GetProperty(part);
+                if (pi == null || !pi.CanRead)
+                    return (null, $"Runtime value parameter '{param}' is invalid; specified property '{part}' is invalid.");
+
+                return GetSystemPropertyValue(param, pi.PropertyType, pi.GetValue(obj, null), parts[1..]);
+            }
         }
 
         /// <summary>

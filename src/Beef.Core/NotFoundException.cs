@@ -8,6 +8,7 @@ namespace Beef
     /// <summary>
     /// Represents an entity not found exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>Requested data was not found.</i></remarks>
     public class NotFoundException : Exception, IBusinessException
     {
         /// <summary>

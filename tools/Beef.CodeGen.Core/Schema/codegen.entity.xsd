@@ -146,7 +146,7 @@
                   </xs:attribute>
                   <xs:attribute name="RefDataType" use="optional">
                     <xs:annotation>
-                      <xs:documentation>The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.</xs:documentation>
+                      <xs:documentation>The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
@@ -882,6 +882,7 @@
                 <xs:restriction base="xs:string">
                   <xs:enumeration value="int" />
                   <xs:enumeration value="Guid" />
+                  <xs:enumeration value="string" />
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

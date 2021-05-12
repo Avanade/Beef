@@ -8,6 +8,7 @@ namespace Beef
     /// <summary>
     /// Represents a data <b>Concurrency</b> exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>A concurrency error occurred; please refresh the data and try again.</i></remarks>
     public class ConcurrencyException : Exception, IBusinessException
     {
         /// <summary>

@@ -8,6 +8,7 @@ namespace Beef
     /// <summary>
     /// Represents a data <b>Duplicate</b> exception.
     /// </summary>
+    /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>A duplicate error occurred.</i></remarks>
     public class DuplicateException : Exception, IBusinessException
     {
         /// <summary>

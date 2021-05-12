@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 
