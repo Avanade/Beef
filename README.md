@@ -115,6 +115,8 @@ To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/
 
 The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events), [`Beef.Events.EventHubs`](./src/Beef.Events.EventHubs) and [`Beef.Events.ServiceBus`](./src/Beef.Events.ServiceBus) assemblies.
 
+Additionally, _Beef_ has capabilities to support the [Transactional Outbox Pattern](./docs/Outbox-Pattern.md) where there is a requirement for events to be sent _reliably_ (with no message loss); i.e. to guarantee at-least-once sent semantics within the context of the underlying data update (currently only supported for Database repository).
+
 <br/>
 
 ## Framework 
