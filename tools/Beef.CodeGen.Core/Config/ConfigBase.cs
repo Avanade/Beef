@@ -61,7 +61,7 @@ namespace Beef.CodeGen.Config
         public static List<string> SystemTypes => new List<string>
         {
             "void", "bool", "byte", "char", "decimal", "double", "float", "int", "long",
-            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "TimeSpan", "Guid"
+            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "DateTimeOffset", "TimeSpan", "Guid"
         };
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Beef.CodeGen.Config
         public static List<string> IgnoreNullableTypes => new List<string>
         {
             "bool", "byte", "char", "decimal", "double", "float", "int", "long",
-            "sbyte", "short", "unit", "ulong", "ushort", "DateTime", "TimeSpan", "Guid"
+            "sbyte", "short", "unit", "ulong", "ushort", "DateTime", "DateTimeOffset", "TimeSpan", "Guid"
         };
 
         /// <summary>

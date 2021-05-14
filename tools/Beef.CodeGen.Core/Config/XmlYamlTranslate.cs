@@ -102,6 +102,8 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", false, (xml) => throw new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType.")),
             (ConfigType.Entity, ConfigurationEntity.Operation, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
+            (ConfigType.Entity, ConfigurationEntity.Property, "Type", false, (xml) => xml != null && xml.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) ? $"^{xml[17..]}" : xml),
+
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),

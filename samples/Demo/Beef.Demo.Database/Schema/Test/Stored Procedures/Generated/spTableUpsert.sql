@@ -67,10 +67,8 @@ BEGIN
     BEGIN
       -- Check user has permission to org unit.
       DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
-      SET @CurrOrgUnitId = (SELECT TOP 1 [t].[OrgUnitId] FROM [Test].[Table] AS [t]
-        WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0))
-
-      IF (@CurrOrgUnitId IS NOT NULL AND (SELECT COUNT(*) FROM [Sec].[fnGetUserOrgUnits]() AS orgunits WHERE orgunits.OrgUnitId = @CurrOrgUnitId) = 0)
+      SET @CurrOrgUnitId = (SELECT TOP 1 [t].[OrgUnitId] FROM [Test].[Table] AS [t] WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0))
+      IF (@CurrOrgUnitId IS NOT NULL AND (@OrgUnitId <> CurrOrgUnitId OR (SELECT COUNT(*) FROM [Sec].[fnGetUserOrgUnits]() AS orgunits WHERE orgunits.OrgUnitId = @CurrOrgUnitId) = 0))
       BEGIN
         EXEC [dbo].[spThrowAuthorizationException]
       END

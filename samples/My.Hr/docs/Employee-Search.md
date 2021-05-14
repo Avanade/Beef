@@ -47,7 +47,7 @@ Add the following entity code-gen configuration after all the other existing ent
   <Entity Name="EmployeeArgs" Text="{{Employee}} search arguments" ExcludeAll="true" >
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
-    <Property Name="Genders" Type="RefDataNamespace.Gender" RefDataList="true" />
+    <Property Name="Genders" Type="^Gender" RefDataList="true" />
     <Property Name="StartFrom" Type="DateTime?" DateTimeTransform="DateOnly" />
     <Property Name="StartTo" Type="DateTime?" DateTimeTransform="DateOnly" />
     <Property Name="IsIncludeTerminated" JsonName="includeTerminated" Type="bool?" />
