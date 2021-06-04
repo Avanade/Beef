@@ -51,33 +51,22 @@ namespace Beef
         public string? FallbackText { get; set; }
 
         /// <summary>
-        /// Returns the <see cref="LText"/> as a <see cref="string"/> (see <see cref="TextProvider"/> <see cref="TextProvider.Current"/> <see cref="TextProvider.GetText(LText)"/>).
+        /// Returns the <see cref="LText"/> as a <see cref="string"/> (see <see cref="TextProvider"/> <see cref="TextProvider.Current"/> <see cref="TextProviderBase.GetText(LText)"/>).
         /// </summary>
         /// <returns>The <see cref="LText"/> string value.</returns>
-        public override string ToString()
-        {
-            return this;
-        }
+        public override string ToString() => this;
 
         /// <summary>
-        /// An implicit cast from an <see cref="LText"/> to a <see cref="string"/> (see <see cref="TextProvider"/> <see cref="TextProvider.Current"/> <see cref="TextProvider.GetText(LText)"/>).
+        /// An implicit cast from an <see cref="LText"/> to a <see cref="string"/> (see <see cref="TextProvider"/> <see cref="TextProvider.Current"/> <see cref="TextProviderBase.GetText(LText)"/>).
         /// </summary>
         /// <param name="text">The <see cref="LText"/>.</param>
         /// <returns>The corresponding text where found; otherwise, the <see cref="LText.FallbackText"/> where specified. Where nothing found or specified then the key itself will be returned.</returns>
-        public static implicit operator string(LText text)
-        {
-            return TextProvider.Current.GetText(text);
-        }
+        public static implicit operator string(LText text) => TextProvider.Current.GetText(text);
 
-#pragma warning disable CA2225 // Operator overloads have named alternates; by-design and valid.
         /// <summary>
         /// An implicit cast from a text <see cref="string"/> to an <see cref="LText"/> value updating the <see cref="KeyAndOrText"/>.
         /// </summary>
         /// <param name="keyAndOrText">The key and/or text.</param>
-        public static implicit operator LText(string keyAndOrText)
-#pragma warning restore CA2225 
-        {
-            return new LText(keyAndOrText);
-        }
+        public static implicit operator LText(string keyAndOrText) => new(keyAndOrText);
     }
 }

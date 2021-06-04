@@ -172,6 +172,12 @@ namespace Beef.Yaml
                         rdi.Id = index + 1;
 
                     break;
+
+                case ReferenceDataBaseString rds:
+                    if (rds.Id == null)
+                        rds.Id = Guid.NewGuid().ToString();
+
+                    break;
             }
 
             if (value.SortOrder == 0)

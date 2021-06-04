@@ -13,6 +13,10 @@ namespace Beef
     /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>A data validation error occurred.</i></remarks>
     public class ValidationException : Exception, IBusinessException
     {
+        private const string _key = "Beef.ValidationException";
+        private const string _message = "A data validation error occurred.";
+        private readonly List<MessageItem> _messages = new();
+
         /// <summary>
         /// Get or sets the <see cref="ShouldBeLogged"/> value.
         /// </summary>
@@ -21,39 +25,29 @@ namespace Beef
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> class.
         /// </summary>
-        public ValidationException()
-            : base(new LText("Beef.ValidationException"))
-        {
-        }
+        public ValidationException() : base(null!) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ValidationException(string? message)
-            : base(message ?? new LText("Beef.ValidationException"))
-        {
-        }
+        public ValidationException(string? message) : base(message ?? new LText(_key, _message)) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public ValidationException(string? message, Exception innerException)
-            : base(message ?? new LText("Beef.ValidationException"), innerException)
-        {
-        }
+        public ValidationException(string? message, Exception innerException) : base(message ?? new LText(_key, _message), innerException) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> class with a <see cref="MessageItem"/> list.
         /// </summary>
         /// <param path="messages">The <see cref="MessageItem"/> list.</param>
-        public ValidationException(IEnumerable<MessageItem> messages)
-            : base(new LText("Beef.ValidationException"))
+        public ValidationException(IEnumerable<MessageItem> messages) : base(new LText(_key, _message))
         {
             if (messages != null)
-                Messages.AddRange(messages);
+                _messages.AddRange(messages);
         }
 
         /// <summary>
@@ -61,22 +55,20 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="messages">The <see cref="MessageItem"/> list.</param>
-        public ValidationException(string? message, IEnumerable<MessageItem> messages)
-            : base(message ?? new LText("Beef.ValidationException"))
+        public ValidationException(string? message, IEnumerable<MessageItem> messages) : base(message ?? new LText(_key, _message))
         {
             if (messages != null)
-                Messages.AddRange(messages);
+                _messages.AddRange(messages);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> with a single <see cref="MessageItem"/>.
         /// </summary>
         /// <param name="item">The <see cref="MessageItem"/>.</param>
-        public ValidationException(MessageItem item)
-            : base(new LText("Beef.ValidationException"))
+        public ValidationException(MessageItem item) : base(new LText(_key, _message))
         {
             Check.NotNull(item, nameof(item));
-            Messages.Add(item);
+            _messages.Add(item);
         }
 
         /// <summary>
@@ -86,39 +78,30 @@ namespace Beef
         /// <param name="messages">The <see cref="MessageItem"/> list.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
         public ValidationException(string? message, IEnumerable<MessageItem> messages, Exception innerException)
-            : base(message ?? new LText("Beef.ValidationException"), innerException)
+            : base(message ?? new LText(_key), innerException)
         {
             if (messages != null)
-                Messages.AddRange(messages);
+                _messages.AddRange(messages);
         }
 
         /// <summary>
-        /// Gets the <see cref="MessageItemCollection"/>.
+        /// Gets the underlying messages.
         /// </summary>
-        public MessageItemCollection Messages { get; } = new MessageItemCollection();
+        public IEnumerable<MessageItem> Messages => _messages;
 
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.ValidationError"/>).
         /// </summary>
-        public ErrorType ErrorType
-        {
-            get { return ErrorType.ValidationError; }
-        }
+        public ErrorType ErrorType => ErrorType.ValidationError; 
 
         /// <summary>
         /// Gets the corresponding <see cref="HttpStatusCode"/>.
         /// </summary>
-        public HttpStatusCode StatusCode
-        {
-            get { return HttpStatusCode.BadRequest; }
-        }
+        public HttpStatusCode StatusCode => HttpStatusCode.BadRequest; 
 
         /// <summary>
         /// Indicates whether the <see cref="Exception"/> should be logged (returns the <see cref="ShouldExceptionBeLogged"/> value).
         /// </summary>
-        public bool ShouldBeLogged
-        {
-            get { return ShouldExceptionBeLogged; }
-        }
+        public bool ShouldBeLogged => ShouldExceptionBeLogged;
     }
 }

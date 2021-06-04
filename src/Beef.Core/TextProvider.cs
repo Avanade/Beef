@@ -1,42 +1,47 @@
 // Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Reflection;
-using System.Resources;
 
 namespace Beef
 {
     /// <summary>
-    /// Provides the text for a passed key.
+    /// Provides access to the global/static <see cref="Current"/> instance.
     /// </summary>
-    /// <remarks>Defaults to the <see cref="DefaultTextProvider"/>.</remarks>
-    public abstract class TextProvider
+    public static class TextProvider
     {
-        private static TextProvider _current = new DefaultTextProvider();
+        private static TextProviderBase? _textProvider;
+        private static TextProviderBase? _backupTextProvider;
 
         /// <summary>
-        /// Creates the <see cref="Current"/> <see cref="TextProvider"/> instance.
+        /// Sets the <see cref="Current"/> <see cref="TextProviderBase"/> instance explicitly.
         /// </summary>
-        /// <param name="textProvider">The concrete <see cref="TextProvider"/> instance.</param>
-        public static void Create(TextProvider textProvider)
-        {
-            _current = textProvider ?? throw new ArgumentNullException(nameof(textProvider));
-        }
+        /// <param name="textProvider">The concrete <see cref="TextProviderBase"/> instance.</param>
+        public static void SetTextProvider(TextProviderBase textProvider) => _textProvider = Check.NotNull(textProvider, nameof(textProvider));
 
         /// <summary>
-        /// Gets the current <see cref="TextProvider"/> instance. 
+        /// Gets the current <see cref="TextProviderBase"/> instance using in the following order: the explicit <see cref="SetTextProvider(TextProviderBase)"/>, <see cref="ExecutionContext.GetService{T}(bool)"/>, the explicit <see cref="SetTextProvider(TextProviderBase)"/>, otherwise, <see cref="DefaultTextProvider"/>. 
         /// </summary>
-        public static TextProvider Current
+        public static TextProviderBase Current
         {
             get
             {
-                if (_current == null)
-                    throw new InvalidOperationException("The Create method must be invoked before this property can be accessed.");
+                if (_textProvider != null)
+                    return _textProvider;
 
-                return _current;
+                var tp = ExecutionContext.GetService<TextProviderBase>(false);
+                if (tp != null)
+                    return tp;
+
+                return _backupTextProvider ??= new DefaultTextProvider();
             }
         }
+    }
 
+    /// <summary>
+    /// Provides the localized text for a passed key.
+    /// </summary>
+    public abstract class TextProviderBase
+    {
         /// <summary>
         /// Gets the text for the passed <see cref="LText"/>.
         /// </summary>
@@ -62,23 +67,15 @@ namespace Beef
     }
 
     /// <summary>
-    /// Provides the default <see cref="TextProvider"/> implementation; leverages the default internal resources.
+    /// Provides a null <see cref="TextProviderBase"/> implementation; the <see cref="GetTextForKey"/> will return the <see cref="LText.KeyAndOrText"/>.
     /// </summary>
-    public class DefaultTextProvider : TextProvider
+    public class NullTextProvider : TextProviderBase
     {
-        private static readonly ResourceManager _resourceManager = new ResourceManager("Beef.Strings.Resources", typeof(DefaultTextProvider).GetTypeInfo().Assembly);
-
         /// <summary>
         /// Gets the text for the passed <see cref="LText"/>.
         /// </summary>
         /// <param name="key">The <see cref="LText"/>.</param>
         /// <returns>The corresponding text where found; otherwise <c>null</c>.</returns>
-        protected override string GetTextForKey(LText key)
-        {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            return _resourceManager.GetString(key.KeyAndOrText, System.Globalization.CultureInfo.InvariantCulture);
-        }
+        protected override string GetTextForKey(LText key) => key?.KeyAndOrText ?? throw new ArgumentNullException(nameof(key));
     }
 }

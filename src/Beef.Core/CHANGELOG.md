@@ -2,9 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.13
+- *Enhancement:* The existing `TextProvider` has been split into a static `TextProvider` to provide `Current` instance, with abstract base class now being `TextProviderBase`. The `DefaultTextProvider` updated to inherit from this new abstract base class. `TextProvider.Current` will attempt to use explicit, then `ExecutionContext.GetService<TextProviderBase>(false)`, then use `DefaultTextProvider`. The following `IServiceCollection` extension methods has also been added: `AddBeefTextProviderSingleton` and `AddBeefTextProviderScoped` (allows different localization per request).
+
 ## v4.1.12
 - *Fixed:* The `EntityBasicBase.NotifyChangesWhenSameValue` should not be included within entity mappings, the `MapperIgnoreAttribute` has been added to the property to exclude/ignore.
-- *Enhancement:* Added a `GetProperies` to the `EntityReflector` to enable access to all properties.
+- *Enhancement:* Added a `GetProperties` to the `EntityReflector` to enable access to all properties.
 - *Enhancement:* Added a readonly `ValueType` property to `EventData` to get the `Type` of the underlying value.
 - *Enhancement:* Added a `TimerHostedServiceBase` to provide a timer-based `IHostedService` that is `ExecutionContext` and `ServiceProvider` enabled.
 - *Enhancement:* Added `CollectionResult` to act similar to `EntityCollectionResult` without the `EntityBase` constraint. New `IEntityCollectionResult<TColl, TEntity>` also added to enable.
@@ -12,7 +15,6 @@ Represents the **NuGet** versions.
 - *Enhancement:* Split timer-based flush from `CachePolicyManager` and moved into new `CachePolicyManagerServiceHost` (inherits from `TimerHostedServiceBase`). This now represents the background process to periodically flush the caches.
 - *Fixed:* The `!=` operator for `ReferenceDataBase` has been fixed to support nullable parameters.
 - *Enhancement:* Added `ReferenceDataBaseString` with an `Id` type of `string`.
-- *Enhancement:* Added `^(Namespace.Type.Property.Method().etc, AssemblyName)` runtime value lookup syntax to data YAML.
 
 ## v4.1.11
 - *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.
