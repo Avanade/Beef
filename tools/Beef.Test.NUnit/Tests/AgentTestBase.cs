@@ -178,7 +178,7 @@ namespace Beef.Test.NUnit.Tests
             {
                 foreach (var l in messages)
                 {
-                    TestContext.Out.WriteLine($"{l}");
+                    TesterBase.WriteTestContextLogMessage(l);
                 }
             }
 

@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.26
+- *Enhancement:* Added `DateTimeOffset` to the list of supported system and nullable types.
+- *Enhancement:* Added shorthand for a `Property.Type` where the `^` is the equivalent to `RefDataNamespace.`; e.g. `RefDataNamespace.Gender` can be replaced by `^Gender`. The XML to YAML conversion will replace with the shorthand where previously specified.
+- *Enhancement:* Added `OrgUnitImmutable` option for database. This will result in stored procedure code that will throw an `AuthorizationException` where the org unit is being changed from original value (where original is not null).
+
 ## v4.1.25
 - *Enhancement:* Added support for Database Event Outbox via new configuration and templates.
 - *Enhancement:* The `EventPublish` property changed from `bool` to string (values are `None`, `DataSvc` and `DataOutbox`.

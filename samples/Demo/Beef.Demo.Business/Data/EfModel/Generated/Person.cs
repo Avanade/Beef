@@ -87,6 +87,11 @@ namespace Beef.Demo.Business.Data.EfModel
         public string? EyeColorCode { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'MetadataJson' column value.
+        /// </summary>
+        public string? MetadataJson { get; set; }
+
+        /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
         /// </summary>
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
@@ -113,6 +118,7 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
                 entity.Property(p => p.UniqueCode).HasColumnType("NVARCHAR(20)");
                 entity.Property(p => p.EyeColorCode).HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.MetadataJson).HasColumnType("NVARCHAR(2048)");
                 AddToModel(entity);
             });
         }

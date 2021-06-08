@@ -26,7 +26,8 @@ AS
       [p].[CreatedBy],
       [p].[UpdatedBy],
       [p].[UniqueCode],
-      [p].[EyeColorCode]
+      [p].[EyeColorCode],
+      [p].[MetadataJson]
     FROM [Test].[Table] AS [t]
       INNER JOIN [Sec].[fnGetUserOrgUnits]() AS [orgunits] ON ([t].[OrgUnitId] = [orgunits].[OrgUnitId])
       INNER JOIN [Demo].[Person] AS [p] ON ([p].[PersonId] = [t].[TableId])

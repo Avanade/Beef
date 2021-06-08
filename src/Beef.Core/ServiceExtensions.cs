@@ -45,7 +45,7 @@ namespace Beef
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddScoped<IRequestCache>(sp => createRequestCache?.Invoke(sp) ?? new RequestCache());
+            return services.AddScoped(sp => createRequestCache?.Invoke(sp) ?? new RequestCache());
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Beef
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddScoped<ISystemTime>(sp => createSystemTime?.Invoke(sp) ?? new SystemTime());
+            return services.AddScoped(sp => createSystemTime?.Invoke(sp) ?? new SystemTime());
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Beef
         /// <param name="firstInterval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> before <see cref="CachePolicyManager.Flush"/> is invoked for the first time (defaults to <see cref="CachePolicyManager.TenMinutes"/>).</param>
         /// <param name="interval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> between subsequent invocations of <see cref="CachePolicyManager.Flush"/> (defaults to <see cref="CachePolicyManager.FiveMinutes"/>).</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        /// <remarks>The The <see cref="CachePolicyManager"/> enables the centralised management of <see cref="ICachePolicy"/> caches.</remarks>
+        /// <remarks>The <see cref="CachePolicyManager"/> enables the centralised management of <see cref="ICachePolicy"/> caches.</remarks>
         public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? firstInterval = null, TimeSpan? interval = null)
         {
             if (services == null)
@@ -88,24 +88,6 @@ namespace Beef
             });
 
             return services;
-        }
-
-        /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="createCachePolicyManager">The function to create the <see cref="IRequestCache"/> instance.</param>
-        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        /// <remarks>The <see cref="IRequestCache"/> enables the short-lived request caching; intended to reduce data chattiness within the context of a request scope.</remarks>
-        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, Func<IServiceProvider, CachePolicyManager> createCachePolicyManager)
-        {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            if (createCachePolicyManager == null)
-                throw new ArgumentNullException(nameof(createCachePolicyManager));
-
-            return services.AddScoped(sp => createCachePolicyManager(sp));
         }
 
         /// <summary>
@@ -160,6 +142,40 @@ namespace Beef
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddSingleton(_ => new WebApiAgentInvoker());
+        }
+
+        /// <summary>
+        /// Adds a singleton service to instantiate a new <see cref="TextProviderBase"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefTextProviderSingleton(this IServiceCollection services, Func<IServiceProvider, TextProviderBase> createTextProvider)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            if (createTextProvider == null)
+                throw new ArgumentNullException(nameof(createTextProvider));
+
+            return services.AddSingleton(sp => createTextProvider(sp));
+        }
+
+        /// <summary>
+        /// Adds a singleton service to instantiate a new <see cref="TextProviderBase"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefTextProviderScoped(this IServiceCollection services, Func<IServiceProvider, TextProviderBase> createTextProvider)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            if (createTextProvider == null)
+                throw new ArgumentNullException(nameof(createTextProvider));
+
+            return services.AddScoped(sp => createTextProvider(sp));
         }
     }
 }

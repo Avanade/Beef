@@ -26,6 +26,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Event", Title = "Provides the _Event_ configuration.")]
     [CategorySchema("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
+    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
@@ -355,6 +356,18 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
         public string? PathCdcPublisher { get; set; }
+
+        #endregion
+
+        #region Auth
+
+        /// <summary>
+        /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
+        /// </summary>
+        [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
+            Description = "This is only applicable for stored procedures.")]
+        public bool? OrgUnitImmutable { get; set; }
 
         #endregion
 

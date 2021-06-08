@@ -11,6 +11,8 @@ namespace Beef
     /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>An authorization error occurred; you are not permitted to perform this action.</i></remarks>
     public class AuthorizationException : Exception, IBusinessException
     {
+        private const string _message = "An authorization error occurred; you are not permitted to perform this action.";
+
         /// <summary>
         /// Get or sets the <see cref="ShouldBeLogged"/> value.
         /// </summary>
@@ -25,43 +27,28 @@ namespace Beef
         /// Initializes a new instance of the <see cref="AuthorizationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public AuthorizationException(string? message)
-            : base(message ?? new LText("Beef.AuthorizationException"))
-        {
-        }
+        public AuthorizationException(string? message) : base(message ?? new LText("Beef.AuthorizationException", _message)) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public AuthorizationException(string? message, Exception innerException)
-            : base(message ?? new LText("Beef.AuthorizationException"), innerException)
-        {
-        }
+        public AuthorizationException(string? message, Exception innerException) : base(message ?? new LText("Beef.AuthorizationException", message), innerException) { }
 
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.AuthorizationError"/>).
         /// </summary>
-        public ErrorType ErrorType
-        {
-            get { return ErrorType.AuthorizationError; }
-        }
+        public ErrorType ErrorType => ErrorType.AuthorizationError;
 
         /// <summary>
         /// Gets the corresponding <see cref="HttpStatusCode"/>.
         /// </summary>
-        public HttpStatusCode StatusCode
-        {
-            get { return HttpStatusCode.Forbidden; }
-        }
+        public HttpStatusCode StatusCode => HttpStatusCode.Forbidden;
 
         /// <summary>
         /// Indicates whether the <see cref="Exception"/> should be logged (returns the <see cref="ShouldExceptionBeLogged"/> value).
         /// </summary>
-        public bool ShouldBeLogged
-        {
-            get { return ShouldExceptionBeLogged; }
-        }
+        public bool ShouldBeLogged => ShouldExceptionBeLogged;
     }
 }

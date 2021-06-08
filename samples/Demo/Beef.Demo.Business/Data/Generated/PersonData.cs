@@ -419,6 +419,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.EyeColorSid, "EyeColorCode");
                 Property(s => s.Birthday);
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
+                Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
                 AddStandardProperties();
                 DbMapperCtor();
             }
@@ -443,6 +444,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Gender, d => d.GenderId).SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default!);
                 Property(s => s.EyeColorSid, d => d.EyeColorCode);
                 Property(s => s.Birthday, d => d.Birthday);
+                Property(s => s.Metadata, d => d.MetadataJson).SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
                 AddStandardProperties();
                 EfMapperCtor();
             }

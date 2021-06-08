@@ -229,6 +229,14 @@ tables:
         [PropertySchema("Auth", Title = "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).", IsImportant = true)]
         public string? Permission { get; set; }
 
+        /// <summary>
+        /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
+        /// </summary>
+        [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
+            Description = "Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.")]
+        public bool? OrgUnitImmutable { get; set; }
+
         #endregion
 
         #region Infer
@@ -472,6 +480,7 @@ tables:
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             EfModelName = DefaultWhereNull(EfModelName, () => Name);
+            OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);

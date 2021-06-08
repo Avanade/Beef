@@ -10,6 +10,7 @@ using Moq;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -137,7 +138,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18), Metadata = new Dictionary<string, string> { { "Key", "Value" } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
@@ -197,7 +198,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new PersonDetail { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new PersonDetail { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18), Metadata = new Dictionary<string, string> { { "Key", "Value" } } })
                 .Run(a => a.GetDetailAsync(1.ToGuid()));
         }
 
@@ -242,7 +243,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18), Metadata = new Dictionary<string, string> { { "Key", "Value" } } })
                 .Run(a => a.GetWithEfAsync(1.ToGuid()));
         }
 
@@ -421,7 +422,8 @@ namespace Beef.Demo.Test
                 LastName = "Gates",
                 GenderSid = "M",
                 Birthday = new DateTime(1955, 10, 28),
-                UniqueCode = "B7890"
+                UniqueCode = "B7890",
+                Metadata = new Dictionary<string, string> { { "Key", "Value" } }
             };
 
             // Create a person.
@@ -915,6 +917,7 @@ namespace Beef.Demo.Test
 
             p.FirstName = "Barry";
             p.Address = new Address { Street = "Simpsons Road", City = "Bardon" };
+            p.Metadata = new Dictionary<string, string> { { "PKEY", "PVAL" } };
 
             // Try patching the person with an invalid eTag.
             p = AgentTester.Test<PersonAgent, Person>()
@@ -923,7 +926,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogUpdated()
                 .ExpectValue(_ => p)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
-                    JToken.Parse("{ \"firstName\": \"Barry\", \"address\": { \"street\": \"Simpsons Road\", \"city\": \"Bardon\" } }"),
+                    JToken.Parse("{ \"firstName\": \"Barry\", \"address\": { \"street\": \"Simpsons Road\", \"city\": \"Bardon\" }, \"metadata\": { \"PKEY\": \"PVAL\" } }"),
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
             // Check the person was patched properly.

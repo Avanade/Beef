@@ -136,6 +136,10 @@ namespace Beef.Core.UnitTest.Json
             public List<ReferKeyData> Refers { get; set; }
             [JsonProperty("nonkeys")]
             public NonKeyDataCollection NonKeys { get; set; }
+            [JsonProperty("dict")]
+            public Dictionary<string, string> Dict { get; set; }
+            [JsonProperty("dict2")]
+            public Dictionary<int, string> Dict2 { get; set; }
 
             public override object Clone() => throw new NotImplementedException();
             public override bool IsInitial => throw new NotImplementedException();
@@ -634,7 +638,7 @@ namespace Beef.Core.UnitTest.Json
         [Test]
         public void Merge_XtremeLoadTest_1000()
         {
-            var text = "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, "
+            var text = "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, \"dict\": [ { \"k\": \"v\" }, { \"k2\": \"w2\" } ], "
                     + "\"values\": [ 1, 2, 4], \"sub\": { \"code\": \"abc\", \"text\": \"xyz\" }, \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, null, { } ], "
                     + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }";
 
@@ -697,6 +701,174 @@ namespace Beef.Core.UnitTest.Json
             Assert.IsNotNull(td.NonKeys[1]);
             Assert.AreEqual("abc", td.NonKeys[1].Code);
             Assert.AreEqual("uvw", td.NonKeys[1].Text);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Null()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": null }"), td));
+            Assert.IsNull(td.Dict);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Null2()
+        {
+            var td = new TestData();
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": null }"), td));
+            Assert.IsNull(td.Dict);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Empty()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ ] }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(0, td.Dict.Count);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Empty2()
+        {
+            var td = new TestData();
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ ] }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(0, td.Dict.Count);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": { \"k\": \"w\" } }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(1, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("k"));
+            Assert.AreEqual("w", td.Dict["k"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single2()
+        {
+            var td = new TestData();
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": { \"k\": \"w\" } }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(1, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("k"));
+            Assert.AreEqual("w", td.Dict["k"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single_NoChanges()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": { \"k\": \"v\" } }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(1, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("k"));
+            Assert.AreEqual("v", td.Dict["k"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single_Malformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": { \"k\": [ \"v\" ] } }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("dict", mi.Property);
+            Assert.AreEqual("The JSON token is malformed: Can not convert Array to String.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single_Malformed2()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": 123 }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("dict", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Single_Malformed3()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Dict2 = new Dictionary<int, string> { { 123, "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict2\": { \"k\": \"v\" } }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("dict2", mi.Property);
+            Assert.AreEqual("The JSON token is malformed: The value \"k\" is not of type \"System.Int32\" and cannot be used in this generic collection. (Parameter 'key')", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Multi()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" }, { "k2", "v2" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ { \"k\": \"v\" }, { \"k2\": \"w2\" } ] }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(2, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("k"));
+            Assert.AreEqual("v", td.Dict["k"]);
+            Assert.IsTrue(td.Dict.ContainsKey("k2"));
+            Assert.AreEqual("w2", td.Dict["k2"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Multi2()
+        {
+            var td = new TestData();
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ { \"k\": \"v\" }, { \"k2\": \"w2\" } ] }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(2, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("k"));
+            Assert.AreEqual("v", td.Dict["k"]);
+            Assert.IsTrue(td.Dict.ContainsKey("k2"));
+            Assert.AreEqual("w2", td.Dict["k2"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Multi3()
+        {
+            var td = new TestData { Dict = new Dictionary<string, string> { { "a", "aa" }, { "b", "bb" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ { \"b\": \"bb\" }, { \"a\": \"aa\" } ] }"), td));
+            Assert.NotNull(td.Dict);
+            Assert.AreEqual(2, td.Dict.Count);
+            Assert.IsTrue(td.Dict.ContainsKey("a"));
+            Assert.AreEqual("aa", td.Dict["a"]);
+            Assert.IsTrue(td.Dict.ContainsKey("b"));
+            Assert.AreEqual("bb", td.Dict["b"]);
+        }
+
+        [Test]
+        public void Merge_Property_Dict_Multi_Malformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Dict = new Dictionary<string, string> { { "k", "v" } } };
+
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"dict\": [ { \"k\": \"v\" }, 123 ] }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("dict", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
         }
     }
 }

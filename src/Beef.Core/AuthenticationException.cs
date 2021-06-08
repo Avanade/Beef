@@ -11,6 +11,8 @@ namespace Beef
     /// <remarks>The <see cref="Exception.Message"/> defaults to: <i>An authentication error occured; the credentials you provided are not valid.</i></remarks>
     public class AuthenticationException : Exception, IBusinessException
     {
+        private const string _message = "An authentication error occured; the credentials you provided are not valid.";
+
         /// <summary>
         /// Get or sets the <see cref="ShouldBeLogged"/> value.
         /// </summary>
@@ -25,16 +27,14 @@ namespace Beef
         /// Initializes a new instance of the <see cref="AuthenticationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public AuthenticationException(string? message)
-            : base(message ?? new LText("Beef.AuthenticationException")) { }
+        public AuthenticationException(string? message) : base(message ?? new LText("Beef.AuthenticationException", _message)) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public AuthenticationException(string? message, Exception innerException)
-            : base(message ?? new LText("Beef.AuthenticationException"), innerException) { }
+        public AuthenticationException(string? message, Exception innerException) : base(message ?? new LText("Beef.AuthenticationException", _message), innerException) { }
 
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.AuthenticationError"/>).

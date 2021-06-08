@@ -254,7 +254,7 @@ namespace Beef.Entities
         /// <returns>A deep copy of the <see cref="MessageItem"/>.</returns>
         public override object Clone()
         {
-            MessageItem clone = new MessageItem();
+            MessageItem clone = new();
             clone.CopyFrom(this);
             return clone;
         }
@@ -280,10 +280,7 @@ namespace Beef.Entities
         /// Returns the message <see cref="Text"/>.
         /// </summary>
         /// <returns>The message <see cref="Text"/>.</returns>
-        public override string? ToString()
-        {
-            return Text;
-        }
+        public override string? ToString() => Text;
 
         /// <summary>
         /// Sets the <see cref="Property"/> and returns <see cref="MessageItem"/> instance to enable fluent-style.
