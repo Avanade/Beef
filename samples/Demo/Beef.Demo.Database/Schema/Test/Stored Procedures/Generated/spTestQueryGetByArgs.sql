@@ -31,7 +31,8 @@ BEGIN
       [vtq].[CreatedBy],
       [vtq].[UpdatedBy],
       [vtq].[UniqueCode],
-      [vtq].[EyeColorCode]
+      [vtq].[EyeColorCode],
+      [vtq].[MetadataJson]
     FROM [Test].[vwTestQuery] AS [vtq]
     WHERE (@Name IS NULL OR [vtq].[Name] LIKE @Name)
 END

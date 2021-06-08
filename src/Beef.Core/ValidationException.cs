@@ -15,7 +15,7 @@ namespace Beef
     {
         private const string _key = "Beef.ValidationException";
         private const string _message = "A data validation error occurred.";
-        private readonly List<MessageItem> _messages = new();
+        private readonly MessageItemCollection _messages = new();
 
         /// <summary>
         /// Get or sets the <see cref="ShouldBeLogged"/> value.
@@ -87,7 +87,7 @@ namespace Beef
         /// <summary>
         /// Gets the underlying messages.
         /// </summary>
-        public IEnumerable<MessageItem> Messages => _messages;
+        public MessageItemCollection Messages => _messages;
 
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.ValidationError"/>).

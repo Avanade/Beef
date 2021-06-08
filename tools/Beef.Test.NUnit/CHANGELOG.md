@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.10
+- *Enhancement:* Adjusted the formatting of the logger output to indent second and subsequent lines.
+
 ## v4.1.9
 - *Fixed:* The `AgentTesterWaf` was not correctly applying the test configuration (`AgentTester.BuildConfiguration<TStartup>`) which excluded any test specific configurations. 
 - *Fixed:* The `ValidationTester` was not failing where an error occured and the error was not expected.

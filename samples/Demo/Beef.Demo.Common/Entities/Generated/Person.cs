@@ -36,6 +36,7 @@ namespace Beef.Demo.Common.Entities
         private DateTime _birthday;
         private Address? _address;
         private string? _etag;
+        private Dictionary<string,string>? _metadata;
         private ChangeLog? _changeLog;
 
         #endregion
@@ -177,6 +178,17 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
+        /// Gets or sets the Metadata.
+        /// </summary>
+        [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Metadata")]
+        public Dictionary<string,string>? Metadata
+        {
+            get => _metadata;
+            set => SetValue(ref _metadata, value, false, false, nameof(Metadata));
+        }
+
+        /// <summary>
         /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -282,6 +294,7 @@ namespace Beef.Demo.Common.Entities
                 && Equals(Birthday, value.Birthday)
                 && Equals(Address, value.Address)
                 && Equals(ETag, value.ETag)
+                && Equals(Metadata, value.Metadata)
                 && Equals(ChangeLog, value.ChangeLog);
         }
 
@@ -317,6 +330,7 @@ namespace Beef.Demo.Common.Entities
             hash.Add(Birthday);
             hash.Add(Address);
             hash.Add(ETag);
+            hash.Add(Metadata);
             hash.Add(ChangeLog);
             return base.GetHashCode() ^ hash.ToHashCode();
         }
@@ -354,6 +368,7 @@ namespace Beef.Demo.Common.Entities
             Birthday = from.Birthday;
             Address = CopyOrClone(from.Address, Address);
             ETag = from.ETag;
+            Metadata = from.Metadata;
             ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
 
             OnAfterCopyFrom(from);
@@ -393,6 +408,7 @@ namespace Beef.Demo.Common.Entities
             Birthday = Cleaner.Clean(Birthday, DateTimeTransform.DateOnly);
             Address = Cleaner.Clean(Address);
             ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
+            Metadata = Cleaner.Clean(Metadata);
             ChangeLog = Cleaner.Clean(ChangeLog);
 
             OnAfterCleanUp();
@@ -415,6 +431,7 @@ namespace Beef.Demo.Common.Entities
                     && Cleaner.IsInitial(Birthday)
                     && Cleaner.IsInitial(Address)
                     && Cleaner.IsInitial(ETag)
+                    && Cleaner.IsInitial(Metadata)
                     && Cleaner.IsInitial(ChangeLog);
             }
         }

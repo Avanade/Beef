@@ -10,6 +10,7 @@ CREATE PROCEDURE [Demo].[spPersonCreate]
   @CreatedDate AS DATETIME2 NULL = NULL,
   @UniqueCode AS NVARCHAR(20) NULL = NULL,
   @EyeColorCode AS NVARCHAR(50) NULL = NULL,
+  @MetadataJson AS NVARCHAR(2048) NULL = NULL,
   @ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -40,7 +41,8 @@ BEGIN
       [CreatedBy],
       [CreatedDate],
       [UniqueCode],
-      [EyeColorCode]
+      [EyeColorCode],
+      [MetadataJson]
     )
     OUTPUT inserted.PersonId INTO @InsertedIdentity
     VALUES (
@@ -53,7 +55,8 @@ BEGIN
       @CreatedBy,
       @CreatedDate,
       @UniqueCode,
-      @EyeColorCode
+      @EyeColorCode,
+      @MetadataJson
     )
 
     -- Get the inserted identity.

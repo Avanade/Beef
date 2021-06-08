@@ -11,6 +11,7 @@ CREATE PROCEDURE [Demo].[spPersonUpdateDetail]
   @UpdatedDate AS DATETIME2 NULL = NULL,
   @UniqueCode AS NVARCHAR(20) NULL = NULL,
   @EyeColorCode AS NVARCHAR(50) NULL = NULL,
+  @MetadataJson AS NVARCHAR(2048) NULL = NULL,
   @WorkHistoryList AS [Demo].[udtWorkHistoryList] READONLY,
   @ReselectRecord AS BIT = 0
 AS
@@ -54,7 +55,8 @@ BEGIN
         [p].[UpdatedBy] = @UpdatedBy,
         [p].[UpdatedDate] = @UpdatedDate,
         [p].[UniqueCode] = @UniqueCode,
-        [p].[EyeColorCode] = @EyeColorCode
+        [p].[EyeColorCode] = @EyeColorCode,
+        [p].[MetadataJson] = @MetadataJson
       FROM [Demo].[Person] AS [p]
       WHERE [p].[PersonId] = @PersonId
 

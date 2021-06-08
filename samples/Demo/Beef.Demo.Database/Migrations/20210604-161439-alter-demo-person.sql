@@ -1,0 +1,8 @@
+-- Migration Script
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Demo].[Person]
+  ADD MetadataJson NVARCHAR(2048) NULL
+	
+COMMIT TRANSACTION

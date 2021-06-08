@@ -3,6 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v4.1.13
+- *Fixed:* Issue [131](https://github.com/Avanade/Beef/issues/131). `ComplexTypeReflector` and `JsonEntityMerge` updated to support properties of Type `IDictionary<TKey,TValue>`. FYI: underlying dictionary order is important for `JsonEntityMerge` to determine whether changes made; not just whether same keys and values. A dictionary is treated like an array on merge, it is a full replacement operation only.
 - *Enhancement:* The existing `TextProvider` has been split into a static `TextProvider` to provide `Current` instance, with abstract base class now being `TextProviderBase`. The `DefaultTextProvider` updated to inherit from this new abstract base class. `TextProvider.Current` will attempt to use explicit, then `ExecutionContext.GetService<TextProviderBase>(false)`, then use `DefaultTextProvider`. The following `IServiceCollection` extension methods has also been added: `AddBeefTextProviderSingleton` and `AddBeefTextProviderScoped` (allows different localization per request).
 
 ## v4.1.12

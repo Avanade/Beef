@@ -32,7 +32,12 @@ namespace Beef.Reflection
         /// <summary>
         /// Is an <see cref="System.Collections.IEnumerable"/>.
         /// </summary>
-        IEnumerable
+        IEnumerable,
+
+        /// <summary>
+        /// Is an <see cref="System.Collections.IDictionary"/>.
+        /// </summary>
+        IDictionary
 #pragma warning restore CA1720 // Identifier contains type name
     }
 
@@ -41,6 +46,8 @@ namespace Beef.Reflection
     /// </summary>
     public class ComplexTypeReflector
     {
+        private IInternalEqualityComparer? _equalityComparer;
+
         /// <summary>
         /// Private constructor.
         /// </summary>
@@ -69,6 +76,16 @@ namespace Beef.Reflection
         /// Indicates whether the <see cref="ItemType"/> is considered a complex type.
         /// </summary>
         public bool IsItemComplexType { get; private set; }
+
+        /// <summary>
+        /// Gets the key <see cref="Type"/> where the <see cref="ComplexTypeCode"/> is <see cref="ComplexTypeCode.IDictionary"/>.
+        /// </summary>
+        public Type? DictKeyType { get; private set; }
+
+        /// <summary>
+        /// Gets the value <see cref="Type"/> where the <see cref="ComplexTypeCode"/> is <see cref="ComplexTypeCode.IDictionary"/>.
+        /// </summary>
+        public Type? DictValueType { get; private set; }
 
         /// <summary>
         /// Indicates whether the <see cref="ComplexTypeCode"/> is a collection of some description.
@@ -101,31 +118,42 @@ namespace Beef.Reflection
             {
                 if (pi.PropertyType.GetInterfaces().Any(x => x == typeof(IEnumerable)))
                 {
-                    var t = GetCollectionType(pi.PropertyType);
-                    if (t != null)
+                    var ts = GetDictionaryType(pi.PropertyType);
+                    if (ts.Item1 != null)
                     {
-                        ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
-                        ctr.ItemType = t;
-                        ctr.AddMethod = pi.PropertyType.GetMethod("Add", new Type[] { t });
-                        if (ctr.AddMethod == null)
-                            throw new ArgumentException($"Type '{pi.DeclaringType.Name}' Property '{pi.Name}' is an ICollection<> however no Add method could be found.", nameof(pi));
+                        ctr.ComplexTypeCode = ComplexTypeCode.IDictionary;
+                        ctr.DictKeyType = ts.Item1!;
+                        ctr.DictValueType = ts.Item2!;
+                        ctr.ItemType = typeof(KeyValuePair<,>).MakeGenericType(ctr.DictKeyType, ctr.DictValueType);
                     }
                     else
-                    {
-                        t = GetEnumerableType(pi.PropertyType);
+                    { 
+                        var t = GetCollectionType(pi.PropertyType);
                         if (t != null)
                         {
-                            ctr.ComplexTypeCode = ComplexTypeCode.IEnumerable;
+                            ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
                             ctr.ItemType = t;
+                            ctr.AddMethod = pi.PropertyType.GetMethod("Add", new Type[] { t });
+                            if (ctr.AddMethod == null)
+                                throw new ArgumentException($"Type '{pi.DeclaringType.Name}' Property '{pi.Name}' is an ICollection<> however no Add method could be found.", nameof(pi));
                         }
                         else
                         {
-                            var result = GetEnumerableTypeFromAdd(pi.PropertyType);
-                            if (result.ItemType != null)
+                            t = GetEnumerableType(pi.PropertyType);
+                            if (t != null)
                             {
-                                ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
-                                ctr.ItemType = result.ItemType;
-                                ctr.AddMethod = result.AddMethod;
+                                ctr.ComplexTypeCode = ComplexTypeCode.IEnumerable;
+                                ctr.ItemType = t;
+                            }
+                            else
+                            {
+                                var result = GetEnumerableTypeFromAdd(pi.PropertyType);
+                                if (result.ItemType != null)
+                                {
+                                    ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
+                                    ctr.ItemType = result.ItemType;
+                                    ctr.AddMethod = result.AddMethod;
+                                }
                             }
                         }
                     }
@@ -135,6 +163,7 @@ namespace Beef.Reflection
             if (ctr.ItemType != null)
                 ctr.IsItemComplexType = !(ctr.ItemType == typeof(string) || ctr.ItemType.IsPrimitive || ctr.ItemType.IsValueType);
 
+            ctr._equalityComparer = (IInternalEqualityComparer)Activator.CreateInstance(typeof(InternalEqualityComparer<>).MakeGenericType(ctr.ItemType));
             return ctr;
         }
 
@@ -203,6 +232,24 @@ namespace Beef.Reflection
         }
 
         /// <summary>
+        /// Gets the underlying IDictionary Type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static (Type?, Type?) GetDictionaryType(Type type)
+        {
+            var t = type.GetInterfaces().FirstOrDefault(x => (x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>)));
+            if (t == null)
+                return (null, null);
+
+            var gas = t.GetGenericArguments();
+            if (gas.Length != 2)
+                return (null, null);
+
+            return (gas[0], gas[1]);
+        }
+
+        /// <summary>
         /// Gets the underlying IEnumerable Type by inferring from the Add method.
         /// </summary>
         private static (Type? ItemType, MethodInfo? AddMethod) GetEnumerableTypeFromAdd(Type type)
@@ -237,6 +284,7 @@ namespace Beef.Reflection
             switch (ComplexTypeCode)
             {
                 case ComplexTypeCode.ICollection:
+                case ComplexTypeCode.IDictionary:
                 case ComplexTypeCode.Object:
                     return Activator.CreateInstance(PropertyInfo.PropertyType);
 
@@ -270,6 +318,9 @@ namespace Beef.Reflection
                     var c = Activator.CreateInstance(PropertyInfo.PropertyType);
                     AddMethod!.Invoke(c, new object[] { value });
                     return c;
+
+                case ComplexTypeCode.IDictionary:
+                    return value;
             }
 
             return null;
@@ -299,6 +350,9 @@ namespace Beef.Reflection
                     case ComplexTypeCode.ICollection:
                         c = Activator.CreateInstance(PropertyInfo.PropertyType);
                         break;
+
+                    case ComplexTypeCode.IDictionary:
+                        return value;
                 }
             }
 
@@ -335,10 +389,7 @@ namespace Beef.Reflection
         /// Creates an instance of the item value.
         /// </summary>
         /// <returns>An instance of the item value.</returns>
-        public object CreateItemValue()
-        {
-            return Activator.CreateInstance(ItemType);
-        }
+        public object CreateItemValue() => Activator.CreateInstance(ItemType);
 
         /// <summary>
         /// Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
@@ -379,6 +430,14 @@ namespace Beef.Reflection
                         return false;
 
                     break;
+
+                case ComplexTypeCode.IDictionary:
+                    var dl = (IDictionary)left!;
+                    var dr = (IDictionary)right!;
+                    if (dl.Count != dr.Count)
+                        return false;
+
+                    break;
             }
 
             // Inspired by: https://referencesource.microsoft.com/#System.Core/System/Linq/Enumerable.cs,9bdd6ef7ba6a5615
@@ -387,12 +446,28 @@ namespace Beef.Reflection
             {
                 while (el.MoveNext())
                 {
-                    if (!(er.MoveNext() && Comparer.Default.Compare(el.Current, er.Current) == 0)) return false;
+                    if (!(er.MoveNext() && _equalityComparer!.IsEqual(el.Current, er.Current))) return false;
                 }
                 if (er.MoveNext()) return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Enables a non-generics equality comparer.
+        /// </summary>
+        private interface IInternalEqualityComparer
+        {
+            bool IsEqual(object x, object y);
+        }
+
+        /// <summary>
+        /// Provides the non-generics equality generic comparer; leveraging the generics comparer within.
+        /// </summary>
+        private class InternalEqualityComparer<T> : IInternalEqualityComparer
+        {
+            public bool IsEqual(object x, object y) => EqualityComparer<T>.Default.Equals((T)x, (T)y);
         }
     }
 }

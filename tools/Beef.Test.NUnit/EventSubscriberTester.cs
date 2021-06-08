@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -369,7 +370,7 @@ namespace Beef.Test.NUnit
             {
                 foreach (var l in messages)
                 {
-                    TestContext.Out.WriteLine($"{l}");
+                    WriteTestContextLogMessage(l);
                 }
             }
         }
