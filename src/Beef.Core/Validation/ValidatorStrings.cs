@@ -145,5 +145,23 @@ namespace Beef.Validation
         /// </summary>
         /// <remarks>Defaults to: <i>{0} contains invalid or non-supported wildcard selection.</i></remarks>
         public static readonly LText WildcardFormat = new LText("Beef.WildcardFormat");
+
+        /// <summary>
+        /// Gets the format string for the collection null item error message.
+        /// </summary>
+        /// <remarks>Defaults to: <i>{0} contains one or more items that are not specified.</i></remarks>
+        public static readonly LText CollectionNullItemFormat = new LText("Beef.CollectionNullItemFormat");
+
+        /// <summary>
+        /// Gets the format string for the dictionary null key error message.
+        /// </summary>
+        /// <remarks>Defaults to: <i>{0} contains one or more keys that are not specified.</i></remarks>
+        public static readonly LText DictionaryNullKeyFormat = new LText("Beef.DictionaryNullKeyFormat");
+
+        /// <summary>
+        /// Gets the format string for the dictionary null value error message.
+        /// </summary>
+        /// <remarks>Defaults to: <i>{0} contains one or more values that are not specified.</i></remarks>
+        public static readonly LText DictionaryNullValueFormat = new LText("Beef.DictionaryNullValueFormat");
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Beef.Caching.Policy
 {
@@ -19,6 +20,10 @@ namespace Beef.Caching.Policy
         private ICachePolicy _defaultPolicy = new NoExpiryCachePolicy();
         private readonly ConcurrentDictionary<string, ICachePolicy> _policies = new();
         private readonly ConcurrentDictionary<string, ICacheCore> _registered = new();
+        private readonly object _lock = new();
+        private Timer? _timer;
+        private ILogger? _logger;
+        private TimeSpan _period;
         private bool _disposed;
 
         /// <summary>
@@ -163,16 +168,73 @@ namespace Beef.Caching.Policy
         public void SetFromCachePolicyConfig(CachePolicyConfig config) => CachePolicyConfig.SetCachePolicyManager(this, config);
 
         /// <summary>
+        /// Starts the timer to manage the frequency in which expired caches will be flushed (see <see cref="CacheCoreBase.OnFlushCache"/>).
+        /// </summary>
+        /// <param name="dueTime">The amount of time to delay before <see cref="Flush"/> is invoked for the first time.</param>
+        /// <param name="period">The time interval between subsequent invocations of <see cref="Flush"/>.</param>
+        /// <param name="logger">The <see cref="ILogger{CachePolicyManager}"/>.</param>
+        /// <remarks>This can only be started once; use <see cref="StopFlushTimer"/> to restart.</remarks>
+        public void StartFlushTimer(TimeSpan dueTime, TimeSpan period, ILogger<CachePolicyManager>? logger)
+        {
+            lock (_lock)
+            {
+                if (_timer != null)
+                    return;
+
+                _period = period;
+                _logger = logger;
+                _logger?.LogDebug($"{nameof(CachePolicyManager)} flush timer started. Timer first/interval {dueTime}/{period}.");
+                _timer = new Timer(TimerElapsed, null, dueTime, period);
+            }
+        }
+
+        /// <summary>
+        /// Timer has elapsed so the cache should be flushed.
+        /// </summary>
+        private void TimerElapsed(Object stateInfo)
+        {
+            lock (_lock)
+            {
+                _logger?.LogTrace($"{nameof(CachePolicyManager)} flush triggered by timer.");
+                _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+
+            Flush();
+
+            lock (_lock)
+            {
+                if (_timer != null)
+                {
+                    _logger?.LogTrace($"{nameof(CachePolicyManager)} execution completed. Retry in {_period}.");
+                    _timer.Change(_period, _period);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stops the timer managing the frequency in which expired caches will be flushed.
+        /// </summary>
+        public void StopFlushTimer()
+        {
+            lock (_lock)
+            {
+                _logger?.LogDebug($"{nameof(CachePolicyManager)} flush timer stopped.");
+                _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+                _timer = null;
+            }
+        }
+
+        /// <summary>
         /// Flushes all registered (see <see cref="Register(ICacheCore, string)"/>) caches where they have expired (see <see cref="ICachePolicy.IsExpired"/>).
         /// </summary>
         /// <param name="logger">Optional <see cref="ILogger"/> to log debug messages where flushing underlying cache.</param>
-        public void Flush(ILogger? logger = null) => EnactFlush(false, logger);
+        public void Flush(ILogger? logger = null) => EnactFlush(false, logger ?? _logger);
 
         /// <summary>
         /// Flushes all registered (see <see cref="Register(ICacheCore, string)"/>) caches regardless of expiry (see <see cref="ICachePolicy.IsExpired"/>).
         /// </summary>
         /// <param name="logger">Optional <see cref="ILogger"/> to log debug messages where flushing underlying cache.</param>
-        public void ForceFlush(ILogger? logger = null) => EnactFlush(true, logger);
+        public void ForceFlush(ILogger? logger = null) => EnactFlush(true, logger ?? _logger);
 
         /// <summary>
         /// Enacts the requested flush.
@@ -188,7 +250,7 @@ namespace Beef.Caching.Policy
                     cache.Value.Flush(ignoreExpiry);
 
                     if (policy.Hits > 0 && logger != null)
-                        logger.LogDebug($"CachePolicyManager Flush '{cache.Key}' {(ignoreExpiry ? "was forced" : "has expired")} (Hits: {policy.Hits}).");
+                        logger?.LogDebug($"nameof(CachePolicyManager) flush '{cache.Key}' {(ignoreExpiry ? "was forced" : "has expired")} (Hits: {policy.Hits}).");
                 }
             }
         }

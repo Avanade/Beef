@@ -9,6 +9,7 @@ using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 
 namespace Beef
 {
@@ -69,9 +70,10 @@ namespace Beef
         /// <param name="config">The optional <see cref="CachePolicyConfig"/>.</param>
         /// <param name="firstInterval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> before <see cref="CachePolicyManager.Flush"/> is invoked for the first time (defaults to <see cref="CachePolicyManager.TenMinutes"/>).</param>
         /// <param name="interval">The optional <see cref="CachePolicyManagerServiceHost"/> <see cref="TimerHostedServiceBase.FirstInterval"/> between subsequent invocations of <see cref="CachePolicyManager.Flush"/> (defaults to <see cref="CachePolicyManager.FiveMinutes"/>).</param>
+        /// <param name="useCachePolicyManagerTimer">Indicates whether the <see cref="CachePolicyManager.StartFlushTimer(TimeSpan, TimeSpan, ILogger{CachePolicyManager}?)"/> should be used; versus, being managed via <c>"IServiceCollection.AddHostedService"</c> <see cref="CachePolicyManagerServiceHost"/> (default).</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
         /// <remarks>The <see cref="CachePolicyManager"/> enables the centralised management of <see cref="ICachePolicy"/> caches.</remarks>
-        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? firstInterval = null, TimeSpan? interval = null)
+        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? firstInterval = null, TimeSpan? interval = null, bool useCachePolicyManagerTimer = false)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -80,12 +82,17 @@ namespace Beef
             if (config != null)
                 cpm.SetFromCachePolicyConfig(config);
 
-            services.AddSingleton(_ => cpm);
-            services.AddHostedService(sp => new CachePolicyManagerServiceHost(cpm, sp, sp.GetService<ILogger<CachePolicyManager>>())
+            firstInterval ??= CachePolicyManager.TenMinutes;
+            interval ??= CachePolicyManager.FiveMinutes;
+
+            services.AddSingleton(sp =>
             {
-                FirstInterval = firstInterval ?? CachePolicyManager.TenMinutes,
-                Interval = interval ?? CachePolicyManager.FiveMinutes
+                cpm.StartFlushTimer(firstInterval.Value, interval.Value, sp.GetService<ILogger<CachePolicyManager>>());
+                return cpm;
             });
+
+            if (!useCachePolicyManagerTimer)
+                services.AddHostedService(sp => new CachePolicyManagerServiceHost(cpm, sp, sp.GetService<ILogger<CachePolicyManager>>()) { FirstInterval = firstInterval, Interval = interval.Value });
 
             return services;
         }

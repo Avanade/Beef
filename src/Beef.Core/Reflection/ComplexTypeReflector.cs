@@ -47,6 +47,7 @@ namespace Beef.Reflection
     public class ComplexTypeReflector
     {
         private IInternalEqualityComparer? _equalityComparer;
+        private IDictKeyValuePair? _dictKeyValuePair;
 
         /// <summary>
         /// Private constructor.
@@ -78,14 +79,14 @@ namespace Beef.Reflection
         public bool IsItemComplexType { get; private set; }
 
         /// <summary>
+        /// Gets the KeyValuePair <see cref="Type"/> where the <see cref="ComplexTypeCode"/> is <see cref="ComplexTypeCode.IDictionary"/>.
+        /// </summary>
+        public Type? DictKeyValuePairType { get; private set; }
+
+        /// <summary>
         /// Gets the key <see cref="Type"/> where the <see cref="ComplexTypeCode"/> is <see cref="ComplexTypeCode.IDictionary"/>.
         /// </summary>
         public Type? DictKeyType { get; private set; }
-
-        /// <summary>
-        /// Gets the value <see cref="Type"/> where the <see cref="ComplexTypeCode"/> is <see cref="ComplexTypeCode.IDictionary"/>.
-        /// </summary>
-        public Type? DictValueType { get; private set; }
 
         /// <summary>
         /// Indicates whether the <see cref="ComplexTypeCode"/> is a collection of some description.
@@ -122,9 +123,10 @@ namespace Beef.Reflection
                     if (ts.Item1 != null)
                     {
                         ctr.ComplexTypeCode = ComplexTypeCode.IDictionary;
+                        ctr.DictKeyValuePairType = typeof(KeyValuePair<,>).MakeGenericType(ts.Item1, ts.Item2);
+                        ctr._dictKeyValuePair = (IDictKeyValuePair)Activator.CreateInstance(typeof(DictKeyValuePair<,>).MakeGenericType(ts.Item1, ts.Item2));
                         ctr.DictKeyType = ts.Item1!;
-                        ctr.DictValueType = ts.Item2!;
-                        ctr.ItemType = typeof(KeyValuePair<,>).MakeGenericType(ctr.DictKeyType, ctr.DictValueType);
+                        ctr.ItemType = ts.Item2!;
                     }
                     else
                     { 
@@ -163,7 +165,7 @@ namespace Beef.Reflection
             if (ctr.ItemType != null)
                 ctr.IsItemComplexType = !(ctr.ItemType == typeof(string) || ctr.ItemType.IsPrimitive || ctr.ItemType.IsValueType);
 
-            ctr._equalityComparer = (IInternalEqualityComparer)Activator.CreateInstance(typeof(InternalEqualityComparer<>).MakeGenericType(ctr.ItemType));
+            ctr._equalityComparer = (IInternalEqualityComparer)Activator.CreateInstance(typeof(InternalEqualityComparer<>).MakeGenericType(ctr.ComplexTypeCode == ComplexTypeCode.IDictionary ? ctr.DictKeyValuePairType : ctr.ItemType));
             return ctr;
         }
 
@@ -180,6 +182,10 @@ namespace Beef.Reflection
 
             if (type.IsArray)
                 return type.GetElementType();
+
+            var dt = GetDictionaryType(type);
+            if (dt.Item2 != null)
+                return dt.Item2;
 
             var t = GetCollectionType(type);
             if (t != null)
@@ -236,7 +242,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static (Type?, Type?) GetDictionaryType(Type type)
+        internal static (Type?, Type?) GetDictionaryType(Type type)
         {
             var t = type.GetInterfaces().FirstOrDefault(x => (x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>)));
             if (t == null)
@@ -263,6 +269,13 @@ namespace Beef.Reflection
         }
 
         /// <summary>
+        /// Gets the key and value from the <see cref="KeyValuePair{TKey, TValue}"/>.
+        /// </summary>
+        /// <param name="kvp">The <see cref="KeyValuePair{TKey, TValue}"/>.</param>
+        /// <returns>The key and value.</returns>
+        public (object Key, object Value) GetDictKeyAndValue(object kvp) => (_dictKeyValuePair ?? throw new InvalidOperationException("This method can only be used where the Type is an IDictionary.")).GetKeyAndValue(kvp);
+
+        /// <summary>
         /// Sets the property value.
         /// </summary>
         /// <param name="objValue">The object whose property value will be set.</param>
@@ -281,16 +294,11 @@ namespace Beef.Reflection
         /// <returns>The property value.</returns>
         public object CreateValue()
         {
-            switch (ComplexTypeCode)
+            return ComplexTypeCode switch
             {
-                case ComplexTypeCode.ICollection:
-                case ComplexTypeCode.IDictionary:
-                case ComplexTypeCode.Object:
-                    return Activator.CreateInstance(PropertyInfo.PropertyType);
-
-                default:
-                    return Array.CreateInstance(ItemType, 0);
-            }
+                ComplexTypeCode.ICollection or ComplexTypeCode.IDictionary or ComplexTypeCode.Object => Activator.CreateInstance(PropertyInfo.PropertyType),
+                _ => Array.CreateInstance(ItemType, 0),
+            };
         }
 
         /// <summary>
@@ -303,8 +311,8 @@ namespace Beef.Reflection
             if (value == null)
                 return null;
 
-            if (value is IEnumerable)
-                return CreateValue((IEnumerable)value);
+            if (value is IEnumerable enumerable)
+                return CreateValue(enumerable);
 
             switch (ComplexTypeCode)
             {
@@ -416,11 +424,8 @@ namespace Beef.Reflection
                 case ComplexTypeCode.Array:
                     var al = (Array)left!;
                     var ar = (Array)right!;
-#pragma warning disable CA1062 // Validate arguments of public methods; by-design, above logic will ensure they are not null.
                     if (al.Length != ar.Length)
                         return false;
-#pragma warning restore CA1062 
-
                     break;
 
                 case ComplexTypeCode.ICollection:
@@ -468,6 +473,20 @@ namespace Beef.Reflection
         private class InternalEqualityComparer<T> : IInternalEqualityComparer
         {
             public bool IsEqual(object x, object y) => EqualityComparer<T>.Default.Equals((T)x, (T)y);
+        }
+
+        private interface IDictKeyValuePair
+        {
+            (object Key, object Value) GetKeyAndValue(object kvp);
+        }
+
+        private class DictKeyValuePair<TKey, TValue> : IDictKeyValuePair
+        {
+            public (object Key, object Value) GetKeyAndValue(object kvp)
+            {
+                var tkvp = (KeyValuePair<TKey, TValue>)kvp;
+                return (tkvp.Key!, tkvp.Value!);
+            }
         }
     }
 }

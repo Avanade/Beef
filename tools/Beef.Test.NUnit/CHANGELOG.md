@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.11
+- *Enhancement:* Added `Test` method to `EventSubscriberTester` to reset the internal state so the instance can be reused for a new test execution.
+
 ## v4.1.10
 - *Enhancement:* Adjusted the formatting of the logger output to indent second and subsequent lines.
 

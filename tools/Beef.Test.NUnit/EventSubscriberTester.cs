@@ -11,7 +11,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -79,7 +78,22 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets the unique correlation identifier that is sent via the event to the subscriber.
         /// </summary>
-        public string CorrelationId { get; } = Guid.NewGuid().ToString();
+        public string CorrelationId { get; private set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Sets (resets) the internal state for a new test.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberTester{TStartup}"/> instance to support fluent/chaining usage.</returns>
+        public EventSubscriberTester<TStartup> Test()
+        {
+            CorrelationId = Guid.NewGuid().ToString();
+            _expectedStatus = SubscriberStatus.Success;
+            _expectedExceptionMessage = null;
+            _expectedPublished.Clear();
+            _expectedNonePublished = false;
+            _ignoreEventMismatch = false;
+            return this;
+        }
 
         /// <summary>
         /// Verifies that the subscriber result has the specified <paramref name="status"/>.

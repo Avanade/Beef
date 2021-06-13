@@ -67,10 +67,10 @@ namespace Beef.RefData
 
         #endregion
 
-        private static readonly object _lock = new object();
-        private static readonly Dictionary<Type, ReferenceDataIdTypeCode> _typeCodeDict = new Dictionary<Type, ReferenceDataIdTypeCode>();
+        private static readonly object _lock = new();
+        private static readonly Dictionary<Type, ReferenceDataIdTypeCode> _typeCodeDict = new();
 
-        private RefDataKey _key = new RefDataKey(null, null);
+        private RefDataKey _key = new(null, null);
         private bool _hasIdBeenUpdated = false;
         private string? _text;
         private string? _description;
@@ -340,7 +340,12 @@ namespace Beef.RefData
         /// <summary>
         /// Overrides the standard <see cref="IsValid"/> check and flags the <see cref="ReferenceDataBase"/> as <b>Invalid</b>.
         /// </summary>
-        public void SetInvalid() => _isInvalid = true;
+        /// <remarks>Will result in <see cref="IsActive"/> set to <c>false</c>.</remarks>
+        public void SetInvalid()
+        {
+            _isInvalid = true;
+            _isActive = false;
+        }
 
         /// <summary>
         /// Sets the mapping <paramref name="value"/> for the specified <paramref name="name"/>.
@@ -583,7 +588,6 @@ namespace Beef.RefData
             return !(a == b);
         }
 
-#pragma warning disable CA2225 // Operator overloads have named alternates; by-design for casting, the developer should use properties etc. in this scenario versus proposed methods.
         /// <summary>
         /// An implicit cast from the <see cref="ReferenceDataBase"/> to an <see cref="int"/> value.
         /// </summary>
@@ -635,7 +639,6 @@ namespace Beef.RefData
             else
                 return (value.Id != null && value.Id is Guid id) ? id : Guid.Empty;
         }
-#pragma warning restore CA2225
 
         /// <summary>
         /// An implicit cast from the <see cref="ReferenceDataBase"/> to a <see cref="string"/> value.
@@ -760,7 +763,6 @@ namespace Beef.RefData
 
         #region IConvertible
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, does not need to be called.
         /// <summary>
         /// Gets the <see cref="TypeCode"/> being <see cref="TypeCode.Object"/>.
         /// </summary>
@@ -886,7 +888,6 @@ namespace Beef.RefData
         /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
         ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException();
 
-#pragma warning restore CA1033
 
         #endregion
 

@@ -84,7 +84,7 @@ namespace Beef.Json
         /// </summary>
         private class UniqueKeyConfig
         {
-            private readonly object _lock = new object();
+            private readonly object _lock = new();
             private IPropertyReflector[]? propertyReflectors = null;
 
             public UniqueKeyConfig(bool isEntityBaseCollection, string[] properties)
@@ -138,7 +138,7 @@ namespace Beef.Json
             }
         }
 
-        private static readonly EntityReflectorArgs _erArgs = new EntityReflectorArgs()
+        private static readonly EntityReflectorArgs _erArgs = new()
         {
             AutoPopulateProperties = true,
             NameComparer = StringComparer.OrdinalIgnoreCase,
@@ -326,7 +326,7 @@ namespace Beef.Json
                     var ivp = (JProperty)iv;
                     try
                     {
-                        dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.DictValueType!)!);
+                        dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.ItemType!)!);
                     }
                     catch (Exception ex)
                     {
@@ -339,7 +339,7 @@ namespace Beef.Json
                 var ivp = (JProperty)jp.Value.First;
                 try
                 {
-                    dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.DictValueType!)!);
+                    dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.ItemType!)!);
                 }
                 catch (Exception ex)
                 {

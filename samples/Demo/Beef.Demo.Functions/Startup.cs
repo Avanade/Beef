@@ -26,7 +26,7 @@ namespace Beef.Demo.Functions
             builder.Services.AddBeefExecutionContext()
                             .AddBeefSystemTime()
                             .AddBeefRequestCache()
-                            .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                            .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>(), new System.TimeSpan(0, 0, 30), new System.TimeSpan(0, 0, 30), useCachePolicyManagerTimer: true)
                             .AddBeefBusinessServices();
 
             // Add event subscriber host with auto-discovered subscribers and set the audit writer to use azure storage; plus use the poison event orchestrator/invoker.
