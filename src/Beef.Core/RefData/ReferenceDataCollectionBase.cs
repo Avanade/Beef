@@ -21,7 +21,7 @@ namespace Beef.RefData
     public abstract class ReferenceDataCollectionBase<TItem> : IEnumerable<TItem>, ICollection<TItem>, IReferenceDataCollection, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
 #pragma warning restore CA1710
     {
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
         private readonly ReferenceDataIdCollection _rdcId;
         private readonly ReferenceDataCodeCollection _rdcCode;
         private readonly Dictionary<MappingsKey, string> _mappingsDict;
@@ -123,9 +123,7 @@ namespace Beef.RefData
         /// <param name="item">The item to add.</param>
         public void Add(TItem item)
         {
-#pragma warning disable CA1062 // Validate arguments of public methods; by-design, the 'AddItem' method checks.
             AddItem(item);
-#pragma warning restore CA1062 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
@@ -369,24 +367,14 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetByCode(string? code)
-        {
-            var c = ConvertCode(code);
-            if (_rdcCode.Contains(c))
-                return _rdcCode[c];
-
-            return default!;
-        }
+        public TItem GetByCode(string? code) => _rdcCode.TryGetValue(ConvertCode(code), out var val) ? val : default!;
 
         /// <summary>
         /// Determines whether the specified <see cref="ReferenceDataBase.Code"/> exists within the collection.
         /// </summary>
         /// <param name="code">The <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsCode(string? code)
-        {
-            return _rdcCode.Contains(ConvertCode(code));
-        }
+        public bool ContainsCode(string? code) => _rdcCode.Contains(ConvertCode(code));
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified mapping (<see cref="ReferenceDataBase.SetMapping{T}(string, T)"/>) name and value.
@@ -394,10 +382,7 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetByMappingValue(string name, IComparable value)
-        {
-            return GetByMappingValue(name, value);
-        }
+        ReferenceDataBase IReferenceDataCollection.GetByMappingValue(string name, IComparable value) => GetByMappingValue(name, value);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified mapping (<see cref="ReferenceDataBase.SetMapping{T}(string, T)"/>) name and value.
@@ -405,11 +390,7 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, <c>null</c>.</returns>
-        public TItem GetByMappingValue(string name, IComparable value)
-        {
-            var key = new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value };
-            return _mappingsDict.ContainsKey(key) ? GetByCode(_mappingsDict[key]) : default!;
-        }
+        public TItem GetByMappingValue(string name, IComparable value) => _mappingsDict.TryGetValue(new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value }, out var map) ? GetByCode(map) : default!;
 
         /// <summary>
         /// Determines whether the specified mapping name and value exists within the collection.
@@ -417,10 +398,7 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsMappingValue(string name, IComparable value)
-        {
-            return _mappingsDict.ContainsKey(new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value });
-        }
+        public bool ContainsMappingValue(string name, IComparable value) => _mappingsDict.ContainsKey(new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value });
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/> (see <see cref="GetById(int)"/>).
@@ -433,14 +411,12 @@ namespace Beef.RefData
             private set { throw new NotSupportedException(); }
         }
 
-#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, is acceptable.
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/> (see <see cref="GetById(Guid)"/>).
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[Guid id]
-#pragma warning restore CA1043 
         {
             get { return GetById(id); }
             private set { throw new NotSupportedException(); }

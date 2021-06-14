@@ -132,6 +132,9 @@
   <data name="Beef.BusinessException" xml:space="preserve">
     <value>A business error occurred.</value>
   </data>
+  <data name="Beef.CollectionNullItemFormat" xml:space="preserve">
+    <value>{0} contains one or more items that are not specified.</value>
+  </data>
   <data name="Beef.CompareEqualFormat" xml:space="preserve">
     <value>{0} must be equal to {2}.</value>
   </data>
@@ -161,6 +164,12 @@
   </data>
   <data name="Beef.DependsOnFormat" xml:space="preserve">
     <value>{0} is required where {2} has a value.</value>
+  </data>
+  <data name="Beef.DictionaryNullKeyFormat" xml:space="preserve">
+    <value>{0} contains one or more keys that are not specified.</value>
+  </data>
+  <data name="Beef.DictionaryNullValueFormat" xml:space="preserve">
+    <value>{0} contains one or more values that are not specified.</value>
   </data>
   <data name="Beef.DuplicateException" xml:space="preserve">
     <value>A duplicate error occurred.</value>

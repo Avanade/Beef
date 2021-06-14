@@ -85,9 +85,7 @@ namespace Beef.Test.NUnit.Tests
                 {
                     json = JToken.Parse(result.Request.Content.ReadAsStringAsync().Result);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception) { }
-#pragma warning restore CA1031
 
                 TestContext.Out.WriteLine($"Content: [{result.Request.Content?.Headers?.ContentType?.MediaType ?? "None"}]");
                 TestContext.Out.WriteLine(json == null ? result.Request.Content?.ToString() : json.ToString());
@@ -127,9 +125,7 @@ namespace Beef.Test.NUnit.Tests
                 {
                     json = JToken.Parse(result.Content);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception) { /* This is being swallowed by design. */ }
-#pragma warning restore CA1031
             }
 
             TestContext.Out.Write($"Content: [{result.Response?.Content?.Headers?.ContentType?.MediaType ?? "none"}]");

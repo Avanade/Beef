@@ -231,6 +231,56 @@ namespace Beef.Core.UnitTest.Mapper
         }
 
         [Test]
+        public void MapToDest_DictValue()
+        {
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Dict, d => d.Dict)
+                .MapToDest(new PersonA { Dict = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } } });
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Dict);
+            Assert.AreEqual(2, r.Dict.Count);
+            Assert.IsTrue(r.Dict.ContainsKey("k1"));
+            Assert.IsTrue(r.Dict.ContainsKey("k2"));
+            Assert.AreEqual("v1", r.Dict["k1"]);
+            Assert.AreEqual("v2", r.Dict["k2"]);
+        }
+
+        [Test]
+        public void MapToDest_Dict2Value()
+        {
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Dict2, d => d.Dict2)
+                .MapToDest(new PersonA { Dict2 = new Dictionary<string, Address> { { "k1", new Address { Street = "S", City = "C" }  } } });
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Dict2);
+            Assert.AreEqual(1, r.Dict2.Count);
+            Assert.IsTrue(r.Dict2.ContainsKey("k1"));
+
+            var a = r.Dict2["k1"];
+            Assert.AreEqual("S", a.Street);
+            Assert.AreEqual("C", a.City);
+        }
+
+        [Test]
+        public void MapToDest_DictValue_Merge()
+        {
+            var r = new PersonB { Dict = new Dictionary<string, string> { { "k8", "v8" }, { "k9", "v9" } } };
+            EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Dict, d => d.Dict)
+                .MapToDest(new PersonA { Dict = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } } }, r);
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Dict);
+            Assert.AreEqual(2, r.Dict.Count);
+            Assert.IsTrue(r.Dict.ContainsKey("k1"));
+            Assert.IsTrue(r.Dict.ContainsKey("k2"));
+            Assert.AreEqual("v1", r.Dict["k1"]);
+            Assert.AreEqual("v2", r.Dict["k2"]);
+        }
+
+        [Test]
         public void XMapToDest_AutoPerfVolume()
         {
             var mapper = EntityMapper.CreateAuto<PersonA, PersonB>()
@@ -531,6 +581,39 @@ namespace Beef.Core.UnitTest.Mapper
             Assert.AreEqual(2, r.Addresses.Length);
         }
 
+        [Test]
+        public void MapToSrce_DictValue()
+        {
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Dict, d => d.Dict)
+                .MapToSrce(new PersonB { Dict = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } } });
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Dict);
+            Assert.AreEqual(2, r.Dict.Count);
+            Assert.IsTrue(r.Dict.ContainsKey("k1"));
+            Assert.IsTrue(r.Dict.ContainsKey("k2"));
+            Assert.AreEqual("v1", r.Dict["k1"]);
+            Assert.AreEqual("v2", r.Dict["k2"]);
+        }
+
+        [Test]
+        public void MapToSrce_Dict2Value()
+        {
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Dict2, d => d.Dict2)
+                .MapToSrce(new PersonB { Dict2 = new Dictionary<string, AddressX> { { "k1", new AddressX { Street = "S", City = "C" } } } });
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Dict2);
+            Assert.AreEqual(1, r.Dict2.Count);
+            Assert.IsTrue(r.Dict2.ContainsKey("k1"));
+
+            var a = r.Dict2["k1"];
+            Assert.AreEqual("S", a.Street);
+            Assert.AreEqual("C", a.City);
+        }
+
         #endregion
 
         #region Classes
@@ -552,6 +635,10 @@ namespace Beef.Core.UnitTest.Mapper
             public Address Address { get; set; }
 
             public Address[] Addresses { get; set; }
+
+            public Dictionary<string, string> Dict { get; set; }
+
+            public Dictionary<string, Address> Dict2 { get; set; }
         }
 
         public class PersonB
@@ -571,6 +658,10 @@ namespace Beef.Core.UnitTest.Mapper
             public AddressX AddressX { get; set; }
 
             public List<AddressX> Addresses { get; set; }
+
+            public Dictionary<string, string> Dict { get; set; }
+
+            public Dictionary<string, AddressX> Dict2 { get; set; }
         }
 
         public class Address

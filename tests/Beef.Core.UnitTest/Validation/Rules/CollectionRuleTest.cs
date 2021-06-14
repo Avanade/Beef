@@ -78,6 +78,23 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
+        public async Task Validate_Item_Null()
+        {
+            var v1 = await new TestItem[] { new TestItem() }.Validate().Collection().RunAsync();
+            Assert.IsFalse(v1.HasError);
+
+            v1 = await new TestItem[] { null }.Validate().Collection().RunAsync();
+            Assert.IsTrue(v1.HasError);
+            Assert.AreEqual(1, v1.Messages.Count);
+            Assert.AreEqual("Value contains one or more items that are not specified.", v1.Messages[0].Text);
+            Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
+            Assert.AreEqual("Value", v1.Messages[0].Property);
+
+            v1 = await new TestItem[] { null }.Validate().Collection(allowNullItems: true).RunAsync();
+            Assert.IsFalse(v1.HasError);
+        }
+
+        [Test]
         public async Task Validate_Item_Duplicates()
         {
             var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());

@@ -256,6 +256,11 @@ namespace Beef.Validation.Rules
         public int? MaxCount { get; set; }
 
         /// <summary>
+        /// Indicates whether the underlying collection items can be null.
+        /// </summary>
+        public bool AllowNullItems { get; set; }
+
+        /// <summary>
         /// Gets or sets the collection item validation configuration.
         /// </summary>
         public ICollectionRuleItem? Item
@@ -299,8 +304,9 @@ namespace Beef.Validation.Rules
                 return;
 
             // Iterate through the collection validating each of the items.
+            var i = 0;
+            var hasNullItem = false;
             var hasItemErrors = false;
-            int i = 0;
             foreach (var item in context.Value)
             {
                 // Create the context args.
@@ -308,6 +314,9 @@ namespace Beef.Validation.Rules
                 args.FullyQualifiedEntityName += "[" + i + "]";
                 args.FullyQualifiedJsonEntityName += "[" + i + "]";
                 i++;
+
+                if (!AllowNullItems && item == null)
+                    hasNullItem = true;
 
                 // Validate and merge.
                 if (Item?.Validator != null)
@@ -318,6 +327,9 @@ namespace Beef.Validation.Rules
                         hasItemErrors = true;
                 }
             }
+
+            if (hasNullItem)
+                context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CollectionNullItemFormat);
 
             // Check the length/count.
             if (i < MinCount)

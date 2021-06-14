@@ -229,6 +229,10 @@ namespace Beef.Core.UnitTest.Validation
             public List<TestItem> Items { get; set; } = new List<TestItem>();
 
             public TestItem Item { get; set; }
+
+            public Dictionary<string, string> Dict { get; set; }
+
+            public Dictionary<string, TestItem> Dict2 { get; set; }
         }
 
         public class TestItem
