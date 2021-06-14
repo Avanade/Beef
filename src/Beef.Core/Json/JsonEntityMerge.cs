@@ -306,6 +306,37 @@ namespace Beef.Json
         }
 
         /// <summary>
+        /// Apply the merge as a full collection replacement; there is <b>no</b> way to detect changes or perform partial property update. 
+        /// </summary>
+        private static JsonEntityMergeResult MergeApplyComplexItems(JsonEntityMergeArgs args, IPropertyReflector pr, JProperty jp, object entity)
+        {
+            var hasError = false;
+            var lo = new List<object?>();
+            var ier = pr.GetItemEntityReflector();
+
+            foreach (var ji in jp.Values())
+            {
+                if (ji.Type == JTokenType.Null)
+                {
+                    lo.Add(null);
+                    continue;
+                }
+
+                var ival = pr.ComplexTypeReflector!.CreateItemValue();
+                if (MergeApply(args, ier!, ji, ival) == JsonEntityMergeResult.Error)
+                    hasError = true;
+                else
+                    lo.Add(ival);
+            }
+
+            if (hasError)
+                return JsonEntityMergeResult.Error;
+
+            pr.ComplexTypeReflector!.SetValue(entity, lo);
+            return JsonEntityMergeResult.SuccessWithChanges;
+        }
+
+        /// <summary>
         /// Apply the merge as a full dictionary replacement; there is <b>no</b> way to detect changes or perform partial property update. 
         /// </summary>
         private static JsonEntityMergeResult MergeApplyDictionaryItems(JsonEntityMergeArgs args, IPropertyReflector pr, JProperty jp, object entity)
@@ -350,37 +381,6 @@ namespace Beef.Json
                 return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed and could not be parsed."));
 
             return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, dict);
-        }
-
-        /// <summary>
-        /// Apply the merge as a full collection replacement; there is <b>no</b> way to detect changes or perform partial property update. 
-        /// </summary>
-        private static JsonEntityMergeResult MergeApplyComplexItems(JsonEntityMergeArgs args, IPropertyReflector pr, JProperty jp, object entity)
-        {
-            var hasError = false;
-            var lo = new List<object?>();
-            var ier = pr.GetItemEntityReflector();
-
-            foreach (var ji in jp.Values())
-            {
-                if (ji.Type == JTokenType.Null)
-                {
-                    lo.Add(null);
-                    continue;
-                }
-
-                var ival = pr.ComplexTypeReflector!.CreateItemValue();
-                if (MergeApply(args, ier!, ji, ival) == JsonEntityMergeResult.Error)
-                    hasError = true;
-                else
-                    lo.Add(ival);
-            }
-
-            if (hasError)
-                return JsonEntityMergeResult.Error;
-
-            pr.ComplexTypeReflector!.SetValue(entity, lo);
-            return JsonEntityMergeResult.SuccessWithChanges;
         }
 
         /// <summary>
