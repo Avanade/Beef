@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.7
+- *Fixed:* Fix error `Cannot delete rows from a temporal history table` when resetting (deleting) [temporal table](https://docs.microsoft.com/en-us/sql/relational-databases/tables/temporal-tables) contents during test fixture start-up.
+
 ## v4.1.6
 - *Enhancement:* Added ability to specify within the data YAML the `IIdentifierGenerators` type using global `^Type` property. Where a table is prefixed with a `^` or `$^` then the identifier value will be generated and set using the appropriate `IIdentifierGenerator`.
 - *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
