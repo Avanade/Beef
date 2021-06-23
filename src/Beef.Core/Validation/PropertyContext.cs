@@ -89,6 +89,8 @@ namespace Beef.Validation
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class PropertyContext<TEntity, TProperty> : IPropertyContext where TEntity : class
     {
+        private readonly bool _doNotAppendName = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyContext{TEntity, TProperty}"/> class.
         /// </summary>
@@ -105,6 +107,26 @@ namespace Beef.Validation
             UseJsonName = context.UseJsonNames;
             Text = text ?? ValidationExtensions.ToSentenceCase(name)!;
             Value = value;
+            FullyQualifiedPropertyName = CreateFullyQualifiedPropertyName(Name);
+            FullyQualifiedJsonPropertyName = CreateFullyQualifiedJsonPropertyName(JsonName);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyContext{TEntity, TProperty}"/> class where the property is considered the value (impacts the fully-qualified names, etc.).
+        /// </summary>
+        /// <param name="text">The property text.</param>
+        /// <param name="context">The validation context for the parent entity.</param>
+        /// <param name="value">The property value.</param>
+        public PropertyContext(LText? text, ValidationContext<TEntity> context, TProperty value)
+        {
+            Parent = Check.NotNull(context, nameof(context));
+            FullyQualifiedPropertyName = Parent.FullyQualifiedEntityName ?? Validator.ValueNameDefault;
+            FullyQualifiedJsonPropertyName = Parent.FullyQualifiedJsonEntityName ?? Validator.ValueNameDefault;
+            Name = FullyQualifiedPropertyName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+            JsonName = FullyQualifiedJsonPropertyName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+            Text = text ?? ValidationExtensions.ToSentenceCase(Name)!;
+            Value = value;
+            _doNotAppendName = true;
         }
 
         /// <summary>
@@ -130,12 +152,12 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the fully qualified property name.
         /// </summary>
-        public string FullyQualifiedPropertyName { get => CreateFullyQualifiedPropertyName(Name); }
+        public string FullyQualifiedPropertyName { get; }
 
         /// <summary>
         /// Gets the fully qualified Json property name.
         /// </summary>
-        public string FullyQualifiedJsonPropertyName { get => CreateFullyQualifiedJsonPropertyName(JsonName); }
+        public string FullyQualifiedJsonPropertyName { get; }
 
         /// <summary>
         /// Indicates whether to use the JSON property name for the <see cref="MessageItem"/> <see cref="MessageItem.Property"/>; by default (<c>false</c>) uses the .NET property name.
@@ -221,10 +243,7 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="format">The composite format string.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public MessageItem CreateErrorMessage(LText format)
-        {
-            return CreateErrorMessage(format, Array.Empty<object>());
-        }
+        public MessageItem CreateErrorMessage(LText format) => CreateErrorMessage(format, Array.Empty<object>());
 
         /// <summary>
         /// Creates a new <see cref="MessageType.Error"/> <see cref="MessageItem"/> with the specified format and additional values to be included in the text and <b>adds</b> to the underlying <see cref="IValidationContext"/>.
@@ -237,32 +256,24 @@ namespace Beef.Validation
         {
             HasError = true;
             var fVals = (new string[] { Text, Value?.ToString()! }).Concat(values).ToArray();
-            return Parent.AddMessage(Name, JsonName, MessageType.Error, format, fVals);
+
+            if (_doNotAppendName)
+                return Parent.AddMessage(MessageType.Error, format, fVals);
+            else
+                return Parent.AddMessage(Name, JsonName, MessageType.Error, format, fVals);
         }
 
         /// <summary>
         /// Creates a fully qualified property name for the name.
         /// </summary>
         /// <param name="name">The property name.</param>
-        public string CreateFullyQualifiedPropertyName(string name)
-        {
-            if (Parent.FullyQualifiedEntityName == null)
-                return name;
-            else
-                return Parent.FullyQualifiedEntityName + "." + name;
-        }
+        public string CreateFullyQualifiedPropertyName(string name) => (Parent.FullyQualifiedEntityName == null) ? name : (Parent.FullyQualifiedEntityName + (name.StartsWith("[") ? "" : ".") + name);
 
         /// <summary>
         /// Creates a fully qualified JSON property name for the name.
         /// </summary>
         /// <param name="name">The property name.</param>
-        public string CreateFullyQualifiedJsonPropertyName(string name)
-        {
-            if (Parent.FullyQualifiedEntityName == null)
-                return name;
-            else
-                return Parent.FullyQualifiedEntityName + "." + name;
-        }
+        public string CreateFullyQualifiedJsonPropertyName(string name) => (Parent.FullyQualifiedJsonEntityName == null) ? name : (Parent.FullyQualifiedJsonEntityName + (name.StartsWith("[") ? "" : ".") + name);
 
         /// <summary>
         /// Creates a new <see cref="ValidationArgs"/> from the <see cref="PropertyContext{TEntity, TProperty}"/>.

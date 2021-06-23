@@ -70,20 +70,22 @@ namespace Beef.Validation
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     public class ValidationContext<TEntity> : IValidationContext where TEntity : class
     {
-        private readonly Dictionary<string, MessageItem> _propertyErrors = new Dictionary<string, MessageItem>();
+        private readonly Dictionary<string, MessageItem> _propertyErrors = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationContext{TEntity}"/> class.
         /// </summary>
         /// <param name="value">The entity value.</param>
         /// <param name="args">The <see cref="ValidationArgs"/>.</param>
-        public ValidationContext(TEntity value, ValidationArgs args)
+        /// <param name="fullyQualifiedEntityNameOverride">Optional <see cref="ValidationArgs.FullyQualifiedEntityName"/> override.</param>
+        /// <param name="fullyQualifiedJsonEntityNameOverride">Optional <see cref="ValidationArgs.FullyQualifiedJsonEntityName"/> override.</param>
+        public ValidationContext(TEntity value, ValidationArgs args, string? fullyQualifiedEntityNameOverride = null, string? fullyQualifiedJsonEntityNameOverride = null)
         {
             Beef.Check.NotNull(args, nameof(args));
 
             Value = value;
-            FullyQualifiedEntityName = args.FullyQualifiedEntityName;
-            FullyQualifiedJsonEntityName = args.FullyQualifiedJsonEntityName;
+            FullyQualifiedEntityName = fullyQualifiedEntityNameOverride ?? args.FullyQualifiedEntityName;
+            FullyQualifiedJsonEntityName = fullyQualifiedJsonEntityNameOverride ?? args.FullyQualifiedJsonEntityName;
             UseJsonNames = args.UseJsonNamesSelection;
             Config = args.Config;
             SelectedPropertyName = args.SelectedPropertyName;
@@ -344,7 +346,7 @@ namespace Beef.Validation
         }
 
         /// <summary>
-        /// Adds an error <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified property and explicit text.
+        /// Adds a <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified property and explicit text.
         /// </summary>
         /// <param name="propertyName">The property name.</param>
         /// <param name="jsonPropertyName">The JSON property name.</param>
@@ -361,7 +363,7 @@ namespace Beef.Validation
         }
 
         /// <summary>
-        /// Adds an error <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified property, explicit text format and and additional values included in the text.
+        /// Adds a <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified property, explicit text format and additional values included in the text.
         /// </summary>
         /// <param name="propertyName">The property name.</param>
         /// <param name="jsonPropertyName">The JSON property name.</param>
@@ -373,6 +375,37 @@ namespace Beef.Validation
         {
             Beef.Check.NotNull(propertyName, nameof(propertyName));
             var mi = Messages.Add(CreateFullyQualifiedName(propertyName, jsonPropertyName ?? propertyName), type, format, values);
+            if (type == MessageType.Error && !HasError(mi.Property!))
+                _propertyErrors.Add(mi.Property!, mi);
+
+            return mi;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified text.
+        /// </summary>
+        /// <param name="type">The <see cref="MessageType"/>.</param>
+        /// <param name="text">The text <see cref="LText"/>.</param>
+        /// <returns>The <see cref="MessageItem"/>.</returns>
+        public MessageItem AddMessage(MessageType type, LText text)
+        {
+            var mi = Messages.Add(UseJsonNames ? FullyQualifiedJsonEntityName : FullyQualifiedEntityName, type, text);
+            if (type == MessageType.Error && !HasError(mi.Property!))
+                _propertyErrors.Add(mi.Property!, mi);
+
+            return mi;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="MessageItem"/> to the <see cref="Messages"/> for the specified text format and additional values included in the text.
+        /// </summary>
+        /// <param name="type">The <see cref="MessageType"/>.</param>
+        /// <param name="format">The composite format string.</param>
+        /// <param name="values">The values that form part of the message text.</param>
+        /// <returns>The <see cref="MessageItem"/>.</returns>
+        public MessageItem AddMessage(MessageType type, LText format, params object?[] values)
+        {
+            var mi = Messages.Add(UseJsonNames ? FullyQualifiedJsonEntityName : FullyQualifiedEntityName, type, format, values);
             if (type == MessageType.Error && !HasError(mi.Property!))
                 _propertyErrors.Add(mi.Property!, mi);
 
@@ -528,12 +561,12 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="name">The property name.</param>
         /// <returns>The fully qualified property name.</returns>
-        private string CreateFullyQualifiedPropertyName(string name)
+        internal string CreateFullyQualifiedPropertyName(string name)
         {
             if (FullyQualifiedEntityName == null)
                 return name;
             else
-                return FullyQualifiedEntityName + "." + name;
+                return name.StartsWith("[") ? FullyQualifiedEntityName + name : FullyQualifiedEntityName + "." + name;
         }
 
         /// <summary>
@@ -541,12 +574,12 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="name">The property name.</param>
         /// <returns>The fully qualified property name.</returns>
-        private string CreateFullyQualifiedJsonPropertyName(string name)
+        internal string CreateFullyQualifiedJsonPropertyName(string name)
         {
             if (FullyQualifiedJsonEntityName == null)
                 return name;
             else
-                return FullyQualifiedJsonEntityName + "." + name;
+                return name.StartsWith("[") ? FullyQualifiedJsonEntityName + name : FullyQualifiedJsonEntityName + "." + name;
         }
 
         #endregion

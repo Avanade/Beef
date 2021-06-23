@@ -216,6 +216,14 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<string?>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult> ParamCollAsync(AddressCollection? addresses, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -507,6 +515,16 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult<string?>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
             PostAsync<string?>("api/v1/persons/invokeApi", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+
+        /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> ParamCollAsync(AddressCollection? addresses, WebApiRequestOptions? requestOptions = null) =>
+            PostAsync("api/v1/persons/paramcoll", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<AddressCollection?>("addresses", addresses, WebApiArgType.FromBody) });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.

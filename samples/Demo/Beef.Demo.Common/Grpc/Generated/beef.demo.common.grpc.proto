@@ -73,6 +73,10 @@ message Address {
   google.protobuf.StringValue city = 2;
 }
 
+message AddressCollection {
+  repeated Address items = 1;
+}
+
 message Robot {
   google.protobuf.StringValue id = 1;
   google.protobuf.StringValue modelNo = 2;

@@ -104,6 +104,8 @@ namespace Beef.CodeGen.Config
 
             (ConfigType.Entity, ConfigurationEntity.Property, "Type", false, (xml) => xml != null && xml.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) ? $"^{xml[17..]}" : xml),
 
+            (ConfigType.Entity, ConfigurationEntity.Parameter, "Type", false, (xml) => xml != null && xml.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) ? $"^{xml[17..]}" : xml),
+
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", false, (xml) => NullValue()),
             (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", false, (xml) => NullValue()),

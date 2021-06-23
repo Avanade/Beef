@@ -63,6 +63,9 @@
     
     <Operation Name="ThrowError" OperationType="Custom" ReturnType="void" WebApiRoute="error" AutoImplement="None" ManagerTransaction="true" />
     <Operation Name="InvokeApiViaAgent" OperationType="Custom" ReturnType="string" UniqueKey="true" WebApiRoute="invokeApi" AutoImplement="None" />
+    <Operation Name="ParamColl" OperationType="Custom" ReturnType="void" WebApiRoute="paramcoll" DataSvcCustom="true" ExcludeIData="true" ExcludeData="true">
+      <Parameter Name="Addresses" Type="AddressCollection" Validator="AddressCollectionValidator" WebApiFrom="FromBody"/>
+    </Operation>
     
     <Operation Name="GetWithEf" OperationType="Get" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" />
     <Operation Name="CreateWithEf" OperationType="Create" Validator="PersonValidator" WebApiRoute="ef" WebApiLocation="^GetWithEf" AutoImplement="EntityFramework" EventPublish="false" />
@@ -86,7 +89,7 @@
     <Property Name="Longitude" Type="decimal" />
   </Entity>
 
-  <Entity Name="Address" Grpc="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" >
+  <Entity Name="Address" Grpc="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" Collection="true" >
     <Property Name="Street" GrpcFieldNo="1" Type="string" />
     <Property Name="City" GrpcFieldNo="2" Type="string" />
   </Entity>

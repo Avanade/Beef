@@ -359,6 +359,18 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        [HttpPost("paramcoll")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult ParamColl([FromBody] AddressCollection? addresses)
+        {
+            return new WebApiPost(this, () => _manager.ParamCollAsync(addresses),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

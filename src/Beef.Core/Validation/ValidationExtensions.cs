@@ -716,7 +716,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Collection<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null, bool allowNullItems = false)
             where TEntity : class
-            where TProperty : System.Collections.ICollection?
+            where TProperty : System.Collections.IEnumerable?
         {
             var cr = new CollectionRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullItems = allowNullItems };
             return Check.NotNull(rule, nameof(rule)).AddRule(cr);
@@ -727,7 +727,7 @@ namespace Beef.Validation
         #region Dictionary
 
         /// <summary>
-        /// Adds a dictionary (<see cref="System.Collections.IEnumerable"/>) validation (see <see cref="DictionaryRule{TEntity, TProperty}"/>).
+        /// Adds a dictionary (<see cref="System.Collections.IDictionary"/>) validation (see <see cref="DictionaryRule{TEntity, TProperty}"/>).
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TProperty"></typeparam>
@@ -742,7 +742,7 @@ namespace Beef.Validation
             where TEntity : class
             where TProperty : System.Collections.IDictionary?
         {
-            var cr = new DictionaryRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Value = item, AllowNullKeys = allowNullKeys, AllowNullItems = allowNullItems };
+            var cr = new DictionaryRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Value = item, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullItems };
             return Check.NotNull(rule, nameof(rule)).AddRule(cr);
         }
 

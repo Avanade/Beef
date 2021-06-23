@@ -130,6 +130,11 @@ namespace Beef.Demo.Business
         private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
         private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
 
+        private Func<AddressCollection?, Task>? _paramCollOnPreValidateAsync;
+        private Action<MultiValidator, AddressCollection?>? _paramCollOnValidate;
+        private Func<AddressCollection?, Task>? _paramCollOnBeforeAsync;
+        private Func<AddressCollection?, Task>? _paramCollOnAfterAsync;
+
         private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getWithEfOnValidate;
         private Func<Guid, Task>? _getWithEfOnBeforeAsync;
@@ -678,6 +683,28 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
                 await (_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        public async Task ParamCollAsync(AddressCollection? addresses)
+        {
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Cleaner.CleanUp(addresses);
+                await (_paramCollOnPreValidateAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+
+                (await MultiValidator.Create()
+                    .Add(addresses.Validate(nameof(addresses)).Entity().With<IValidator<AddressCollection>>())
+                    .Additional((__mv) => _paramCollOnValidate?.Invoke(__mv, addresses))
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+                await (_paramCollOnBeforeAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+                await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
+                await (_paramCollOnAfterAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
             }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 

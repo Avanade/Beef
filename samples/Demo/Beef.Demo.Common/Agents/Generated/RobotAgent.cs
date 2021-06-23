@@ -79,10 +79,10 @@ namespace Beef.Demo.Common.Agents
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        /// <param name="powerSource">The Power Source.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, WebApiRequestOptions? requestOptions = null);
     }
 
     /// <summary>
@@ -164,12 +164,12 @@ namespace Beef.Demo.Common.Agents
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        /// <param name="powerSource">The Power Source.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource, WebApiRequestOptions? requestOptions = null) =>
+        public Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, WebApiRequestOptions? requestOptions = null) =>
             PostAsync("api/v1/robots/{id}/powerSource/{powerSource}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id), new WebApiArg<RefDataNamespace.PowerSource?>("powerSource", powerSource) });
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id), new WebApiArg<string?>("powerSource", powerSource) });
     }
 }
 

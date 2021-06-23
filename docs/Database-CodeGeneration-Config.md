@@ -15,6 +15,7 @@ Category | Description
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Event`](#Event) | Provides the _Event_ configuration.
 [`Outbox`](#Outbox) | Provides the _Event Outbox_ configuration.
+[`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
@@ -102,6 +103,15 @@ Property | Description
 -|-
 `eventOutbox` | Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
 `eventOutboxTableName` | The table name for the `EventOutbox`. Defaults to `EventOutbox` (literal).
+
+<br/>
+
+## Auth
+Provides the _Authorization_ configuration.
+
+Property | Description
+-|-
+**`orgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. This is only applicable for stored procedures.
 
 <br/>
 

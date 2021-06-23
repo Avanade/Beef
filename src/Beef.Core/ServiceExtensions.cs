@@ -87,7 +87,9 @@ namespace Beef
 
             services.AddSingleton(sp =>
             {
-                cpm.StartFlushTimer(firstInterval.Value, interval.Value, sp.GetService<ILogger<CachePolicyManager>>());
+                if (useCachePolicyManagerTimer)
+                    cpm.StartFlushTimer(firstInterval.Value, interval.Value, sp.GetService<ILogger<CachePolicyManager>>());
+
                 return cpm;
             });
 

@@ -59,7 +59,7 @@ namespace Beef.Entities
         /// <param name="type">The <see cref="MessageType"/>.</param>
         /// <param name="text">The message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public static MessageItem CreateMessage(string property, MessageType type, LText text)
+        public static MessageItem CreateMessage(string? property, MessageType type, LText text)
         {
             return new MessageItem
             {
@@ -77,7 +77,7 @@ namespace Beef.Entities
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public static MessageItem CreateMessage(string property, MessageType type, LText format, params object?[] values)
+        public static MessageItem CreateMessage(string? property, MessageType type, LText format, params object?[] values)
         {
             return new MessageItem
             {
@@ -93,7 +93,7 @@ namespace Beef.Entities
         /// <param name="property">The property name.</param>
         /// <param name="text">The message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public static MessageItem CreateErrorMessage(string property, LText text)
+        public static MessageItem CreateErrorMessage(string? property, LText text)
         {
             return new MessageItem
             {

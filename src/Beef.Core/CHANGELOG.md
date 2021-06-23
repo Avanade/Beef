@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.15
+- *Fixed:* The `AddBeefCachePolicyManager` parameter `useCachePolicyManagerTimer` when set to `false` was incorrectly starting the timer resulting in itself and the `CachePolicyManagerServiceHost` running.
+- *Fixed:* The `ReferenceDataBase` should not `CleanUp` the key properties as they are considered immutable.
+- *Enhancement:* Added `IWebApiAgent` which `WebApiAgentBase` now implements.
+- *Enhancement:* Removed the method parameters `memberName`, `filePath` and `lineNumber` to simplify the `WebApiAgentBase`. It is believed these are not being used by any consumers. *Note:* will look to remove all of these parameters throughout the solution within a future _Beef_ version.
+- *Enhancement:* Issue [136](https://github.com/Avanade/Beef/issues/136). Added `CollectionValidator` and `DictionaryValidator` to allow each of these types to be validated directly; versus having to be a property within a parent class.
+
 ## v4.1.14
 - *Enhancement:* Added new `DictionaryRule` validator.
 - *Fixed:* Issue [131](https://github.com/Avanade/Beef/issues/131). The `EntityMapper` did not support properties of Type `IDictionary`; this has also been corrected.

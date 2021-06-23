@@ -1,5 +1,4 @@
-﻿using Beef.Demo.Business.DataSvc;
-using Beef.Events;
+﻿using Beef.Events;
 using System;
 using System.Threading.Tasks;
 using RefDataNamespace = Beef.Demo.Common.Entities;

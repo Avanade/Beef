@@ -55,8 +55,8 @@ parameters: [
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The .NET `Type`.", IsImportant = true,
-            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data " +
-            "using statement is used. Shortcut: Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
+            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data " +
+            "`using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
         public string? Type { get; set; }
 
         /// <summary>
@@ -238,7 +238,7 @@ parameters: [
         /// <summary>
         /// Gets the WebApi Agent parameter type.
         /// </summary>
-        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : ParameterType!;
+        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : WebApiParameterType!;
 
         /// <summary>
         /// Gets the <see cref="WebApiFrom"/> for use in an Agent.
@@ -307,6 +307,9 @@ parameters: [
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
+            if (Type!.StartsWith("^"))
+                Type = $"RefDataNamespace.{Type[1..]}";
+
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
 

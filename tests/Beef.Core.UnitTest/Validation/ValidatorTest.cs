@@ -403,5 +403,166 @@ namespace Beef.Core.UnitTest.Validation
 
             Task.WaitAll(tasks);
         }
+
+        [Test]
+        public async Task Coll_Validator_MaxCount()
+        {
+            var vxc = Validator.Create<List<TestItem>, TestItem>(minCount: 1, maxCount: 2, item: CollectionRuleItem.Create(new TestItemValidator()));
+            var tc = new List<TestItem> { new TestItem { Code = "A", Text = "aaa" }, new TestItem { Code = "B", Text = "bbb" }, new TestItem { Code= "C", Text = "ccc" } };
+
+            var r = await vxc.ValidateAsync(tc);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(3, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
+            Assert.AreEqual("Value[0].Text", r.Messages[0].Property);
+            Assert.AreEqual(MessageType.Error, r.Messages[1].Type);
+            Assert.AreEqual("Description is invalid.", r.Messages[1].Text);
+            Assert.AreEqual("Value[1].Text", r.Messages[1].Property);
+            Assert.AreEqual(MessageType.Error, r.Messages[2].Type);
+            Assert.AreEqual("Value must not exceed 2 item(s).", r.Messages[2].Text);
+            Assert.AreEqual("Value", r.Messages[2].Property);
+        }
+
+        [Test]
+        public async Task Coll_Validator_MinCount()
+        {
+            var vxc = Validator.Create<List<TestItem>, TestItem>(minCount: 3, item: CollectionRuleItem.Create(new TestItemValidator()));
+            var tc = new List<TestItem> { new TestItem { Code = "A", Text = "A" }, new TestItem { Code = "B", Text = "B" } };
+
+            var r = await vxc.ValidateAsync(tc);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Value must have at least 3 item(s).", r.Messages[0].Text);
+            Assert.AreEqual("Value", r.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Coll_Validator_Duplicate()
+        {
+            var vxc = Validator.Create<List<TestItem>, TestItem>(item: CollectionRuleItem.Create(new TestItemValidator()).DuplicateCheck(x => x.Code));
+            var tc = new List<TestItem> { new TestItem { Code = "A", Text = "A" }, new TestItem { Code = "A", Text = "A" } };
+
+            var r = await vxc.ValidateAsync(tc);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Value contains duplicates; Code value 'A' specified more than once.", r.Messages[0].Text);
+            Assert.AreEqual("Value", r.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Coll_Validator_OK()
+        {
+            var vxc = Validator.Create<List<TestItem>, TestItem>(minCount: 1, maxCount: 2, item: CollectionRuleItem.Create(new TestItemValidator()).DuplicateCheck(x => x.Code));
+            var tc = new List<TestItem> { new TestItem { Code = "A", Text = "A" }, new TestItem { Code = "B", Text = "B" } };
+
+            var r = await vxc.ValidateAsync(tc);
+
+            Assert.IsFalse(r.HasErrors);
+        }
+
+        [Test]
+        public async Task Coll_Validator_Int_OK()
+        {
+            var vxc = Validator.Create<List<int>, int>(minCount: 1, maxCount: 5);
+            var ic = new List<int> { 1, 2, 3, 4, 5 };
+
+            var r = await vxc.ValidateAsync(ic);
+
+            Assert.IsFalse(r.HasErrors);
+        }
+
+        [Test]
+        public async Task Coll_Validator_Int_Error()
+        {
+            var vxc = Validator.Create<List<int>, int>(minCount: 1, maxCount: 3);
+            var ic = new List<int> { 1, 2, 3, 4, 5 };
+
+            var r = await vxc.ValidateAsync(ic);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Value must not exceed 3 item(s).", r.Messages[0].Text);
+            Assert.AreEqual("Value", r.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Dict_Validator_MaxCount()
+        {
+            var vxd = Validator.Create<Dictionary<string, TestItem>, string, TestItem>(minCount: 1, maxCount: 2, value: DictionaryRuleValue.Create<string, TestItem>(new TestItemValidator()));
+            var tc = new Dictionary<string, TestItem> { { "k1", new TestItem { Code = "A", Text = "aaa" } }, { "k2", new TestItem { Code = "B", Text = "bbb" } }, { "k3", new TestItem { Code = "C", Text = "ccc" } } };
+
+            var r = await vxd.ValidateAsync(tc);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(3, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
+            Assert.AreEqual("Value[k1].Text", r.Messages[0].Property);
+            Assert.AreEqual(MessageType.Error, r.Messages[1].Type);
+            Assert.AreEqual("Description is invalid.", r.Messages[1].Text);
+            Assert.AreEqual("Value[k2].Text", r.Messages[1].Property);
+            Assert.AreEqual(MessageType.Error, r.Messages[2].Type);
+            Assert.AreEqual("Value must not exceed 2 item(s).", r.Messages[2].Text);
+            Assert.AreEqual("Value", r.Messages[2].Property);
+        }
+
+        [Test]
+        public async Task Dict_Validator_MinCount()
+        {
+            var vxd = Validator.Create<Dictionary<string, TestItem>, string, TestItem>(minCount: 3, value: DictionaryRuleValue.Create<string, TestItem>(new TestItemValidator()));
+            var tc = new Dictionary<string, TestItem> { { "k1", new TestItem { Code = "A", Text = "A" } }, { "k2", new TestItem { Code = "B", Text = "B" } } };
+
+            var r = await vxd.ValidateAsync(tc);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Value must have at least 3 item(s).", r.Messages[0].Text);
+            Assert.AreEqual("Value", r.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Dict_Validator_OK()
+        {
+            var vxd = Validator.Create<Dictionary<string, TestItem>, string, TestItem>(minCount: 2, value: DictionaryRuleValue.Create<string, TestItem>(new TestItemValidator()));
+            var tc = new Dictionary<string, TestItem> { { "k1", new TestItem { Code = "A", Text = "A" } }, { "k2", new TestItem { Code = "B", Text = "B" } } };
+
+            var r = await vxd.ValidateAsync(tc);
+
+            Assert.IsFalse(r.HasErrors);
+        }
+
+        [Test]
+        public async Task Dict_Validator_Int_OK()
+        {
+            var vxd = Validator.Create<Dictionary<string, int>, string, int>(minCount: 1, maxCount: 5);
+            var id = new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 }, { "k3", 3 }, { "k4", 4 }, { "k5", 5 } };
+
+            var r = await vxd.ValidateAsync(id);
+
+            Assert.IsFalse(r.HasErrors);
+        }
+
+        [Test]
+        public async Task Dict_Validator_Int_Error()
+        {
+            var vxd = Validator.Create<Dictionary<string, int>, string, int>(minCount: 1, maxCount: 3);
+            var id = new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 }, { "k3", 3 }, { "k4", 4 }, { "k5", 5 } };
+
+            var r = await vxd.ValidateAsync(id);
+
+            Assert.IsTrue(r.HasErrors);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
+            Assert.AreEqual("Value must not exceed 3 item(s).", r.Messages[0].Text);
+            Assert.AreEqual("Value", r.Messages[0].Property);
+        }
     }
 }

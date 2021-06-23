@@ -9,7 +9,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Beef.WebApi
@@ -17,7 +16,7 @@ namespace Beef.WebApi
     /// <summary>
     /// Provides the base capabilites to <b>invoke</b> Web API agent operations.
     /// </summary>
-    public abstract class WebApiAgentBase
+    public abstract class WebApiAgentBase : IWebApiAgent
     {
         /// <summary>
         /// Sets the accept header for the <paramref name="httpClient"/> to <see cref="MediaTypeNames.Application.Json"/>. 
@@ -86,11 +85,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
-        public async Task<WebApiAgentResult> GetAsync(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> GetAsync(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
@@ -99,7 +95,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -109,11 +105,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> GetAsync<TResult>(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> GetAsync<TResult>(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
@@ -122,7 +115,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -134,16 +127,13 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> GetCollectionResultAsync<TResult, TColl, TEntity>(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> GetCollectionResultAsync<TResult, TColl, TEntity>(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
             where TResult : IEntityCollectionResult<TColl, TEntity>, new()
             where TColl : IEnumerable<TEntity>, new()
             where TEntity : class
         {
-            var result = await GetAsync<TColl>(urlSuffix, requestOptions, args, memberName, filePath, lineNumber).ConfigureAwait(false);
+            var result = await GetAsync<TColl>(urlSuffix, requestOptions, args).ConfigureAwait(false);
             if (!result.Response.IsSuccessStatusCode)
                 return new WebApiAgentResult<TResult>(result);
 
@@ -173,11 +163,8 @@ namespace Beef.WebApi
         /// <param name="value">The content value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
-        public async Task<WebApiAgentResult> PutAsync(string urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> PutAsync(string? urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -191,7 +178,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -202,11 +189,8 @@ namespace Beef.WebApi
         /// <param name="value">The content value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> PutAsync<TResult>(string urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> PutAsync<TResult>(string? urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -220,7 +204,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -229,11 +213,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
-        public async Task<WebApiAgentResult> PutAsync(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> PutAsync(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
@@ -242,7 +223,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -252,11 +233,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> PutAsync<TResult>(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> PutAsync<TResult>(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
@@ -265,7 +243,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -275,11 +253,8 @@ namespace Beef.WebApi
         /// <param name="value">The content value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
-        public async Task<WebApiAgentResult> PostAsync(string urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> PostAsync(string? urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -293,7 +268,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -304,11 +279,8 @@ namespace Beef.WebApi
         /// <param name="value">The content value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string? urlSuffix, object value, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -322,7 +294,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, value, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -331,11 +303,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
-        public async Task<WebApiAgentResult> PostAsync(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> PostAsync(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
 
@@ -345,7 +314,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -355,11 +324,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
 
@@ -369,7 +335,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -378,11 +344,8 @@ namespace Beef.WebApi
         /// <param name="urlSuffix">The url suffix for the operation.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{T}"/>.</returns>
-        public async Task<WebApiAgentResult> DeleteAsync(string urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> DeleteAsync(string? urlSuffix, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             var uri = CreateFullUri(urlSuffix, args, requestOptions);
             return await WebApiAgentInvoker.Current.InvokeAsync(this, async () =>
@@ -390,7 +353,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(HttpMethod.Delete, uri, requestOptions: requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, null!, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, null!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -401,11 +364,8 @@ namespace Beef.WebApi
         /// <param name="json">The json value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult> PatchAsync(string urlSuffix, WebApiPatchOption patchOption, JToken json, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult> PatchAsync(string? urlSuffix, WebApiPatchOption patchOption, JToken json, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (json == null)
                 throw new ArgumentNullException(nameof(json));
@@ -424,7 +384,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(new HttpMethod("PATCH"), uri, content, requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return VerifyResult(result);
-            }, json, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, json).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -436,11 +396,8 @@ namespace Beef.WebApi
         /// <param name="json">The json value.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="urlSuffix"/>.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
-        public async Task<WebApiAgentResult<TResult>> PatchAsync<TResult>(string urlSuffix, WebApiPatchOption patchOption, JToken json, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public async Task<WebApiAgentResult<TResult>> PatchAsync<TResult>(string? urlSuffix, WebApiPatchOption patchOption, JToken json, WebApiRequestOptions? requestOptions = null, WebApiArg[]? args = null)
         {
             if (json == null)
                 throw new ArgumentNullException(nameof(json));
@@ -456,7 +413,7 @@ namespace Beef.WebApi
                 var result = new WebApiAgentResult(await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(new HttpMethod("PATCH"), uri, content, requestOptions).ConfigureAwait(false)).ConfigureAwait(false));
                 result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new WebApiAgentResult<TResult>(VerifyResult(result));
-            }, json, memberName, filePath, lineNumber).ConfigureAwait(false);
+            }, json).ConfigureAwait(false);
         }
 
         #endregion

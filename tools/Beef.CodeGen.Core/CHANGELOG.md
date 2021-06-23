@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.27
+- *Fixed:* A Web API agent reference data parameter should use the underlying `RefDataType` not the reference data `Type` itself as the operation parameter (decouple reference data types from Agent contracts).
+
 ## v4.1.26
 - *Enhancement:* Added `DateTimeOffset` to the list of supported system and nullable types.
 - *Enhancement:* Added shorthand for a `Property.Type` where the `^` is the equivalent to `RefDataNamespace.`; e.g. `RefDataNamespace.Gender` can be replaced by `^Gender`. The XML to YAML conversion will replace with the shorthand where previously specified.

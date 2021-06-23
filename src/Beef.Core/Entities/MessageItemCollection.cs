@@ -43,7 +43,7 @@ namespace Beef.Entities
         /// <param name="type">The <see cref="MessageType"/>.</param>
         /// <param name="text">The message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public MessageItem Add(string property, MessageType type, LText text)
+        public MessageItem Add(string? property, MessageType type, LText text)
         {
             MessageItem item = MessageItem.CreateMessage(property, type, text);
             this.Add(item);
@@ -58,7 +58,7 @@ namespace Beef.Entities
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public MessageItem Add(string property, MessageType type, LText format, params object?[] values)
+        public MessageItem Add(string? property, MessageType type, LText format, params object?[] values)
         {
             MessageItem item = MessageItem.CreateMessage(property, type, format, values);
             this.Add(item);

@@ -81,5 +81,19 @@ namespace Beef.Core.UnitTest.Validation.Rules
             v1 = await new Dictionary<string, TestItem> { { "k1", null } }.Validate("Dict").Dictionary(allowNullItems: true).RunAsync();
             Assert.IsFalse(v1.HasError);
         }
+
+        [Test]
+        public async Task Validate_Ints()
+        {
+            var v1 = await new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 }, { "k3", 3 }, { "k4", 4 } }.Validate("Dict").Dictionary(maxCount: 4).RunAsync();
+            Assert.IsFalse(v1.HasError);
+
+            v1 = await new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 }, { "k3", 3 }, { "k4", 4} }.Validate("Dict").Dictionary(maxCount: 3).RunAsync();
+            Assert.IsTrue(v1.HasError);
+            Assert.AreEqual(1, v1.Messages.Count);
+            Assert.AreEqual("Dict must not exceed 3 item(s).", v1.Messages[0].Text);
+            Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
+            Assert.AreEqual("Dict", v1.Messages[0].Property);
+        }
     }
 }

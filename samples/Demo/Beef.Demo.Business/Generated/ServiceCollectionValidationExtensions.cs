@@ -27,6 +27,7 @@ namespace Beef.Demo.Business
             return services.AddScoped<IValidator<Person>, PersonValidator>()
                            .AddScoped<IValidator<PersonArgs>, PersonArgsValidator>()
                            .AddScoped<IValidator<PersonDetail>, PersonDetailValidator>()
+                           .AddScoped<IValidator<AddressCollection>, AddressCollectionValidator>()
                            .AddScoped<IValidator<ProductArgs>, ProductArgsValidator>()
                            .AddScoped<IValidator<Robot>, RobotValidator>()
                            .AddScoped<IValidator<RobotArgs>, RobotArgsValidator>();

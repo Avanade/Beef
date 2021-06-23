@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.12
+- *Enhancement:* Added constructor to `UsingAgentTesterServer` to allow settings for underlying `AgentTestServer`.
+
 ## v4.1.11
 - *Enhancement:* Added `Test` method to `EventSubscriberTester` to reset the internal state so the instance can be reused for a new test execution.
 

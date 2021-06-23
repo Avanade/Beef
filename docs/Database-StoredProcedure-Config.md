@@ -93,6 +93,7 @@ Provides the _Authorization_ configuration.
 Property | Description
 -|-
 `permission` | The name of the `StoredProcedure` in the database.
+**`orgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. Defaults to `Table.OrgUnitImmutable`.
 
 <br/>
 
