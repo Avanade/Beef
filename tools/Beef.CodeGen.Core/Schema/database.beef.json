@@ -228,6 +228,11 @@
       "title": "The path (directory) for the CDC-related (.NET) artefacts.",
       "description": "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
     },
+    "orgUnitImmutable": {
+      "type": "boolean",
+      "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+      "description": "This is only applicable for stored procedures."
+    },
     "namespaceBase": {
       "type": "string",
       "title": "The base Namespace (root) for the .NET artefacts.",
@@ -374,6 +379,11 @@
               "type": "string",
               "title": "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure)."
             },
+            "orgUnitImmutable": {
+              "type": "boolean",
+              "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+              "description": "Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures."
+            },
             "columnNameIsDeleted": {
               "type": "string",
               "title": "The column name for the `IsDeleted` capability.",
@@ -488,6 +498,11 @@
                     "permission": {
                       "type": "string",
                       "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "orgUnitImmutable": {
+                      "type": "boolean",
+                      "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+                      "description": "Defaults to `Table.OrgUnitImmutable`."
                     },
                     "includeColumns": {
                       "type": "array",

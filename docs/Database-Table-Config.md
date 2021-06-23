@@ -118,6 +118,7 @@ Provides the _Authorization_ configuration.
 Property | Description
 -|-
 **`permission`** | The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).
+**`orgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.
 
 <br/>
 

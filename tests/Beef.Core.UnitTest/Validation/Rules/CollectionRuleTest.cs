@@ -14,7 +14,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class CollectionRuleTest
     {
         [Test]
-        public async Task Validate()
+        public async Task Validate_Errors()
         {
             var v1 = await new int[] { 1 }.Validate().Collection(2).RunAsync();
             Assert.IsTrue(v1.HasError);
@@ -51,7 +51,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
-        public async Task Validate2()
+        public async Task Validate_MinCount()
         {
             var v1 = await new List<int> { 1 }.Validate().Collection(2).RunAsync();
             Assert.IsTrue(v1.HasError);
@@ -114,6 +114,20 @@ namespace Beef.Core.UnitTest.Validation.Rules
             Assert.AreEqual("Value contains duplicates; Code value 'ABC' specified more than once.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Validate_Ints()
+        {
+            var v1 = await new int[] { 1, 2, 3, 4 }.Validate(name: "Array").Collection(maxCount: 5).RunAsync();
+            Assert.IsFalse(v1.HasError);
+
+            v1 = await new int[] { 1, 2, 3, 4 }.Validate(name: "Array").Collection(maxCount: 3).RunAsync();
+            Assert.IsTrue(v1.HasError);
+            Assert.AreEqual(1, v1.Messages.Count);
+            Assert.AreEqual("Array must not exceed 3 item(s).", v1.Messages[0].Text);
+            Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
+            Assert.AreEqual("Array", v1.Messages[0].Property);
         }
     }
 }

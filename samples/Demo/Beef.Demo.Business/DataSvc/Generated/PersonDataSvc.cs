@@ -383,6 +383,13 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        public Task ParamCollAsync(AddressCollection? addresses)
+            => DataSvcInvoker.Current.InvokeAsync(this, () => ParamCollOnImplementationAsync(addresses));
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

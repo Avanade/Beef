@@ -181,6 +181,12 @@ namespace Beef.Demo.Business
         Task<string?> InvokeApiViaAgentAsync(Guid id);
 
         /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        Task ParamCollAsync(AddressCollection? addresses);
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

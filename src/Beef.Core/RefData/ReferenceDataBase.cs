@@ -698,18 +698,9 @@ namespace Beef.RefData
         #region ICleanUp
 
         /// <summary>
-        /// Performs a clean-up of the <see cref="ReferenceDataBase"/> resetting property values as appropriate to ensure
-        /// a basic data consistency.
+        /// Performs a clean-up of the <see cref="ReferenceDataBase"/> resetting property values as appropriate to ensure a basic data consistency.
         /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Text = Cleaner.Clean(_text);
-            Description = Cleaner.Clean(_description);
-            IsActive = Cleaner.Clean(_isActive);
-            StartDate = Cleaner.Clean(_startDate, DateTimeTransform.DateOnly);
-            EndDate = Cleaner.Clean(_endDate, DateTimeTransform.DateOnly);
-        }
+        public override void CleanUp() => base.CleanUp();
 
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.

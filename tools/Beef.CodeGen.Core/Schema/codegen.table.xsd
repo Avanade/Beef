@@ -186,6 +186,11 @@
                       <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="OrgUnitImmutable" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. Defaults to `Table.OrgUnitImmutable`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="IncludeColumns" use="optional">
                     <xs:annotation>
                       <xs:documentation>The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`). Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.</xs:documentation>
@@ -304,6 +309,11 @@
             <xs:attribute name="Permission" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="OrgUnitImmutable" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
@@ -1168,6 +1178,11 @@
       <xs:attribute name="PathCdcPublisher" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="OrgUnitImmutable" use="optional" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. This is only applicable for stored procedures.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="NamespaceBase" use="optional" type="xs:string">

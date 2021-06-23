@@ -366,5 +366,18 @@ namespace Beef.Demo.Test
         }
 
         #endregion
+
+        #region Other
+
+        [Test, TestSetUp]
+        public void Z100_RaisePowerSourceChange()
+        {
+            AgentTester.Test<RobotAgent>()
+                .ExpectStatusCode(HttpStatusCode.Accepted)
+                .ExpectEvent($"Demo.Robot.{3.ToGuid()}", "PowerSourceChange")
+                .Run(a => a.RaisePowerSourceChangeAsync(3.ToGuid(), "F"));
+        }
+
+        #endregion
     }
 }

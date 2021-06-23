@@ -67,7 +67,7 @@ properties: [
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The .NET `Type`.", IsImportant = true,
-            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data " +
+            Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data " +
             "`using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
         public string? Type { get; set; }
 
@@ -653,7 +653,7 @@ properties: [
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
             IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
-            Immutable = DefaultWhereNull(Immutable, () => false);
+            Immutable = DefaultWhereNull(Immutable, () => RefDataMapping.HasValue && RefDataMapping.Value == true);
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
 
             DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);

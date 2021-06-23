@@ -29,5 +29,10 @@ namespace Beef.Demo.Business.DataSvc
             _evtPub.PublishValue(value, $"Beef.Demo.NoSend.{value.Id}");
             return Task.FromResult(value);
         }
+
+        private Task ParamCollOnImplementationAsync(AddressCollection addresses)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

@@ -2,7 +2,9 @@
 
 using Beef.Entities;
 using Beef.Reflection;
+using Beef.Validation.Rules;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -23,11 +25,37 @@ namespace Beef.Validation
         /// <summary>
         /// Creates a <see cref="Validator{TEntity}"/>.
         /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <returns>A <see cref="Validator{TEntity}"/>.</returns>
-        public static Validator<TEntity> Create<TEntity>() where TEntity : class
-        {
-            return new Validator<TEntity>();
-        }
+        public static Validator<TEntity> Create<TEntity>() where TEntity : class => new Validator<TEntity>();
+
+        /// <summary>
+        /// Creates a <see cref="CollectionValidator{TColl, TItem}"/>.
+        /// </summary>
+        /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
+        /// <param name="minCount">The minimum count.</param>
+        /// <param name="maxCount">The maximum count.</param>
+        /// <param name="item">The item <see cref="ICollectionRuleItem"/> configuration.</param>
+        /// <param name="allowNullItems">Indicates whether the underlying collection item must not be null.</param>
+        /// <returns>The <see cref="CollectionValidator{TColl, TItem}"/>.</returns>
+        public static CollectionValidator<TColl, TItem> Create<TColl, TItem>(int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null, bool allowNullItems = false) where TColl : class, IEnumerable<TItem> => 
+            new CollectionValidator<TColl, TItem> { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullItems = allowNullItems };
+
+        /// <summary>
+        /// Creates a <see cref="DictionaryValidator{TDict, TKey, TValue}"/>.
+        /// </summary>
+        /// <typeparam name="TDict">The dictionary <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
+        /// <param name="minCount">The minimum count.</param>
+        /// <param name="maxCount">The maximum count.</param>
+        /// <param name="value">The item <see cref="ICollectionRuleItem"/> configuration.</param>
+        /// <param name="allowNullKeys">Indicates whether the underlying dictionary key can be null.</param>
+        /// <param name="allowNullValues">Indicates whether the underlying dictionary value can be null.</param>
+        /// <returns>The <see cref="CollectionValidator{TColl, TItem}"/>.</returns>
+        public static DictionaryValidator<TDict, TKey, TValue> Create<TDict, TKey, TValue>(int minCount = 0, int? maxCount = null, IDictionaryRuleValue? value = null, bool allowNullKeys = false, bool allowNullValues = false) where TDict : class, IDictionary<TKey, TValue> =>
+            new DictionaryValidator<TDict, TKey, TValue> { MinCount = minCount, MaxCount = maxCount, Value = value, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullValues };
     }
 
     /// <summary>

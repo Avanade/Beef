@@ -194,6 +194,42 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
     }
+
+    #region Collection
+
+    /// <summary>
+    /// Represents the <see cref="Address"/> collection.
+    /// </summary>
+    public partial class AddressCollection : EntityBaseCollection<Address>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AddressCollection"/> class.
+        /// </summary>
+        public AddressCollection() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AddressCollection"/> class with an entities range.
+        /// </summary>
+        /// <param name="entities">The <see cref="Address"/> entities.</param>
+        public AddressCollection(IEnumerable<Address> entities) => AddRange(entities);
+
+        /// <summary>
+        /// Creates a deep copy of the <see cref="AddressCollection"/>.
+        /// </summary>
+        /// <returns>A deep copy of the <see cref="AddressCollection"/>.</returns>
+        public override object Clone()
+        {
+            var clone = new AddressCollection();
+            foreach (var item in this)
+            {
+                clone.Add((Address)item.Clone());
+            }
+                
+            return clone;
+        }
+    }
+
+    #endregion  
 }
 
 #pragma warning restore

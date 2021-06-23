@@ -44,29 +44,29 @@ namespace Beef.Validation.Rules
         /// Create an instance of the <see cref="DictionaryRuleValue{TKey, TValueEntity}"/> class with no <see cref="Validator"/>.
         /// </summary>
         /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TValueEntity">The value entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The value entity <see cref="Type"/>.</typeparam>
         /// <returns>The <see cref="DictionaryRuleValue{TKey, TValueEntity}"/>.</returns>
-        public static DictionaryRuleValue<TKey, TValueEntity> Create<TKey, TValueEntity>() where TValueEntity : class => new DictionaryRuleValue<TKey, TValueEntity>(null);
+        public static DictionaryRuleValue<TKey, TValue> Create<TKey, TValue>() where TValue : class => new DictionaryRuleValue<TKey, TValue>(null);
 
         /// <summary>
         /// Create an instance of the <see cref="DictionaryRuleValue{TKey, TValueEntity}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
         /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TValueEntity">The value entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The value entity <see cref="Type"/>.</typeparam>
         /// <param name="validator">The corresponding value <see cref="IValidator{TValueEntity}"/>.</param>
         /// <returns>The <see cref="DictionaryRuleValue{TKey, TValueEntity}"/>.</returns>
-        public static DictionaryRuleValue<TKey, TValueEntity> Create<TKey, TValueEntity>(IValidator<TValueEntity> validator) where TValueEntity : class
+        public static DictionaryRuleValue<TKey, TValue> Create<TKey, TValue>(IValidator<TValue> validator) where TValue : class
             => new(validator ?? throw new ArgumentNullException(nameof(validator)));
 
         /// <summary>
         /// Create an instance of the <see cref="DictionaryRuleValue{TKey, TValueEntity}"/> class leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
         /// </summary>
         /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TValueEntity">The value entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The value entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValidator">The value validator <see cref="Type"/>.</typeparam>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>; defaults to <see cref="ExecutionContext.ServiceProvider"/> where not specified.</param>
         /// <returns>The <see cref="DictionaryRuleValue{TKey, TValueEntity}"/>.</returns>
-        public static DictionaryRuleValue<TKey, TValueEntity> Create<TKey, TValueEntity, TValidator>(IServiceProvider? serviceProvider = null) where TValueEntity : class where TValidator : IValidator<TValueEntity>
+        public static DictionaryRuleValue<TKey, TValue> Create<TKey, TValue, TValidator>(IServiceProvider? serviceProvider = null) where TValue : class where TValidator : IValidator<TValue>
             => new(serviceProvider == null
                 ? ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!
                 : (serviceProvider.GetService<TValidator>() ?? throw new InvalidOperationException($"Attempted to get service '{typeof(TValidator).FullName}' but null was returned; this would indicate that the service has not been configured correctly.")));
@@ -139,7 +139,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Indicates whether the underlying dictionary value can be null.
         /// </summary>
-        public bool AllowNullItems { get; set; }
+        public bool AllowNullValues { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum count;
@@ -211,7 +211,7 @@ namespace Beef.Validation.Rules
                 if (!AllowNullKeys && de.Key == null)
                     hasNullKey = true;
 
-                if (!AllowNullItems && de.Value == null)
+                if (!AllowNullValues && de.Value == null)
                     hasNullValue = true;
 
                 // Validate and merge.

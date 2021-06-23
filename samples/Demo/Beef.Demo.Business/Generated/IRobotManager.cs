@@ -61,7 +61,7 @@ namespace Beef.Demo.Business
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        /// <param name="powerSource">The Power Source.</param>
         Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource);
     }
 }

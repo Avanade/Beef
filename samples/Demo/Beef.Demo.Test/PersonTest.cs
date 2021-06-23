@@ -1154,6 +1154,26 @@ namespace Beef.Demo.Test
             Assert.Pass("Expected Publish/Send mismatch.");
         }
 
+        [Test, TestSetUp]
+        public void I410_ParamColl_Error()
+        {
+            AgentTester.Test<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectMessages(
+                     "Addresses must not exceed 2 item(s).",
+                     "Street is required.")
+                .Run(a => a.ParamCollAsync(new AddressCollection { new Address { Street = "Aaa", City = "Bbb" }, new Address { Street = "Ccc", City = "Ddd" }, new Address { City = "Xxx" } }));
+        }
+
+        [Test, TestSetUp]
+        public void I410_ParamColl_Duplicate()
+        {
+            AgentTester.Test<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectMessages("Addresses contains duplicates; Street value 'Aaa' specified more than once.")
+                .Run(a => a.ParamCollAsync(new AddressCollection { new Address { Street = "Aaa", City = "Bbb" }, new Address { Street = "Aaa", City = "Ddd" }}));
+        }
+
         #endregion
     }
 }

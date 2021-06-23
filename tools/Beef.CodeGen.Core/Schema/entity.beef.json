@@ -877,7 +877,7 @@
                     "type": {
                       "type": "string",
                       "title": "The .NET `Type`.",
-                      "description": "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`"
+                      "description": "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`"
                     },
                     "nullable": {
                       "type": "boolean",
@@ -982,7 +982,7 @@
                     "refDataType": {
                       "type": "string",
                       "title": "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).",
-                      "description": "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.",
+                      "description": "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.` or `^`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.",
                       "enum": [
                         "string",
                         "int",
@@ -1503,7 +1503,7 @@
                             "type": {
                               "type": "string",
                               "title": "The .NET `Type`.",
-                              "description": "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data using statement is used. Shortcut: Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`"
+                              "description": "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`"
                             },
                             "nullable": {
                               "type": "boolean",
