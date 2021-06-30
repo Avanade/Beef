@@ -68,7 +68,7 @@ namespace Beef.Validation
     /// Provides a validation context for an entity.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    public class ValidationContext<TEntity> : IValidationContext where TEntity : class
+    public class ValidationContext<TEntity> : IValidationContext 
     {
         private readonly Dictionary<string, MessageItem> _propertyErrors = new();
 
@@ -85,7 +85,7 @@ namespace Beef.Validation
 
             Value = value;
             FullyQualifiedEntityName = fullyQualifiedEntityNameOverride ?? args.FullyQualifiedEntityName;
-            FullyQualifiedJsonEntityName = fullyQualifiedJsonEntityNameOverride ?? args.FullyQualifiedJsonEntityName;
+            FullyQualifiedJsonEntityName = fullyQualifiedJsonEntityNameOverride ?? args.FullyQualifiedJsonEntityName ?? FullyQualifiedEntityName;
             UseJsonNames = args.UseJsonNamesSelection;
             Config = args.Config;
             SelectedPropertyName = args.SelectedPropertyName;

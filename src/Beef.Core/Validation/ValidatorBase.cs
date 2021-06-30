@@ -23,22 +23,22 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
         /// </summary>
-        Type EntityType { get; }
+        Type ValueType { get; }
     }
 
     /// <summary>
-    /// Enables a <see cref="ValidateAsync(TEntity, ValidationArgs)"/>.
+    /// Enables a <see cref="ValidateAsync(T, ValidationArgs)"/>.
     /// </summary>
-    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    public interface IValidator<TEntity> : IValidator where TEntity : class
+    /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+    public interface IValidator<T> : IValidator
     {
         /// <summary>
         /// Validate the entity value with specified <see cref="ValidationArgs"/>.
         /// </summary>
-        /// <param name="value">The entity value.</param>
+        /// <param name="value">The value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
-        Task<ValidationContext<TEntity>> ValidateAsync(TEntity value, ValidationArgs args);
+        Task<ValidationContext<T>> ValidateAsync(T value, ValidationArgs args);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace Beef.Validation
         public virtual PropertyRule<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
 #pragma warning restore CA1716
         {
-            PropertyRule<TEntity, TProperty> rule = new PropertyRule<TEntity, TProperty>(propertyExpression);
+            PropertyRule<TEntity, TProperty> rule = new(propertyExpression);
             Rules.Add(rule);
             return rule;
         }
@@ -93,6 +93,6 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
         /// </summary>
-        Type IValidator.EntityType => typeof(TEntity);
+        Type IValidator.ValueType => typeof(TEntity);
     }
 }

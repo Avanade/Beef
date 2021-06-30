@@ -1,6 +1,6 @@
 Demo:
   - Person:
-    - { PersonId: 1, FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18, UniqueCode: A1234, MetadataJson: '{"Key":"Value"}' }
+    - { PersonId: 1, FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18, UniqueCode: A1234, MetadataJson: '{"F":"Value"}' }
     - { PersonId: 2, FirstName: Brian, LastName: Smith, Gender: M, EyeColorCode: BLUE, Birthday: 1994-11-07, UniqueCode: B2345 }
     - { PersonId: 3, FirstName: Rachael, LastName: Browne, Gender: F, Birthday: 1972-06-28, Street: 25 Upoko Road, City: Wellington }
     - { PersonId: 4, FirstName: Waylon, LastName: Smithers, Gender: M, Birthday: 1952-02-21, UniqueCode: C3456 }

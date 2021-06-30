@@ -2,6 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.16
+- *Summary:* Issue [138](https://github.com/Avanade/Beef/issues/138). This is a minor overhaul to the validation capability to support validation of any types via the new `GenericValidator<T>`. The Collection and Dictionary validations have been updated so intrinsic values can be validated, as well as the existing complex entities. For the Dictionary both the `Key` and `Value` can be validated. The [`PersonValidator`](../../samples/Demo/Beef.Demo.Business/Validation/PersonValidator.cs) example has been updated to demonstrate usage. Although, there are a number of breaking changes below, for the most part there should be little impact given limited usage outside of framework itself.
+- *Enhancement:* Added `GenericValidator<T>` which is similar to `Validator<T>` except it supports any `Type`; it is primarily intended for single intrinsic validations such as `string`, `int` or `struct`. There is a single `Rule` method to enable the additional of fluent rules. Complex `Type` validation should continue to use the existing `Validator<T>`.
+- *Enhancement:* The `CollectionRuleItem.Create` methods have had the `Type` constraint removed; no longer just supports entity classes. Also, renamed `Validator` property to `ItemValidator` (breaking change).
+- *Enhancement:* The `DictionaryRuleItem.Create` method has had the `Type` constraint removed; no longer just supports entity classes. Also, renamed `Validator` property to `ValueValidator` (breaking change), and added corresponding new `KeyValidator` property. `DictionaryRuleValue` has been renamed to	`DictionaryRuleItem` (breaking change).
+- *Enhancement:* Added `ReferenceDataCodeRule` to enable validation of a reference data code, being a `string` value. A corresponding `RefDataCode` validator extension method has been added. Example: `Property(x => x.GenderCode).RefDataCode().As<Gender>()`.
+- *Enhancement:* The `DictionaryValidator.Value` property renamed to  `DictionaryValidator.Item` (breaking change).
+- *Enhancement:* The `Validator` static class has had the `Create` methods for collection and dictionary renamed to `CreateCollection` and `CreateDictionary` respectively (breaking changes). New `CreateGeneric<T>` method added to support the new `GenericValidator<T>`. A new `Create<TValidator>` where `TValidator` is `IValidator` method has also been added to create/get from a `ServiceProvider` (dependency injection).
+- *Enhancement:* To enable the `GenericValidator<T>` the `IValidator.EntityType` has been renamed to `ValueType` (breaking change). The `IValidator<T>` has had the `Type` constraint removed.
+
 ## v4.1.15
 - *Fixed:* The `AddBeefCachePolicyManager` parameter `useCachePolicyManagerTimer` when set to `false` was incorrectly starting the timer resulting in itself and the `CachePolicyManagerServiceHost` running.
 - *Fixed:* The `ReferenceDataBase` should not `CleanUp` the key properties as they are considered immutable.

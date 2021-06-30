@@ -87,7 +87,7 @@ namespace Beef.Validation
             foreach (var item in value)
             {
                 var name = "[" + i + "]";
-                var ictx = new PropertyContext<TColl, TItem>(context, item, name, name, Validator.ValueNameDefault);
+                var ictx = new PropertyContext<TColl, TItem>(context, item, name, name, StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
                 var iargs = ictx.CreateValidationArgs();
                 i++;
 
@@ -95,16 +95,16 @@ namespace Beef.Validation
                     hasNullItem = true;
 
                 // Validate and merge.
-                if (item != null && Item?.Validator != null)
+                if (item != null && Item?.ItemValidator != null)
                 {
-                    var r = await Item.Validator.ValidateAsync(item, iargs).ConfigureAwait(false);
+                    var r = await Item.ItemValidator.ValidateAsync(item, iargs).ConfigureAwait(false);
                     context.MergeResult(r);
                     if (r.HasErrors)
                         hasItemErrors = true;
                 }
             }
 
-            var text = new Lazy<LText>(() => Text ?? Beef.StringConversion.ToSentenceCase(args?.FullyQualifiedEntityName) ?? Validator.ValueNameDefault);
+            var text = new Lazy<LText>(() => Text ?? Beef.StringConversion.ToSentenceCase(args?.FullyQualifiedEntityName) ?? StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
             if (hasNullItem)
                 context.AddMessage(Entities.MessageType.Error, ValidatorStrings.CollectionNullItemFormat, new object?[] { text.Value, null });
 

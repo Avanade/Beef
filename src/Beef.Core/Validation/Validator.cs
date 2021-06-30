@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Beef.Reflection;
 using Beef.Validation.Rules;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,27 @@ namespace Beef.Validation
         public static string ValueNameDefault { get; set; } = "Value";
 
         /// <summary>
+        /// Gets or sets the default key name (used by the <see cref="DictionaryValidator{TDict, TKey, TValue}"/>).
+        /// </summary>
+        public static string KeyNameDefault { get; set; } = "Key";
+
+        /// <summary>
         /// Creates a <see cref="Validator{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <returns>A <see cref="Validator{TEntity}"/>.</returns>
-        public static Validator<TEntity> Create<TEntity>() where TEntity : class => new Validator<TEntity>();
+        public static Validator<TEntity> Create<TEntity>() where TEntity : class => new();
+
+        /// <summary>
+        /// Creates (or gets) an instance leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// </summary>
+        /// <typeparam name="TValidator">The validator <see cref="Type"/>.</typeparam>
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>; defaults to <see cref="ExecutionContext.ServiceProvider"/> where not specified.</param>
+        /// <returns>The <typeparamref name="TValidator"/> instance.</returns>
+        public static TValidator Create<TValidator>(IServiceProvider? serviceProvider = null) where TValidator : IValidator
+            => serviceProvider == null
+                ? ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!
+                : (serviceProvider.GetService<TValidator>() ?? throw new InvalidOperationException($"Attempted to get service '{typeof(TValidator).FullName}' but null was returned; this would indicate that the service has not been configured correctly."));
 
         /// <summary>
         /// Creates a <see cref="CollectionValidator{TColl, TItem}"/>.
@@ -39,8 +56,8 @@ namespace Beef.Validation
         /// <param name="item">The item <see cref="ICollectionRuleItem"/> configuration.</param>
         /// <param name="allowNullItems">Indicates whether the underlying collection item must not be null.</param>
         /// <returns>The <see cref="CollectionValidator{TColl, TItem}"/>.</returns>
-        public static CollectionValidator<TColl, TItem> Create<TColl, TItem>(int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null, bool allowNullItems = false) where TColl : class, IEnumerable<TItem> => 
-            new CollectionValidator<TColl, TItem> { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullItems = allowNullItems };
+        public static CollectionValidator<TColl, TItem> CreateCollection<TColl, TItem>(int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null, bool allowNullItems = false) where TColl : class, IEnumerable<TItem> => 
+            new() { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullItems = allowNullItems };
 
         /// <summary>
         /// Creates a <see cref="DictionaryValidator{TDict, TKey, TValue}"/>.
@@ -50,12 +67,19 @@ namespace Beef.Validation
         /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
         /// <param name="minCount">The minimum count.</param>
         /// <param name="maxCount">The maximum count.</param>
-        /// <param name="value">The item <see cref="ICollectionRuleItem"/> configuration.</param>
+        /// <param name="item">The item <see cref="ICollectionRuleItem"/> configuration.</param>
         /// <param name="allowNullKeys">Indicates whether the underlying dictionary key can be null.</param>
         /// <param name="allowNullValues">Indicates whether the underlying dictionary value can be null.</param>
         /// <returns>The <see cref="CollectionValidator{TColl, TItem}"/>.</returns>
-        public static DictionaryValidator<TDict, TKey, TValue> Create<TDict, TKey, TValue>(int minCount = 0, int? maxCount = null, IDictionaryRuleValue? value = null, bool allowNullKeys = false, bool allowNullValues = false) where TDict : class, IDictionary<TKey, TValue> =>
-            new DictionaryValidator<TDict, TKey, TValue> { MinCount = minCount, MaxCount = maxCount, Value = value, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullValues };
+        public static DictionaryValidator<TDict, TKey, TValue> CreateDictionary<TDict, TKey, TValue>(int minCount = 0, int? maxCount = null, IDictionaryRuleItem? item = null, bool allowNullKeys = false, bool allowNullValues = false) where TDict : class, IDictionary<TKey, TValue> =>
+            new() { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullValues };
+
+        /// <summary>
+        /// Creates a <see cref="GenericValidator{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <returns>The <see cref="GenericValidator{T}"/>.</returns>
+        public static GenericValidator<T> CreateGeneric<T>() => new();
     }
 
     /// <summary>
@@ -71,7 +95,7 @@ namespace Beef.Validation
         /// <summary>
         /// Validate the entity value with specified <see cref="ValidationArgs"/>.
         /// </summary>
-        /// <param name="value">The entity value.</param>
+        /// <param name="value">The entity value to validate.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="ValidationContext{TEntity}"/>.</returns>
         public override async Task<ValidationContext<TEntity>> ValidateAsync(TEntity value, ValidationArgs? args = null)
@@ -114,11 +138,11 @@ namespace Beef.Validation
         }
 
         /// <summary>
-        /// Adds the <see cref="PropertyRule{TEntity, TProperty}"/> to the validator allowing enabling additional configuration via the specified <paramref name="property"/> action.
+        /// Adds the <see cref="PropertyRule{TEntity, TProperty}"/> to the validator enabling additional configuration via the specified <paramref name="property"/> action.
         /// </summary>
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <param name="property">The action to act of the created <see cref="PropertyRule{TEntity, TProperty}"/>.</param>
+        /// <param name="property">The action to act on the created <see cref="PropertyRule{TEntity, TProperty}"/>.</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
         public Validator<TEntity> HasProperty<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, Action<PropertyRule<TEntity, TProperty>>? property = null)
         {

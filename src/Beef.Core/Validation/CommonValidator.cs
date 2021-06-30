@@ -52,11 +52,23 @@ namespace Beef.Validation
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public async Task<ValueValidatorResult<ValidationValue<T>, T>> ValidateAsync(T value, string? name = null, LText? text = null, bool throwOnError = false)
+        public Task<ValueValidatorResult<ValidationValue<T>, T>> ValidateAsync(T value, string? name = null, LText? text = null, bool throwOnError = false)
+            => ValidateAsync(value, name ?? Validator.ValueNameDefault, name ?? Validator.ValueNameDefault, text ?? StringConversion.ToSentenceCase(name ?? Validator.ValueNameDefault)!, throwOnError);
+
+        /// <summary>
+        /// Validates the value.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="name">The value name.</param>
+        /// <param name="jsonName">The value JSON name.</param>
+        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
+        /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
+        /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
+        public async Task<ValueValidatorResult<ValidationValue<T>, T>> ValidateAsync(T value, string name, string jsonName, LText? text = null, bool throwOnError = false)
         {
             var vv = new ValidationValue<T>(null, value);
             var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(vv,
-                new ValidationArgs()), value, name ?? Validator.ValueNameDefault, null, text);
+                new ValidationArgs()), value, Check.NotNull(name, nameof(name)), Check.NotNull(jsonName, nameof(jsonName)), text ?? StringConversion.ToSentenceCase(name)!);
 
             await InvokeAsync(ctx).ConfigureAwait(false);
             var res = new ValueValidatorResult<ValidationValue<T>, T>(ctx);

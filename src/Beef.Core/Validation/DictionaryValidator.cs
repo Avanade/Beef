@@ -3,6 +3,7 @@
 using Beef.Validation.Rules;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.Validation
@@ -16,7 +17,7 @@ namespace Beef.Validation
     public class DictionaryValidator<TDict, TKey, TValue> : ValidatorBase<TDict>
         where TDict : class, IDictionary<TKey, TValue>
     {
-        private IDictionaryRuleValue? _value;
+        private IDictionaryRuleItem? _item;
         private Func<ValidationContext<TDict>, Task>? _additionalAsync;
 
         /// <summary>
@@ -42,22 +43,25 @@ namespace Beef.Validation
         /// <summary>
         /// Gets or sets the collection item validation configuration.
         /// </summary>
-        public IDictionaryRuleValue? Value
+        public IDictionaryRuleItem? Item
         {
-            get => _value;
+            get => _item;
 
             set
             {
                 if (value == null)
                 {
-                    _value = value;
+                    _item = value;
                     return;
                 }
 
-                if (typeof(TValue) != value.ValueType)
-                    throw new ArgumentException($"A CollectionRule TProperty ItemType '{typeof(TValue).Name}' must be the same as the Item {value.ValueType.Name}");
+                if (typeof(TKey) != value.KeyType)
+                    throw new ArgumentException($"A CollectionRule TProperty Key Type '{typeof(TKey).Name}' must be the same as the Key {value.KeyType.Name}.");
 
-                _value = value;
+                if (typeof(TValue) != value.ValueType)
+                    throw new ArgumentException($"A CollectionRule TProperty Value Type '{typeof(TValue).Name}' must be the same as the Value {value.ValueType.Name}.");
+
+                _item = value;
             }
         }
 
@@ -93,8 +97,6 @@ namespace Beef.Validation
             foreach (var item in value)
             {
                 var name = "[" + item.Key + "]";
-                var ictx = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name, Validator.ValueNameDefault);
-                var iargs = ictx.CreateValidationArgs();
                 i++;
 
                 if (!AllowNullKeys && item.Key == null)
@@ -104,9 +106,21 @@ namespace Beef.Validation
                     hasNullValue = true;
 
                 // Validate and merge.
-                if (item.Value != null && Value?.Validator != null)
+                if (item.Key != null && Item?.KeyValidator != null)
                 {
-                    var r = await Value.Validator.ValidateAsync(item.Value, iargs).ConfigureAwait(false);
+                    var kctx = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name, StringConversion.ToSentenceCase(Validator.KeyNameDefault)!);
+                    var kargs = kctx.CreateValidationArgs();
+                    var kval = Item.KeyValidator is IGenericValidator gv ? gv.CreateValidationValue(item.Key) : item.Key;
+                    var r = await Item.KeyValidator.ValidateAsync(kval, kargs).ConfigureAwait(false);
+                    context.MergeResult(r);
+                }
+
+                if (item.Value != null && Item?.ValueValidator != null)
+                {
+                    var ictx = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name, StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
+                    var iargs = ictx.CreateValidationArgs();
+                    var vval = Item.ValueValidator is IGenericValidator gv ? gv.CreateValidationValue(item.Value) : item.Value;
+                    var r = await Item.ValueValidator.ValidateAsync(vval, iargs).ConfigureAwait(false);
                     context.MergeResult(r);
                 }
             }
