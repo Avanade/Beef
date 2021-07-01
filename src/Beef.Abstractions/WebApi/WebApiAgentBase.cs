@@ -427,12 +427,14 @@ namespace Beef.WebApi
         protected Uri CreateFullUri(string? urlSuffix = null, WebApiArg[]? args = null, WebApiRequestOptions? requestOptions = null)
         {
             // Concatenate the base and specific url strings to form the full Url.
-            string fullUrl = Args.HttpClient.BaseAddress.AbsoluteUri;
-            if (fullUrl[^1] != '/')
-                fullUrl += "/";
-
+            var fullUrl = Args.HttpClient.BaseAddress.AbsoluteUri;
             if (!string.IsNullOrEmpty(urlSuffix))
+            {
+                if (fullUrl[^1] != '/')
+                    fullUrl += "/";
+
                 fullUrl += ((urlSuffix[0] == '/') ? urlSuffix[1..] : urlSuffix);
+            }
 
             // Replace known url tokens with passed argument values.
             if (args != null)

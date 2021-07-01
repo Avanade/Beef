@@ -268,7 +268,7 @@ namespace Beef.WebApi
 #pragma warning restore CA1054 
         {
             if (Check.NotNull(sb, nameof(sb)).Length > 0)
-                sb.Append("&");
+                sb.Append('&');
 
             sb.Append(uriValue);
         }
@@ -340,7 +340,7 @@ namespace Beef.WebApi
             if (Value == null)
                 return null;
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             if (Value.IsSkipTake)
             {
                 if (Value.Skip > 0)

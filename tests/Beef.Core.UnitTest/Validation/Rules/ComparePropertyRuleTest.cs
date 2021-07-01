@@ -12,6 +12,9 @@ namespace Beef.Core.UnitTest.Validation.Rules
     [TestFixture]
     public class ComparePropertyRuleTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         [Test]
         public async Task Validate()
         {

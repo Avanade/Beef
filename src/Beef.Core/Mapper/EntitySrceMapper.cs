@@ -36,9 +36,9 @@ namespace Beef.Mapper
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     public abstract class EntitySrceMapper<TSrce> : IEntitySrceMapper<TSrce> where TSrce : class
     {
-        private readonly List<IPropertySrceMapper<TSrce>> _mappings = new List<IPropertySrceMapper<TSrce>>();
-        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
-        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
+        private readonly List<IPropertySrceMapper<TSrce>> _mappings = new();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new();
         private IPropertyMapperBase[]? _uniqueKey;
 
         /// <summary>

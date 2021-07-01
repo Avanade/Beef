@@ -13,7 +13,7 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The property <see cref="System.Type"/>.</typeparam>
     public abstract class ValueRuleBase<TEntity, TProperty> : IValueRule<TEntity, TProperty> where TEntity : class
     {
-        private readonly List<IPropertyRuleClause<TEntity>> _clauses = new List<IPropertyRuleClause<TEntity>>();
+        private readonly List<IPropertyRuleClause<TEntity>> _clauses = new();
 
         /// <summary>
         /// Gets or sets the error message format text (overrides the default).

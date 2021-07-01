@@ -26,6 +26,11 @@ namespace Beef.Test.NUnit
         private MessageItemCollection? _expectedMessages;
 
         /// <summary>
+        /// Static constructor.
+        /// </summary>
+        static ValidationTester() => TextProvider.SetTextProvider(new DefaultTextProvider());
+
+        /// <summary>
         /// Create a new <see cref="ValidationTester"/> for a named <paramref name="username"/>.
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>

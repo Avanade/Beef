@@ -48,7 +48,8 @@ namespace Beef.Demo.Api
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                     .AddBeefWebApiServices()
                     .AddBeefGrpcServiceServices()
-                    .AddBeefBusinessServices();
+                    .AddBeefBusinessServices()
+                    .AddBeefTextProviderAsSingleton();
 
             // Add the data sources as singletons for dependency injection requirements.
             services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))

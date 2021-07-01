@@ -129,7 +129,7 @@ namespace Beef
                     return query.Where(x =>
                     {
                         var v = property.Invoke(x);
-                        return checkForNull ? v != null && v.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0 : v!.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0;
+                        return checkForNull ? v != null && v.Contains(wr.GetTextWithoutWildcards(), sc) : v!.Contains(wr.GetTextWithoutWildcards(), sc);
                     });
                 else if (wr.Selection.HasFlag(WildcardSelection.StartsWith))
                     return query.Where(x =>

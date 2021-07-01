@@ -15,6 +15,9 @@ namespace Beef.Core.UnitTest.Validation
     [TestFixture]
     public class ValidatorTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         [Test]
         public async Task Create_NewValidator()
         {

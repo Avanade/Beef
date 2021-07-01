@@ -15,6 +15,9 @@ namespace Beef.Core.UnitTest.Validation.Rules
         private static readonly IValidator _tiv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
         private static readonly IValidator _tev = Validator.Create<TestEntity>().HasProperty(x => x.Item, p => p.Entity(_tiv));
 
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         [Test]
         public async Task Validate()
         {

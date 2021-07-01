@@ -2,23 +2,29 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Beef</RootNamespace>
     <Version>4.2.1</Version>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
-    <Description>Business Entity Execution Framework (Beef) OData framework.</Description>
+    <Description>Business Entity Execution Framework (Beef) core abstractions.</Description>
+    <LangVersion>latest</LangVersion>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+    <Product>Beef.Abstractions</Product>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
     <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Title>Business Entity Execution Framework (Beef) OData framework.</Title>
+    <Title>Business Entity Execution Framework (Beef) core abstractions.</Title>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PackageTags>beef data odata</PackageTags>
+    <PackageTags>beef framework abstractions</PackageTags>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -29,18 +35,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <DocumentationFile>.\bin\debug\Beef.Data.OData.xml</DocumentationFile>
-    <NoWarn>1701;1702;CA1303;CS8002</NoWarn>
+    <DocumentationFile>.\bin\debug\Beef.Abstractions.xml</DocumentationFile>
+    <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.16" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.ComponentModel" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Simple.OData.V4.Client" Version="5.21.0" />
-  </ItemGroup>
-  
   <ItemGroup>
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>

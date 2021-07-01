@@ -9,7 +9,7 @@ namespace Beef.Mapper.Converters
     /// </summary>
     public class IntToStringConverter : CustomConverter<int, string?>
     {
-        private static readonly Lazy<IntToStringConverter> _default = new Lazy<IntToStringConverter>(() => new IntToStringConverter(), true);
+        private static readonly Lazy<IntToStringConverter> _default = new(() => new IntToStringConverter(), true);
 
         /// <summary>
         /// Gets the default (singleton) instance.
@@ -30,7 +30,7 @@ namespace Beef.Mapper.Converters
     /// </summary>
     public class NullableIntToStringConverter : CustomConverter<int?, string?>
     {
-        private static readonly Lazy<IntToStringConverter> _default = new Lazy<IntToStringConverter>(() => new IntToStringConverter(), true);
+        private static readonly Lazy<IntToStringConverter> _default = new(() => new IntToStringConverter(), true);
 
         /// <summary>
         /// Gets the default (singleton) instance.

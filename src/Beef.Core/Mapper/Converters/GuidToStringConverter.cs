@@ -9,7 +9,7 @@ namespace Beef.Mapper.Converters
     /// </summary>
     public class GuidToStringConverter : CustomConverter<Guid, string?>
     {
-        private static readonly Lazy<GuidToStringConverter> _default = new Lazy<GuidToStringConverter>(() => new GuidToStringConverter(), true);
+        private static readonly Lazy<GuidToStringConverter> _default = new(() => new GuidToStringConverter(), true);
 
         /// <summary>
         /// Gets the default (singleton) instance.
@@ -30,7 +30,7 @@ namespace Beef.Mapper.Converters
     /// </summary>
     public class NullableGuidToStringConverter : CustomConverter<Guid?, string?>
     {
-        private static readonly Lazy<GuidToStringConverter> _default = new Lazy<GuidToStringConverter>(() => new GuidToStringConverter(), true);
+        private static readonly Lazy<GuidToStringConverter> _default = new(() => new GuidToStringConverter(), true);
 
         /// <summary>
         /// Gets the default (singleton) instance.

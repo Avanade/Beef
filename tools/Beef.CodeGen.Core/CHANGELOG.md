@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+- *Enhancement:* A code-generation change was required to the Reference Data Web API Controller template as a result of the changes to the `ReferenceDataFilter` and new `ReferenceDataFilterer` for the `Beef.Abstractions` change.
+
 ## v4.1.27
 - *Fixed:* A Web API agent reference data parameter should use the underlying `RefDataType` not the reference data `Type` itself as the operation parameter (decouple reference data types from Agent contracts).
 

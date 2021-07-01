@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Mapper.Converters;
-using Beef.Reflection;
 using System;
 
 namespace Beef.Mapper
@@ -83,12 +82,7 @@ namespace Beef.Mapper
         void SetOperationTypes(OperationTypes operationTypes);
 
         /// <summary>
-        /// Gets the <see cref="Beef.Reflection.ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
-        /// </summary>
-        ComplexTypeReflector? SrceComplexTypeReflector { get; }
-
-        /// <summary>
-        /// Indicates whether the property is a complex type or complex type collection (see <see cref="SrceComplexTypeReflector"/>).
+        ///  Indicates whether the property is a complex type or complex type collection.
         /// </summary>
         bool IsSrceComplexType { get; }
     }

@@ -37,7 +37,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult OpenStatusGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.OpenStatus>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -51,7 +51,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult ProductCategoryGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.ProductCategory>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -65,7 +65,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult AccountUTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.AccountUType>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -79,7 +79,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult MaturityInstructionsGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.MaturityInstructions>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -93,7 +93,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult TransactionTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TransactionType>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -107,7 +107,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult TransactionStatusGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TransactionStatus>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
@@ -133,12 +133,12 @@ namespace Cdr.Banking.Api.Controllers
                 {
                     switch (q.Key)
                     {
-                        case var s when string.Compare(s, nameof(RefDataNamespace.OpenStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.OpenStatus), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.ProductCategory), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.ProductCategory), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.AccountUType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.AccountUType), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.MaturityInstructions), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.MaturityInstructions), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionType), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionStatus), await ReferenceDataFilter.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.OpenStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.OpenStatus), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.ProductCategory), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.ProductCategory), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.AccountUType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.AccountUType), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.MaturityInstructions), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.MaturityInstructions), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionType), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionStatus), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
                     }
                 }
                 

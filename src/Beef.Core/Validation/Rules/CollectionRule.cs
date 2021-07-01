@@ -62,7 +62,7 @@ namespace Beef.Validation.Rules
         /// <typeparam name="TValidator">The item validator <see cref="Type"/>.</typeparam>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>; defaults to <see cref="ExecutionContext.ServiceProvider"/> where not specified.</param>
         /// <returns>The <see cref="CollectionRuleItem{TItem}"/>.</returns>
-        public static CollectionRuleItem<TItem> Create<TItem, TValidator>(IServiceProvider? serviceProvider = null) where TValidator : IValidator<TItem> => new(Validator.Create<TValidator>());
+        public static CollectionRuleItem<TItem> Create<TItem, TValidator>(IServiceProvider? serviceProvider = null) where TValidator : IValidator<TItem> => new(Validator.Create<TValidator>(serviceProvider));
     }
 
     /// <summary>

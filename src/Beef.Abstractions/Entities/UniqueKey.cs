@@ -128,7 +128,7 @@ namespace Beef.Entities
     /// </summary>
     public class UniqueKeyComparer : IEqualityComparer<UniqueKey>
     {
-        private static readonly object _nullObject = new object();
+        private static readonly object _nullObject = new();
 
         /// <summary>
         /// Determines whether the specified <see cref="UniqueKey"/> values are equal.

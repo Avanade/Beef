@@ -149,7 +149,7 @@ namespace Beef.Entities
         /// <returns>A deep copy of the <see cref="ChangeLog"/>.</returns>
         public override object Clone()
         {
-            ChangeLog clone = new ChangeLog();
+            ChangeLog clone = new();
             clone.CopyFrom(this);
             return clone;
         }

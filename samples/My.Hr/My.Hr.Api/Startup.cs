@@ -52,6 +52,7 @@ namespace My.Hr.Api
 
             // Add the core beef services.
             services.AddBeefExecutionContext()
+                    .AddBeefTextProviderAsSingleton()
                     .AddBeefSystemTime()
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())

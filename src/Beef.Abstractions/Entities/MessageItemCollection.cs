@@ -204,7 +204,7 @@ namespace Beef.Entities
         /// <returns>A new <see cref="MessageItemCollection"/>.</returns>
         public MessageItemCollection GetMessagesForType(MessageType type)
         {
-            MessageItemCollection msgs = new MessageItemCollection();
+            MessageItemCollection msgs = new();
 
             foreach (MessageItem item in this)
             {
@@ -223,7 +223,7 @@ namespace Beef.Entities
         /// <returns>A new <see cref="MessageItemCollection"/>.</returns>
         public MessageItemCollection GetMessagesForType(MessageType type, string property)
         {
-            MessageItemCollection msgs = new MessageItemCollection();
+            MessageItemCollection msgs = new();
 
             foreach (MessageItem item in this)
             {
@@ -241,7 +241,7 @@ namespace Beef.Entities
         /// <returns>A new <see cref="MessageItemCollection"/>.</returns>
         public MessageItemCollection GetMessagesForProperty(string property)
         {
-            MessageItemCollection msgs = new MessageItemCollection();
+            MessageItemCollection msgs = new();
 
             foreach (MessageItem item in this)
             {
@@ -317,7 +317,7 @@ namespace Beef.Entities
         /// <returns>A deep copy of the <see cref="MessageItemCollection"/>.</returns>
         public override object Clone()
         {
-            MessageItemCollection clone = new MessageItemCollection();
+            MessageItemCollection clone = new();
             foreach (MessageItem item in this)
                 clone.Add((MessageItem)item.Clone());
 

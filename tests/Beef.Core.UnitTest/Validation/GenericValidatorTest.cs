@@ -7,6 +7,9 @@ namespace Beef.Core.UnitTest.Validation
     [TestFixture]
     public class GenericValidatorTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         public class IntValidator : GenericValidator<int>
         {
             public IntValidator()

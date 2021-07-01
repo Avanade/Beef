@@ -12,7 +12,7 @@ namespace Beef.Caching
     /// </summary>
     public class RequestCache : IRequestCache
     {
-        private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
+        private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new(true);
 
         /// <summary>
         /// Gets the cached value associated with the specified <see cref="Type"/> and key.

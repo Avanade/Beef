@@ -157,34 +157,28 @@ namespace Beef
         /// Adds a singleton service to instantiate a new <see cref="TextProviderBase"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance.</param>
+        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance; defaults to <see cref="DefaultTextProvider"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefTextProviderSingleton(this IServiceCollection services, Func<IServiceProvider, TextProviderBase> createTextProvider)
+        public static IServiceCollection AddBeefTextProviderAsSingleton(this IServiceCollection services, Func<IServiceProvider, TextProviderBase>? createTextProvider = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            if (createTextProvider == null)
-                throw new ArgumentNullException(nameof(createTextProvider));
-
-            return services.AddSingleton(sp => createTextProvider(sp));
+            return services.AddSingleton(sp => createTextProvider?.Invoke(sp) ?? new DefaultTextProvider());
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="TextProviderBase"/> instance.
+        /// Adds a scoped service to instantiate a new <see cref="TextProviderBase"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance.</param>
+        /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance; defaults to <see cref="DefaultTextProvider"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefTextProviderScoped(this IServiceCollection services, Func<IServiceProvider, TextProviderBase> createTextProvider)
+        public static IServiceCollection AddBeefTextProviderAsScoped(this IServiceCollection services, Func<IServiceProvider, TextProviderBase>? createTextProvider = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            if (createTextProvider == null)
-                throw new ArgumentNullException(nameof(createTextProvider));
-
-            return services.AddScoped(sp => createTextProvider(sp));
+            return services.AddScoped(sp => createTextProvider?.Invoke(sp) ?? new DefaultTextProvider());
         }
     }
 }

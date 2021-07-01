@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+
 ## v4.1.7
 - *Fixed:* Fix error `Cannot delete rows from a temporal history table` when resetting (deleting) [temporal table](https://docs.microsoft.com/en-us/sql/relational-databases/tables/temporal-tables) contents during test fixture start-up.
 

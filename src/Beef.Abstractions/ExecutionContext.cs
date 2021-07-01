@@ -94,7 +94,7 @@ namespace Beef
     /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments.</remarks>
     public class ExecutionContext : IExecutionContext
     {
-        private static readonly AsyncLocal<ExecutionContext?> _asyncLocal = new AsyncLocal<ExecutionContext?>();
+        private static readonly AsyncLocal<ExecutionContext?> _asyncLocal = new();
         private static readonly Func<ExecutionContext?> _get = () => _asyncLocal.Value;
         private static readonly Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
 
@@ -107,8 +107,8 @@ namespace Beef
         private bool _timestampChanged;
         private PagingArgs? _pagingArgs;
         private KeyOnlyDictionary<string>? _roles;
-        private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
-        private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<MessageItemCollection> _messages = new(true);
+        private readonly Lazy<Dictionary<string, object>> _properties = new(true);
 
         /// <summary>
         /// Gets the standard message for when changing an immutable value.

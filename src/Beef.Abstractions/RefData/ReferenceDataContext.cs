@@ -15,7 +15,7 @@ namespace Beef.RefData
     public class ReferenceDataContext
     {
         private DateTime? _date;
-        private readonly Dictionary<Type, DateTime?> _coll = new Dictionary<Type, DateTime?>();
+        private readonly Dictionary<Type, DateTime?> _coll = new();
 
         /// <summary>
         /// Initializes a new instances of the <see cref="ReferenceDataContext"/>.

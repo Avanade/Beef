@@ -20,9 +20,9 @@ namespace Beef.RefData.Caching
         where TItem : ReferenceDataBase, new()
     {
         private readonly Func<Task<TColl>> _loadCollection;
-        private readonly ConcurrentDictionary<Guid, CacheValue<TColl>> _dict = new ConcurrentDictionary<Guid, CacheValue<TColl>>();
+        private readonly ConcurrentDictionary<Guid, CacheValue<TColl>> _dict = new();
         private readonly ReferenceDataCacheLoader _loader = ReferenceDataCacheLoader.Create();
-        private readonly KeyedLock<Guid> _keyLock = new KeyedLock<Guid>();
+        private readonly KeyedLock<Guid> _keyLock = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataMultiTenantCache{TColl, TItem}"/> class.

@@ -5,6 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.CodeGen.Core" Version="4.1.27" />
+    <PackageReference Include="Beef.CodeGen.Core" Version="4.2.1" />
   </ItemGroup>
 </Project>
