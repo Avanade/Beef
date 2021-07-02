@@ -159,7 +159,7 @@ namespace Beef
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance; defaults to <see cref="DefaultTextProvider"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefTextProviderAsSingleton(this IServiceCollection services, Func<IServiceProvider, TextProviderBase>? createTextProvider = null)
+        public static IServiceCollection AddBeefTextProviderAsSingleton(this IServiceCollection services, Func<IServiceProvider, ITextProvider>? createTextProvider = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -173,7 +173,7 @@ namespace Beef
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="createTextProvider">The function to create the <see cref="TextProviderBase"/> instance; defaults to <see cref="DefaultTextProvider"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefTextProviderAsScoped(this IServiceCollection services, Func<IServiceProvider, TextProviderBase>? createTextProvider = null)
+        public static IServiceCollection AddBeefTextProviderAsScoped(this IServiceCollection services, Func<IServiceProvider, ITextProvider>? createTextProvider = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
