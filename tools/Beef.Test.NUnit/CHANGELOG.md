@@ -2,6 +2,25 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+- *Fixed:* The `ValidationTester` sets the default `TextProvider` to `DefaultTextProvier` within its static constructor to ensure the default texts are used for the validation messages.
+
+## v4.1.12
+- *Enhancement:* Added constructor to `UsingAgentTesterServer` to allow settings for underlying `AgentTestServer`.
+
+## v4.1.11
+- *Enhancement:* Added `Test` method to `EventSubscriberTester` to reset the internal state so the instance can be reused for a new test execution.
+
+## v4.1.10
+- *Enhancement:* Adjusted the formatting of the logger output to indent second and subsequent lines.
+
+## v4.1.9
+- *Fixed:* The `AgentTesterWaf` was not correctly applying the test configuration (`AgentTester.BuildConfiguration<TStartup>`) which excluded any test specific configurations. 
+- *Fixed:* The `ValidationTester` was not failing where an error occured and the error was not expected.
+- *Fixed:* The `AgentTesterWaf` was throwing an error that the `contentRootPath` does not exist.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.8
 - *Enhancement:* Added `EventData.Source` to the test output log.
 - *Enhancement:* Updated the event testing to support new `IEventDataContentSerializer` and `IEventDataConverter`. 

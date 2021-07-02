@@ -77,7 +77,7 @@ Alternatively, a *Reference Data* reference could be the code itself, typically 
 
 <br/>
 
-#### Yaml configuration
+#### YAML configuration
 
 Example YAML configuration for *merging* reference data is as follows:
 ``` YAML
@@ -98,6 +98,27 @@ Demo:
   - WorkHistory:
     - { PersonId: 2, Name: Telstra, StartDate: 2015-05-23, EndDate: 2016-04-06 }
     - { PersonId: 2, Name: Optus, StartDate: 2016-04-16 }
+```
+
+Additionally, to use an [`IIdentifierGenerator`](../../src/Beef.Core/Entities/IIdentifierGenerator.cs) to generate the identifiers, an [`IIdentifierGenerators`](./IIdentifierGenerators.cs) implementation is required (see `DefaultIdentifierGenerators` for an example). To specify the type at runtime it must be specified in the YAML using `^Type: typeName`. Then for this to be used the `^` prefix must be specified for each corresponding table (must opt-in). Example as follows.
+
+``` yaml
+^Type: Beef.Database.Core.DefaultIdentifierGenerators
+Ref:
+  - $^Gender:
+    - { Code: M, Text: Male, TripCode: Male }
+Demo:
+  - ^Person:
+    - { FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18 }
+```
+
+Finally, runtime values can be used within the YAML using the value lookup notation. This notation is `^(Namespace.Type.Property.Method().etc, AssemblyName)`. Where the `AssemblyName` is not specified then the default `mscorlib` is assumed. The `System` root namespace is optional, i.e. it will be attempted by default. The initial property or method for a `Type` must be `static`, in that the `Type` will not be instantiated. Example as follows.
+
+``` yaml
+Demo:
+  - Person:
+    - { FirstName: Wendy, Username: ^(System.Security.Principal.WindowsIdentity.GetCurrent().Name,System.Security.Principal.Windows), Birthday: ^(DateTime.UtcNow) }
+    - { FirstName: Wendy, Username: ^(Beef.ExecutionContext.EnvironmentUsername,Beef.Core), Birthday: ^(DateTime.UtcNow) }
 ```
 
 <br/>

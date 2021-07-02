@@ -320,11 +320,11 @@ namespace Beef.Net.Http
         /// </summary>
         private class MultiPart
         {
-            public Dictionary<string, string[]> ResponseHeaders = new Dictionary<string, string[]>();
+            public Dictionary<string, string[]> ResponseHeaders = new();
             public bool IsResponseMessage;
             public HttpStatusCode StatusCode = HttpStatusCode.BadRequest;
-            public Dictionary<string, string[]> ContentHeaders = new Dictionary<string, string[]>();
-            public StringBuilder Content = new StringBuilder();
+            public Dictionary<string, string[]> ContentHeaders = new();
+            public StringBuilder Content = new();
 
             /// <summary>
             /// Create the corresponding <see cref="HttpResponseMessage"/>.

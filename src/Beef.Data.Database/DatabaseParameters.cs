@@ -176,7 +176,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWhen<T>(bool? when, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -184,7 +184,7 @@ namespace Beef.Data.Database
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (when)
+            if (when == true)
                 AddParameter(name, value(), direction);
 
             return this;
@@ -228,7 +228,7 @@ namespace Beef.Data.Database
         /// <param name="dbType">The parameter <see cref="DbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWhen<T>(bool? when, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -236,7 +236,7 @@ namespace Beef.Data.Database
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (when)
+            if (when == true)
                 AddParameter(name, value(), dbType, direction);
 
             return this;
@@ -283,7 +283,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWhen<T>(bool? when, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -291,7 +291,7 @@ namespace Beef.Data.Database
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (when)
+            if (when == true)
                 AddParameter(name, value(), sqlDbType, direction);
 
             return this;
@@ -373,7 +373,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWhen<T>(bool when, IDatabasePropertyMapper propertyMapper, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWhen<T>(bool? when, IDatabasePropertyMapper propertyMapper, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
             if (propertyMapper == null)
                 throw new ArgumentNullException(nameof(propertyMapper));
@@ -381,7 +381,7 @@ namespace Beef.Data.Database
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (when)
+            if (when == true)
                 Param(propertyMapper, value(), direction);
 
             return this;
@@ -753,7 +753,7 @@ namespace Beef.Data.Database
         /// <param name="tvp">The <see cref="TableValuedParameter"/>.</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>This specifically implies that the <see cref="SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DatabaseParameters TableValuedParamWhen(bool when, string name, Func<TableValuedParameter> tvp)
+        public DatabaseParameters TableValuedParamWhen(bool? when, string name, Func<TableValuedParameter> tvp)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -761,7 +761,7 @@ namespace Beef.Data.Database
             if (tvp == null)
                 throw new ArgumentNullException(nameof(tvp));
 
-            if (when)
+            if (when == true)
                 TableValuedParam(name, tvp());
 
             return this;
@@ -811,9 +811,9 @@ namespace Beef.Data.Database
         /// <param name="when">Adds the parameter when <c>true</c>.</param>
         /// <param name="reselect">Indicates whether to reselect after the operation (defaults to <c>true</c>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ReselectRecordParamWhen(bool when, bool reselect = true)
+        public DatabaseParameters ReselectRecordParamWhen(bool? when, bool reselect = true)
         {
-            if (when)
+            if (when == true)
                 AddReselectRecordParam(reselect);
 
             return this;

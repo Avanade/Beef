@@ -2,6 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+
+## v4.1.6
+- *Enhancement:* Added Event Outbox support with `DatabaseEventOutboxBase`, `DatabaseEventOutboxItem` and `DatabaseEventOutboxInvoker` (enqueue events to the database on publish/send).
+- *Enhancement:* Added `IDatabase.EventOutboxInvoker` to access the corresponding event outbox capability.
+- *Enhancement:* Added `DatabaseEventOutboxPublisherService` that is the `IHostedService` to dequeue events from the databade and publish/send.
+- *Enhancement:* Added supported for `bool?` on `DatabaseParameters.When`.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.5
 - *Fixed:* `DatabaseRowVersionConverter.ConvertToSrce` will now return `null` when the `byte[]` is empty; versus, an empty string.
 

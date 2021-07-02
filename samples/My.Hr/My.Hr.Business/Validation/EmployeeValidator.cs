@@ -2,7 +2,7 @@
 using Beef.Validation;
 using Beef.Validation.Rules;
 using My.Hr.Business.DataSvc;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;

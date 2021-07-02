@@ -2,6 +2,28 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+- *Enhancement:* A code-generation change was required to the Reference Data Web API Controller template as a result of the changes to the `ReferenceDataFilter` and new `ReferenceDataFilterer` for the `Beef.Abstractions` change.
+
+## v4.1.27
+- *Fixed:* A Web API agent reference data parameter should use the underlying `RefDataType` not the reference data `Type` itself as the operation parameter (decouple reference data types from Agent contracts).
+
+## v4.1.26
+- *Enhancement:* Added `DateTimeOffset` to the list of supported system and nullable types.
+- *Enhancement:* Added shorthand for a `Property.Type` where the `^` is the equivalent to `RefDataNamespace.`; e.g. `RefDataNamespace.Gender` can be replaced by `^Gender`. The XML to YAML conversion will replace with the shorthand where previously specified.
+- *Enhancement:* Added `OrgUnitImmutable` option for database. This will result in stored procedure code that will throw an `AuthorizationException` where the org unit is being changed from original value (where original is not null).
+
+## v4.1.25
+- *Enhancement:* Added support for Database Event Outbox via new configuration and templates.
+- *Enhancement:* The `EventPublish` property changed from `bool` to string (values are `None`, `DataSvc` and `DataOutbox`.
+- *Enhancement:* A new `CodeGeneration.EntityScope` and `Entity.EntityScope` has been added, this determines where and how the entities are generated. Defaults to existing behaviour of `Common`; being the `EntityBase`-inherited entities are defined in the `Common` project only. The new _recommended_ approach is to set to `Autonomous`; will create the existing `EntityBase`-inherited entities within the `Business` project, and lightweight entities (no `EntityBase` or rich reference data) within `Common` - in this case the `Business` and `Api` projects do not require a reference to `Common` - their usage is autonomous. This has the advantage of decoupling the internals from external consumption.
+- *Enhancement:* A new `Property.InternalOnly` option enables a property to be specified for internal use only, being generated witthin the `Business`, but not `Common`, entities. Applicable only where `Entity.EntityScope` is `Autonomous`.
+- *Enhancement:* The code-generation for an EF model is now logically delete (`IsDeleted` column) aware; this will ensure that any logically deleted data is appropriately filtered.
+- *Enhancement:* The code-generation for an EF model is now logically delete (`TenantId` column) aware; this will ensure that the `TenantId` is appropriately filtered.
+- *Enhancement:* Add support for `ReferenceDataBaseString` code-generation.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.24
 - *Fixed:* The `CdcJoinConfig.Schema` was defaulting to `dbo` versus `CodeGenConfig.Schema` as was intended.
 - *Fixed:* The `CdcConfig` special `RowVersion` treatment was removed as it was unnecessary and meant column could not be explicitly excluded.

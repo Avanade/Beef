@@ -5,7 +5,8 @@
   "properties": {
     "schema": {
       "type": "string",
-      "title": "The name of the `Schema` where the `Table` is defined in the database."
+      "title": "The name of the `Schema` where the artefacts are defined in, or should be created in, the database.",
+      "description": "This is used as the default `Schema` for all child objects."
     },
     "columnNameIsDeleted": {
       "type": "string",
@@ -75,7 +76,7 @@
     "cdcSchema": {
       "type": "string",
       "title": "The schema name for the generated `CDC`-related database artefacts.",
-      "description": "Defaults to `Cdc` (literal)."
+      "description": "Defaults to `XCdc` (literal)."
     },
     "cdcAuditTableName": {
       "type": "string",
@@ -134,6 +135,16 @@
         "SnakeKebabToPascalCase"
       ]
     },
+    "entityScope": {
+      "type": "string",
+      "title": "The entity scope option.",
+      "description": "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).",
+      "enum": [
+        "Common",
+        "Business",
+        "Autonomous"
+      ]
+    },
     "eventSubjectRoot": {
       "type": "string",
       "title": "The root for the event name by prepending to all event subject names via CDC.",
@@ -183,6 +194,15 @@
         "NameAndGlobalId"
       ]
     },
+    "eventOutbox": {
+      "type": "boolean",
+      "title": "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required."
+    },
+    "eventOutboxTableName": {
+      "type": "string",
+      "title": "The table name for the `EventOutbox`.",
+      "description": "Defaults to `EventOutbox` (literal)."
+    },
     "pathBase": {
       "type": "string",
       "title": "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
@@ -203,10 +223,15 @@
       "title": "The path (directory) for the Business-related (.NET) artefacts.",
       "description": "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
-    "pathCdc": {
+    "PathCdcPublisher": {
       "type": "string",
       "title": "The path (directory) for the CDC-related (.NET) artefacts.",
       "description": "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+    },
+    "orgUnitImmutable": {
+      "type": "boolean",
+      "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+      "description": "This is only applicable for stored procedures."
     },
     "namespaceBase": {
       "type": "string",
@@ -223,10 +248,10 @@
       "title": "The Namespace (root) for the Business-related .NET artefacts.",
       "description": "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
-    "namespaceCdc": {
+    "NamespaceCdcPublisher": {
       "type": "string",
-      "title": "The Namespace (root) for the CDC-related .NET artefacts.",
-      "description": "Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+      "title": "The Namespace (root) for the CDC-related publisher .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`."
     },
     "tables": {
       "type": "array",
@@ -340,9 +365,24 @@
               "type": "string",
               "title": "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`."
             },
+            "entityScope": {
+              "type": "string",
+              "title": "The entity scope option.",
+              "description": "Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).",
+              "enum": [
+                "Common",
+                "Business",
+                "Autonomous"
+              ]
+            },
             "permission": {
               "type": "string",
               "title": "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure)."
+            },
+            "orgUnitImmutable": {
+              "type": "boolean",
+              "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+              "description": "Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures."
             },
             "columnNameIsDeleted": {
               "type": "string",
@@ -458,6 +498,11 @@
                     "permission": {
                       "type": "string",
                       "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "orgUnitImmutable": {
+                      "type": "boolean",
+                      "title": "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.",
+                      "description": "Defaults to `Table.OrgUnitImmutable`."
                     },
                     "includeColumns": {
                       "type": "array",

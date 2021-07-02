@@ -15,8 +15,8 @@ using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
 using My.Hr.Business;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Api.Controllers
 {

@@ -1,5 +1,5 @@
 ﻿using Beef.Validation;
-using Company.AppName.Common.Entities;
+using Company.AppName.Business.Entities;
 
 namespace Company.AppName.Business.Validation
 {

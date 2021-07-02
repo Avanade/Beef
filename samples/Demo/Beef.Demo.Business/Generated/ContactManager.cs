@@ -13,7 +13,7 @@ using Beef;
 using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
-using Beef.Demo.Common.Entities;
+using Beef.Demo.Business.Entities;
 using Beef.Demo.Business.DataSvc;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
@@ -108,6 +108,19 @@ namespace Beef.Demo.Business
                 (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        public async Task RaiseEventAsync(bool throwError)
+        {
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Cleaner.CleanUp(throwError);
+                await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
     }
 }

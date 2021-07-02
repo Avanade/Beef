@@ -49,7 +49,7 @@ Property | Description
 -|-
 **`name`** | The unique property name.
 `text` | The overriding text for use in comments. By default the `Text` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
-**`type`** | The .NET `Type`. Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`
+**`type`** | The .NET `Type`. Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`
 **`nullable`** | Indicates whether the .NET `Type` should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.
 `inherited` | Indicates whether the property is inherited and therefore should not be output within the generated Entity class.
 `privateName` | The overriding private name. Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
@@ -74,6 +74,7 @@ Property | Description
 `secondaryPropertyChanged` | The names of the secondary property(s), comma delimited, that are to be notified on a property change.
 `bubblePropertyChanges` | Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself. Note that the `IsEntity` property is also required to enable.
 `excludeCleanup` | Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.
+`internalOnly` | Indicates whether the property is for internal use only; declared in Business entities only. This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.
 
 <br/>
 
@@ -82,7 +83,7 @@ Provides the _Reference Data_ configuration.
 
 Property | Description
 -|-
-`refDataType` | The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Valid options are: `string`, `int`, `Guid`. Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.
+`refDataType` | The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID). Valid options are: `string`, `int`, `Guid`. Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.` or `^`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.
 `refDataList` | Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`). This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.
 `refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection. This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `refDataMapping` | Indicates whether the property should use the underlying Reference Data mapping capabilities. Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.

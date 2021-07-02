@@ -64,7 +64,7 @@ Generate the configured entities and reference data:
 
 ```
 cd Foo.Bar.CodeGen
-dotnet new all
+dotnet run all
 ```
 
 This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code generation will be logged to the console showing what was added or updated.
@@ -76,16 +76,17 @@ This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code g
 The solution has been created with the sample `Person` table defined and related reference data tables, migration scripts to create the database objects, and finally includes the stored procedure generation configuration.
 
 The [database generation](../tools/Beef.Database.Core/README.md) will reference the following configuration within the `Foo.Bar.Database` directory:
-- `Foo.Bar.Database.xml` - contains the table(s) configuration.
+- `Foo.Bar.Database.xml` - contains the database/table(s) configuration.
 
 Generate the configured tables and stored procedures:
 
 ```
 cd Foo.Bar.Database
-dotnet new all
+dotnet run all
+dotnet run codegen --script DatabaseEventOutbox.xml
 ```
 
-This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated.
+This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated. The final command will create the required migration scripts for the event outbox functionality.
 
 <br/>
 

@@ -3,6 +3,7 @@
 using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -472,18 +473,18 @@ namespace Beef.Mapper
             SetSrceValue(entity, (TSrceProperty)value!, operationType);
         }
 
-#pragma warning disable IDE0060, CA1801 // Remove unused parameter; by-design to have consistent interface
         /// <summary>
         /// Gets the destination property value.
         /// </summary>
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
+#pragma warning disable IDE0060 // Remove unused parameter; by-design to have consistent interface
         protected TDestProperty GetDestValue(TDest entity, OperationTypes operationType)
-#pragma warning restore IDE0060, CA1801
         {
             return DestPropertyExpression.GetValue(entity);
         }
+#pragma warning restore IDE0060
 
         /// <summary>
         /// Sets the destination property value.
@@ -629,18 +630,43 @@ namespace Beef.Mapper
                 return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            if (SrceComplexTypeReflector!.IsCollection != DestComplexTypeReflector!.IsCollection)
+                throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; where one is a collection then both must be, otherwise consider using a Converter.");
+
+            if ((SrceComplexTypeReflector.ComplexTypeCode == ComplexTypeCode.IDictionary && DestComplexTypeReflector!.ComplexTypeCode != ComplexTypeCode.IDictionary)
+                || (DestComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.IDictionary && SrceComplexTypeReflector.ComplexTypeCode != ComplexTypeCode.IDictionary))
+                throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; where one is an IDictionary then both must be, otherwise consider using a Converter.");
+
             if (SrceComplexTypeReflector!.IsCollection)
             {
-                var c = new List<object?>();
-                foreach (var item in (System.Collections.IEnumerable)sourcePropertyValue)
+                if (DestComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.IDictionary)
                 {
-                    if (Mapper != null)
-                        c.Add(((IEntityMapper)Mapper).MapToDest(item, operationType));
-                    else
-                        c.Add(Convert.ChangeType(item, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
-                }
+                    var dict = (IDictionary)DestComplexTypeReflector.CreateValue();
+                    foreach (var item in (System.Collections.IEnumerable)sourcePropertyValue)
+                    {
+                        var (Key, Value) = SrceComplexTypeReflector.GetDictKeyAndValue(item);
+                        var dkey = Convert.ChangeType(Key, DestComplexTypeReflector.DictKeyType, System.Globalization.CultureInfo.InvariantCulture);
+                        if (Mapper != null)
+                            dict.Add(dkey, ((IEntityMapper)Mapper).MapToDest(Value, operationType));
+                        else
+                            dict.Add(dkey, Convert.ChangeType(Value, DestComplexTypeReflector.ItemType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
 
-                return (TDestProperty)DestComplexTypeReflector!.CreateValue(c);
+                    return (TDestProperty)dict;
+                }
+                else
+                {
+                    var c = new List<object?>();
+                    foreach (var item in (System.Collections.IEnumerable)sourcePropertyValue)
+                    {
+                        if (Mapper != null)
+                            c.Add(((IEntityMapper)Mapper).MapToDest(item, operationType));
+                        else
+                            c.Add(Convert.ChangeType(item, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
+
+                    return (TDestProperty)DestComplexTypeReflector!.CreateValue(c);
+                }
             }
 
             try
@@ -739,18 +765,44 @@ namespace Beef.Mapper
                 return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            if (SrceComplexTypeReflector!.IsCollection != DestComplexTypeReflector!.IsCollection)
+                throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; where one is a collection then both must be, otherwise consider using a Converter.");
+
+            if ((SrceComplexTypeReflector.ComplexTypeCode == ComplexTypeCode.IDictionary && DestComplexTypeReflector!.ComplexTypeCode != ComplexTypeCode.IDictionary)
+                || (DestComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.IDictionary && SrceComplexTypeReflector.ComplexTypeCode != ComplexTypeCode.IDictionary))
+                throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; where one is an IDictionary then both must be, otherwise consider using a Converter.");
+
+
             if (IsSrceComplexType && SrceComplexTypeReflector!.IsCollection)
             {
-                var c = new List<object>();
-                foreach (var item in (System.Collections.IEnumerable)destinationPropertyValue)
+                if (SrceComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.IDictionary)
                 {
-                    if (Mapper != null)
-                        c.Add(((IEntityMapper)Mapper).MapToSrce(item, operationType)!);
-                    else
-                        c.Add(Convert.ChangeType(item, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
-                }
+                    var dict = (IDictionary)SrceComplexTypeReflector.CreateValue();
+                    foreach (var item in (System.Collections.IEnumerable)destinationPropertyValue)
+                    {
+                        var (Key, Value) = DestComplexTypeReflector.GetDictKeyAndValue(item);
+                        var dkey = Convert.ChangeType(Key, SrceComplexTypeReflector.DictKeyType, System.Globalization.CultureInfo.InvariantCulture);
+                        if (Mapper != null)
+                            dict.Add(dkey, ((IEntityMapper)Mapper).MapToSrce(Value, operationType));
+                        else
+                            dict.Add(dkey, Convert.ChangeType(Value, SrceComplexTypeReflector.ItemType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
 
-                return (TSrceProperty)SrceComplexTypeReflector.CreateValue(c);
+                    return (TSrceProperty)dict;
+                }
+                else
+                {
+                    var c = new List<object>();
+                    foreach (var item in (System.Collections.IEnumerable)destinationPropertyValue)
+                    {
+                        if (Mapper != null)
+                            c.Add(((IEntityMapper)Mapper).MapToSrce(item, operationType)!);
+                        else
+                            c.Add(Convert.ChangeType(item, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
+
+                    return (TSrceProperty)SrceComplexTypeReflector.CreateValue(c);
+                }
             }
 
             try

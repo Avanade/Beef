@@ -2,6 +2,46 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+- *Issue [139](https://github.com/Avanade/Beef/issues/139)*. Moved the nucleus of `Beef.Core` into a new `Beef.Abstractions` - see the [issue](https://github.com/Avanade/Beef/issues/139) for the reasoning and the changes required as a result of some minor breaking changes.
+- *Issue [138](https://github.com/Avanade/Beef/issues/138)*. This is a minor overhaul to the validation capability to support validation of any types via the new `GenericValidator<T>`. The Collection and Dictionary validations have been updated so intrinsic values can be validated, as well as the existing complex entities. For the Dictionary both the `Key` and `Value` can be validated. The [`PersonValidator`](../../samples/Demo/Beef.Demo.Business/Validation/PersonValidator.cs) example has been updated to demonstrate usage. Although, there are a number of breaking changes below, for the most part there should be little impact given limited usage outside of framework itself.
+  - *Enhancement:* Added `GenericValidator<T>` which is similar to `Validator<T>` except it supports any `Type`; it is primarily intended for single intrinsic validations such as `string`, `int` or `struct`. There is a single `Rule` method to enable the additional of fluent rules. Complex `Type` validation should continue to use the existing `Validator<T>`.
+  - *Enhancement:* The `CollectionRuleItem.Create` methods have had the `Type` constraint removed; no longer just supports entity classes. Also, renamed `Validator` property to `ItemValidator` (breaking change).
+  - *Enhancement:* The `DictionaryRuleItem.Create` method has had the `Type` constraint removed; no longer just supports entity classes. Also, renamed `Validator` property to `ValueValidator` (breaking change), and added corresponding new `KeyValidator` property. `DictionaryRuleValue` has been renamed to	`DictionaryRuleItem` (breaking change).
+  - *Enhancement:* Added `ReferenceDataCodeRule` to enable validation of a reference data code, being a `string` value. A corresponding `RefDataCode` validator extension method has been added. Example: `Property(x => x.GenderCode).RefDataCode().As<Gender>()`.
+  - *Enhancement:* The `DictionaryValidator.Value` property renamed to  `DictionaryValidator.Item` (breaking change).
+  - *Enhancement:* The `Validator` static class has had the `Create` methods for collection and dictionary renamed to `CreateCollection` and `CreateDictionary` respectively (breaking changes). New `CreateGeneric<T>` method added to support the new `GenericValidator<T>`. A new `Create<TValidator>` where `TValidator` is `IValidator` method has also been added to create/get from a `ServiceProvider` (dependency injection).
+  - *Enhancement:* To enable the `GenericValidator<T>` the `IValidator.EntityType` has been renamed to `ValueType` (breaking change). The `IValidator<T>` has had the `Type` constraint removed.
+
+## v4.1.15
+- *Fixed:* The `AddBeefCachePolicyManager` parameter `useCachePolicyManagerTimer` when set to `false` was incorrectly starting the timer resulting in itself and the `CachePolicyManagerServiceHost` running.
+- *Fixed:* The `ReferenceDataBase` should not `CleanUp` the key properties as they are considered immutable.
+- *Enhancement:* Added `IWebApiAgent` which `WebApiAgentBase` now implements.
+- *Enhancement:* Removed the method parameters `memberName`, `filePath` and `lineNumber` to simplify the `WebApiAgentBase`. It is believed these are not being used by any consumers. *Note:* will look to remove all of these parameters throughout the solution within a future _Beef_ version.
+- *Enhancement:* Issue [136](https://github.com/Avanade/Beef/issues/136). Added `CollectionValidator` and `DictionaryValidator` to allow each of these types to be validated directly; versus having to be a property within a parent class.
+
+## v4.1.14
+- *Enhancement:* Added new `DictionaryRule` validator.
+- *Fixed:* Issue [131](https://github.com/Avanade/Beef/issues/131). The `EntityMapper` did not support properties of Type `IDictionary`; this has also been corrected.
+- *Fixed:* `ReferenceDataBase` was not setting `IsActive` to `false` when executing `SetInvalid`.
+- *Fixed:* The `AddBeefCachePolicyManager` has a new method parameter `useCachePolicyManagerTimer`. The default (`false`) is to use the `CachePolicyManagerServiceHost`; however, in instances where this fails (i.e. Azure function execution) this should be used (`true`) to leverage an internal timer to perform.
+
+## v4.1.13
+- *Fixed:* Issue [131](https://github.com/Avanade/Beef/issues/131). `ComplexTypeReflector` and `JsonEntityMerge` updated to support properties of Type `IDictionary<TKey,TValue>`. FYI: underlying dictionary order is important for `JsonEntityMerge` to determine whether changes made; not just whether same keys and values. A dictionary is treated like an array on merge, it is a full replacement operation only.
+- *Enhancement:* The existing `TextProvider` has been split into a static `TextProvider` to provide `Current` instance, with abstract base class now being `TextProviderBase`. The `DefaultTextProvider` updated to inherit from this new abstract base class. `TextProvider.Current` will attempt to use explicit, then `ExecutionContext.GetService<TextProviderBase>(false)`, then use `DefaultTextProvider`. The following `IServiceCollection` extension methods has also been added: `AddBeefTextProviderSingleton` and `AddBeefTextProviderScoped` (allows different localization per request).
+
+## v4.1.12
+- *Fixed:* The `EntityBasicBase.NotifyChangesWhenSameValue` should not be included within entity mappings, the `MapperIgnoreAttribute` has been added to the property to exclude/ignore.
+- *Enhancement:* Added a `GetProperties` to the `EntityReflector` to enable access to all properties.
+- *Enhancement:* Added a readonly `ValueType` property to `EventData` to get the `Type` of the underlying value.
+- *Enhancement:* Added a `TimerHostedServiceBase` to provide a timer-based `IHostedService` that is `ExecutionContext` and `ServiceProvider` enabled.
+- *Enhancement:* Added `CollectionResult` to act similar to `EntityCollectionResult` without the `EntityBase` constraint. New `IEntityCollectionResult<TColl, TEntity>` also added to enable.
+- *Enhancement:* Extended `WebApiAgentBase.GetCollectionResultAsync` to support `CollectionResult` in addition to `EntityCollectionResult`.
+- *Enhancement:* Split timer-based flush from `CachePolicyManager` and moved into new `CachePolicyManagerServiceHost` (inherits from `TimerHostedServiceBase`). This now represents the background process to periodically flush the caches.
+- *Fixed:* The `!=` operator for `ReferenceDataBase` has been fixed to support nullable parameters.
+- *Enhancement:* Added `ReferenceDataBaseString` with an `Id` type of `string`.
+
 ## v4.1.11
 - *Enhancement:* Added new `EventData.Source` as an `Uri` to define the event source. The `EventData.Create*`, `IEventPublisher.Create*` and `IEventPublisher.Publish*` methods have new overloads to support the source `Uri`. `EventPublisherBase` simplified as the `IEventPublisher` is the primary means to access all methods given Dependency Injection (DI) usage.
 - *Enhancement:* Changed `EventData` to inherit from `EventMetadata` to house all the properties; this enables separation of metadata from `EventData` as required.

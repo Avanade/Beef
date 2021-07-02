@@ -17,8 +17,8 @@ using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
 {

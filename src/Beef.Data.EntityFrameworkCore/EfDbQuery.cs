@@ -60,7 +60,7 @@ namespace Beef.Data.EntityFrameworkCore
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
     /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public class EfDbQuery<T, TModel, TDbContext> : IEfDbQuery<T, TModel> where T : class, new() where TModel : class, new() where TDbContext : DbContext
+    public class EfDbQuery<T, TModel, TDbContext> : IEfDbQuery<T, TModel> where T : class, new() where TModel : class, new() where TDbContext : DbContext, IEfDbContext
     {
         private readonly EfDbBase<TDbContext> _db;
         private readonly Func<IQueryable<TModel>, IQueryable<TModel>>? _query;

@@ -26,7 +26,13 @@ namespace Beef.Database.Core.Sql
             if (name.StartsWith('$'))
             {
                 IsMerge = true;
-                name = name.Substring(1);
+                name = name[1..];
+            }
+
+            if (name.StartsWith('^'))
+            {
+                UseIdentifierGenerator = true;
+                name = name[1..];
             }
 
             DbTable = SqlDataUpdater.DbTables.Where(t => t.Schema == schema && t.Name == name).SingleOrDefault();
@@ -38,6 +44,15 @@ namespace Beef.Database.Core.Sql
 
             // Will attempt to infer by checking for specified columns.
             IsRefData = DbTable.Columns.Any(x => x.Name == "Code") && DbTable.Columns.Any(x => x.Name == "Text") && DbTable.Columns.Any(x => x.Name == "IsActive") && DbTable.Columns.Any(x => x.Name == "SortOrder");
+
+            // Check that an identifier generator can be used.
+            if (UseIdentifierGenerator)
+            {
+                if (DbTable.PrimaryKeyColumns.Count > 0 && Enum.TryParse<SqlDataTableIdentifierType>(DbTable.PrimaryKeyColumns[0].DotNetType, true, out var igType))
+                    IdentifierType = igType;
+                else
+                    throw new SqlDataUpdaterException($"Table '{schema}.{name}' specifies usage of IIdentifierGenerator; either there is more than one column representing the primary key or the underlying type is not supported.");
+            }
         }
 
         /// <summary>
@@ -66,6 +81,16 @@ namespace Beef.Database.Core.Sql
         public bool IsMerge { get; private set; }
 
         /// <summary>
+        /// Indicates whether to use the identifier generator for the primary key (single column) on create (where not specified).
+        /// </summary>
+        public bool UseIdentifierGenerator { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier generator (see <see cref="UseIdentifierGenerator"/>) <see cref="Type"/>.
+        /// </summary>
+        public SqlDataTableIdentifierType? IdentifierType { get; private set; }
+
+        /// <summary>
         /// Gets the columns.
         /// </summary>
         public List<DbColumn> Columns { get; } = new List<DbColumn>();
@@ -73,7 +98,12 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the merge match columns.
         /// </summary>
-        public List<DbColumn> MergeMatchColumns => Columns.Where(x => !x.IsAudit).ToList();
+        public List<DbColumn> MergeMatchColumns => Columns.Where(x => !x.IsAudit && !(UseIdentifierGenerator && x.IsPrimaryKey)).ToList();
+
+        /// <summary>
+        /// Gets the merge update columns.
+        /// </summary>
+        public List<DbColumn> MergeUpdateColumns => Columns.Where(x => !(UseIdentifierGenerator && x.IsPrimaryKey)).ToList();
 
         /// <summary>
         /// Gets the primary key columns.
@@ -118,7 +148,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Prepares the data.
         /// </summary>
-        public void Prepare()
+        public void Prepare(IIdentifierGenerators? ig)
         {
             var hasCreatedDate = DbTable.Columns.Any(x => x.Name == DatabaseColumns.CreatedDateName);
             var hasCreatedBy = DbTable.Columns.Any(x => x.Name == DatabaseColumns.CreatedByName);
@@ -136,6 +166,35 @@ namespace Beef.Database.Core.Sql
                 AddColumnWhereNotSpecified(row, hasUpdatedBy, DatabaseColumns.UpdatedByName, ExecutionContext.EnvironmentUsername);
                 AddColumnWhereNotSpecified(row, hasIsActive, DatabaseRefDataColumns.IsActiveColumnName, true);
                 AddColumnWhereNotSpecified(row, hasSortOrder, DatabaseRefDataColumns.SortOrderColumnName, i + 1);
+
+                if (ig != null && UseIdentifierGenerator)
+                {
+                    var pkc = DbTable.PrimaryKeyColumns[0];
+                    var val = row.Columns.SingleOrDefault(x => x.Name == pkc.Name!);
+                    if (val == null)
+                    {
+                        switch (IdentifierType)
+                        {
+                            case SqlDataTableIdentifierType.Guid:
+                                if (ig!.GuidGenerator != null)
+                                    AddColumnWhereNotSpecified(row, true, pkc.Name!, ig.GuidGenerator.GenerateIdentifierAsync().GetAwaiter().GetResult());
+
+                                break;
+
+                            case SqlDataTableIdentifierType.String:
+                                if (ig!.StringGenerator != null)
+                                    AddColumnWhereNotSpecified(row, true, pkc.Name!, ig.StringGenerator.GenerateIdentifierAsync().GetAwaiter().GetResult());
+
+                                break;
+
+                            case SqlDataTableIdentifierType.Int:
+                                if (ig!.IntGenerator != null)
+                                    AddColumnWhereNotSpecified(row, true, pkc.Name!, ig.IntGenerator.GenerateIdentifierAsync().GetAwaiter().GetResult());
+
+                                break;
+                        }
+                    }
+                }
             }
         }
 
@@ -150,5 +209,31 @@ namespace Beef.Database.Core.Sql
                 row.AddColumn(name, value);
             }
         }
+    }
+
+    /// <summary>
+    /// Defines the identifier generator <see cref="Type"/>.
+    /// </summary>
+    public enum SqlDataTableIdentifierType
+    {
+        /// <summary>
+        /// Represents an invalid <see cref="Type"/>.
+        /// </summary>
+        Invalid = 0,
+
+        /// <summary>
+        /// Represents a <see cref="string"/> <see cref="Type"/>.
+        /// </summary>
+        String = 1,
+
+        /// <summary>
+        /// Represents a <see cref="System.Guid"/> <see cref="Type"/>.
+        /// </summary>
+        Guid = 2,
+
+        /// <summary>
+        /// Represents an <see cref="int"/> <see cref="Type"/>.
+        /// </summary>
+        Int = 3
     }
 }

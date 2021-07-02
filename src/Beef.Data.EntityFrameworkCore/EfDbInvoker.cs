@@ -13,7 +13,7 @@ namespace Beef.Data.EntityFrameworkCore
     /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="EfDbBase{TDbContext}"/> invocations
     /// specifically exception handling (see <see cref="EfDbBase{TDbContext}.ExceptionHandler"/>).
     /// </summary>
-    public class EfDbInvoker<TDbContext> : InvokerBase<EfDbBase<TDbContext>> where TDbContext : DbContext
+    public class EfDbInvoker<TDbContext> : InvokerBase<EfDbBase<TDbContext>> where TDbContext : DbContext, IEfDbContext
     {
         #region NoResult
 

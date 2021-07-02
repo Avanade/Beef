@@ -7,8 +7,8 @@
 
 using Beef.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using My.Hr.Business.Entities;
 using My.Hr.Business.Validation;
-using My.Hr.Common.Entities;
 
 namespace My.Hr.Business
 {

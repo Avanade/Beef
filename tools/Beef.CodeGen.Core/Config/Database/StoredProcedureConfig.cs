@@ -142,6 +142,14 @@ tables:
         [PropertySchema("Auth", Title = "The name of the `StoredProcedure` in the database.")]
         public string? Permission { get; set; }
 
+        /// <summary>
+        /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
+        /// </summary>
+        [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
+            Description = "Defaults to `Table.OrgUnitImmutable`.")]
+        public bool? OrgUnitImmutable { get; set; }
+
         #endregion
 
         #region Columns
@@ -286,6 +294,7 @@ tables:
 
             StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"sp{Parent!.Name}{Name}");
             Type = DefaultWhereNull(Type, () => "GetColl");
+            OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
             Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch
             {
                 "Delete" => "DELETE",
@@ -339,6 +348,9 @@ tables:
             {
                 settable.Prepare(Root!, this);
             }
+
+            if (Paging == true && OrderBy.Count < 1)
+                throw new CodeGenException(this, nameof(OrderBy), $"At least one OrderBy column must be specified when using Paging.");
         }
 
         /// <summary>

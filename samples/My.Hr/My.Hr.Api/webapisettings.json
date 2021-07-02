@@ -3,12 +3,17 @@
   "KeyVaultName": null, // Turns on: https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration (recommend setting via environment variable Hr_KeyVaultName)
   "Logging": {
     "LogLevel": {
-      "Default": "Warning"
+      "Default": "Information"
     }
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "Database": "Data Source=.;Initial Catalog=My.Hr;Integrated Security=True"
+  },
+  "BeefDatabaseEventOutboxPublisherService": {
+    "MaxDequeueCount": 10,
+    "Interval": "00:05:00",
+    "DequeueInterval": "00:00:30"
   },
   "BeefIncludeExceptionInInternalServerError": true,
   "BeefDefaultPageSize": 25,

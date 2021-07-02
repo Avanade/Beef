@@ -17,7 +17,7 @@ MERGE INTO [{{Schema}}].[{{Name}}] WITH (HOLDLOCK) as [t]
       SELECT {{#each MergeMatchColumns}}[s].[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}
       EXCEPT
       SELECT {{#each MergeMatchColumns}}[t].[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}})
-    THEN UPDATE SET {{#each Columns}}[t].[{{Name}}] = [s].[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}
+    THEN UPDATE SET {{#each MergeUpdateColumns}}[t].[{{Name}}] = [s].[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}
   WHEN NOT MATCHED BY TARGET
     THEN INSERT ({{#each Columns}}[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}})
       VALUES ({{#each Columns}}[s].[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}});

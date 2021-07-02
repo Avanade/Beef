@@ -14,6 +14,8 @@ Category | Description
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Event`](#Event) | Provides the _Event_ configuration.
+[`Outbox`](#Outbox) | Provides the _Event Outbox_ configuration.
+[`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
@@ -45,7 +47,7 @@ Provides the _Change Data Capture (CDC)_ configuration.
 
 Property | Description
 -|-
-`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `Cdc` (literal).
+`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `XCdc` (literal).
 `cdcAuditTableName` | The table name for the `Cdc`-Tracking. Defaults to `CdcTracking` (literal).
 `cdcIdentifierMapping` | Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
 `cdcIdentifierMappingTableName` | The table name for the `Cdc`-IdentifierMapping. Defaults to `CdcIdentifierMapping` (literal).
@@ -65,7 +67,7 @@ Property | Description
 `pathDatabaseSchema` | The path (directory) for the Schema Database-related artefacts. Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`.
 `pathDatabaseMigrations` | The path (directory) for the Schema Database-related artefacts. Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`.
 `pathBusiness` | The path (directory) for the Business-related (.NET) artefacts. Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`pathCdc` | The path (directory) for the CDC-related (.NET) artefacts. Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
+`PathCdcPublisher` | The path (directory) for the CDC-related (.NET) artefacts. Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
 
 <br/>
 
@@ -76,6 +78,7 @@ Property | Description
 -|-
 `cdcExcludeColumnsFromETag` | The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)
 `autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`. Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
+`entityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`. Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
 
 <br/>
 
@@ -93,6 +96,25 @@ Property | Description
 
 <br/>
 
+## Outbox
+Provides the _Event Outbox_ configuration.
+
+Property | Description
+-|-
+`eventOutbox` | Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+`eventOutboxTableName` | The table name for the `EventOutbox`. Defaults to `EventOutbox` (literal).
+
+<br/>
+
+## Auth
+Provides the _Authorization_ configuration.
+
+Property | Description
+-|-
+**`orgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. This is only applicable for stored procedures.
+
+<br/>
+
 ## Namespace
 Provides the _.NET Namespace_ configuration for the generated artefacts.
 
@@ -101,7 +123,7 @@ Property | Description
 `namespaceBase` | The base Namespace (root) for the .NET artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
 `namespaceCommon` | The Namespace (root) for the Common-related .NET artefacts. Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.
 `namespaceBusiness` | The Namespace (root) for the Business-related .NET artefacts. Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`namespaceCdc` | The Namespace (root) for the CDC-related .NET artefacts. Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
+`NamespaceCdcPublisher` | The Namespace (root) for the CDC-related publisher .NET artefacts. Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`.
 
 <br/>
 

@@ -81,6 +81,7 @@ Property | Description
 **`Udt`** | Indicates whether a `User Defined Table (UDT)` type should be created.
 `UdtExcludeColumns` | The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`. Where not specified this indicates that no `Columns` are to be excluded.
 **`Tvp`** | The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
+`EntityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`. Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
 
 <br/>
 
@@ -90,6 +91,7 @@ Provides the _Authorization_ configuration.
 Property | Description
 -|-
 **`Permission`** | The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).
+**`OrgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set. Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.
 
 <br/>
 

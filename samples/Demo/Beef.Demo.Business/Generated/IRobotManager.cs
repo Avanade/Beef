@@ -52,7 +52,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
         Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging);
@@ -61,7 +61,7 @@ namespace Beef.Demo.Business
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        /// <param name="powerSource">The Power Source.</param>
         Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource);
     }
 }

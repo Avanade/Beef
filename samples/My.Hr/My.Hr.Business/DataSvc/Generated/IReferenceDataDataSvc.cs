@@ -7,7 +7,7 @@
 
 using System;
 using Beef.RefData;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.DataSvc
 {

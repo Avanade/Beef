@@ -31,19 +31,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.12" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.16" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Data.Database.Cdc\Beef.Data.Database.Cdc.csproj" />
     <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
-    <ProjectReference Include="..\Beef.Demo.Cdc\Beef.Demo.Cdc.csproj" />
+    <ProjectReference Include="..\Beef.Demo.CdcPublisher\Beef.Demo.CdcPublisher.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Functions\Beef.Demo.Functions.csproj" />
   </ItemGroup>

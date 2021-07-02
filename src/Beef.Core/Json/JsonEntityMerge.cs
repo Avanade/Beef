@@ -84,7 +84,7 @@ namespace Beef.Json
         /// </summary>
         private class UniqueKeyConfig
         {
-            private readonly object _lock = new object();
+            private readonly object _lock = new();
             private IPropertyReflector[]? propertyReflectors = null;
 
             public UniqueKeyConfig(bool isEntityBaseCollection, string[] properties)
@@ -138,7 +138,7 @@ namespace Beef.Json
             }
         }
 
-        private static readonly EntityReflectorArgs _erArgs = new EntityReflectorArgs()
+        private static readonly EntityReflectorArgs _erArgs = new()
         {
             AutoPopulateProperties = true,
             NameComparer = StringComparer.OrdinalIgnoreCase,
@@ -223,10 +223,6 @@ namespace Beef.Json
                     {
                         return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed: {fex.Message}"));
                     }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
 
                     continue;
                 }
@@ -273,6 +269,10 @@ namespace Beef.Json
             }
             else
             {
+                // Merge in the contents of an IDictionary type.
+                if (pr.ComplexTypeReflector.ComplexTypeCode == ComplexTypeCode.IDictionary)
+                    return MergeApplyDictionaryItems(args, pr, jp, entity);
+
                 // Ensure we are dealing with an array.
                 if (jp.Value.Type != JTokenType.Array)
                     return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed and could not be parsed."));
@@ -287,7 +287,14 @@ namespace Beef.Json
                     var lo = new List<object>();
                     foreach (var iv in jp.Value.Values())
                     {
-                        lo.Add(iv.ToObject(pr.ComplexTypeReflector.ItemType)!);
+                        try
+                        {
+                            lo.Add(iv.ToObject(pr.ComplexTypeReflector.ItemType)!);
+                        }
+                        catch (Exception ex)
+                        {
+                            return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed: {ex.Message}"));
+                        }
                     }
 
                     return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, (IEnumerable)pr.ComplexTypeReflector.CreateValue(lo));
@@ -327,6 +334,53 @@ namespace Beef.Json
 
             pr.ComplexTypeReflector!.SetValue(entity, lo);
             return JsonEntityMergeResult.SuccessWithChanges;
+        }
+
+        /// <summary>
+        /// Apply the merge as a full dictionary replacement; there is <b>no</b> way to detect changes or perform partial property update. 
+        /// </summary>
+        private static JsonEntityMergeResult MergeApplyDictionaryItems(JsonEntityMergeArgs args, IPropertyReflector pr, JProperty jp, object entity)
+        {
+            var dict = (IDictionary)pr.ComplexTypeReflector!.CreateValue();
+
+            if (jp.Value.Type == JTokenType.Array)
+            {
+                // Where empty array then update as such.
+                if (!jp.Value.HasValues)
+                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, dict);
+
+                foreach (var iv in jp.Value.Values())
+                {
+                    if (iv.Type != JTokenType.Property)
+                        return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed and could not be parsed."));
+
+                    var ivp = (JProperty)iv;
+                    try
+                    {
+                        dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.ItemType!)!);
+                    }
+                    catch (Exception ex)
+                    {
+                        return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed: {ex.Message}"));
+                    }
+                }
+            }
+            else if (jp.Value.Type == JTokenType.Object && jp.Value.HasValues && jp.Value.First!.Type == JTokenType.Property && jp.Values().Count() == 1)
+            {
+                var ivp = (JProperty)jp.Value.First;
+                try
+                {
+                    dict.Add(ivp.Name, ivp.ToObject(pr.ComplexTypeReflector.ItemType!)!);
+                }
+                catch (Exception ex)
+                {
+                    return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed: {ex.Message}"));
+                }
+            }
+            else
+                return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed and could not be parsed."));
+
+            return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, dict);
         }
 
         /// <summary>

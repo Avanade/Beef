@@ -31,7 +31,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
         Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging);

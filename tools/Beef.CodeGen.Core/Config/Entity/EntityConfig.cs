@@ -34,6 +34,7 @@ entities:
     [CategorySchema("Collection", Title = "Provides the _Entity collection class_ configuration.")]
     [CategorySchema("Operation", Title = "Provides the _Operation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `Create`, `Update` and `Delete` operations (versus having to specify directly).")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
@@ -83,9 +84,18 @@ entities:
         /// Gets or sets the entity scope option.
         /// </summary>
         [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business" },
-            Description = "Determines whether the entity is considered `Common` (default) or should be scoped to the `Business` namespace/assembly only (i.e. not externally visible).")]
+        [PropertySchema("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+            Description = "Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
+            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
         public string? EntityScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
+        /// </summary>
+        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
+            Description = "Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
+        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding private name.
@@ -127,7 +137,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid" },
+        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
 
@@ -536,41 +546,6 @@ entities:
         public bool? DataSvcCaching { get; set; }
 
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
-        /// </summary>
-        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
-            Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
-        public bool? EventPublish { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URI event source.
-        /// </summary>
-        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The Event Source.",
-            Description = "Defaults to `Name` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
-        public string? EventSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
-        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
-        /// </summary>
-        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
-            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
-                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
-                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.")]
-        public bool? EventTransaction { get; set; }
-
-        /// <summary>
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
         [JsonProperty("dataSvcCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -594,6 +569,53 @@ entities:
         [PropertySchema("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
             Description = "This can be overridden using `Operation.DataSvcExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// </summary>
+        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).")]
+        public string? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
+            Description = "Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
+        public string? EventOutbox { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URI event source.
+        /// </summary>
+        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The Event Source.",
+            Description = "Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.")]
+        public string? EventSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default formatting for the Subject when an Event is published.
+        /// </summary>
+        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
+        public string? EventSubjectFormat { get; set; }
+
+        /// <summary>
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
+        /// </summary>
+        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
+                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
+                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.")]
+        public bool? EventTransaction { get; set; }
 
         #endregion
 
@@ -825,7 +847,7 @@ entities:
         /// <summary>
         /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
-        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value)).ToList();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && !(x.InternalOnly == true && Root!.RuntimeEntityScope == "Common" && Root.IsDataModel == false)).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key.
@@ -1012,6 +1034,11 @@ entities:
         public string? EntityCollectionInherits { get; set; }
 
         /// <summary>
+        /// Gets or sets the computed entity collection result inherits.
+        /// </summary>
+        public string? EntityCollectionResultInherits { get; set; }
+
+        /// <summary>
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityImplements { get; set; }
@@ -1042,9 +1069,14 @@ entities:
         public bool RequiresData => (CompareValue(ExcludeData, "None") && IsYesOption(ExcludeIData)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
 
         /// <summary>
-        /// Indicates whether any of the operations will raise an event. 
+        /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 
         /// </summary>
-        public bool SupportsEvents => Operations.Any(x => x.Events.Count > 0);
+        public bool SupportsDataSvcEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "DataSvc");
+
+        /// <summary>
+        /// Indicates whether any of the operations will raise an event within the Data-layer.
+        /// </summary>
+        public bool SupportsDataEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "Data");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Database'.
@@ -1079,7 +1111,7 @@ entities:
         /// <summary>
         /// Gets the reference data qualified Entity name.
         /// </summary>
-        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamesapce" : "RefDataNamespace")}.{Name}";
+        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamespace" : "RefDataNamespace")}.{Name}";
 
         /// <summary>
         /// <inheritdoc/>
@@ -1090,7 +1122,8 @@ entities:
             CheckOptionsProperties();
             Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
-            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
+            EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
+            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : EntityScope);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");
@@ -1109,8 +1142,10 @@ entities:
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
-            EventSource = DefaultWhereNull(EventSource, () => Name!.ToLowerInvariant());
+            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
+            EventSource = DefaultWhereNull(EventSource, () => $"{Name!.ToLowerInvariant()}/{{$key}}");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+            EventOutbox = DefaultWhereNull(EventOutbox, () => Parent!.EventOutbox);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
@@ -1150,6 +1185,7 @@ entities:
             {
                 "int" => "ReferenceDataBaseInt",
                 "Guid" => "ReferenceDataBaseGuid",
+                "string" => "ReferenceDataBaseString",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
             });
 
@@ -1157,7 +1193,8 @@ entities:
             {
                 "int" => "ReferenceDataBaseInt",
                 "Guid" => "ReferenceDataBaseGuid",
-                _ => null
+                "string" => "ReferenceDataBaseString",
+                _ => EntityInherits == "EntityBase" ? null : EntityInherits
             };
 
             EntityCollectionInherits = CollectionInherits;
@@ -1169,8 +1206,11 @@ entities:
                     return $"ReferenceDataCollectionBase<{EntityName}>";
             });
 
+            EntityCollectionResultInherits = CollectionResultInherits;
+            EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
+
             CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
-            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
+            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"CollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
         /// <summary>
@@ -1317,7 +1357,10 @@ entities:
             }
 
             if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+            {
                 implements.Insert(i++, "IUniqueKey");
+                modelImplements.Insert(m++, "IUniqueKey");
+            }
 
             if (Properties.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
                 implements.Insert(i++, "IPartitionKey");
@@ -1375,7 +1418,7 @@ entities:
             if (RequiresData)
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
 
-            if (SupportsEvents)
+            if (SupportsDataSvcEvents)
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
@@ -1401,6 +1444,9 @@ entities:
 
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            if (SupportsDataEvents)
+                DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)

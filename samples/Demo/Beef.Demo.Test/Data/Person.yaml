@@ -1,6 +1,6 @@
 Demo:
   - Person:
-    - { PersonId: 1, FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18, UniqueCode: A1234 }
+    - { PersonId: 1, FirstName: Wendy, LastName: Jones, Gender: F, Birthday: 1985-03-18, UniqueCode: A1234, MetadataJson: '{"F":"Value"}' }
     - { PersonId: 2, FirstName: Brian, LastName: Smith, Gender: M, EyeColorCode: BLUE, Birthday: 1994-11-07, UniqueCode: B2345 }
     - { PersonId: 3, FirstName: Rachael, LastName: Browne, Gender: F, Birthday: 1972-06-28, Street: 25 Upoko Road, City: Wellington }
     - { PersonId: 4, FirstName: Waylon, LastName: Smithers, Gender: M, Birthday: 1952-02-21, UniqueCode: C3456 }
@@ -10,4 +10,5 @@ Demo:
     - { WorkHistoryId: 3, PersonId: 4, Name: Microsoft, StartDate: 2015-05-23, EndDate: 2016-04-06 }
     - { WorkHistoryId: 4, PersonId: 4, Name: Amazon, StartDate: 2016-04-16 }
   - Contact:
-    - { ContactId: 1, FirstName: Jenny, LastName: Cuthbert }
+    - { ContactId: 1, FirstName: Jenny, LastName: Cuthbert, StatusCode: P }
+    - { ContactId: 2, FirstName: Brian, LastName: Missing, IsDeleted: true }

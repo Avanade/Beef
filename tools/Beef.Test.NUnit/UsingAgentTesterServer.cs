@@ -2,6 +2,7 @@
 
 using Beef.Test.NUnit.Tests;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 
@@ -15,6 +16,28 @@ namespace Beef.Test.NUnit
     public abstract class UsingAgentTesterServer<TStartup> : ITestSetupPrepareExecutionContext where TStartup : class
     {
         private AgentTesterServer<TStartup>? _agentTester;
+        private readonly string? _environmentVariablePrefix;
+        private readonly string _environment;
+        private readonly IConfiguration? _config;
+        private readonly Action<IServiceCollection>? _services;
+        private readonly bool _configureLocalRefData;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsingAgentTesterServer{TStartup}"/> class.
+        /// </summary>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
+        /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
+        /// <param name="services">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
+        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
+        protected UsingAgentTesterServer(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true)
+        {
+            _environmentVariablePrefix = environmentVariablePrefix;
+            _environment = environment;
+            _config = config;
+            _services = services;
+            _configureLocalRefData = configureLocalRefData;
+        }
 
         /// <summary>
         /// Gets the underlying <see cref="AgentTesterBase"/>.
@@ -33,7 +56,7 @@ namespace Beef.Test.NUnit
         public void UsingOneTimeSetUp()
         {
             TestSetUp.Reset(true, null);
-            _agentTester = new AgentTesterServer<TStartup>();
+            _agentTester = new AgentTesterServer<TStartup>(_environmentVariablePrefix, _environment, _config, _services, _configureLocalRefData);
         }
 
         /// <summary>

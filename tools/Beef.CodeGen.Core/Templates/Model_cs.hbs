@@ -27,7 +27,7 @@ using {{Root.UsingNamespace2}};
   {{#if Root.UsingNamespace3}}
 using {{Root.UsingNamespace3}};
   {{/if}}
-  {{#ifeq Root.EntityUsing 'Common' 'All'}}
+  {{#ifeq EntityUsing 'Common' 'All'}}
     {{#ifeq EntityScope 'Business'}}
 using {{Root.NamespaceCommon}}.Entities;
     {{/ifeq}}
@@ -35,7 +35,7 @@ using {{Root.NamespaceCommon}}.Entities;
 {{/unless}}
 
 {{! ===== Class ===== }}
-namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
+namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
 {
     /// <summary>
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
@@ -55,7 +55,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
-        [JsonProperty("{{JsonDataModelName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+        [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#unless IsDataModel}}
@@ -71,6 +71,29 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{/unless}}
         public {{{PrivateType}}} {{Name}} { get; set; }
 {{/each}}
+{{#unless RefDataType}}
+  {{#ifne UniqueKeyProperties.Count 0}}
+
+        /// <summary>
+        /// Gets the list of property names that represent the unique key.
+        /// </summary>
+        public string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
+        
+        /// <summary>
+        /// Creates the <see cref="UniqueKey"/>.
+        /// </summary>
+        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+  {{#each UniqueKeyProperties}}
+        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+  {{/each}}
+        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+
+        /// <summary>
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// </summary>
+        public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+  {{/ifne}}
+{{/unless}}
     }
 {{! ===== Collection ===== }}
 {{#if Collection}}
@@ -79,6 +102,34 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
     public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
+{{/if}}
+{{#if CollectionResult}}
+  {{#unless Root.IsDataModel}}
+
+    /// <summary>
+    /// Represents the {{{EntityNameSeeComments}}} collection result.
+    /// </summary>
+    public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
+    {
+        /// <summary>
+        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class.
+        /// </summary>
+        public {{{EntityCollectionResultName}}}() { }
+        
+        /// <summary>
+        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with <paramref name="paging"/>.
+        /// </summary>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
+        
+        /// <summary>
+        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// </summary>
+        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
+    }
+  {{/unless}}
 {{/if}}
 }
 

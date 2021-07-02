@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +55,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberTester{TStartup}"/> class.
         /// </summary>
-        internal EventSubscriberTester() : base(configureLocalRefData: true, useCorrelationIdLogger: true)
+        internal EventSubscriberTester() : base(configureLocalRefData: true)
         {
             // TODO: Come back and revisit.
             // string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string environment = TestSetUp.DefaultEnvironment, Action<ConfigurationBuilder>? configurationBuilder = null, Action<IServiceCollection>? services = null
@@ -78,7 +79,22 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets the unique correlation identifier that is sent via the event to the subscriber.
         /// </summary>
-        public string CorrelationId { get; } = Guid.NewGuid().ToString();
+        public string CorrelationId { get; private set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Sets (resets) the internal state for a new test.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberTester{TStartup}"/> instance to support fluent/chaining usage.</returns>
+        public EventSubscriberTester<TStartup> Test()
+        {
+            CorrelationId = Guid.NewGuid().ToString();
+            _expectedStatus = SubscriberStatus.Success;
+            _expectedExceptionMessage = null;
+            _expectedPublished.Clear();
+            _expectedNonePublished = false;
+            _ignoreEventMismatch = false;
+            return this;
+        }
 
         /// <summary>
         /// Verifies that the subscriber result has the specified <paramref name="status"/>.
@@ -362,14 +378,14 @@ namespace Beef.Test.NUnit
         {
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"LOGGING >");
-            var messages = CorrelationIdLogger.GetMessages(CorrelationId);
+            var messages = CorrelationIdLogger.GetMessages(CorrelationId, true);
             if (messages.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
             {
                 foreach (var l in messages)
                 {
-                    TestContext.Out.WriteLine($"{l}");
+                    WriteTestContextLogMessage(l);
                 }
             }
         }

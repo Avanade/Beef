@@ -9,7 +9,7 @@ namespace Beef.Caching.Policy
     /// </summary>
     public sealed class AbsoluteCachePolicy : ICachePolicy
     {
-        private TimeSpan _duration = new TimeSpan(1, 0, 0);
+        private TimeSpan _duration = new(1, 0, 0);
         private TimeSpan? _randomizerOffset;
 
         /// <summary>

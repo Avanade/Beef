@@ -16,11 +16,17 @@ namespace Beef.Entities
     public interface IIntIdentifierGenerator : IIdentifierGenerator
     {
         /// <summary>
-        /// Generate a new <see cref="int"/> identifier.
+        /// Generate a new <see cref="int"/> identifier for a specified <see cref="Type"/>.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/> that the identifier is required for.</typeparam>
         /// <returns>The newly generated identifier.</returns>
         Task<int> GenerateIdentifierAsync<T>();
+
+        /// <summary>
+        /// Generate a new <see cref="int"/> identifier for a default <see cref="object"/> <see cref="Type"/>.
+        /// </summary>
+        /// <returns>The newly generated identifier.</returns>
+        Task<int> GenerateIdentifierAsync() => GenerateIdentifierAsync<object>();
     }
 
     /// <summary>
@@ -29,11 +35,17 @@ namespace Beef.Entities
     public interface IGuidIdentifierGenerator : IIdentifierGenerator
     {
         /// <summary>
-        /// Generate a new <see cref="Guid"/> identifier.
+        /// Generate a new <see cref="Guid"/> identifier for a specified <see cref="Type"/>.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/> that the identifier is required for.</typeparam>
         /// <returns>The newly generated identifier.</returns>
         Task<Guid> GenerateIdentifierAsync<T>();
+
+        /// <summary>
+        /// Generate a new <see cref="Guid"/> identifier for a default <see cref="object"/> <see cref="Type"/>.
+        /// </summary>
+        /// <returns>The newly generated identifier.</returns>
+        Task<Guid> GenerateIdentifierAsync() => GenerateIdentifierAsync<object>();
     }
 
     /// <summary>
@@ -42,10 +54,16 @@ namespace Beef.Entities
     public interface IStringIdentifierGenerator : IIdentifierGenerator
     {
         /// <summary>
-        /// Generate a new <see cref="int"/> identifier.
+        /// Generate a new <see cref="string"/> identifier for a specified <see cref="Type"/>.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/> that the identifier is required for.</typeparam>
         /// <returns>The newly generated identifier.</returns>
         Task<string> GenerateIdentifierAsync<T>();
+
+        /// <summary>
+        /// Generate a new <see cref="string"/> identifier for default <see cref="object"/> <see cref="Type"/>.
+        /// </summary>
+        /// <returns>The newly generated identifier.</returns>
+        Task<string> GenerateIdentifierAsync() => GenerateIdentifierAsync<object>();
     }
 }

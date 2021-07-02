@@ -180,7 +180,7 @@ namespace Beef.Events
         /// Creates (clones) a new instance copying the existing values.
         /// </summary>
         /// <returns></returns>
-        public EventMetadata CopyMetadata() => new EventMetadata
+        public EventMetadata CopyMetadata() => new()
         {
             EventId = EventId,
             TenantId = TenantId,
@@ -373,6 +373,11 @@ namespace Beef.Events
         public virtual void ResetValue() { }
 
         /// <summary>
+        /// Gets the <see cref="EventData"/> <b>value</b> <see cref="Type"/>; returns <c>null</c> where <see cref="HasValue"/> is <c>false</c>.
+        /// </summary>
+        public virtual Type? ValueType => null;
+
+        /// <summary>
         /// Indicates whether the <see cref="EventData"/> has a <b>value</b> property; i.e. is an <see cref="EventData{T}"/>.
         /// </summary>
         public virtual bool HasValue => false;
@@ -437,6 +442,11 @@ namespace Beef.Events
         /// </summary>
         /// <param name="metadata">The <see cref="EventMetadata"/>.</param>
         public EventData(EventMetadata? metadata) : base(metadata) { }
+
+        /// <summary>
+        /// Gets the <see cref="EventData"/> <b>value</b> <see cref="Type"/>; returns <c>null</c> where <see cref="HasValue"/> is <c>false</c>.
+        /// </summary>
+        public override Type? ValueType => typeof(T);
 
         /// <summary>
         /// Gets (same as <see cref="GetValue"/>) or sets (same as <see cref="SetValue"/>) the event value (automatically setting/overriding the <see cref="EventMetadata.ETag"/> and <see cref="EventMetadata.PartitionKey"/>).

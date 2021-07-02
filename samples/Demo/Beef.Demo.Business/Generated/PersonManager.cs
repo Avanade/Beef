@@ -130,6 +130,11 @@ namespace Beef.Demo.Business
         private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
         private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
 
+        private Func<AddressCollection?, Task>? _paramCollOnPreValidateAsync;
+        private Action<MultiValidator, AddressCollection?>? _paramCollOnValidate;
+        private Func<AddressCollection?, Task>? _paramCollOnBeforeAsync;
+        private Func<AddressCollection?, Task>? _paramCollOnAfterAsync;
+
         private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getWithEfOnValidate;
         private Func<Guid, Task>? _getWithEfOnBeforeAsync;
@@ -331,7 +336,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -356,7 +361,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -426,7 +431,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public async Task<MapCoordinates> MapAsync(MapArgs? args)
         {
@@ -522,7 +527,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         public async Task AddAsync(Person person)
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -617,7 +622,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
@@ -678,6 +683,28 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
                 await (_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        public async Task ParamCollAsync(AddressCollection? addresses)
+        {
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Cleaner.CleanUp(addresses);
+                await (_paramCollOnPreValidateAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+
+                (await MultiValidator.Create()
+                    .Add(addresses.Validate(nameof(addresses)).Entity().With<IValidator<AddressCollection>>())
+                    .Additional((__mv) => _paramCollOnValidate?.Invoke(__mv, addresses))
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+                await (_paramCollOnBeforeAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+                await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
+                await (_paramCollOnAfterAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
             }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 

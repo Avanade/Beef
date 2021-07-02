@@ -23,6 +23,7 @@ namespace Beef.Data.Database
         private DbConnection? _connection;
         private bool _disposed;
         private ILogger? _logger;
+        private DatabaseEventOutboxInvoker? _eventOutboxInvoker;
 
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for the <see cref="SqlException"/> known list.
@@ -107,6 +108,22 @@ namespace Beef.Data.Database
         /// Gets the <see cref="DatabaseInvoker"/>.
         /// </summary>
         public DatabaseInvoker Invoker { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DatabaseEventOutboxInvoker"/>. This defaults where not explicitly overridden.
+        /// </summary>
+        /// <returns>The <see cref="IDatabase.EventOutboxInvoker"/>.</returns>
+        public DatabaseEventOutboxInvoker EventOutboxInvoker
+        {
+            get => _eventOutboxInvoker ??= new DatabaseEventOutboxInvoker(this);
+            set
+            {
+                if (value != null && value.Database != this)
+                    throw new ArgumentException("The DatabaseEventOutboxInvoker.Database property must be the same instance as this DatabaseBase instance.", nameof(EventOutboxInvoker));
+
+                _eventOutboxInvoker = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="DatabaseWildcard"/> to enable wildcard replacement.
@@ -367,7 +384,7 @@ namespace Beef.Data.Database
 
             DatabaseRecordFieldCollection? fields = null;
             var idCol = idColumnName ?? DatabaseRefDataColumns.IdColumnName;
-            var isInt = ReferenceDataBase.GetIdTypeCode(typeof(TItem)) == ReferenceDataIdTypeCode.Int32;
+            var typeCode = ReferenceDataBase.GetIdTypeCode(typeof(TItem));
 
             var list = new List<Action<DatabaseRecord>>
             {
@@ -382,7 +399,12 @@ namespace Beef.Data.Database
 
                     TItem item = new TItem()
                     {
-                        Id = isInt ? (object)dr.GetValue<int>(fields[idCol].Index) : (object)dr.GetValue<Guid>(fields[idCol].Index),
+                        Id = typeCode switch
+                        {
+                            ReferenceDataIdTypeCode.Guid => (object)dr.GetValue<Guid>(fields[idCol].Index),
+                            ReferenceDataIdTypeCode.Int32 => (object)dr.GetValue<int>(fields[idCol].Index),
+                            _ => (object)dr.GetValue<string>(fields[idCol].Index)
+                        },
                         Code = dr.GetValue<string>(fields[DatabaseRefDataColumns.CodeColumnName].Index),
                         Text = !fields.Contains(DatabaseRefDataColumns.TextColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.TextColumnName].Index),
                         Description = !fields.Contains(DatabaseRefDataColumns.DescriptionColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.DescriptionColumnName].Index),

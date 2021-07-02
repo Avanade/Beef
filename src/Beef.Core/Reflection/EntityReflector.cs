@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.RefData;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -42,6 +45,12 @@ namespace Beef.Reflection
         /// Indicates whether duplicate properties are ignored.
         /// </summary>
         public bool IgnoreDuplicateProperties { get; set; } = true;
+
+        /// <summary>
+        /// Indicates whether to evaluate the reference data properties and set the <see cref="IPropertyReflector.ReferenceDataPropertyType"/> accordingly; otherwise, all properties will default to
+        /// <see cref="ReferenceDataPropertyType.NotEvaluated"/>.
+        /// </summary>
+        public bool EvaluateReferenceDataProperties { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the function to invoke to perform additional logic when reflecting/building the <b>property</b> <see cref="Type"/>; the result determines whether the
@@ -138,7 +147,7 @@ namespace Beef.Reflection
     {
         private readonly Dictionary<string, IPropertyReflector<TEntity>> _properties;
         private readonly Dictionary<string, IPropertyReflector<TEntity>> _jsonProperties;
-        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<Dictionary<string, object>> _data = new(true);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityReflector{TEntity}"/> class.
@@ -227,10 +236,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns>The <see cref="IPropertyReflector"/>.</returns>
-        IPropertyReflector IEntityReflector.GetProperty(string name)
-        {
-            return GetProperty(name);
-        }
+        IPropertyReflector IEntityReflector.GetProperty(string name) => GetProperty(name);
 
         /// <summary>
         /// Gets the <see cref="IPropertyReflector"/> for the specified name.
@@ -248,10 +254,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="jsonName">The JSON name.</param>
         /// <returns>The <see cref="IPropertyReflector"/>.</returns>
-        IPropertyReflector IEntityReflector.GetJsonProperty(string jsonName)
-        {
-            return GetJsonProperty(jsonName);
-        }
+        IPropertyReflector IEntityReflector.GetJsonProperty(string jsonName) => GetJsonProperty(jsonName);
 
         /// <summary>
         /// Gets the <see cref="IPropertyReflector"/> for the specified JSON name.
@@ -263,6 +266,11 @@ namespace Beef.Reflection
             _jsonProperties.TryGetValue(jsonName, out var value);
             return value;
         }
+
+        /// <summary>
+        /// Gets all the properties.
+        /// </summary>
+        public IReadOnlyCollection<IPropertyReflector> GetProperties() => new ReadOnlyCollection<IPropertyReflector>(_properties.Values.OfType<IPropertyReflector>().ToList());
     }
 
     /// <summary>
@@ -326,6 +334,11 @@ namespace Beef.Reflection
         Type PropertyType { get; }
 
         /// <summary>
+        /// Gets the <see cref="Reflection.ReferenceDataPropertyType"/>.
+        /// </summary>
+        ReferenceDataPropertyType ReferenceDataPropertyType { get; }
+
+        /// <summary>
         /// Gets the <see cref="IEntityReflector"/> for the property; will return <c>null</c> where <see cref="PropertyType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
@@ -336,6 +349,12 @@ namespace Beef.Reflection
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
         IEntityReflector? GetItemEntityReflector();
+
+        /// <summary>
+        /// Gets the specified <see cref="Reflection.ReferenceDataPropertyType"/> <see cref="PropertyInfo"/> for this <see cref="ReferenceDataPropertyType.ReferenceData"/> property.
+        /// </summary>
+        /// <returns>The corresponding <see cref="PropertyInfo"/>; otherwise, an <see cref="InvalidOperationException"/> will be thrown.</returns>
+        PropertyInfo GetReferenceDataProperty(ReferenceDataPropertyType type);
 
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
@@ -411,7 +430,11 @@ namespace Beef.Reflection
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class PropertyReflector<TEntity, TProperty> : IPropertyReflector<TEntity> where TEntity : class, new()
     {
-        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<Dictionary<string, object>> _data = new(true);
+        private string? _rootRefDataName;
+
+        private const string _refDataSidSuffix = "Sid";
+        private const string _refDataTextSuffix = "Text";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyReflector{TEntity, TProperty}"/> class.
@@ -426,6 +449,37 @@ namespace Beef.Reflection
 
             if (PropertyInfo.PropertyType.IsClass && PropertyInfo.PropertyType != typeof(string))
                 ComplexTypeReflector = ComplexTypeReflector.Create(PropertyInfo);
+
+            if (args.EvaluateReferenceDataProperties)
+            {
+                if (PropertyInfo.PropertyType.IsClass && typeof(ReferenceDataBase).IsAssignableFrom(PropertyInfo.PropertyType))
+                {
+                    ReferenceDataPropertyType = ReferenceDataPropertyType.Value;
+                    _rootRefDataName = PropertyName;
+                }
+                else if (IsReferenceDataProperty(_refDataSidSuffix))
+                    ReferenceDataPropertyType = ReferenceDataPropertyType.Sid;
+                else if (IsReferenceDataProperty(_refDataTextSuffix))
+                    ReferenceDataPropertyType = ReferenceDataPropertyType.Text;
+                else
+                    ReferenceDataPropertyType = ReferenceDataPropertyType.None;
+            }
+        }
+
+        /// <summary>
+        /// Check whether property has a name that ends with the specified suffix and determine whether that property is reference data.
+        /// </summary>
+        private bool IsReferenceDataProperty(string suffix)
+        {
+            if (PropertyName.Length < 4 || !PropertyName.EndsWith(suffix, StringComparison.InvariantCulture))
+                return false;
+
+            var rdp = EntityType.GetProperty(PropertyName[0..^suffix.Length]);
+            if (rdp == null || !typeof(ReferenceDataBase).IsAssignableFrom(rdp.PropertyType))
+                return false;
+
+            _rootRefDataName = rdp.Name;
+            return true;
         }
 
         /// <summary>
@@ -489,6 +543,11 @@ namespace Beef.Reflection
         public Type PropertyType => typeof(TProperty);
 
         /// <summary>
+        /// Gets the <see cref="Reflection.ReferenceDataPropertyType"/>.
+        /// </summary>
+        public ReferenceDataPropertyType ReferenceDataPropertyType { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="IEntityReflector"/> for the property; will return <c>null</c> where <see cref="PropertyType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
@@ -516,15 +575,24 @@ namespace Beef.Reflection
         }
 
         /// <summary>
+        /// Gets the specified <see cref="Reflection.ReferenceDataPropertyType"/> <see cref="PropertyInfo"/> for this <see cref="ReferenceDataPropertyType.ReferenceData"/> property.
+        /// </summary>
+        /// <returns>The corresponding <see cref="PropertyInfo"/>; otherwise, an <see cref="InvalidOperationException"/> will be thrown.</returns>
+        public PropertyInfo GetReferenceDataProperty(ReferenceDataPropertyType type) => type switch
+        {
+            ReferenceDataPropertyType.Value => ReferenceDataPropertyType == ReferenceDataPropertyType.Value ? PropertyInfo : EntityType.GetProperty($"{_rootRefDataName}")!,
+            ReferenceDataPropertyType.Sid => ReferenceDataPropertyType == ReferenceDataPropertyType.Sid ? PropertyInfo : EntityType.GetProperty($"{_rootRefDataName}{_refDataSidSuffix}")!,
+            ReferenceDataPropertyType.Text => ReferenceDataPropertyType == ReferenceDataPropertyType.Text ? PropertyInfo : EntityType.GetProperty($"{_rootRefDataName}{_refDataTextSuffix}")!,
+            ReferenceDataPropertyType.None => throw new InvalidOperationException($"The {nameof(ReferenceDataPropertyType)} is '{nameof(ReferenceDataPropertyType.None)}'; as such no corresponding property exists."),
+            _ => throw new InvalidOperationException($"The {nameof(ReferenceDataPropertyType)} is '{nameof(ReferenceDataPropertyType.NotEvaluated)}'; as such not determination can be made."),
+        };
+
+        /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        object? IPropertyReflector.GetJTokenValue(JToken jtoken)
-        {
-            return GetJTokenValue(jtoken);
-        }
-
+        object? IPropertyReflector.GetJTokenValue(JToken jtoken) => GetJTokenValue(jtoken);
 
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
@@ -532,10 +600,7 @@ namespace Beef.Reflection
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Needs to be a non-static as matches interface.")]
-        TProperty GetJTokenValue(JToken jtoken)
-        {
-            return jtoken.ToObject<TProperty>()!;
-        }
+        TProperty GetJTokenValue(JToken jtoken) => jtoken.ToObject<TProperty>()!;
 
         /// <summary>
         /// Sets the property value from a <see cref="JToken"/>.
@@ -543,10 +608,7 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool IPropertyReflector.SetValueFromJToken(object entity, JToken jtoken)
-        {
-            return SetValueFromJToken((TEntity)entity, jtoken);
-        }
+        bool IPropertyReflector.SetValueFromJToken(object entity, JToken jtoken) => SetValueFromJToken((TEntity)entity, jtoken);
 
         /// <summary>
         /// Sets the property value from a <see cref="JToken"/>.
@@ -567,10 +629,7 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool IPropertyReflector.SetValue(object entity, object? value)
-        {
-            return SetValue((TEntity)entity, (TProperty)value!);
-        }
+        bool IPropertyReflector.SetValue(object entity, object? value) => SetValue((TEntity)entity, (TProperty)value!);
 
         /// <summary>
         /// Sets the property value.
@@ -578,10 +637,7 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool IPropertyReflector<TEntity>.SetValue(TEntity entity, object? value)
-        {
-            return SetValue(entity, (TProperty)value!);
-        }
+        bool IPropertyReflector<TEntity>.SetValue(TEntity entity, object? value) => SetValue(entity, (TProperty)value!);
 
         /// <summary>
         /// Sets the property value.
@@ -604,10 +660,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        (bool changed, object? value) IPropertyReflector.NewValue(object entity)
-        {
-            return NewValue((TEntity)entity);
-        }
+        (bool changed, object? value) IPropertyReflector.NewValue(object entity) => NewValue((TEntity)entity);
 
         /// <summary>
         /// Creates a new instance and sets the property value.
@@ -624,18 +677,48 @@ namespace Beef.Reflection
         /// Creates a new instance.
         /// </summary>
         /// <returns>The value.</returns>
-        object? IPropertyReflector.NewValue()
-        {
-            return NewValue();
-        }
+        object? IPropertyReflector.NewValue() => NewValue();
 
         /// <summary>
         /// Creates a new instance.
         /// </summary>
         /// <returns>The value.</returns>
-        public TProperty NewValue()
-        {
-            return Activator.CreateInstance<TProperty>();
-        }
+        public TProperty NewValue() => Activator.CreateInstance<TProperty>();
+    }
+
+    /// <summary>
+    /// Indicates whether the <see cref="IPropertyReflector"/> is referencing a <see cref="ReferenceDataBase"/> and which of the possible code-generated property types it is based on naming convention.
+    /// </summary>
+    public enum ReferenceDataPropertyType
+    {
+        /// <summary>
+        /// Indicates that the property has not been evaluated.
+        /// </summary>
+        NotEvaluated = 0,
+
+        /// <summary>
+        /// Indicates that the property is not considered related to reference data.
+        /// </summary>
+        None = 1,
+
+        /// <summary>
+        /// Indicates that the property is <i>the</i> <see cref="ReferenceDataBase"/> property value itsef.
+        /// </summary>
+        Value = 2,
+
+        /// <summary>
+        /// Inidicates that the property is the corresponding Serialization Identifier (SID) property (typically <see cref="ReferenceDataBase.Code"/>); this property is named with the <c>Sid</c> suffix.
+        /// </summary>
+        Sid = 4,
+
+        /// <summary>
+        /// Inidicates that the property is the corresponding <see cref="ReferenceDataBase.Text"/> property; this property is named with the <c>Text</c> suffix.
+        /// </summary>
+        Text = 8,
+
+        /// <summary>
+        /// Indicates that the property is reference data in orientation, in that it is either <see cref="Value"/>, <see cref="Sid"/> or <see cref="Text"/>.
+        /// </summary>
+        ReferenceData = Value | Sid | Text
     }
 }

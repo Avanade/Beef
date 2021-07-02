@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -148,6 +149,29 @@ namespace Beef.Test.NUnit.Tests
 
             if (sb.Length > 0)
                 Assert.Fail($"Messages mismatch:{System.Environment.NewLine}{sb}");
+        }
+
+        /// <summary>
+        /// Writes the log message to <see cref="TestContext.Out"/> such that second and subsequent lines are indented.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public static void WriteTestContextLogMessage(string message)
+        {
+            var sr = new StringReader(message);
+            var first = true;
+            while (true)
+            {
+                var l = sr.ReadLine();
+                if (l == null)
+                    return;
+
+                if (first)
+                    TestContext.Out.WriteLine($"{l}");
+                else
+                    TestContext.Out.WriteLine($"{new string(' ', 31)}{l}");
+
+                first = false;
+            }
         }
     }
 }

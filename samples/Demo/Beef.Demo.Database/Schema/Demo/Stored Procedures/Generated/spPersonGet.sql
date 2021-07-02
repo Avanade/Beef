@@ -23,7 +23,8 @@ BEGIN
       [p].[UpdatedBy],
       [p].[UpdatedDate],
       [p].[UniqueCode],
-      [p].[EyeColorCode]
+      [p].[EyeColorCode],
+      [p].[MetadataJson]
     FROM [Demo].[Person] AS [p]
       WHERE [p].[PersonId] = @PersonId
 END

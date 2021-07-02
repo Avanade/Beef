@@ -15,7 +15,7 @@ using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
 using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
+using Beef.Demo.Business.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Api.Controllers
@@ -101,6 +101,18 @@ namespace Beef.Demo.Api.Controllers
         {
             return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        [HttpPost("raise")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult RaiseEvent(bool throwError)
+        {
+            return new WebApiPost(this, () => _manager.RaiseEventAsync(throwError),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
         }
     }
 }

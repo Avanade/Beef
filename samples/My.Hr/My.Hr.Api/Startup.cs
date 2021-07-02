@@ -52,6 +52,7 @@ namespace My.Hr.Api
 
             // Add the core beef services.
             services.AddBeefExecutionContext()
+                    .AddBeefTextProviderAsSingleton()
                     .AddBeefSystemTime()
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
@@ -81,6 +82,10 @@ namespace My.Hr.Api
                 services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
             else
                 services.AddBeefNullEventPublisher();
+
+            // Add transactional event outbox services.
+            services.AddGeneratedDatabaseEventOutbox();
+            services.AddBeefDatabaseEventOutboxPublisherService();
 
             // Add additional services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();

@@ -11,6 +11,9 @@ namespace Beef.Core.UnitTest.Validation.Rules
     [TestFixture]
     public class StringRuleTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         [Test]
         public async Task Validate_MinLength()
         {

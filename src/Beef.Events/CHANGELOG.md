@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+
+## v4.1.9
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+
 ## v4.1.8
 - *Fixed:* Corrected issue where converting JSON deserialized `EventData.Value` to an intrinsic type such as a `Guid`.
 - *Enhancement:* Added new `IEventSubscriber.ConsiderNullValueAsInvalidData` which defaults to `true`. Will automatically result in an `InvalidData` result where the `EventData.Value` is `null`.

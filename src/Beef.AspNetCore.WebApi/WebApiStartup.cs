@@ -26,7 +26,7 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="IWebHost"/>.</returns>
         public static IWebHostBuilder CreateWebHost<TStartup>(string[] args, string? environmentVariablePrefix = null) where TStartup : class =>
             WebHost.CreateDefaultBuilder(args)
-                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, hostingContext.HostingEnvironment, environmentVariablePrefix))
+                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, args, hostingContext.HostingEnvironment, environmentVariablePrefix))
                    .UseStartup<TStartup>();
 
         /// <summary>
@@ -40,15 +40,16 @@ namespace Beef.AspNetCore.WebApi
             CreateWebHost<TStartup>(args, environmentVariablePrefix).Build();
 
         /// <summary>
-        /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
-        /// 2) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (see <paramref name="environmentVariablePrefix"/>),
-        /// 4) appsettings.{environment}.json, 5) appsettings.json, 6) webapisettings.{environment}.json (embedded resource), and 7) webapisettings.json (embedded resource).
+        /// Builds the configuration probing; will probe in the following order: 1) Command-line arguments, 2) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
+        /// 3) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 4) environment variable (see <paramref name="environmentVariablePrefix"/>),
+        /// 5) appsettings.{environment}.json, 6) appsettings.json, 7) webapisettings.{environment}.json (embedded resource), and 8) webapisettings.json (embedded resource).
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="configurationBuilder">The <see cref="IConfigurationBuilder"/>.</param>
+        /// <param name="args">The command line args.</param>
         /// <param name="hostingEnvironment">The <see cref="IWebHostEnvironment"/>.</param>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
-        public static void ConfigurationBuilder<TStartup>(IConfigurationBuilder configurationBuilder, IWebHostEnvironment hostingEnvironment, string? environmentVariablePrefix = null) where TStartup : class
+        public static void ConfigurationBuilder<TStartup>(IConfigurationBuilder configurationBuilder, string[] args, IWebHostEnvironment hostingEnvironment, string? environmentVariablePrefix = null) where TStartup : class
         {
             if (configurationBuilder == null)
                 throw new ArgumentNullException(nameof(configurationBuilder));
@@ -66,6 +67,8 @@ namespace Beef.AspNetCore.WebApi
             else
                 configurationBuilder.AddEnvironmentVariables(environmentVariablePrefix.EndsWith("_", StringComparison.InvariantCulture) ? environmentVariablePrefix : environmentVariablePrefix + "_");
 
+            configurationBuilder.AddCommandLine(args);
+
             var config = configurationBuilder.Build();
             if (hostingEnvironment.IsDevelopment() && config.GetValue<bool>("UseUserSecrets"))
                 configurationBuilder.AddUserSecrets<TStartup>();
@@ -79,6 +82,8 @@ namespace Beef.AspNetCore.WebApi
                 configurationBuilder.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
 #pragma warning restore CA2000
             }
+
+            configurationBuilder.AddCommandLine(args);
         }
 
         /// <summary>

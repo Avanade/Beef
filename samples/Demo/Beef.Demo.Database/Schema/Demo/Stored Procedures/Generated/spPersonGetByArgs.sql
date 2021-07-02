@@ -32,7 +32,8 @@ BEGIN
       [p].[UpdatedBy],
       [p].[UpdatedDate],
       [p].[UniqueCode],
-      [p].[EyeColorCode]
+      [p].[EyeColorCode],
+      [p].[MetadataJson]
     FROM [Demo].[Person] AS [p]
     WHERE (@FirstName IS NULL OR [p].[FirstName] LIKE @FirstName)
       AND (@LastName IS NULL OR [p].[LastName] LIKE @LastName)

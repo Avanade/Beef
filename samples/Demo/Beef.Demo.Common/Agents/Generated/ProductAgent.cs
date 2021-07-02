@@ -34,7 +34,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -65,7 +65,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>

@@ -2,8 +2,7 @@
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Entity" Inherits="EntityOnly.xml">
   <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathBusiness}}/Entities/Generated" EntityScope="Business" HelpText="EntityCodeGenerator: Business/Entities" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator" Template="Model_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathCommon}}/Entities/Generated" EntityScope="Common" HelpText="EntityOmitBaseCodeGenerator: Common/Entities" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator" Template="Model_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathCommon}}/Entities/Generated" EntityScope="Business" HelpText="EntityOmitBaseCodeGenerator: Business/Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator" Template="Model_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathBusiness}}/Entities/Generated" EntityScope="Business" HelpText="EntityOmitBaseCodeGenerator: Business/Entities" />
   <Generate GenType="Beef.CodeGen.Generators.EntityDataModelCodeGenerator" Template="Model_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathBusiness}}/Data/Model/Generated" IsDataModel="true" EntityScope="Business" HelpText="EntityModelCodeGenerator: Business/Data/Model" />
 
   <Generate GenType="Beef.CodeGen.Generators.EntityIDataCodeGenerator" Template="EntityIData_cs.hbs" FileName="I{{Name}}Data.cs" OutDir="{{Root.PathBusiness}}/Data/Generated" HelpText="IEntityDataCodeGenerator: Business/Data" />

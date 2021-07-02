@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Entities;
-using Beef.Demo.Common.Entities;
+using Beef.Demo.Business.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.DataSvc
@@ -53,6 +53,12 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         Task DeleteAsync(Guid id);
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        Task RaiseEventAsync(bool throwError);
     }
 }
 

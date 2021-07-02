@@ -62,6 +62,14 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult> RaiseEventAsync(bool throwError, WebApiRequestOptions? requestOptions = null);
     }
 
     /// <summary>
@@ -124,6 +132,16 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
             DeleteAsync("api/v1/contacts/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+
+        /// <summary>
+        /// Raise Event.
+        /// </summary>
+        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> RaiseEventAsync(bool throwError, WebApiRequestOptions? requestOptions = null) =>
+            PostAsync("api/v1/contacts/raise", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<bool>("throwError", throwError) });
     }
 }
 

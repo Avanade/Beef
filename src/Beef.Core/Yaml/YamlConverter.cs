@@ -136,7 +136,7 @@ namespace Beef.Yaml
                 {
                     var jv = (JValue)j;
                     var s = jv.Value as string;
-                    if (!string.IsNullOrEmpty(s) && s.StartsWith("^", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(s.Substring(1), out var i))
+                    if (!string.IsNullOrEmpty(s) && s.StartsWith("^", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(s[1..], out var i))
                         jv.Value = new Guid(i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 }
                 else
@@ -170,6 +170,12 @@ namespace Beef.Yaml
                 case ReferenceDataBaseInt rdi:
                     if (rdi.Id == 0)
                         rdi.Id = index + 1;
+
+                    break;
+
+                case ReferenceDataBaseString rds:
+                    if (rds.Id == null)
+                        rds.Id = Guid.NewGuid().ToString();
 
                     break;
             }

@@ -74,6 +74,24 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
+        /// Indicates whether any <see cref="RegisterSetUp(Func{int, object?, bool})"/> and <see cref="RegisterSetUp(Func{int, object?, Task{bool}})"/> has occured.
+        /// </summary>
+        public static bool HasSetUpBeenRegistered => _registeredSetupAsync != null || _registeredSetup != null;
+
+        /// <summary>
+        /// Unregisters any previous <see cref="RegisterSetUp(Func{int, object?, bool})"/> and <see cref="RegisterSetUp(Func{int, object?, Task{bool}})"/>.
+        /// </summary>
+        public static void UnregisterSetUp()
+        {
+            lock (_lock)
+            {
+                _registeredSetupAsync = null;
+                _registeredSetup = null;
+                Reset();
+            }
+        }
+
+        /// <summary>
         /// Indicates whether tests should continue running; otherwise, set to <c>false</c> for all other remaining tests to return inconclusive.
         /// </summary>
         public static bool ShouldContinueRunningTests { get; set; } = true;
@@ -116,14 +134,12 @@ namespace Beef.Test.NUnit
                             Assert.Fail("This RegisterSetUp function failed to execute successfully.");
                     }
                     catch (AssertionException) { throw; }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design, catches them all!
                     catch (Exception ex)
                     {
                         ShouldContinueRunningTests = false;
                         TestContext.Out.WriteLine($"This RegisterSetUp function failed to execute successfully: {ex.Message}{Environment.NewLine}{ex}");
                         Assert.Fail($"This RegisterSetUp function failed to execute successfully: {ex.Message}");
                     }
-#pragma warning restore CA1031
                     finally
                     {
                         _registeredSetupInvoked = true;

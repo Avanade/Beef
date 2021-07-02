@@ -279,7 +279,7 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         [HttpPost("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public IActionResult Add([FromBody] Person person)
@@ -356,6 +356,18 @@ namespace Beef.Demo.Api.Controllers
         {
             return new WebApiPost<string?>(this, () => _manager.InvokeApiViaAgentAsync(id),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        [HttpPost("paramcoll")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult ParamColl([FromBody] AddressCollection? addresses)
+        {
+            return new WebApiPost(this, () => _manager.ParamCollAsync(addresses),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>

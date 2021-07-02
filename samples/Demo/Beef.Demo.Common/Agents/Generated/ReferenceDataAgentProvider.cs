@@ -64,6 +64,10 @@ namespace Beef.Demo.Common.Agents
             _typeDict.Add(typeof(RefDataNamespace.Company), nameof(Company));
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
+            _nameDict.Add(nameof(Status), typeof(RefDataNamespace.Status));
+            _typeDict.Add(typeof(RefDataNamespace.Status), nameof(Status));
+            _cacheDict.Add(typeof(RefDataNamespace.Status), new ReferenceDataCache<RefDataNamespace.StatusCollection, RefDataNamespace.Status>(() => _agent.StatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+
             ReferenceDataAgentProviderCtor();
         }
 
@@ -108,6 +112,12 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
         public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
+
+        /// <summary>
+        /// Gets the <see cref="RefDataNamespace.StatusCollection"/>.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.StatusCollection"/>.</returns>
+        public override RefDataNamespace.StatusCollection Status => (RefDataNamespace.StatusCollection)this[typeof(RefDataNamespace.Status)];
 
         #endregion
 
@@ -170,6 +180,7 @@ namespace Beef.Demo.Common.Agents
                         case nameof(EyeColor): GetCache(_nameDict[nameof(EyeColor)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.EyeColor[]>(items!)); break;
                         case nameof(PowerSource): GetCache(_nameDict[nameof(PowerSource)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.PowerSource[]>(items!)); break;
                         case nameof(Company): GetCache(_nameDict[nameof(Company)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Company[]>(items!)); break;
+                        case nameof(Status): GetCache(_nameDict[nameof(Status)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Status[]>(items!)); break;
                     }
                  }
             }

@@ -2,6 +2,17 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+
+## v4.1.7
+- *Fixed:* Fix error `Cannot delete rows from a temporal history table` when resetting (deleting) [temporal table](https://docs.microsoft.com/en-us/sql/relational-databases/tables/temporal-tables) contents during test fixture start-up.
+
+## v4.1.6
+- *Enhancement:* Added ability to specify within the data YAML the `IIdentifierGenerators` type using global `^Type` property. Where a table is prefixed with a `^` or `$^` then the identifier value will be generated and set using the appropriate `IIdentifierGenerator`.
+- *Enhancement:* Updated project to produce symbol packages for improved [debugging](https://devblogs.microsoft.com/dotnet/improving-debug-time-productivity-with-source-link/).
+- *Enhancement:* Added `^(Namespace.Type.Property.Method().etc, AssemblyName)` runtime value lookup syntax to data YAML.
+
 ## v4.1.5
 - *Enhancement:* Added additional statistics information to console output.
 - *Enhancement:* Will strip out `bin/debug` and `bin/release` folders from default directory path to find the output directory; meaning the path does not need to be explicity set when running/debugging from Visual Studio.

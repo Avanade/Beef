@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 using Beef;
 using Beef.RefData;
 using My.Hr.Business.DataSvc;
-using My.Hr.Common.Entities;
-using RefDataNamespace = My.Hr.Common.Entities;
+using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business
 {

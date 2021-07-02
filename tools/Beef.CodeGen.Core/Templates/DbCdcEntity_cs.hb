@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 {{/if}}
 
-namespace {{Root.NamespaceCdc}}.Entities
+namespace {{Root.NamespaceCdcPublisher}}.Entities
 {
     /// <summary>
     /// Represents the CDC model for the root (parent) database table '{{Schema}}.{{Name}}'.

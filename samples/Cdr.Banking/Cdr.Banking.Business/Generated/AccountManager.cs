@@ -39,7 +39,7 @@ namespace Cdr.Banking.Business
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public async Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)

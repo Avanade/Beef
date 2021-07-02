@@ -219,7 +219,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -238,7 +238,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -262,7 +262,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
             => DataInvoker.Current.InvokeAsync(this, () => MapOnImplementationAsync(args), new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
@@ -302,7 +302,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
@@ -419,6 +419,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.EyeColorSid, "EyeColorCode");
                 Property(s => s.Birthday);
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
+                Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
                 AddStandardProperties();
                 DbMapperCtor();
             }
@@ -443,6 +444,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Gender, d => d.GenderId).SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default!);
                 Property(s => s.EyeColorSid, d => d.EyeColorCode);
                 Property(s => s.Birthday, d => d.Birthday);
+                Property(s => s.Metadata, d => d.MetadataJson).SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
                 AddStandardProperties();
                 EfMapperCtor();
             }

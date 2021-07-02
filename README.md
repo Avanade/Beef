@@ -109,11 +109,13 @@ To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/
 
 ![Layers](./docs/images/EventDrivenArchitecture.png "Event-Driven Architecture")
 
-- **Producer / Publisher** - the publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer.
+- **Producer / Publisher** - the publishing of events is integrated into the API processing pipeline; this is enabled within either the [Data](./docs/Layer-Data.md) (where leveraging the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html)) or [Service orchestration](./docs/Layer-DataSvc.md) layers to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer (unless provided, see Azure [EventHubs](./src/Beef.Events.EventHubs) or [ServiceBus](./src/Beef.Events.ServiceBus)). 
 
 - **Consumer / Subscriber** - a event subscriber is then implemented to listen to events from the underlying event/messaging infrastructure (event-stream) and perform the related action. The event subscriber is encouraged to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a subscribing domain).
 
-The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events) assembly.
+The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events), [`Beef.Events.EventHubs`](./src/Beef.Events.EventHubs) and [`Beef.Events.ServiceBus`](./src/Beef.Events.ServiceBus) assemblies.
+
+Additionally, _Beef_ has capabilities to support the [Transactional Outbox Pattern](./docs/Outbox-Pattern.md) where there is a requirement for events to be sent _reliably_ (with no message loss); i.e. to guarantee at-least-once sent semantics within the context of the underlying data update (currently only supported for Database repository).
 
 <br/>
 
@@ -161,6 +163,7 @@ Sample | Description
 -|-
 [`My.Hr`](./samples/My.Hr) | A sample as an end-to-end solution walkthrough to demonstrate the usage of _Beef_ within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
 [`Cdr.Banking`](./samples/Cdr.Banking) | A sample as an end-to-end solution to demonstrate _Beef_ being used to solve a real-world scenario. This demonstrates an implementation of the [CDR](https://consumerdatastandards.org.au/) [Banking](https://consumerdatastandardsaustralia.github.io/standards/#consumer-data-standards-banking-apis) APIs leveraging a Cosmos DB data source.
+[`Xyz.Legacy`](./samples/Xyz.Legacy) | A sample as an end-to-end solution to demonstrate _Beef_ being used to faciliate the introduction of [Change Data Capture (CDC)](./src/Beef.Data.Database.Cdc) entity event publishing on a legacy SQL Server database.
 [`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is primarily used to further test the key end-to-end capabilities enabled by _Beef_.
 
 <br/>

@@ -26,6 +26,11 @@ namespace Beef.Test.NUnit
         private MessageItemCollection? _expectedMessages;
 
         /// <summary>
+        /// Static constructor.
+        /// </summary>
+        static ValidationTester() => TextProvider.SetTextProvider(new DefaultTextProvider());
+
+        /// <summary>
         /// Create a new <see cref="ValidationTester"/> for a named <paramref name="username"/>.
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
@@ -280,6 +285,9 @@ namespace Beef.Test.NUnit
                 if (_expectedMessages != null)
                     CompareExpectedVsActualMessages(_expectedMessages, vc!.Messages);
 
+                if (!IsExpectingError && vc.HasErrors)
+                    Assert.Fail("Expected success yet one or more errors.");
+
                 return vc;
             }
             catch (AssertionException) { throw; }
@@ -299,6 +307,8 @@ namespace Beef.Test.NUnit
                     errorTypeOK = true;
                     if (_expectedMessages != null)
                         CompareExpectedVsActualMessages(_expectedMessages, ex is ValidationException vexx ? vexx.Messages : null);
+                    else if (!_expectedErrorType.HasValue)
+                        Assert.Fail($"Expected success; however, {ex.GetType().Name} was thrown.");
                 }
 
                 if (IsExpectingError && errorTypeOK)

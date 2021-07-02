@@ -16,7 +16,7 @@ namespace Beef.Mapper.Converters
         where TSrceProperty : ReferenceDataBase
         where TDestProperty : IComparable
     {
-        private static readonly Lazy<TDefault> _default = new Lazy<TDefault>(() => new TDefault(), true);
+        private static readonly Lazy<TDefault> _default = new(() => new TDefault(), true);
 
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>

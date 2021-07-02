@@ -48,7 +48,8 @@ namespace Beef.Demo.Api
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                     .AddBeefWebApiServices()
                     .AddBeefGrpcServiceServices()
-                    .AddBeefBusinessServices();
+                    .AddBeefBusinessServices()
+                    .AddBeefTextProviderAsSingleton();
 
             // Add the data sources as singletons for dependency injection requirements.
             services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
@@ -78,6 +79,10 @@ namespace Beef.Demo.Api
             // Add identifier generator services.
             services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
                     .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
+
+            // Add event outbox services.
+            services.AddGeneratedDatabaseEventOutbox();
+            services.AddBeefDatabaseEventOutboxPublisherService();
 
             // Add custom services; in this instance to allow it to call itself for testing purposes.
             services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));

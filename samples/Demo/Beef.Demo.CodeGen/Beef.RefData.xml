@@ -5,7 +5,7 @@
   <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/usStates" AutoImplement="Database" DatabaseSchema="Ref" />
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref">
     <Property Name="AlternateName" Type="string" />
-    <Property Name="TripCode" Text="Trip OData Code" Type="string" RefDataMapping="true" Immutable="true" IgnoreSerialization="true" />
+    <Property Name="TripCode" Text="Trip OData Code" Type="string" RefDataMapping="true" IgnoreSerialization="true" />
     <Const Name="Female" Value="F"/>
     <Const Name="Male" Value="M"/>
   </Entity>
@@ -16,4 +16,5 @@
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">
     <Property Name="ExternalCode" Type="string" RefDataMapping="true" Immutable="true" />
   </Entity>
+  <Entity Name="Status" RefDataType="string" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/statuses" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Status" />
 </CodeGeneration>

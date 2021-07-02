@@ -16,16 +16,16 @@ using Beef.Business;
 using Beef.Caching;
 {{/if}}
 using Beef.Entities;
-{{#if SupportsEvents}}
+{{#if SupportsDataSvcEvents}}
 using Beef.Events;
 {{/if}}
 {{#if RequiresData}}
 using {{Root.NamespaceBusiness}}.Data;
 {{/if}}
-{{#ifeq Root.EntityUsing 'Common' 'All'}}
+{{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
-{{#ifeq Root.EntityUsing 'Business' 'All'}}
+{{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
@@ -109,7 +109,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     {{#if DataSvcExtensions}}
                 await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
     {{/if}}
-    {{#if EventPublish}}
+    {{#ifeq EventPublish 'DataSvc'}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
                 await _evtPub.Publish{{#ifval Value}}Value{{/ifval}}({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).SendAsync().ConfigureAwait(false);
@@ -127,7 +127,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
           {{/each}}
         {{/ifeq}}
       {{/ifeq}}
-    {{/if}}
+    {{/ifeq}}
     {{#if SupportsCaching}}
       {{#ifeq Type 'Delete'}}
                 _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));

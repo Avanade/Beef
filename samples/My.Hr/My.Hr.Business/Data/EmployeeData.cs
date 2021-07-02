@@ -1,7 +1,7 @@
 ﻿using Beef;
 using Beef.Data.Database;
 using Microsoft.EntityFrameworkCore;
-using My.Hr.Common.Entities;
+using My.Hr.Business.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

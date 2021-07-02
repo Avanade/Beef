@@ -27,13 +27,8 @@ namespace Beef.Validation
     /// <summary>
     /// Represents a base validation rule for an entity property.
     /// </summary>
-    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-    public abstract class PropertyRuleBase<TEntity, TProperty> where TEntity : class
+    public abstract class PropertyRuleBase
     {
-        private readonly List<IValueRule<TEntity, TProperty>> _rules = new List<IValueRule<TEntity, TProperty>>();
-        private readonly List<IPropertyRuleClause<TEntity>> _clauses = new List<IPropertyRuleClause<TEntity>>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyRuleBase{TEntity, TProperty}"/> class.
         /// </summary>
@@ -50,17 +45,36 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the property name.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; internal set; }
 
         /// <summary>
         /// Gets the JSON property name.
         /// </summary>
-        public string JsonName { get; private set; }
+        public string JsonName { get; internal set; }
 
         /// <summary>
         /// Gets or sets the friendly text name used in validation messages.
         /// </summary>
         public LText Text { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a base validation rule for an entity property.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+    public abstract class PropertyRuleBase<TEntity, TProperty> : PropertyRuleBase where TEntity : class
+    {
+        private readonly List<IValueRule<TEntity, TProperty>> _rules = new();
+        private readonly List<IPropertyRuleClause<TEntity>> _clauses = new();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyRuleBase{TEntity, TProperty}"/> class.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="StringConversion.ToSentenceCase(string, bool)"/>).</param>
+        /// <param name="jsonName">The JSON property name (defaults to <paramref name="name"/>).</param>
+        protected PropertyRuleBase(string name, LText? text = null, string? jsonName = null) : base(name, text, jsonName) { }
 
         /// <summary>
         /// Adds a rule (<see cref="IValueRule{TEntity, TProperty}"/>) to the property.

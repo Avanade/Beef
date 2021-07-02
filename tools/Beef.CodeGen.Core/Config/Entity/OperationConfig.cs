@@ -40,6 +40,7 @@ operations: [
 ```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Events", Title = "Provides the _Events_ configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
@@ -164,6 +165,14 @@ operations: [
         public bool? DataExtensions { get; set; }
 
         /// <summary>
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer.
+        /// </summary>
+        [JsonProperty("dataTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer.",
+            Description = "Where using an `EventOutbox` this is ignored as it is implied through its usage.")]
+        public bool? DataTransaction { get; set; }
+
+        /// <summary>
         /// Gets or sets the database stored procedure name.
         /// </summary>
         [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -271,28 +280,40 @@ operations: [
             Description = "Defaults to `Entity.ManagerExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
 
+        #endregion
+
+        #region Events
+
         /// <summary>
-        /// Indicates whether to add logic to publish an event on the successful completion of the <c>DataSvc</c> layer invocation for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
+        /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
-            Description = "Defaults to the `CodeGeneration.EventPublish` or `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
-        public bool? EventPublish { get; set; }
+        [PropertySchema("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+            Description = "Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
+        public string? EventPublish { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
+        /// </summary>
+        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
+            Description = "Defaults to `Entity.EventOutbox` configuration property (inherits) where not specified and `EventPublish` is `Data`; otherwise, `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
+        public string? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The Event Source.",
+        [PropertySchema("Events", Title = "The Event Source.",
             Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Entity`.")]
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.")]
         public string? EventSource { get; set; }
 
         /// <summary>
         /// Gets or sets the event subject template and corresponding event action pair (separated by a colon).
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The event subject template and corresponding event action pair (separated by a colon).",
+        [PropertySchema("Events", Title = "The event subject template and corresponding event action pair (separated by a colon).",
             Description = "The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). " +
             "The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
             "E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.")]
@@ -664,12 +685,37 @@ operations: [
         /// <summary>
         /// Gets the event source URI.
         /// </summary>
-        public string EventSourceUri => Root!.EventSourceRoot + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
+        public string EventSourceUri => Root!.EventSourceRoot?.ToLowerInvariant() + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource.ToLowerInvariant() : ("/" + EventSource.ToLowerInvariant()));
 
         /// <summary>
         /// Gets the event format key code.
         /// </summary>
         public string? EventFormatKey { get; private set; }
+
+        /// <summary>
+        /// Indicates whether the manual (OnImplementation) can be implemened as shorthand - minimal amount of code.
+        /// </summary>
+        public bool IsManualShorthand => AutoImplement == "None" && !HasDataEvents;
+
+        /// <summary>
+        /// Indicates whether any of the operations will raise an event within the Data-layer.
+        /// </summary>
+        public bool HasDataEvents => EventPublish == "Data";
+
+        /// <summary>
+        /// Gets or sets the DataInvoker code.
+        /// </summary>
+        public string DataInvoker { get; set; } = "DataInvoker.Current";
+
+        /// <summary>
+        /// Gets or sets the DataInvokerArgs code.
+        /// </summary>
+        public string DataInvokerArgs { get; set; } = "BusinessInvokerArgs";
+
+        /// <summary>
+        /// Indicates whether a send as well as a publish should occur.
+        /// </summary>
+        public bool DataEventSend { get; set; } = true;
 
         /// <summary>
         /// <inheritdoc/>
@@ -810,7 +856,8 @@ operations: [
             });
 
             EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
-            EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
+            EventPublish = DefaultWhereNull(EventPublish, () => new string[] { "Create", "Update", "Delete" }.Contains(Type) ? Parent!.EventPublish : "None");
+            EventOutbox = DefaultWhereNull(EventOutbox, () => EventPublish != "None" ? Parent!.EventOutbox : "None");
 
             EventFormatKey = Type switch
             {
@@ -822,13 +869,13 @@ operations: [
 
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
-                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
                 _ => null
             });
 
-            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
+            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -932,7 +979,7 @@ operations: [
         /// </summary>
         private void PrepareEvents()
         {
-            if (string.IsNullOrEmpty(EventSubject) || CompareNullOrValue(Parent!.EventPublish, false))
+            if (string.IsNullOrEmpty(EventSubject) || CompareNullOrValue(EventPublish, "None"))
                 return;
 
             foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))
@@ -982,30 +1029,60 @@ operations: [
         private void PrepareData()
         {
             DataArgs = new ParameterConfig { Name = "<internal>", PrivateName = "__dataArgs" };
-            switch (AutoImplement)
+            switch (AutoImplement != "None" ? AutoImplement : Parent!.AutoImplement)
             {
                 case "Database":
                     DataArgs.Name = "_db";
                     DataArgs.Type = "IDatabaseArgs";
+
+                    if (EventOutbox != "None" && EventOutbox != "Database")
+                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Database' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
+
                     break;
 
                 case "EntityFramework":
                     DataArgs.Name = "_ef";
                     DataArgs.Type = "IEfDbArgs";
+
+                    if (EventOutbox != "None" && EventOutbox != "Database")
+                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'EntityFramework' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
+
                     break;
 
                 case "Cosmos":
                     DataArgs.Name = "_cosmos";
                     DataArgs.Type = "ICosmosDbArgs";
+
+                    if (EventOutbox != "None" && EventOutbox != "Cosmos")
+                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Cosmos' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
+
                     break;
 
                 case "OData":
                     DataArgs.Name = "_odata";
                     DataArgs.Type = "IODataArgs";
+
+                    if (EventOutbox != "None" && EventOutbox != "OData")
+                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'OData' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
+
+                    break;
+
+                default:
+                    if (EventPublish == "Data")
+                        throw new CodeGenException(this, nameof(EventPublish), "Unable to determine the EventOutbox 'Data' repository as both the Operation.AutoImplement and Entity.AutoImplement are set to 'None'; at least one of these must be set.");
+
                     break;
             }
 
             DataArgs.Prepare(Root!, this);
+
+            if (EventOutbox != "None")
+            {
+                DataInvoker = $"{(DataArgs.Name == "<internal>" ? "_db" : DataArgs.Name)}.EventOutboxInvoker";
+                DataInvokerArgs = "DatabaseEventOutboxInvokerArgs";
+                DataTransaction = false;
+                DataEventSend = false;
+            }
         }
 
         /// <summary>

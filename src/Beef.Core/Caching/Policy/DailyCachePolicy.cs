@@ -10,7 +10,7 @@ namespace Beef.Caching.Policy
     /// </summary>
     public sealed class DailyCachePolicy : ICachePolicy
     {
-        private TimeSpan _duration = new TimeSpan(24, 0, 0);
+        private TimeSpan _duration = new(24, 0, 0);
         private TimeSpan? _randomizerOffset;
 
         /// <summary>

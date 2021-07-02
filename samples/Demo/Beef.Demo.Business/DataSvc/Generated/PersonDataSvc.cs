@@ -77,7 +77,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await (_createOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/person/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -125,7 +125,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/person/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -141,7 +141,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.UpdateWithRollbackAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await (_updateWithRollbackOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/person/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -178,7 +178,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -194,7 +194,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
@@ -220,8 +220,8 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
                 await (_mergeOnAfterAsync?.Invoke(__result, fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
                 await _evtPub.Publish(
-                    _evtPub.CreateValueEvent(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
-                    _evtPub.CreateValueEvent(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{toId}", "MergeTo", fromId, toId)).SendAsync().ConfigureAwait(false);
+                    _evtPub.CreateValueEvent(__result, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
+                    _evtPub.CreateValueEvent(__result, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{toId}", "MergeTo", fromId, toId)).SendAsync().ConfigureAwait(false);
 
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
@@ -243,7 +243,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
@@ -303,7 +303,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await (_updateDetailOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/person/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -342,7 +342,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
@@ -381,6 +381,13 @@ namespace Beef.Demo.Business.DataSvc
                 return __result;
             });
         }
+
+        /// <summary>
+        /// Param Coll.
+        /// </summary>
+        /// <param name="addresses">The Addresses.</param>
+        public Task ParamCollAsync(AddressCollection? addresses)
+            => DataSvcInvoker.Current.InvokeAsync(this, () => ParamCollOnImplementationAsync(addresses));
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -427,7 +434,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await (_updateWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/person", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, new Uri($"/person/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Person.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
                 return _cache.SetAndReturnValue(__result);
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -442,7 +449,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
                 await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person", UriKind.Relative), $"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
+                await _evtPub.PublishValue(new Person { Id = id }, new Uri($"/person/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Person.{id}", "Delete", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }

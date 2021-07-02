@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator"/>.
         /// </summary>
-        IValidator? Validator { get; }
+        IValidator? ItemValidator { get; }
 
         /// <summary>
         /// Gets the item <see cref="Type"/>.
@@ -40,43 +41,35 @@ namespace Beef.Validation.Rules
     public static class CollectionRuleItem
     {
         /// <summary>
-        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with no <see cref="Validator"/>.
+        /// Create an instance of the <see cref="CollectionRuleItem{TItem}"/> class with no <see cref="Validator"/>.
         /// </summary>
-        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
-        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
-        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>() where TItemEntity : class
-        {
-            return new CollectionRuleItem<TItemEntity>(null);
-        }
+        /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
+        /// <returns>The <see cref="CollectionRuleItem{TItem}"/>.</returns>
+        public static CollectionRuleItem<TItem> Create<TItem>() => new(null);
 
         /// <summary>
-        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
+        /// Create an instance of the <see cref="CollectionRuleItem{TItem}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
-        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
-        /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
-        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
-        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>(IValidator<TItemEntity> validator) where TItemEntity : class
-        {
-            return new CollectionRuleItem<TItemEntity>(validator ?? throw new ArgumentNullException(nameof(validator)));
-        }
+        /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
+        /// <param name="validator">The corresponding item <see cref="IValidator{TItem}"/>.</param>
+        /// <returns>The <see cref="CollectionRuleItem{TItem}"/>.</returns>
+        public static CollectionRuleItem<TItem> Create<TItem>(IValidator<TItem> validator) => new(validator ?? throw new ArgumentNullException(nameof(validator)));
 
         /// <summary>
-        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// Create an instance of the <see cref="CollectionRuleItem{TItem}"/> class leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
         /// </summary>
-        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TItem">The item entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValidator">The item validator <see cref="Type"/>.</typeparam>
-        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
-        public static CollectionRuleItem<TItemEntity> Create<TItemEntity, TValidator>() where TItemEntity : class where TValidator : IValidator<TItemEntity>
-        {
-            return new CollectionRuleItem<TItemEntity>(ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true));
-        }
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>; defaults to <see cref="ExecutionContext.ServiceProvider"/> where not specified.</param>
+        /// <returns>The <see cref="CollectionRuleItem{TItem}"/>.</returns>
+        public static CollectionRuleItem<TItem> Create<TItem, TValidator>(IServiceProvider? serviceProvider = null) where TValidator : IValidator<TItem> => new(Validator.Create<TValidator>(serviceProvider));
     }
 
     /// <summary>
     /// Provides validation configuration for an item within a <see cref="CollectionRule{TEntity, TProperty}"/>.
     /// </summary>
-    /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
-    public sealed class CollectionRuleItem<TItemEntity> : ICollectionRuleItem where TItemEntity : class
+    /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
+    public sealed class CollectionRuleItem<TItem> : ICollectionRuleItem
     {
         private bool _duplicateCheck = false;
         private IPropertyExpression? _propertyExpression;
@@ -84,35 +77,32 @@ namespace Beef.Validation.Rules
         private bool _ignoreWhereUniqueKeyIsInitial = false;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
+        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItem}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
-        /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
-        internal CollectionRuleItem(IValidator<TItemEntity>? validator)
-        {
-            Validator = validator;
-        }
+        /// <param name="validator">The corresponding item <see cref="IValidator{TItem}"/>.</param>
+        internal CollectionRuleItem(IValidator<TItem>? validator) => ItemValidator = validator;
 
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator"/>.
         /// </summary>
-        IValidator? ICollectionRuleItem.Validator => Validator;
+        IValidator? ICollectionRuleItem.ItemValidator => ItemValidator;
 
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator{TItemEntity}"/>.
         /// </summary>
-        public IValidator<TItemEntity>? Validator { get; private set; }
+        public IValidator<TItem>? ItemValidator { get; private set; }
 
         /// <summary>
         /// Gets the item <see cref="Type"/>.
         /// </summary>
-        public Type ItemType => typeof(TItemEntity);
+        public Type ItemType => typeof(TItem);
 
         /// <summary>
         /// Specifies that the collection is to be checked for duplicates using the item's <see cref="IUniqueKey"/> value.
         /// </summary>
         /// <param name="duplicateText">The duplicate text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself where possible).</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/> instance to support chaining/fluent.</returns>
-        public CollectionRuleItem<TItemEntity> UniqueKeyDuplicateCheck(LText? duplicateText = null)
+        public CollectionRuleItem<TItem> UniqueKeyDuplicateCheck(LText? duplicateText = null)
         {
             if (_duplicateCheck)
                 throw new InvalidOperationException("A DuplicateCheck or UniqueKeyDuplicateCheck can only be specified once.");
@@ -152,7 +142,7 @@ namespace Beef.Validation.Rules
         /// <param name="ignoreWhereUniqueKeyIsInitial">Indicates whether to ignore the <see cref="UniqueKey"/> where <see cref="UniqueKey.IsInitial"/>; useful where the unique key will be generated by the underlying data source on create.</param>
         /// <param name="duplicateText">The duplicate text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself where possible).</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/> instance to support chaining/fluent.</returns>
-        public CollectionRuleItem<TItemEntity> UniqueKeyDuplicateCheck(bool ignoreWhereUniqueKeyIsInitial, LText? duplicateText = null)
+        public CollectionRuleItem<TItem> UniqueKeyDuplicateCheck(bool ignoreWhereUniqueKeyIsInitial, LText? duplicateText = null)
         {
             UniqueKeyDuplicateCheck(duplicateText);
             _ignoreWhereUniqueKeyIsInitial = ignoreWhereUniqueKeyIsInitial;
@@ -166,7 +156,7 @@ namespace Beef.Validation.Rules
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the item property that is being duplicate checked.</param>
         /// <param name="duplicateText">The duplicate text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself where possible).</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/> instance to support chaining/fluent.</returns>
-        public CollectionRuleItem<TItemEntity> DuplicateCheck<TItemProperty>(Expression<Func<TItemEntity, TItemProperty>> propertyExpression, LText? duplicateText = null)
+        public CollectionRuleItem<TItem> DuplicateCheck<TItemProperty>(Expression<Func<TItem, TItemProperty>> propertyExpression, LText? duplicateText = null)
         {
             if (_duplicateCheck)
                 throw new InvalidOperationException("A DuplicateCheck or UniqueKeyDuplicateCheck can only be specified once.");
@@ -183,17 +173,14 @@ namespace Beef.Validation.Rules
         /// </summary>
         /// <param name="context">The <see cref="IPropertyContext"/>.</param>
         /// <param name="items">The items to duplicate check.</param>
-        void ICollectionRuleItem.DuplicateValidation(IPropertyContext context, IEnumerable items)
-        {
-            DuplicateValidation(context, (IEnumerable<TItemEntity>)items);
-        }
+        void ICollectionRuleItem.DuplicateValidation(IPropertyContext context, IEnumerable items) => DuplicateValidation(context, (IEnumerable<TItem>)items);
 
         /// <summary>
         /// Performs the duplicate validation check.
         /// </summary>
         /// <param name="context">The <see cref="IPropertyContext"/>.</param>
         /// <param name="items">The items to duplicate check.</param>
-        private void DuplicateValidation(IPropertyContext context, IEnumerable<TItemEntity> items)
+        private void DuplicateValidation(IPropertyContext context, IEnumerable<TItem> items)
         {
             if (!_duplicateCheck)
                 return;
@@ -222,10 +209,10 @@ namespace Beef.Validation.Rules
             else
             {
                 var dict = new Dictionary<object?, object?>();
-                foreach (var item in items)
+                foreach (var item in items.Where(x => x != null))
                 {
-                    var val = _propertyExpression.GetValue(item);
-                    if (dict.ContainsKey(_propertyExpression.GetValue(item)))
+                    var val = _propertyExpression.GetValue(item!);
+                    if (dict.ContainsKey(val))
                     {
                         context.CreateErrorMessage(ValidatorStrings.DuplicateValueFormat, _duplicateText!, val!);
                         return;
@@ -252,10 +239,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionRule{TEntity, TProperty}"/> class.
         /// </summary>
-        public CollectionRule()
-        {
-            _itemType = ComplexTypeReflector.GetItemType(typeof(TProperty));
-        }
+        public CollectionRule() => _itemType = ComplexTypeReflector.GetItemType(typeof(TProperty));
 
         /// <summary>
         /// Gets or sets the minimum count;
@@ -266,6 +250,11 @@ namespace Beef.Validation.Rules
         /// Gets or sets the maximum count.
         /// </summary>
         public int? MaxCount { get; set; }
+
+        /// <summary>
+        /// Indicates whether the underlying collection items can be null.
+        /// </summary>
+        public bool AllowNullItems { get; set; }
 
         /// <summary>
         /// Gets or sets the collection item validation configuration.
@@ -311,8 +300,9 @@ namespace Beef.Validation.Rules
                 return;
 
             // Iterate through the collection validating each of the items.
+            var i = 0;
+            var hasNullItem = false;
             var hasItemErrors = false;
-            int i = 0;
             foreach (var item in context.Value)
             {
                 // Create the context args.
@@ -321,15 +311,22 @@ namespace Beef.Validation.Rules
                 args.FullyQualifiedJsonEntityName += "[" + i + "]";
                 i++;
 
+                if (!AllowNullItems && item == null)
+                    hasNullItem = true;
+
                 // Validate and merge.
-                if (Item?.Validator != null)
+                if (item != null && Item?.ItemValidator != null)
                 {
-                    var r = await Item.Validator.ValidateAsync(item, args).ConfigureAwait(false);
+                    var v = Item.ItemValidator is IGenericValidator gv ? gv.CreateValidationValue(item) : item;
+                    var r = await Item.ItemValidator.ValidateAsync(v, args).ConfigureAwait(false);
                     context.MergeResult(r);
                     if (r.HasErrors)
                         hasItemErrors = true;
                 }
             }
+
+            if (hasNullItem)
+                context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CollectionNullItemFormat);
 
             // Check the length/count.
             if (i < MinCount)

@@ -2,6 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+
+## v4.1.10
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
+## v4.1.9
+- *Enhancement:* Changed the default entity code-gen behaviour to be the new `EntityScope = "Autonomous"`.
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v4.1.8
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 

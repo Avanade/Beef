@@ -19,7 +19,7 @@ namespace Beef.Validation
         #region Text
 
         /// <summary>
-        /// Updates the rule friendly name text used in validation messages (see <see cref="PropertyRuleBase{TEntity, TProperty}.Text"/>.
+        /// Updates the rule friendly name text used in validation messages (see <see cref="PropertyRuleBase.Text"/>.
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
@@ -699,12 +699,25 @@ namespace Beef.Validation
             return Check.NotNull(rule, nameof(rule)).AddRule(new ReferenceDataSidListRule<TEntity, TProperty> { AllowDuplicates = allowDuplicates, MinCount = minCount, MaxCount = maxCount, ErrorText = errorText });
         }
 
+        /// <summary>
+        /// Adds a <see cref="ReferenceDataBase.Code"/> validation (see <see cref="ReferenceDataCodeRule{TEntity, TRefData}"/> to ensure the <c>Code</c> is valid.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static ReferenceDataCodeRuleAs<TEntity> RefDataCode<TEntity>(this PropertyRuleBase<TEntity, string?> rule, LText? errorText = null)
+            where TEntity : class
+        {
+            return new ReferenceDataCodeRuleAs<TEntity>(Check.NotNull(rule, nameof(rule)), errorText);
+        }
+
         #endregion
 
         #region Collection
 
         /// <summary>
-        /// Adds a collection validation (see <see cref="CollectionRule{TEntity, TProperty}"/>).
+        /// Adds a collection (<see cref="System.Collections.IEnumerable"/>) validation (see <see cref="CollectionRule{TEntity, TProperty}"/>).
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TProperty"></typeparam>
@@ -712,12 +725,37 @@ namespace Beef.Validation
         /// <param name="minCount">The minimum count.</param>
         /// <param name="maxCount">The maximum count.</param>
         /// <param name="item">The item <see cref="ICollectionRuleItem"/> configuration.</param>
+        /// <param name="allowNullItems">Indicates whether the underlying collection item must not be null.</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Collection<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null)
+        public static PropertyRuleBase<TEntity, TProperty> Collection<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, int minCount = 0, int? maxCount = null, ICollectionRuleItem? item = null, bool allowNullItems = false)
             where TEntity : class
             where TProperty : System.Collections.IEnumerable?
         {
-            var cr = new CollectionRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Item = item };
+            var cr = new CollectionRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullItems = allowNullItems };
+            return Check.NotNull(rule, nameof(rule)).AddRule(cr);
+        }
+
+        #endregion
+
+        #region Dictionary
+
+        /// <summary>
+        /// Adds a dictionary (<see cref="System.Collections.IDictionary"/>) validation (see <see cref="DictionaryRule{TEntity, TProperty}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <param name="minCount">The minimum count.</param>
+        /// <param name="maxCount">The maximum count.</param>
+        /// <param name="item">The item <see cref="IDictionaryRuleItem"/> configuration.</param>
+        /// <param name="allowNullKeys">Indicates whether the underlying dictionary keys must not be null.</param>
+        /// <param name="allowNullValues">Indicates whether the underlying dictionary values must not be null.</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
+        public static PropertyRuleBase<TEntity, TProperty> Dictionary<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, int minCount = 0, int? maxCount = null, IDictionaryRuleItem? item = null, bool allowNullKeys = false, bool allowNullValues = false)
+            where TEntity : class
+            where TProperty : System.Collections.IDictionary?
+        {
+            var cr = new DictionaryRule<TEntity, TProperty> { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullValues };
             return Check.NotNull(rule, nameof(rule)).AddRule(cr);
         }
 

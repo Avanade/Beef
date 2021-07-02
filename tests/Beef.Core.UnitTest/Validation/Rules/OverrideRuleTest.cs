@@ -9,6 +9,9 @@ namespace Beef.Core.UnitTest.Validation.Rules
     [TestFixture]
     public class OverrideRuleTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         [Test]
         public void Validate_Value()
         {

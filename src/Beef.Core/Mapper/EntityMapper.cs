@@ -143,9 +143,9 @@ namespace Beef.Mapper
         where TSrce : class, new()
         where TDest : class, new()
     {
-        private readonly List<IPropertyMapper<TSrce, TDest>> _mappings = new List<IPropertyMapper<TSrce, TDest>>();
-        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _srceMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
-        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _destMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
+        private readonly List<IPropertyMapper<TSrce, TDest>> _mappings = new();
+        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _srceMappings = new();
+        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _destMappings = new();
         private IPropertyMapper<TSrce, TDest>[]? _uniqueKey;
 
         /// <summary>
@@ -352,7 +352,7 @@ namespace Beef.Mapper
             if (destPropertyExpression == null)
                 throw new ArgumentNullException(nameof(destPropertyExpression));
 
-            PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> mapping = new PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>(srcePropertyExpression, destPropertyExpression);
+            PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> mapping = new(srcePropertyExpression, destPropertyExpression);
             AddPropertyMapper(mapping);
             return mapping;
         }
@@ -405,7 +405,7 @@ namespace Beef.Mapper
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
 
-            PropertySrceMapper<TSrce, TSrceProperty, TDest> mapping = new PropertySrceMapper<TSrce, TSrceProperty, TDest>(srcePropertyExpression);
+            PropertySrceMapper<TSrce, TSrceProperty, TDest> mapping = new(srcePropertyExpression);
             AddPropertyMapper(mapping);
             return mapping;
         }
@@ -529,7 +529,7 @@ namespace Beef.Mapper
             if (sourceEntity == null)
                 return default!;
 
-            TDest? dest = new TDest();
+            TDest? dest = new();
 
             foreach (var map in Mappings)
             {
@@ -601,7 +601,7 @@ namespace Beef.Mapper
             if (destinationEntity == null)
                 return default!;
 
-            TSrce? srce = new TSrce();
+            TSrce? srce = new();
 
             foreach (var map in Mappings)
             {
@@ -732,7 +732,7 @@ namespace Beef.Mapper
         where TDest : class, new()
         where TMapper : EntityMapper<TSrce, TDest, TMapper>, new()
     {
-        private static readonly TMapper _default = new TMapper();
+        private static readonly TMapper _default = new();
 
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>

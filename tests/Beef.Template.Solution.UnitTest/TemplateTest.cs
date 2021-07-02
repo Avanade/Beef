@@ -136,6 +136,7 @@ namespace Beef.Template.Solution.UnitTest
             {
                 Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
+                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.xml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.xml [database]");
             }
 
             // Run the intra-integration tests.
