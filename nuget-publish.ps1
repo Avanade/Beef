@@ -48,6 +48,7 @@ param(
     [switch]$DeleteFromlocalCache,
     [string]$NugetCacheFolder = "$($env:USERPROFILE)\.nuget\packages",
     [String[]]$ProjectsToPublish = @(
+        "src\Beef.Abstractions",
         "src\Beef.Core",
         "src\Beef.AspNetCore.WebApi",
         "src\Beef.Data.Database",
@@ -128,7 +129,7 @@ foreach ($project in $projectsToPublish) {
 
 # Publish packages to NuGet repository (where a key and NugetServer have been provided).
 if ($ShouldPublishRemote) {
-	Get-ChildItem -Path $publishFolder -Filter *.nupkg -Exclude *.symbols.nupkg | ForEach-Object {
+	Get-ChildItem -Path $publishFolder -Filter *.nupkg | ForEach-Object {
 		$package = Join-Path $publishFolder $_.Name
 		$pushCommand = "dotnet nuget push --source $($nugetServer) --api-key $($apiKey) $($package) --skip-duplicate"
 
