@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.1
+- *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
+- *Fixed:* The `ValidationTester` sets the default `TextProvider` to `DefaultTextProvier` within its static constructor to ensure the default texts are used for the validation messages.
+
 ## v4.1.12
 - *Enhancement:* Added constructor to `UsingAgentTesterServer` to allow settings for underlying `AgentTestServer`.
 

@@ -84,10 +84,7 @@ namespace Beef.Validation.Rules
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public PropertyRuleBase<TEntity, TProperty> With<TValidator>(IServiceProvider? serviceProvider = null) where TValidator : IValidator
         {
-            _parent.AddRule(new EntityRule<TEntity, TProperty, TValidator>(serviceProvider == null 
-                ? ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)! 
-                : (serviceProvider.GetService<TValidator>() ?? throw new InvalidOperationException($"Attempted to get service '{typeof(TValidator).FullName}' but null was returned; this would indicate that the service has not been configured correctly."))));
-
+            _parent.AddRule(new EntityRule<TEntity, TProperty, TValidator>(Validator.Create<TValidator>(serviceProvider)));
             return _parent;
         }
     }

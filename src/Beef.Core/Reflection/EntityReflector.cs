@@ -147,7 +147,7 @@ namespace Beef.Reflection
     {
         private readonly Dictionary<string, IPropertyReflector<TEntity>> _properties;
         private readonly Dictionary<string, IPropertyReflector<TEntity>> _jsonProperties;
-        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<Dictionary<string, object>> _data = new(true);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityReflector{TEntity}"/> class.
@@ -430,7 +430,7 @@ namespace Beef.Reflection
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class PropertyReflector<TEntity, TProperty> : IPropertyReflector<TEntity> where TEntity : class, new()
     {
-        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<Dictionary<string, object>> _data = new(true);
         private string? _rootRefDataName;
 
         private const string _refDataSidSuffix = "Sid";

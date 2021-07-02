@@ -18,7 +18,7 @@ namespace Beef.Entities
     public abstract class EntityBaseKeyedCollection<TKey, TEntity> : KeyedCollection<TKey, TEntity>, IEntityBaseCollection, INotifyCollectionChanged, IEquatable<EntityBaseKeyedCollection<TKey, TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;
-        private readonly Lazy<bool> _hasUniqueKey = new Lazy<bool>(() => typeof(IUniqueKey).IsAssignableFrom(typeof(TEntity)));
+        private readonly Lazy<bool> _hasUniqueKey = new(() => typeof(IUniqueKey).IsAssignableFrom(typeof(TEntity)));
         private readonly Func<TEntity, TKey>? _getKeyForItem;
 
         /// <summary>

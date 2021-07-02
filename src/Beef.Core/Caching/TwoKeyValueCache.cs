@@ -20,10 +20,10 @@ namespace Beef.Caching
     /// in this case the value for <i>Key1</i> is always used.</remarks>
     public class TwoKeyValueCache<TKey1, TKey2, TValue> : CacheCoreBase
     {
-        private readonly ConcurrentDictionary<TKey1, CacheValue> _dict1 = new ConcurrentDictionary<TKey1, CacheValue>();
-        private readonly ConcurrentDictionary<TKey2, CacheValue> _dict2 = new ConcurrentDictionary<TKey2, CacheValue>();
-        private readonly KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>(); // this is the primary key used for *all* concurrency management.
-        private readonly KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>(); // this is a secondary key, used to minimise get2 concurrency only.
+        private readonly ConcurrentDictionary<TKey1, CacheValue> _dict1 = new();
+        private readonly ConcurrentDictionary<TKey2, CacheValue> _dict2 = new();
+        private readonly KeyedLock<TKey1> _keyLock1 = new(); // this is the primary key used for *all* concurrency management.
+        private readonly KeyedLock<TKey2> _keyLock2 = new(); // this is a secondary key, used to minimise get2 concurrency only.
 
         private readonly Func<TKey1, (bool hasValue, TKey2 key2, TValue value)>? _get1;
         private readonly Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>>? _getAsync1;

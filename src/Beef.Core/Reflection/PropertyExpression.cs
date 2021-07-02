@@ -96,7 +96,7 @@ namespace Beef.Reflection
             public bool ProbeForJsonRefDataSidProperties;
         }
 
-        private static readonly ConcurrentDictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new ConcurrentDictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
+        private static readonly ConcurrentDictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new();
 
         private readonly Func<TEntity, TProperty> _func;
 

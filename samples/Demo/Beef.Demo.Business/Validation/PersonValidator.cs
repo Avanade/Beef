@@ -2,6 +2,7 @@
 
 using Beef.Demo.Common.Entities;
 using Beef.Validation;
+using Beef.Validation.Rules;
 using System;
 
 namespace Beef.Demo.Business.Validation
@@ -26,6 +27,9 @@ namespace Beef.Demo.Business.Validation
             Property(x => x.EyeColor).IsValid();
             Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.Now, _ => "Today");
             Property(x => x.Address).Entity(_addressValidator);
+            Property(x => x.Metadata).Dictionary(item: DictionaryRuleItem.Create<string?, string?>(
+                key: Validator.CreateGeneric<string?>().Rule(r => r.Text("Gender").Mandatory().RefDataCode().As<Gender>()),
+                value: Validator.CreateGeneric<string?>().Rule(r => r.Text("Description").Mandatory().String(10))));
         }
     }
 }

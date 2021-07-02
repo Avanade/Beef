@@ -180,7 +180,7 @@ namespace Beef.Events
         /// Creates (clones) a new instance copying the existing values.
         /// </summary>
         /// <returns></returns>
-        public EventMetadata CopyMetadata() => new EventMetadata
+        public EventMetadata CopyMetadata() => new()
         {
             EventId = EventId,
             TenantId = TenantId,

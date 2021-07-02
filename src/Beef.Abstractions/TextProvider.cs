@@ -9,38 +9,51 @@ namespace Beef
     /// </summary>
     public static class TextProvider
     {
-        private static TextProviderBase? _textProvider;
-        private static TextProviderBase? _backupTextProvider;
+        private static ITextProvider? _textProvider;
+        private static ITextProvider? _backupTextProvider;
 
         /// <summary>
-        /// Sets the <see cref="Current"/> <see cref="TextProviderBase"/> instance explicitly.
+        /// Sets the <see cref="Current"/> <see cref="ITextProvider"/> instance explicitly.
         /// </summary>
-        /// <param name="textProvider">The concrete <see cref="TextProviderBase"/> instance.</param>
-        public static void SetTextProvider(TextProviderBase textProvider) => _textProvider = Check.NotNull(textProvider, nameof(textProvider));
+        /// <param name="textProvider">The concrete <see cref="ITextProvider"/> instance.</param>
+        public static void SetTextProvider(ITextProvider textProvider) => _textProvider = Check.NotNull(textProvider, nameof(textProvider));
 
         /// <summary>
-        /// Gets the current <see cref="TextProviderBase"/> instance using in the following order: the explicit <see cref="SetTextProvider(TextProviderBase)"/>, <see cref="ExecutionContext.GetService{T}(bool)"/>, the explicit <see cref="SetTextProvider(TextProviderBase)"/>, otherwise, <see cref="DefaultTextProvider"/>. 
+        /// Gets the current <see cref="ITextProvider"/> instance using in the following order: <see cref="ExecutionContext.GetService{T}(bool)"/>, the explicit <see cref="SetTextProvider(ITextProvider)"/>, otherwise, <see cref="NullTextProvider"/>. 
         /// </summary>
-        public static TextProviderBase Current
+        public static ITextProvider Current
         {
             get
             {
-                if (_textProvider != null)
-                    return _textProvider;
-
-                var tp = ExecutionContext.GetService<TextProviderBase>(false);
+                var tp = ExecutionContext.GetService<ITextProvider>(false);
                 if (tp != null)
                     return tp;
 
-                return _backupTextProvider ??= new DefaultTextProvider();
+                if (_textProvider != null)
+                    return _textProvider;
+
+                return _backupTextProvider ??= new NullTextProvider();
             }
         }
     }
 
     /// <summary>
+    /// Enables the localized text for a passed key.
+    /// </summary>
+    public interface ITextProvider
+    {
+        /// <summary>
+        /// Gets the text for the passed <see cref="LText"/>.
+        /// </summary>
+        /// <param name="key">The <see cref="LText"/>.</param>
+        /// <returns>The corresponding text where found; otherwise, the <see cref="LText.FallbackText"/> where specified. Where nothing found or specified then the key itself will be returned.</returns>
+        string GetText(LText key);
+    }
+
+    /// <summary>
     /// Provides the localized text for a passed key.
     /// </summary>
-    public abstract class TextProviderBase
+    public abstract class TextProviderBase : ITextProvider
     {
         /// <summary>
         /// Gets the text for the passed <see cref="LText"/>.

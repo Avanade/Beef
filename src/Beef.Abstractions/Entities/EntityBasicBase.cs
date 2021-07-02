@@ -15,7 +15,7 @@ namespace Beef.Entities
         internal const string ValueIsImmutableMessage = "Value is immutable; cannot be changed once already set to a value.";
         internal const string EntityIsReadOnlyMessage = "Entity is read only; property cannot be changed.";
 
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
         private Dictionary<string, PropertyChangedEventHandler>? _propertyEventHandlers;
 
         /// <summary>

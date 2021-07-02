@@ -19,8 +19,8 @@ namespace Beef.RefData
     /// </remarks>
     public sealed class ReferenceDataManager : IReferenceDataProvider
     {
-        private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _providers = new ConcurrentDictionary<Type, IReferenceDataProvider>();
-        private static readonly ConcurrentDictionary<Type, Type> _refEntityToInterface = new ConcurrentDictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _providers = new();
+        private static readonly ConcurrentDictionary<Type, Type> _refEntityToInterface = new();
 
         [ThreadStatic()]
         private static ReferenceDataContext? _context;

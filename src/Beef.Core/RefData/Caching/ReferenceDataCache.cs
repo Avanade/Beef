@@ -17,7 +17,7 @@ namespace Beef.RefData.Caching
         where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
         where TItem : ReferenceDataBase, new()
     {
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
         private TColl? _coll;
         private readonly Func<Task<TColl>> _loadCollection;
         private readonly ReferenceDataCacheLoader _loader = ReferenceDataCacheLoader.Create();

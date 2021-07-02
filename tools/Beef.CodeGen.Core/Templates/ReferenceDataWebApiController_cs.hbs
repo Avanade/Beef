@@ -51,7 +51,7 @@ namespace {{Root.NamespaceApi}}.Controllers
         [ProducesResponseType(typeof(IEnumerable<{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult {{Name}}GetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<{{RefDataQualifiedEntityName}}>>(this, 
-            async () => await ReferenceDataFilter.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
+            async () => await ReferenceDataFilterer.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
 {{/each}}
@@ -82,7 +82,7 @@ namespace {{Root.NamespaceApi}}.Controllers
                     switch (q.Key)
                     {
 {{#each RefDataEntities}}
-                        case var s when string.Compare(s, nameof({{RefDataQualifiedEntityName}}), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof({{RefDataQualifiedEntityName}}), await ReferenceDataFilter.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
+                        case var s when string.Compare(s, nameof({{RefDataQualifiedEntityName}}), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof({{RefDataQualifiedEntityName}}), await ReferenceDataFilterer.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
 {{/each}}
                     }
                 }

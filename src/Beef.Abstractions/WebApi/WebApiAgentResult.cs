@@ -175,7 +175,7 @@ namespace Beef.WebApi
                     }
                     else
                     {
-                        _value = JsonConvert.DeserializeObject<T>(Content);
+                        _value = JsonConvert.DeserializeObject<T>(Content)!;
                         if (_value != null && _value is IETag eTag)
                         {
                             if (eTag.ETag == null && Response.Headers.ETag != null)

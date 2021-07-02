@@ -11,6 +11,9 @@ namespace Beef.Core.UnitTest.Validation
     [TestFixture]
     public class CommonValidatorTest
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
+
         private static readonly CommonValidator<string> _cv = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
         private static readonly CommonValidator<int?> _cv2 = CommonValidator.Create<int?>(v => v.CompareValue(CompareOperator.NotEqual, 1));
 

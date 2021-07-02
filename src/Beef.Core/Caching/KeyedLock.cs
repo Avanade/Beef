@@ -11,7 +11,7 @@ namespace Beef.Caching
     /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
     public sealed class KeyedLock<TKey>
     {
-        private readonly ConcurrentDictionary<TKey, object> _lockDict = new ConcurrentDictionary<TKey, object>();
+        private readonly ConcurrentDictionary<TKey, object> _lockDict = new();
 
         /// <summary>
         /// Gets/creates a lock object for the specified key.

@@ -25,6 +25,7 @@ else {
 
 # Set the projects to publish.
 $projectsToPublish = @(
+    "src\Beef.Abstractions",
     "src\Beef.Core",
     "src\Beef.AspNetCore.WebApi",
     "src\Beef.Data.Database",
