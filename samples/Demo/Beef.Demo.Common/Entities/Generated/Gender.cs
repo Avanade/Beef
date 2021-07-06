@@ -40,6 +40,7 @@ namespace Beef.Demo.Common.Entities
         #region Privates
 
         private string? _alternateName;
+        private string? _countrySid;
 
         #endregion
 
@@ -64,6 +65,28 @@ namespace Beef.Demo.Common.Entities
         {
             get => GetMapping<string>(nameof(TripCode));
             set { var __tripCode = GetMapping<string?>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Country"/> using the underlying Serialization Identifier (SID).
+        /// </summary>
+        [JsonProperty("country", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Country")]
+        public string? CountrySid
+        {
+            get => _countrySid;
+            set => SetValue(ref _countrySid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Country));
+        }
+
+        /// <summary>
+        /// Gets or sets the Country (see <see cref="RefDataNamespace.Country"/>).
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Display(Name="Country")]
+        public RefDataNamespace.Country? Country
+        {
+            get => _countrySid;
+            set => SetValue(ref _countrySid, value, false, false, nameof(Country)); 
         }
 
         #endregion
@@ -110,6 +133,7 @@ namespace Beef.Demo.Common.Entities
             CopyFrom((ReferenceDataBaseGuid)from);
             AlternateName = from.AlternateName;
             TripCode = from.TripCode;
+            CountrySid = from.CountrySid;
 
             OnAfterCopyFrom(from);
         }
@@ -140,6 +164,7 @@ namespace Beef.Demo.Common.Entities
         {
             base.CleanUp();
             AlternateName = Cleaner.Clean(AlternateName, StringTrim.UseDefault, StringTransform.UseDefault);
+            CountrySid = Cleaner.Clean(CountrySid);
 
             OnAfterCleanUp();
         }
@@ -156,7 +181,8 @@ namespace Beef.Demo.Common.Entities
                     return false;
 
                 return Cleaner.IsInitial(AlternateName)
-                    && Cleaner.IsInitial(TripCode);
+                    && Cleaner.IsInitial(TripCode)
+                    && Cleaner.IsInitial(CountrySid);
             }
         }
 

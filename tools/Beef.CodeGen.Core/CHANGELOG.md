@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Fixed:* Issue [143](https://github.com/Avanade/Beef/issues/143) fixed. Where referencing a reference data property within a reference data class and there is a need to perform a data conversion an `InvalidCastException` (`Object must implement IConvertible.`) was being thrown. Generated code has been corrected.
+
 ## v4.2.2
 - *Fixed:* Issue [141](https://github.com/Avanade/Beef/issues/141) fixed. Exclude `using company.appName.DataSvc` statement output where all operations are custom. 
 

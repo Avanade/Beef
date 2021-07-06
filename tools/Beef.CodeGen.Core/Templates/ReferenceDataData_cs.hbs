@@ -89,7 +89,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#ifne CoreProperties.Count 0}}
                 {
       {{#each CoreProperties}}
-                    item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{DeclaredType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
+                    item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{DataReaderType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
       {{/each}}
                 });
     {{/ifne}}

@@ -96,6 +96,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.SortOrder);
                 Property(s => s.AlternateName);
                 Property(s => s.TripCode);
+                Property(s => s.Country, "CountryId").SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Country>.Default!);
                 AddStandardProperties();
                 DbMapperCtor();
             }
