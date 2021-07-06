@@ -265,3 +265,6 @@ __pycache__/
 
 # Debug launch settings
 launchSettings.json
+
+# Additional ignores...
+packageonly/
