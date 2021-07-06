@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Fixed:* Issue [141](https://github.com/Avanade/Beef/issues/141) fixed. Exclude `using company.appName.DataSvc` statement output where all operations are custom. 
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 - *Enhancement:* A code-generation change was required to the Reference Data Web API Controller template as a result of the changes to the `ReferenceDataFilter` and new `ReferenceDataFilterer` for the `Beef.Abstractions` change.

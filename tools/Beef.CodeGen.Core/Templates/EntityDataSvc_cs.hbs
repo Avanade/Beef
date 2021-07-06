@@ -20,7 +20,9 @@ using Beef.Entities;
 using Beef.Events;
 {{/if}}
 {{#if RequiresData}}
+{{#if DataSvcNeedsUsingData}}
 using {{Root.NamespaceBusiness}}.Data;
+{{/if}}
 {{/if}}
 {{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
