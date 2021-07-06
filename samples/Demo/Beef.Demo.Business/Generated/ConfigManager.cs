@@ -14,7 +14,6 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.DataSvc;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business
