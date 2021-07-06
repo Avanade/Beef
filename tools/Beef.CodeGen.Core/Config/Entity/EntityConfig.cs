@@ -1114,6 +1114,16 @@ entities:
         public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamespace" : "RefDataNamespace")}.{Name}";
 
         /// <summary>
+        /// Indicates whether the Manager needs a DataSvc using statement.
+        /// </summary>
+        public bool ManagerNeedsUsingDataSvc => Operations.Any(x => x.ManagerCustom == null || x.ManagerCustom == false);
+
+        /// <summary>
+        /// Indicates whether the DataSvc needs a DataSvc using statement.
+        /// </summary>
+        public bool DataSvcNeedsUsingData => Operations.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()

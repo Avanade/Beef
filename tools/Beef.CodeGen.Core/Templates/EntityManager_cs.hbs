@@ -20,7 +20,9 @@ using {{Root.NamespaceCommon}}.Entities;
 {{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
+{{#if ManagerNeedsUsingDataSvc}}
 using {{Root.NamespaceBusiness}}.DataSvc;
+{{/if}}
 {{#if UsesValidators}}
 using {{#ifeq Root.ValidatorLayer 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Validation;
 {{/if}}
