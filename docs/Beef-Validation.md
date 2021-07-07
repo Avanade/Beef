@@ -196,10 +196,40 @@ An example is as follows:
 var person = new Person { Name = "Freddie", Birthday = new DateTime(1946, 09, 05);
 
 // Create an entity-based validator on the fly.
-var result = await Validator<Test>.Create()
+var result = await Validator.Create<Test>()
     .HasProperty(x => x.Name, p => p.Mandatory().String(maxLength: 50))
     .HasProperty(x => x.Birthdar, p => p.CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "today"))
     .ValidateAsync(person);
+```
+
+<br/>
+
+### Generic-based validator class
+
+The generic-based validator provides both entity (e.g. class) and non-entity (e.g. intrinsics) validations. Although it can be used for entity-based validation, the aforementioned Entity-based validator class should be preferred.
+
+The primary means for a generic-based validator is to inherit from the `GenericValidator` class. The instance should be instantiated once (and cached) where possible as the underlying property expressions can be a relatively expensive (performance) operation.
+
+There is no `Property` equivalent as the underlying value may not be class, as such the `Rule` method is provided to enable configuration. It is also very likely that the `Text` method will be used to override the friendly text used in the error messages; defaults to `Validator.ValueNameDefault` being "Value".  
+
+``` csharp
+public class GenderCodeValidator : GenericValidator<string>
+{
+    public DescriptionValidator()
+    {
+        Rule().Text("Gender").Mandatory().RefDataCode().As<Gender>();
+    }
+}
+```
+
+<br/>
+
+### Generic-based inline validator
+
+The secondary means for a generic-based validator is to define and execute inline. The `HasRule()` is used to update the rule, with a corresponding action to enable validation configuration.
+
+``` csharp
+Validator.CreateGeneric<string?>().Rule(r => r.Text("Gender").Mandatory().RefDataCode().As<Gender>());
 ```
 
 <br/>
