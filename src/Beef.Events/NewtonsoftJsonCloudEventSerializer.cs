@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using CloudNative.CloudEvents;
+using CloudNative.CloudEvents.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Mime;
@@ -16,15 +18,8 @@ namespace Beef.Events
     /// </summary>
     public class NewtonsoftJsonCloudEventSerializer : IEventDataContentSerializer
     {
-        private const string _beefJsonName = "beef";
-
         /// <summary>
-        /// Gets or sets the <see cref="EventMetadata"/> JSON extension object name. Defaults to `beef`;
-        /// </summary>
-        public string EventMetadataExtensionName { get; set; } = _beefJsonName;
-
-        /// <summary>
-        /// Indicates whether to include the <see cref="EventMetadata"/> as <see cref="CloudEvent"/> <see cref="CloudEvent.GetAttributes">attributes</see>.
+        /// Indicates whether to include the <see cref="EventMetadata"/> as <see cref="CloudEvent"/> <see cref="CloudEvent.SetAttributeFromString(string, string)">attributes</see>.
         /// </summary>
         /// <remarks>Defaults to <c>true</c>.</remarks>
         public bool IncludeEventMetadata { get; set; } = true;
@@ -58,25 +53,24 @@ namespace Beef.Events
 
             var type = $"{@event.Subject}{(string.IsNullOrEmpty(@event.Action) ? "" : $".{@event.Action}")}";
 
-            var ce = new CloudEvent(type, @event.Source ?? DefaultSource, @event.EventId?.ToString(), @event.Timestamp);
+            var ce = new CloudEvent
+            {
+                Type = type,
+                Source = @event.Source ?? DefaultSource,
+                Id = @event.EventId?.ToString(),
+                Time = @event.Timestamp == null ? (DateTimeOffset?)null : new DateTimeOffset(@event.Timestamp.Value, TimeSpan.Zero)
+            };
+
             if (@event.HasValue)
             {
-                ce.DataContentType = new ContentType(MediaTypeNames.Application.Json);
+                ce.DataContentType = MediaTypeNames.Application.Json;
                 ce.Data = @event.GetValue();
             };
 
             if (IncludeEventMetadata)
-            {
-                // Add metadata (remove values which are already part of the payload).
-                var md = @event.CopyMetadata();
-                SetOrNullMetadata(md);
+                SetMetadataAttributes(ce, @event);
 
-                // Add metadata as an attribute.
-                var ces = ce.GetAttributes();
-                ces.Add(EventMetadataExtensionName ??= _beefJsonName, md);
-            }
-
-            return Task.FromResult(new JsonEventFormatter().EncodeStructuredEvent(ce, out var _));
+            return Task.FromResult(new JsonEventFormatter().EncodeStructuredModeMessage(ce, out var _).ToArray());
         }
 
         /// <summary>
@@ -105,8 +99,8 @@ namespace Beef.Events
             if (d.CloudEvent?.Data == null)
                 return Task.FromResult<EventData?>(null);
 
-            if (d.CloudEvent.DataContentType.MediaType != MediaTypeNames.Application.Json)
-                throw new InvalidOperationException($"CloudEvent DataContentType.MediaType is '{d.CloudEvent.DataContentType.Name}', it must be '{MediaTypeNames.Application.Json}' to use the '{nameof(NewtonsoftJsonCloudEventSerializer)}'.");
+            if (d.CloudEvent.DataContentType != MediaTypeNames.Application.Json)
+                throw new InvalidOperationException($"CloudEvent DataContentType.MediaType is '{d.CloudEvent.DataContentType}'; it must be '{MediaTypeNames.Application.Json}' to use the '{nameof(NewtonsoftJsonCloudEventSerializer)}'.");
 
             var ed = (EventData)Activator.CreateInstance(NewtonsoftJsonEventDataSerializer.CreateValueEventDataType(valueType), new object[] { d.Metadata! });
             ed.SetValue(d.CloudEvent.Data is JToken json ? json.ToObject(valueType) 
@@ -123,54 +117,83 @@ namespace Beef.Events
             if (bytes == null || bytes.Length == 0)
                 return (null, null);
 
-            var ce = new JsonEventFormatter().DecodeStructuredEvent(bytes);
+            var rom = new ReadOnlyMemory<byte>(bytes);
+            var ce = new JsonEventFormatter().DecodeStructuredModeMessage(rom, new ContentType(MediaTypeNames.Application.Json), null);
 
-            EventMetadata? md = null;
-            if (IncludeEventMetadata && ce.GetAttributes().TryGetValue(EventMetadataExtensionName ??= _beefJsonName, out object val) && val != null && val is JToken json)
-            {
-                md = json.ToObject<EventMetadata>();
-                SetOrNullMetadata(md);
-            }
-
-            if (md == null)
-                md = new EventMetadata();
+            var md = new EventMetadata();
+            if (IncludeEventMetadata)
+                GetMetadataAttributes(ce, md);
 
             if (string.IsNullOrEmpty(md.Subject))
                 md.Subject = ce.Type;
 
             md.Source = ce.Source;
             md.EventId = string.IsNullOrEmpty(ce.Id) ? null : (Guid.TryParse(ce.Id, out var eid) ? eid : (Guid?)null);
-            md.Timestamp = ce.Time;
+            md.Timestamp = ce.Time?.UtcDateTime;
 
             return (ce, md);
         }
 
         /// <summary>
-        /// Sets or nulls the metadata based on the name inclusion.
+        /// Sets the metadata attributes based on configuration.
         /// </summary>
-        private void SetOrNullMetadata(EventMetadata? md)
+        private void SetMetadataAttributes(CloudEvent ce, EventMetadata? md)
         {
             if (md == null)
                 return;
 
-            md.EventId = SetOrNullValue(nameof(EventMetadata.EventId), md.EventId);
-            md.TenantId = SetOrNullValue(nameof(EventMetadata.TenantId), md.TenantId);
-            md.Subject = SetOrNullValue(nameof(EventMetadata.Subject), md.Subject);
-            md.Action = SetOrNullValue(nameof(EventMetadata.Action), md.Action);
-            md.Source = SetOrNullValue(nameof(EventMetadata.Source), md.Source);
-            md.Key = SetOrNullValue(nameof(EventMetadata.Key), md.Key);
-            md.Username = SetOrNullValue(nameof(EventMetadata.Username), md.Username);
-            md.UserId = SetOrNullValue(nameof(EventMetadata.UserId), md.UserId);
-            md.Timestamp = SetOrNullValue(nameof(EventMetadata.Timestamp), md.Timestamp);
-            md.CorrelationId = SetOrNullValue(nameof(EventMetadata.CorrelationId), md.CorrelationId);
-            md.ETag = SetOrNullValue(nameof(EventMetadata.ETag), md.ETag);
-            md.PartitionKey = SetOrNullValue(nameof(EventMetadata.PartitionKey), md.PartitionKey);
+            SetMetadataAttribute(ce, nameof(EventMetadata.TenantId), md.TenantId?.ToString());
+            SetMetadataAttribute(ce, nameof(EventMetadata.Subject), md.Subject);
+            SetMetadataAttribute(ce, nameof(EventMetadata.Action), md.Action);
+            SetMetadataAttribute(ce, nameof(EventMetadata.Key), md.Key?.ToString());
+            SetMetadataAttribute(ce, nameof(EventMetadata.Username), md.Username);
+            SetMetadataAttribute(ce, nameof(EventMetadata.UserId), md.UserId);
+            SetMetadataAttribute(ce, nameof(EventMetadata.CorrelationId), md.CorrelationId);
+            SetMetadataAttribute(ce, nameof(EventMetadata.ETag), md.ETag);
+            SetMetadataAttribute(ce, nameof(EventMetadata.PartitionKey), md.PartitionKey);
         }
 
         /// <summary>
-        /// Set the value of null depending on configuration.
+        /// Sets the metadata attribute based on configuration.
         /// </summary>
-        private T SetOrNullValue<T>(string name, T value) => 
-            IncludeEventMetadataProperties == null || IncludeEventMetadataProperties.Length == 0 || IncludeEventMetadataProperties.Any(x => string.Equals(x, name, StringComparison.InvariantCultureIgnoreCase)) ? value : default!;
+        private void SetMetadataAttribute<T>(CloudEvent ce, string name, T value)
+        {
+            if (Comparer<T>.Default.Compare(value, default(T)!) == 0)
+                return;
+
+            if (IncludeEventMetadataProperties == null || IncludeEventMetadataProperties.Length == 0 || IncludeEventMetadataProperties.Any(x => string.Equals(x, name, StringComparison.InvariantCultureIgnoreCase)))
+                ce[name.ToLowerInvariant()] = value;
+        }
+
+        /// <summary>
+        /// Gets the configured metadata attributes.
+        /// </summary>
+        private void GetMetadataAttributes(CloudEvent ce, EventMetadata md)
+        {
+            var tenantId = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.TenantId));
+            if (Guid.TryParse(tenantId, out var guid))
+                md.TenantId = guid;
+
+            md.Subject = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.Subject));
+            md.Action = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.Action));
+            md.Key = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.Key));
+            md.Username = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.Username));
+            md.UserId = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.UserId));
+            md.CorrelationId = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.CorrelationId));
+            md.ETag = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.ETag));
+            md.PartitionKey = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.PartitionKey));
+        }
+
+        /// <summary>
+        /// Gets the configured metadata attribute.
+        /// </summary>
+        private static T GetMetadataAttribute<T>(CloudEvent ce, string name)
+        {
+            var val = ce[name.ToLowerInvariant()];
+            if (val == null)
+                return default!;
+            else
+                return (T)val;
+        }
     }
 }

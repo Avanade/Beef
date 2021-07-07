@@ -30,30 +30,10 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual(@"{
-  ""specversion"": ""1.0"",
-  ""type"": ""Test.Subject.Created"",
-  ""source"": ""/test"",
-  ""id"": ""00000001-0000-0000-0000-000000000000"",
-  ""time"": ""2001-01-15T12:48:16"",
-  ""beef"": {
-    ""eventId"": ""00000001-0000-0000-0000-000000000000"",
-    ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
-    ""subject"": ""Test.Subject"",
-    ""action"": ""Created"",
-    ""source"": ""/test"",
-    ""key"": 1,
-    ""username"": ""Bob"",
-    ""userid"": ""123"",
-    ""timestamp"": ""2001-01-15T12:48:16"",
-    ""correlationId"": ""XXX"",
-    ""etag"": ""YYY"",
-    ""partitionKey"": ""PK""
-  }
-}", json);
+            Assert.AreEqual(@"{""specversion"":""1.0"",""type"":""Test.Subject.Created"",""source"":""/test"",""id"":""00000001-0000-0000-0000-000000000000"",""time"":""2001-01-15T12:48:16Z"",""tenantid"":""00000002-0000-0000-0000-000000000000"",""subject"":""Test.Subject"",""action"":""Created"",""key"":""1"",""username"":""Bob"",""userid"":""123"",""correlationid"":""XXX"",""etag"":""YYY"",""partitionkey"":""PK""}", json);
 
             var ed = await eds.DeserializeAsync(bytes);
-            NewtonsoftJsonEventDataSerializerTest.AssertEventMetadata(ed);
+            NewtonsoftJsonEventDataSerializerTest.AssertEventMetadata(ed, keyIsAString: true);
         }
 
         [Test]
@@ -64,35 +44,10 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual(@"{
-  ""specversion"": ""1.0"",
-  ""type"": ""Test.Subject.Created"",
-  ""source"": ""/test"",
-  ""id"": ""00000001-0000-0000-0000-000000000000"",
-  ""time"": ""2001-01-15T12:48:16"",
-  ""datacontenttype"": ""application/json"",
-  ""data"": {
-    ""first"": ""Rebecca"",
-    ""last"": ""Brown""
-  },
-  ""beef"": {
-    ""eventId"": ""00000001-0000-0000-0000-000000000000"",
-    ""tenantId"": ""00000002-0000-0000-0000-000000000000"",
-    ""subject"": ""Test.Subject"",
-    ""action"": ""Created"",
-    ""source"": ""/test"",
-    ""key"": 1,
-    ""username"": ""Bob"",
-    ""userid"": ""123"",
-    ""timestamp"": ""2001-01-15T12:48:16"",
-    ""correlationId"": ""XXX"",
-    ""etag"": ""YYY"",
-    ""partitionKey"": ""PK""
-  }
-}", json);
+            Assert.AreEqual(@"{""specversion"":""1.0"",""type"":""Test.Subject.Created"",""source"":""/test"",""id"":""00000001-0000-0000-0000-000000000000"",""time"":""2001-01-15T12:48:16Z"",""datacontenttype"":""application/json"",""tenantid"":""00000002-0000-0000-0000-000000000000"",""subject"":""Test.Subject"",""action"":""Created"",""key"":""1"",""username"":""Bob"",""userid"":""123"",""correlationid"":""XXX"",""etag"":""YYY"",""partitionkey"":""PK"",""data"":{""first"":""Rebecca"",""last"":""Brown""}}", json);
 
             var ed = await eds.DeserializeAsync(typeof(Person), bytes);
-            NewtonsoftJsonEventDataSerializerTest.AssertEventMetadata(ed);
+            NewtonsoftJsonEventDataSerializerTest.AssertEventMetadata(ed, keyIsAString: true);
             Assert.NotNull(ed.GetValue());
 
             var p = ((EventData<Person>)ed).Value;
@@ -110,13 +65,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual(@"{
-  ""specversion"": ""1.0"",
-  ""type"": ""Test.Subject.Created"",
-  ""source"": ""/test"",
-  ""id"": ""00000001-0000-0000-0000-000000000000"",
-  ""time"": ""2001-01-15T12:48:16""
-}", json);
+            Assert.AreEqual(@"{""specversion"":""1.0"",""type"":""Test.Subject.Created"",""source"":""/test"",""id"":""00000001-0000-0000-0000-000000000000"",""time"":""2001-01-15T12:48:16Z""}", json);
 
             var ed = await eds.DeserializeAsync(bytes);
             AssertPartialEventMetadata(ed);
@@ -130,15 +79,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual(@"{
-  ""specversion"": ""1.0"",
-  ""type"": ""Test.Subject.Created"",
-  ""source"": ""/test"",
-  ""id"": ""00000001-0000-0000-0000-000000000000"",
-  ""time"": ""2001-01-15T12:48:16"",
-  ""datacontenttype"": ""application/json"",
-  ""data"": 88
-}", json);
+            Assert.AreEqual(@"{""specversion"":""1.0"",""type"":""Test.Subject.Created"",""source"":""/test"",""id"":""00000001-0000-0000-0000-000000000000"",""time"":""2001-01-15T12:48:16Z"",""datacontenttype"":""application/json"",""data"":88}", json);
 
             var ed = await eds.DeserializeAsync(typeof(int), bytes);
             AssertPartialEventMetadata(ed);
