@@ -1525,10 +1525,15 @@
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="ReferenceDataCodeConverter" />
+            <xs:enumeration value="ReferenceDataCodeConverter{T}" />
             <xs:enumeration value="ReferenceDataInt32IdConverter" />
+            <xs:enumeration value="ReferenceDataInt32IdConverter{T}" />
             <xs:enumeration value="ReferenceDataNullableInt32IdConverter" />
+            <xs:enumeration value="ReferenceDataNullableInt32IdConverter{T}" />
             <xs:enumeration value="ReferenceDataGuidIdConverter" />
+            <xs:enumeration value="ReferenceDataGuidIdConverter{T}" />
             <xs:enumeration value="ReferenceDataNullableGuidIdConverter" />
+            <xs:enumeration value="ReferenceDataNullableGuidIdConverter{T}" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

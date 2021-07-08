@@ -151,10 +151,15 @@
       "description": "Defaults to `ReferenceDataCodeConverter`.",
       "enum": [
         "ReferenceDataCodeConverter",
+        "ReferenceDataCodeConverter{T}",
         "ReferenceDataInt32IdConverter",
+        "ReferenceDataInt32IdConverter{T}",
         "ReferenceDataNullableInt32IdConverter",
+        "ReferenceDataNullableInt32IdConverter{T}",
         "ReferenceDataGuidIdConverter",
-        "ReferenceDataNullableGuidIdConverter"
+        "ReferenceDataGuidIdConverter{T}",
+        "ReferenceDataNullableGuidIdConverter",
+        "ReferenceDataNullableGuidIdConverter{T}"
       ]
     },
     "dataUsingNamespace": {

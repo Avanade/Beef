@@ -107,7 +107,7 @@ Provides the generic _Data-layer_ configuration.
 
 Property | Description
 -|-
-`refDataDefaultMapperConverter` | The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined. Valid options are: `ReferenceDataCodeConverter`, `ReferenceDataInt32IdConverter`, `ReferenceDataNullableInt32IdConverter`, `ReferenceDataGuidIdConverter`, `ReferenceDataNullableGuidIdConverter`. Defaults to `ReferenceDataCodeConverter`.
+`refDataDefaultMapperConverter` | The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined. Valid options are: `ReferenceDataCodeConverter`, `ReferenceDataCodeConverter{T}`, `ReferenceDataInt32IdConverter`, `ReferenceDataInt32IdConverter{T}`, `ReferenceDataNullableInt32IdConverter`, `ReferenceDataNullableInt32IdConverter{T}`, `ReferenceDataGuidIdConverter`, `ReferenceDataGuidIdConverter{T}`, `ReferenceDataNullableGuidIdConverter`, `ReferenceDataNullableGuidIdConverter{T}`. Defaults to `ReferenceDataCodeConverter`.
 `dataUsingNamespace` | The additional Namespace using statement to the added to the generated `Data` code.
 
 <br/>
