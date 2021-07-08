@@ -241,7 +241,8 @@ entities:
         /// Gets or sets the default Reference Data property Converter used by the generated Mapper(s) where not specifically defined.
         /// </summary>
         [JsonProperty("refDataDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", Options = new string[] { "ReferenceDataCodeConverter", "ReferenceDataInt32IdConverter", "ReferenceDataNullableInt32IdConverter", "ReferenceDataGuidIdConverter", "ReferenceDataNullableGuidIdConverter" },
+        [PropertySchema("Data", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", 
+            Options = new string[] { "ReferenceDataCodeConverter", "ReferenceDataCodeConverter{T}", "ReferenceDataInt32IdConverter", "ReferenceDataInt32IdConverter{T}", "ReferenceDataNullableInt32IdConverter", "ReferenceDataNullableInt32IdConverter{T}", "ReferenceDataGuidIdConverter", "ReferenceDataGuidIdConverter{T}", "ReferenceDataNullableGuidIdConverter", "ReferenceDataNullableGuidIdConverter{T}" },
             Description = "Defaults to `ReferenceDataCodeConverter`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
 

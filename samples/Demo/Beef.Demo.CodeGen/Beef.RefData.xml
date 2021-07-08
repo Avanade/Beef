@@ -6,6 +6,7 @@
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref">
     <Property Name="AlternateName" Type="string" />
     <Property Name="TripCode" Text="Trip OData Code" Type="string" RefDataMapping="true" IgnoreSerialization="true" />
+    <Property Name="Country" Type="^Country" DataName="CountryId" DataConverter="ReferenceDataNullableGuidIdConverter{T}" /> <!-- Ignore how this relationship makes NO sense; is for testing purposes only! -->
     <Const Name="Female" Value="F"/>
     <Const Name="Male" Value="M"/>
   </Entity>

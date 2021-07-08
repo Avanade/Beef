@@ -541,7 +541,22 @@ properties: [
         /// <summary>
         /// Gets or sets the declared type including nullability.
         /// </summary>
-        public string? DeclaredType { get; set; } 
+        public string? DeclaredType { get; set; }
+
+        /// <summary>
+        /// Gets the data reader type (used for ReferenceDataData layer only).
+        /// </summary>
+        public string? DataReaderType => string.IsNullOrEmpty(RefDataType)
+            ? DeclaredType
+            : DataConverter switch
+                {
+                    "ReferenceDataGuidIdConverter" => "Guid",
+                    "ReferenceDataNullableGuidIdConverter" => "Guid?",
+                    "ReferenceDataInt32IdConverter" => "int",
+                    "ReferenceDataNullableInt32IdConverter" => "int?",
+                    "ReferenceDataStringIdConverter" => "string?",
+                    _ => DeclaredType
+                };
 
         /// <summary>
         /// Gets the computed property name.

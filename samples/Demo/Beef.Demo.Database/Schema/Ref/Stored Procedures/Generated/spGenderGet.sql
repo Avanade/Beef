@@ -21,7 +21,8 @@ BEGIN
       [g].[UpdatedBy],
       [g].[UpdatedDate],
       [g].[AlternateName],
-      [g].[TripCode]
+      [g].[TripCode],
+      [g].[CountryId]
     FROM [Ref].[Gender] AS [g]
       WHERE [g].[GenderId] = @GenderId
 END

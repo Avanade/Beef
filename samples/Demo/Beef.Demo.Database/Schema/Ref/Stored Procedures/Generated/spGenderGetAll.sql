@@ -20,7 +20,8 @@ BEGIN
       [g].[UpdatedBy],
       [g].[UpdatedDate],
       [g].[AlternateName],
-      [g].[TripCode]
+      [g].[TripCode],
+      [g].[CountryId]
     FROM [Ref].[Gender] AS [g]
     ORDER BY [g].[SortOrder] ASC, [g].[Code] ASC
 END

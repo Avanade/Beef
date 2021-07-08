@@ -491,43 +491,42 @@ The program output will not have logged the event JSON explicity like before. Lo
   "id": "d28fdd61-fc25-4a29-924f-136596a47049",
   "time": "2021-04-22T22:20:37.112817Z",
   "datacontenttype": "application/json",
-  "data": {
-    "globalId": "ed5fc9de-2042-46b5-9749-36b0e2346788",
-    "firstName": "JohnX",
-    "lastName": "Doe",
-    "phone": "425 647 1234",
-    "email": "jd@hotmail.com",
-    "active": true,
-    "addresses": [
-      {
-        "id": 1,
-        "personId": 1,
-        "addressTypeId": 1,
-        "street1": "8000 Main Rd",
-        "city": "Redmond",
-        "state": "98052",
-        "postalZipCode": "WA",
-        "code": "HOME"
-      },
-      {
-        "id": 2,
-        "personId": 1,
-        "addressTypeId": 2,
-        "street1": "1001 1ST AVE N",
-        "city": "Seattle",
-        "state": "98109",
-        "postalZipCode": "WA",
-        "code": "POST"
-      }
-    ],
-    "etag": "+GC46Y1fb4DfzNXnyr6Aow=="
-  },
-  "beef": {
-    "subject": "xyz.legacy.person",
-    "action": "updated",
-    "username": "DOMAIN\\username",
-    "correlationId": "d1afe27b-d708-4a34-9ea6-9bbd094ed086"
-  }
+  "subject": "xyz.legacy.person",
+  "action": "updated",
+  "correlationid": "d1afe27b-d708-4a34-9ea6-9bbd094ed086",
+  "data":
+    {
+      "globalId": "ed5fc9de-2042-46b5-9749-36b0e2346788",
+      "firstName": "JohnX",
+      "lastName": "Doe",
+      "phone": "425 647 1234",
+      "email": "jd@hotmail.com",
+      "active": true,
+      "addresses":
+        [
+          {
+            "id": 1,
+            "personId": 1,
+            "addressTypeId": 1,
+            "street1": "8000 Main Rd",
+            "city": "Redmond",
+            "state": "98052",
+            "postalZipCode": "WA",
+            "code": "HOME",
+          },
+          {
+            "id": 2,
+            "personId": 1,
+            "addressTypeId": 2,
+            "street1": "1001 1ST AVE N",
+            "city": "Seattle",
+            "state": "98109",
+            "postalZipCode": "WA",
+            "code": "POST",
+          },
+        ],
+      "etag": "+GC46Y1fb4DfzNXnyr6Aow==",
+    },
 }
 ```
 

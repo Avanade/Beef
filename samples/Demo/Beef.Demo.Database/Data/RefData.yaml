@@ -1,16 +1,16 @@
 ﻿^Type: Beef.Database.Core.DefaultIdentifierGenerators
 Ref:
-  - $^Gender:
-    - { Code: M, Text: Male, TripCode: Male }
-    - { Code: F, Text: Female, TripCode: Female }
-  - $EyeColor:
-    - BLUE: Blue
-    - BROWN: Brown
-    - GREEN: Green
   - $Country:
     - NZ: New Zealand
     - AU: Australia
     - US: UnitedStates
+  - $^Gender:
+    - { Code: M, Text: Male, TripCode: Male, CountryId: NZ }
+    - { Code: F, Text: Female, TripCode: Female, CountryId: AU }
+  - $EyeColor:
+    - BLUE: Blue
+    - BROWN: Brown
+    - GREEN: Green
   - $USState:
     - AL: Alabama
     - AK: Alaska

@@ -28,6 +28,7 @@
     <None Remove="Migrations\20210331-100536-alter-legacy-contact.sql" />
     <None Remove="Migrations\20210604-161439-alter-demo-person.sql" />
     <None Remove="Migrations\20210617-132408-alter-contact-systemversioning.sql" />
+    <None Remove="Migrations\20210706-111003-alter-ref-gender.sql" />
     <None Remove="Schema\Sec\Functions\fnGetUserHasPermission.sql" />
     <None Remove="Schema\Sec\Functions\fnGetUserOrgUnits.sql" />
     <None Remove="Schema\Sec\Stored Procedures\spCheckUserHasPermission.sql" />

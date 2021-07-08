@@ -84,6 +84,7 @@ namespace Beef.Demo.Business.Data
                 {
                     item.AlternateName = dr.GetValue<string>("AlternateName");
                     item.TripCode = dr.GetValue<string>("TripCode");
+                    item.Country = ReferenceDataNullableGuidIdConverter<RefDataNamespace.Country>.Default.ConvertToSrce(dr.GetValue<Guid?>("CountryId"));
                 });
             }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 

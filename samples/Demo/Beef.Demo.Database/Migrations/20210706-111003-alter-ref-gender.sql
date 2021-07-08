@@ -1,0 +1,8 @@
+﻿-- Migration Script
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Ref].[Gender]
+  ADD CountryId UNIQUEIDENTIFIER NULL
+	
+COMMIT TRANSACTION

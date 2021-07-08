@@ -9,6 +9,7 @@ CREATE PROCEDURE [Ref].[spGenderUpdate]
   @UpdatedDate AS DATETIME2 NULL = NULL,
   @AlternateName AS NVARCHAR(50) NULL = NULL,
   @TripCode AS NVARCHAR(50) NULL = NULL,
+  @CountryId AS UNIQUEIDENTIFIER NULL = NULL,
   @ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -49,7 +50,8 @@ BEGIN
         [g].[UpdatedBy] = @UpdatedBy,
         [g].[UpdatedDate] = @UpdatedDate,
         [g].[AlternateName] = @AlternateName,
-        [g].[TripCode] = @TripCode
+        [g].[TripCode] = @TripCode,
+        [g].[CountryId] = @CountryId
       FROM [Ref].[Gender] AS [g]
       WHERE [g].[GenderId] = @GenderId
 
