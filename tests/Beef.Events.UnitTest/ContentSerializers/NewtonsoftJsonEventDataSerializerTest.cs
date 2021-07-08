@@ -16,7 +16,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual("﻿{\"eventId\":\"00000001-0000-0000-0000-000000000000\",\"tenantId\":\"00000002-0000-0000-0000-000000000000\",\"subject\":\"Test.Subject\",\"action\":\"Created\",\"source\":\"/test\",\"key\":1,\"username\":\"Bob\",\"userid\":\"123\",\"timestamp\":\"2001-01-15T12:48:16\",\"correlationId\":\"XXX\",\"etag\":\"YYY\",\"partitionKey\":\"PK\"}", json);
+            Assert.AreEqual("﻿{\"eventId\":\"00000001-0000-0000-0000-000000000000\",\"tenantId\":\"00000002-0000-0000-0000-000000000000\",\"subject\":\"Test.Subject\",\"action\":\"Created\",\"source\":\"/test\",\"key\":1,\"username\":\"Bob\",\"userid\":\"123\",\"timestamp\":\"2001-01-15T12:48:16Z\",\"correlationId\":\"XXX\",\"etag\":\"YYY\",\"partitionKey\":\"PK\"}", json);
 
             var ed = await eds.DeserializeAsync(bytes);
             AssertEventMetadata(ed);
@@ -30,7 +30,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
             Assert.Greater(bytes.Length, 0);
 
             var json = Encoding.UTF8.GetString(bytes);
-            Assert.AreEqual("﻿{\"value\":88,\"eventId\":\"00000001-0000-0000-0000-000000000000\",\"tenantId\":\"00000002-0000-0000-0000-000000000000\",\"subject\":\"Test.Subject\",\"action\":\"Created\",\"source\":\"/test\",\"key\":1,\"username\":\"Bob\",\"userid\":\"123\",\"timestamp\":\"2001-01-15T12:48:16\",\"correlationId\":\"XXX\",\"etag\":\"YYY\",\"partitionKey\":\"PK\"}", json);
+            Assert.AreEqual("﻿{\"value\":88,\"eventId\":\"00000001-0000-0000-0000-000000000000\",\"tenantId\":\"00000002-0000-0000-0000-000000000000\",\"subject\":\"Test.Subject\",\"action\":\"Created\",\"source\":\"/test\",\"key\":1,\"username\":\"Bob\",\"userid\":\"123\",\"timestamp\":\"2001-01-15T12:48:16Z\",\"correlationId\":\"XXX\",\"etag\":\"YYY\",\"partitionKey\":\"PK\"}", json);
 
             var ed = await eds.DeserializeAsync(typeof(int), bytes);
             AssertEventMetadata(ed);
@@ -76,7 +76,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
                 CorrelationId = "XXX",
                 Source = new Uri("/test", UriKind.Relative),
                 TenantId = new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                Timestamp = new DateTime(2001, 01, 15, 12, 48, 16),
+                Timestamp = new DateTime(2001, 01, 15, 12, 48, 16, DateTimeKind.Utc),
                 ETag = "YYY",
                 Key = 1,
                 PartitionKey = "PK",
@@ -85,7 +85,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
             };
         }
 
-        public static void AssertEventMetadata(EventMetadata metadata, bool defaultPropertiesOnly = false)
+        public static void AssertEventMetadata(EventMetadata metadata, bool defaultPropertiesOnly = false, bool keyIsAString = false)
         {
             Assert.IsNotNull(metadata);
             Assert.AreEqual("Test.Subject", metadata.Subject);
@@ -96,7 +96,7 @@ namespace Beef.Events.UnitTest.ContentSerializers
                 Assert.AreEqual("XXX", metadata.CorrelationId);
                 Assert.AreEqual(new Uri("/test", UriKind.Relative), metadata.Source);
                 Assert.AreEqual(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.TenantId);
-                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16), metadata.Timestamp);
+                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16, DateTimeKind.Utc), metadata.Timestamp);
                 Assert.Null(metadata.ETag);
                 Assert.Null(metadata.Key);
                 Assert.Null(metadata.PartitionKey);
@@ -109,9 +109,13 @@ namespace Beef.Events.UnitTest.ContentSerializers
                 Assert.AreEqual("XXX", metadata.CorrelationId);
                 Assert.AreEqual(new Uri("/test", UriKind.Relative), metadata.Source);
                 Assert.AreEqual(new Guid(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), metadata.TenantId);
-                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16), metadata.Timestamp);
+                Assert.AreEqual(new DateTime(2001, 01, 15, 12, 48, 16, DateTimeKind.Utc), metadata.Timestamp);
                 Assert.AreEqual("YYY", metadata.ETag);
-                Assert.AreEqual(1, metadata.Key);
+                if (keyIsAString)
+                    Assert.AreEqual("1", metadata.Key);
+                else
+                    Assert.AreEqual(1, metadata.Key);
+
                 Assert.AreEqual("PK", metadata.PartitionKey);
                 Assert.AreEqual("123", metadata.UserId);
                 Assert.AreEqual("Bob", metadata.Username);
