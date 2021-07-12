@@ -102,7 +102,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public async Task Validate_Key()
         {
-            var kv = Validator.CreateGeneric<string>().Rule(r => r.Mandatory().String(2));
+            var kv = Validator.CreateCommon<string>(r => r.Text("Key").Mandatory().String(2));
 
             var v1 = await new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 } }.Validate("Dict").Dictionary(item: DictionaryRuleItem.Create<string, int>(kv)).RunAsync();
             Assert.IsFalse(v1.HasError);
@@ -112,14 +112,14 @@ namespace Beef.Core.UnitTest.Validation.Rules
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Key must not exceed 2 characters in length.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
-            Assert.AreEqual("Dict[k2x].Key", v1.Messages[0].Property);
+            Assert.AreEqual("Dict[k2x]", v1.Messages[0].Property);
         }
 
         [Test]
         public async Task Validate_KeyAndValue()
         {
-            var kv = Validator.CreateGeneric<string>().Rule(r => r.Mandatory().String(2));
-            var vv = Validator.CreateGeneric<int>().Rule(r => r.Mandatory().CompareValue(CompareOperator.LessThanEqual, 10));
+            var kv = Validator.CreateCommon<string>(r => r.Text("Key").Mandatory().String(2));
+            var vv = Validator.CreateCommon<int>(r => r.Mandatory().CompareValue(CompareOperator.LessThanEqual, 10));
 
             var v1 = await new Dictionary<string, int> { { "k1", 1 }, { "k2", 2 } }.Validate("Dict").Dictionary(item: DictionaryRuleItem.Create<string, int>(kv, vv)).RunAsync();
             Assert.IsFalse(v1.HasError);
@@ -129,10 +129,10 @@ namespace Beef.Core.UnitTest.Validation.Rules
             Assert.AreEqual(2, v1.Messages.Count);
             Assert.AreEqual("Value must be less than or equal to 10.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
-            Assert.AreEqual("Dict[k1].Value", v1.Messages[0].Property);
+            Assert.AreEqual("Dict[k1]", v1.Messages[0].Property);
             Assert.AreEqual("Key must not exceed 2 characters in length.", v1.Messages[1].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[1].Type);
-            Assert.AreEqual("Dict[k2x].Key", v1.Messages[1].Property);
+            Assert.AreEqual("Dict[k2x]", v1.Messages[1].Property);
         }
     }
 }

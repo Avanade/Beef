@@ -14,8 +14,8 @@ namespace Beef.Core.UnitTest.Validation
         [OneTimeSetUp]
         public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
 
-        private static readonly CommonValidator<string> _cv = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
-        private static readonly CommonValidator<int?> _cv2 = CommonValidator.Create<int?>(v => v.CompareValue(CompareOperator.NotEqual, 1));
+        private static readonly CommonValidator<string> _cv = Validator.CreateCommon<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
+        private static readonly CommonValidator<int?> _cv2 = Validator.CreateCommon<int?>(v => v.CompareValue(CompareOperator.NotEqual, 1));
 
         [Test]
         public async Task Validate()
@@ -100,6 +100,41 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual("Count B must not be equal to 1.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("CountB", r.Messages[0].Property);
+        }
+
+        public class IntValidator : CommonValidator<int>
+        {
+            public IntValidator() => this.Text("Count").Mandatory().CompareValue(CompareOperator.GreaterThanEqual, 10).CompareValue(CompareOperator.LessThanEqual, 20);
+
+            protected override Task OnValidateAsync(PropertyContext<ValidationValue<int>, int> context)
+            {
+                if (context.Value == 11)
+                    context.CreateErrorMessage("{0} is not allowed to be eleven.");
+
+                return Task.CompletedTask;
+            }
+        }
+
+        [Test]
+        public async Task Inherited_Basic()
+        {
+            var iv = new IntValidator();
+            var vr = await iv.ValidateAsync(8);
+            Assert.IsTrue(vr.HasError);
+            Assert.AreEqual(1, vr.Messages.Count);
+            Assert.AreEqual("Count must be greater than or equal to 10.", vr.Messages[0].Text);
+            Assert.AreEqual("Value", vr.Messages[0].Property);
+        }
+
+        [Test]
+        public async Task Inherited_OnValidate()
+        {
+            var iv = new IntValidator();
+            var vr = await iv.ValidateAsync(11);
+            Assert.IsTrue(vr.HasError);
+            Assert.AreEqual(1, vr.Messages.Count);
+            Assert.AreEqual("Count is not allowed to be eleven.", vr.Messages[0].Text);
+            Assert.AreEqual("Value", vr.Messages[0].Property);
         }
     }
 }

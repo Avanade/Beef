@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Enhancement:* After a review of the newly introduced `GenericValidator` and the existing `CommonValidator` it has been decided these will be combined because the functionality was so closely aligned (duplicated). To minimize usage impact, the `GenericValidator` will be deprecated, with its unique functionality migrated into the `CommonValidator`. The `Validator` static class has been extended to support the creation of a `CommonValidator` via a new `CreateCommon` method.
+- *Fixed:* There were inconsistencies with the `MessageItem.Property` output from `DictionaryRule` and `DictionaryValidator` with respect to the underlying property names. The property name was sometimes including the key value and suffixing with `Key` and `Value` (e.g. `Foo["bar"].Key` and `Foo["bar"].Value`), and others just the key value and no suffix (e.g. `Foo["bar"]` and `Foo["bar"]`) - the latter will be the standardized output.
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 - *Issue [139](https://github.com/Avanade/Beef/issues/139)*. Moved the nucleus of `Beef.Core` into a new `Beef.Abstractions` - see the [issue](https://github.com/Avanade/Beef/issues/139) for the reasoning and the changes required as a result of some minor breaking changes.

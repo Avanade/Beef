@@ -571,8 +571,9 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public async Task Dict_Validator_KeyError()
         {
-            var kv = Validator.CreateGeneric<string>().Rule(x => x.Mandatory().String(2));
-            var vxd = Validator.CreateDictionary<Dictionary<string, TestItem>, string, TestItem>(minCount: 2, item: DictionaryRuleItem.Create<string, TestItem>(key: kv, value: new TestItemValidator()));
+            var kv = CommonValidator.Create<string>(x => x.Text("Key").Mandatory().String(2));
+
+            var vxd = Validator.CreateDictionary<Dictionary<string, TestItem>, string, TestItem>(minCount: 2, item: DictionaryRuleItem.Create(key: kv, value: new TestItemValidator()));
             var tc = new Dictionary<string, TestItem> { { "k1", new TestItem { Code = "A", Text = "A" } }, { "k2x", new TestItem { Code = "B", Text = "B" } } };
 
             var r = await vxd.ValidateAsync(tc);
@@ -581,7 +582,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Key must not exceed 2 characters in length.", r.Messages[0].Text);
-            Assert.AreEqual("Value[k2x].Key", r.Messages[0].Property);
+            Assert.AreEqual("Value[k2x]", r.Messages[0].Property);
         }
     }
 }

@@ -86,22 +86,22 @@ namespace Beef.Validation
             var hasItemErrors = false;
             foreach (var item in value)
             {
-                var name = "[" + i + "]";
-                var ictx = new PropertyContext<TColl, TItem>(context, item, name, name, StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
-                var iargs = ictx.CreateValidationArgs();
-                i++;
-
                 if (!AllowNullItems && item == null)
                     hasNullItem = true;
 
                 // Validate and merge.
                 if (item != null && Item?.ItemValidator != null)
                 {
-                    var r = await Item.ItemValidator.ValidateAsync(item, iargs).ConfigureAwait(false);
-                    context.MergeResult(r);
-                    if (r.HasErrors)
+                    var name = $"[{i}]";
+                    var ic = new PropertyContext<TColl, TItem>(context, item, name, name);
+                    var ia = ic.CreateValidationArgs();
+                    var ir = await Item.ItemValidator.ValidateAsync(item, ia).ConfigureAwait(false);
+                    context.MergeResult(ir);
+                    if (ir.HasErrors)
                         hasItemErrors = true;
                 }
+
+                i++;
             }
 
             var text = new Lazy<LText>(() => Text ?? Beef.StringConversion.ToSentenceCase(args?.FullyQualifiedEntityName) ?? StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);

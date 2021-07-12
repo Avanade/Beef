@@ -317,8 +317,7 @@ namespace Beef.Validation.Rules
                 // Validate and merge.
                 if (item != null && Item?.ItemValidator != null)
                 {
-                    var v = Item.ItemValidator is IGenericValidator gv ? gv.CreateValidationValue(item) : item;
-                    var r = await Item.ItemValidator.ValidateAsync(v, args).ConfigureAwait(false);
+                    var r = await Item.ItemValidator.ValidateAsync(item, args).ConfigureAwait(false);
                     context.MergeResult(r);
                     if (r.HasErrors)
                         hasItemErrors = true;
