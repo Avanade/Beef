@@ -29,16 +29,6 @@ namespace Beef.CodeGen.Generators
         protected static bool IsFalse(bool? value) => !value.HasValue || !value.Value;
 
         /// <summary>
-        /// Checks whether the string value is 'No'.
-        /// </summary>
-        protected static bool IsNoOption(string? value) => string.IsNullOrEmpty(value) || string.Compare(value, ConfigBase.NoOption, StringComparison.OrdinalIgnoreCase) == 0;
-
-        /// <summary>
-        /// Checks whether the string value is 'Yes'.
-        /// </summary>
-        protected static bool IsYesOption(string? value) => !string.IsNullOrEmpty(value) && string.Compare(value, ConfigBase.YesOption, StringComparison.OrdinalIgnoreCase) == 0;
-
-        /// <summary>
         /// Gets or sets the output file name.
         /// </summary>
         public string? OutputFileName { get; set; }

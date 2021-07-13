@@ -28,8 +28,8 @@ namespace Beef.Demo.Business.Validation
             Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.Now, _ => "Today");
             Property(x => x.Address).Entity(_addressValidator);
             Property(x => x.Metadata).Dictionary(item: DictionaryRuleItem.Create<string?, string?>(
-                key: Validator.CreateGeneric<string?>().Rule(r => r.Text("Gender").Mandatory().RefDataCode().As<Gender>()),
-                value: Validator.CreateGeneric<string?>().Rule(r => r.Text("Description").Mandatory().String(10))));
+                key: Validator.CreateCommon<string?>(r => r.Text("Gender").Mandatory().RefDataCode().As<Gender>()),
+                value: Validator.CreateCommon<string?>(r => r.Text("Description").Mandatory().String(10))));
         }
     }
 }

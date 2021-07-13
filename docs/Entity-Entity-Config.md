@@ -269,17 +269,17 @@ Provides the _Exclude_ configuration.
 
 Property | Description
 -|-
-**`excludeEntity`** | The option to exclude the generation of the `Entity` class (`Xxx.cs`). Valid options are: `No`, `Yes`.
-**`excludeAll`** | The option to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class. Valid options are: `No`, `Yes`. Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to `Yes`.
-`excludeIData` | The option to exclude the generation of the `Data` interface (`IXxxData.cs`). Valid options are: `No`, `Yes`.
-`excludeData` | The option to exclude the generation of the `Data` class (`XxxData.cs`). Valid options are: `No`, `Yes`, `RequiresMapper`. Defaults to `No` indicating _not_ to exlude. A value of `Yes` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.
-`excludeIDataSvc` | The option to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`). Valid options are: `No`, `Yes`.
-`excludeDataSvc` | The option to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`). Valid options are: `No`, `Yes`.
-`excludeIManager` | The option to exclude the generation of the `Manager` interface (`IXxxManager.cs`). Valid options are: `No`, `Yes`.
-`excludeManager` | The option to exclude the generation of the `Manager` class (`XxxManager.cs`). Valid options are: `No`, `Yes`.
-`excludeWebApi` | The option to exclude the generation of the WebAPI `Controller` class (`XxxController.cs`). Valid options are: `No`, `Yes`.
-`excludeWebApiAgent` | The option to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`). Valid options are: `No`, `Yes`.
-`excludeGrpcAgent` | The option to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`). Valid options are: `No`, `Yes`.
+**`excludeEntity`** | Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`).
+**`excludeAll`** | Indicates whether to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class. Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to exclude.
+`excludeIData` | Indicates whether to exclude the generation of the `Data` interface (`IXxxData.cs`).
+`excludeData` | The option to exclude the generation of the `Data` class (`XxxData.cs`). Valid options are: `Include`, `Exclude`, `RequiresMapper`. Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.
+`excludeIDataSvc` | Indicates whether to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).
+`excludeDataSvc` | Indicates whether to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).
+`excludeIManager` | Indicates whether to exclude the generation of the `Manager` interface (`IXxxManager.cs`).
+`excludeManager` | Indicates whether to exclude the generation of the `Manager` class (`XxxManager.cs`).
+`excludeWebApi` | The option to exclude the generation of the WebAPI `Controller` class (`XxxController.cs`).
+`excludeWebApiAgent` | Indicates whether to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).
+`excludeGrpcAgent` | Indicates whether to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`).
 
 <br/>
 

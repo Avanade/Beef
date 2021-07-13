@@ -41,21 +41,6 @@ namespace Beef.CodeGen.Config
         #region static
 
         /// <summary>
-        /// The <b>Yes</b> option.
-        /// </summary>
-        public const string YesOption = "Yes";
-
-        /// <summary>
-        /// The <b>No</b> option.
-        /// </summary>
-        public const string NoOption = "No";
-
-        /// <summary>
-        /// Gets the <see cref="YesOption"/> and <see cref="NoOption"/> options.
-        /// </summary>
-        public static readonly string[] YesNoOptions = new string[] { "No", "Yes" };
-
-        /// <summary>
         /// The list of standard system <see cref="Type"/> names.
         /// </summary>
         public static List<string> SystemTypes => new List<string>
@@ -74,16 +59,14 @@ namespace Beef.CodeGen.Config
         };
 
         /// <summary>
-        /// Checks whether the <see cref="string"/> value is <see cref="NoOption"/>.
+        /// Check whether the nullable boolean is true.
         /// </summary>
-        /// <param name="value">The value.</param>
-        protected static bool IsNoOption(string? value) => string.IsNullOrEmpty(value) || string.Compare(value, NoOption, StringComparison.OrdinalIgnoreCase) == 0;
+        protected static bool IsTrue(bool? value) => value.HasValue && value.Value;
 
         /// <summary>
-        /// Checks whether the <see cref="string"/> value is <see cref="YesOption"/>.
+        /// Check whether the nullable boolean is null or false.
         /// </summary>
-        /// <param name="value">The value.</param>
-        protected static bool IsYesOption(string? value) => !string.IsNullOrEmpty(value) && string.Compare(value, YesOption, StringComparison.OrdinalIgnoreCase) == 0;
+        protected static bool IsFalse(bool? value) => !value.HasValue || !value.Value;
 
         /// <summary>
         /// Defaults the <see cref="string"/> <paramref name="value"/> where <c>null</c> using the <paramref name="defaultValue"/> function.

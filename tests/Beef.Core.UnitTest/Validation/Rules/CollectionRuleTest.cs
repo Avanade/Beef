@@ -81,6 +81,22 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
+        public async Task Validate_ItemInt()
+        {
+            var iv = Validator.CreateCommon<int>(r => r.Text("Number").CompareValue(CompareOperator.LessThanEqual, 5));
+
+            var v1 = await new int[] { 1, 2, 3, 4, 5 }.Validate().Collection(item: CollectionRuleItem.Create(iv)).RunAsync();
+            Assert.IsFalse(v1.HasError);
+
+            v1 = await new int[] { 6, 2, 3, 4, 5 }.Validate().Collection(item: CollectionRuleItem.Create(iv)).RunAsync();
+            Assert.IsTrue(v1.HasError);
+            Assert.AreEqual(1, v1.Messages.Count);
+            Assert.AreEqual("Number must be less than or equal to 5.", v1.Messages[0].Text);
+            Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
+            Assert.AreEqual("Value[0]", v1.Messages[0].Property);
+        }
+
+        [Test]
         public async Task Validate_Item_Null()
         {
             var v1 = await new TestItem[] { new TestItem() }.Validate().Collection().RunAsync();

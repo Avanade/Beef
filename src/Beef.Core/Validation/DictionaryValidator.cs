@@ -96,7 +96,6 @@ namespace Beef.Validation
             var hasNullValue = false;
             foreach (var item in value)
             {
-                var name = "[" + item.Key + "]";
                 i++;
 
                 if (!AllowNullKeys && item.Key == null)
@@ -105,23 +104,26 @@ namespace Beef.Validation
                 if (!AllowNullValues && item.Value == null)
                     hasNullValue = true;
 
+                if (Item?.KeyValidator == null && Item?.ValueValidator == null)
+                    continue;
+
                 // Validate and merge.
+                var name = $"[{item.Key}]";
+
                 if (item.Key != null && Item?.KeyValidator != null)
                 {
-                    var kctx = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name, StringConversion.ToSentenceCase(Validator.KeyNameDefault)!);
-                    var kargs = kctx.CreateValidationArgs();
-                    var kval = Item.KeyValidator is IGenericValidator gv ? gv.CreateValidationValue(item.Key) : item.Key;
-                    var r = await Item.KeyValidator.ValidateAsync(kval, kargs).ConfigureAwait(false);
-                    context.MergeResult(r);
+                    var kc = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name);
+                    var ka = kc.CreateValidationArgs();
+                    var kr = await Item.KeyValidator.ValidateAsync(item.Key, ka).ConfigureAwait(false);
+                    context.MergeResult(kr);
                 }
 
                 if (item.Value != null && Item?.ValueValidator != null)
                 {
-                    var ictx = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name, StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
-                    var iargs = ictx.CreateValidationArgs();
-                    var vval = Item.ValueValidator is IGenericValidator gv ? gv.CreateValidationValue(item.Value) : item.Value;
-                    var r = await Item.ValueValidator.ValidateAsync(vval, iargs).ConfigureAwait(false);
-                    context.MergeResult(r);
+                    var vc = new PropertyContext<TDict, KeyValuePair<TKey, TValue>>(context, item, name, name);
+                    var va = vc.CreateValidationArgs();
+                    var vr = await Item.ValueValidator.ValidateAsync(item.Value, va).ConfigureAwait(false);
+                    context.MergeResult(vr);
                 }
             }
 

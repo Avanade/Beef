@@ -26,9 +26,9 @@ namespace {{Root.NamespaceCdcPublisher}}.Services
         public static IServiceCollection AddGeneratedCdcHostedServices(this IServiceCollection services, IConfiguration config)
         {
 {{#each Cdc}}
-  {{#ifne ExcludeHostedService 'Yes'}}
+  {{#unless ExcludeHostedService}}
             services.AddCdcHostedService<{{ModelName}}CdcHostedService>(config);
-  {{/ifne}}
+  {{/unless}}
 {{/each}}
             return services;
         }

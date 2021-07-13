@@ -73,9 +73,6 @@ namespace Beef.Validation.Rules
         {
             KeyValidator = keyValidator;
             ValueValidator = valueValidator;
-
-            if (KeyValidator != null)
-                (KeyValidator as IGenericValidator)?.OverrideNamesAndTextForRules(Validator.KeyNameDefault, Validator.KeyNameDefault, Validator.KeyNameDefault);
         }
 
         /// <summary>
@@ -226,15 +223,13 @@ namespace Beef.Validation.Rules
                 // Validate and merge.
                 if (de.Key != null && Item?.KeyValidator != null)
                 {
-                    var k = Item.KeyValidator is IGenericValidator gv ? gv.CreateValidationValue(de.Key) : de.Key;
-                    var r = await Item.KeyValidator.ValidateAsync(k, args).ConfigureAwait(false);
+                    var r = await Item.KeyValidator.ValidateAsync(de.Key, args).ConfigureAwait(false);
                     context.MergeResult(r);
                 }
 
                 if (de.Value != null && Item?.ValueValidator != null)
                 {
-                    var v = Item.ValueValidator is IGenericValidator gv ? gv.CreateValidationValue(de.Value) : de.Value;
-                    var r = await Item.ValueValidator.ValidateAsync(v, args).ConfigureAwait(false);
+                    var r = await Item.ValueValidator.ValidateAsync(de.Value, args).ConfigureAwait(false);
                     context.MergeResult(r);
                 }
             }

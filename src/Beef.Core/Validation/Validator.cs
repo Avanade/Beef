@@ -75,11 +75,12 @@ namespace Beef.Validation
             new() { MinCount = minCount, MaxCount = maxCount, Item = item, AllowNullKeys = allowNullKeys, AllowNullValues = allowNullValues };
 
         /// <summary>
-        /// Creates a <see cref="GenericValidator{T}"/>.
+        /// Creates a <see cref="CommonValidator{T}"/>.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <returns>The <see cref="GenericValidator{T}"/>.</returns>
-        public static GenericValidator<T> CreateGeneric<T>() => new();
+        /// <param name="validator">An action with the <see cref="CommonValidator{T}"/>.</param>
+        /// <returns>The <see cref="CommonValidator{T}"/>.</returns>
+        public static CommonValidator<T> CreateCommon<T>(Action<CommonValidator<T>> validator) => CommonValidator.Create<T>(validator);
     }
 
     /// <summary>

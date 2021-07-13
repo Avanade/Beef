@@ -203,8 +203,8 @@ namespace Beef.CodeGen.Config.Database
         /// The option to exclude the generation of the <c>CdcHostedService</c> (background) class (<c>XxxHostedService.cs</c>).
         /// </summary>
         [JsonProperty("excludeHostedService", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
-        public string? ExcludeHostedService { get; set; }
+        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).", IsImportant = true)]
+        public bool? ExcludeHostedService { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
@@ -440,7 +440,7 @@ namespace Beef.CodeGen.Config.Database
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Root!.EventSubjectFormat);
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
-            ExcludeHostedService = DefaultWhereNull(ExcludeHostedService, () => NoOption);
+            ExcludeHostedService = DefaultWhereNull(ExcludeHostedService, () => false);
             if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
                 ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 

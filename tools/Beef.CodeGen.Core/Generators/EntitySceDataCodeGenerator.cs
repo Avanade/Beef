@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Config;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +16,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<Config.Entity.CodeGenConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Any(x => x.ExcludeData != ConfigBase.YesOption && x.Operations!.Count > 0) ? new Config.Entity.CodeGenConfig[] { config } : System.Array.Empty<Config.Entity.CodeGenConfig>();
+            => Check.NotNull(config, nameof(config)).Entities.Any(x => x.ExcludeData != "Exclude" && x.Operations!.Count > 0) ? new Config.Entity.CodeGenConfig[] { config } : System.Array.Empty<Config.Entity.CodeGenConfig>();
     }
 }
