@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CdcConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Cdc!.Where(x => IsNoOption(x.ExcludeHostedService));
+            => Check.NotNull(config, nameof(config)).Cdc!.Where(x => IsFalse(x.ExcludeHostedService));
     }
 }

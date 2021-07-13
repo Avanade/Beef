@@ -724,25 +724,25 @@ entities:
         #region Exclude
 
         /// <summary>
-        /// The option to exclude the generation of the <c>Entity</c> class (<c>Xxx.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>Entity</c> class (<c>Xxx.cs</c>).
         /// </summary>
         [JsonProperty("excludeEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Entity` class (`Xxx.cs`).", IsImportant = true)]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`).", IsImportant = true)]
         public bool? ExcludeEntity { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of <b>all</b> <c>Operation</c> related code; excluding the <c>Entity</c> class.
+        /// Indicates whether to exclude the generation of <b>all</b> <c>Operation</c> related code; excluding the <c>Entity</c> class.
         /// </summary>
         [JsonProperty("excludeAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.", IsImportant = true,
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.", IsImportant = true,
             Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to exclude.")]
         public bool? ExcludeAll { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>Data</c> interface (<c>IXxxData.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>Data</c> interface (<c>IXxxData.cs</c>).
         /// </summary>
         [JsonProperty("excludeIData", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Data` interface (`IXxxData.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `Data` interface (`IXxxData.cs`).")]
         public bool? ExcludeIData { get; set; }
 
         /// <summary>
@@ -754,35 +754,35 @@ entities:
         public string? ExcludeData { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
         /// </summary>
         [JsonProperty("excludeIDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).")]
         public bool? ExcludeIDataSvc { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>DataSvc</c> class (<c>XxxDataSvc.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>DataSvc</c> class (<c>XxxDataSvc.cs</c>).
         /// </summary>
         [JsonProperty("excludeDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).")]
         public bool? ExcludeDataSvc { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>Manager</c> interface (<c>IXxxManager.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>Manager</c> interface (<c>IXxxManager.cs</c>).
         /// </summary>
         [JsonProperty("excludeIManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Manager` interface (`IXxxManager.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `Manager` interface (`IXxxManager.cs`).")]
         public bool? ExcludeIManager { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the <c>Manager</c> class (<c>XxxManager.cs</c>).
+        /// Indicates whether to exclude the generation of the <c>Manager</c> class (<c>XxxManager.cs</c>).
         /// </summary>
         [JsonProperty("excludeManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Manager` class (`XxxManager.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the `Manager` class (`XxxManager.cs`).")]
         public bool? ExcludeManager { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the WebAPI <c>Controller</c> class (<c>XxxController.cs</c>).
+        /// Indicates whether to exclude the generation of the WebAPI <c>Controller</c> class (<c>XxxController.cs</c>).
         /// </summary>
         [JsonProperty("excludeWebApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Exclude", Title = "The option to exclude the generation of the WebAPI `Controller` class (`XxxController.cs`).")]
@@ -792,14 +792,14 @@ entities:
         /// The option to exclude the generation of the WebAPI <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
         [JsonProperty("excludeWebApiAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).")]
         public bool? ExcludeWebApiAgent { get; set; }
 
         /// <summary>
-        /// The option to exclude the generation of the gRPC <c>Agent</c> class (<c>XxxAgent.cs</c>).
+        /// Indicates whether to exclude the generation of the gRPC <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
         [JsonProperty("excludeGrpcAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`).")]
+        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`).")]
         public bool? ExcludeGrpcAgent { get; set; }
 
         #endregion

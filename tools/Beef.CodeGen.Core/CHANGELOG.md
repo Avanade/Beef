@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* The was a YAML configuration issue using `Yes` and `No` for option strings, as these are reserved for `boolean` values. All properties that previously supported both `Yes` and `No` are now booleans. The one exception is `Entity.ExcludeData` which has options: `Include` (default), `Exclude` and `RequiresMapper`. These are all automatically translated from their respective existing XML values.
+- *Fixed:* The JSON Schemas have been updated to leverage `definitions` for defining each object type; this fixes the issue where only the first item in an array was validating correctly (and supporting corresponding intellisense).
+
 ## v4.2.3
 - *Fixed:* Issue [143](https://github.com/Avanade/Beef/issues/143) fixed. Where referencing a reference data property within a reference data class and there is a need to perform a data conversion an `InvalidCastException` (`Object must implement IConvertible.`) was being thrown. Generated code has been corrected.
 

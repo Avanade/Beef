@@ -1144,12 +1144,8 @@
           }
         },
         "excludeHostedService": {
-          "type": "string",
-          "title": "The option to exclude the generation of the 'CdcHostedService' (background) class ('XxxHostedService.cs').",
-          "enum": [
-            "No",
-            "Yes"
-          ]
+          "type": "boolean",
+          "title": "The option to exclude the generation of the 'CdcHostedService' (background) class ('XxxHostedService.cs')."
         },
         "excludeColumnsFromETag": {
           "type": "array",

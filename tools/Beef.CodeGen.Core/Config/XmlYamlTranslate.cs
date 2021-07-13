@@ -131,8 +131,6 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumnsFromETag", true, null)
         });
 
-        private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);
-
         private static string? NullValue() => (string?)null!;
 
         private static string? ConvertEventPublish(string? xml)

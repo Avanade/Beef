@@ -763,16 +763,16 @@
         },
         "excludeEntity": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'Entity' class ('Xxx.cs')."
+          "title": "Indicates whether to exclude the generation of the 'Entity' class ('Xxx.cs')."
         },
         "excludeAll": {
           "type": "boolean",
-          "title": "The option to exclude the generation of all 'Operation' related artefacts; excluding the 'Entity' class.",
+          "title": "Indicates whether to exclude the generation of all 'Operation' related artefacts; excluding the 'Entity' class.",
           "description": "Is a shorthand means for setting all of the other 'Exclude*' properties (with the exception of 'ExcludeEntity') to exclude."
         },
         "excludeIData": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'Data' interface ('IXxxData.cs')."
+          "title": "Indicates whether to exclude the generation of the 'Data' interface ('IXxxData.cs')."
         },
         "excludeData": {
           "type": "string",
@@ -786,19 +786,19 @@
         },
         "excludeIDataSvc": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'DataSvc' interface ('IXxxDataSvc.cs')."
+          "title": "Indicates whether to exclude the generation of the 'DataSvc' interface ('IXxxDataSvc.cs')."
         },
         "excludeDataSvc": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'DataSvc' class ('XxxDataSvc.cs')."
+          "title": "Indicates whether to exclude the generation of the 'DataSvc' class ('XxxDataSvc.cs')."
         },
         "excludeIManager": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'Manager' interface ('IXxxManager.cs')."
+          "title": "Indicates whether to exclude the generation of the 'Manager' interface ('IXxxManager.cs')."
         },
         "excludeManager": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the 'Manager' class ('XxxManager.cs')."
+          "title": "Indicates whether to exclude the generation of the 'Manager' class ('XxxManager.cs')."
         },
         "excludeWebApi": {
           "type": "boolean",
@@ -806,11 +806,11 @@
         },
         "excludeWebApiAgent": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the WebAPI consuming 'Agent' class ('XxxAgent.cs')."
+          "title": "Indicates whether to exclude the generation of the WebAPI consuming 'Agent' class ('XxxAgent.cs')."
         },
         "excludeGrpcAgent": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the gRPC consuming 'Agent' class ('XxxAgent.cs')."
+          "title": "Indicates whether to exclude the generation of the gRPC consuming 'Agent' class ('XxxAgent.cs')."
         },
         "authRole": {
           "type": "string",
@@ -1384,44 +1384,44 @@
         },
         "excludeAll": {
           "type": "boolean",
-          "title": "The option to exclude the generation of all 'Operation' related output.",
+          "title": "Indicates whether to exclude the generation of all 'Operation' related output.",
           "description": "Is a shorthand means for setting all of the other 'Exclude*' properties to 'true'."
         },
         "excludeIData": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'Data' interface ('IXxxData.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'Data' interface ('IXxxData.cs') output."
         },
         "excludeData": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'Data' class ('XxxData.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'Data' class ('XxxData.cs') output."
         },
         "excludeIDataSvc": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'DataSvc' interface ('IXxxDataSvc.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'DataSvc' interface ('IXxxDataSvc.cs') output."
         },
         "excludeDataSvc": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'DataSvc' class ('XxxDataSvc.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'DataSvc' class ('XxxDataSvc.cs') output."
         },
         "excludeIManager": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'Manager' interface ('IXxxManager.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'Manager' interface ('IXxxManager.cs') output."
         },
         "excludeManager": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the 'Manager' class ('XxxManager.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the 'Manager' class ('XxxManager.cs') output."
         },
         "excludeWebApi": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the WebAPI 'Controller' class ('XxxController.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the WebAPI 'Controller' class ('XxxController.cs') output."
         },
         "excludeWebApiAgent": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the WebAPI consuming 'Agent' class ('XxxAgent.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the WebAPI consuming 'Agent' class ('XxxAgent.cs') output."
         },
         "excludeGrpcAgent": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the operation within the gRPC consuming 'Agent' class ('XxxAgent.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the gRPC consuming 'Agent' class ('XxxAgent.cs') output."
         },
         "grpc": {
           "type": "boolean",

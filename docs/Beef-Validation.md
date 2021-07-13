@@ -204,35 +204,6 @@ var result = await Validator.Create<Test>()
 
 <br/>
 
-### Generic-based validator class
-
-The generic-based validator provides both entity (e.g. class) and non-entity (e.g. intrinsics) validations. Although it can be used for entity-based validation, the aforementioned Entity-based validator class should be preferred.
-
-The primary means for a generic-based validator is to inherit from the `GenericValidator` class. The instance should be instantiated once (and cached) where possible as the underlying property expressions can be a relatively expensive (performance) operation.
-
-There is no `Property` equivalent as the underlying value may not be class, as such the `Rule` method is provided to enable configuration. It is also very likely that the `Text` method will be used to override the friendly text used in the error messages; defaults to `Validator.ValueNameDefault` being "Value".  
-
-``` csharp
-public class GenderCodeValidator : GenericValidator<string>
-{
-    public DescriptionValidator()
-    {
-        Rule().Text("Gender").Mandatory().RefDataCode().As<Gender>();
-    }
-}
-```
-
-<br/>
-
-### Generic-based inline validator
-
-The secondary means for a generic-based validator is to define and execute inline. The `HasRule()` is used to update the rule, with a corresponding action to enable validation configuration.
-
-``` csharp
-Validator.CreateGeneric<string?>().Rule(r => r.Text("Gender").Mandatory().RefDataCode().As<Gender>());
-```
-
-<br/>
 
 ### Value-based validator
 
@@ -273,12 +244,12 @@ Property(x => x.DateTo).Mandatory.CompareProperty(CompareOperator.GreaterThanEqu
 
 ### Common validations
 
-To support reusablility of property validations a `CommonValidator` is used to enable. This allows for the validation logic to be defined once, and reused (shared) across multiple validations.
+To support reusablility of property validations a `CommonValidator` is used to enable. This allows for the validation logic to be defined once, and reused (shared) across multiple validations. This validator also enables validation to be configured for non-entities (e.g. intrinisic types).
 
 An example is as follows:
 
 ``` csharp
-var cv = CommonValidator<string> _cv = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
+var cv = CommonValidator<string> _cv = Validator.CreateCommon<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
 
 var v = Validator.Create<TestData>()
     .HasProperty(x => x.Text, p => p.Mandatory().Common(cv));

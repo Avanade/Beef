@@ -161,16 +161,16 @@ Provides the _Exclude_ configuration.
 
 Property | Description
 -|-
-**`excludeAll`** | The option to exclude the generation of all `Operation` related output. Valid options are: `No`, `Yes`. Is a shorthand means for setting all of the other `Exclude*` properties to `true`.
-`excludeIData` | The option to exclude the generation of the operation within the `Data` interface (`IXxxData.cs`) output. Valid options are: `No`, `Yes`.
-`excludeData` | The option to exclude the generation of the operation within the `Data` class (`XxxData.cs`) output. Valid options are: `No`, `Yes`.
-`excludeIDataSvc` | The option to exclude the generation of the operation within the `DataSvc` interface (`IXxxDataSvc.cs`) output. Valid options are: `No`, `Yes`.
-`excludeDataSvc` | The option to exclude the generation of the operation within the `DataSvc` class (`XxxDataSvc.cs`) output. Valid options are: `No`, `Yes`.
-`excludeIManager` | The option to exclude the generation of the operation within the `Manager` interface (`IXxxManager.cs`) output. Valid options are: `No`, `Yes`.
-`excludeManager` | The option to exclude the generation of the operation within the `Manager` class (`XxxManager.cs`) output. Valid options are: `No`, `Yes`.
-`excludeWebApi` | The option to exclude the generation of the operation within the WebAPI `Controller` class (`XxxController.cs`) output. Valid options are: `No`, `Yes`.
-`excludeWebApiAgent` | The option to exclude the generation of the operation within the WebAPI consuming `Agent` class (`XxxAgent.cs`) output. Valid options are: `No`, `Yes`.
-`excludeGrpcAgent` | The option to exclude the generation of the operation within the gRPC consuming `Agent` class (`XxxAgent.cs`) output. Valid options are: `No`, `Yes`.
+**`excludeAll`** | Indicates whether to exclude the generation of all `Operation` related output. Is a shorthand means for setting all of the other `Exclude*` properties to `true`.
+`excludeIData` | Indicates whether to exclude the generation of the operation within the `Data` interface (`IXxxData.cs`) output.
+`excludeData` | Indicates whether to exclude the generation of the operation within the `Data` class (`XxxData.cs`) output.
+`excludeIDataSvc` | Indicates whether to exclude the generation of the operation within the `DataSvc` interface (`IXxxDataSvc.cs`) output.
+`excludeDataSvc` | Indicates whether to exclude the generation of the operation within the `DataSvc` class (`XxxDataSvc.cs`) output.
+`excludeIManager` | Indicates whether to exclude the generation of the operation within the `Manager` interface (`IXxxManager.cs`) output.
+`excludeManager` | Indicates whether to exclude the generation of the operation within the `Manager` class (`XxxManager.cs`) output.
+`excludeWebApi` | Indicates whether to exclude the generation of the operation within the WebAPI `Controller` class (`XxxController.cs`) output.
+`excludeWebApiAgent` | Indicates whether to exclude the generation of the operation within the WebAPI consuming `Agent` class (`XxxAgent.cs`) output.
+`excludeGrpcAgent` | Indicates whether to exclude the generation of the operation within the gRPC consuming `Agent` class (`XxxAgent.cs`) output.
 
 <br/>
 
