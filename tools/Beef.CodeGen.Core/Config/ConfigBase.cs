@@ -74,6 +74,16 @@ namespace Beef.CodeGen.Config
         };
 
         /// <summary>
+        /// Check whether the nullable boolean is true.
+        /// </summary>
+        protected static bool IsTrue(bool? value) => value.HasValue && value.Value;
+
+        /// <summary>
+        /// Check whether the nullable boolean is null or false.
+        /// </summary>
+        protected static bool IsFalse(bool? value) => !value.HasValue || !value.Value;
+
+        /// <summary>
         /// Checks whether the <see cref="string"/> value is <see cref="NoOption"/>.
         /// </summary>
         /// <param name="value">The value.</param>

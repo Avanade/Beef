@@ -524,17 +524,17 @@ entities:
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
         /// </summary>
-        public List<EntityConfig>? IManagerEntities => Entities.Where(x => IsNoOption(x.ExcludeIManager) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IManagerEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => IsNoOption(x.ExcludeIDataSvc) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
  
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataEntities => Entities.Where(x => IsNoOption(x.ExcludeIData) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for Reference Data.  

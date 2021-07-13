@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsNoOption(x.ExcludeManager) && x.Operations!.Count > 0).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsFalse(x.ExcludeManager) && x.Operations!.Count > 0).AsEnumerable();
     }
 }

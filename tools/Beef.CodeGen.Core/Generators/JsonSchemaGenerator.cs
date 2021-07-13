@@ -33,7 +33,7 @@ namespace Beef.CodeGen.Builders
                 jtw.WritePropertyName("title");
                 jtw.WriteValue(title);
                 jtw.WritePropertyName("$schema");
-                jtw.WriteValue("http://json-schema.org/draft-04/schema");
+                jtw.WriteValue("http://json-schema.org/draft-04/schema#");
             });
 
             return sb.ToString();
@@ -70,11 +70,11 @@ namespace Beef.CodeGen.Builders
                     jtw.WritePropertyName("type");
                     jtw.WriteValue(GetJsonType(pi));
                     jtw.WritePropertyName("title");
-                    jtw.WriteValue(psa.Title ??StringConversion.ToSentenceCase(name)!);
+                    jtw.WriteValue(CleanString(psa.Title) ?? StringConversion.ToSentenceCase(name)!);
                     if (psa.Description != null)
                     {
                         jtw.WritePropertyName("description");
-                        jtw.WriteValue(psa.Description);
+                        jtw.WriteValue(CleanString(psa.Description));
                     }
 
                     if (psa.IsMandatory)
@@ -100,11 +100,11 @@ namespace Beef.CodeGen.Builders
                     jtw.WritePropertyName("type");
                     jtw.WriteValue("array");
                     jtw.WritePropertyName("title");
-                    jtw.WriteValue(pcsa.Title ??StringConversion.ToSentenceCase(name)!);
+                    jtw.WriteValue(CleanString(pcsa.Title) ?? StringConversion.ToSentenceCase(name)!);
                     if (pcsa.Description != null)
                     {
                         jtw.WritePropertyName("description");
-                        jtw.WriteValue(pcsa.Description);
+                        jtw.WriteValue(CleanString(pcsa.Description));
                     }
 
                     jtw.WritePropertyName("items");
@@ -157,5 +157,10 @@ namespace Beef.CodeGen.Builders
                 _ => throw new InvalidOperationException($"Type '{pi.DeclaringType?.Name}' Property '{pi.Name}' has a Type '{pi.PropertyType.Name}' that is not supported."),
             };
         }
+
+        /// <summary>
+        /// Cleans the string.
+        /// </summary>
+        private static string? CleanString(string? text) => text?.Replace('`', '\'');
     }
 }
