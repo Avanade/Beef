@@ -24,31 +24,83 @@ namespace Beef.CodeGen.Builders
         /// <returns>The JSON <see cref="string"/>.</returns>
         public static string Create<T>(string title)
         {
+            var type = typeof(T);
+            var types = new List<Type> { type };
+            FindAllTypes(types, typeof(T));
+
             var sb = new StringBuilder();
             using var sw = new StringWriter(sb);
             using var jtw = new JsonTextWriter(sw) { Formatting = Formatting.Indented };
 
-            WriteObject(typeof(T), jtw, () =>
-            {
-                jtw.WritePropertyName("title");
-                jtw.WriteValue(title);
-                jtw.WritePropertyName("$schema");
-                jtw.WriteValue("http://json-schema.org/draft-04/schema#");
-            });
+            jtw.WriteStartObject();
+            jtw.WritePropertyName("title");
+            jtw.WriteValue(title);
+            jtw.WritePropertyName("$schema");
+            jtw.WriteValue("https://json-schema.org/draft-04/schema#");
+            jtw.WritePropertyName("definitions");
 
+            jtw.WriteStartObject();
+            types.ForEach(t => WriteDefinition(t, jtw));
+            jtw.WriteEndObject();
+
+            jtw.WritePropertyName("allOf");
+            jtw.WriteStartArray();
+            jtw.WriteStartObject();
+            jtw.WritePropertyName("$ref");
+            jtw.WriteValue($"#/definitions/{type.GetCustomAttribute<ClassSchemaAttribute>()!.Name}");
+            jtw.WriteEndObject();
+            jtw.WriteEndArray();
+
+            jtw.WriteEndObject();
             return sb.ToString();
         }
 
         /// <summary>
-        /// Writes the schema for the object.
+        /// Recursively find all types (definitions).
         /// </summary>
-        private static void WriteObject(Type type, JsonTextWriter jtw, Action? additional = null)
+        private static void FindAllTypes(List<Type> types, Type type)
         {
-            jtw.WriteStartObject();
-            additional?.Invoke();
+            foreach (var pi in type.GetProperties())
+            {
+                var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                if (pcsa != null)
+                {
+                    if (pi.PropertyType == typeof(List<string>))
+                        continue;
 
+                    var t = ComplexTypeReflector.GetItemType(pi.PropertyType);
+                    if (types.Contains(t))
+                        continue;
+
+                    types.Add(t);
+                    FindAllTypes(types, t);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes the object definition.
+        /// </summary>
+        private static void WriteDefinition(Type type, JsonTextWriter jtw)
+        {
+            var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
+            if (csa == null)
+                throw new InvalidOperationException($"Type {type.Name} does not have required ClassSchemaAttribute defined.");
+
+            jtw.WritePropertyName(csa.Name);
+
+
+            jtw.WriteStartObject();
             jtw.WritePropertyName("type");
             jtw.WriteValue("object");
+            jtw.WritePropertyName("title");
+            jtw.WriteValue(CleanString(csa.Title) ?? StringConversion.ToSentenceCase(csa.Name)!);
+            if (csa.Description != null)
+            {
+                jtw.WritePropertyName("description");
+                jtw.WriteValue(CleanString(csa.Description));
+            }
+
             jtw.WritePropertyName("properties");
             jtw.WriteStartObject();
 
@@ -108,21 +160,23 @@ namespace Beef.CodeGen.Builders
                     }
 
                     jtw.WritePropertyName("items");
-                    jtw.WriteStartArray();
 
                     if (pi.PropertyType == typeof(List<string>))
                     {
                         jtw.WriteStartObject();
                         jtw.WritePropertyName("type");
                         jtw.WriteValue("string");
-                        jtw.WritePropertyName("uniqueItems");
-                        jtw.WriteValue(true);
                         jtw.WriteEndObject();
                     }
                     else
-                        WriteObject(ComplexTypeReflector.GetItemType(pi.PropertyType), jtw);
+                    {
+                        var t = ComplexTypeReflector.GetItemType(pi.PropertyType);
 
-                    jtw.WriteEndArray();
+                        jtw.WriteStartObject();
+                        jtw.WritePropertyName("$ref");
+                        jtw.WriteValue($"#/definitions/{t.GetCustomAttribute<ClassSchemaAttribute>()!.Name}");
+                        jtw.WriteEndObject();
+                    }
                 }
 
                 jtw.WriteEndObject();
