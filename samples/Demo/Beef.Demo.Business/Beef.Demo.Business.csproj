@@ -7,6 +7,8 @@
   <ItemGroup>
     <Folder Include="DataSvc\Generated\" />
     <Folder Include="Data\EfModel\Generated\" />
+    <Folder Include="Data\Generated\" />
+    <Folder Include="Generated\" />
   </ItemGroup>
 
   <ItemGroup>
