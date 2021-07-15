@@ -75,7 +75,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", true, null),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", true, null),
             (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", true, null),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeData", false, (xml) => string.IsNullOrEmpty(xml) || xml == "false" ? null : (xml == "true" ? "Exclude" : "RequiresMapper")),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeData", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Exclude" : "RequiresMapper")),
             (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiAuthorize", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
             (ConfigType.Entity, ConfigurationEntity.Entity, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 

@@ -14,7 +14,7 @@ The employee termination will only terminate an existing employee under certain 
 
 ## Data repository
 
-No additional data repository effort is required as the intent is to reuse what already exists; specifically the Update stored procedure that already exposes the termination related columns.
+No additional data repository effort is required as the intent is to reuse what already exists; specifically the `Update` stored procedure that already exposes the termination related columns.
 
 <br/>
 
@@ -22,19 +22,21 @@ No additional data repository effort is required as the intent is to reuse what 
 
 The `Termination` operation needs to be added to the `Employee` entity configuration; add the following after the existing `GetByArgs` operation.
 
-``` xml
-    <!-- Terminate operation
-         - OperationType is Update as it follows a similar pattern. 
-         - Text is specified to override the default for an Update.
-         - ValueType is overridden with the TerminationDetail to use this instead of the default Employee. 
-         - Validator is overridden to use the TerminationDetailValidator. 
-         - WebApiMethod is overriden to use HttpPost (an Update otherwise defaults to an HttpPut).
-         - EventSubject is overridden so that the action component will be Terminated. 
-         - AutoImplement is None as this will be implemented by the developer.
-         - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers. -->
-    <Operation Name="Terminate" Text="Terminates an existing {{Employee}}" OperationType="Update" ValueType="TerminationDetail" Validator="TerminationDetailValidator" WebApiRoute="{id}/terminate" WebApiMethod="HttpPost" EventSubject="Hr.Employee.{id}:Terminated" AutoImplement="None">
-      <Parameter Name="Id" Type="Guid" Text="{{Employee}} identifier" />
-    </Operation>
+``` yaml
+      # Terminate operation
+      # - Text is specified to override the default for an Update.
+      # - OperationType is Update as it follows a similar pattern.
+      # - ValueType is overridden with the TerminationDetail to use this instead of the default Employee.
+      # - Validator is overridden to use the TerminationDetailValidator.
+      # - WebApiMethod is overriden to use HttpPost (an Update otherwise defaults to an HttpPut).
+      # - EventSubject is overridden so that the action component will be Terminated.
+      # - AutoImplement is None as this will be implemented by the developer.
+      # - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers.
+      { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
+        parameters: [
+          { name: Id, type: Guid, text: '{{Employee}} identifier' }
+        ]
+      }
 ```
 
 Execute the code-generation using the command line.

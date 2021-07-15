@@ -1,0 +1,75 @@
+# Configuring the code-generation global settings
+# - Schema defines the default for al tables unless explicitly defined.
+# - EventOutbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+# - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
+# 
+schema: Hr
+eventOutbox: true
+entityScope: Autonomous
+tables:
+  # Reference data tables/models.
+- { name: Gender, efModel: true }
+- { name: TerminationReason, efModel: true }
+- { name: RelationshipType, efModel: true }
+- { name: USState, efModel: true }
+
+  # References the Employee table to infer the underlying schema, then creates stored procedures as configured:
+  # - Each then specifies an additional SQL statement to be executed after the primary action (as defined by Type).
+  # - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure.
+- { name: Employee,
+    storedProcedures: [
+      { name: Get, type: Get,
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId' }
+        ]
+      },
+      { name: Create, type: Create,
+        parameters: [
+          { name: EmergencyContactList, sqlType: '[Hr].[udtEmergencyContactList] READONLY' }
+        ],
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList' }
+        ]
+      },
+      { name: Update, type: Update,
+        parameters: [
+          { name: EmergencyContactList, sqlType: '[Hr].[udtEmergencyContactList] READONLY' }
+        ],
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList' }
+        ]
+      },
+      { name: Delete, type: Delete,
+        execute: [
+          { statement: 'DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId' },
+          { statement: 'DELETE FROM [Hr].[PerformanceReview] WHERE [EmployeeId] = @EmployeeId' }
+        ]
+      }
+    ]
+  }
+
+  # References the EmergencyContact table to infer the underlying schema, then creates stored procedures as configured:
+  # - Specifies need for a SQL User-Defined Type (UDT) and corresponding .NET (C#) Table-Valued Parameter (TVP) excluding the EmployeeId column (as this is the merge key).
+  # - GetByEmployeeId will get all rows using the specified Parameter - the characteristics of the Parameter are inferred from the underlying schema.
+  # - Merge will perform a SQL merge using the specified Parameter.
+- { name: EmergencyContact, udt: true, tvp: EmergencyContact, udtExcludeColumns: [ EmployeeId ],
+    storedProcedures: [
+      { name: GetByEmployeeId, type: GetColl,
+        parameters: [
+          { name: EmployeeId }
+        ]
+      },
+      { name: Merge, type: Merge,
+        parameters: [
+          { name: EmployeeId }
+        ]
+      }
+    ]
+  }
+
+  # References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only.
+- { name: Employee, efModel: true, includeColumns: [ EmployeeId,  Email,  FirstName,  LastName,  GenderCode,  Birthday,  StartDate,  TerminationDate,  TerminationReasonCode,  PhoneNo ] }
+
+  # PerformanceReview table and related referenace data.
+- { name: PerformanceReview, efModel: true }
+- { name: PerformanceOutcome, efModel: true }

@@ -1,0 +1,90 @@
+﻿//#if (implement_database)
+entityScope: Autonomous
+eventSubjectRoot: Foo.Db
+eventSubjectFormat: NameOnly
+eventActionFormat: PastTense
+eventSourceRoot: Foo.Db/Bar
+eventSourceKind: Relative
+eventOutbox: Database
+appBasedAgentArgs: true
+webApiAutoLocation: true
+refDataText: true
+databaseSchema: Bar
+entities:
+
+  # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
+      { name: FirstName },
+      { name: LastName },
+      { name: Gender, type: ^Gender, dataName: GenderCode },
+      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly },
+      { name: ETag, type: string },
+//#endif
+//#if (implement_entityframework)
+entityScope: Autonomous
+eventSubjectRoot: Foo.Ef
+eventSubjectFormat: NameOnly
+eventActionFormat: PastTense
+eventSourceRoot: Foo.Ef/Bar
+eventSourceKind: Relative
+eventOutbox: Database
+appBasedAgentArgs: true
+webApiAutoLocation: true
+refDataText: true
+databaseSchema: Bar
+entities:
+
+  # The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework.
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
+      { name: FirstName },
+      { name: LastName },
+      { name: Gender, type: ^Gender, dataName: GenderCode },
+      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly },
+      { name: ETag, type: string },
+//#endif
+//#if (implement_cosmos)
+entityScope: Autonomous
+eventSubjectRoot: Foo.Co
+eventSubjectFormat: NameOnly
+eventActionFormat: PastTense
+eventSourceRoot: Foo.Co/Bar
+eventSourceKind: Relative
+appBasedAgentArgs: true
+webApiAutoLocation: true
+refDataText: true
+databaseSchema: Bar
+entities:
+
+  # The following is an example Entity with CRUD operations defined accessing Cosmos DB.
+
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator },
+      { name: FirstName },
+      { name: LastName },
+      { name: Gender, type: ^Gender },
+      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly },
+      { name: ETag, type: string, jsonDataModelName: _etag },
+//#endif
+      { name: ChangeLog, type: ChangeLog }
+    ],
+    operations: [
+      { name: GetByArgs, type: GetColl, paging: true,
+        parameters: [
+          { name: Args, type: PersonArgs, validator: PersonArgsValidator }
+        ]
+      }
+    ]
+  }
+
+- { name: PersonArgs, text: '{{Person}} arguments', excludeAll: true,
+    properties: [
+      { name: FirstName },
+      { name: LastName },
+      { name: Genders, type: ^Gender, refDataList: true }
+    ]
+  }

@@ -36,27 +36,6 @@ Within the `Migrations` folder there will three entries that were created during
 
 <br/>
 
-## Event outbox
-
-To support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) there is the need to have the backing event queue tables. The migration scripts to create these can be code generated using the following.
-
-```
-dotnet run codegen --script DatabaseEventOutbox.xml
-```
-
-This should create two migrations script files with names similar as follows.
-
-```
-└── Migrations
-  └── 20210430-170605-create-hr-eventoutbox.sql
-  └── 20210430-170605-create-hr-eventoutboxdata.sql
-```
-
-
-The corresponding stored procedures and user defined types will be automatically code-generated as a result of the `EventOutbox="true"` configuration property already set within the code-gen XML configuration file.
-
-<br/>
-
 ## Create Employee table
 
 First step is to create the migration script for the `Employee` table table within the `Hr` schema following a similar naming convention to ensure it is executed (applied) in the correct order. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
@@ -68,7 +47,7 @@ dotnet run scriptnew create Hr Employee
 For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable.
 
 ``` SQL
--- Migration Script
+-- Create table: Hr.Employee
 
 BEGIN TRANSACTION
 
@@ -107,7 +86,7 @@ dotnet run scriptnew create Hr EmergencyContact
 Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
 
 ``` SQL
--- Migration Script
+-- Create table: Hr.EmergencyContact
 
 BEGIN TRANSACTION
 
@@ -155,28 +134,35 @@ _Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For refer
 ``` yaml
 Hr:
   - $Gender:
-    - M: Male
     - F: Female
+    - M: Male
     - N: Not specified
+  ...
 ```
 
 <br/>
 
 ## Reference Data query
 
-To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `EfModel="true"` option. 
+To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `efModel: true` option. 
 
-Remove all existing configuration from `My.Hr.Database.xml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
+Remove all existing configuration from `database.beef.yaml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
 
-``` XML
-<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
-  <!-- Reference data tables/models. -->
-  <Table Name="Gender" EfModel="true" />
-  <Table Name="TerminationReason" EfModel="true" />
-  <Table Name="RelationshipType" EfModel="true" />
-  <Table Name="USState" EfModel="true" />
-</CodeGeneration>
+``` yaml
+# Configuring the code-generation global settings
+# - Schema defines the default for al tables unless explicitly defined.
+# - EventOutbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+# - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
+# 
+schema: Hr
+eventOutbox: true
+entityScope: Autonomous
+tables:
+  # Reference data tables/models.
+- { name: Gender, efModel: true }
+- { name: TerminationReason, efModel: true }
+- { name: RelationshipType, efModel: true }
+- { name: USState, efModel: true }
 ```
 
 <br/>
@@ -187,52 +173,72 @@ Stored procedures will be used for the primary `Employee` CRUD as this also allo
 
 Where these related tables contain a related collection (i.e. zero or more rows), then a SQL [Merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql?view=sql-server-ver15) is used as it will `insert`, `update` or `delete` each row accordingly. To generate this the _Beef code-gen_ enables a `Type` of `Merge`. Additionally, a SQL [User-Defined Type (UDT)](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql?view=sql-server-ver15) and corresponding .NET (C#) [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) will also need to be generated to support the passing of the data (multiple rows) between .NET and SQL Server.
 
-Copy the following configuration and append (after reference data) to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
+Copy the following configuration and append (after reference data) to the `database.beef.yaml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
 
-``` XML
-  <!-- References the Employee table to infer the underlying schema, then creates stored procedures as configured:
-       - Each then specifies an additional SQL statement to be executed after the primary action (as defined by Type). 
-       - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure. -->
-  <Table Name="Employee">
-    <StoredProcedure Name="Get" Type="Get">
-      <Execute Statement="EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId" />
-    </StoredProcedure>
-    <StoredProcedure Name="Create" Type="Create">
-      <Parameter Name="EmergencyContactList" SqlType="[Hr].[udtEmergencyContactList] READONLY" />
-      <Execute Statement="EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList" />
-    </StoredProcedure>
-    <StoredProcedure Name="Update" Type="Update">
-      <Parameter Name="EmergencyContactList" SqlType="[Hr].[udtEmergencyContactList] READONLY" />
-      <Execute Statement="EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList" />
-    </StoredProcedure>
-    <StoredProcedure Name="Delete" Type="Delete">
-      <Execute Statement="DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId" />
-    </StoredProcedure>
-  </Table>
+``` yaml
+  # References the Employee table to infer the underlying schema, then creates stored procedures as configured:
+  # - Each then specifies an additional SQL statement to be executed after the primary action (as defined by Type).
+  # - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure.
+- { name: Employee,
+    storedProcedures: [
+      { name: Get, type: Get,
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId' }
+        ]
+      },
+      { name: Create, type: Create,
+        parameters: [
+          { name: EmergencyContactList, sqlType: '[Hr].[udtEmergencyContactList] READONLY' }
+        ],
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList' }
+        ]
+      },
+      { name: Update, type: Update,
+        parameters: [
+          { name: EmergencyContactList, sqlType: '[Hr].[udtEmergencyContactList] READONLY' }
+        ],
+        execute: [
+          { statement: 'EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList' }
+        ]
+      },
+      { name: Delete, type: Delete,
+        execute: [
+          { statement: 'DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId' },
+        ]
+      }
+    ]
+  }
 
-  <!-- References the EmergencyContact table to infer the underlying schema, then creates stored procedures as configured: 
-       - Specifies need for a SQL User-Defined Type (UDT) and corresponding .NET (C#) Table-Valued Parameter (TVP) excluding the EmployeeId column (as this is the merge key).
-       - GetByEmployeeId will get all rows using the specified Parameter - the characteristics of the Parameter are inferred from the underlying schema.
-       - Merge will perform a SQL merge using the specified Parameter. -->
-  <Table Name="EmergencyContact" Udt="true" Tvp="EmergencyContact" UdtExcludeColumns="EmployeeId">
-    <StoredProcedure Name="GetByEmployeeId" Type="GetAll">
-      <Parameter Name="EmployeeId" />
-    </StoredProcedure>
-    <StoredProcedure Name="Merge" Type="Merge">
-      <Parameter Name="EmployeeId" />
-    </StoredProcedure>
-  </Table>
+  # References the EmergencyContact table to infer the underlying schema, then creates stored procedures as configured:
+  # - Specifies need for a SQL User-Defined Type (UDT) and corresponding .NET (C#) Table-Valued Parameter (TVP) excluding the EmployeeId column (as this is the merge key).
+  # - GetByEmployeeId will get all rows using the specified Parameter - the characteristics of the Parameter are inferred from the underlying schema.
+  # - Merge will perform a SQL merge using the specified Parameter.
+- { name: EmergencyContact, udt: true, tvp: EmergencyContact, udtExcludeColumns: [ EmployeeId ],
+    storedProcedures: [
+      { name: GetByEmployeeId, type: GetColl,
+        parameters: [
+          { name: EmployeeId }
+        ]
+      },
+      { name: Merge, type: Merge,
+        parameters: [
+          { name: EmployeeId }
+        ]
+      }
+    ]
+  }
 ```
 
 <br/>
 
 ## Entity Framework query
 
-To support a flexible query approach for the `Employee` Entity Framework (EF) will be used. To further optimize only the key data will be surfaced via the generated .NET (C#) data model. Append the following to the end of `My.Hr.Database.xml`.
+To support a flexible query approach for the `Employee` Entity Framework (EF) will be used. To further optimize only the key data will be surfaced via the generated .NET (C#) data model using the include columns option. Append the following to the end of `database.beef.yaml`.
 
-``` xml
-  <!-- References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only. -->
-  <Table Name="Employee" EfModel="true" IncludeColumns="EmployeeId, Email, FirstName, LastName, GenderCode, Birthday, StartDate, TerminationDate, TerminationReasonCode, PhoneNo" />
+``` yaml
+  # References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only.
+- { name: Employee, efModel: true, includeColumns: [ EmployeeId,  Email,  FirstName,  LastName,  GenderCode,  Birthday,  StartDate,  TerminationDate,  TerminationReasonCode,  PhoneNo ] }
 ```
 
 <br/>
@@ -258,6 +264,33 @@ dotnet run drop
 ## Indexes, etc.
 
 Where tables need indexes and other constraints added these would be created using additional migration scripts. None have been included in the sample for brevity.
+
+<br/>
+
+## Event outbox
+
+To support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) there is the need to have the backing event queue tables. The migration scripts to create these can be code generated using the following.
+
+```
+dotnet run codegen --script DatabaseEventOutbox.xml
+```
+
+This should create two migrations script files with names similar as follows.
+
+```
+└── Migrations
+  └── 20210430-170605-create-hr-eventoutbox.sql
+  └── 20210430-170605-create-hr-eventoutboxdata.sql
+```
+
+
+The corresponding stored procedures and user defined types will be automatically code-generated as a result of the `eventOutbox: true` configuration property already set within the code-gen YAML configuration file.
+
+At the command line execute the following command to update the database using the new migration scripts.
+
+```
+dotnet run all
+```
 
 <br/>
 

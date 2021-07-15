@@ -67,16 +67,18 @@ dotnet new beef --company My --appname Hr --datasource EntityFramework
 The following solution structure will have been generated. Open `My.Hr.sln` in Visual Studio.
 
 ```
-└── My.Hr
+└── My.Hr               # Solution that references all underlying projects
+  └── Testing
+    └── My.Hr.Test      # Unit and intra-integration tests
+  └── Tools
+    └── My.Hr.CodeGen   # Entity and Reference Data code generation console
+    └── My.Hr.Database  # Database code generation console
   └── My.Hr.Api         # API end-point and operations
   └── My.Hr.Business    # Core business logic components
-  └── My.Hr.CodeGen     # Entity and Reference Data code generation console
   └── My.Hr.Common      # Common / shared components
-  └── My.Hr.Test        # Unit and intra-integration tests
-  └── My.Hr.sln         # Solution file that references all above projects
 ```
 
-_Note:_ Code generation should **not** be performed before updating the corresponding XML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
+_Note:_ Code generation should **not** be performed before updating the corresponding YAML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
 
 Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the base-line to build up the solution from.
 

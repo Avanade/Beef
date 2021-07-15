@@ -11,10 +11,11 @@ The [`Beef.Test.NUnit`](../../../tools/Beef.Test.NUnit/README.md) provides the i
 The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs` and `PersonValidatorTest.cs` should be removed (deleted).
 
 ```
+└── Apis
+  └── FixtureSetup.cs           <- leave; contains key logic to set up database
+  └── PersonTest.cs             <- remove
 └── Data
   └── Data.yaml                 <- leave; will replace contents
-└── FixtureSetup.cs             <- leave; contains key logic to set up database
-└── PersonTest.cs               <- remove
 └── Validators
   └── PersonValidatorTest.cs    <- remove
 ```
@@ -42,9 +43,9 @@ Hr:
 
 <br/>
 
-## Employee test
+## Employee API test
 
-For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs) and paste into an equivalent (new) `EmployeeTest.cs`. Comment out the region `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
+For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/Apis/EmployeeTest.cs) and paste into an equivalent (new) `EmployeeTest.cs`. Comment out the regions `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
 
 Review and execute the tests and ensure they all pass as expected.
 

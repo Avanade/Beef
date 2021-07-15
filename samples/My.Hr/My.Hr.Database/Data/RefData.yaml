@@ -1,7 +1,7 @@
 ﻿Hr:
   - $Gender:
-    - M: Male
     - F: Female
+    - M: Male
     - N: Not specified
   - $TerminationReason:
     - RE: Resigned

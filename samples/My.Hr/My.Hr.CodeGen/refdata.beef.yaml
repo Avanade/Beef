@@ -1,0 +1,10 @@
+entityScope: Autonomous
+refDataWebApiRoute: api/v1/ref
+appBasedAgentArgs: true
+databaseSchema: Hr
+entities:
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
+- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
+- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
+- { name: PerformanceOutcome, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/performanceOutcomes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.PerformanceOutcome }

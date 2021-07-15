@@ -8,7 +8,7 @@ This will walk through the process of creating and testing the employee search c
 
 The employee search will allow the following criteria to be searched:
 - First and last name using wildcard; e.g. `Smi*`.
-- Gender selection; one or more.
+- Gender selection; zero, one or more.
 - Start date range (from/to).
 - Option to include terminated employees (default is to exclude).
 
@@ -36,44 +36,47 @@ During the initial database set up process the `Employee` table (with a subset o
 
 The API selection criteria will be enabled by defining a class with all of the requisite properties. _Beef_ will then expose each of the properties individually within the API Controller to enable their usage. _Beef_ can automatically enable paging support when selected to do so; therefore, this does not need to be enabled via the selection criteria directly.
 
-Add the following entity code-gen configuration after all the other existing entities within `My.Hr.xml` (`My.Hr.CodeGen` project).
+Add the following entity code-gen configuration after all the other existing entities within `entity.beef.yaml` (`My.Hr.CodeGen` project).
 
-``` xml
-  <!-- Creating an EmployeeArgs entity
-       - Genders will support a list (none or more) reference data values.
-       - StartFrom, StartTo and IncludeTerminated are all Nullable so we can tell whether a value was provided or not. 
-       - ExcludeAll is used so only the entity (not other layers are generated).
-       - The IsIncludeTerminated overrides the JsonName to meet the stated requirement name of includeTerminated. -->
-  <Entity Name="EmployeeArgs" Text="{{Employee}} search arguments" ExcludeAll="true" >
-    <Property Name="FirstName" Type="string" />
-    <Property Name="LastName" Type="string" />
-    <Property Name="Genders" Type="^Gender" RefDataList="true" />
-    <Property Name="StartFrom" Type="DateTime?" DateTimeTransform="DateOnly" />
-    <Property Name="StartTo" Type="DateTime?" DateTimeTransform="DateOnly" />
-    <Property Name="IsIncludeTerminated" JsonName="includeTerminated" Type="bool?" />
-  </Entity>
+``` yaml
+  # Creating an EmployeeArgs entity
+  # - Genders will support a list (none or more) reference data values.
+  # - StartFrom, StartTo and IncludeTerminated are all Nullable so we can tell whether a value was provided or not.
+  # - ExcludeAll is used so only the entity (not other layers are generated).
+  # - The IsIncludeTerminated overrides the JsonName to meet the stated requirement name of includeTerminated.
+- { name: EmployeeArgs, text: '{{Employee}} search arguments', excludeAll: true,
+    properties: [
+      { name: FirstName },
+      { name: LastName },
+      { name: Genders, type: ^Gender, refDataList: true },
+      { name: StartFrom, type: 'DateTime?', dateTimeTransform: DateOnly },
+      { name: StartTo, type: 'DateTime?', dateTimeTransform: DateOnly },
+      { name: IsIncludeTerminated, jsonName: includeTerminated, type: 'bool?' }
+    ]
+  }
 ```
 
 The `GetByArgs` operation needs to be added to the `Employee` entity configuration; add the following after the existing `Delete` operation.
 
-``` xml
-    <!-- Search operation 
-         - OperationType is GetColl which indicates that a collection is the expected result. 
-         - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields). 
-         - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation. 
-         - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
-         - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated. -->
-    <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" ReturnType="EmployeeBase" WebApiRoute="" AutoImplement="EntityFramework" DataEntityMapper="EmployeeBaseData.EfMapper" >
-      <Parameter Name="Args" Type="EmployeeArgs" Validator="EmployeeArgsValidator" />
-    </Operation>
+``` yaml
+      # Search operation
+      # - OperationType is GetColl which indicates that a collection is the expected result.
+      # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
+      # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
+      # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
+      # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
+      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework, dataEntityMapper: EmployeeBaseData.EfMapper,
+        parameters: [
+          { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }
+        ]
+      }
 ```
 
-So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` element configuration. Replace the previous XML with the following (note that the xml comment termination will need to be fixed if copied).
+So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` object configuration. Replace the previous YAML for the `Employee` (including the new comment) with the following.
 
-``` xml
-       - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
-  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
-
+``` yaml
+  # - The EntityFrameworkModel is required so that the GetByArgs code-gen knows what EfModel is to be used; however, EntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required).
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
 ```
 
 Execute the code-generation using the command line.

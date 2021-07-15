@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration EntityScope="Autonomous" RefDataWebApiRoute="api/v1/ref" AppBasedAgentArgs="true" DatabaseSchema="Hr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
-  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Gender" />
-  <Entity Name="TerminationReason" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/terminationReasons" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.TerminationReason" />
-  <Entity Name="RelationshipType" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/relationshipTypes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.RelationshipType" />
-  <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/usStates" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.USState" />
-  <Entity Name="PerformanceOutcome" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/performanceOutcomes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.PerformanceOutcome" />
-</CodeGeneration>

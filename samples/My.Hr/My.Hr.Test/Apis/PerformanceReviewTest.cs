@@ -1,14 +1,11 @@
-﻿using Beef;
-using Beef.Entities;
+﻿using Beef.Entities;
 using Beef.Test.NUnit;
 using Beef.WebApi;
 using My.Hr.Api;
-using My.Hr.Business.Validation;
 using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 

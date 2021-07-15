@@ -24,7 +24,7 @@ namespace My.Hr.Test.Apis
 
             Assert.IsNotNull(v);
             Assert.AreEqual(3, v.Count);
-            Assert.AreEqual(new string[] { "M", "F", "N" }, v.Select(x => x.Code).ToArray());
+            Assert.AreEqual(new string[] { "F", "M", "N" }, v.Select(x => x.Code).ToArray());
         }
 
         [Test, TestSetUp]

@@ -1,0 +1,22 @@
+﻿entityScope: Autonomous
+refDataWebApiRoute: api/v1/ref
+appBasedAgentArgs: true
+//#if (implement_database)
+databaseSchema: AppName
+entities:
+
+  # The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures.
+  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: api/v1/ref/genders, autoImplement: Database }
+//#endif
+//#if (implement_entityframework)
+entities:
+
+  # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
+  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: api/v1/ref/genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+//#endif
+//#if (implement_cosmos)
+entities:
+
+  # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
+  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: api/v1/ref/genders, dataModel: true, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.Gender }
+//#endif

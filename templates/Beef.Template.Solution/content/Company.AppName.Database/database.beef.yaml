@@ -1,0 +1,33 @@
+﻿schema: AppName
+eventOutbox: true
+entityScope: Autonomous
+//#if (implement_database)
+tables:
+  # Reference data stored procedures
+- { name: Gender, getAll: true }
+
+  # Master data stored procedures.
+- { name: Person, get: true, create: true, update: true, delete: true,
+    storedProcedures: [
+      { name: GetByArgs, paging: true,
+        parameters: [
+          { name: FirstName, nullable: true, operator: LIKE },
+          { name: LastName, nullable: true, operator: LIKE },
+          { name: GenderCode, nullable: true, collection: true }
+        ],
+        orderby: [
+          { name: LastName },
+          { name: FirstName }
+        ]
+      }
+    ]
+  }
+//#endif
+//#if (implement_entityframework)
+tables:
+  # Reference data tables/models.
+- { name: Gender, efModel: true }
+
+  # Master data tables/models.
+- { name: Person, efModel: true }
+//#endif

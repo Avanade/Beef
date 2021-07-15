@@ -94,7 +94,7 @@ namespace Beef.Template.Solution.UnitTest
 
             // Install the Beef template solution from local package.
             // dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "nuget-publish")}").exitCode, "install beef.template.solution");
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "packageonly")}").exitCode, "install beef.template.solution");
         }
 
         [Test]
@@ -123,24 +123,24 @@ namespace Beef.Template.Solution.UnitTest
             // Mkdir and create solution from template. 
             var dir = Path.Combine(_unitTests.FullName, $"{company}.{appName}");
             Directory.CreateDirectory(dir);
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, "dotnet new beef");
+            Assert.Zero(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, "dotnet new beef");
 
             // Restore nuget packages from our repository.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "nuget-publish")}", dir).exitCode, "dotnet restore");
+            Assert.Zero(ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "packageonly")}", dir).exitCode, "dotnet restore");
 
             // CodeGen: Execute code-generation.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
+            Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
             if (datasource == "Database" || datasource == "EntityFramework")
             {
-                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
-                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
-                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.xml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.xml [database]");
+                Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
+                Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
+                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.xml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.xml [database]");
             }
 
             // Run the intra-integration tests.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");
+            Assert.Zero(ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");
         }
     }
 }

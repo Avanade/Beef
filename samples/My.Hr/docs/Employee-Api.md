@@ -19,17 +19,22 @@ The following files were created when the solution was provisioned, these should
 
 ## Reference Data configuration
 
-The `My.RefData.xml` within `My.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straighforward.
+The `refdata.beef.yaml` within `My.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straightforward.
 
 Each reference data entity is defined, by specifying the name, the Web API route prefix (i.e. its endpoint), that it is to be automatically implemented using Entity Framework, and the name of the corresponding Entity Framework model (which was previously generated from the database; see `My.Hr.Business/Data/EfModel/Generated` folder).
 
-Replace the existing `Entity` XML (keeping the `CodeGeneration` element) with the following.
+Replace the existing `Entity` YAML with the following.
 
-``` xml
-  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Gender" />
-  <Entity Name="TerminationReason" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/terminationReasons" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.TerminationReason" />
-  <Entity Name="RelationshipType" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/relationshipTypes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.RelationshipType" />
-  <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/usStates" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.USState" />
+``` yaml
+entityScope: Autonomous
+refDataWebApiRoute: api/v1/ref
+appBasedAgentArgs: true
+databaseSchema: Hr
+entities:
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
+- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
+- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
 ```
 
 <br/>
@@ -56,7 +61,7 @@ To implement the core `Employee` CRUD operations, the following will need to be 
 
 ### Code-gen configuration
 
-First up, the entities need to be defined (configured) within the `My.Hr.xml` (`My.Hr.CodeGen` project). The entities that will be created are as follows. Note that we will add some shape (e.g. address) to the data so it is easier (and more logical) to consume and understand, versus mapping directly to the database structure. 
+First up, the entities need to be defined (configured) within the `entity.beef.yaml` (`My.Hr.CodeGen` project). The entities that will be created are as follows. Note that we will add some shape (e.g. address) to the data so it is easier (and more logical) to consume and understand, versus mapping directly to the database structure. 
 
 - `EmployeeBase` - this represents the base Employee in that it contains the key properties and will be used as the base for searching as a means to minimise the properties that are available outside of the `Employee` CRUD itself.
 - `Employee` - this represents the complete detailed Employee, which inherits from the `EmployeeBase`. All of the key operations for the Employee including the search will be configured/grouped as a logical set here.
@@ -64,87 +69,124 @@ First up, the entities need to be defined (configured) within the `My.Hr.xml` (`
 - `Address` - this represents the employees' address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
 - `EmergencyContact` - this represents the collection of emergency contacts for an employee. 
 
-Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the following. The comments including are intended to describe the usage and why certain attributes have been specified.
+Replace the existing `entity.beef.yaml` with the following. The comments included are intended to describe the usage and why certain attributes have been specified.
 
-``` xml
-  <!-- Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
-       - As we will be returning more than one we need the Collection and CollectionResult.
-       - Any Text with a handlebars '{{xxx}}' is a shortcut for .NET see comments; e.g. '<see cref="xxx"/>'.
-       - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of false where it is a special case to output a DataMapper.
-       - Use of DataName is to reference the name of the column where different to the property name iteself.
-       - Use of DataAutoGenerated indicates that the data source will automatically generate the value.
-       - A Type with a '^' prefix is a shorthand for 'RefDataNamespace.*', this is how to reference a reference data entity (will default RefDataType to 'string' where not specified).
-       - A DateTimeTransform of DateOnly is used to indicate that the DateTime property should only be concerned with the Date component.
-       - ETag and ChangeLog are special case and Beef will automatically map between RowVersion and other Audit columns where they exist. 
-       - AutoImplement of Database will ensure that the DbMapper is generated; used by the Employee.Get/Create/Update. 
-       - By specifying the EntityFrameworkEntity the EfMapper (mapping to defined type will be mapped) will also be generated; used by the Employee.GetByArgs.
-       - The Termination property DataEntityFrameworkIgnore is set as this cannot be automatically generated; custom code will need to be developed to handle; used by the Employee.GetByArgs. -->
-  <Entity Name="EmployeeBase" Text="{{Employee}} base" Collection="true" CollectionResult="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" EntityFrameworkEntity="EfModel.Employee" >
-    <Property Name="Id" Type="Guid" Text="{{Employee}} identifier" UniqueKey="true" DataName="EmployeeId" DataAutoGenerated="true" />
-    <Property Name="Email" Type="string" Text="Unique {{Employee}} Email" />
-    <Property Name="FirstName" Type="string" />
-    <Property Name="LastName" Type="string" />
-    <Property Name="Gender" Type="^Gender" DataName="GenderCode" />
-    <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
-    <Property Name="StartDate" Type="DateTime" DateTimeTransform="DateOnly" />
-    <Property Name="Termination" Type="TerminationDetail" DataDatabaseMapper="TerminationDetailData.DbMapper" DataEntityFrameworkIgnore="true" />
-    <Property Name="PhoneNo" Type="string" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
-  </Entity>
+``` yaml
+# Configuring the code-generation global settings
+# - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
+# - RefDataText generates a corresponding reference data text property for '$text=true' output.
+# - EventSubjectRoot specifies the root for the event subject.
+# - EventSubjectFormat specifies the name only; i.e. not include the key.
+# - EventActionFormat specifies past tense for the event action.
+# - EventSourceRoot specifies the root for the event source.
+# - EventSourceKind will be a relative path URI.
+# - EventOutbox indicates that the code-generated event publish will occur in the Data-layer and should use the database to transactionally persist the event(s).
+# - AppBasedAgentArgs indicates to create a domain specific AgentArgs to simplify dependency injection usage.
+# - WebApiAutoLocation indicate to set the HTTP response location for a create.
+# - DatabaseSchema defaults the database schema name.
+entityScope: Autonomous
+refDataText: true
+eventSubjectRoot: My
+eventSubjectFormat: NameOnly
+eventActionFormat: PastTense
+eventSourceRoot: My/Hr
+eventSourceKind: Relative
+eventOutbox: Database
+appBasedAgentArgs: true
+webApiAutoLocation: true
+databaseSchema: Hr
+entities:
+  # Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
+  # - As we will be returning more than one we need the Collection and CollectionResult.
+  # - Any Text with a handlebars '{{xxx}}' is a shortcut for .NET see comments; e.g. '<see cref="xxx"/>'.
+  # - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of RequiresMapper where it is a special case to output a DataMapper.
+  # - Use of DataName is to reference the name of the column where different to the property name iteself.
+  # - Use of DataAutoGenerated indicates that the data source will automatically generate the value.
+  # - A Type with a '^' prefix is shorthand for 'RefDataNamespace.*', this is how to reference a reference data entity (will default RefDataType to 'string' where not specified).
+  # - A DateTimeTransform of DateOnly is used to indicate that the DateTime property should only be concerned with the Date component.
+  # - ETag and ChangeLog are special case and Beef will automatically map between RowVersion and other Audit columns where they exist.
+  # - AutoImplement of Database will ensure that the DbMapper is generated; used by the Employee.Get/Create/Update.
+  # - By specifying the EntityFrameworkModel the EfMapper (mapping to defined type will be mapped) will also be generated; used by the Employee.GetByArgs.
+  # - The Termination property EntityFrameworkIgnore is set as this cannot be automatically generated; custom code will need to be developed to handle; used by the Employee.GetByArgs.
+- { name: EmployeeBase, text: '{{Employee}} base', collection: true, collectionResult: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, entityFrameworkModel: EfModel.Employee,
+    properties: [
+      { name: Id, type: Guid, text: '{{Employee}} identifier', uniqueKey: true, dataName: EmployeeId, dataAutoGenerated: true },
+      { name: Email, text: 'Unique {{Employee}} Email' },
+      { name: FirstName },
+      { name: LastName },
+      { name: Gender, type: ^Gender, dataName: GenderCode },
+      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly },
+      { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
+      { name: Termination, type: TerminationDetail, databaseMapper: TerminationDetailData.DbMapper, entityFrameworkIgnore: true },
+      { name: PhoneNo },
+      { name: ETag },
+      { name: ChangeLog, type: ChangeLog }
+    ]
+  }
 
-  <!-- Creating an Employee inheriting from EmployeeBase (DataMapper will also inherit).
-       - The Id is re-specified, but marked as inherited, as is needed to assist with the operations that reference the UniqueKey.
-       - The Validator is specified, which is then used by both the Create and Update operations.
-       - The AutoImplement specifies that operations should be auto-implemented using Database (ADO.NET) unless explicitly overridden.
-       - The WebApiRoutePrefix is defined, which is in turn extended by each operation. -->
-  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DatabaseSchema="Hr" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper">
-    <Property Name="Id" Type="Guid" UniqueKey="true" Inherited="true" DataDatabaseIgnore="true" />
-    <Property Name="Address" Type="Address" DataConverter="ObjectToJsonConverter{T}" DataName="AddressJson"/>
-    <Property Name="EmergencyContacts" Type="EmergencyContactCollection" DataDatabaseIgnore="true" />
+  # Creating an Employee inheriting from EmployeeBase (DataMapper will also inherit).
+  # - The Id is re-specified, but marked as inherited, as is needed to assist with the operations that reference the UniqueKey.
+  # - The Validator is specified, which is then used by both the Create and Update operations.
+  # - The AutoImplement specifies that operations should be auto-implemented using Database (ADO.NET) unless explicitly overridden.
+  # - The WebApiRoutePrefix is defined, which is in turn extended by each operation.
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper,
+    properties: [
+      { name: Id, text: '{{Employee}} identifier', type: Guid, uniqueKey: true, inherited: true, databaseIgnore: true },
+      { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson },
+      { name: EmergencyContacts, type: EmergencyContactCollection, databaseIgnore: true }
+    ],
+    operations: [
+      # CRUD operations:
+      # - Get - Get by unique identifier which it infers from the properties marked as UniqueKey; data access cannot be automatically implemented given complexity.
+      # - Create/Update/Patch - infers UniqueKey where appropriate; data access cannot be automatically implemented given complexity (Patch is Controller-only, reuses Get and Update to perform).
+      # - Delete - explictly defining so that we can tie further validation to the identifier check.
+      # - Using the Property attribute to copy configuration from the Entity itself.
+      # - Providing further validation by using the Common extension method to invoke the EmployeeValidator.CanDelete.
+      { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+      { name: Create, type: Create, autoImplement: None },
+      { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+      { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+      { name: Delete, type: Delete, webApiRoute: '{id}',
+        parameters: [
+          { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
+        ]
+      }
+    ]
+  }
 
-    <!-- CRUD operations:
-         - Get - Get by unique identifier which it infers from the properties marked as UniqueKey; data access cannot be automatically implemented given complexity.
-         - Create/Update/Patch - infers UniqueKey where appropriate; data access cannot be automatically implemented given complexity (Patch is Controller-only, reuses Get and Update to perform). 
-         - Delete - explictly defining so that we can tie further validation to the identifier check. 
-                  - Using the Property attribute to copy configuration from the Entity itself.
-                  - Providing further validation by using the Common extension method to invoke the EmployeeValidator.CanDelete. -->
-    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
-    <Operation Name="Create" OperationType="Create" WebApiRoute="" AutoImplement="None" />
-    <Operation Name="Update" OperationType="Update" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
-    <Operation Name="Patch" OperationType="Patch" UniqueKey="true" WebApiRoute="{id}" />
-    <Operation Name="Delete" OperationType="Delete" WebApiRoute="{id}">
-      <Parameter Name="Id" Property="Id" IsMandatory="true" ValidatorFluent="Common(EmployeeValidator.CanDelete)"/>
-    </Operation>
-  </Entity>
+  # Creating a TerminationDetail with Date and Reason.
+  # - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of RequiresMapper where it is a special case to output a DataMapper.
+  # - By specifying the EntityFrameworkModel the EfMapper (mapping to defined type will be mapped) will also be generated; used by the Employee.GetByArgs.
+- { name: TerminationDetail, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, entityFrameworkModel: EfModel.Employee,
+    properties: [
+      { name: Date, type: DateTime, dateTimeTransform: DateOnly, dataName: TerminationDate },
+      { name: Reason, type: ^TerminationReason, dataName: TerminationReasonCode }
+    ]
+  }
 
-  <!-- Creating a TerminationDetail with Date and Reason.
-       - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of false where it is a special case to output a DataMapper. 
-       - By specifying the EntityFrameworkEntity the EfMapper (mapping to defined type will be mapped) will also be generated; used by the Employee.GetByArgs. -->
-  <Entity Name="TerminationDetail" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" EntityFrameworkEntity="EfModel.Employee">
-    <Property Name="Date" Type="DateTime" DateTimeTransform="DateOnly" DataName="TerminationDate" />
-    <Property Name="Reason" Type="^TerminationReason" DataName="TerminationReasonCode" />
-  </Entity>
+  # Creating an Address.
+  # - ExcludeAll is used so only the entity (not other layers are generated); no ExcludeData required as no mapper is needed as converting to JSON.
+- { name: Address, excludeAll: true,
+    properties: [
+      { name: Street1 },
+      { name: Street2 },
+      { name: City },
+      { name: State, type: ^USState },
+      { name: PostCode }
+    ]
+  }
 
-  <!-- Creating an Address.
-       - ExcludeAll is used so only the entity (not other layers are generated); no ExcludeData required as no mapper is needed as converting to JSON. -->
-  <Entity Name="Address" ExcludeAll="true">
-    <Property Name="Street1" Type="string" />
-    <Property Name="Street2" Type="string" />
-    <Property Name="City" Type="string" />
-    <Property Name="State" Type="^USState" />
-    <Property Name="PostCode" Type="string" />
-  </Entity>
-
-  <!-- Creating a EmergencyContact and corresponding collection.
-       - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of false where it is a special case to output a DataMapper. -->
-  <Entity Name="EmergencyContact" Collection="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" >
-    <Property Name="Id" Type="Guid" UniqueKey="true" DataName="EmergencyContactId" />
-    <Property Name="FirstName" Type="string" />
-    <Property Name="LastName" Type="string" />
-    <Property Name="PhoneNo" Type="string" />
-    <Property Name="Relationship" Type="^RelationshipType" DataName="RelationshipTypeCode" />
-  </Entity>
+  # Creating a EmergencyContact and corresponding collection.
+  # - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of false where it is a special case to output a DataMapper.
+- { name: EmergencyContact, collection: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
+    properties: [
+      { name: Id, type: Guid, uniqueKey: true, dataName: EmergencyContactId },
+      { name: FirstName },
+      { name: LastName },
+      { name: PhoneNo },
+      { name: Relationship, type: ^RelationshipType, dataName: RelationshipTypeCode }
+    ]
+  }
 ```
 
 <br/>
