@@ -40,6 +40,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{2CD70532-8E64-46DF-A895-B41234BAC290}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Beef.Demo", "Beef.Demo", "{FDB20FC0-9D38-4E22-87EF-2865877B0F84}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Demo\README.md = samples\Demo\README.md
+		samples\Demo\RegenerateAll.ps1 = samples\Demo\RegenerateAll.ps1
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{104CA8C9-84F6-4B5C-9576-F25ADA255CF0}"
 EndProject
@@ -170,7 +174,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyz.Legacy.CdcReceiver", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Demo.CdcPublisher", "samples\Demo\Beef.Demo.CdcPublisher\Beef.Demo.CdcPublisher.csproj", "{EAC3FFA7-CF82-457B-923E-02CA75131553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beef.Abstractions", "src\Beef.Abstractions\Beef.Abstractions.csproj", "{DA051F63-A77F-49C1-92E1-DA9938BAC8FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Abstractions", "src\Beef.Abstractions\Beef.Abstractions.csproj", "{DA051F63-A77F-49C1-92E1-DA9938BAC8FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
