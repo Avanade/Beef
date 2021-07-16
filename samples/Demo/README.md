@@ -2,6 +2,8 @@
 
 This sample represents an end-to-end demonstration of the usage of _Beef_; as well as serving as the primary test vehicle of the overall code-generation and supporing execution framework.
 
+</br>
+
 ## Naming
 
 There are two key attributes within the [code-generation](../../tools/Beef.CodeGen.Core/README.md) that drive the naming:
@@ -9,6 +11,8 @@ There are two key attributes within the [code-generation](../../tools/Beef.CodeG
 - **AppName** - the application name - for this sample we use: _**Demo**_
 
 This sample has been set up and named in accordance with the documented [solution structure](../../docs/Solution-Structure.md).
+
+</br>
 
 ## Beef.Demo.CodeGen
 
@@ -33,6 +37,8 @@ dotnet run all           # Generates all (both entity and reference data)
 
 _Note:_ Database code generation can be driven from this project also; this is where the richer database and data manangement capabilities are not required. 
 
+</br>
+
 ## Beef.Demo.Database
 
 This is the optional database and data management console used where a SQL Server database is required and the documented [approach](../../tools/Beef.Database.Core/README.md) is required.
@@ -52,6 +58,8 @@ dotnet run all           # Database Create, Migrate, CodeGen, Schema and Data.
 dotnet run drop          # Database Drop if it already exists.
 dotnet run codegen       # Generates only the database Schema objects.
 ```
+
+</br>
 
 ## Beef.Demo.Test
 
