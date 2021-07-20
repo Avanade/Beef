@@ -54,6 +54,7 @@ namespace Cdr.Banking.Api
 
             // Add the core beef services (including the customized ExecutionContext).
             services.AddBeefExecutionContext(_ => new Business.ExecutionContext())
+                    .AddBeefTextProviderAsSingleton()
                     .AddBeefSystemTime()
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())

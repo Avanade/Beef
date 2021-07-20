@@ -45,14 +45,11 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> where found.</returns>
-        public Task<Product?> GetAsync(int id)
+        public Task<Product?> GetAsync(int id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = ODataMapper.Default.CreateArgs("Products");
-                return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = ODataMapper.Default.CreateArgs("Products");
+            return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
@@ -60,16 +57,13 @@ namespace Beef.Demo.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
-        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
+        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                ProductCollectionResult __result = new ProductCollectionResult(paging);
-                var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!, "Products");
-                __result.Result = _odata.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
-                return await Task.FromResult(__result).ConfigureAwait(false);
-            });
-        }
+            ProductCollectionResult __result = new ProductCollectionResult(paging);
+            var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!, "Products");
+            __result.Result = _odata.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
+            return await Task.FromResult(__result).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Provides the <see cref="Product"/> and OData  property mapping.

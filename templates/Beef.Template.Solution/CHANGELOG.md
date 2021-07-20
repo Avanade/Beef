@@ -2,10 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v4.2.2
 - *Enhancement:* Replace all XML code-gen configurations with YAML equivalents.
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
-- 
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 

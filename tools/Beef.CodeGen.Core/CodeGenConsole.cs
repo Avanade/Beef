@@ -235,7 +235,7 @@ namespace Beef.CodeGen
 ╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
 ╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
 ");
-            logger.LogInformation("Business Entity Execution Framework (Beef) Code Generator.");
+            logger.LogInformation($"Business Entity Execution Framework (Beef) Code Generator [v{typeof(CodeGenConsole).Assembly.GetName().Version?.ToString(3)}].");
             logger.LogInformation(string.Empty);
         }
 

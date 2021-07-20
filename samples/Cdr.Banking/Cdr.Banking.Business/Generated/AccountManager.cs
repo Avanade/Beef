@@ -42,45 +42,36 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public async Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public async Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(args);
-                (await args.Validate(nameof(args)).Entity().With<IValidator<AccountArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(args);
+            await args.Validate(nameof(args)).Entity().With<IValidator<AccountArgs>>().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public async Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public async Task<AccountDetail?> GetDetailAsync(string? accountId) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(accountId);
-                (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(accountId);
+            await accountId.Validate(nameof(accountId)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public async Task<Balance?> GetBalanceAsync(string? accountId)
+        public async Task<Balance?> GetBalanceAsync(string? accountId) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(accountId);
-                (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(accountId);
+            await accountId.Validate(nameof(accountId)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
     }
 }
 

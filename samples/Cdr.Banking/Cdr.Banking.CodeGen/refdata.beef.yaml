@@ -1,0 +1,19 @@
+refDataNamespace: Cdr.Banking.Common.Entities
+refDataWebApiRoute: api/v1/ref
+entities:
+  # Each of the requred reference data entities defined.
+  # Use the same Cosmos Container given small volume which helps manage costs.
+  # 
+- { name: OpenStatus, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/openStatuses, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.OpenStatus, constType: string, dataModel: true,
+    consts: [
+      # Constant defined (generated within Entity) to avoid hard-coding of value within any corresponding business logic.
+      # 
+      { name: All, text: All (both Open and Closed), value: ALL }
+    ]
+  }
+
+- { name: ProductCategory, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/productCategories, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.ProductCategory, dataModel: true }
+- { name: AccountUType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/accountUTypes, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.AccountUType, dataModel: true }
+- { name: MaturityInstructions, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/maturityInstructions, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.MaturityInstructions, dataModel: true }
+- { name: TransactionType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/transactionTypes, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.TransactionType, dataModel: true }
+- { name: TransactionStatus, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/transactionStatuses, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.TransactionStatus, dataModel: true }

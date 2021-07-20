@@ -557,6 +557,11 @@ operations: [
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
 
         /// <summary>
+        /// Indicates whether any parameters exist with WebApiFrom contain "FromEntityProperties".
+        /// </summary>
+        public bool HasFromEntityPropertiesParameters => Parameters.Any(x => x.WebApiFrom == "FromEntityProperties");
+
+        /// <summary>
         /// The operation event properties.
         /// </summary>
         public class OperationEvent

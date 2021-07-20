@@ -39,14 +39,11 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> where found.</returns>
-        public Task<Product?> GetAsync(int id)
+        public Task<Product?> GetAsync(int id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                return __result;
-            });
-        }
+            var __result = await _data.GetAsync(id).ConfigureAwait(false);
+            return __result;
+        });
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
@@ -54,14 +51,11 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
-        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
+        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
-                return __result;
-            });
-        }
+            var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            return __result;
+        });
     }
 }
 

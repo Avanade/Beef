@@ -46,11 +46,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id)
-        {
-            return new WebApiGet<Gender?>(this, () => _manager.GetAsync(id),
+        public IActionResult Get(Guid id) =>
+            new WebApiGet<Gender?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
-        }
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
@@ -59,11 +57,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Gender"/>.</returns>
         [HttpPost("")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Gender value)
-        {
-            return new WebApiPost<Gender>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
+        public IActionResult Create([FromBody] Gender value) =>
+            new WebApiPost<Gender>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -73,11 +69,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Gender"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Gender value, Guid id)
-        {
-            return new WebApiPut<Gender>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
+        public IActionResult Update([FromBody] Gender value, Guid id) =>
+            new WebApiPut<Gender>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
     }
 }
 

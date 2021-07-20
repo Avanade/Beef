@@ -165,7 +165,7 @@ entities:
   }
 
   # Creating an Address.
-  # - ExcludeAll is used so only the entity (not other layers are generated); no ExcludeData required as no mapper is needed as converting to JSON.
+  # - ExcludeAll is automatically set to true as there are no operations; is used so only the entity (not other layers are generated); no ExcludeData required as no mapper is needed as converting to JSON.
 - { name: Address, excludeAll: true,
     properties: [
       { name: Street1 },
@@ -177,7 +177,7 @@ entities:
   }
 
   # Creating a EmergencyContact and corresponding collection.
-  # - ExcludeAll is used so only the entity (not other layers are generated); with the exception of ExcludeData of false where it is a special case to output a DataMapper.
+  # - ExcludeData of RequiresMapper is a special case to specifically output a DataMapper.
 - { name: EmergencyContact, collection: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
     properties: [
       { name: Id, type: Guid, uniqueKey: true, dataName: EmergencyContactId },

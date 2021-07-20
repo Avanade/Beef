@@ -41,14 +41,11 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
+        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
-                return __result;
-            });
-        }
+            var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
+            return __result;
+        });
     }
 }
 

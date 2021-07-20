@@ -42,7 +42,6 @@ Add the following entity code-gen configuration after all the other existing ent
   # Creating an EmployeeArgs entity
   # - Genders will support a list (none or more) reference data values.
   # - StartFrom, StartTo and IncludeTerminated are all Nullable so we can tell whether a value was provided or not.
-  # - ExcludeAll is used so only the entity (not other layers are generated).
   # - The IsIncludeTerminated overrides the JsonName to meet the stated requirement name of includeTerminated.
 - { name: EmployeeArgs, text: '{{Employee}} search arguments', excludeAll: true,
     properties: [

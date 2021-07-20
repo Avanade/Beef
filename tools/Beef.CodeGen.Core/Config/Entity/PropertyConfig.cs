@@ -315,7 +315,7 @@ properties: [
         /// </summary>
         [JsonProperty("dataConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Data", Title = "The data `Converter` class name where `Entity.AutoImplement` is selected.", IsImportant = true,
-            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied.")]
+            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `DataConverterIsGeneric` to `true`.")]
         public string? DataConverter { get; set; }
 
         /// <summary>

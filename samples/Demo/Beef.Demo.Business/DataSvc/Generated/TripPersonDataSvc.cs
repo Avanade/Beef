@@ -45,62 +45,50 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
-        public Task<TripPerson?> GetAsync(string? id)
+        public Task<TripPerson?> GetAsync(string? id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out TripPerson? __val))
-                    return __val;
+            var __key = new UniqueKey(id);
+            if (_cache.TryGetValue(__key, out TripPerson? __val))
+                return __val;
 
-                var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__key, __result);
-            });
-        }
+            var __result = await _data.GetAsync(id).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__key, __result);
+        });
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <returns>The created <see cref="TripPerson"/>.</returns>
-        public Task<TripPerson> CreateAsync(TripPerson value)
+        public Task<TripPerson> CreateAsync(TripPerson value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <returns>The updated <see cref="TripPerson"/>.</returns>
-        public Task<TripPerson> UpdateAsync(TripPerson value)
+        public Task<TripPerson> UpdateAsync(TripPerson value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, new Uri($"/tripperson/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
 
         /// <summary>
         /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        public Task DeleteAsync(string? id)
+        public Task DeleteAsync(string? id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishValue(new TripPerson { Id = id }, new Uri($"/tripperson/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
-                _cache.Remove<TripPerson>(new UniqueKey(id));
-            });
-        }
+            await _data.DeleteAsync(id).ConfigureAwait(false);
+            await _evtPub.PublishValue(new TripPerson { Id = id }, new Uri($"/tripperson/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.TripPerson.{_evtPub.FormatKey(id)}", "Delete", id).SendAsync().ConfigureAwait(false);
+            _cache.Remove<TripPerson>(new UniqueKey(id));
+        });
     }
 }
 

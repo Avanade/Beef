@@ -1,0 +1,175 @@
+refDataNamespace: Cdr.Banking.Common.Entities
+entities:
+  # Account as per the defined schema, including corresponding collection/result.
+  # API route prefixed defined.
+  # Auto-implementing data access using Cosmos with Container 'Account', leveraging auto-mapping to a 'Model.Account'.
+  # 
+- { name: Account, text: Account, collection: true, collectionResult: true, webApiRoutePrefix: api/v1/banking/accounts, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account,
+    properties: [
+      # Convention of Id property within entity.
+      # Reference as accountId otherwise (ArgumentName and JsonName).
+      # It is the UniqueKey.
+      # 
+      { name: Id, argumentName: accountId, jsonName: accountId, text: '{{Account}} identifier', uniqueKey: true },
+      # Creation date should have no time associated; therefore, DateTimeTransform is set to DateOnly.
+      # 
+      { name: CreationDate, type: DateTime, dateTimeTransform: DateOnly },
+      { name: DisplayName },
+      { name: Nickname },
+      # Property is ReferenceData and as per the defined Type.
+      # For serialization the RefDataType is set to string; i.e. only the underlying code is serialized.
+      # 
+      { name: OpenStatus, type: ^OpenStatus, refDataType: string },
+      { name: IsOwned, type: bool },
+      { name: MaskedNumber },
+      { name: ProductCategory, type: ^ProductCategory, refDataType: string },
+      { name: ProductName }
+    ],
+    operations: [
+      # Operation to get all Accounts for the user.
+      # No further route information defined.
+      # Supports filtering using defined properies from AccountArgs (the args will be validated (AccountArgsValidator) to ensure valid values are passed).
+      # Supports paging.
+      # Data access will be auto-implemented for Cosmos as defined for the entity.
+      # 
+      { name: GetAccounts, text: Get all accounts, type: GetColl, paging: true,
+        parameters: [
+          { name: Args, type: AccountArgs, validator: AccountArgsValidator }
+        ]
+      },
+      # Operation to get the AccountDetail for a specified account.
+      # Operation attached to Account for logical grouping.
+      # Returns AccountDetail (the DataEntityMapper is overridden to ensure correct mapper is used).
+      # UniqueKey="true" indicates that all properties marked as UniqueKey are to be used for parameters (avoids having to explicitly define again).
+      # Route requires accountId; e.g. api/v1/banking/accounts/{accountId}
+      # Data access will be auto-implemented for Cosmos as defined for the entity.
+      # 
+      { name: GetDetail, text: 'Get {{AccountDetail}}', type: Get, returnType: AccountDetail, webApiRoute: '{accountId}', uniqueKey: true, dataEntityMapper: AccountDetailData.CosmosMapper },
+      # Operation to get the Balance for a specified account.
+      # Operation attached to Account for logical grouping.
+      # Returns Balanace and no DataEntityMapper is required as implementing using custom logic.
+      # UniqueKey="true" indicates that all properties marked as UniqueKey are to be used for parameters (avoids having to explicitly define again).
+      # Route requires accountId; e.g. api/v1/banking/accounts/{accountId}/balance
+      # Data access logic cannot be auto-implemented.
+      # 
+      { name: GetBalance, text: 'Get {{Account}} {{Balance}}', type: Get, returnType: Balance, webApiRoute: '{accountId}/balance', uniqueKey: true, autoImplement: None }
+    ]
+  }
+
+  # Specifying the arguments for the Account.GetAccounts; note usage of the JsonName to override the default query string parameter names.
+  # ExcludeAll ensures that only the corresponding Entity is generated; i.e. other layer artefacts are only required where an operation is being exposed.
+  # 
+- { name: AccountArgs, text: '{{Account}} arguments', excludeAll: true,
+    properties: [
+      { name: ProductCategory, jsonName: 'product-category', type: ^ProductCategory, refDataType: string },
+      { name: OpenStatus, jsonName: 'open-status', type: ^OpenStatus, refDataType: string },
+      { name: IsOwned, jsonName: 'is-owned', type: bool, nullable: true }
+    ]
+  }
+
+  # As per the AccountDetail schema it inherits from Account and extends the properties (also inherits the data mapper).
+  # 
+- { name: AccountDetail, text: '{{Account}} Detail', inherits: Account, excludeAll: true, excludeData: RequiresMapper, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account, cosmosValueContainer: true, cosmosMapperInheritsFrom: AccountData.CosmosMapper,
+    properties: [
+      { name: Bsb },
+      { name: AccountNumber },
+      { name: BundleName },
+      { name: SpecificAccountUType, type: ^AccountUType, refDataType: string },
+      { name: TermDeposit, type: TermDepositAccount, isEntity: true },
+      { name: CreditCard, type: CreditCardAccount, isEntity: true }
+    ]
+  }
+
+  # Remaining entities required as per defined schema.
+  # 
+- { name: TermDepositAccount, excludeAll: true,
+    properties: [
+      { name: LodgementDate, type: DateTime, dateTimeTransform: DateOnly },
+      { name: MaturityDate, type: DateTime, dateTimeTransform: DateOnly },
+      { name: MaturityAmount, type: decimal },
+      { name: MaturityCurrency },
+      { name: MaturityInstructions, type: ^MaturityInstructions, refDataType: string }
+    ]
+  }
+
+- { name: CreditCardAccount, excludeAll: true,
+    properties: [
+      { name: MinPaymentAmount, type: decimal },
+      { name: PaymentDueAmount, type: decimal },
+      { name: PaymentCurrency },
+      { name: PaymentDueDate, type: DateTime, dateTimeTransform: DateOnly }
+    ]
+  }
+
+- { name: Balance, excludeAll: true,
+    properties: [
+      { name: Id, jsonName: accountId, text: '{{Account}} identifier' },
+      { name: CurrentBalance, type: decimal, serializationEmitDefault: true },
+      { name: AvailableBalance, type: decimal, serializationEmitDefault: true },
+      { name: CreditLimit, type: decimal },
+      { name: AmortisedLimit, type: decimal },
+      { name: Currency },
+      { name: Purses, type: BalancePurseCollection, isEntity: true }
+    ]
+  }
+
+- { name: BalancePurse, collection: true, excludeAll: true,
+    properties: [
+      { name: Amount, type: decimal },
+      { name: Currency }
+    ]
+  }
+
+  # Account as per the defined schema, including corresponding collection/result.
+  # API route prefixed defined (note same as Account to ensure correct API surface).
+  # Auto-implementing data access using Cosmos with Container 'Transaction', leveraging auto-mapping to a 'Model.Transaction'.
+  # 
+- { name: Transaction, text: Transaction, collection: true, collectionResult: true, webApiRoutePrefix: api/v1/banking/accounts, autoImplement: Cosmos, cosmosModel: Model.Transaction, cosmosContainerId: Transaction,
+    properties: [
+      { name: Id, jsonName: transactionId, text: '{{Account}} identifier', uniqueKey: true, dataAutoGenerated: false },
+      { name: AccountId },
+      { name: IsDetailAvailable, type: bool },
+      { name: Type, type: ^TransactionType, refDataType: string },
+      { name: Status, type: ^TransactionStatus, refDataType: string },
+      { name: Description },
+      { name: PostingDateTime, type: DateTime },
+      { name: ExecutionDateTime, type: DateTime },
+      { name: Amount, type: decimal },
+      { name: Currency },
+      { name: Reference },
+      { name: MerchantName },
+      { name: MerchantCategoryCode },
+      { name: BillerCode },
+      { name: BillerName },
+      { name: ApcaNumber }
+    ],
+    operations: [
+      # Operation to get all Transactions for a specified Account.
+      # Operation and Route requires accountId; e.g. api/v1/banking/accounts/{accountId}/transactions
+      # Supports filtering using defined properies from TransactionArgs (the args will be validated (TransactionArgsValidator) to ensure valid values are passed).
+      # Supports paging.
+      # Data access will be auto-implemented for Cosmos as defined for the entity.
+      # Cosmos PartitionKey will be set to the accountId parameter value for data access.
+      # 
+      { name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/transactions', paging: true, cosmosPartitionKey: accountId,
+        parameters: [
+          # Note usage of ValidatorFluent which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check.
+          { name: AccountId, validatorCode: Common(Validators.AccountId), webApiFrom: FromRoute, isMandatory: true },
+          { name: Args, type: TransactionArgs, validator: TransactionArgsValidator }
+        ]
+      }
+    ]
+  }
+
+  # Specifying the arguments for the Transaction.GetTransactions; note usage of the JsonName to override the default query string parameter names.
+  # FromDate & ToDate are so named for C# access; however, they are referred to 'Oldest time' and 'Newest time' externally - DisplayName is used for corresponding error message text.
+  # 
+- { name: TransactionArgs, text: '{{Account}} arguments', excludeAll: true,
+    properties: [
+      { name: FromDate, text: From (oldest time), displayName: Oldest time, jsonName: 'oldest-time', type: DateTime, nullable: true },
+      { name: ToDate, text: To (newest time), displayName: Newest time, jsonName: 'newest-time', type: DateTime, nullable: true },
+      { name: MinAmount, jsonName: 'min-amount', type: decimal, nullable: true },
+      { name: MaxAmount, jsonName: 'max-amount', type: decimal, nullable: true },
+      { name: Text, jsonName: text }
+    ]
+  }

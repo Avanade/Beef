@@ -44,11 +44,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpPost("")]
         [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetEnvVars()
-        {
-            return new WebApiPost<System.Collections.IDictionary>(this, () => _manager.GetEnvVarsAsync(),
+        public IActionResult GetEnvVars() =>
+            new WebApiPost<System.Collections.IDictionary>(this, () => _manager.GetEnvVarsAsync(),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
     }
 }
 

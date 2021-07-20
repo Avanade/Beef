@@ -44,11 +44,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(ContactCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetAll()
-        {
-            return new WebApiGet<ContactCollectionResult, ContactCollection, Contact>(this, () => _manager.GetAllAsync(),
+        public IActionResult GetAll() =>
+            new WebApiGet<ContactCollectionResult, ContactCollection, Contact>(this, () => _manager.GetAllAsync(),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
@@ -58,11 +56,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id)
-        {
-            return new WebApiGet<Contact?>(this, () => _manager.GetAsync(id),
+        public IActionResult Get(Guid id) =>
+            new WebApiGet<Contact?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
-        }
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
@@ -71,11 +67,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Contact"/>.</returns>
         [HttpPost("")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Contact value)
-        {
-            return new WebApiPost<Contact>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
+        public IActionResult Create([FromBody] Contact value) =>
+            new WebApiPost<Contact>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
@@ -85,11 +79,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Contact"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Contact value, Guid id)
-        {
-            return new WebApiPut<Contact>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
+        public IActionResult Update([FromBody] Contact value, Guid id) =>
+            new WebApiPut<Contact>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
@@ -97,11 +89,9 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id)
-        {
-            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
+        public IActionResult Delete(Guid id) =>
+            new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
-        }
 
         /// <summary>
         /// Raise Event.
@@ -109,11 +99,9 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
         [HttpPost("raise")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult RaiseEvent(bool throwError)
-        {
-            return new WebApiPost(this, () => _manager.RaiseEventAsync(throwError),
+        public IActionResult RaiseEvent(bool throwError) =>
+            new WebApiPost(this, () => _manager.RaiseEventAsync(throwError),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
-        }
     }
 }
 

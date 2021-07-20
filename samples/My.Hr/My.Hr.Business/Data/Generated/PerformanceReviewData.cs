@@ -47,14 +47,11 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id)
+        public Task<PerformanceReview?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = EfMapper.Default.CreateArgs();
+            return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -62,62 +59,50 @@ namespace My.Hr.Business.Data
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                PerformanceReviewCollectionResult __result = new PerformanceReviewCollectionResult(paging);
-                var __dataArgs = EfMapper.Default.CreateArgs(__result.Paging!);
-                __result.Result = _ef.Query(__dataArgs, q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, __dataArgs) ?? q).SelectQuery<PerformanceReviewCollection>();
-                return await Task.FromResult(__result).ConfigureAwait(false);
-            });
-        }
+            PerformanceReviewCollectionResult __result = new PerformanceReviewCollectionResult(paging);
+            var __dataArgs = EfMapper.Default.CreateArgs(__result.Paging!);
+            __result.Result = _ef.Query(__dataArgs, q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, __dataArgs) ?? q).SelectQuery<PerformanceReviewCollection>();
+            return await Task.FromResult(__result).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value)
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
-            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = EfMapper.Default.CreateArgs();
-                var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
-                return __result;
-            });
-        }
+            var __dataArgs = EfMapper.Default.CreateArgs();
+            var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+            return __result;
+        });
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value)
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
-            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = EfMapper.Default.CreateArgs();
-                var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
-                return __result;
-            });
-        }
+            var __dataArgs = EfMapper.Default.CreateArgs();
+            var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+            return __result;
+        });
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
-            return _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = EfMapper.Default.CreateArgs();
-                await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-                _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted", id);
-            });
-        }
+            var __dataArgs = EfMapper.Default.CreateArgs();
+            await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted", id);
+        });
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> property mapping.

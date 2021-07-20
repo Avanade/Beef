@@ -1,0 +1,84 @@
+# Defines the internal model (persisted in Cosmos) that inherits the AccountModel which adds the Balance.
+entities:
+  # Account model definitions.
+- { name: Account, text: Account model for data persistence,
+    properties: [
+      { name: Id },
+      { name: CreationDate, type: DateTime },
+      { name: DisplayName },
+      { name: Nickname },
+      { name: OpenStatus },
+      { name: IsOwned, type: bool },
+      { name: MaskedNumber },
+      { name: ProductCategory },
+      { name: ProductName },
+      { name: Bsb },
+      { name: AccountNumber },
+      { name: BundleName },
+      { name: SpecificAccountUType },
+      { name: TermDeposit, type: TermDepositAccount },
+      { name: CreditCard, type: CreditCardAccount },
+      { name: Balance, type: Balance }
+    ]
+  }
+
+- { name: TermDepositAccount,
+    properties: [
+      { name: LodgementDate, type: DateTime },
+      { name: MaturityDate, type: DateTime },
+      { name: MaturityAmount, type: decimal },
+      { name: MaturityCurrency },
+      { name: MaturityInstructions }
+    ]
+  }
+
+- { name: CreditCardAccount,
+    properties: [
+      { name: MinPaymentAmount, type: decimal },
+      { name: PaymentDueAmount, type: decimal },
+      { name: PaymentCurrency },
+      { name: PaymentDueDate, type: DateTime }
+    ]
+  }
+
+- { name: Balance,
+    properties: [
+      { name: CurrentBalance, type: decimal },
+      { name: AvailableBalance, type: decimal },
+      { name: CreditLimit, type: decimal },
+      { name: AmortisedLimit, type: decimal },
+      { name: Currency },
+      { name: Purses, type: BalancePurseCollection }
+    ]
+  }
+
+- { name: BalancePurse, collection: true,
+    properties: [
+      { name: Amount, type: decimal },
+      { name: Currency }
+    ]
+  }
+
+  # Transaction model definitions
+- { name: Transaction, text: Transaction model for data persistence,
+    properties: [
+      { name: Id },
+      { name: AccountId },
+      { name: IsDetailAvailable, type: bool },
+      { name: Type },
+      { name: Status },
+      { name: Description },
+      { name: PostingDateTime, type: DateTime },
+      { name: ExecutionDateTime, type: DateTime },
+      { name: Amount, type: decimal },
+      { name: Currency },
+      { name: Reference },
+      { name: MerchantName },
+      { name: MerchantCategoryCode },
+      { name: BillerCode },
+      { name: BillerName },
+      { name: ApcaNumber },
+      # Special purpose property to house the date time to be used for the simplifying of transaction filtering.
+      { name: TransactionDateTime, type: DateTime }
+    ]
+  }

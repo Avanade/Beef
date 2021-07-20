@@ -97,8 +97,10 @@ namespace {{Root.NamespaceApi}}.Controllers
         [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]
     {{/ifne}}
   {{/if}}
-        public IActionResult {{Name}}({{#each PagingLessParameters}}{{#unless @first}}, {{/unless}}{{#ifeq WebApiFrom 'FromEntityProperties'}}{{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{#ifne ArgumentName JsonName}}[FromQuery(Name = "{{JsonName}}")] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/each}}{{else}}{{#ifne WebApiFrom 'FromQuery'}}[{{WebApiFrom}}] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}}{{#ifval Default}} = {{Default}}{{/ifval}}{{/ifeq}}{{/each}})
+        public IActionResult {{Name}}({{#each PagingLessParameters}}{{#unless @first}}, {{/unless}}{{#ifeq WebApiFrom 'FromEntityProperties'}}{{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{#ifne ArgumentName JsonName}}[FromQuery(Name = "{{JsonName}}")] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/each}}{{else}}{{#ifne WebApiFrom 'FromQuery'}}[{{WebApiFrom}}] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}}{{#ifval Default}} = {{Default}}{{/ifval}}{{/ifeq}}{{/each}}){{#unless HasFromEntityPropertiesParameters}} =>{{/unless}}
+  {{#if HasFromEntityPropertiesParameters}} 
         {
+  {{/if}}
   {{#each Parameters}}
     {{#ifeq WebApiFrom 'FromEntityProperties'}}
             var {{ArgumentName}} = new {{Type}} { {{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{PropertyName}} = {{#ifval WebApiQueryStringConverter}}new {{WebApiQueryStringConverter}}().ConvertToSrce({{ArgumentName}}){{else}}{{ArgumentName}}{{/ifval}}{{/each}} };
@@ -106,25 +108,27 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{/each}}
   {{#ifeq WebApiMethod 'HttpGet'}}
     {{#ifeq Type 'GetColl'}}
-            return new WebApiGet<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection, {{BaseReturnType}}>(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiGet<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection, {{BaseReturnType}}>(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/each}}),
     {{else}}
-            return new WebApiGet<{{OperationReturnType}}>(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiGet<{{OperationReturnType}}>(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
     {{/ifeq}}
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPost'}}
-            return new WebApiPost{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiPost{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPut'}}
-            return new WebApiPut{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiPut{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPatch'}}
-            return new WebApiPatch{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, value, () => {{PatchGetVariable}}.{{PatchGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), (__value) => {{PatchUpdateVariable}}.{{PatchUpdateOperation}}Async(__value{{#each ValueLessParameters}}, {{ArgumentName}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiPatch{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, value, () => {{PatchGetVariable}}.{{PatchGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), (__value) => {{PatchUpdateVariable}}.{{PatchUpdateOperation}}Async(__value{{#each ValueLessParameters}}, {{ArgumentName}}{{/each}}),
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
-            return new WebApiDelete{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
+            {{#if HasFromEntityPropertiesParameters}}return {{/if}}new WebApiDelete{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
   {{/ifeq}}
                 operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}{{#ifval WebApiLocation}}, locationUri: ({{#if HasReturnValue}}r{{/if}}) => new Uri($"{{WebApiLocation}}", UriKind.Relative){{/ifval}});
+  {{#if HasFromEntityPropertiesParameters}} 
         }
+  {{/if}}
 {{/each}}
     }
 }

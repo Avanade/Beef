@@ -43,19 +43,16 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public async Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
+        public async Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(accountId, args);
-                (await MultiValidator.Create()
-                    .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
-                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<TransactionArgs>>())
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            Cleaner.CleanUp(accountId, args);
+            await MultiValidator.Create()
+                .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
+                .Add(args.Validate(nameof(args)).Entity().With<IValidator<TransactionArgs>>())
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
     }
 }
 

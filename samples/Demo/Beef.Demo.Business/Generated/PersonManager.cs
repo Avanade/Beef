@@ -172,67 +172,58 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        public async Task<Person> CreateAsync(Person value)
+        public async Task<Person> CreateAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
-                Cleaner.CleanUp(value);
-                await (_createOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
+            Cleaner.CleanUp(value);
+            await (_createOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_createOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
-                await (_createOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
-        }
+            await (_createOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
+            await (_createOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                await (_deleteOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(id);
+            await (_deleteOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(id.Validate(nameof(id)).Mandatory())
+                .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_deleteOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _dataService.DeleteAsync(id).ConfigureAwait(false);
-                await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
-        }
+            await (_deleteOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            await _dataService.DeleteAsync(id).ConfigureAwait(false);
+            await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetAsync(Guid id)
+        public async Task<Person?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                (await MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            Cleaner.CleanUp(id);
+            await MultiValidator.Create()
+                .Add(id.Validate(nameof(id)).Mandatory())
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -240,27 +231,24 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateAsync(Person value, Guid id)
+        public async Task<Person> UpdateAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = id;
-                Cleaner.CleanUp(value);
-                await (_updateOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = id;
+            Cleaner.CleanUp(value);
+            await (_updateOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_updateOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
-                await (_updateOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_updateOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
+            await (_updateOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -268,70 +256,61 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateWithRollbackAsync(Person value, Guid id)
+        public async Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = id;
-                Cleaner.CleanUp(value);
-                await (_updateWithRollbackOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = id;
+            Cleaner.CleanUp(value);
+            await (_updateWithRollbackOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _updateWithRollbackOnValidate?.Invoke(__mv, value, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _updateWithRollbackOnValidate?.Invoke(__mv, value, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_updateWithRollbackOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
-                await (_updateWithRollbackOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_updateWithRollbackOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
+            await (_updateWithRollbackOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
+        public async Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_getAllOnPreValidateAsync?.Invoke(paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_getAllOnPreValidateAsync?.Invoke(paging) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _getAllOnValidate?.Invoke(__mv, paging))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _getAllOnValidate?.Invoke(__mv, paging))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getAllOnBeforeAsync?.Invoke(paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
-                await (_getAllOnAfterAsync?.Invoke(__result, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getAllOnBeforeAsync?.Invoke(paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
+            await (_getAllOnAfterAsync?.Invoke(__result, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetAll2Async()
+        public async Task<PersonCollectionResult> GetAll2Async() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_getAll2OnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_getAll2OnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _getAll2OnValidate?.Invoke(__mv))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _getAll2OnValidate?.Invoke(__mv))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getAll2OnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
-                await (_getAll2OnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getAll2OnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
+            await (_getAll2OnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -339,24 +318,21 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
+        public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(args);
-                await (_getByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(args);
+            await (_getByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
-                    .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
+                .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getByArgsOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
-                await (_getByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getByArgsOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            await (_getByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
@@ -364,24 +340,21 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
-        public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
+        public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(args);
-                await (_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(args);
+            await (_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
-                    .Additional((__mv) => _getDetailByArgsOnValidate?.Invoke(__mv, args, paging))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
+                .Additional((__mv) => _getDetailByArgsOnValidate?.Invoke(__mv, args, paging))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getDetailByArgsOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
-                await (_getDetailByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getDetailByArgsOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
+            await (_getDetailByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Merge first <see cref="Person"/> into second.
@@ -389,112 +362,97 @@ namespace Beef.Demo.Business
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public async Task<Person> MergeAsync(Guid fromId, Guid toId)
+        public async Task<Person> MergeAsync(Guid fromId, Guid toId) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(fromId, toId);
-                await (_mergeOnPreValidateAsync?.Invoke(fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(fromId, toId);
+            await (_mergeOnPreValidateAsync?.Invoke(fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(fromId.Validate(nameof(fromId)).Mandatory())
-                    .Add(toId.Validate(nameof(toId)).Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
-                    .Additional((__mv) => _mergeOnValidate?.Invoke(__mv, fromId, toId))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(fromId.Validate(nameof(fromId)).Mandatory())
+                .Add(toId.Validate(nameof(toId)).Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
+                .Additional((__mv) => _mergeOnValidate?.Invoke(__mv, fromId, toId))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_mergeOnBeforeAsync?.Invoke(fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
-                await (_mergeOnAfterAsync?.Invoke(__result, fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_mergeOnBeforeAsync?.Invoke(fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
+            await (_mergeOnAfterAsync?.Invoke(__result, fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        public async Task MarkAsync()
+        public async Task MarkAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_markOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_markOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _markOnValidate?.Invoke(__mv))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _markOnValidate?.Invoke(__mv))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_markOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-                await _dataService.MarkAsync().ConfigureAwait(false);
-                await (_markOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_markOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await _dataService.MarkAsync().ConfigureAwait(false);
+            await (_markOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        public async Task<MapCoordinates> MapAsync(MapArgs? args)
+        public async Task<MapCoordinates> MapAsync(MapArgs? args) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(args);
-                await (_mapOnPreValidateAsync?.Invoke(args) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(args);
+            await (_mapOnPreValidateAsync?.Invoke(args) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_mapOnBeforeAsync?.Invoke(args) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
-                await (_mapOnAfterAsync?.Invoke(__result, args) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_mapOnBeforeAsync?.Invoke(args) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
+            await (_mapOnAfterAsync?.Invoke(__result, args) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Get no arguments.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetNoArgsAsync()
+        public async Task<Person?> GetNoArgsAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_getNoArgsOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_getNoArgsOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _getNoArgsOnValidate?.Invoke(__mv))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _getNoArgsOnValidate?.Invoke(__mv))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getNoArgsOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
-                await (_getNoArgsOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getNoArgsOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
+            await (_getNoArgsOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-        public async Task<PersonDetail?> GetDetailAsync(Guid id)
+        public async Task<PersonDetail?> GetDetailAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                await (_getDetailOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(id);
+            await (_getDetailOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getDetailOnValidate?.Invoke(__mv, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(id.Validate(nameof(id)).Mandatory())
+                .Additional((__mv) => _getDetailOnValidate?.Invoke(__mv, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getDetailOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
-                await (_getDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getDetailOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
+            await (_getDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Updates an existing <see cref="PersonDetail"/>.
@@ -502,72 +460,60 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        public async Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id)
+        public async Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = id;
-                Cleaner.CleanUp(value);
-                await (_updateDetailOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = id;
+            Cleaner.CleanUp(value);
+            await (_updateDetailOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<PersonDetail>>())
-                    .Additional((__mv) => _updateDetailOnValidate?.Invoke(__mv, value, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<PersonDetail>>())
+                .Additional((__mv) => _updateDetailOnValidate?.Invoke(__mv, value, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_updateDetailOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
-                await (_updateDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_updateDetailOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
+            await (_updateDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
         /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-        public async Task AddAsync(Person person)
+        public async Task AddAsync(Person person) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await AddOnImplementationAsync(person).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
-        }
+            await AddOnImplementationAsync(person).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
 
         /// <summary>
         /// Validate a DataSvc Custom generation.
         /// </summary>
         /// <returns>A resultant <see cref="int"/>.</returns>
-        public async Task<int> DataSvcCustomAsync()
+        public async Task<int> DataSvcCustomAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_dataSvcCustomOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_dataSvcCustomOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _dataSvcCustomOnValidate?.Invoke(__mv))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _dataSvcCustomOnValidate?.Invoke(__mv))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_dataSvcCustomOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
-                await (_dataSvcCustomOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
-        }
+            await (_dataSvcCustomOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
+            await (_dataSvcCustomOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
 
         /// <summary>
         /// Validate a Manager Custom generation.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> ManagerCustomAsync()
+        public async Task<Person?> ManagerCustomAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Get Null.
@@ -575,49 +521,43 @@ namespace Beef.Demo.Business
         /// <param name="name">The Name.</param>
         /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public async Task<Person?> GetNullAsync(string? name, List<string>? names)
+        public async Task<Person?> GetNullAsync(string? name, List<string>? names) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(name, names);
-                await (_getNullOnPreValidateAsync?.Invoke(name, names) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(name, names);
+            await (_getNullOnPreValidateAsync?.Invoke(name, names) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name, names))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name, names))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getNullOnBeforeAsync?.Invoke(name, names) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
-                await (_getNullOnAfterAsync?.Invoke(__result, name, names) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
-        }
+            await (_getNullOnBeforeAsync?.Invoke(name, names) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
+            await (_getNullOnAfterAsync?.Invoke(__result, name, names) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
 
         /// <summary>
         /// Validate when an Event is published but not sent.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> EventPublishNoSendAsync(Person value)
+        public async Task<Person> EventPublishNoSendAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(value);
-                await (_eventPublishNoSendOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(value);
+            await (_eventPublishNoSendOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _eventPublishNoSendOnValidate?.Invoke(__mv, value))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _eventPublishNoSendOnValidate?.Invoke(__mv, value))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_eventPublishNoSendOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
-                await (_eventPublishNoSendOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_eventPublishNoSendOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
+            await (_eventPublishNoSendOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -625,139 +565,121 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
+        public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(args);
-                await (_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(args);
+            await (_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
-                    .Additional((__mv) => _getByArgsWithEfOnValidate?.Invoke(__mv, args, paging))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
+                .Additional((__mv) => _getByArgsWithEfOnValidate?.Invoke(__mv, args, paging))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getByArgsWithEfOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
-                await (_getByArgsWithEfOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getByArgsWithEfOnBeforeAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
+            await (_getByArgsWithEfOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Throw Error.
         /// </summary>
-        public async Task ThrowErrorAsync()
+        public async Task ThrowErrorAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await (_throwErrorOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await (_throwErrorOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _throwErrorOnValidate?.Invoke(__mv))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _throwErrorOnValidate?.Invoke(__mv))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_throwErrorOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-                await _dataService.ThrowErrorAsync().ConfigureAwait(false);
-                await (_throwErrorOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-            }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified }).ConfigureAwait(false);
-        }
+            await (_throwErrorOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+            await _dataService.ThrowErrorAsync().ConfigureAwait(false);
+            await (_throwErrorOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified }).ConfigureAwait(false);
 
         /// <summary>
         /// Invoke Api Via Agent.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public async Task<string?> InvokeApiViaAgentAsync(Guid id)
+        public async Task<string?> InvokeApiViaAgentAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                await (_invokeApiViaAgentOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(id);
+            await (_invokeApiViaAgentOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Additional((__mv) => _invokeApiViaAgentOnValidate?.Invoke(__mv, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Additional((__mv) => _invokeApiViaAgentOnValidate?.Invoke(__mv, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_invokeApiViaAgentOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
-                await (_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
-        }
+            await (_invokeApiViaAgentOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+            await (_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
 
         /// <summary>
         /// Param Coll.
         /// </summary>
         /// <param name="addresses">The Addresses.</param>
-        public async Task ParamCollAsync(AddressCollection? addresses)
+        public async Task ParamCollAsync(AddressCollection? addresses) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(addresses);
-                await (_paramCollOnPreValidateAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(addresses);
+            await (_paramCollOnPreValidateAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(addresses.Validate(nameof(addresses)).Entity().With<IValidator<AddressCollection>>())
-                    .Additional((__mv) => _paramCollOnValidate?.Invoke(__mv, addresses))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(addresses.Validate(nameof(addresses)).Entity().With<IValidator<AddressCollection>>())
+                .Additional((__mv) => _paramCollOnValidate?.Invoke(__mv, addresses))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_paramCollOnBeforeAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
-                await (_paramCollOnAfterAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
-        }
+            await (_paramCollOnBeforeAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+            await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
+            await (_paramCollOnAfterAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetWithEfAsync(Guid id)
+        public async Task<Person?> GetWithEfAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                await (_getWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(id);
+            await (_getWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getWithEfOnValidate?.Invoke(__mv, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(id.Validate(nameof(id)).Mandatory())
+                .Additional((__mv) => _getWithEfOnValidate?.Invoke(__mv, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_getWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
-                await (_getWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            await (_getWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
+            await (_getWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        public async Task<Person> CreateWithEfAsync(Person value)
+        public async Task<Person> CreateWithEfAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
-                Cleaner.CleanUp(value);
-                await (_createWithEfOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
+            Cleaner.CleanUp(value);
+            await (_createWithEfOnPreValidateAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _createWithEfOnValidate?.Invoke(__mv, value))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _createWithEfOnValidate?.Invoke(__mv, value))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_createWithEfOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
-                await (_createWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
-        }
+            await (_createWithEfOnBeforeAsync?.Invoke(value) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
+            await (_createWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -765,49 +687,43 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateWithEfAsync(Person value, Guid id)
+        public async Task<Person> UpdateWithEfAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = id;
-                Cleaner.CleanUp(value);
-                await (_updateWithEfOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            value.Id = id;
+            Cleaner.CleanUp(value);
+            await (_updateWithEfOnPreValidateAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
-                    .Additional((__mv) => _updateWithEfOnValidate?.Invoke(__mv, value, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                .Additional((__mv) => _updateWithEfOnValidate?.Invoke(__mv, value, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_updateWithEfOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
-                await (_updateWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
-                return Cleaner.Clean(__result);
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            await (_updateWithEfOnBeforeAsync?.Invoke(value, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
+            await (_updateWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
+            return Cleaner.Clean(__result);
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public async Task DeleteWithEfAsync(Guid id)
+        public async Task DeleteWithEfAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                await (_deleteWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            Cleaner.CleanUp(id);
+            await (_deleteWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
 
-                (await MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _deleteWithEfOnValidate?.Invoke(__mv, id))
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await MultiValidator.Create()
+                .Add(id.Validate(nameof(id)).Mandatory())
+                .Additional((__mv) => _deleteWithEfOnValidate?.Invoke(__mv, id))
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
-                await (_deleteWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-                await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
-                await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
-        }
+            await (_deleteWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+            await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
+            await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
     }
 }
 
