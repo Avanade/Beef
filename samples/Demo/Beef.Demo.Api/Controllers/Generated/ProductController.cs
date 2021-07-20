@@ -45,11 +45,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(int id)
-        {
-            return new WebApiGet<Product?>(this, () => _manager.GetAsync(id),
+        public IActionResult Get(int id) =>
+            new WebApiGet<Product?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
-        }
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.

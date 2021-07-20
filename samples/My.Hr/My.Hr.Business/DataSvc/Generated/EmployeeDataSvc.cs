@@ -42,59 +42,47 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id)
+        public Task<Employee?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Employee? __val))
-                    return __val;
+            var __key = new UniqueKey(id);
+            if (_cache.TryGetValue(__key, out Employee? __val))
+                return __val;
 
-                var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__key, __result);
-            });
-        }
+            var __result = await _data.GetAsync(id).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__key, __result);
+        });
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value)
+        public Task<Employee> CreateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value)
+        public Task<Employee> UpdateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                await _data.DeleteAsync(id).ConfigureAwait(false);
-                _cache.Remove<Employee>(new UniqueKey(id));
-            });
-        }
+            await _data.DeleteAsync(id).ConfigureAwait(false);
+            _cache.Remove<Employee>(new UniqueKey(id));
+        });
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -102,14 +90,11 @@ namespace My.Hr.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
-                return __result;
-            });
-        }
+            var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            return __result;
+        });
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
@@ -117,14 +102,11 @@ namespace My.Hr.Business.DataSvc
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id)
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.TerminateAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.TerminateAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
     }
 }
 

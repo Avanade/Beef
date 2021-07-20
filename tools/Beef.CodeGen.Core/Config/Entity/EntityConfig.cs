@@ -1161,8 +1161,16 @@ entities:
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
+
+            InferInherits();
+            PrepareConsts();
+            PrepareProperties();
+            PrepareOperations();
+            InferImplements();
+            PrepareConstructors();
+
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
-            ExcludeAll = DefaultWhereNull(ExcludeAll, () => false);
+            ExcludeAll = DefaultWhereNull(ExcludeAll, () => Operations!.Count == 0);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? "Exclude" : "Include");
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
@@ -1172,13 +1180,6 @@ entities:
             ExcludeWebApi = DefaultWhereNull(ExcludeWebApi, () => CompareValue(ExcludeAll, true));
             ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, true));
             ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, true));
-
-            InferInherits();
-            PrepareConsts();
-            PrepareProperties();
-            PrepareOperations();
-            InferImplements();
-            PrepareConstructors();
         }
 
         /// <summary>

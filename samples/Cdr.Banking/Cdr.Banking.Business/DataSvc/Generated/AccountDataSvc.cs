@@ -43,50 +43,41 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
-                return __result;
-            });
-        }
+            var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
+            return __result;
+        });
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __key = new UniqueKey(accountId);
-                if (_cache.TryGetValue(__key, out AccountDetail? __val))
-                    return __val;
+            var __key = new UniqueKey(accountId);
+            if (_cache.TryGetValue(__key, out AccountDetail? __val))
+                return __val;
 
-                var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__key, __result);
-            });
-        }
+            var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__key, __result);
+        });
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId)
+        public Task<Balance?> GetBalanceAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __key = new UniqueKey(accountId);
-                if (_cache.TryGetValue(__key, out Balance? __val))
-                    return __val;
+            var __key = new UniqueKey(accountId);
+            if (_cache.TryGetValue(__key, out Balance? __val))
+                return __val;
 
-                var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__key, __result);
-            });
-        }
+            var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__key, __result);
+        });
     }
 }
 

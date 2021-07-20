@@ -92,37 +92,33 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
-  {{#if DataSvcCustom}}
-            => DataSvcInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
-  {{else}}
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}}) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});{{else}}DataSvcInvoker.Current.InvokeAsync(this, async () =>{{/if}}
+  {{#unless DataSvcCustom}}
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
     {{#if SupportsCaching}}
       {{#ifeq Type 'Get'}}
-                var __key = new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
-                if (_cache.TryGetValue(__key, out {{OperationReturnType}} __val))
-                    return __val;
+            var __key = new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
+            if (_cache.TryGetValue(__key, out {{OperationReturnType}} __val))
+                return __val;
 
       {{/ifeq}}
     {{/if}}         
-                {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
     {{#if DataSvcExtensions}}
-                await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
+            await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
     {{/if}}
     {{#ifeq EventPublish 'DataSvc'}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
-                await _evtPub.Publish{{#ifval Value}}Value{{/ifval}}({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).SendAsync().ConfigureAwait(false);
+            await _evtPub.Publish{{#ifval Value}}Value{{/ifval}}({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).SendAsync().ConfigureAwait(false);
         {{/each}}
       {{else}}
         {{#ifeq Events.Count 0}}
-                await _evtPub.SendAsync().ConfigureAwait(false);
+            await _evtPub.SendAsync().ConfigureAwait(false);
         {{else}}
-                await _evtPub.Publish(
+            await _evtPub.Publish(
           {{#each Events}}
-                    _evtPub.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).SendAsync().ConfigureAwait(false);{{else}},{{/if}}
+                _evtPub.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).SendAsync().ConfigureAwait(false);{{else}},{{/if}}
             {{#if @last}}
 
             {{/if}}
@@ -132,18 +128,17 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     {{/ifeq}}
     {{#if SupportsCaching}}
       {{#ifeq Type 'Delete'}}
-                _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
+            _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
       {{else}}
-                return _cache.SetAndReturnValue({{#ifeq Type 'Get'}}__key, {{/ifeq}}__result);
+            return _cache.SetAndReturnValue({{#ifeq Type 'Get'}}__key, {{/ifeq}}__result);
       {{/ifeq}}
     {{else}}   
       {{#if HasReturnValue}}
-                return __result;
+            return __result;
       {{/if}}
     {{/if}}
-            }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
-        }
-  {{/if}}
+        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+  {{/unless}}
 {{/each}}
     }
 }

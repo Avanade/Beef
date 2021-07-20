@@ -45,11 +45,9 @@ namespace My.Hr.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id)
-        {
-            return new WebApiGet<Employee?>(this, () => _manager.GetAsync(id),
+        public IActionResult Get(Guid id) =>
+            new WebApiGet<Employee?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
-        }
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -58,11 +56,9 @@ namespace My.Hr.Api.Controllers
         /// <returns>The created <see cref="Employee"/>.</returns>
         [HttpPost("")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Employee value)
-        {
-            return new WebApiPost<Employee>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
+        public IActionResult Create([FromBody] Employee value) =>
+            new WebApiPost<Employee>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/employees/{r.Id}", UriKind.Relative));
-        }
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -72,11 +68,9 @@ namespace My.Hr.Api.Controllers
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Employee value, Guid id)
-        {
-            return new WebApiPut<Employee>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
+        public IActionResult Update([FromBody] Employee value, Guid id) =>
+            new WebApiPut<Employee>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Patches an existing <see cref="Employee"/>.
@@ -86,11 +80,9 @@ namespace My.Hr.Api.Controllers
         /// <returns>The patched <see cref="Employee"/>.</returns>
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Patch([FromBody] JToken value, Guid id)
-        {
-            return new WebApiPatch<Employee>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
+        public IActionResult Patch([FromBody] JToken value, Guid id) =>
+            new WebApiPatch<Employee>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -98,11 +90,9 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The Id.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id)
-        {
-            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
+        public IActionResult Delete(Guid id) =>
+            new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
-        }
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -132,11 +122,9 @@ namespace My.Hr.Api.Controllers
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPost("{id}/terminate")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Terminate([FromBody] TerminationDetail value, Guid id)
-        {
-            return new WebApiPost<Employee>(this, () => _manager.TerminateAsync(WebApiActionBase.Value(value), id),
+        public IActionResult Terminate([FromBody] TerminationDetail value, Guid id) =>
+            new WebApiPost<Employee>(this, () => _manager.TerminateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
     }
 }
 

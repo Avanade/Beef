@@ -81,7 +81,7 @@ entities:
     ]
   }
 
-- { name: PersonArgs, text: '{{Person}} arguments', excludeAll: true,
+- { name: PersonArgs, text: '{{Person}} arguments',
     properties: [
       { name: FirstName },
       { name: LastName },

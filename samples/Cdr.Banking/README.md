@@ -71,7 +71,7 @@ dotnet new beef --company Cdr --appname Banking --datasource Cosmos
   └── Cdr.Banking.sln         # Solution file that references all above projects
 ```
 
-_Note:_ Code generation was **not** performed before updating the corresponding XML files described in the next section. Otherwise, extraneous files would have been generated that would then need to be manually removed.
+_Note:_ Code generation was **not** performed before updating the corresponding YAML files described in the next section. Otherwise, extraneous files would have been generated that would then need to be manually removed.
 
 Also, any files that started with `Person` (being the demonstration entity) were removed (deleted) from their respective projects. This then represented the base-line to build up the solution from.
 
@@ -80,9 +80,9 @@ Also, any files that started with `Person` (being the demonstration entity) were
 ## Code generation
 
 The following code-generation files require configuration:
-- [`Cdr.Banking.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.xml) - this describes the entities, their properties and operations, to fulfil the aforementioned CDR Banking API endpoint and schema requirements.
-- [`Cdr.RefData.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.xml) - this describes the reference data entities, their properties, and corresponding get all (read) operation. These are defined seperately as different code-generation templates are used.
-- [`Cdr.Banking.DataModel.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.DataModel.xml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a _basic model_ class is generated. 
+- [`entity.beef.yaml`](./Cdr.Banking.CodeGen/entity.beef.yaml) - this describes the entities, their properties and operations, to fulfil the aforementioned CDR Banking API endpoint and schema requirements.
+- [`refdata.beef.yaml`](./Cdr.Banking.CodeGen/refdata.beef.yaml) - this describes the reference data entities, their properties, and corresponding get all (read) operation. These are defined seperately as different code-generation templates are used.
+- [`datamodel.beef.yaml`](./Cdr.Banking.CodeGen/datamodel.beef.yaml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a _basic model_ class is generated. 
 
 Each of the files have comments added within to aid the reader as to purpose of the configuration. Otherwise, see the related entity-driven code-generation [documentation](../../tools/Beef.CodeGen.Core/README.md) for more information.
 
@@ -199,15 +199,24 @@ In this instance, the onus is on the developer to set the `PartitionKey` appropr
 
 In this case, we are setting this using the code-generation for the operation. The `DataCosmosPartitionKey` attribute for the `Operation` element enables. The `accountId` parameter value will be used for partitioning.
 
-``` xml
-    <Operation Name="GetTransactions" Text="Get transaction for account" OperationType="GetColl" WebApiRoute="{accountId}/transactions" PagingArgs="true" DataCosmosPartitionKey="accountId">
-      <!-- Note usage of ValidatorFluent which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check. -->
-      <Parameter Name="AccountId" Type="string" ValidatorFluent="Common(Validators.AccountId)" WebApiFrom="FromRoute" IsMandatory="true" />
-      <Parameter Name="Args" Type="TransactionArgs" Validator="TransactionArgsValidator" />
-    </Operation>
+``` yaml
+# Operation to get all Transactions for a specified Account.
+# Operation and Route requires accountId; e.g. api/v1/banking/accounts/{accountId}/transactions
+# Supports filtering using defined properies from TransactionArgs (the args will be validated TransactionArgsValidator) to ensure valid values are passed).
+# Supports paging.
+# Data access will be auto-implemented for Cosmos as defined for the entity.
+# Cosmos PartitionKey will be set to the accountId parameter value for data access.
+# 
+{ name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/ransactions', paging: true, cosmosPartitionKey: accountId,
+  parameters: [
+    # Note usage of ValidatorFluent which will inject the code as-is into the validation logic; beinga common validator 'Validators.Account' that will perform the authorization check.
+    { name: AccountId, type: string, validatorCode: Common(Validators.AccountId), webApiFrom: romRoute, isMandatory: true },
+    { name: Args, type: TransactionArgs, validator: TransactionArgsValidator }
+  ]
+}
 ```
 
-As stated in the above XML comments, a common [validator](../../docs/Beef-Validation.md) will be used to perform the authorization logic. The static [`Validators.AccountId`](./Cdr.Banking.Business/Validation/Validators.cs) is used to perform the validation.
+As stated in the above YAML comments, a common [validator](../../docs/Beef-Validation.md) will be used to perform the authorization logic. The static [`Validators.AccountId`](./Cdr.Banking.Business/Validation/Validators.cs) is used to perform the validation.
 
 ``` csharp
 public static CommonValidator<string?> AccountId => CommonValidator.Create<string?>(v => v.Custom(ctx =>

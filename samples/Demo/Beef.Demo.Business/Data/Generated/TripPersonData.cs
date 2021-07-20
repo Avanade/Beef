@@ -43,55 +43,43 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
-        public Task<TripPerson?> GetAsync(string? id)
+        public Task<TripPerson?> GetAsync(string? id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = ODataMapper.Default.CreateArgs();
+            return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <returns>The created <see cref="TripPerson"/>.</returns>
-        public Task<TripPerson> CreateAsync(TripPerson value)
+        public Task<TripPerson> CreateAsync(TripPerson value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await _odata.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = ODataMapper.Default.CreateArgs();
+            return await _odata.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <returns>The updated <see cref="TripPerson"/>.</returns>
-        public Task<TripPerson> UpdateAsync(TripPerson value)
+        public Task<TripPerson> UpdateAsync(TripPerson value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await _odata.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = ODataMapper.Default.CreateArgs();
+            return await _odata.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        public Task DeleteAsync(string? id)
+        public Task DeleteAsync(string? id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = ODataMapper.Default.CreateArgs();
-                await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = ODataMapper.Default.CreateArgs();
+            await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Provides the <see cref="TripPerson"/> and OData  property mapping.

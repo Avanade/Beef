@@ -45,11 +45,9 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(string? id)
-        {
-            return new WebApiGet<TripPerson?>(this, () => _manager.GetAsync(id),
+        public IActionResult Get(string? id) =>
+            new WebApiGet<TripPerson?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
-        }
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
@@ -58,11 +56,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="TripPerson"/>.</returns>
         [HttpPost("")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] TripPerson value)
-        {
-            return new WebApiPost<TripPerson>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
+        public IActionResult Create([FromBody] TripPerson value) =>
+            new WebApiPost<TripPerson>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Updates an existing <see cref="TripPerson"/>.
@@ -72,11 +68,9 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="TripPerson"/>.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] TripPerson value, string? id)
-        {
-            return new WebApiPut<TripPerson>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
+        public IActionResult Update([FromBody] TripPerson value, string? id) =>
+            new WebApiPut<TripPerson>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
-        }
 
         /// <summary>
         /// Deletes the specified <see cref="TripPerson"/>.
@@ -84,11 +78,9 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(string? id)
-        {
-            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
+        public IActionResult Delete(string? id) =>
+            new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
-        }
     }
 }
 

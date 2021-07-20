@@ -45,48 +45,39 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id)
+        public Task<Gender?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Gender? __val))
-                    return __val;
+            var __key = new UniqueKey(id);
+            if (_cache.TryGetValue(__key, out Gender? __val))
+                return __val;
 
-                var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__key, __result);
-            });
-        }
+            var __result = await _data.GetAsync(id).ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__key, __result);
+        });
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value)
+        public Task<Gender> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value)
+        public Task<Gender> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
-                return _cache.SetAndReturnValue(__result);
-            });
-        }
+            var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
+            return _cache.SetAndReturnValue(__result);
+        });
     }
 }
 

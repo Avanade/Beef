@@ -42,42 +42,33 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id)
+        public Task<Gender?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
-                return await _db.GetAsync(__dataArgs, id).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
+            return await _db.GetAsync(__dataArgs, id).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value)
+        public Task<Gender> CreateAsync(Gender value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                return await _db.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
+            return await _db.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value)
+        public Task<Gender> UpdateAsync(Gender value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            return DataInvoker.Current.InvokeAsync(this, async () =>
-            {
-                var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                return await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            });
-        }
+            var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
+            return await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+        });
 
         /// <summary>
         /// Provides the <see cref="Gender"/> property and database column mapping.

@@ -96,81 +96,78 @@ namespace {{Root.NamespaceBusiness}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public async {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
+        public async {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}}) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
   {{#ifeq Type 'Create' 'Update'}}
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
   {{/ifeq}}
-            {{#if HasReturnValue}}return {{/if}}await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
   {{#ifval AuthRole}}
-                ExecutionContext.Current.IsInRole("{{AuthRole}}", true);
+            ExecutionContext.Current.IsInRole("{{AuthRole}}", true);
   {{/ifval}}
   {{#ifval AuthPermission}}
-                ExecutionContext.Current.IsAuthorized("{{AuthPermission}}", true);
+            ExecutionContext.Current.IsAuthorized("{{AuthPermission}}", true);
   {{/ifval}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#ifval IdentifierGeneratorName}}
-                value.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>().ConfigureAwait(false);
+            value.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>().ConfigureAwait(false);
       {{/ifval}}
     {{/each}}
   {{/ifeq}}
   {{#each Parameters}}
     {{#ifeq LayerPassing 'ToManagerSet'}}
-                value.{{Name}} = {{ArgumentName}};
+            value.{{Name}} = {{ArgumentName}};
     {{/ifeq}}
     {{#ifeq LayerPassing 'ToManagerCollSet'}}
-                value?.ForEach(__item => __item.{{Name}} = {{ArgumentName}});
+            value?.ForEach(__item => __item.{{Name}} = {{ArgumentName}});
     {{/ifeq}}
   {{/each}}
   {{#if ManagerCustom}}
-                {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
-                Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
+            Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
     {{/ifne}}
     {{#if ManagerExtensions}}
       {{#unless SingleValdiateParameters}}
-                await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
+            await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-                (await {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.RunAsync(throwOnError: true).ConfigureAwait(false);
       {{/each}}
     {{else}}
-                (await MultiValidator.Create()
+            await MultiValidator.Create()
       {{#each ValidateParameters}}
-                    .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+                .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
       {{#if ManagerExtensions}}
         {{#unless SingleValidateParameters}}
-                    .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
+                .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
 
     {{/if}}
     {{#if ManagerExtensions}}
-                await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
-                {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
-                await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
+            await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+            await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
       {{#if HasReturnValue}}
-                return Cleaner.Clean(__result);
+            return Cleaner.Clean(__result);
       {{/if}}
     {{else}}
-                {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}
-            }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }).ConfigureAwait(false);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }).ConfigureAwait(false);
   {{else}}
-            }, BusinessInvokerArgs.{{ManagerOperationType}}).ConfigureAwait(false);
+        }, BusinessInvokerArgs.{{ManagerOperationType}}).ConfigureAwait(false);
   {{/if}}
-        }
 {{/each}}
     }
 }

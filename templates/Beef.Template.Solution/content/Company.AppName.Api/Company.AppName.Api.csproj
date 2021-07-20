@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.1" />
+    <PackageReference Include="Beef.Events" Version="4.2.2" />
     <PackageReference Include="Beef.Events.EventHubs" Version="4.2.1" />
     <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />

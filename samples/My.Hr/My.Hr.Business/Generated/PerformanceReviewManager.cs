@@ -41,15 +41,12 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public async Task<PerformanceReview?> GetAsync(Guid id)
+        public async Task<PerformanceReview?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(id);
+            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -57,14 +54,11 @@ namespace My.Hr.Business
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public async Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
+        public async Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(employeeId);
-                return Cleaner.Clean(await _dataService.GetByEmployeeIdAsync(employeeId, paging).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(employeeId);
+            return Cleaner.Clean(await _dataService.GetByEmployeeIdAsync(employeeId, paging).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
@@ -72,18 +66,15 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public async Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId)
+        public async Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.EmployeeId = employeeId;
-                Cleaner.CleanUp(value);
-                (await value.Validate(nameof(value)).Entity().With<IValidator<PerformanceReview>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
-        }
+            value.EmployeeId = employeeId;
+            Cleaner.CleanUp(value);
+            await value.Validate().Entity().With<IValidator<PerformanceReview>>().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
@@ -91,32 +82,26 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public async Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id)
+        public async Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
-            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                value.Id = id;
-                Cleaner.CleanUp(value);
-                (await value.Validate(nameof(value)).Entity().With<IValidator<PerformanceReview>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
-        }
+            value.Id = id;
+            Cleaner.CleanUp(value);
+            await value.Validate().Entity().With<IValidator<PerformanceReview>>().RunAsync(throwOnError: true).ConfigureAwait(false);
+            return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
-            await ManagerInvoker.Current.InvokeAsync(this, async () =>
-            {
-                Cleaner.CleanUp(id);
-                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
-                await _dataService.DeleteAsync(id).ConfigureAwait(false);
-            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
-        }
+            Cleaner.CleanUp(id);
+            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            await _dataService.DeleteAsync(id).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
     }
 }
 

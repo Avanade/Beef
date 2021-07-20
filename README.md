@@ -26,12 +26,12 @@ The key industralisation goals are:
 As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardised and consistent manner.
 
 The APIs created will have the following capabilities out-of-the-box with limited developer effort, so the developer can focus on the key business value:
-- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICloneable`](./src/Beef.Core/Entities/ICloneable.cs), [`ICopyFrom`](./src/Beef.Core/Entities/ICopyFrom.cs), [`ICleanUp`](./src/Beef.Core/Entities/ICleanUp.cs), [`IUniqueKey`](./src/Beef.Core/Entities/IUniqueKey.cs), etc.
+- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICloneable`](./src/Beef.Abstractions/Entities/ICloneable.cs), [`ICopyFrom`](./src/Beef.Abstractions/Entities/ICopyFrom.cs), [`ICleanUp`](./src/Beef.Abstractions/Entities/ICleanUp.cs), [`IUniqueKey`](./src/Beef.Abstractions/Entities/IUniqueKey.cs), etc.
 - Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimised serialisation, and enriched API endpoints.
 - Rich [Validation](./docs/Beef-Validation.md) capability to simplify and ensure data integrity and consistency.
 - CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](./src/Beef.Data.Database/README.md) and [Entity Framework](./src/Beef.Data.EntityFrameworkCore/README.md)), [Cosmos DB](./src/Beef.Data.Cosmos/README.md) and [OData](./src/Beef.Data.OData/README.md) in a standardised manner. 
 - An approach and tooling to automate and manage [database](./tools/Beef.Database.Core/README.md) set up, configuration, and deployment.
-- [Paging](./src/Beef.Core/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
+- [Paging](./src/Beef.Abstractions/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
 - [ETag](https://en.wikipedia.org/wiki/HTTP_ETag) (concurrency) and `If-Match`/`If-None-Match` handling.
 - JSON response field [filtering (include/exclude)](./src/Beef.Core/Json/JsonPropertyFilter.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
 - [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
@@ -137,6 +137,7 @@ The **key** capabilities for _Beef_ are enabled by the following runtime assembl
 
 Assembly | Description | NuGet | Changes
 -|-|-|-
+[`Beef.Abstractions`](./src/Beef.Abstractions) | Core foundational framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Abstractions.svg)](https://badge.fury.io/nu/Beef.Abstractions) | [Log](./src/Beef.Abstractions/CHANGELOG.md)
 [`Beef.Core`](./src/Beef.Core) | Core foundational framework. | [![NuGet version](https://badge.fury.io/nu/Beef.core.svg)](https://badge.fury.io/nu/Beef.core) | [Log](./src/Beef.Core/CHANGELOG.md)
 [`Beef.AspNetCore.WebApi`](./src/Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi) | [Log](./src/Beef.AspNetCore.WebApi/ChangeLog.md)
 [`Beef.Data.Database`](./src/Beef.Data.Database) | ADO.NET database framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database) | [Log](./src/Beef.Data.Database/CHANGELOG.md)

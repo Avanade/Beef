@@ -2,11 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Enhancement:* The `Entity.ExcludeAll` configuration will automatically default to `true` where an entity does not have at least one `Operation` specified.
+- *Enhancement:* The `EntityWebApiController_cs`, `EntityManager_cs`, `EntityDataSvc_cs` and `EntityData_cs` handlebars templates have been updated to further simplify the code generated.
+- *Enhancement:* Added the `Beef.Codegen.Core` version number to the code-gen console output.
+
 ## v4.2.5
 - *Fixed:* The `ServiceCollectionExtensions` were not being generated correctly for the `Manager` and `DataSvc` layers.
 
 ## v4.2.4
-- *Fixed:* The was a YAML configuration issue using `Yes` and `No` for option strings, as these are reserved for `boolean` values. All properties that previously supported both `Yes` and `No` are now booleans. The one exception is `Entity.ExcludeData` which has options: `Include` (default), `Exclude` and `RequiresMapper`. These are all automatically translated from their respective existing XML values.
+- *Fixed:* There was a YAML configuration issue using `Yes` and `No` for option strings, as these are reserved for `boolean` values. All properties that previously supported both `Yes` and `No` are now booleans. The one exception is `Entity.ExcludeData` which has options: `Include` (default), `Exclude` and `RequiresMapper`. These are all automatically translated from their respective existing XML values.
 - *Fixed:* The JSON Schemas have been updated to leverage `definitions` for defining each object type; this fixes the issue where only the first item in an array was validating correctly (and supporting corresponding intellisense).
 
 ## v4.2.3
