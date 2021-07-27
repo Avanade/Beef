@@ -1,17 +1,16 @@
 ﻿//#if (implement_database)
 entityScope: Autonomous
-eventSubjectRoot: Foo.Db
+eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventSourceRoot: Foo.Db/Bar
+eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 eventOutbox: Database
 appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
-databaseSchema: Bar
+databaseSchema: AppName
 entities:
-
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
     properties: [
@@ -24,18 +23,16 @@ entities:
 //#endif
 //#if (implement_entityframework)
 entityScope: Autonomous
-eventSubjectRoot: Foo.Ef
+eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventSourceRoot: Foo.Ef/Bar
+eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 eventOutbox: Database
 appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
-databaseSchema: Bar
 entities:
-
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
     properties: [
@@ -48,17 +45,15 @@ entities:
 //#endif
 //#if (implement_cosmos)
 entityScope: Autonomous
-eventSubjectRoot: Foo.Co
+eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventSourceRoot: Foo.Co/Bar
+eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
-databaseSchema: Bar
 entities:
-
   # The following is an example Entity with CRUD operations defined accessing Cosmos DB.
 
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,

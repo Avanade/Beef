@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Fixed hard-coded company and appname values.
+
 ## v4.2.3
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 
