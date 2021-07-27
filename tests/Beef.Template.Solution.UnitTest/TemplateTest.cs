@@ -140,7 +140,7 @@ namespace Beef.Template.Solution.UnitTest
             }
 
             // Run the intra-integration tests.
-            Assert.Zero(ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");
+            Assert.Zero(ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj -v n", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");
         }
     }
 }
