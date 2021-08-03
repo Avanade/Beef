@@ -10,6 +10,7 @@ namespace Beef.Entities
     /// <summary>
     /// Represents the base <b>Entity</b> class.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class EntityBase : EntityBasicBase, IEditableObject, ICloneable, ICopyFrom, ICleanUp, IChangeTrackingLogging
     {
         private object? _editCopy;

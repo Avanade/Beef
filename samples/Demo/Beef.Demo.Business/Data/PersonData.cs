@@ -2,6 +2,7 @@
 using Beef.Data.EntityFrameworkCore;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
+using Beef.Mapper;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -137,19 +138,16 @@ namespace Beef.Demo.Business.Data
             return pd;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-        private Task<Person> GetNullOnImplementationAsync(string _, List<string> __)
-        {
-            return Task.FromResult<Person>(null);
-        }
+        private Task<Person> GetNullOnImplementationAsync(string _, List<string> __) => Task.FromResult<Person>(null);
 
-        public partial class EfMapper
+        public partial class EfMapperProfile
         {
-            private readonly EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper.CreateAuto<Address, EfModel.Person>();
-
-            partial void EfMapperCtor()
+            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Person, EfModel.Person> s2d, AutoMapper.IMappingExpression<EfModel.Person, Person> d2s)
             {
-                SrceProperty(s => s.Address).SetMapper(_addressMapper);
+                // Flatten and unflatten the address.
+                CreateMap<Address, EfModel.Person>().ReverseMap();
+                s2d.IncludeMembers(s => s.Address);
+                d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
             }
         }
     }

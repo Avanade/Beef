@@ -579,14 +579,19 @@ properties: [
         public string DataMapperPropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : CompareNullOrValue(DataConverter, "ReferenceDataCodeConverter") ? PropertyName : Name!;
 
         /// <summary>
+        /// Gets or sets the data converter name.
+        /// </summary>
+        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
+
+        /// <summary>
         /// Gets the data converter C# code.
         /// </summary>
-        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverterName}.Default!)";
 
         /// <summary>
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
-        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default.ConvertToSrce(";
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.Default.ConvertToSrce(";
 
         /// <summary>
         /// Gets the WebAPI parameter type.

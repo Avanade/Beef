@@ -8,6 +8,7 @@ namespace Beef.Entities
     /// <summary>
     /// Represents a composite unique key.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public struct UniqueKey : IEquatable<UniqueKey>
     {
         /// <summary>

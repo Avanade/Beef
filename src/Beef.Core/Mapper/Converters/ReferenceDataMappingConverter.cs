@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using AutoMapper;
 using Beef.RefData;
 using System;
 
@@ -32,6 +33,8 @@ namespace Beef.Mapper.Converters
         protected ReferenceDataMappingConverter(string name)
         {
             Name = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
+            ToDest = new ReferenceDataMappingConverterToDest(this);
+            ToSrce = new ReferenceDataMappingConverterToSrce(this);
         }
 
         /// <summary>
@@ -94,19 +97,65 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((TSrceProperty)value!);
-        }
+        object? IPropertyMapperConverter.ConvertToDest(object? value) => ConvertToDest((TSrceProperty)value!);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value) => ConvertToSrce((TDestProperty)value!);
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceDataMappingConverterToDest"/>.
+        /// </summary>
+        public ReferenceDataMappingConverterToDest ToDest { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceDataMappingConverterToSrce"/>.
+        /// </summary>
+        public ReferenceDataMappingConverterToSrce ToSrce { get; }
+
+        /// <summary>
+        /// Represents a <see cref="ReferenceDataMappingConverter{TDefault, TSrceProperty, TDestProperty}"/> <see cref="IValueConverter{TSourceMember, TDestinationMember}"/> for source to destination conversion.
+        /// </summary>
+        public class ReferenceDataMappingConverterToDest : IValueConverter<TSrceProperty, TDestProperty>
         {
-            return ConvertToSrce((TDestProperty)value!);
+            private readonly ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> _parent;
+
+            /// <summary>
+            /// Initializes a new instance of the class.
+            /// </summary>
+            internal ReferenceDataMappingConverterToDest(ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> parent) => _parent = parent;
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            /// <param name="sourceMember"><inheritdoc/></param>
+            /// <param name="context"><inheritdoc/></param>
+            /// <returns><inheritdoc/></returns>
+            public TDestProperty Convert(TSrceProperty sourceMember, ResolutionContext context) => _parent.ConvertToDest(sourceMember);
+        }
+
+        /// <summary>
+        /// Represents a <see cref="ReferenceDataMappingConverter{TDefault, TSrceProperty, TDestProperty}"/> <see cref="IValueConverter{TSourceMember, TDestinationMember}"/> for destination to source conversion.
+        /// </summary>
+        public class ReferenceDataMappingConverterToSrce : IValueConverter<TDestProperty, TSrceProperty>
+        {
+            private readonly ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> _parent;
+
+            /// <summary>
+            /// Initializes a new instance of the class.
+            /// </summary>
+            internal ReferenceDataMappingConverterToSrce(ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> parent) => _parent = parent;
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            /// <param name="sourceMember"><inheritdoc/></param>
+            /// <param name="context"><inheritdoc/></param>
+            /// <returns><inheritdoc/></returns>
+            public TSrceProperty Convert(TDestProperty sourceMember, ResolutionContext context) => _parent.ConvertToSrce(sourceMember);
         }
     }
 }

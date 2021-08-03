@@ -8,6 +8,7 @@ namespace Beef.Entities
     /// Represents either position-based paging being (<see cref="Page"/> and <see cref="Size"/>), or <see cref="Skip"/> and <see cref="Take"/>. The <see cref="DefaultTake"/> 
     /// and <see cref="MaxTake"/> (and <see cref="DefaultIsGetCount"/>) are system-wide settings to encourage page-size consistency, as well as limit the maximum value possible. 
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class PagingArgs
     {
         private static long _defaultTake = 100;

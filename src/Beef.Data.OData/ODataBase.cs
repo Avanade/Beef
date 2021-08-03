@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Mapper;
 using Microsoft.OData;
 using Simple.OData.Client;
 using System;
@@ -79,23 +80,21 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="queryArgs">The <see cref="IODataArgs"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="ODataQuery{T, TModel}"/>.</returns>
-        public ODataQuery<T, TModel> Query<T, TModel>(ODataArgs<T, TModel> queryArgs, Func<Soc.IBoundClient<TModel>, Soc.IBoundClient<TModel>>? query = null) where T : class, new() where TModel : class, new()
-        {
-            return new ODataQuery<T, TModel>(this, queryArgs, query);
-        }
+        public ODataQuery<T, TModel> Query<T, TModel>(IODataArgs queryArgs, Func<Soc.IBoundClient<TModel>, Soc.IBoundClient<TModel>>? query = null) where T : class, new() where TModel : class, new()
+            => new ODataQuery<T, TModel>(this, queryArgs, query);
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> (mapping from <typeparamref name="TModel"/> to <typeparamref name="T"/>) asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="getArgs">The <see cref="IODataArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T?> GetAsync<T, TModel>(ODataArgs<T, TModel> getArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
+        public async Task<T?> GetAsync<T, TModel>(IODataArgs getArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));
@@ -106,8 +105,8 @@ namespace Beef.Data.OData
             {
                 try
                 {
-                    var model = await GetModelAsync(getArgs, okeys).ConfigureAwait(false);
-                    return GetValue(getArgs, model);
+                    var model = await GetModelAsync<T, TModel>(getArgs, okeys).ConfigureAwait(false);
+                    return GetValue<T, TModel>(getArgs, model);
                 }
                 catch (WebRequestException odex)
                 {
@@ -122,7 +121,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the model.
         /// </summary>
-        private async Task<TModel?> GetModelAsync<T, TModel>(ODataArgs<T, TModel> getArgs, object[]? keys) where T : class, new() where TModel : class, new()
+        private async Task<TModel?> GetModelAsync<T, TModel>(IODataArgs getArgs, object?[] keys) where T : class, new() where TModel : class, new()
         {
             try
             {
@@ -142,10 +141,10 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IODataArgs"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The created entity value.</returns>
-        public async Task<T> CreateAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new()
+        public async Task<T> CreateAsync<T, TModel>(IODataArgs saveArgs, T value) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -157,9 +156,9 @@ namespace Beef.Data.OData
 
             return await Invoker.InvokeAsync(this, async () =>
             {
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
+                var model = saveArgs.Mapper.Map<T, TModel>(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
                 var created = await Client.For<TModel>(saveArgs.CollectionName).Set(model).InsertEntryAsync(true).ConfigureAwait(false);
-                return GetValue(saveArgs, created)!;
+                return GetValue<T, TModel>(saveArgs, created)!;
             }, this).ConfigureAwait(false);
         }
 
@@ -168,10 +167,10 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IODataArgs"/>.</param>
         /// <param name="value">The value to update.</param>
         /// <returns>The updated entity value.</returns>
-        public async Task<T> UpdateAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new()
+        public async Task<T> UpdateAsync<T, TModel>(IODataArgs saveArgs, T value) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -184,16 +183,16 @@ namespace Beef.Data.OData
             return await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(value);
-                var model = await GetModelAsync(saveArgs, okeys).ConfigureAwait(false);
+                var model = await GetModelAsync<T, TModel>(saveArgs, okeys).ConfigureAwait(false);
                 if (model == null)
                     throw new NotFoundException();
 
-                saveArgs.Mapper.MapToDest(value, model, Mapper.OperationTypes.Update);
+                saveArgs.Mapper.Map<T, TModel>(value, model, Mapper.OperationTypes.Update);
                 var updated = await Client.For<TModel>(saveArgs.CollectionName).Key(okeys).Set(model).UpdateEntryAsync(true).ConfigureAwait(false);
                 if (updated == null)
                     throw new NotFoundException();
 
-                return GetValue(saveArgs, updated)!;
+                return GetValue<T, TModel>(saveArgs, updated)!;
             }, this).ConfigureAwait(false);
         }
 
@@ -202,10 +201,10 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IODataArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
+        public async Task DeleteAsync<T, TModel>(IODataArgs saveArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -230,12 +229,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the corresponding entity value from the model value.
         /// </summary>
-        internal static T? GetValue<T, TModel>(ODataArgs<T, TModel> args, TModel? model) where T : class, new() where TModel : class, new()
-        {
-            if (model == null)
-                return null;
-            else
-                return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the OData model must not result in a null value.");
-        }
+        internal static T? GetValue<T, TModel>(IODataArgs args, TModel? model) where T : class, new() where TModel : class, new()   
+            => (model == null) ? null : args.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the OData model must not result in a null value.");
     }
 }

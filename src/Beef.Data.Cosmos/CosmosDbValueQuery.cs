@@ -29,17 +29,15 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the <see cref="CosmosDbArgs{T, TModel}"/>.
+        /// Gets the <see cref="ICosmosDbArgs"/>.
         /// </summary>
-        public CosmosDbArgs<T, TModel> QueryArgs => _container.DbArgs;
+        public ICosmosDbArgs QueryArgs => _container.DbArgs;
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
         internal void ExecuteQuery(Action<IQueryable<CosmosDbValue<TModel>>> execute)
-        {
-            _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
-        }
+            => _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
 
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
@@ -47,7 +45,7 @@ namespace Beef.Data.Cosmos
         private IQueryable<CosmosDbValue<TModel>> ExecuteQueryInternal(Action<IQueryable<CosmosDbValue<TModel>>>? execute)
         {
             IQueryable<CosmosDbValue<TModel>> q =
-                _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
+                _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions<T, TModel>(QueryArgs));
 
             q = _query == null ?
                 AuthorizationFilter(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name)) :

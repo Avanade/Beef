@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Data.Database;
-using Beef.Events;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -36,49 +35,49 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="queryArgs">The <see cref="IEfDbArgs"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
-        IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new();
+        IEfDbQuery<T, TModel> Query<T, TModel>(IEfDbArgs queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> mapping from <typeparamref name="TModel"/> to <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="getArgs">The <see cref="IEfDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        Task<T?> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+        Task<T?> GetAsync<T, TModel>(IEfDbArgs getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Performs a create for the value (reselects and/or automatically saves changes where specified).
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IEfDbArgs"/>.</param>
         /// <param name="value">The value to insert.</param>
         /// <returns>The value (refreshed where specified).</returns>
-        Task<T> CreateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+        Task<T> CreateAsync<T, TModel>(IEfDbArgs saveArgs, T value) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Performs an update for the value (reselects and/or automatically saves changes where specified).
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IEfDbArgs"/>.</param>
         /// <param name="value">The value to insert.</param>
         /// <returns>The value (refreshed where specified).</returns>
-        Task<T> UpdateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+        Task<T> UpdateAsync<T, TModel>(IEfDbArgs saveArgs, T value) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Performs a delete for the specified <paramref name="keys"/>.
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="IEfDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
-        Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+        Task DeleteAsync<T, TModel>(IEfDbArgs saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Gets the <see cref="DatabaseEventOutboxInvoker"/> for the base <see cref="IDatabase"/>.

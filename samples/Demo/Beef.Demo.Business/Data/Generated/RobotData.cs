@@ -28,6 +28,7 @@ namespace Beef.Demo.Business.Data
     public partial class RobotData : IRobotData
     {
         private readonly ICosmosDb _cosmos;
+        private readonly AutoMapper.IMapper _mapper;
 
         private Action<ICosmosDbArgs>? _onDataArgsCreate;
         private Func<IQueryable<Model.Robot>, RobotArgs?, ICosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
@@ -36,8 +37,9 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="RobotData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public RobotData(ICosmosDb cosmos)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); RobotDataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public RobotData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); RobotDataCtor(); }
 
         partial void RobotDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -48,8 +50,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
         public Task<Robot?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-            return await _cosmos.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).GetAsync(id).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -59,8 +61,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-            return await _cosmos.Container(__dataArgs).CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -70,8 +72,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-            return await _cosmos.Container(__dataArgs).UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -80,8 +82,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-            await _cosmos.Container(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            await _cosmos.Container<Robot, Model.Robot>(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -93,31 +95,43 @@ namespace Beef.Demo.Business.Data
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             RobotCollectionResult __result = new RobotCollectionResult(paging);
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
-            __result.Result = _cosmos.Container(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+            __result.Result = _cosmos.Container<Robot, Model.Robot>(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
 
         /// <summary>
-        /// Provides the <see cref="Robot"/> and Cosmos  property mapping.
+        /// Provides the <see cref="Robot"/> and Entity Framework <see cref="CosmoskModel"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class CosmosMapper : CosmosDbMapper<Robot, Model.Robot, CosmosMapper>
+        public partial class CosmosMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
+            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
             /// </summary>
-            public CosmosMapper()
+            public CosmosMapperProfile()
             {
-                Property(s => s.Id, d => d.Id).SetUniqueKey(false);
-                Property(s => s.ModelNo, d => d.ModelNo);
-                Property(s => s.SerialNo, d => d.SerialNo);
-                Property(s => s.EyeColorSid, d => d.EyeColor);
-                Property(s => s.PowerSourceSid, d => d.PowerSource);
-                AddStandardProperties();
-                CosmosMapperCtor();
+                var s2d = CreateMap<Robot, Model.Robot>();
+                s2d.ForMember(d => d.Id, o => o.MapFrom(s => s.Id));
+                s2d.ForMember(d => d.ModelNo, o => o.MapFrom(s => s.ModelNo));
+                s2d.ForMember(d => d.SerialNo, o => o.MapFrom(s => s.SerialNo));
+                s2d.ForMember(d => d.EyeColor, o => o.MapFrom(s => s.EyeColorSid));
+                s2d.ForMember(d => d.PowerSource, o => o.MapFrom(s => s.PowerSourceSid));
+                s2d.ForMember(d => d.ETag, o => o.MapFrom(s => s.ETag));
+                s2d.ForMember(d => d.ChangeLog, o => o.MapFrom(s => s.ChangeLog));
+
+                var d2s = CreateMap<Model.Robot, Robot>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.Id));
+                d2s.ForMember(s => s.ModelNo, o => o.MapFrom(d => d.ModelNo));
+                d2s.ForMember(s => s.SerialNo, o => o.MapFrom(d => d.SerialNo));
+                d2s.ForMember(s => s.EyeColorSid, o => o.MapFrom(d => d.EyeColor));
+                d2s.ForMember(s => s.PowerSourceSid, o => o.MapFrom(d => d.PowerSource));
+                d2s.ForMember(s => s.ETag, o => o.MapFrom(d => d.ETag));
+                d2s.ForMember(s => s.ChangeLog, o => o.MapFrom(d => d.ChangeLog));
+
+                CosmosMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
+
+            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Robot, Model.Robot> s2d, AutoMapper.IMappingExpression<Model.Robot, Robot> d2s); // Enables the constructor to be extended.
         }
     }
 }

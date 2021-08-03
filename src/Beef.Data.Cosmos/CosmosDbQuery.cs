@@ -50,24 +50,21 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the <see cref="CosmosDbArgs{T, TModel}"/>.
+        /// Gets the <see cref="ICosmosDbArgs"/>.
         /// </summary>
-        public CosmosDbArgs<T, TModel> QueryArgs => _container.DbArgs;
+        public ICosmosDbArgs QueryArgs => _container.DbArgs;
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal void ExecuteQuery(Action<IQueryable<TModel>> execute)
-        {
-            _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
-        }
+        internal void ExecuteQuery(Action<IQueryable<TModel>> execute) => _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
 
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
         /// </summary>
         private IQueryable<TModel> ExecuteQueryInternal(Action<IQueryable<TModel>>? execute)
         {
-            IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
+            IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions<T, TModel>(QueryArgs));
             q = _query == null ? q : _query(q);
 
             if (QueryArgs.AuthorizeFilter != null)
@@ -98,10 +95,7 @@ namespace Beef.Data.Cosmos
         /// Gets a prepared <see cref="IQueryable{TModel}"/> with any <see cref="CosmosDbValue{TModel}"/> filtering as applicable.
         /// </summary>
         /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
-        public IQueryable<TModel> AsQueryable()
-        {
-            return AsQueryable(true);
-        }
+        public IQueryable<TModel> AsQueryable() => AsQueryable(true);
 
         /// <summary>
         /// Initiate the IQueryable.

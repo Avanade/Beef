@@ -259,6 +259,14 @@ entities:
         public string? DataUsingNamespace { get; set; }
 
         /// <summary>
+        /// Gets or sets the data mapper option. 
+        /// </summary>
+        [JsonProperty("dataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The data mapper option.", IsImportant = true, Options = new string[] { "AutoMapper", "EntityMapper" },
+            Description = "Defaults to `AutoMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).")]
+        public string? DataMapper { get; set; }
+
+        /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code where <c>Operation.AutoImplement</c> is <c>Database</c>.
         /// </summary>
         [JsonProperty("databaseUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -625,6 +633,7 @@ entities:
             EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : "Common");
             RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.{EntityUsing}.Entities");
             RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
+            DataMapper = DefaultWhereNull(DataMapper, () => "AutoMapper");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");

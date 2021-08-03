@@ -63,6 +63,9 @@ namespace Beef.Demo.Functions
             // Add event publishing.
             builder.Services.AddBeefEventHubEventProducer(new EventHubProducerClient(config.GetValue<string>("EventHubConnectionString")));
 
+            // Add the AutoMapper profiles.
+            builder.Services.AddAutoMapper(Mapper.AutoMapperProfile.Assembly, typeof(ContactData).Assembly);
+
             // Add logging.
             builder.Services.AddLogging();
         }

@@ -12,6 +12,7 @@ namespace Beef.Entities
     /// </summary>
     [DebuggerDisplay("Type = {Type}, Text = {Text}, Property = {Property}")]
     [JsonObject(MemberSerialization.OptIn)]
+    [System.Diagnostics.DebuggerStepThrough]
     public class MessageItem : EntityBase, IEquatable<MessageItem>
     {
         private MessageType _type;

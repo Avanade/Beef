@@ -3,6 +3,8 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Beef.Mapper;
+using AutoMapper;
+using System.Diagnostics;
 
 namespace Beef.Core.UnitTest.Mapper
 {
@@ -309,15 +311,21 @@ namespace Beef.Core.UnitTest.Mapper
             };
 
             PersonB pb = null;
-            for (int i = 0; i < 10000; i++)
+            pb = mapper.MapToDest(pa);
+            var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < 100000; i++)
             {
                 pa.Age = i;
                 pb = mapper.MapToDest(pa);
             }
 
+            sw.Stop();
+            System.Console.WriteLine($"100K mappings - elapsed: {sw.ElapsedMilliseconds} (ms)");
+
             Assert.IsNotNull(pb);
             Assert.AreEqual("Bob", pb.Name);
-            Assert.AreEqual(9999, pb.Age);
+            Assert.AreEqual(99999, pb.Age);
             Assert.AreEqual(18995m, pb.Salary);
             Assert.AreEqual("Simpsons", pb.StreetX);
             Assert.AreEqual("Bardon", pb.CityX);
@@ -359,7 +367,9 @@ namespace Beef.Core.UnitTest.Mapper
             };
 
             PersonB pb = null;
-            for (int i = 0; i < 10000; i++)
+            var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < 100000; i++)
             {
                 pa.Age = i;
                 pb = new PersonB
@@ -383,9 +393,79 @@ namespace Beef.Core.UnitTest.Mapper
                 };
             }
 
+            sw.Stop();
+            System.Console.WriteLine($"100K mappings - elapsed: {sw.ElapsedMilliseconds} (ms)");
+
             Assert.IsNotNull(pb);
             Assert.AreEqual("Bob", pb.Name);
-            Assert.AreEqual(9999, pb.Age);
+            Assert.AreEqual(99999, pb.Age);
+            Assert.AreEqual(18995m, pb.Salary);
+            Assert.AreEqual("Simpsons", pb.StreetX);
+            Assert.AreEqual("Bardon", pb.CityX);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.IsNotNull(pb.Codes);
+            Assert.AreEqual(new int[] { 1, 2, 3 }, pb.Codes);
+            Assert.IsNotNull(pb.AddressX);
+            Assert.AreEqual("Petherick", pb.AddressX.Street);
+            Assert.AreEqual("Pomare", pb.AddressX.City);
+            Assert.IsNotNull(pb.Addresses);
+            Assert.AreEqual(2, pb.Addresses.Count);
+            Assert.AreEqual("158TH", pb.Addresses[0].Street);
+            Assert.AreEqual("Redmond", pb.Addresses[0].City);
+            Assert.AreEqual("Upoko", pb.Addresses[1].Street);
+            Assert.AreEqual("Hataitai", pb.Addresses[1].City);
+        }
+
+        [Test]
+        public void XMapToDest_AutoPerfVolume_AutoMapperCompare()
+        {
+            var mc = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Address, AddressX>();
+                cfg.CreateMap<PersonA, PersonB>()
+                    .ForMember(d => d.StreetX, o => o.MapFrom(s => s.Street))
+                    .ForMember(d => d.CityX, o => o.MapFrom(s => s.City))
+                    .ForMember(d => d.AddressX, o => o.MapFrom(s => s.Address));
+            });
+
+            var mapper = new AutoMapper.Mapper(mc);
+
+            var pa = new PersonA
+            {
+                Name = "Bob",
+                Age = 21,
+                Salary = 18995m,
+                Street = "Simpsons",
+                City = "Bardon",
+                Codes = new int[] { 1, 2, 3 },
+                Address = new Address
+                {
+                    Street = "Petherick",
+                    City = "Pomare"
+                },
+                Addresses = new Address[]
+                {
+                    new Address { Street = "158TH", City = "Redmond" },
+                    new Address { Street = "Upoko", City = "Hataitai" }
+                }
+            };
+
+            PersonB pb = null;
+            pb = mapper.Map<PersonA, PersonB>(pa);
+            var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < 100000; i++)
+            {
+                pa.Age = i;
+                pb = mapper.Map<PersonA, PersonB>(pa);
+            }
+
+            sw.Stop();
+            System.Console.WriteLine($"100K mappings - elapsed: {sw.ElapsedMilliseconds} (ms)");
+
+            Assert.IsNotNull(pb);
+            Assert.AreEqual("Bob", pb.Name);
+            Assert.AreEqual(99999, pb.Age);
             Assert.AreEqual(18995m, pb.Salary);
             Assert.AreEqual("Simpsons", pb.StreetX);
             Assert.AreEqual("Bardon", pb.CityX);

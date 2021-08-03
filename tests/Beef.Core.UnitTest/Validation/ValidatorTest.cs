@@ -584,5 +584,23 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual("Key must not exceed 2 characters in length.", r.Messages[0].Text);
             Assert.AreEqual("Value[k2x]", r.Messages[0].Property);
         }
+
+        [Test]
+        public async Task Validator_Perf()
+        {
+            var ev = new EmployeeValidator();
+            var v = new Employee { FirstName = "Speedy", LastName = "Fasti", Birthdate = new DateTime(1999, 10, 22), Salary = 51000m, WorkingYears = 20 };
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            for (int i = 0; i < 100000; i++)
+            {
+                var r = await ev.ValidateAsync(v).ConfigureAwait(false);
+                Assert.IsFalse(r.HasErrors);
+            }
+
+            sw.Stop();
+            System.Console.WriteLine($"100K validations - elapsed: {sw.ElapsedMilliseconds} (ms)");
+        }
     }
 }

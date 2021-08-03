@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping:
+  - Renamed `ICosmosDbArgs.Mapper` to `ICosmosDbArgs.EntityMapper`, and `CosmosDbArgs.Mapper` to `CosmosDbArgs.EntityMapper` - they are now nullable to support different mappers.
+  - `ICosmosDbArgs.Mapper` and `CosmosDbArgs<T, TModel>.Mapper` properties added (`Type` of `AutoMapper.IMapper`).
+  - `CosmosDbArgs` added to support the new AutoMapper requirements; the existing `CosmosDbArgs<T, TModel>` will be deprecated in the future.
+  - `CosmosDbBase` and `CosmosDbQuery` updated to support both existing `EntityMapper` and AutoMapper mappings.
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 

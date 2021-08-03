@@ -98,7 +98,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -109,7 +109,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.PowerSource, Model.PowerSource>(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -131,7 +131,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.StatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(StatusMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Status, EfModel.Status>(StatusMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 

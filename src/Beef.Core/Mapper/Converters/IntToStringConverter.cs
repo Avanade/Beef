@@ -30,12 +30,12 @@ namespace Beef.Mapper.Converters
     /// </summary>
     public class NullableIntToStringConverter : CustomConverter<int?, string?>
     {
-        private static readonly Lazy<IntToStringConverter> _default = new(() => new IntToStringConverter(), true);
+        private static readonly Lazy<NullableIntToStringConverter> _default = new(() => new NullableIntToStringConverter(), true);
 
         /// <summary>
         /// Gets the default (singleton) instance.
         /// </summary>
-        public static IntToStringConverter Default { get { return _default.Value; } }
+        public static NullableIntToStringConverter Default { get { return _default.Value; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IntToStringConverter"/> class.

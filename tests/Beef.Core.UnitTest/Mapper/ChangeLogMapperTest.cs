@@ -1,4 +1,5 @@
-﻿using Beef.Entities;
+﻿using AutoMapper;
+using Beef.Entities;
 using Beef.Mapper;
 using NUnit.Framework;
 using System;
@@ -10,6 +11,16 @@ namespace Beef.Core.UnitTest.Mapper
     [TestFixture]
     public class ChangeLogMapperTest
     {
+        private IMapper AutoMapperCreate()
+        {
+            var c = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<AutoMapperProfile>();
+                cfg.CreateMap<TestS, TestD>().ReverseMap();
+            });
+            return new AutoMapper.Mapper(c);
+        }
+
         private ChangeLog CreateChangeLog() => new ChangeLog
         {
             CreatedBy = "C",
@@ -39,6 +50,14 @@ namespace Beef.Core.UnitTest.Mapper
             Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
             Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
             Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+
+            r = AutoMapperCreate().Map<TestS, TestD>(new TestS { ChangeLog = CreateChangeLog() });
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("C", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
         }
 
         [Test]
@@ -48,6 +67,14 @@ namespace Beef.Core.UnitTest.Mapper
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
 
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.IsNull(r.ChangeLog.CreatedBy);
+            Assert.IsNull(r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+
+            r = AutoMapperCreate().Map<TestS, TestD>(new TestS { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.ChangeLog);
             Assert.IsNull(r.ChangeLog.CreatedBy);
@@ -70,6 +97,15 @@ namespace Beef.Core.UnitTest.Mapper
             Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
             Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
             Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+
+            r = new TestD { ChangeLog = CreateChangeLog2() };
+            AutoMapperCreate().Map<TestS, TestD>(new TestS { ChangeLog = CreateChangeLog() }, r);
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("C", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
         }
 
         [Test]
@@ -80,6 +116,15 @@ namespace Beef.Core.UnitTest.Mapper
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() }, r, OperationTypes.Update);
 
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("CC", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1971, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+
+            r = new TestD { ChangeLog = CreateChangeLog2() };
+            AutoMapperCreate().Map<TestS, TestD>(new TestS { ChangeLog = CreateChangeLog() }, r, OperationTypes.Update);
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.ChangeLog);
             Assert.AreEqual("CC", r.ChangeLog.CreatedBy);
@@ -101,6 +146,14 @@ namespace Beef.Core.UnitTest.Mapper
             Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
             Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
             Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+
+            r = AutoMapperCreate().Map<TestD, TestS>(new TestD { ChangeLog = CreateChangeLog() });
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("C", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
         }
 
         [Test]
@@ -110,6 +163,7 @@ namespace Beef.Core.UnitTest.Mapper
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToSrce(new TestD { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
 
+            r = AutoMapperCreate().Map<TestD, TestS>(new TestD { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.ChangeLog);
             Assert.IsNull(r.ChangeLog.CreatedBy);
@@ -119,37 +173,26 @@ namespace Beef.Core.UnitTest.Mapper
         }
 
         [Test]
-        public void MapToSrce_Replace_OperationAny()
+        public void MapToSrce_OperationGet()
         {
-            Assert.Inconclusive("Functionality not implemented (yet).");
-            //var r = new TestS { ChangeLog = CreateChangeLog2() };
-            //EntityMapper<TestS, TestD>.Create()
-            //    .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
-            //    .MapToSrce(new TestD { ChangeLog = CreateChangeLog() }, r);
+            var r = EntityMapper.Create<TestS, TestD>()
+                .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
+                .MapToSrce(new TestD { ChangeLog = CreateChangeLog() });
 
-            //Assert.IsNotNull(r);
-            //Assert.IsNotNull(r.ChangeLog);
-            //Assert.AreEqual("C", r.ChangeLog.CreatedBy);
-            //Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
-            //Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
-            //Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
-        }
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("C", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
 
-        [Test]
-        public void MapToSrce_Replace_OperationUpdate()
-        {
-            Assert.Inconclusive("Functionality not implemented (yet).");
-            //var r = new TestS { ChangeLog = CreateChangeLog2() };
-            //EntityMapper<TestS, TestD>.Create()
-            //    .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
-            //    .MapToSrce(new TestD { ChangeLog = CreateChangeLog() }, r, OperationTypes.Update);
-
-            //Assert.IsNotNull(r);
-            //Assert.IsNotNull(r.ChangeLog);
-            //Assert.AreEqual("CC", r.ChangeLog.CreatedBy);
-            //Assert.AreEqual(new DateTime(1971, 01, 01), r.ChangeLog.CreatedDate);
-            //Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
-            //Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
+            r = AutoMapperCreate().Map<TestD, TestS>(new TestD { ChangeLog = CreateChangeLog() }, r, OperationTypes.Get);
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.ChangeLog);
+            Assert.AreEqual("C", r.ChangeLog.CreatedBy);
+            Assert.AreEqual(new DateTime(1970, 01, 01), r.ChangeLog.CreatedDate);
+            Assert.AreEqual("U", r.ChangeLog.UpdatedBy);
+            Assert.AreEqual(new DateTime(1980, 01, 01), r.ChangeLog.UpdatedDate);
         }
 
         public class TestS

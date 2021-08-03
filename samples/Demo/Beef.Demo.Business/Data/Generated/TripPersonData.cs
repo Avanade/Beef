@@ -28,13 +28,15 @@ namespace Beef.Demo.Business.Data
     public partial class TripPersonData : ITripPersonData
     {
         private readonly ITripOData _odata;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITripOData"/>.</param>
-        public TripPersonData(ITripOData odata)
-            { _odata = Check.NotNull(odata, nameof(odata)); TripPersonDataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public TripPersonData(ITripOData odata, AutoMapper.IMapper mapper)
+            { _odata = Check.NotNull(odata, nameof(odata)); _mapper = Check.NotNull(mapper, nameof(mapper)); TripPersonDataCtor(); }
 
         partial void TripPersonDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,8 +47,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
         public Task<TripPerson?> GetAsync(string? id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = ODataMapper.Default.CreateArgs();
-            return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            var __dataArgs = ODataArgs.Create(_mapper);
+            return await _odata.GetAsync<TripPerson, Model.Person>(__dataArgs, id).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -56,8 +58,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = ODataMapper.Default.CreateArgs();
-            return await _odata.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __dataArgs = ODataArgs.Create(_mapper);
+            return await _odata.CreateAsync<TripPerson, Model.Person>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -67,8 +69,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = ODataMapper.Default.CreateArgs();
-            return await _odata.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __dataArgs = ODataArgs.Create(_mapper);
+            return await _odata.UpdateAsync<TripPerson, Model.Person>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -77,28 +79,34 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = ODataMapper.Default.CreateArgs();
-            await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            var __dataArgs = ODataArgs.Create(_mapper);
+            await _odata.DeleteAsync<TripPerson, Model.Person>(__dataArgs, id).ConfigureAwait(false);
         });
 
         /// <summary>
-        /// Provides the <see cref="TripPerson"/> and OData  property mapping.
+        /// Provides the <see cref="TripPerson"/> and OData <see cref="Model.Person"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class ODataMapper : ODataMapper<TripPerson, Model.Person, ODataMapper>
+        public partial class ODataMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ODataMapper"/> class.
+            /// Initializes a new instance of the <see cref="ODataMapperProfile"/> class.
             /// </summary>
-            public ODataMapper()
+            public ODataMapperProfile()
             {
-                Property(s => s.Id, d => d.UserName).SetUniqueKey(false);
-                Property(s => s.FirstName, d => d.FirstName);
-                Property(s => s.LastName, d => d.LastName);
-                AddStandardProperties();
-                ODataMapperCtor();
+                var s2d = CreateMap<TripPerson, Model.Person>();
+                s2d.ForMember(d => d.UserName, o => o.MapFrom(s => s.Id));
+                s2d.ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName));
+                s2d.ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName));
+
+                var d2s = CreateMap<Model.Person, TripPerson>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.UserName));
+                d2s.ForMember(s => s.FirstName, o => o.MapFrom(d => d.FirstName));
+                d2s.ForMember(s => s.LastName, o => o.MapFrom(d => d.LastName));
+
+                ODataMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void ODataMapperCtor(); // Enables the ODataMapper constructor to be extended.
+
+            partial void ODataMapperProfileCtor(AutoMapper.IMappingExpression<TripPerson, Model.Person> s2d, AutoMapper.IMappingExpression<Model.Person, TripPerson> d2s); // Enables the constructor to be extended.
         }
     }
 }

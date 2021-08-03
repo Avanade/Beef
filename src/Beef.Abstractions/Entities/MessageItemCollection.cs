@@ -7,7 +7,9 @@ namespace Beef.Entities
     /// <summary>
     /// Represents a <see cref="MessageItem"/> collection.
     /// </summary>
-	public class MessageItemCollection : EntityBaseCollection<MessageItem>
+
+    [System.Diagnostics.DebuggerStepThrough]
+    public class MessageItemCollection : EntityBaseCollection<MessageItem>
     {
         /// <summary>
         /// Adds a new <see cref="MessageItem"/> for a specified <see cref="MessageType"/> and text.

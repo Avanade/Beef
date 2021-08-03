@@ -365,6 +365,14 @@ entities:
             Description = "This can be overridden using `Operation.DataExtensions`.")]
         public bool? DataExtensions { get; set; }
 
+        /// <summary>
+        /// Gets or sets the data mapper option. 
+        /// </summary>
+        [JsonProperty("dataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The data mapper option.", IsImportant = true, Options = new string[] { "AutoMapper", "EntityMapper" },
+            Description = "Defaults to `CodeGeneration.DataMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).")]
+        public string? DataMapper { get; set; }
+
         #endregion
 
         #region Database
@@ -877,12 +885,32 @@ entities:
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
+        public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
         public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false)).ToList();
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IChangeLog"/> property.
+        /// </summary>
+        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IETag"/> property.
+        /// </summary>
+        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
 
         /// <summary>
         /// Gets the list of properties that are to be used for gRPC.
@@ -1099,6 +1127,11 @@ entities:
         public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
 
         /// <summary>
+        /// Indicates whether AutoMapper is being used.
+        /// </summary>
+        public bool UsesAutoMapper { get; set; }
+
+        /// <summary>
         /// Indicates whether the data extensions section is required.
         /// </summary>
         public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
@@ -1144,6 +1177,7 @@ entities:
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
+            DataMapper = DefaultWhereNull(DataMapper, () => Root!.DataMapper);
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
@@ -1456,6 +1490,12 @@ entities:
 
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            if ((DataMapper == "AutoMapper" && (UsesEntityFramework || UsesCosmos)) || UsesOData)
+            { 
+                DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
+                UsesAutoMapper = true;
+            }
 
             if (SupportsDataEvents)
                 DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });

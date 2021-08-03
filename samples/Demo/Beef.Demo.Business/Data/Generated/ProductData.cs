@@ -28,6 +28,7 @@ namespace Beef.Demo.Business.Data
     public partial class ProductData : IProductData
     {
         private readonly ITestOData _odata;
+        private readonly AutoMapper.IMapper _mapper;
 
         private Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
 
@@ -35,8 +36,9 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="ProductData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITestOData"/>.</param>
-        public ProductData(ITestOData odata)
-            { _odata = Check.NotNull(odata, nameof(odata)); ProductDataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public ProductData(ITestOData odata, AutoMapper.IMapper mapper)
+            { _odata = Check.NotNull(odata, nameof(odata)); _mapper = Check.NotNull(mapper, nameof(mapper)); ProductDataCtor(); }
 
         partial void ProductDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -47,8 +49,8 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Product"/> where found.</returns>
         public Task<Product?> GetAsync(int id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = ODataMapper.Default.CreateArgs("Products");
-            return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            var __dataArgs = ODataArgs.Create(_mapper, "Products");
+            return await _odata.GetAsync<Product, Model.Product>(__dataArgs, id).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -60,29 +62,35 @@ namespace Beef.Demo.Business.Data
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             ProductCollectionResult __result = new ProductCollectionResult(paging);
-            var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!, "Products");
-            __result.Result = _odata.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
+            var __dataArgs = ODataArgs.Create(_mapper, __result.Paging!, "Products");
+            __result.Result = _odata.Query<Product, Model.Product>(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
 
         /// <summary>
-        /// Provides the <see cref="Product"/> and OData  property mapping.
+        /// Provides the <see cref="Product"/> and OData <see cref="Model.Product"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class ODataMapper : ODataMapper<Product, Model.Product, ODataMapper>
+        public partial class ODataMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ODataMapper"/> class.
+            /// Initializes a new instance of the <see cref="ODataMapperProfile"/> class.
             /// </summary>
-            public ODataMapper()
+            public ODataMapperProfile()
             {
-                Property(s => s.Id, d => d.ID).SetUniqueKey(false);
-                Property(s => s.Name, d => d.Name);
-                Property(s => s.Description, d => d.Description);
-                AddStandardProperties();
-                ODataMapperCtor();
+                var s2d = CreateMap<Product, Model.Product>();
+                s2d.ForMember(d => d.ID, o => o.MapFrom(s => s.Id));
+                s2d.ForMember(d => d.Name, o => o.MapFrom(s => s.Name));
+                s2d.ForMember(d => d.Description, o => o.MapFrom(s => s.Description));
+
+                var d2s = CreateMap<Model.Product, Product>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.ID));
+                d2s.ForMember(s => s.Name, o => o.MapFrom(d => d.Name));
+                d2s.ForMember(s => s.Description, o => o.MapFrom(d => d.Description));
+
+                ODataMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void ODataMapperCtor(); // Enables the ODataMapper constructor to be extended.
+
+            partial void ODataMapperProfileCtor(AutoMapper.IMappingExpression<Product, Model.Product> s2d, AutoMapper.IMappingExpression<Model.Product, Product> d2s); // Enables the constructor to be extended.
         }
     }
 }

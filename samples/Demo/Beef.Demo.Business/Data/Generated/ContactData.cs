@@ -50,7 +50,7 @@ namespace Beef.Demo.Business.Data
         {
             ContactCollectionResult __result = new ContactCollectionResult();
             var __dataArgs = EfMapper.Default.CreateArgs();
-            __result.Result = _ef.Query(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
+            __result.Result = _ef.Query<Contact, EfModel.Contact>(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
 
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.Data
         public Task<Contact?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             var __dataArgs = EfMapper.Default.CreateArgs();
-            return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            return await _ef.GetAsync<Contact, EfModel.Contact>(__dataArgs, id).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business.Data
         public Task<Contact> CreateAsync(Contact value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __dataArgs = EfMapper.Default.CreateArgs();
-            var __result = await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create");
             return __result;
         });
@@ -86,7 +86,7 @@ namespace Beef.Demo.Business.Data
         public Task<Contact> UpdateAsync(Contact value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __dataArgs = EfMapper.Default.CreateArgs();
-            var __result = await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update");
             return __result;
         });
@@ -98,7 +98,7 @@ namespace Beef.Demo.Business.Data
         public Task DeleteAsync(Guid id) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __dataArgs = EfMapper.Default.CreateArgs();
-            await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            await _ef.DeleteAsync<Contact, EfModel.Contact>(__dataArgs, id).ConfigureAwait(false);
             _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id);
         });
 

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using AutoMapper;
 using Beef.Caching;
 using Beef.Caching.Policy;
 using System;
@@ -32,7 +33,10 @@ namespace Beef.Mapper.Converters
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
         protected PropertyMapperConverterBase(Func<object?, IEnumerable<Tuple<TSrceProperty, TDestProperty>>> loadCache, string? policyKey = null, object? data = null)
             : base(loadCache, policyKey, data)
-        { }
+        {
+            ToDest = new PropertyMapperConverterToDest(this);
+            ToSrce = new PropertyMapperConverterToSrce(this);
+        }
 
         /// <summary>
         /// Gets the source value <see cref="Type"/>.
@@ -59,39 +63,79 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public TDestProperty ConvertToDest(TSrceProperty value)
-        {
-            return GetByKey1(value);
-        }
+        public TDestProperty ConvertToDest(TSrceProperty value) => GetByKey1(value);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public TSrceProperty ConvertToSrce(TDestProperty value)
-        {
-            return GetByKey2(value);
-        }
+        public TSrceProperty ConvertToSrce(TDestProperty value) => GetByKey2(value);
 
         /// <summary>
         /// Converts the source <paramref name="value"/> to the destination equivalent.
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((TSrceProperty)value!);
-        }
+        object? IPropertyMapperConverter.ConvertToDest(object? value) => ConvertToDest((TSrceProperty)value!);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value) => ConvertToSrce((TDestProperty)value!);
+
+        /// <summary>
+        /// Gets the <see cref="PropertyMapperConverterToDest"/>.
+        /// </summary>
+        public PropertyMapperConverterToDest ToDest { get; }
+
+        /// <summary>
+        /// Gets the <see cref="PropertyMapperConverterToSrce"/>.
+        /// </summary>
+        public PropertyMapperConverterToSrce ToSrce { get; }
+
+        /// <summary>
+        /// Represents a <see cref="PropertyMapperConverterBase{T, TSrceProperty, TDestProperty}"/> <see cref="IValueConverter{TSourceMember, TDestinationMember}"/> for source to destination conversion.
+        /// </summary>
+        public class PropertyMapperConverterToDest : IValueConverter<TSrceProperty, TDestProperty>
         {
-            return ConvertToSrce((TDestProperty)value!);
+            private readonly PropertyMapperConverterBase<T, TSrceProperty, TDestProperty> _parent;
+
+            /// <summary>
+            /// Initializes a new instance of the class.
+            /// </summary>
+            internal PropertyMapperConverterToDest(PropertyMapperConverterBase<T, TSrceProperty, TDestProperty> parent) => _parent = parent;
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            /// <param name="sourceMember"><inheritdoc/></param>
+            /// <param name="context"><inheritdoc/></param>
+            /// <returns><inheritdoc/></returns>
+            public TDestProperty Convert(TSrceProperty sourceMember, ResolutionContext context) => _parent.ConvertToDest(sourceMember);
+        }
+
+        /// <summary>
+        /// Represents a <see cref="PropertyMapperConverterBase{T, TSrceProperty, TDestProperty}"/> <see cref="IValueConverter{TSourceMember, TDestinationMember}"/> for destination to source conversion.
+        /// </summary>
+        public class PropertyMapperConverterToSrce : IValueConverter<TDestProperty, TSrceProperty>
+        {
+            private readonly PropertyMapperConverterBase<T, TSrceProperty, TDestProperty> _parent;
+
+            /// <summary>
+            /// Initializes a new instance of the class.
+            /// </summary>
+            internal PropertyMapperConverterToSrce(PropertyMapperConverterBase<T, TSrceProperty, TDestProperty> parent) => _parent = parent;
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            /// <param name="sourceMember"><inheritdoc/></param>
+            /// <param name="context"><inheritdoc/></param>
+            /// <returns><inheritdoc/></returns>
+            public TSrceProperty Convert(TDestProperty sourceMember, ResolutionContext context) => _parent.ConvertToSrce(sourceMember);
         }
     }
 }
