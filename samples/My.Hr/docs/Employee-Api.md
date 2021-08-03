@@ -119,8 +119,8 @@ entities:
       { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
       { name: Termination, type: TerminationDetail, databaseMapper: TerminationDetailData.DbMapper, entityFrameworkIgnore: true },
       { name: PhoneNo },
-      { name: ETag },
-      { name: ChangeLog, type: ChangeLog }
+      { name: ETag, entityFrameworkIgnore: true },
+      { name: ChangeLog, type: ChangeLog, entityFrameworkIgnore: true }
     ]
   }
 

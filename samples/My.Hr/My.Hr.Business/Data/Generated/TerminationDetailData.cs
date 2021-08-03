@@ -48,22 +48,27 @@ namespace My.Hr.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="TerminationDetail"/> and Entity Framework <see cref="EfModel.Employee"/> property mapping.
+        /// Provides the <see cref="TerminationDetail"/> and Entity Framework <see cref="EfModel.Employee"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class EfMapper : EfDbMapper<TerminationDetail, EfModel.Employee, EfMapper>
+        public partial class EfMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapper"/> class.
+            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
             /// </summary>
-            public EfMapper()
+            public EfMapperProfile()
             {
-                Property(s => s.Date, d => d.TerminationDate);
-                Property(s => s.ReasonSid, d => d.TerminationReasonCode);
-                AddStandardProperties();
-                EfMapperCtor();
+                var s2d = CreateMap<TerminationDetail, EfModel.Employee>();
+                s2d.ForMember(d => d.TerminationDate, o => o.MapFrom(s => s.Date));
+                s2d.ForMember(d => d.TerminationReasonCode, o => o.MapFrom(s => s.ReasonSid));
+
+                var d2s = CreateMap<EfModel.Employee, TerminationDetail>();
+                d2s.ForMember(s => s.Date, o => o.MapFrom(d => d.TerminationDate));
+                d2s.ForMember(s => s.ReasonSid, o => o.MapFrom(d => d.TerminationReasonCode));
+
+                EfMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void EfMapperCtor(); // Enables the EfMapper constructor to be extended.
+
+            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<TerminationDetail, EfModel.Employee> s2d, AutoMapper.IMappingExpression<EfModel.Employee, TerminationDetail> d2s); // Enables the constructor to be extended.
         }
     }
 }

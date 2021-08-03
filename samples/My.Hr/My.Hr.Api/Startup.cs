@@ -87,6 +87,9 @@ namespace My.Hr.Api
             services.AddGeneratedDatabaseEventOutbox();
             services.AddBeefDatabaseEventOutboxPublisherService();
 
+            // Add AutoMapper services via Assembly-based probing for Profiles.
+            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(EmployeeData).Assembly);
+
             // Add additional services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();

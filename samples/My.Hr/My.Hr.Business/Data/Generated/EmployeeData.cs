@@ -30,6 +30,7 @@ namespace My.Hr.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
+        private readonly AutoMapper.IMapper _mapper;
         private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IEfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
@@ -39,9 +40,16 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher evtPub)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); EmployeeDataCtor(); }
+        public EmployeeData(IDatabase db, IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
+        {
+            _db = Check.NotNull(db, nameof(db));
+            _ef = Check.NotNull(ef, nameof(ef));
+            _mapper = Check.NotNull(mapper, nameof(mapper));
+            _evtPub = Check.NotNull(evtPub, nameof(evtPub));
+            EmployeeDataCtor();
+        }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -96,8 +104,8 @@ namespace My.Hr.Business.Data
         public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             EmployeeBaseCollectionResult __result = new EmployeeBaseCollectionResult(paging);
-            var __dataArgs = EmployeeBaseData.EfMapper.Default.CreateArgs(__result.Paging!);
-            __result.Result = _ef.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<EmployeeBaseCollection>();
+            var __dataArgs = EfDbArgs.Create(_mapper, __result.Paging!);
+            __result.Result = _ef.Query<EmployeeBase, EfModel.Employee>(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<EmployeeBaseCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
 

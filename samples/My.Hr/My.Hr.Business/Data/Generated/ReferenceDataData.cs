@@ -41,7 +41,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
         {
             var __coll = new RefDataNamespace.GenderCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(GenderMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Gender, EfModel.Gender>(GenderMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -52,7 +52,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync()
         {
             var __coll = new RefDataNamespace.TerminationReasonCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(TerminationReasonMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>(TerminationReasonMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -63,7 +63,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.RelationshipTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(RelationshipTypeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>(RelationshipTypeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -74,7 +74,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
         {
             var __coll = new RefDataNamespace.USStateCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(USStateMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.USState, EfModel.USState>(USStateMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -85,7 +85,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync()
         {
             var __coll = new RefDataNamespace.PerformanceOutcomeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(PerformanceOutcomeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>(PerformanceOutcomeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 

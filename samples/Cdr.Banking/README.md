@@ -105,7 +105,7 @@ To demonstrate the authentication and authorisation the following is required:
 
 ### Execution Context
 
-A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _Beef_ [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
+A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _Beef_ [`ExecutionContext`](../../src/Beef.Abstractions/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
 
 ``` csharp
 /// <summary>

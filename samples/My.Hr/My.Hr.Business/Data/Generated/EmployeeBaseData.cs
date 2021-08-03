@@ -55,28 +55,40 @@ namespace My.Hr.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="EmployeeBase"/> and Entity Framework <see cref="EfModel.Employee"/> property mapping.
+        /// Provides the <see cref="EmployeeBase"/> and Entity Framework <see cref="EfModel.Employee"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class EfMapper : EfDbMapper<EmployeeBase, EfModel.Employee, EfMapper>
+        public partial class EfMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapper"/> class.
+            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
             /// </summary>
-            public EfMapper()
+            public EfMapperProfile()
             {
-                Property(s => s.Id, d => d.EmployeeId).SetUniqueKey(true);
-                Property(s => s.Email, d => d.Email);
-                Property(s => s.FirstName, d => d.FirstName);
-                Property(s => s.LastName, d => d.LastName);
-                Property(s => s.GenderSid, d => d.GenderCode);
-                Property(s => s.Birthday, d => d.Birthday);
-                Property(s => s.StartDate, d => d.StartDate);
-                Property(s => s.PhoneNo, d => d.PhoneNo);
-                AddStandardProperties();
-                EfMapperCtor();
+                var s2d = CreateMap<EmployeeBase, EfModel.Employee>();
+                s2d.ForMember(d => d.EmployeeId, o => o.MapFrom(s => s.Id));
+                s2d.ForMember(d => d.Email, o => o.MapFrom(s => s.Email));
+                s2d.ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName));
+                s2d.ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName));
+                s2d.ForMember(d => d.GenderCode, o => o.MapFrom(s => s.GenderSid));
+                s2d.ForMember(d => d.Birthday, o => o.MapFrom(s => s.Birthday));
+                s2d.ForMember(d => d.StartDate, o => o.MapFrom(s => s.StartDate));
+                s2d.ForMember(d => d.PhoneNo, o => o.MapFrom(s => s.PhoneNo));
+
+                var d2s = CreateMap<EfModel.Employee, EmployeeBase>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EmployeeId));
+                d2s.ForMember(s => s.Email, o => o.MapFrom(d => d.Email));
+                d2s.ForMember(s => s.FirstName, o => o.MapFrom(d => d.FirstName));
+                d2s.ForMember(s => s.LastName, o => o.MapFrom(d => d.LastName));
+                d2s.ForMember(s => s.GenderSid, o => o.MapFrom(d => d.GenderCode));
+                d2s.ForMember(s => s.Birthday, o => o.MapFrom(d => d.Birthday));
+                d2s.ForMember(s => s.StartDate, o => o.MapFrom(d => d.StartDate));
+                d2s.ForMember(s => s.Termination, o => o.Ignore());
+                d2s.ForMember(s => s.PhoneNo, o => o.MapFrom(d => d.PhoneNo));
+
+                EfMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void EfMapperCtor(); // Enables the EfMapper constructor to be extended.
+
+            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<EmployeeBase, EfModel.Employee> s2d, AutoMapper.IMappingExpression<EfModel.Employee, EmployeeBase> d2s); // Enables the constructor to be extended.
         }
     }
 }
