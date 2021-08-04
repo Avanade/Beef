@@ -96,6 +96,7 @@ Property | Description
 -|-
 `MapperDefaultRefDataConverter` | The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined. Valid options are: `ReferenceDataCodeConverter`, `ReferenceDataCodeConverter{T}`, `ReferenceDataCodeConverter<T>`, `ReferenceDataInt32IdConverter`, `ReferenceDataInt32IdConverter{T}`, `ReferenceDataInt32IdConverter<T>`, `ReferenceDataNullableInt32IdConverter`, `ReferenceDataNullableInt32IdConverter{T}`, `ReferenceDataNullableInt32IdConverter<T>`, `ReferenceDataGuidIdConverter`, `ReferenceDataGuidIdConverter{T}`, `ReferenceDataGuidIdConverter<T>`, `ReferenceDataNullableGuidIdConverter`, `ReferenceDataNullableGuidIdConverter{T}`, `ReferenceDataNullableGuidIdConverter<T>`. Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Property.DataConverterIsGeneric` to `true`.
 `DataUsingNamespace` | The additional Namespace using statement to be added to the generated `Data` code.
+**`DataMapper`** | The data mapper option. Valid options are: `AutoMapper`, `EntityMapper`. Defaults to `AutoMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).
 
 <br/>
 

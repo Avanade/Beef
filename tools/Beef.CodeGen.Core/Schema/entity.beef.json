@@ -176,6 +176,15 @@
           "type": "string",
           "title": "The additional Namespace using statement to be added to the generated 'Data' code."
         },
+        "dataMapper": {
+          "type": "string",
+          "title": "The data mapper option.",
+          "description": "Defaults to 'AutoMapper'. Indicates that the implementation for the underlying data mapping will use 'AutoMapper' or 'EntityMapper' (Beef).",
+          "enum": [
+            "AutoMapper",
+            "EntityMapper"
+          ]
+        },
         "databaseUsingNamespace": {
           "type": "string",
           "title": "The additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'Database'."
@@ -537,6 +546,15 @@
           "type": "boolean",
           "title": "Indicates whether the 'Data' extensions logic should be generated.",
           "description": "This can be overridden using 'Operation.DataExtensions'."
+        },
+        "dataMapper": {
+          "type": "string",
+          "title": "The data mapper option.",
+          "description": "Defaults to 'CodeGeneration.DataMapper'. Indicates that the implementation for the underlying data mapping will use 'AutoMapper' or 'EntityMapper' (Beef).",
+          "enum": [
+            "AutoMapper",
+            "EntityMapper"
+          ]
         },
         "databaseName": {
           "type": "string",

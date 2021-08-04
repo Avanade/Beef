@@ -173,6 +173,7 @@ Property | Description
 `DataConstructor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 **`DataCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `DataExtensions` | Indicates whether the `Data` extensions logic should be generated. This can be overridden using `Operation.DataExtensions`.
+**`DataMapper`** | The data mapper option. Valid options are: `AutoMapper`, `EntityMapper`. Defaults to `CodeGeneration.DataMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).
 
 <br/>
 

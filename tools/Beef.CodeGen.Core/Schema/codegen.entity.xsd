@@ -1051,6 +1051,17 @@
                 <xs:documentation>Indicates whether the `Data` extensions logic should be generated. This can be overridden using `Operation.DataExtensions`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="DataMapper" use="optional">
+              <xs:annotation>
+                <xs:documentation>The data mapper option. Defaults to `CodeGeneration.DataMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="AutoMapper" />
+                  <xs:enumeration value="EntityMapper" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
             <xs:attribute name="DatabaseName" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The .NET database interface name (used where `AutoImplement` is `Database`). Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`).</xs:documentation>
@@ -1547,6 +1558,17 @@
         <xs:annotation>
           <xs:documentation>The additional Namespace using statement to be added to the generated `Data` code.</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DataMapper" use="optional">
+        <xs:annotation>
+          <xs:documentation>The data mapper option. Defaults to `AutoMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="AutoMapper" />
+            <xs:enumeration value="EntityMapper" />
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="DatabaseUsingNamespace" use="optional" type="xs:string">
         <xs:annotation>
