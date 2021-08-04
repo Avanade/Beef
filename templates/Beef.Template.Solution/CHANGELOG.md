@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Fixed:* Updated referenced *Beef* NuGet references to latest related to AutoMapper introduction.
+
 ## v4.2.4
 - *Fixed:* Fixed hard-coded company and appname values.
 

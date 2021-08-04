@@ -16,6 +16,7 @@
     <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.4" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Business\Company.AppName.Business.csproj" />
