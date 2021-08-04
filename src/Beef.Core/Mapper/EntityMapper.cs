@@ -115,6 +115,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
         /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        [Obsolete("Entity mapping is expected to be fulfilled by AutoMapper (now fully supported by Beef).")]
         public static EntityMapper<TSrce, TDest> CreateAuto<TSrce, TDest>(params string[] ignoreSrceProperties)
             where TSrce : class, new()
             where TDest : class, new()
@@ -126,6 +127,7 @@ namespace Beef.Mapper
         /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> where properties are added manually.
         /// </summary>
         /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        [Obsolete("Entity mapping is expected to be fulfilled by AutoMapper (now fully supported by Beef).")]
         public static EntityMapper<TSrce, TDest> Create<TSrce, TDest>()
             where TSrce : class, new()
             where TDest : class, new()

@@ -7,6 +7,7 @@ Represents the **NuGet** versions.
   - The existing `Converters` have been extended so that they can be used for `AutoMapper` and existing `Beef.Mapper.EntityMapper`. In the short-term both `AutoMapper` and existing `Beef.Mapper.EntityMapper` will be supported; although the longer term plan is to deprecate `Beef.Mapper.EntityMapper` (in the meantime has had the `ObsoleteAttribute` added).
   - Added a new `AutoMapperExtensions` class to add helper extension methods: `OperationTypes`, `Flatten` and `Unflatten` to simplify/improve usage in a _Beef_ context.
 - *Enhancement:* Added support for the `IInt32Identifier` (rename) and `IInt64Identifier` (new).
+- *Enhancement:* Added validation `BetweenRule` to enable a value comparison between a from and to value.
 
 ## v4.2.2
 - *Enhancement:* After a review of the newly introduced `GenericValidator` and the existing `CommonValidator` it has been decided these will be combined because the functionality was so closely aligned (duplicated). To minimize usage impact, the `GenericValidator` will be deprecated, with its unique functionality migrated into the `CommonValidator`. The `Validator` static class has been extended to support the creation of a `CommonValidator` via a new `CreateCommon` method.

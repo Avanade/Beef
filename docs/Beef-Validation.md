@@ -27,6 +27,7 @@ The following represent the available rules:
 
 Rule | Description 
 -|-
+`BetweenRule` | Provides a comparision validation between a specified from and to value.
 `CollectionRule` | Provides collection (`IEnumerable`) validation including `MinCount`, `MaxCount`, per item validation `CollectionRuleItem` and duplicate checking. 
 `CommonRule` | Provides for integrating a common validation against a specified property.
 `ComparePropertyRule` | Provides a comparision validation against another property within the same entity; also confirms other property has no errors prior to comparison.
@@ -70,6 +71,7 @@ The following represent the available extension methods:
 Extension method | Description | Underlying rule
 -|-|-
 `AreValid()` | Adds a *reference data list* validation. | `ReferenceDataSidListRule`
+`Between()` | Adds a *between comparision* validation. | `BetweenRule`
 `Collection()` | Adds a *collection* validation. | `CollectionRule`
 `CompareProperty()` | Adds a *property comparison* validation. | `ComparePropertyRule`
 `CompareValue()` | Adds a *value comparison* validation. | `CompareValueRule`
@@ -108,6 +110,8 @@ All error messages are managed as an embedded resources accessible via the `Vali
 Property | Format string
 -|-
 `AllowNegativesFormat` | {0} must not be negative.
+`BetweenInclusiveFormat` | {0} must be between {2} and {3}.
+`BetweenExclusiveFormat` | {0} must be between {2} and {3} (exclusive).
 `CollectionNullItemFormat` | {0} contains one or more items that are not specified.
 `CompareEqualFormat` | {0} must be equal to {2}.
 `CompareGreaterThanEqualFormat` | {0} must be greater than or equal to {2}.
