@@ -60,7 +60,10 @@ namespace Beef.Validation
         {
             if (context.Value != null)
             {
-                if (context.Parent.Value is ReferenceDataBaseInt && (int)context.Value != 0)
+                if (context.Parent.Value is ReferenceDataBaseInt32 && (int)context.Value != 0)
+                    return Task.CompletedTask;
+
+                if (context.Parent.Value is ReferenceDataBaseInt64 && (long)context.Value != 0)
                     return Task.CompletedTask;
 
                 if (context.Parent.Value is ReferenceDataBaseGuid && (Guid)context.Value != Guid.Empty)

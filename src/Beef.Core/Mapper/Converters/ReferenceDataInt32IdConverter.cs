@@ -9,7 +9,7 @@ namespace Beef.Mapper.Converters
     /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="Int32"/>-based <see cref="ReferenceDataBase.Id"/> mapping.
     /// </summary>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
-    public sealed class ReferenceDataInt32IdConverter<TSrceProperty> : CustomConverter<TSrceProperty, int> where TSrceProperty : ReferenceDataBaseInt
+    public sealed class ReferenceDataInt32IdConverter<TSrceProperty> : CustomConverter<TSrceProperty, int> where TSrceProperty : ReferenceDataBaseInt32
     {
         private static readonly Lazy<ReferenceDataInt32IdConverter<TSrceProperty>> _default = new(() => new ReferenceDataInt32IdConverter<TSrceProperty>(), true);
 

@@ -12,7 +12,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
     [TestFixture]
     public class ReferenceDataCacheTest
     {
-        private class TestRd : ReferenceDataBaseInt
+        private class TestRd : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

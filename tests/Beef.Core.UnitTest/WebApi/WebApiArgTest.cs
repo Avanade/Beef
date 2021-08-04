@@ -10,7 +10,7 @@ namespace Beef.Core.UnitTest.WebApi
     [TestFixture]
     public class WebApiArgTest
     {
-        private class XyzRd : ReferenceDataBaseInt
+        private class XyzRd : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

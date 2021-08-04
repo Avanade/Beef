@@ -15,7 +15,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
         private static int _count08;
         private static int _count09;
 
-        private class TestRd : ReferenceDataBaseInt
+        private class TestRd : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

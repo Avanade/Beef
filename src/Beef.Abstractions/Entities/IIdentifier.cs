@@ -10,14 +10,25 @@ namespace Beef.Entities
     public interface IIdentifier { }
 
     /// <summary>
-    /// Provides the <see cref="Id"/> for a class with a <see cref="Type"/> of <see cref="int"/>.
+    /// Provides the <see cref="Id"/> for a class with a <see cref="Type"/> of <see cref="System.Int32"/>.
     /// </summary>
-    public interface IIntIdentifier : IIdentifier
+    public interface IInt32Identifier : IIdentifier
     {
         /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
         int Id { get; set; }
+    }
+
+    /// <summary>
+    /// Provides the <see cref="Id"/> for a class with a <see cref="Type"/> of <see cref="System.Int64"/>.
+    /// </summary>
+    public interface IInt64Identifier : IIdentifier
+    {
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
+        long Id { get; set; }
     }
 
     /// <summary>

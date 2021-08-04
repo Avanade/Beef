@@ -7,25 +7,25 @@ using System.Diagnostics;
 namespace Beef.RefData
 {
     /// <summary>
-    /// Represents a <b>ReferenceData</b> base class with an <see cref="Id"/> <see cref="System.Type"/> of <see cref="System.Int32"/>.
+    /// Represents a <b>ReferenceData</b> base class with an <see cref="Id"/> <see cref="System.Type"/> of <see cref="System.Int64"/>.
     /// </summary>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, IsActive={IsActive}, IsValid={IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class ReferenceDataBaseInt : ReferenceDataBase, IIntIdentifier
+    public abstract class ReferenceDataBaseInt64 : ReferenceDataBase, IInt64Identifier
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataBaseInt"/> class.
+        /// Initializes a new instance of the <see cref="ReferenceDataBaseInt64"/> class.
         /// </summary>
-        public ReferenceDataBaseInt() : base(ReferenceDataIdTypeCode.Int32, 0) { }
+        public ReferenceDataBaseInt64() : base(ReferenceDataIdTypeCode.Int64, 0) { }
 
         /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
         /// <remarks>Once set this value cannot be updated (it becomes immutable).</remarks>
         [JsonProperty("id", Order = 0)]
-        public new int Id
+        public new long Id
         {
-            get { return base.Id == null || !(base.Id is int) ? 0 : (int)base.Id; }
+            get { return base.Id == null || base.Id is not long lid ? 0 : lid; }
             set { base.Id = value; }
         }
     }

@@ -9,7 +9,7 @@ namespace Beef.Mapper.Converters
     /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="Nullable{Int32}"/>-based <see cref="ReferenceDataBase.Id"/> mapping.
     /// </summary>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
-    public sealed class ReferenceDataNullableInt32IdConverter<TSrceProperty> : CustomConverter<TSrceProperty, int?> where TSrceProperty : ReferenceDataBaseInt
+    public sealed class ReferenceDataNullableInt32IdConverter<TSrceProperty> : CustomConverter<TSrceProperty, int?> where TSrceProperty : ReferenceDataBaseInt32
     {
         private static readonly Lazy<ReferenceDataNullableInt32IdConverter<TSrceProperty>> _default = new(() => new ReferenceDataNullableInt32IdConverter<TSrceProperty>(), true);
 

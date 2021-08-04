@@ -403,6 +403,7 @@ namespace Beef.Data.Database
                         {
                             ReferenceDataIdTypeCode.Guid => (object)dr.GetValue<Guid>(fields[idCol].Index),
                             ReferenceDataIdTypeCode.Int32 => (object)dr.GetValue<int>(fields[idCol].Index),
+                            ReferenceDataIdTypeCode.Int64 => (object)dr.GetValue<long>(fields[idCol].Index),
                             _ => (object)dr.GetValue<string>(fields[idCol].Index)
                         },
                         Code = dr.GetValue<string>(fields[DatabaseRefDataColumns.CodeColumnName].Index),

@@ -54,7 +54,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsNull(ed.PartitionKey);
         }
 
-        private class Entity : IIntIdentifier
+        private class Entity : IInt32Identifier
         {
             public int Id { get; set; }
         }

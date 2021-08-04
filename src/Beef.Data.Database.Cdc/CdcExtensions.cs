@@ -54,8 +54,12 @@ namespace Beef.Data.Database.Cdc
             var sb = new StringBuilder();
             switch (value ?? throw new ArgumentNullException(nameof(value)))
             {
-                case IIntIdentifier ii:
+                case IInt32Identifier ii:
                     sb.Append(ii.Id);
+                    break;
+
+                case IInt64Identifier il:
+                    sb.Append(il.Id);
                     break;
 
                 case IGuidIdentifier gi:
@@ -73,7 +77,7 @@ namespace Beef.Data.Database.Cdc
                     for (int i = 0; i < uk.UniqueKey.Args.Length; i++)
                     {
                         if (i > 0)
-                            sb.Append(",");
+                            sb.Append(',');
 
                         sb.Append(uk.UniqueKey.Args[i]);
                     }

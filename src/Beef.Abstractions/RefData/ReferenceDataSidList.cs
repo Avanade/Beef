@@ -32,7 +32,6 @@ namespace Beef.RefData
         public abstract List<ReferenceDataBase> ToRefDataList();
     }
 
-#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design; "List" is the most appropriate name.
     /// <summary>
     /// Represents a special purpose <see cref="ReferenceDataBase"/> collection specifically for managing a referenced list of <b>Serialization Identifiers</b> (SIDs) versus
     /// storing instances of the <see cref="ReferenceDataBase"/> items directly. This is a required capability to enable the serialization of a list of reference data items
@@ -43,22 +42,21 @@ namespace Beef.RefData
     /// <remarks>This collection wraps an externally referenced list of SIDs and maintains this directly. There is no <see cref="ReferenceDataBase"/> collection being managed
     /// within, it is just managing the casting between the <see cref="ReferenceDataBase"/> items and its SID giving the appearance that it is.</remarks>
     public class ReferenceDataSidList<TItem, TSid> : ReferenceDataSidListBase, IList<TItem>, IEnumerable<TItem>, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
-#pragma warning restore CA1710
     {
         private static readonly SidType _sidType;
         private readonly List<TSid> _sids;
 
-#pragma warning disable CA1810 // Initialize reference type static fields inline; by-design, as value will differ depending on TSid Type.
         /// <summary>
         /// Static initializer.
         /// </summary>
         static ReferenceDataSidList()
-#pragma warning restore CA1810
         {
             if (typeof(TSid) == typeof(string))
                 _sidType = SidType.String;
             else if (typeof(TSid) == typeof(int))
                 _sidType = SidType.Int32;
+            else if (typeof(TSid) == typeof(long))
+                _sidType = SidType.Int64;
             else if (typeof(TSid) == typeof(Guid))
                 _sidType = SidType.Guid;
         }
@@ -71,6 +69,7 @@ namespace Beef.RefData
             Unknown,
             String,
             Int32,
+            Int64,
             Guid
         }
 
@@ -197,10 +196,7 @@ namespace Beef.RefData
         /// Gets the underlying <see cref="ReferenceDataBase"/> list.
         /// </summary>
         /// <returns>The underlying <see cref="ReferenceDataBase"/> list.</returns>
-        public override List<ReferenceDataBase> ToRefDataList()
-        {
-            return this.ToList<ReferenceDataBase>();
-        }
+        public override List<ReferenceDataBase> ToRefDataList() => this.ToList<ReferenceDataBase>();
 
         /// <summary>
         /// Gets Reference Data <typeparamref name="TItem"/> by the SID.
@@ -214,6 +210,7 @@ namespace Beef.RefData
             {
                 SidType.String => ReferenceDataBase.ConvertFromCode<TItem>((string)sid),
                 SidType.Int32 => ReferenceDataBase.ConvertFromId<TItem>((int)sid),
+                SidType.Int64 => ReferenceDataBase.ConvertFromId<TItem>((long)sid),
                 SidType.Guid => ReferenceDataBase.ConvertFromId<TItem>((Guid)sid),
                 _ => default!,
             };
@@ -227,17 +224,12 @@ namespace Beef.RefData
             if (item == null)
                 return default!;
 
-            switch (_sidType)
+            return _sidType switch
             {
-                case SidType.String:
-                    return (TSid)(object)item.Code!;
-
-                case SidType.Int32:
-                case SidType.Guid:
-                    return (TSid)item.Id!;
-            }
-
-            return default!;
+                SidType.String => (TSid)(object)item.Code!,
+                SidType.Int32 or SidType.Int64 or SidType.Guid => (TSid)item.Id!,
+                _ => default!,
+            };
         }
 
         /// <summary>
@@ -254,10 +246,7 @@ namespace Beef.RefData
         /// Indicates whether the collection contains invalid items (i.e. not <see cref="ReferenceDataBase"/> <see cref="ReferenceDataBase.IsValid"/>).
         /// </summary>
         /// <returns><c>true</c> indicates that invalid items exist; otherwise, <c>false</c>.</returns>
-        public override bool ContainsInvalidItems()
-        {
-            return this.Any(x => x != null! && !x.IsValid);
-        }
+        public override bool ContainsInvalidItems() => this.Any(x => x != null! && !x.IsValid);
 
         #region IEnumerable<>
 
@@ -275,10 +264,7 @@ namespace Beef.RefData
         /// <summary>
         /// Supports an iteration over the collection.
         /// </summary>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
 
@@ -287,18 +273,12 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the number of items in the collection.
         /// </summary>
-        public override int Count
-        {
-            get { return _sids.Count; }
-        }
+        public override int Count => _sids.Count;
 
         /// <summary>
         /// Indicates whether the collection is read only; it is not (returns <c>false</c>).
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets or sets the item at the specified index.
@@ -357,10 +337,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool Contains(TItem item)
-        {
-            return _sids.Contains(GetSidForItem(item));
-        }
+        public bool Contains(TItem item) => _sids.Contains(GetSidForItem(item));
 
         /// <summary>
         /// Copies the entire contents of an item array into the target collection starting at the specified index.
@@ -404,10 +381,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="item">The item to search for.</param>
         /// <returns>The index for the item.</returns>
-        public int IndexOf(TItem item)
-        {
-            return _sids.IndexOf(GetSidForItem(item));
-        }
+        public int IndexOf(TItem item) => _sids.IndexOf(GetSidForItem(item));
 
         /// <summary>
         /// Inserts an item at the specified index.
@@ -439,10 +413,7 @@ namespace Beef.RefData
         /// Raises the <see cref="CollectionChanged"/> event with the provided arguments.
         /// </summary>
         /// <param name="e">Arguments of the event being raised.</param>
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
-        }
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
         /// <summary>
         /// Occurs when an item is added, removed, changed, moved, or the entire list is refreshed.

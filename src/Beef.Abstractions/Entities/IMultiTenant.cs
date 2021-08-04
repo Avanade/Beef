@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Beef.Data.EntityFrameworkCore
+namespace Beef.Entities
 {
     /// <summary>
     /// Enables support for a <see cref="TenantId"/> column.
@@ -10,7 +10,7 @@ namespace Beef.Data.EntityFrameworkCore
     public interface IMultiTenant
     {
         /// <summary>
-        /// Indicates whether the columns is logically deleted.
+        /// Gets or sets the <b>Tenant</b> identifier.
         /// </summary>
         Guid? TenantId { get; set; }
     }

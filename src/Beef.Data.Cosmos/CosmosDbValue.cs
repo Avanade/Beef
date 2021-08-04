@@ -78,7 +78,8 @@ namespace Beef.Data.Cosmos
                 Id = Value switch
                 {
                     IStringIdentifier isi => isi.Id,
-                    IIntIdentifier iii => iii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    IInt32Identifier iii => iii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    IInt64Identifier ili => ili.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
                     IGuidIdentifier igi => igi.Id.ToString(),
                     _ => throw new InvalidOperationException("An Identifier cannot be inferred for this Type."),
                 };
@@ -104,8 +105,12 @@ namespace Beef.Data.Cosmos
                     isi.Id = Id!;
                     break;
 
-                case IIntIdentifier iii:
+                case IInt32Identifier iii:
                     iii.Id = Id == null ? 0 : int.Parse(Id, System.Globalization.CultureInfo.InvariantCulture);
+                    break;
+
+                case IInt64Identifier ili:
+                    ili.Id = Id == null ? 0 : long.Parse(Id, System.Globalization.CultureInfo.InvariantCulture);
                     break;
 
                 case IGuidIdentifier igi:

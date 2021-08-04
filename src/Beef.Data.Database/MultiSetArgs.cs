@@ -338,6 +338,10 @@ namespace Beef.Data.Database
                     _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<int>(_columnName))!);
                     break;
 
+                case ReferenceDataIdTypeCode.Int64:
+                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<long>(_columnName))!);
+                    break;
+
                 case ReferenceDataIdTypeCode.Guid:
                     _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<Guid>(_columnName))!);
                     break;

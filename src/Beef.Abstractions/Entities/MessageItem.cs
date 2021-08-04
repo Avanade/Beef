@@ -175,13 +175,7 @@ namespace Beef.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || !(obj is MessageItem val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj != null && obj is MessageItem val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="MessageItem"/> is equal to the current <see cref="MessageItem"/> by comparing the values of all the properties.

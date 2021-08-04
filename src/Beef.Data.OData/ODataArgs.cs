@@ -160,9 +160,10 @@ namespace Beef.Data.OData
         {
             IStringIdentifier si => new object?[] { si.Id! },
             IGuidIdentifier gi => new object?[] { gi.Id },
-            IIntIdentifier ii => new object?[] { ii.Id! },
+            IInt32Identifier ii => new object?[] { ii.Id! },
+            IInt64Identifier il => new object?[] { il.Id! },
             IUniqueKey uk => uk.UniqueKey.Args,
-            _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IIntIdentifier)}, or {nameof(IUniqueKey)}."),
+            _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IInt32Identifier)}, {nameof(IInt64Identifier)}, or {nameof(IUniqueKey)}."),
         };
     }
 }

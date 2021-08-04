@@ -295,7 +295,7 @@ properties: [
         [PropertySchema("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
             Description = "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored. " +
-                "See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
+                "See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
         public string? IdentifierGenerator { get; set; }
 
         #endregion
@@ -554,6 +554,8 @@ properties: [
                     "ReferenceDataNullableGuidIdConverter" => "Guid?",
                     "ReferenceDataInt32IdConverter" => "int",
                     "ReferenceDataNullableInt32IdConverter" => "int?",
+                    "ReferenceDataInt64IdConverter" => "long",
+                    "ReferenceDataNullableInt64IdConverter" => "long?",
                     "ReferenceDataStringIdConverter" => "string?",
                     _ => DeclaredType
                 };

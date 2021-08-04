@@ -98,6 +98,13 @@ namespace Beef.RefData
 
                 typeCode = ReferenceDataIdTypeCode.Int32;
             }
+            else if (id is long)
+            {
+                if (id == null)
+                    throw new ArgumentNullException(nameof(id));
+
+                typeCode = ReferenceDataIdTypeCode.Int64;
+            }
             else if (id is Guid)
             {
                 if (id == null)
@@ -108,7 +115,7 @@ namespace Beef.RefData
             else if (id == null || id is string)
                 typeCode = ReferenceDataIdTypeCode.String;
             else
-                throw new ArgumentException("Id can only be of Type Int32, Guid or String.", nameof(id));
+                throw new ArgumentException("Id can only be of Type Int32, Int64, Guid or String.", nameof(id));
 
             if (typeCode != idTypeCode)
                 throw new ArgumentException($"Reference Data identifier value has an invalid TypeCode '{typeCode}'; expected TypeCode '{idTypeCode}'.");
@@ -407,6 +414,28 @@ namespace Beef.RefData
         /// <returns>The corresponding <see cref="ReferenceDataBase"/>.</returns>
         /// <remarks>Where the item (<see cref="ReferenceDataBase"/>) is not found it will be created and <see cref="ReferenceDataBase.SetInvalid"/> will be invoked.</remarks>
         public static T ConvertFromId<T>(int id) where T : ReferenceDataBase, new()
+        {
+            IReferenceDataCollection rd = ReferenceDataManager.Current[typeof(T)];
+            T val;
+            if (rd != null)
+            {
+                val = (T)rd.GetById(id)!;
+                if (val != default!)
+                    return val;
+            }
+
+            val = new T { Id = id };
+            val.SetInvalid();
+            return val;
+        }
+
+        /// <summary>
+        /// Performs a conversion from an <see cref="ReferenceDataBase.Id"/> to a <see cref="ReferenceDataBase"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The corresponding <see cref="ReferenceDataBase"/>.</returns>
+        /// <remarks>Where the item (<see cref="ReferenceDataBase"/>) is not found it will be created and <see cref="ReferenceDataBase.SetInvalid"/> will be invoked.</remarks>
+        public static T ConvertFromId<T>(long id) where T : ReferenceDataBase, new()
         {
             IReferenceDataCollection rd = ReferenceDataManager.Current[typeof(T)];
             T val;

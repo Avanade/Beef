@@ -73,7 +73,8 @@ namespace Beef.Events
 
             return value switch
             {
-                IIntIdentifier ii => ii.Id.ToString(),
+                IInt32Identifier ii => ii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                IInt64Identifier li => li.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 IGuidIdentifier gi => gi.Id.ToString(),
                 IStringIdentifier si => si.Id,
                 IUniqueKey uk => uk.UniqueKey.Args.Length == 1 ? FormatKey(uk.UniqueKey.Args[0]) : FormatKey(uk.UniqueKey.Args),

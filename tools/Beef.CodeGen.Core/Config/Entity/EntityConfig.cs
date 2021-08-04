@@ -117,7 +117,7 @@ entities:
         /// Gets or sets the Const Type option.
         /// </summary>
         [JsonProperty("constType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "Guid", "string" },
+        [PropertySchema("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "long", "Guid", "string" },
             Description = "The .NET Type to be used for the `const` values. Defaults to `string`.")]
         public string? ConstType { get; set; }
 
@@ -137,7 +137,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid", "string" },
+        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
 
@@ -174,7 +174,7 @@ entities:
         /// </summary>
         [JsonProperty("inherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Entity", Title = "The base class that the entity inherits from.",
-            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseInt` or `ReferenceDataBaseGuid` depending on the corresponding `RefDataType` value. " +
+            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. " +
                           "See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.")]
         public string? Inherits { get; set; }
 
@@ -190,7 +190,7 @@ entities:
         /// </summary>
         [JsonProperty("implementsAutoInfer", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Entity", Title = "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-            Description = "Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
+            Description = "Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
         public bool? ImplementsAutoInfer { get; set; }
 
         /// <summary>
@@ -1229,7 +1229,8 @@ entities:
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt",
+                "int" => "ReferenceDataBaseInt32",
+                "long" => "ReferenceDataBaseInt64",
                 "Guid" => "ReferenceDataBaseGuid",
                 "string" => "ReferenceDataBaseString",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
@@ -1237,7 +1238,8 @@ entities:
 
             ModelInherits = RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt",
+                "int" => "ReferenceDataBaseInt32",
+                "long" => "ReferenceDataBaseInt64",
                 "Guid" => "ReferenceDataBaseGuid",
                 "string" => "ReferenceDataBaseString",
                 _ => EntityInherits == "EntityBase" ? null : EntityInherits
@@ -1392,7 +1394,8 @@ entities:
                     var iid = id.Type switch
                     {
                         "Guid" => "IGuidIdentifier",
-                        "int" => "IIntIdentifier",
+                        "int" => "IInt32Identifier",
+                        "long" => "IInt64Identifier",
                         "string" => "IStringIdentifier",
                         _ => "IIdentifier",
                     };

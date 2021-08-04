@@ -21,6 +21,11 @@ namespace Beef.RefData
         Int32,
 
         /// <summary>
+        /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="long"/>.
+        /// </summary>
+        Int64,
+
+        /// <summary>
         /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="System.Guid"/>.
         /// </summary>
         Guid,
