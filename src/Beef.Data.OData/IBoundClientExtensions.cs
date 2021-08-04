@@ -8,7 +8,7 @@ namespace Beef.Data.OData
     /// <summary>
     /// Adds additional extension methods to the <see cref="IBoundClient{T}"/>.
     /// </summary>
-    public static class IBoundClientExtenstions
+    public static class IBoundClientExtensions
     {
         /// <summary>
         /// Filters a sequence of values based on a <paramref name="predicate"/> only <paramref name="when"/> <c>true</c>.

@@ -254,7 +254,7 @@ namespace Beef.Data.Cosmos
         {
             IStringIdentifier si => si.Id!,
             IGuidIdentifier gi => gi.Id.ToString(),
-            IIntIdentifier ii => ii.Id.ToString(),
+            IIntIdentifier ii => ii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
             IUniqueKey uk => uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0]?.ToString()! : throw new NotSupportedException("Only a single key value is currently supported."),
             _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IIntIdentifier)}, or {nameof(IUniqueKey)}."),
         };

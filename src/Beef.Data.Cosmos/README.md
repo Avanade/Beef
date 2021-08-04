@@ -24,45 +24,20 @@ public class MyCosmosDb : CosmosDb<MyCosmosDb>
 
 ## Mapping
 
-A key feature is the mapping of a .NET entity to/from a cosmos-oriented .NET model (these can be the same). The [`CosmosDbMapper`](./CosmosDbMapper.cs) will enable:
-- Property to/from mapping, including naming differences.
-- Property to/from data type conversions.
-- Entity to/from one or more property mappings.
-
-Also, specific mappings can be configured to only be performed when performing a specific [operation type](../Beef.Core/Mapper/OperationTypes.cs); e.g. Create or Update, etc.
-
-The following demonstrates the usage:
-
-``` csharp
-public partial class CosmosMapper : CosmosDbMapper<Robot, Robot, CosmosMapper>
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
-    /// </summary>
-    public CosmosMapper()
-    {
-        Property(s => s.Id, d => d.Id).SetUniqueKey(true);
-        Property(s => s.ModelNo, d => d.ModelNo);
-        Property(s => s.SerialNo, d => d.SerialNo);
-        Property(s => s.EyeColorSid, d => d.EyeColorSid);
-        Property(s => s.PowerSourceSid, d => d.PowerSourceSid);
-        AddStandardProperties();
-        CosmosMapperCtor();
-    }
-}
-``` 
+Mapping between the .NET entity to/from a cosmos-oriented .NET model (these can be the same) is managed using [AutoMapper](https://automapper.org/).
 
 </br>
 
 ## Operation arguments
 
-The [`CosmosDbArgs`](./CosmosDbArgs.cs) provides the required [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) operation arguments. As a general rule the `CosmosDbArgs` is created from the `CosmosDbMapper`:
+The [`CosmosDbArgs`](./CosmosDbArgs.cs) provides the required [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) operation arguments.
 
 Property | Description
 -|-
+`Mapper` | The _AutoMapper_ `IMapper` instance to be used to perform the source to/from destination model mapping.
 `ContainerId` | The Cosmos `Container` identifier.
 `PartitionKey` | The [PartitionKey](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.partitionkey) (defaults to `PartitionKey.None`).
-`Paging` | The [paging](../Beef.Core/Entities/PagingResult.cs) configuration (used by `Query` operation only).
+`Paging` | The [paging](../Beef.Abstractions/Entities/PagingResult.cs) configuration (used by `Query` operation only).
 `ItemRequestOptions` | The [`ItemRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.itemrequestoptions) used for `Get`, `Create`, `Update` and `Delete`.
 `QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
 `NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
@@ -71,8 +46,8 @@ Property | Description
 The following demonstrates the usage:
 
 ``` csharp
-var args1 = CosmosMapper.Default.CreateArgs("Persons");
-var args2 = CosmosMapper.Default.CreateArgs("Persons", paging);
+var args1 = CosmosDbArgs.Create(_mapping, "Persons");
+var args2 = CosmosDbArgs.Create(_mapping, "Persons", paging);
 ```
 
 <br/>
@@ -108,14 +83,14 @@ The primary data persistence activities are CRUD (Create, Read, Update and Delet
 
 Operation | Description
 -|-
-`GetAsync` | Gets the entity for the specified key where found; otherwise, `null` (default) or [`NotFoundException`](../Beef.Core/NotFoundException.cs) depending on the corresponding [`CosmosDbArgs.NullOnNotFoundResponse`](./CosmosDbArgs.cs).
-`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented. Where the  the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the Cosmos `Id` will be set to `Guid.NewGuid` (overriding any prior value).
-`UpdateAsync` | Updates the entity. Automatically updates the `Updated*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented; also ensuring that the existing `Created*` fields are not changed.
+`GetAsync` | Gets the entity for the specified key where found; otherwise, `null` (default) or [`NotFoundException`](../Beef.Abstractions/NotFoundException.cs) depending on the corresponding [`CosmosDbArgs.NullOnNotFoundResponse`](./CosmosDbArgs.cs).
+`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Abstractions/Entities/IChangeLog.cs) where implemented. Where the  the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the Cosmos `Id` will be set to `Guid.NewGuid` (overriding any prior value).
+`UpdateAsync` | Updates the entity. Automatically updates the `Updated*` fields of [`IChangeLog`](../Beef.Abstractions/Entities/IChangeLog.cs) where implemented; also ensuring that the existing `Created*` fields are not changed.
 `DeleteAsync` | Deletes the entity. Given a delete is idempotent it will be successful even where the entity does not exist.
 
 Additional information:
-- Where the entity implements [`IETag`](../Beef.Core/Entities/IEtag.cs) then the `UpdateAsync` will be performed with an `If-Match` header; and a corresponding [`ConcurrencyException`](../Beef.Core/ConcurrencyException.cs) will be thrown where it does not match. **Note**: for the `ETag` to function correctly the JSON name on the model must be `_etag`.
-- Where uniqueness has been defined for the `Container` and a create or update results in a duplicate a [`DuplicateException`](../Beef.Core/DuplicateException.cs) will be thrown.
+- Where the entity implements [`IETag`](../Beef.Abstractions/Entities/IEtag.cs) then the `UpdateAsync` will be performed with an `If-Match` header; and a corresponding [`ConcurrencyException`](../Beef.Abstractions/ConcurrencyException.cs) will be thrown where it does not match. **Note**: for the `ETag` to function correctly the JSON name on the model must be `_etag`.
+- Where uniqueness has been defined for the `Container` and a create or update results in a duplicate a [`DuplicateException`](../Beef.Abstractions/DuplicateException.cs) will be thrown.
 
 <br/>
 
@@ -157,8 +132,7 @@ _onDataArgsCreate = OnDataArgsCreate;
 
 private void OnDataArgsCreate(ICosmosDbArgs dbArgs)
 {
-    var cda = (CosmosDbArgs<Content, Content>)dbArgs;
-    cda.SetAuthorizedFilter((q) => ((IQueryable<CosmosDbValue<Content>>)q).Where(c => ExecutionContext.Current.ContentType.Contains(c.Value.ContentType)));
+    dbArgs.SetAuthorizedFilter((q) => ((IQueryable<CosmosDbValue<Content>>)q).Where(c => ExecutionContext.Current.ContentType.Contains(c.Value.ContentType)));
 }
 ```
 

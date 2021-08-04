@@ -21,6 +21,12 @@ namespace Beef.Mapper
         /// </summary>
         public AutoMapperProfile()
         {
+            // Never map property EntityBasicBase.NotifyChangesWhenSameValue.
+            ForAllPropertyMaps(pm => pm.SourceMember.Name == nameof(EntityBasicBase.NotifyChangesWhenSameValue)
+                && (pm.TypeMap.SourceType == typeof(EntityBase) || typeof(EntityBasicBase).IsAssignableFrom(pm.TypeMap.SourceType) 
+                || pm.TypeMap.DestinationType == typeof(EntityBase) || typeof(EntityBasicBase).IsAssignableFrom(pm.TypeMap.DestinationType)), (pm, opt) => opt.Ignore());
+
+            // Standardize ChangeLog -> Changelog mapping with the OperationTypes condition.
             CreateMap<ChangeLog, ChangeLog>()
                 .ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.CreatedBy))
                 .ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.CreatedDate))
