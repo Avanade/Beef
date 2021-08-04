@@ -29,6 +29,7 @@ namespace Beef.Demo.Business.Data
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
         private readonly ICosmosDb _cosmos;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
@@ -36,8 +37,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); DataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos, AutoMapper.IMapper mapper)
+            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
 
         partial void DataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -98,7 +100,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -109,7 +111,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.PowerSource, Model.PowerSource>(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.PowerSource, Model.PowerSource>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -131,30 +133,76 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.StatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Status, EfModel.Status>(StatusMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Status, EfModel.Status>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper => EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
-            .HasProperty(s => s.Id, d => d.EyeColorId)
-            .AddStandardProperties();
+        public partial class EyeColorMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="EyeColorMapperProfile"/> class.
+            /// </summary>
+            public EyeColorMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.EyeColor, RefDataNamespace.EyeColor>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EyeColorId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                EyeColorMapperProfileCtor(d2s);
+            }
+
+            partial void EyeColorMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.EyeColor, RefDataNamespace.EyeColor> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.PowerSource"/> and Cosmos <see cref="Model.PowerSource"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.PowerSource"/> and Entity Framework <see cref="Model.PowerSource"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.PowerSource, Model.PowerSource> PowerSourceMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, Model.PowerSource>()
-            .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any))
-            .AddStandardProperties();
+        public partial class PowerSourceMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PowerSourceMapperProfile"/> class.
+            /// </summary>
+            public PowerSourceMapperProfile()
+            {
+                var d2s = CreateMap<Model.PowerSource, RefDataNamespace.PowerSource>();
+                d2s.ForMember(s => s.AdditionalInfo, o => o.MapFrom(d => d.AdditionalInfo));
+
+                PowerSourceMapperProfileCtor(d2s);
+            }
+
+            partial void PowerSourceMapperProfileCtor(AutoMapper.IMappingExpression<Model.PowerSource, RefDataNamespace.PowerSource> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.Status"/> and Entity Framework <see cref="EfModel.Status"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.Status"/> and Entity Framework <see cref="EfModel.Status"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.Status, EfModel.Status> StatusMapper => EfDbMapper.CreateAuto<RefDataNamespace.Status, EfModel.Status>()
-            .HasProperty(s => s.Id, d => d.StatusId)
-            .AddStandardProperties();
+        public partial class StatusMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StatusMapperProfile"/> class.
+            /// </summary>
+            public StatusMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.Status, RefDataNamespace.Status>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.StatusId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                StatusMapperProfileCtor(d2s);
+            }
+
+            partial void StatusMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.Status, RefDataNamespace.Status> d2s); // Enables the constructor to be extended.
+        }
     }
 }
 

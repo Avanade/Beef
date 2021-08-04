@@ -59,7 +59,7 @@ namespace Cdr.Banking.Business.Data
         });
 
         /// <summary>
-        /// Provides the <see cref="Transaction"/> and Entity Framework <see cref="CosmoskModel"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Transaction"/> and Entity Framework <see cref="Model.Transaction"/> <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class CosmosMapperProfile : AutoMapper.Profile
         {

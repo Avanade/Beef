@@ -76,7 +76,7 @@ namespace Cdr.Banking.Business.Data
         public Task<Balance?> GetBalanceAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
 
         /// <summary>
-        /// Provides the <see cref="Account"/> and Entity Framework <see cref="CosmoskModel"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Account"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class CosmosMapperProfile : AutoMapper.Profile
         {

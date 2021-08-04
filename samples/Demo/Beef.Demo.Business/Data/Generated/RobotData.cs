@@ -101,7 +101,7 @@ namespace Beef.Demo.Business.Data
         });
 
         /// <summary>
-        /// Provides the <see cref="Robot"/> and Entity Framework <see cref="CosmoskModel"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Robot"/> and Entity Framework <see cref="Model.Robot"/> <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class CosmosMapperProfile : AutoMapper.Profile
         {
