@@ -2,56 +2,14 @@
 
 using AutoMapper;
 using Beef.Entities;
-using Beef.Mapper;
-using System;
 using System.Net;
 
 namespace Beef.Data.OData
 {
     /// <summary>
-    /// Enables the <b>OData</b> arguments capabilities.
-    /// </summary>
-    public interface IODataArgs
-    {
-        /// <summary>
-        /// Gets the <see cref="PagingResult"/>.
-        /// </summary>
-        PagingResult? Paging { get; }
-
-        /// <summary>
-        /// Gets the <i>AutoMapper</i> <see cref="IMapper"/>.
-        /// </summary>
-        IMapper Mapper { get; }
-
-        /// <summary>
-        /// Gets the entity collection name.
-        /// </summary>
-        string? CollectionName { get; }
-
-        /// <summary>
-        /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
-        /// </summary>
-        bool NullOnNotFoundResponse { get; }
-
-        /// <summary>
-        /// Gets the <b>OData</b> keys from the specified keys.
-        /// </summary>
-        /// <param name="keys">The key values.</param>
-        /// <returns>The OData key values.</returns>
-        internal object?[] GetODataKeys(IComparable?[] keys);
-
-        /// <summary>
-        /// Gets the <b>OData</b> keys from the entity value.
-        /// </summary>
-        /// <param name="value">The entity value.</param>
-        /// <returns>The OData OData key values.</returns>
-        internal object?[] GetODataKeys(object value);
-    }
-
-    /// <summary>
     /// Provides the base <b>OData</b> arguments capabilities.
     /// </summary>
-    public class ODataArgs : IODataArgs
+    public class ODataArgs
     {
         /// <summary>
         /// Creates a new instance of the <see cref="ODataArgs"/> class with a <paramref name="mapper"/>.
@@ -119,11 +77,6 @@ namespace Beef.Data.OData
         public bool NullOnNotFoundResponse { get; set; } = true;
 
         /// <summary>
-        /// Gets the <see cref="IEntityMapper"/>.
-        /// </summary>
-        IMapper IODataArgs.Mapper => Mapper;
-
-        /// <summary>
         /// Gets or sets the <see cref="IMapper"/>.
         /// </summary>
         public IMapper Mapper { get; private set; }
@@ -137,33 +90,5 @@ namespace Beef.Data.OData
         /// Gets or sets the entity collection name where overriding the default.
         /// </summary>
         public string? CollectionName { get; set; }
-
-        /// <summary>
-        /// Gets the <b>OData</b> keys from the specified keys.
-        /// </summary>
-        /// <param name="keys">The key values.</param>
-        /// <returns>The OData key values.</returns>
-        object?[] IODataArgs.GetODataKeys(IComparable?[] keys)
-        {
-            if (keys == null || keys.Length == 0)
-                throw new ArgumentNullException(nameof(keys));
-
-            return keys;
-        }
-
-        /// <summary>
-        /// Gets the converted <b>OData</b> keys from the entity value.
-        /// </summary>
-        /// <param name="value">The entity value.</param>
-        /// <returns>The OData OData key values.</returns>
-        object?[] IODataArgs.GetODataKeys(object value) => value switch
-        {
-            IStringIdentifier si => new object?[] { si.Id! },
-            IGuidIdentifier gi => new object?[] { gi.Id },
-            IInt32Identifier ii => new object?[] { ii.Id! },
-            IInt64Identifier il => new object?[] { il.Id! },
-            IUniqueKey uk => uk.UniqueKey.Args,
-            _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IInt32Identifier)}, {nameof(IInt64Identifier)}, or {nameof(IUniqueKey)}."),
-        };
     }
 }

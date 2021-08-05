@@ -1048,7 +1048,7 @@ operations: [
 
                 case "EntityFramework":
                     DataArgs.Name = "_ef";
-                    DataArgs.Type = "IEfDbArgs";
+                    DataArgs.Type = "EfDbArgs";
 
                     if (EventOutbox != "None" && EventOutbox != "Database")
                         throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'EntityFramework' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
@@ -1057,7 +1057,7 @@ operations: [
 
                 case "Cosmos":
                     DataArgs.Name = "_cosmos";
-                    DataArgs.Type = "ICosmosDbArgs";
+                    DataArgs.Type = "CosmosDbArgs";
 
                     if (EventOutbox != "None" && EventOutbox != "Cosmos")
                         throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Cosmos' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
@@ -1066,7 +1066,7 @@ operations: [
 
                 case "OData":
                     DataArgs.Name = "_odata";
-                    DataArgs.Type = "IODataArgs";
+                    DataArgs.Type = "ODataArgs";
 
                     if (EventOutbox != "None" && EventOutbox != "OData")
                         throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'OData' is at odds with the EventOutbox persistence of '{EventOutbox}'.");

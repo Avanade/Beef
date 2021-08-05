@@ -29,9 +29,9 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the <see cref="ICosmosDbArgs"/>.
+        /// Gets the <see cref="CosmosDbArgs"/>.
         /// </summary>
-        public ICosmosDbArgs QueryArgs => _container.DbArgs;
+        public CosmosDbArgs QueryArgs => _container.DbArgs;
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
@@ -86,7 +86,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets a prepared <see cref="IQueryable{TModel}"/> with any <see cref="CosmosDbValue{TModel}"/> filtering as applicable.
         /// </summary>
-        /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
+        /// <remarks>The <see cref="CosmosDbArgs.Paging"/> is not supported.</remarks>
         public IQueryable<CosmosDbValue<TModel>> AsQueryable()
         {
             return AsQueryable(true);
@@ -166,7 +166,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <returns>A resultant collection.</returns>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ICosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="CosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public TColl SelectQuery<TColl>() where TColl : ICollection<T>, new()
         {
             var coll = new TColl();
@@ -179,7 +179,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ICosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="CosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>
         {
             ExecuteQuery(query => 

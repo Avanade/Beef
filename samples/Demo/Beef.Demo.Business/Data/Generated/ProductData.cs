@@ -30,7 +30,7 @@ namespace Beef.Demo.Business.Data
         private readonly ITestOData _odata;
         private readonly AutoMapper.IMapper _mapper;
 
-        private Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
+        private Func<Soc.IBoundClient<Model.Product>, ProductArgs?, ODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductData"/> class.

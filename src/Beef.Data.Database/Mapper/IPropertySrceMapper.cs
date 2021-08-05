@@ -1,8 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Mapper;
 using System;
 
-namespace Beef.Mapper
+namespace Beef.Data.Database.Mapper
 {
     /// <summary>
     /// Provides property mapper capabilities for a source entity property.
@@ -21,7 +22,7 @@ namespace Beef.Mapper
         /// Gets the source property value.
         /// </summary>
         /// <param name="entity">The source entity value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
         object? GetSrceValue(TSrce entity, OperationTypes operationType);
 
@@ -30,7 +31,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="entity">The source entity value.</param>
         /// <param name="value">The property value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void SetSrceValue(TSrce entity, object? value, OperationTypes operationType);
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="destinationEntity">The destination entity.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void MapToDest(TSrce sourceEntity, object destinationEntity, OperationTypes operationType);
     }
 }

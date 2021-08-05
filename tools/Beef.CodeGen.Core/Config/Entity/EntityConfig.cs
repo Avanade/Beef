@@ -333,14 +333,6 @@ entities:
         public string? AutoImplement { get; set; }
 
         /// <summary>
-        /// Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`.
-        /// </summary>
-        [JsonProperty("mapperAddStandardProperties", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`.",
-            Description = "Defaults to `true`.")]
-        public bool? MapperAddStandardProperties { get; set; }
-
-        /// <summary>
         /// Gets or sets the access modifier for the generated `Data` constructor.
         /// </summary>
         [JsonProperty("dataCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -364,14 +356,6 @@ entities:
         [PropertySchema("Data", Title = "Indicates whether the `Data` extensions logic should be generated.",
             Description = "This can be overridden using `Operation.DataExtensions`.")]
         public bool? DataExtensions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the data mapper option. 
-        /// </summary>
-        [JsonProperty("dataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The data mapper option.", IsImportant = true, Options = new string[] { "AutoMapper", "EntityMapper" },
-            Description = "Defaults to `CodeGeneration.DataMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).")]
-        public string? DataMapper { get; set; }
 
         #endregion
 
@@ -905,6 +889,16 @@ entities:
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
         /// </summary>
+        public bool HasDatabaseChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.DatabaseIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IETag"/> property.
+        /// </summary>
+        public bool HasDatabaseETagProperty => Properties!.Any(x => x.Name == "ETag" && CompareNullOrValue(x.DatabaseIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IChangeLog"/> property.
+        /// </summary>
         public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
 
         /// <summary>
@@ -1177,7 +1171,6 @@ entities:
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
-            DataMapper = DefaultWhereNull(DataMapper, () => Root!.DataMapper);
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
@@ -1494,7 +1487,7 @@ entities:
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
 
-            if ((DataMapper == "AutoMapper" && (UsesEntityFramework || UsesCosmos)) || UsesOData)
+            if (UsesEntityFramework || UsesCosmos || UsesOData)
             { 
                 DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
                 UsesAutoMapper = true;

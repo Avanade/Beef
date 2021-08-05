@@ -39,7 +39,6 @@ namespace Beef.Demo.Business.Data
             {
                 Property(s => s.Street);
                 Property(s => s.City);
-                AddStandardProperties();
                 DbMapperCtor();
             }
             

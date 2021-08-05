@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Mapper;
 using Beef.Reflection;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Beef.Mapper
+namespace Beef.Data.Database.Mapper
 {
     /// <summary>
     /// Enables the base source entity <see cref="Type"/> mapping capabilities. 
@@ -36,9 +37,9 @@ namespace Beef.Mapper
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     public abstract class EntitySrceMapper<TSrce> : IEntitySrceMapper<TSrce> where TSrce : class
     {
-        private readonly List<IPropertySrceMapper<TSrce>> _mappings = new();
-        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new();
-        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new();
+        private readonly List<IPropertySrceMapper<TSrce>> _mappings = new List<IPropertySrceMapper<TSrce>>();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
         private IPropertyMapperBase[]? _uniqueKey;
 
         /// <summary>

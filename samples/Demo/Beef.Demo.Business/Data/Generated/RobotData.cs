@@ -30,8 +30,8 @@ namespace Beef.Demo.Business.Data
         private readonly ICosmosDb _cosmos;
         private readonly AutoMapper.IMapper _mapper;
 
-        private Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Robot>, RobotArgs?, ICosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
+        private Action<CosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Robot>, RobotArgs?, CosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotData"/> class.

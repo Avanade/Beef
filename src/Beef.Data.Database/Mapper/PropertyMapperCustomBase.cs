@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Beef.Mapper
+namespace Beef.Data.Database.Mapper
 {
     /// <summary>
     /// Provides property mapper capabilities for a source entity property and <b>custom</b> destination (for use where the destination is not a .NET Type).
@@ -23,7 +23,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="destPropertyName">The name of the destination property (defaults to <see cref="SrcePropertyName"/> where null).</param>
-        /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
+        /// <param name="operationTypes">The <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         protected PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? destPropertyName = null, OperationTypes operationTypes = OperationTypes.Any)
         {
             SrcePropertyExpression = PropertyExpression.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression)));
@@ -188,21 +188,21 @@ namespace Beef.Mapper
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).
+        /// Gets or sets the <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).
         /// </summary>
         public OperationTypes OperationTypes { get; set; } = OperationTypes.Any;
 
         /// <summary>
         /// Sets the <see cref="OperationTypes"/>.
         /// </summary>
-        /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</param>
+        /// <param name="operationTypes">The <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</param>
         void IPropertyMapperBase.SetOperationTypes(OperationTypes operationTypes) => SetOperationTypes(operationTypes);
 
         /// <summary>
         /// Sets the <see cref="OperationTypes"/>.
         /// </summary>
         /// <param name="operationTypes"></param>
-        /// <returns>The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</returns>
+        /// <returns>The <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</returns>
         public PropertyMapperCustomBase<TSrce, TSrceProperty> SetOperationTypes(OperationTypes operationTypes)
         {
             OperationTypes = operationTypes;
@@ -234,7 +234,7 @@ namespace Beef.Mapper
         /// Gets the source property value.
         /// </summary>
         /// <param name="entity">The entity value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
         protected TSrceProperty GetSrceValue(TSrce entity, OperationTypes operationType)
         {
@@ -249,7 +249,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         protected void SetSrceValue(TSrce entity, TSrceProperty value, OperationTypes operationType)
         {
             if (OperationTypes.HasFlag(operationType))
@@ -260,7 +260,7 @@ namespace Beef.Mapper
         /// Gets the source property value.
         /// </summary>
         /// <param name="entity">The entity value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
         object? IPropertySrceMapper<TSrce>.GetSrceValue(TSrce entity, OperationTypes operationType)
         {
@@ -272,7 +272,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void IPropertySrceMapper<TSrce>.SetSrceValue(TSrce entity, object? value, OperationTypes operationType)
         {
             SetSrceValue(entity, (TSrceProperty)value!, operationType);
@@ -283,7 +283,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="destinationEntity">The destination entity.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void IPropertySrceMapper<TSrce>.MapToDest(TSrce sourceEntity, object destinationEntity, OperationTypes operationType) => throw new NotSupportedException();
     }
 }

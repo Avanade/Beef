@@ -64,22 +64,22 @@ namespace Beef.Demo.Business.Data
         private Action<Exception>? _getDetailOnException;
         private Action<Exception>? _updateDetailOnException;
         private Action<Exception>? _getNullOnException;
-        private Func<IQueryable<EfModel.Person>, PersonArgs?, IEfDbArgs, IQueryable<EfModel.Person>>? _getByArgsWithEfOnQuery;
-        private Func<PersonArgs?, IEfDbArgs, Task>? _getByArgsWithEfOnBeforeAsync;
+        private Func<IQueryable<EfModel.Person>, PersonArgs?, EfDbArgs, IQueryable<EfModel.Person>>? _getByArgsWithEfOnQuery;
+        private Func<PersonArgs?, EfDbArgs, Task>? _getByArgsWithEfOnBeforeAsync;
         private Func<PersonCollectionResult, PersonArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Action<Exception>? _getByArgsWithEfOnException;
         private Action<Exception>? _throwErrorOnException;
         private Action<Exception>? _invokeApiViaAgentOnException;
-        private Func<Guid, IEfDbArgs, Task>? _getWithEfOnBeforeAsync;
+        private Func<Guid, EfDbArgs, Task>? _getWithEfOnBeforeAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Action<Exception>? _getWithEfOnException;
-        private Func<Person, IEfDbArgs, Task>? _createWithEfOnBeforeAsync;
+        private Func<Person, EfDbArgs, Task>? _createWithEfOnBeforeAsync;
         private Func<Person, Task>? _createWithEfOnAfterAsync;
         private Action<Exception>? _createWithEfOnException;
-        private Func<Person, IEfDbArgs, Task>? _updateWithEfOnBeforeAsync;
+        private Func<Person, EfDbArgs, Task>? _updateWithEfOnBeforeAsync;
         private Func<Person, Task>? _updateWithEfOnAfterAsync;
         private Action<Exception>? _updateWithEfOnException;
-        private Func<Guid, IEfDbArgs, Task>? _deleteWithEfOnBeforeAsync;
+        private Func<Guid, EfDbArgs, Task>? _deleteWithEfOnBeforeAsync;
         private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
         private Action<Exception>? _deleteWithEfOnException;
 

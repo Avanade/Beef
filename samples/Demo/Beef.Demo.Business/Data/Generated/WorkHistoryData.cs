@@ -41,7 +41,6 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Name).SetUniqueKey(false);
                 Property(s => s.StartDate);
                 Property(s => s.EndDate);
-                AddStandardProperties();
                 DbMapperCtor();
             }
             

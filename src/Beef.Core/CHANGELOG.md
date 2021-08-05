@@ -4,7 +4,8 @@ Represents the **NuGet** versions.
 
 ## v4.2.3
 - *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (except the database stored procedure mapping which will remain as-is). This has the advantage of broad industry support, and based on initial performance testing offers around a ~90% mapping performance improvement (after first execution).
-  - The existing `Converters` have been extended so that they can be used for `AutoMapper` and existing `Beef.Mapper.EntityMapper`. In the short-term both `AutoMapper` and existing `Beef.Mapper.EntityMapper` will be supported; although the longer term plan is to deprecate `Beef.Mapper.EntityMapper` (in the meantime has had the `ObsoleteAttribute` added).
+  - The existing `EntityMapper` has been removed. All capabilities to support `Beef.Data.Database.DatabaseMapper` have been moved to that `Assembly`.
+  - The existing `Converters` have been extended so that they can be used for `AutoMapper` and existing `Beef.Data.Database.DatabaseMapper`.
   - Added a new `AutoMapperExtensions` class to add helper extension methods: `OperationTypes`, `Flatten` and `Unflatten` to simplify/improve usage in a _Beef_ context.
 - *Enhancement:* Added support for the `IInt32Identifier` (rename) and `IInt64Identifier` (new).
 - *Enhancement:* Added validation `BetweenRule` to enable a value comparison between a from and to value.

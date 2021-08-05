@@ -70,9 +70,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// Initializes a new instance of the <see cref="EfDbQuery{T, TModel, TDbContext}"/> class.
         /// </summary>
         /// <param name="db">The <see cref="DbSet{TModel}"/>.</param>
-        /// <param name="args">The <see cref="IEfDbArgs"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
-        internal EfDbQuery(EfDbBase<TDbContext> db, IEfDbArgs args, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
+        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs args, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
             Args = args ?? throw new ArgumentNullException(nameof(args));
@@ -80,9 +80,9 @@ namespace Beef.Data.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Gets the <see cref="IEfDbArgs"/>.
+        /// Gets the <see cref="EfDbArgs"/>.
         /// </summary>
-        public IEfDbArgs Args { get; private set; }
+        public EfDbArgs Args { get; private set; }
 
         /// <summary>
         /// Manages the DbContext and underlying query construction and lifetime.
@@ -131,10 +131,7 @@ namespace Beef.Data.EntityFrameworkCore
             if (model == null)
                 return null;
 
-            if (Args is EfDbArgs<T, TModel> ema)
-                return ema.EntityMapper.MapToSrce(model, Mapper.OperationTypes.Get)!;
-            else
-                return (Args as EfDbArgs)!.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
+            return Args.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
         }
 
         #region SelectSingle/SelectFirst

@@ -22,9 +22,9 @@ namespace Beef.Data.Cosmos
         CosmosDbBase CosmosDb { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ICosmosDbArgs"/> (used for all operations).
+        /// Gets or sets the <see cref="CosmosDbArgs"/> (used for all operations).
         /// </summary>
-        ICosmosDbArgs DbArgs { get; }
+        CosmosDbArgs DbArgs { get; }
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.Container"/>.
@@ -43,8 +43,8 @@ namespace Beef.Data.Cosmos
         /// Initializes a new instance of the <see cref="CosmosDbContainer{T, TModel}"/> class.
         /// </summary>
         /// <param name="cosmosDb">The <see cref="CosmosDb"/>.</param>
-        /// <param name="dbArgs">The <see cref="ICosmosDbArgs"/>.</param>
-        public CosmosDbContainer(CosmosDbBase cosmosDb, ICosmosDbArgs dbArgs)
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
+        public CosmosDbContainer(CosmosDbBase cosmosDb, CosmosDbArgs dbArgs)
         {
             CosmosDb = cosmosDb ?? throw new ArgumentNullException(nameof(cosmosDb));
             DbArgs = dbArgs ?? throw new ArgumentNullException(nameof(dbArgs));
@@ -57,9 +57,9 @@ namespace Beef.Data.Cosmos
         public CosmosDbBase CosmosDb { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ICosmosDbArgs"/> (used for all operations).
+        /// Gets or sets the <see cref="CosmosDbArgs"/> (used for all operations).
         /// </summary>
-        public ICosmosDbArgs DbArgs { get; private set; }
+        public CosmosDbArgs DbArgs { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.Container"/>.
@@ -87,10 +87,7 @@ namespace Beef.Data.Cosmos
         internal T GetValue(TModel model)
         {
             CosmosDbBase.ReformatValueETag(model);
-            if (DbArgs is CosmosDbArgs<T, TModel> ema)
-                return ema.EntityMapper.MapToSrce(model, Mapper.OperationTypes.Get)!;
-            else
-                return (DbArgs as CosmosDbArgs)!.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
+            return DbArgs.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
         }
 
         /// <summary>
@@ -127,7 +124,7 @@ namespace Beef.Data.Cosmos
         /// Creates a <see cref="CosmosDbQuery{T, TModel}"/> and returns the corresponding <see cref="CosmosDbQuery{T, TModel}.AsQueryable()"/> to enable ad-hoc LINQ-style queries.
         /// </summary>
         /// <returns>An <see cref="IQueryable{T}"/>.</returns>
-        /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
+        /// <remarks>The <see cref="CosmosDbArgs.Paging"/> is not supported.</remarks>
         public IQueryable<TModel> AsQueryable() => new CosmosDbQuery<T, TModel>(this).AsQueryable();
 
         #endregion
@@ -138,10 +135,10 @@ namespace Beef.Data.Cosmos
         /// Gets the <b>CosmosDb/DocumentDb</b> entity for the specified <paramref name="keys"/> converting to <typeparamref name="T"/> asynchronously.
         /// </summary>
         /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="ICosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
+        /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="CosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
         public async Task<T?> GetAsync(params IComparable?[] keys)
         {
-            string key = DbArgs.GetCosmosKey(keys);
+            string key = CosmosDbBase.GetCosmosKey(keys);
 
             return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
@@ -177,11 +174,7 @@ namespace Beef.Data.Cosmos
             return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
                 CosmosDbBase.PrepareEntityForCreate(value);
-                TModel model;
-                if (DbArgs is CosmosDbArgs<T, TModel> ema)
-                    model = ema.EntityMapper.MapToDest(value, Mapper.OperationTypes.Create)!;
-                else
-                    model = (DbArgs as CosmosDbArgs)!.Mapper.Map<T, TModel>(value, Mapper.OperationTypes.Create)!;
+                TModel model = DbArgs.Mapper.Map<T, TModel>(value, Mapper.OperationTypes.Create)!;
 
                 CheckAuthorized(model);
 
@@ -210,7 +203,7 @@ namespace Beef.Data.Cosmos
                 if (ro.IfMatchEtag == null && value is IETag etag && etag.ETag != null)
                     ro.IfMatchEtag = etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) ? etag.ETag : "\"" + etag.ETag + "\"";
 
-                string? key = DbArgs.GetCosmosKey(value);
+                string? key = CosmosDbBase.GetCosmosKey(value);
                 CosmosDbBase.PrepareEntityForUpdate(value);
                     
                 // Must read existing to update.
@@ -218,10 +211,7 @@ namespace Beef.Data.Cosmos
                 CheckAuthorized(resp);
 
                 ro.SessionToken = resp.Headers?.Session;
-                if (DbArgs is CosmosDbArgs<T, TModel> ema)
-                    ema.EntityMapper.MapToDest(value, resp.Resource, Mapper.OperationTypes.Update);
-                else
-                    (DbArgs as CosmosDbArgs)!.Mapper.Map<T, TModel>(value, resp.Resource, Mapper.OperationTypes.Update);
+                DbArgs.Mapper.Map<T, TModel>(value, resp.Resource, Mapper.OperationTypes.Update);
 
                 resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
                 return GetResponseValue(resp)!;
@@ -239,7 +229,7 @@ namespace Beef.Data.Cosmos
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task DeleteAsync(params IComparable?[] keys)
         {
-            string? key = DbArgs.GetCosmosKey(keys);
+            string? key = CosmosDbBase.GetCosmosKey(keys);
 
             await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {

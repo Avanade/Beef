@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Data.Database.Mapper;
 using Beef.Mapper;
 using System;
 using System.Data;
@@ -29,7 +30,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="entity">The source entity.</param>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void SetSrceValue(object entity, DatabaseRecord dr, OperationTypes operationType);
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void SetDestValue(object value, DatabaseParameters parameters, OperationTypes operationType);
     }
 
@@ -59,7 +60,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="entity">The source entity.</param>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void SetSrceValue(TSrce entity, DatabaseRecord dr, OperationTypes operationType);
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         void SetDestValue(TSrce value, DatabaseParameters parameters, OperationTypes operationType);
     }
 
@@ -88,12 +89,9 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="destColumnName">The <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}.DestPropertyName">name</see> of the destination database column (auto-generated from the source where not specified).</param>
-        /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
+        /// <param name="operationTypes">The <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         public DatabasePropertyMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? destColumnName = null, OperationTypes operationTypes = OperationTypes.Any) 
-            : base(srcePropertyExpression, destColumnName, operationTypes)
-        {
-            DestParameterName = "@" + DestPropertyName;
-        }
+            : base(srcePropertyExpression, destColumnName, operationTypes) => DestParameterName = "@" + DestPropertyName;
 
         /// <summary>
         /// Gets or sets the destination <see cref="DatabaseParameters"/> name.
@@ -148,10 +146,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="predicate">A function to determine whether the property is to be mapped.</param>
         /// <returns>The <see cref="DatabasePropertyMapper{TEntity, TProperty}"/>.</returns>
-        public new DatabasePropertyMapper<TSrce, TSrceProperty> MapSrceToDestWhen(Func<TSrce, bool> predicate)
-        {
-            return (DatabasePropertyMapper<TSrce, TSrceProperty>)base.MapSrceToDestWhen(predicate);
-        }
+        public new DatabasePropertyMapper<TSrce, TSrceProperty> MapSrceToDestWhen(Func<TSrce, bool> predicate) => (DatabasePropertyMapper<TSrce, TSrceProperty>)base.MapSrceToDestWhen(predicate);
 
         /// <summary>
         /// Defines a conditional clause which must be <c>true</c> when mapping from the destination to the source.
@@ -169,10 +164,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
-        public bool MapDestToSrceWhen(DatabaseRecord dr)
-        {
-            return (_mapDestToSrceWhen == null) || _mapDestToSrceWhen.Invoke(dr);
-        }
+        public bool MapDestToSrceWhen(DatabaseRecord dr) => (_mapDestToSrceWhen == null) || _mapDestToSrceWhen.Invoke(dr);
 
         /// <summary>
         /// Overrides the entity to database mapping for this <see cref="DatabasePropertyMapper{TSrce, TSrceProperty}"/>.
@@ -201,29 +193,23 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="entity">The source entity.</param>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IDatabasePropertyMapper.SetSrceValue(object entity, DatabaseRecord dr, OperationTypes operationType)
-        {
-            SetSrceValue((TSrce)entity, dr, operationType);
-        }
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
+        void IDatabasePropertyMapper.SetSrceValue(object entity, DatabaseRecord dr, OperationTypes operationType) => SetSrceValue((TSrce)entity, dr, operationType);
 
         /// <summary>
         /// Sets the destination <see cref="DatabaseParameters"/> from the source property value.
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IDatabasePropertyMapper.SetDestValue(object value, DatabaseParameters parameters, OperationTypes operationType)
-        {
-            SetDestValue((TSrce)value, parameters, operationType);
-        }
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
+        void IDatabasePropertyMapper.SetDestValue(object value, DatabaseParameters parameters, OperationTypes operationType) => SetDestValue((TSrce)value, parameters, operationType);
 
         /// <summary>
         /// Sets the source property value from <see cref="DatabaseRecord"/>.
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         public void SetSrceValue(TSrce value, DatabaseRecord dr, OperationTypes operationType)
         {
             if (value == null)
@@ -267,7 +253,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         public void SetDestValue(TSrce value, DatabaseParameters parameters, OperationTypes operationType)
         {
             if (parameters == null)
