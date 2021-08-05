@@ -138,14 +138,20 @@ namespace Beef.Test.NUnit.Tests
                 throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor could not be determined.");
 
             var pis = ctors[0].GetParameters();
-            if (pis.Length != 1)
-                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor must only have a single parameter.");
+            if (pis.Length != 2)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor must have two parameters.");
 
             var pi = pis[0];
             if (pi.ParameterType != typeof(IWebApiAgentArgs) && !pi.ParameterType.GetInterfaces().Contains(typeof(IWebApiAgentArgs)))
-                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor parameter must implement IWebApiAgentArgs.");
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the first constructor parameter must implement IWebApiAgentArgs.");
 
-            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs(pi.ParameterType));
+            var pi2 = pis[1];
+            if (pi2.ParameterType != typeof(AutoMapper.IMapper))
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the second constructor parameter must be of Type AutoMapper.IMapper.");
+
+            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs(pi.ParameterType), AgentTesterBase.LocalServiceProvider.GetService<AutoMapper.IMapper>()
+                ?? throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the LocalServiceProvider is unable to construct the required AutoMapper.IMapper parameter instance."));
+
             if (obj == null)
                 throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created.");
 

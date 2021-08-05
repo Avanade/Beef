@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Enhancement:* Updated `GrpcAgentTestBase` to enable instantiation of `Agent` with new `AutoMapper.IMapper` requirement.
+- *Enhancement:* Added `ConfigureLocalServices` to `UsingAgentTesterServer` to allow dependency injection (DI) configuration for local (non-server related) services.
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 - *Fixed:* The `ValidationTester` sets the default `TextProvider` to `DefaultTextProvier` within its static constructor to ensure the default texts are used for the validation messages.

@@ -53,7 +53,8 @@ namespace {{Root.NamespaceCommon}}.Grpc
         /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="{{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}}"/>.</param>
-        public {{Name}}Agent({{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}} args) : base(args) { }
+        /// <param name="mapper">The <see cref="IMapper"/>.</param>
+        public {{Name}}Agent({{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}} args, AutoMapper.IMapper mapper) : base(args, mapper) { }
 {{#each GrpcOperations}}
 
         /// <summary>
@@ -70,9 +71,9 @@ namespace {{Root.NamespaceCommon}}.Grpc
         public {{{GrpcAgentOperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{ParameterType}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}GrpcRequestOptions? requestOptions = null)
         {
   {{#ifne Parameters.Count 0}}
-            var __req = new proto.{{Parent.Name}}{{Name}}Request { {{#each Parameters}}{{#unless @first}}, {{/unless}}{{Name}} = {{#if IsValueArg}}Transformers.{{Type}}.MapToDest(Check.NotNull(value, nameof(value))){{else}}{{#if IsPagingArgs}}Transformers.PagingArgsToPagingArgsConverter.ConvertToDest(paging!){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToDest({{ArgumentName}}){{else}}{{#if GrpcMapper}}Transformers.{{GrpcMapper}}.MapToDest({{ArgumentName}}){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}} };
+            var __req = new proto.{{Parent.Name}}{{Name}}Request { {{#each Parameters}}{{#unless @first}}, {{/unless}}{{Name}} = {{#if IsValueArg}}Mapper.Map<{{Type}}, proto.{{Type}}>(Check.NotNull(value, nameof(value))){{else}}{{#if IsPagingArgs}}Transformers.PagingArgsToPagingArgsConverter.ConvertToDest(paging!){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToDest({{ArgumentName}}){{else}}{{#if GrpcMapper}}Mapper.Map<{{Type}}, proto.{{Type}}>({{ArgumentName}}){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}} };
   {{/ifne}}
-            return InvokeAsync((c, o) => c.{{Name}}Async({{#ifne Parameters.Count 0}}__req, {{/ifne}}o), {{#ifne Parameters.Count 0}}__req, {{/ifne}}{{#if HasReturnValue}}{{#if GrpcReturnConverter}}Transformers.{{GrpcReturnConverter}}, {{else}}{{#if GrpcReturnMapper}}Transformers.{{GrpcReturnMapper}}, {{/if}}{{/if}}{{/if}}requestOptions);
+            return InvokeAsync{{#if GrpcReturnMapper}}<{{GrpcReturnType}}, proto.{{GrpcReturnType}}>{{/if}}((c, o) => c.{{Name}}Async({{#ifne Parameters.Count 0}}__req, {{/ifne}}o), {{#ifne Parameters.Count 0}}__req, {{/ifne}}{{#if HasReturnValue}}{{#if GrpcReturnConverter}}Transformers.{{GrpcReturnConverter}}, {{/if}}{{/if}}requestOptions);
         }
 {{/each}}
     }

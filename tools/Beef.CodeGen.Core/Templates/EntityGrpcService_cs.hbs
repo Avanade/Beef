@@ -13,9 +13,15 @@ using Beef;
 using Beef.Grpc;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
+{{#ifeq EntityUsing 'Common' 'All'}}
+using {{Root.NamespaceCommon}}.Entities;
+{{/ifeq}}
+{{#ifeq EntityUsing 'Business' 'All'}}
+using {{Root.NamespaceBusiness}}.Entities;
+{{/ifeq}}
 using {{Root.NamespaceBusiness}};
 using {{Root.NamespaceCommon}}.Grpc;
-using {{Root.NamespaceCommon}}.Grpc.Proto;
+using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
@@ -31,16 +37,18 @@ namespace {{Root.NamespaceApi}}.Grpc
 {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
 {{/ifval}}
-    public partial class {{Name}}Service : {{Name}}GrpcService.{{Name}}GrpcServiceBase
+    public partial class {{Name}}Service : proto.{{Name}}GrpcService.{{Name}}GrpcServiceBase
     {
         private readonly I{{Name}}Manager _manager;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Service"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="I{{Name}}Manager"/>.</param>
-        public {{Name}}Service(I{{Name}}Manager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); ServiceCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public {{Name}}Service(I{{Name}}Manager manager, AutoMapper.IMapper mapper)
+            { _manager = Check.NotNull(manager, nameof(manager)); _mapper = Check.NotNull(mapper, nameof(mapper)); ServiceCtor(); }
 
         partial void ServiceCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -51,19 +59,19 @@ namespace {{Root.NamespaceApi}}.Grpc
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-        /// <param name="request">The <see cref="{{Parent.Name}}{{Name}}Request"/>.</param>
+        /// <param name="request">The <see cref="proto.{{Parent.Name}}{{Name}}Request"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The {{#if HasReturnValue}}{{seecomments ReturnType}}{{else}}{{seecomments 'Google.Protobuf.WellKnownTypes.Empty'}}{{/if}}.</returns>
   {{#ifval WebApiAuthorize}}
         [{{{WebApiAuthorize}}}]
   {{/ifval}}
-        public override Task<{{#if HasReturnValue}}{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}> {{Name}}({{Parent.Name}}{{Name}}Request request, ServerCallContext context)
+        public override Task<{{#if HasReturnValue}}proto.{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}> {{Name}}(proto.{{Parent.Name}}{{Name}}Request request, ServerCallContext context)
         {
-            return new GrpcService<{{#if HasReturnValue}}{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}>(context, async () =>
+            return new GrpcService<{{#if HasReturnValue}}proto.{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}>(context, async () =>
             {
-                var __req = request ?? new {{Parent.Name}}{{Name}}Request();
-                {{#if HasReturnValue}}var __result = {{/if}}await _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Transformers.{{Type}}.MapToSrce(__req.Value)!{{else}}{{#if IsPagingArgs}}__req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToSrce(__req.{{Name}}){{else}}{{#if GrpcMapper}}Transformers.{{GrpcMapper}}.MapToSrce(__req.{{Name}})!{{else}}__req.{{Name}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}});
-                return {{#if HasReturnValue}}Transformers.{{ReturnType}}.MapToDest(__result!)!;{{else}}new Google.Protobuf.WellKnownTypes.Empty();{{/if}}
+                var __req = request ?? new proto.{{Parent.Name}}{{Name}}Request();
+                {{#if HasReturnValue}}var __result = {{/if}}await _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}_mapper.Map<proto.{{Type}}, {{Type}}>(__req.Value)!{{else}}{{#if IsPagingArgs}}__req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToSrce(__req.{{Name}}){{else}}{{#if GrpcMapper}}_mapper.Map<proto.{{Type}}, {{Type}}>(__req.{{Name}})!{{else}}__req.{{Name}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}});
+                return {{#if HasReturnValue}}_mapper.Map<{{ReturnType}}, proto.{{ReturnType}}>(__result!)!;{{else}}new Google.Protobuf.WellKnownTypes.Empty();{{/if}}
             }, operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}).ExecuteAsync();
         }
 {{/each}}

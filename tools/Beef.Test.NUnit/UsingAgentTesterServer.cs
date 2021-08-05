@@ -97,5 +97,11 @@ namespace Beef.Test.NUnit
                 return new ExpectExceptionTest();
             }
         }
+
+        /// <summary>
+        /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="serviceCollection">The <see cref="IServiceCollection"/> action.</param>
+        protected void ConfigureLocalServices(Action<IServiceCollection> serviceCollection) => AgentTester.ConfigureLocalServices(serviceCollection);
     }
 }

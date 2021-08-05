@@ -7,16 +7,6 @@
 #pragma warning disable
 
 using System;
-{{#ifval ColumnTenantId}}
-using Beef;
-{{/ifval}}
-{{#ifval ColumnIsDeleted}}
-using Beef.Data.EntityFrameworkCore;
-{{else}}
-  {{#ifval ColumnTenantId}}
-using Beef.Data.EntityFrameworkCore;
-  {{/ifval}}
-{{/ifval}}
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,7 +15,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{#ifval ColumnTenantId}}, IMultiTenant{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : IMultiTenant{{/ifval}}{{/ifval}}
+    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : Beef.Entities.ILogicallyDeleted{{#ifval ColumnTenantId}}, Beef.Entities.IMultiTenant{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : Beef.Entities.IMultiTenant{{/ifval}}{{/ifval}}
     {
 {{#each CoreColumns}}
         /// <summary>

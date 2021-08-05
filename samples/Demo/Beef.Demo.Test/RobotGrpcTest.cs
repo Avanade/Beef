@@ -2,6 +2,7 @@
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
 using Beef.Test.NUnit;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Linq;
 using System.Net;
@@ -16,7 +17,7 @@ namespace Beef.Demo.Test
         private readonly RobotTest _robotTest = new RobotTest();
 
         [OneTimeSetUp]
-        public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();
+        public async Task OneTimeSetUp() { await _robotTest.CosmosOneTimeSetUp(); ConfigureLocalServices(sc => sc.AddAutoMapper(typeof(Transformers.AutoMapperProfile))); }
 
         [OneTimeTearDown]
         public async Task OneTimeTearDown() => await _robotTest.OneTimeTearDown();
