@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Mapper;
 using Beef.Mapper.Converters;
 using System;
 
-namespace Beef.Mapper
+namespace Beef.Data.Database.Mapper
 {
     /// <summary>
     /// Enables property mapping capabilities.
@@ -71,14 +72,14 @@ namespace Beef.Mapper
         void SetMapper(IEntityMapperBase mapper);
 
         /// <summary>
-        /// Gets the <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).
+        /// Gets the <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).
         /// </summary>
         OperationTypes OperationTypes { get; }
 
         /// <summary>
         /// Sets the <see cref="OperationTypes"/>.
         /// </summary>
-        /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</param>
+        /// <param name="operationTypes">The <see cref="Beef.Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property.</param>
         void SetOperationTypes(OperationTypes operationTypes);
 
         /// <summary>

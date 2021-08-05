@@ -37,7 +37,6 @@ namespace Beef.Entities
         /// Indicates whether the <see cref="INotifyPropertyChanged.PropertyChanged"/> event is raised when a property is set with a value that is the same as the existing overriding
         /// the <see cref="ShouldNotifyChangesWhenSameValue"/> for the specific instance. A value of <c>null</c> indicates to use the <see cref="ShouldNotifyChangesWhenSameValue"/> setting.
         /// </summary>
-        [Mapper.MapperIgnore]
         public bool? NotifyChangesWhenSameValue { get; set; } = null;
 
         /// <summary>

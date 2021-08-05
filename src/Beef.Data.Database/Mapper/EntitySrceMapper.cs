@@ -85,20 +85,14 @@ namespace Beef.Data.Database.Mapper
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mappings.
         /// </summary>
-        public IReadOnlyCollection<IPropertySrceMapper<TSrce>> Mappings
-        {
-            get { return new ReadOnlyCollection<IPropertySrceMapper<TSrce>>(_mappings.ToArray()); }
-        }
+        public IReadOnlyCollection<IPropertySrceMapper<TSrce>> Mappings => new ReadOnlyCollection<IPropertySrceMapper<TSrce>>(_mappings.ToArray()); 
 
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertySrceMapper<TSrce>? GetBySrcePropertyName(string name)
-        {
-            return _srceMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
-        }
+        public IPropertySrceMapper<TSrce>? GetBySrcePropertyName(string name) => _srceMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
 
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property expression.
@@ -120,30 +114,21 @@ namespace Beef.Data.Database.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertySrceMapper<TSrce>? GetByDestPropertyName(string name)
-        {
-            return _destMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
-        }
+        public IPropertySrceMapper<TSrce>? GetByDestPropertyName(string name) => _destMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
 
         /// <summary>
         /// Gets the <see cref="IPropertyMapperBase"/> mapping by source property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase? IEntityMapperBase.GetBySrcePropertyName(string name)
-        {
-            return GetBySrcePropertyName(name);
-        }
+        IPropertyMapperBase? IEntityMapperBase.GetBySrcePropertyName(string name) => GetBySrcePropertyName(name);
 
         /// <summary>
         /// Gets the <see cref="IPropertyMapperBase"/> mapping by destination property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase? IEntityMapperBase.GetByDestPropertyName(string name)
-        {
-            return GetByDestPropertyName(name);
-        }
+        IPropertyMapperBase? IEntityMapperBase.GetByDestPropertyName(string name) => GetByDestPropertyName(name);
 
         /// <summary>
         /// Gets the properties that form the unique key.

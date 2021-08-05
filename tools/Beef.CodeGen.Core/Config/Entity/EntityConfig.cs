@@ -1168,7 +1168,6 @@ entities:
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
             ImplementsAutoInfer = DefaultWhereNull(ImplementsAutoInfer, () => true);
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
-            MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));

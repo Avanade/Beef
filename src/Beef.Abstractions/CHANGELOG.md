@@ -8,6 +8,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Added `ILogicallyDeleted` and `IMultiTenant` interfaces.
 - *Enhancement:* Renamed `IIntIdentifier` to `IInt32Identifier`, and added new `IInt64Identifier`.
 - *Enhancement:* Renamed `ReferenceDataBaseInt` to `ReferenceDataBaseInt32`, and added new `ReferenceDataBaseInt64`. Plus additional changes to support both `Int32` and `Int64` options.
+- *Enhancement:* `Mapper`-related artefacts relocated to `Beef.Core`.
 
 ## v4.2.1
 - *New:* Initial publish to GitHub made in conjunction with `Beef.Core` version `v4.2.1`. The core abstractions (nucleus) and capabilities have been moved to this assembly to have a more static core code base, decoupling from `Beef.Core` (which continues to have regular enhancements/fixes). As a minimum, a `Common` project should only have a dependency on this (not `Beef.Core`) to minimize assembly versioning challenges when using `Common` projects from other domains/applications. See Issue [139](https://github.com/Avanade/Beef/issues/139) for more details.

@@ -93,21 +93,13 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
         /// <returns>A <see cref="DatabaseMapper{TSrce}"/>.</returns>
-        public static DatabaseMapper<TSrce> CreateAuto<TSrce>(params string[] ignoreSrceProperties)
-            where TSrce : class, new()
-        {
-            return new DatabaseMapper<TSrce>(true, ignoreSrceProperties);
-        }
+        public static DatabaseMapper<TSrce> CreateAuto<TSrce>(params string[] ignoreSrceProperties) where TSrce : class, new() => new DatabaseMapper<TSrce>(true, ignoreSrceProperties);
 
         /// <summary>
         /// Creates a <see cref="DatabaseMapper{TSrce}"/> where properties are added manually.
         /// </summary>
         /// <returns>A <see cref="DatabaseMapper{TSrce}"/>.</returns>
-        public static DatabaseMapper<TSrce> Create<TSrce>()
-            where TSrce : class, new()
-        {
-            return new DatabaseMapper<TSrce>(false);
-        }
+        public static DatabaseMapper<TSrce> Create<TSrce>() where TSrce : class, new() => new DatabaseMapper<TSrce>(false);
     }
 
     /// <summary>
@@ -298,10 +290,7 @@ namespace Beef.Data.Database
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
         /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
-        void IDatabaseMapper.MapToDb(object value, DatabaseParameters parameters, OperationTypes operationType, object? data)
-        {
-            MapToDb((TSrce)value, parameters, operationType, data);
-        }
+        void IDatabaseMapper.MapToDb(object value, DatabaseParameters parameters, OperationTypes operationType, object? data) => MapToDb((TSrce)value, parameters, operationType, data);
 
         /// <summary>
         /// Extension opportunity when performing a <see cref="MapToDb(TSrce, DatabaseParameters, OperationTypes, object)"/>.
@@ -347,10 +336,7 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
         /// <returns>An object instance populated from the <see cref="DatabaseParameters"/>.</returns>
-        object? IDatabaseMapper.MapFromDb(DatabaseRecord dr, OperationTypes operationType, object? data)
-        {
-            return MapFromDb(dr, operationType, data);
-        }
+        object? IDatabaseMapper.MapFromDb(DatabaseRecord dr, OperationTypes operationType, object? data) => MapFromDb(dr, operationType, data);
 
         /// <summary>
         /// Extension opportunity when performing a <see cref="MapFromDb(DatabaseRecord, OperationTypes, object)"/>.
@@ -360,10 +346,7 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
         /// <returns>The entity value.</returns>
-        protected virtual TSrce OnMapFromDb(TSrce value, DatabaseRecord dr, OperationTypes operationType, object? data)
-        {
-            return value;
-        }
+        protected virtual TSrce OnMapFromDb(TSrce value, DatabaseRecord dr, OperationTypes operationType, object? data) => value;
 
         /// <summary>
         /// Indicates whether when performing a <see cref="MapFromDb(DatabaseRecord, OperationTypes, object)"/> and the result implements <see cref="ICleanUp"/> and <see cref="ICleanUp.IsInitial"/>
@@ -422,9 +405,7 @@ namespace Beef.Data.Database
         /// <param name="sourcePropertyName">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, throws an <see cref="ArgumentException"/>.</returns>
         public IDatabasePropertyMapper<TSrce> this[string sourcePropertyName]
-        {
-            get { return (IDatabasePropertyMapper<TSrce>)(GetBySrcePropertyName(Check.NotEmpty(sourcePropertyName, nameof(sourcePropertyName))) ?? throw new ArgumentException($"Source property `{sourcePropertyName}` does not exist.", nameof(sourcePropertyName))); }
-        }
+            => (IDatabasePropertyMapper<TSrce>)(GetBySrcePropertyName(Check.NotEmpty(sourcePropertyName, nameof(sourcePropertyName))) ?? throw new ArgumentException($"Source property `{sourcePropertyName}` does not exist.", nameof(sourcePropertyName)));
 
         /// <summary>
         /// Gets the unique key and adds to the <see cref="DatabaseParameters"/> from an entity <paramref name="value"/>.
@@ -434,10 +415,7 @@ namespace Beef.Data.Database
         /// therefore any key properties marked as <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}.IsUniqueKeyAutoGeneratedOnCreate"/> have a parameter direction of 
         /// <see cref="ParameterDirection.Output"/> versus <see cref="ParameterDirection.Input"/>.</param>
         /// <param name="value">The entity value.</param>
-        void IDatabaseMapper.GetKeyParams(DatabaseParameters parameters, OperationTypes operationType, object? value)
-        {
-            GetKeyParams(parameters, operationType, (TSrce)value!);
-        }
+        void IDatabaseMapper.GetKeyParams(DatabaseParameters parameters, OperationTypes operationType, object? value) => GetKeyParams(parameters, operationType, (TSrce)value!);
 
         /// <summary>
         /// Gets the unique key and adds to the <see cref="DatabaseParameters"/> from an entity <paramref name="value"/>.
@@ -530,10 +508,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="storedProcedure">The stored procedure name.</param>
         /// <returns>A <see cref="DatabaseArgs{T}"/>.</returns>
-        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure)
-        {
-            return new DatabaseArgs<TSrce>(this, storedProcedure);
-        }
+        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure) => new DatabaseArgs<TSrce>(this, storedProcedure);
 
         /// <summary>
         /// Creates a <see cref="DatabaseArgs{T}"/> with a <see cref="PagingArgs"/>.
@@ -541,10 +516,7 @@ namespace Beef.Data.Database
         /// <param name="storedProcedure">The stored procedure name.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="DatabaseArgs{T}"/>.</returns>
-        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure, PagingArgs paging)
-        {
-            return new DatabaseArgs<TSrce>(this, storedProcedure, paging);
-        }
+        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure, PagingArgs paging) => new DatabaseArgs<TSrce>(this, storedProcedure, paging);
 
         /// <summary>
         /// Creates a <see cref="DatabaseArgs{T}"/> with a <see cref="PagingResult"/>.
@@ -552,10 +524,7 @@ namespace Beef.Data.Database
         /// <param name="storedProcedure">The stored procedure name.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <returns>A <see cref="DatabaseArgs{T}"/>.</returns>
-        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure, PagingResult paging)
-        {
-            return new DatabaseArgs<TSrce>(this, storedProcedure, paging);
-        }
+        public DatabaseArgs<TSrce> CreateArgs(string storedProcedure, PagingResult paging) => new DatabaseArgs<TSrce>(this, storedProcedure, paging);
 
         #endregion
 
