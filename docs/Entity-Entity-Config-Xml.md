@@ -42,7 +42,7 @@ Property | Description
 `EntityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`. Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).
 `PrivateName` | The overriding private name. Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
 `ArgumentName` | The overriding argument name. Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
-`ConstType` | The Const .NET Type option. Valid options are: `int`, `Guid`, `string`. The .NET Type to be used for the `const` values. Defaults to `string`.
+`ConstType` | The Const .NET Type option. Valid options are: `int`, `long`, `Guid`, `string`. The .NET Type to be used for the `const` values. Defaults to `string`.
 `IsInitialOverride` | Indicates whether to override the `ICleanup.IsInitial` property. Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.
 
 <br/>
@@ -52,7 +52,7 @@ Provides the _Reference Data_ configuration.
 
 Property | Description
 -|-
-**`RefDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `Guid`, `string`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
+**`RefDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `long`, `Guid`, `string`. Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
 `RefDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection. This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `RefDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`. Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
 `RefDataStringFormat` | The Reference Data `ToString` composite format. The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.
@@ -65,9 +65,9 @@ Provides the _Entity class_ configuration.
 Property | Description
 -|-
 `EntityUsing` | The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement). Valid options are: `Common`, `Business`, `All`, `None`. Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.
-`Inherits` | The base class that the entity inherits from. Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseInt` or `ReferenceDataBaseGuid` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
+`Inherits` | The base class that the entity inherits from. Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
 `Implements` | The list of comma separated interfaces that are to be declared for the entity class.
-`AutoInferImplements` | Indicates whether to automatically infer the interface implements for the entity from the properties declared. Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.
+`AutoInferImplements` | Indicates whether to automatically infer the interface implements for the entity from the properties declared. Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.
 `Abstract` | Indicates whether the class should be defined as abstract.
 `GenericWithT` | Indicates whether the class should be defined as a generic with a single parameter `T`.
 `Namespace` | The entity namespace to be appended. Appended to the end of the standard structure as follows: `{Company}.{AppName}.Common.Entities.{Namespace}`.

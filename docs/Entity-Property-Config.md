@@ -108,7 +108,7 @@ Provides the _Manager-layer_ configuration.
 
 Property | Description
 -|-
-`identifierGenerator` | The Identifier Generator Type to generate the identifier on create via Dependency Injection. Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.
+`identifierGenerator` | The Identifier Generator Type to generate the identifier on create via Dependency Injection. Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.
 
 <br/>
 
