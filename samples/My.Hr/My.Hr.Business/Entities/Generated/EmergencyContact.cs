@@ -92,7 +92,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{Relationship}} text (read-only where selected).
+        /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("relationshipText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? RelationshipText { get => _relationshipText ?? GetRefDataText(() => Relationship); set => _relationshipText = value; }

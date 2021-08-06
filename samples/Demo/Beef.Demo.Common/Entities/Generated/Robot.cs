@@ -84,7 +84,7 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{EyeColor}} text (read-only where selected).
+        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("eyeColorText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? EyeColorText { get => _eyeColorText ?? GetRefDataText(() => EyeColor); set => _eyeColorText = value; }
@@ -112,7 +112,7 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{PowerSource}} text (read-only where selected).
+        /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("powerSourceText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? PowerSourceText { get => _powerSourceText ?? GetRefDataText(() => PowerSource); set => _powerSourceText = value; }

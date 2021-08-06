@@ -480,7 +480,7 @@ properties: [
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText => $"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).";
+        public string? SummaryRefDataText => ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
 
         /// <summary>
         /// Gets the formatted summary text when used in a parameter context.

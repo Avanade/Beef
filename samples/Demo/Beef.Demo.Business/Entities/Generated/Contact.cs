@@ -81,7 +81,7 @@ namespace Beef.Demo.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{Status}} text (read-only where selected).
+        /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("statusText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? StatusText { get => _statusText ?? GetRefDataText(() => Status); set => _statusText = value; }

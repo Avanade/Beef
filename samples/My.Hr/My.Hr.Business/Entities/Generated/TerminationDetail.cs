@@ -56,7 +56,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{Reason}} text (read-only where selected).
+        /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("reasonText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? ReasonText { get => _reasonText ?? GetRefDataText(() => Reason); set => _reasonText = value; }
