@@ -1,4 +1,5 @@
-﻿using Beef.Entities;
+﻿using AutoMapper;
+using Beef.Entities;
 using Beef.RefData;
 using Beef.Test.NUnit;
 using Newtonsoft.Json;
@@ -10,11 +11,21 @@ namespace Beef.Data.Cosmos.UnitTest
 {
     public class CosmosDb : CosmosDbBase
     {
+        private readonly IMapper _mapper;
+
         public CosmosDb() : base(new AzCosmos.CosmosClient("https://localhost:8081", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="), "Beef.UnitTest", true)
         {
-            Persons1 = new CosmosDbContainer<Person1, Person1>(this, CosmosDbMapper.CreateAuto<Person1, Person1>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons1"));
-            Persons2 = new CosmosDbContainer<Person2, Person2>(this, CosmosDbMapper.CreateAuto<Person2, Person2>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons2"));
-            Persons3 = new CosmosDbValueContainer<Person3, Person3>(this, CosmosDbMapper.CreateAuto<Person3, Person3>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons3"));
+            _mapper = new AutoMapper.Mapper(new MapperConfiguration(c =>
+            {
+                c.AddProfile<Mapper.AutoMapperProfile>();
+                c.CreateMap<Person1, Person1>();
+                c.CreateMap<Person2, Person2>();
+                c.CreateMap<Person3, Person3>();
+            }));
+
+            Persons1 = new CosmosDbContainer<Person1, Person1>(this, CosmosDbArgs.Create(_mapper, "Persons1"));
+            Persons2 = new CosmosDbContainer<Person2, Person2>(this, CosmosDbArgs.Create(_mapper, "Persons2"));
+            Persons3 = new CosmosDbValueContainer<Person3, Person3>(this, CosmosDbArgs.Create(_mapper, "Persons3"));
         }
 
         public async Task SetUp()
@@ -50,7 +61,7 @@ namespace Beef.Data.Cosmos.UnitTest
             await c3.ImportValueBatchAsync<CosmosDb, Person3>("Data.yaml");
 
             // Add other random "type" to Person3.
-            var c = new CosmosDbValueContainer<Person1, Person1>(this, CosmosDbMapper.CreateAuto<Person1, Person1>().CreateArgs("Persons3"));
+            var c = new CosmosDbValueContainer<Person1, Person1>(this, CosmosDbArgs.Create(_mapper, "Persons3"));
             await c.Container.ImportValueBatchAsync(new Person1[] { new Person1 { Id = 100.ToGuid(), Name = "Greg" } });
 
             // Load the reference data.

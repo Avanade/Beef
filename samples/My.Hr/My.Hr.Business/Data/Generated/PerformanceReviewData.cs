@@ -31,7 +31,7 @@ namespace My.Hr.Business.Data
         private readonly AutoMapper.IMapper _mapper;
         private readonly IEventPublisher _evtPub;
 
-        private Func<IQueryable<EfModel.PerformanceReview>, Guid, IEfDbArgs, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
+        private Func<IQueryable<EfModel.PerformanceReview>, Guid, EfDbArgs, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewData"/> class.

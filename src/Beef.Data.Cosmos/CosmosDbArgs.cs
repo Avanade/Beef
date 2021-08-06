@@ -75,7 +75,7 @@ namespace Beef.Data.Cosmos
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
-            PartitionKey = partitionKey ?? Microsoft.Azure.Cosmos.PartitionKey.None;
+            PartitionKey = partitionKey;
             ItemRequestOptions = requestOptions;
         }
 
@@ -102,7 +102,7 @@ namespace Beef.Data.Cosmos
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
-            PartitionKey = partitionKey ?? Microsoft.Azure.Cosmos.PartitionKey.None;
+            PartitionKey = partitionKey;
             Paging = Check.NotNull(paging, nameof(paging));
             QueryRequestOptions = requestOptions;
         }

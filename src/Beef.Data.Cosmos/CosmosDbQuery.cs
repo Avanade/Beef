@@ -57,7 +57,8 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal void ExecuteQuery(Action<IQueryable<TModel>> execute) => _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
+        internal void ExecuteQuery(Action<IQueryable<TModel>> execute) 
+            => _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
 
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.

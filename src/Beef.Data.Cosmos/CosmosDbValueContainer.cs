@@ -98,20 +98,14 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
-        public CosmosDbValueQuery<T, TModel> Query(Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null)
-        {
-            return new CosmosDbValueQuery<T, TModel>(this, query);
-        }
+        public CosmosDbValueQuery<T, TModel> Query(Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null) => new CosmosDbValueQuery<T, TModel>(this, query);
 
         /// <summary>
         /// Creates a <see cref="CosmosDbQuery{T, TModel}"/> and returns the corresponding <see cref="CosmosDbQuery{T, TModel}.AsQueryable()"/> to enable ad-hoc LINQ-style queries.
         /// </summary>
         /// <returns>An <see cref="IQueryable{T}"/>.</returns>
         /// <remarks>The <see cref="CosmosDbArgs.Paging"/> is not supported.</remarks>
-        public IQueryable<CosmosDbValue<TModel>> AsQueryable()
-        {
-            return new CosmosDbValueQuery<T, TModel>(this).AsQueryable();
-        }
+        public IQueryable<CosmosDbValue<TModel>> AsQueryable() => new CosmosDbValueQuery<T, TModel>(this).AsQueryable();
 
         #endregion
 

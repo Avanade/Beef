@@ -33,7 +33,7 @@ namespace My.Hr.Business.Data
         private readonly AutoMapper.IMapper _mapper;
         private readonly IEventPublisher _evtPub;
 
-        private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IEfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
+        private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, EfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeData"/> class.
@@ -134,7 +134,6 @@ namespace My.Hr.Business.Data
             {
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
                 Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default!);
-                AddStandardProperties();
                 DbMapperCtor();
             }
             

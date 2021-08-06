@@ -20,7 +20,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Perform the query filering for the GetAccounts.
         /// </summary>
-        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, CosmosDbArgs dbArgs)
         {
             if (args == null || args.IsInitial)
                 return query;

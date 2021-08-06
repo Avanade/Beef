@@ -30,8 +30,8 @@ namespace Cdr.Banking.Business.Data
         private readonly ICosmosDb _cosmos;
         private readonly AutoMapper.IMapper _mapper;
 
-        private Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, ICosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
+        private Action<CosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, CosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionData"/> class.

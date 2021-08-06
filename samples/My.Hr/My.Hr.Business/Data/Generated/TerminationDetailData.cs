@@ -40,7 +40,6 @@ namespace My.Hr.Business.Data
             {
                 Property(s => s.Date, "TerminationDate");
                 Property(s => s.ReasonSid, "TerminationReasonCode");
-                AddStandardProperties();
                 DbMapperCtor();
             }
             

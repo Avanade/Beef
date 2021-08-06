@@ -30,8 +30,8 @@ namespace Cdr.Banking.Business.Data
         private readonly ICosmosDb _cosmos;
         private readonly AutoMapper.IMapper _mapper;
 
-        private Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
+        private Action<CosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Account>, AccountArgs?, CosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class.
