@@ -182,15 +182,6 @@
           "type": "string",
           "title": "The additional Namespace using statement to be added to the generated 'Data' code."
         },
-        "dataMapper": {
-          "type": "string",
-          "title": "The data mapper option.",
-          "description": "Defaults to 'AutoMapper'. Indicates that the implementation for the underlying data mapping will use 'AutoMapper' or 'EntityMapper' (Beef).",
-          "enum": [
-            "AutoMapper",
-            "EntityMapper"
-          ]
-        },
         "databaseUsingNamespace": {
           "type": "string",
           "title": "The additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'Database'."
@@ -527,11 +518,6 @@
             "None"
           ]
         },
-        "mapperAddStandardProperties": {
-          "type": "boolean",
-          "title": "Indicates that the 'AddStandardProperties' method call is to be included for the generated (corresponding) 'Mapper'.",
-          "description": "Defaults to 'true'."
-        },
         "dataCtor": {
           "type": "string",
           "title": "The access modifier for the generated 'Data' constructor.",
@@ -554,15 +540,6 @@
           "type": "boolean",
           "title": "Indicates whether the 'Data' extensions logic should be generated.",
           "description": "This can be overridden using 'Operation.DataExtensions'."
-        },
-        "dataMapper": {
-          "type": "string",
-          "title": "The data mapper option.",
-          "description": "Defaults to 'CodeGeneration.DataMapper'. Indicates that the implementation for the underlying data mapping will use 'AutoMapper' or 'EntityMapper' (Beef).",
-          "enum": [
-            "AutoMapper",
-            "EntityMapper"
-          ]
         },
         "databaseName": {
           "type": "string",
@@ -1100,28 +1077,13 @@
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the database 'Mapper' generated output."
         },
-        "entityFrameworkMapper": {
-          "type": "string",
-          "title": "The Entity Framework property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
-        },
         "entityFrameworkIgnore": {
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the Entity Framework 'Mapper' generated output."
         },
-        "cosmosMapper": {
-          "type": "string",
-          "title": "The Cosmos property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
-        },
         "cosmosIgnore": {
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the Cosmos 'Mapper' generated output."
-        },
-        "odataMapper": {
-          "type": "string",
-          "title": "The OData property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
         },
         "odataIgnore": {
           "type": "boolean",

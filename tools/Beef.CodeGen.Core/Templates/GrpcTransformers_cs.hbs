@@ -139,7 +139,12 @@ namespace {{Root.NamespaceCommon}}.Grpc
                     .ForMember(s => s.Paging, o => o.ConvertUsing(PagingResultToPagingResultConverter.ToSrce, d => d.Paging));
   {{/if}}
 {{/each}}
+
+                AutoMapperProfileCtor();
             }
+
+            partial void AutoMapperProfileCtor(); // Enables the constructor to be extended.
+
         }
 
         #endregion

@@ -373,14 +373,6 @@ properties: [
         #region EntityFramework
 
         /// <summary>
-        /// Gets or sets the Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? EntityFrameworkMapper { get; set; }
-
-        /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
         /// </summary>
         [JsonProperty("entityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -392,14 +384,6 @@ properties: [
         #region Cosmos
 
         /// <summary>
-        /// Gets or sets the Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("cosmosMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "The Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? CosmosMapper { get; set; }
-
-        /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
         /// </summary>
         [JsonProperty("cosmosIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -409,14 +393,6 @@ properties: [
         #endregion
 
         #region OData
-
-        /// <summary>
-        /// Gets or sets the OData property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("odataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The OData property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? ODataMapper { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.

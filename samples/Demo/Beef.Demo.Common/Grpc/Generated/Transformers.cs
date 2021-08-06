@@ -195,7 +195,12 @@ namespace Beef.Demo.Common.Grpc
                     .ForMember(s => s.ModelNo, o => o.MapFrom(s => s.ModelNo))
                     .ForMember(s => s.SerialNo, o => o.MapFrom(s => s.SerialNo))
                     .ForMember(s => s.PowerSourcesSids, o => o.MapFrom(s => s.PowerSources));
+
+                AutoMapperProfileCtor();
             }
+
+            partial void AutoMapperProfileCtor(); // Enables the constructor to be extended.
+
         }
 
         #endregion

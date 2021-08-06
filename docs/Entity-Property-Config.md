@@ -141,7 +141,6 @@ Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoIm
 
 Property | Description
 -|-
-`entityFrameworkMapper` | The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `entityFrameworkIgnore` | Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
 
 <br/>
@@ -151,7 +150,6 @@ Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or 
 
 Property | Description
 -|-
-`cosmosMapper` | The Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `cosmosIgnore` | Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
 
 <br/>
@@ -161,7 +159,6 @@ Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Ope
 
 Property | Description
 -|-
-`odataMapper` | The OData property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `odataIgnore` | Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
 
 <br/>

@@ -187,11 +187,9 @@ Provides the generic _Data-layer_ configuration.
 Property | Description
 -|-
 **`autoImplement`** | The data source auto-implementation option. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.
-`mapperAddStandardProperties` | Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`. Defaults to `true`.
 `dataCtor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `dataCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataExtensions` | Indicates whether the `Data` extensions logic should be generated. This can be overridden using `Operation.DataExtensions`.
-**`dataMapper`** | The data mapper option. Valid options are: `AutoMapper`, `EntityMapper`. Defaults to `CodeGeneration.DataMapper`. Indicates that the implementation for the underlying data mapping will use `AutoMapper` or `EntityMapper` (Beef).
 
 <br/>
 
