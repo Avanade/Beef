@@ -33,7 +33,7 @@ namespace Beef.Data.Database
         Func<DatabaseRecord, bool>? StopOnPredicate { get; }
 
         /// <summary>
-        /// Gets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
+        /// Gets the single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.
         /// </summary>
         OperationTypes OperationType { get; }
 
@@ -86,7 +86,7 @@ namespace Beef.Data.Database
         public bool IsMandatory { get; set; }
 
         /// <summary>
-        /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
+        /// Gets or sets the single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.
         /// </summary>
         public OperationTypes OperationType { get; set; } = OperationTypes.Get;
 
@@ -193,7 +193,7 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
+        /// Gets or sets the single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.
         /// </summary>
         public OperationTypes OperationType { get; set; } = OperationTypes.Get;
 
@@ -336,6 +336,10 @@ namespace Beef.Data.Database
             {
                 case ReferenceDataIdTypeCode.Int32:
                     _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<int>(_columnName))!);
+                    break;
+
+                case ReferenceDataIdTypeCode.Int64:
+                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<long>(_columnName))!);
                     break;
 
                 case ReferenceDataIdTypeCode.Guid:

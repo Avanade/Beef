@@ -29,17 +29,15 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the <see cref="CosmosDbArgs{T, TModel}"/>.
+        /// Gets the <see cref="CosmosDbArgs"/>.
         /// </summary>
-        public CosmosDbArgs<T, TModel> QueryArgs => _container.DbArgs;
+        public CosmosDbArgs QueryArgs => _container.DbArgs;
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
         internal void ExecuteQuery(Action<IQueryable<CosmosDbValue<TModel>>> execute)
-        {
-            _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
-        }
+            => _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
 
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
@@ -47,7 +45,7 @@ namespace Beef.Data.Cosmos
         private IQueryable<CosmosDbValue<TModel>> ExecuteQueryInternal(Action<IQueryable<CosmosDbValue<TModel>>>? execute)
         {
             IQueryable<CosmosDbValue<TModel>> q =
-                _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
+                _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions<T, TModel>(QueryArgs));
 
             q = _query == null ?
                 AuthorizationFilter(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name)) :
@@ -88,7 +86,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets a prepared <see cref="IQueryable{TModel}"/> with any <see cref="CosmosDbValue{TModel}"/> filtering as applicable.
         /// </summary>
-        /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
+        /// <remarks>The <see cref="CosmosDbArgs.Paging"/> is not supported.</remarks>
         public IQueryable<CosmosDbValue<TModel>> AsQueryable()
         {
             return AsQueryable(true);
@@ -168,7 +166,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <returns>A resultant collection.</returns>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ICosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="CosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public TColl SelectQuery<TColl>() where TColl : ICollection<T>, new()
         {
             var coll = new TColl();
@@ -181,7 +179,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ICosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="CosmosDbArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>
         {
             ExecuteQuery(query => 

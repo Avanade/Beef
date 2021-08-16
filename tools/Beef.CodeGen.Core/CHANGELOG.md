@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (except the database stored procedure mapping which will remain as-is). This has the advantage of broad industry support, and based on initial performance testing offers around a ~90% mapping performance improvement (after first execution).
+  - The `EntityData_cs` template has been updated to support `AutoMapper`.
+  - The `ReferenceDataData_cs` template has been updated to support `AutoMapper`.
+  - The gRPC-related templates have been updated to support `AutoMapper`.
+
 ## v4.2.6
 - *Enhancement:* The `Entity.ExcludeAll` configuration will automatically default to `true` where an entity does not have at least one `Operation` specified.
 - *Enhancement:* The `EntityWebApiController_cs`, `EntityManager_cs`, `EntityDataSvc_cs` and `EntityData_cs` handlebars templates have been updated to further simplify the code generated.

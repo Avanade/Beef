@@ -86,7 +86,7 @@ namespace {{Root.NamespaceCommon}}.Grpc
          /// <summary>
         /// Converts a <see cref="Beef.Entities.PagingResult"/> to a <see cref="proto.PagingResult"/>.
         /// </summary>
-        public static CustomConverter<Beef.Entities.PagingResult?, proto.PagingResult> PagingResultToPagingResultConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingResult?, proto.PagingResult>(
+        public static CustomConverter<Beef.Entities.PagingResult, proto.PagingResult> PagingResultToPagingResultConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingResult, proto.PagingResult>(
             s => s == null ? null! : new proto.PagingResult { Skip = s.Skip, Take = s.Take, TotalCount = s.TotalCount },
             d => d == null ? null! : new Beef.Entities.PagingResult(Beef.Entities.PagingArgs.CreateSkipAndTake(d.Skip, d.Take), d.TotalCount));
 
@@ -95,32 +95,57 @@ namespace {{Root.NamespaceCommon}}.Grpc
         #region Mappers
 
         /// <summary>
-        /// Gets the <see cref="Beef.Entities.ChangeLog"/> gRPC mapper.
+        /// Represents the <c>AutoMapper</c> <see cref="Profile"/> for <i>gRPC</i>.
         /// </summary>
-        public static EntityMapper<Beef.Entities.ChangeLog, proto.ChangeLog> ChangeLog => EntityMapper.Create<Beef.Entities.ChangeLog, proto.ChangeLog>()
-            .HasProperty(e => e.CreatedBy, g => g.CreatedBy)
-            .HasProperty(e => e.CreatedDate, g => g.CreatedDate, p => p.SetConverter(NullableDateTimeToTimestamp))
-            .HasProperty(e => e.UpdatedBy, g => g.UpdatedBy)
-            .HasProperty(e => e.UpdatedDate, g => g.UpdatedDate, p => p.SetConverter(NullableDateTimeToTimestamp));
+        public partial class AutoMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="AutoMapperProfile"/> class.
+            /// </summary>
+            public AutoMapperProfile()
+            {
+                CreateMap<Beef.Entities.ChangeLog, proto.ChangeLog>()
+                    .ForMember(d => d.CreatedBy, o => o.MapFrom(s => s.CreatedBy))
+                    .ForMember(d => d.CreatedDate, o => o.ConvertUsing(NullableDateTimeToTimestamp.ToDest, s => s.CreatedDate))
+                    .ForMember(d => d.UpdatedBy, o => o.MapFrom(s => s.UpdatedBy))
+                    .ForMember(d => d.UpdatedDate, o => o.ConvertUsing(NullableDateTimeToTimestamp.ToDest, s => s.UpdatedDate));
+
+                CreateMap<proto.ChangeLog, Beef.Entities.ChangeLog>()
+                    .ForMember(s => s.CreatedBy, o => o.MapFrom(d => d.CreatedBy))
+                    .ForMember(s => s.CreatedDate, o => o.ConvertUsing(NullableDateTimeToTimestamp.ToSrce, d => d.CreatedDate))
+                    .ForMember(s => s.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy))
+                    .ForMember(s => s.UpdatedDate, o => o.ConvertUsing(NullableDateTimeToTimestamp.ToSrce, d => d.UpdatedDate));
 {{#each GrpcEntities}}
 
-        /// <summary>
-        /// Gets the <b>{{Name}}</b> gRPC mapper.
-        /// </summary>
-        public static EntityMapper<entities.{{Name}}, proto.{{Name}}> {{Name}} => EntityMapper.Create<entities.{{Name}}, proto.{{Name}}>()
+                CreateMap<entities.{{Name}}, proto.{{Name}}>()
   {{#each GrpcProperties}}
-            .HasProperty(e => e.{{PropertyName}}, g => g.{{pascalx ArgumentName}}{{#ifval GrpcConverter}}, p => p.SetConverter({{GrpcConverter}}){{/ifval}}{{#ifval GrpcMapper}}, p => p.SetMapper({{GrpcMapper}}){{/ifval}}){{#if @last}};{{/if}}
+                    .ForMember(d => d.{{pascalx ArgumentName}}, o => o.{{#ifval GrpcConverter}}ConvertUsing({{GrpcConverter}}.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{PropertyName}})){{#if @last}};{{/if}}
+  {{/each}}
+
+                CreateMap<proto.{{Name}}, entities.{{Name}}>()
+  {{#each GrpcProperties}}
+                    .ForMember(s => s.{{PropertyName}}, o => o.{{#ifval GrpcConverter}}ConvertUsing({{GrpcConverter}}.ToSrce, {{else}}MapFrom({{/ifval}}s => s.{{pascalx ArgumentName}})){{#if @last}};{{/if}}
   {{/each}}
   {{#if CollectionResult}}
 
-        /// <summary>
-        /// Gets the <b>{{Name}}CollectionResult</b> gRPC mapper.
-        /// </summary>
-        public static EntityMapper<entities.{{Name}}CollectionResult, proto.{{Name}}CollectionResult> {{Name}}CollectionResult => EntityMapper.Create<entities.{{Name}}CollectionResult, proto.{{Name}}CollectionResult>()
-            .HasProperty(e => e.Result, g => g.Result, p => p.SetMapper({{Name}}))
-            .HasProperty(e => e.Paging, g => g.Paging, p => p.SetConverter(PagingResultToPagingResultConverter));
+                CreateMap<entities.{{Name}}CollectionResult, proto.{{Name}}CollectionResult>()
+                    .ConstructUsing(c => new proto.{{Name}}CollectionResult())
+                    .ForMember(d => d.Result, o => o.MapFrom(s => s.Result))
+                    .ForMember(d => d.Paging, o => o.ConvertUsing(PagingResultToPagingResultConverter.ToDest, s => s.Paging));
+
+                CreateMap<proto.{{Name}}CollectionResult, entities.{{Name}}CollectionResult>()
+                    .ConstructUsing(c => new entities.{{Name}}CollectionResult())
+                    .ForMember(s => s.Result, o => o.MapFrom(d => d.Result))
+                    .ForMember(s => s.Paging, o => o.ConvertUsing(PagingResultToPagingResultConverter.ToSrce, d => d.Paging));
   {{/if}}
 {{/each}}
+
+                AutoMapperProfileCtor();
+            }
+
+            partial void AutoMapperProfileCtor(); // Enables the constructor to be extended.
+
+        }
 
         #endregion
     }

@@ -28,16 +28,18 @@ namespace Cdr.Banking.Business.Data
     public partial class AccountData : IAccountData
     {
         private readonly ICosmosDb _cosmos;
+        private readonly AutoMapper.IMapper _mapper;
 
-        private Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
+        private Action<CosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Account>, AccountArgs?, CosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public AccountData(ICosmosDb cosmos)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); AccountDataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public AccountData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); AccountDataCtor(); }
 
         partial void AccountDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -50,8 +52,8 @@ namespace Cdr.Banking.Business.Data
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             AccountCollectionResult __result = new AccountCollectionResult(paging);
-            var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
-            __result.Result = _cosmos.Container(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+            __result.Result = _cosmos.Container<Account, Model.Account>(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
 
@@ -62,8 +64,8 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None, onCreate: _onDataArgsCreate);
-            return await _cosmos.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", PartitionKey.None, onCreate: _onDataArgsCreate);
+            return await _cosmos.Container<AccountDetail, Model.Account>(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
         });
 
         /// <summary>
@@ -74,29 +76,41 @@ namespace Cdr.Banking.Business.Data
         public Task<Balance?> GetBalanceAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
 
         /// <summary>
-        /// Provides the <see cref="Account"/> and Cosmos  property mapping.
+        /// Provides the <see cref="Account"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class CosmosMapper : CosmosDbMapper<Account, Model.Account, CosmosMapper>
+        public partial class CosmosMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
+            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
             /// </summary>
-            public CosmosMapper()
+            public CosmosMapperProfile()
             {
-                Property(s => s.Id, d => d.Id).SetUniqueKey(false);
-                Property(s => s.CreationDate, d => d.CreationDate);
-                Property(s => s.DisplayName, d => d.DisplayName);
-                Property(s => s.Nickname, d => d.Nickname);
-                Property(s => s.OpenStatusSid, d => d.OpenStatus);
-                Property(s => s.IsOwned, d => d.IsOwned);
-                Property(s => s.MaskedNumber, d => d.MaskedNumber);
-                Property(s => s.ProductCategorySid, d => d.ProductCategory);
-                Property(s => s.ProductName, d => d.ProductName);
-                AddStandardProperties();
-                CosmosMapperCtor();
+                var s2d = CreateMap<Account, Model.Account>();
+                s2d.ForMember(d => d.Id, o => o.MapFrom(s => s.Id));
+                s2d.ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate));
+                s2d.ForMember(d => d.DisplayName, o => o.MapFrom(s => s.DisplayName));
+                s2d.ForMember(d => d.Nickname, o => o.MapFrom(s => s.Nickname));
+                s2d.ForMember(d => d.OpenStatus, o => o.MapFrom(s => s.OpenStatusSid));
+                s2d.ForMember(d => d.IsOwned, o => o.MapFrom(s => s.IsOwned));
+                s2d.ForMember(d => d.MaskedNumber, o => o.MapFrom(s => s.MaskedNumber));
+                s2d.ForMember(d => d.ProductCategory, o => o.MapFrom(s => s.ProductCategorySid));
+                s2d.ForMember(d => d.ProductName, o => o.MapFrom(s => s.ProductName));
+
+                var d2s = CreateMap<Model.Account, Account>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.Id));
+                d2s.ForMember(s => s.CreationDate, o => o.MapFrom(d => d.CreationDate));
+                d2s.ForMember(s => s.DisplayName, o => o.MapFrom(d => d.DisplayName));
+                d2s.ForMember(s => s.Nickname, o => o.MapFrom(d => d.Nickname));
+                d2s.ForMember(s => s.OpenStatusSid, o => o.MapFrom(d => d.OpenStatus));
+                d2s.ForMember(s => s.IsOwned, o => o.MapFrom(d => d.IsOwned));
+                d2s.ForMember(s => s.MaskedNumber, o => o.MapFrom(d => d.MaskedNumber));
+                d2s.ForMember(s => s.ProductCategorySid, o => o.MapFrom(d => d.ProductCategory));
+                d2s.ForMember(s => s.ProductName, o => o.MapFrom(d => d.ProductName));
+
+                CosmosMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
+
+            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Account, Model.Account> s2d, AutoMapper.IMappingExpression<Model.Account, Account> d2s); // Enables the constructor to be extended.
         }
     }
 }

@@ -2,6 +2,7 @@
 
 using Beef.Data.Database;
 using Beef.Entities;
+using Beef.Mapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -53,6 +54,34 @@ namespace Beef.Data.EntityFrameworkCore
         /// Gets or sets the list of known <see cref="SqlException.Number"/> values for the <see cref="ThrowTransformedSqlException(SqlException)"/> method.
         /// </summary>
         public static List<int> SqlDuplicateErrorNumbers { get; } = new List<int>(new int[] { 2601, 2627 });
+
+        /// <summary>
+        /// Gets the <b>Entity Framework</b> keys from the specified keys.
+        /// </summary>
+        /// <param name="keys">The key values.</param>
+        /// <returns>The <b>Entity Framework</b> key values.</returns>
+        public static object?[] GetEfKeys(IComparable?[] keys)
+        {
+            if (keys == null || keys.Length == 0)
+                throw new ArgumentNullException(nameof(keys));
+
+            return keys;
+        }
+
+        /// <summary>
+        /// Gets the converted <b>Entity Framework</b> keys from the entity value.
+        /// </summary>
+        /// <param name="value">The entity value.</param>
+        /// <returns>The <b>Entity Framework</b> key values.</returns>
+        public static object?[] GetEfKeys(object value) => value switch
+        {
+            IStringIdentifier si => new object?[] { si.Id! },
+            IGuidIdentifier gi => new object?[] { gi.Id },
+            IInt32Identifier ii => new object?[] { ii.Id! },
+            IInt64Identifier il => new object?[] { il.Id! },
+            IUniqueKey uk => uk.UniqueKey.Args,
+            _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IInt32Identifier)}, {nameof(IInt64Identifier)}, or {nameof(IUniqueKey)}."),
+        };
     }
 
     /// <summary>
@@ -136,37 +165,30 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
-        public IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
-        {
-            return new EfDbQuery<T, TModel, TDbContext>(this, queryArgs, query);
-        }
+        public IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs args, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
+            => new EfDbQuery<T, TModel, TDbContext>(this, args, query);
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> mapping from <typeparamref name="TModel"/> to <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T?> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task<T?> GetAsync<T, TModel>(EfDbArgs args, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
-            if (getArgs == null)
-                throw new ArgumentNullException(nameof(getArgs));
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
 
-            CheckKeys(getArgs, keys);
-            var efKeys = new object[keys.Length];
-            for (int i = 0; i < getArgs.Mapper.UniqueKey.Count; i++)
-            {
-                efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
-            }
+            var efKeys = GetEfKeys(keys);
 
             return await Invoker.InvokeAsync(this, async () =>
             {
-                return await FindAsync(getArgs, efKeys).ConfigureAwait(false);
+                return await FindAsync<T, TModel>(args, efKeys).ConfigureAwait(false);
             }, this).ConfigureAwait(false);
         }
 
@@ -175,12 +197,12 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="value">The value to insert.</param>
         /// <returns>The value (refreshed where specified).</returns>
-        public async Task<T> CreateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new()
+        public async Task<T> CreateAsync<T, TModel>(EfDbArgs args, T value) where T : class, new() where TModel : class, new()
         {
-            CheckSaveArgs(saveArgs);
+            CheckSaveArgs<T, TModel>(args);
 
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -196,7 +218,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             return await Invoker.InvokeAsync(this, async () =>
             {
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
+                TModel model = args.Mapper.Map<T, TModel>(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
 
                 // On create the tenant id must have a value specified.
                 if (model is IMultiTenant mt)
@@ -204,10 +226,10 @@ namespace Beef.Data.EntityFrameworkCore
 
                 DbContext.Add(model);
 
-                if (saveArgs.SaveChanges)
+                if (args.SaveChanges)
                     await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
-                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
+                return args.Refresh ? args.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
         }
 
@@ -216,12 +238,12 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="value">The value to insert.</param>
         /// <returns>The value (refreshed where specified).</returns>
-        public async Task<T> UpdateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new()
+        public async Task<T> UpdateAsync<T, TModel>(EfDbArgs args, T value) where T : class, new() where TModel : class, new()
         {
-            CheckSaveArgs(saveArgs);
+            CheckSaveArgs<T, TModel>(args);
 
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -238,12 +260,7 @@ namespace Beef.Data.EntityFrameworkCore
             return await Invoker.InvokeAsync(this, async () =>
             {
                 // Check (find) if the entity exists.
-                var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
-                for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
-                {
-                    var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
-                    efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
-                }
+                var efKeys = GetEfKeys(value);
 
                 var model = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                 if (model == null)
@@ -253,13 +270,14 @@ namespace Beef.Data.EntityFrameworkCore
                 DbContext.Remove(model);
                 DbContext.ChangeTracker.AcceptAllChanges();
 
-                saveArgs.Mapper.MapToDest(value, model, Mapper.OperationTypes.Update);
+                args.Mapper.Map<T, TModel>(value, model, Mapper.OperationTypes.Update);
+
                 DbContext.Update(model);
 
-                if (saveArgs.SaveChanges)
+                if (args.SaveChanges)
                     await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
-                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
+                return args.Refresh ? args.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
         }
 
@@ -268,18 +286,14 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <remarks>Where the model implements <see cref="ILogicallyDeleted"/> then this will update the <see cref="ILogicallyDeleted.IsDeleted"/> with <c>true</c> versus perform a physical deletion.</remarks>
-        public async Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task DeleteAsync<T, TModel>(EfDbArgs args, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
-            CheckSaveArgs(saveArgs);
-            CheckKeys(saveArgs, keys);
-            var efKeys = new object[keys.Length];
-            for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
-            {
-                efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
-            }
+            CheckSaveArgs<T, TModel>(args);
+
+            var efKeys = GetEfKeys(keys);
 
             await Invoker.InvokeAsync(this, async () =>
             {
@@ -296,27 +310,15 @@ namespace Beef.Data.EntityFrameworkCore
                 else
                     DbContext.Remove(model);
 
-                if (saveArgs.SaveChanges)
+                if (args.SaveChanges)
                     await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
             }, this).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Checks keys provided and match against defined.
-        /// </summary>
-        private static void CheckKeys<T, TModel>(EfDbArgs<T, TModel> args, IComparable[] keys) where T : class, new() where TModel : class, new()
-        {
-            if (keys == null || keys.Length == 0)
-                throw new ArgumentNullException(nameof(keys));
-
-            if (keys.Length != args.Mapper.UniqueKey.Count)
-                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{args.Mapper.UniqueKey.Count}'.", nameof(keys));
-        }
-
-        /// <summary>
         /// Check the consistency of the save arguments.
         /// </summary>
-        private static void CheckSaveArgs<T, TModel>(EfDbArgs<T, TModel> saveArgs) where T : class, new() where TModel : class, new()
+        private static void CheckSaveArgs<T, TModel>(EfDbArgs saveArgs) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -328,13 +330,13 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Performs the EF select single (find).
         /// </summary>
-        private async Task<T> FindAsync<T, TModel>(EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
+        private async Task<T> FindAsync<T, TModel>(EfDbArgs args, object?[] keys) where T : class, new() where TModel : class, new()
         {
             var model = await DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
             if (model == default)
                 return default!;
-            else
-                return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value.");
+
+            return args.Mapper.Map<T>(model) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value.");
         }
     }
 }

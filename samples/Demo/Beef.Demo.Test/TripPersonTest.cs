@@ -57,7 +57,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp, Parallelizable]
-        public void D120_Delete()
+        public void E110_Delete()
         {
             AgentTester.Test<TripPersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)

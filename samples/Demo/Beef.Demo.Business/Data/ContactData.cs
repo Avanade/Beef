@@ -1,4 +1,6 @@
-﻿using Beef.Events;
+﻿using Beef.Demo.Business.Entities;
+using Beef.Events;
+using Beef.Mapper;
 using System;
 using System.Threading.Tasks;
 

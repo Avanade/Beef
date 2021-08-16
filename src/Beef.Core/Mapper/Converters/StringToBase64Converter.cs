@@ -7,69 +7,21 @@ namespace Beef.Mapper.Converters
     /// <summary>
     /// Represents a <see cref="string"/> to <see cref="byte"/> <see cref="Array"/> (uses <see cref="Convert.FromBase64String(string)"/> and <see cref="Convert.ToBase64String(byte[])"/>).
     /// </summary>
-    public class StringToBase64Converter : Singleton<StringToBase64Converter>, IPropertyMapperConverter<string?, byte[]>
+    public class StringToBase64Converter : CustomConverter<string?, byte[]>
     {
-        /// <summary>
-        /// Gets the source value <see cref="Type"/>.
-        /// </summary>
-        Type IPropertyMapperConverter.SrceType { get; } = typeof(string);
+        private static readonly Lazy<StringToBase64Converter> _default = new(() => new StringToBase64Converter(), true);
 
         /// <summary>
-        /// Gets the destination value <see cref="Type"/>.
+        /// Gets the default (singleton) instance.
         /// </summary>
-        Type IPropertyMapperConverter.DestType { get; } = typeof(byte[]);
+        public static StringToBase64Converter Default { get { return _default.Value; } }
 
         /// <summary>
-        /// Gets the underlying source <see cref="Type"/> allowing for nullables.
+        /// Initializes a new instance of the <see cref="JObjectToJsonConverter"/> class.
         /// </summary>
-        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = typeof(string);
-
-        /// <summary>
-        /// Gets the underlying destination <see cref="Type"/> allowing for nullables.
-        /// </summary>
-        Type IPropertyMapperConverter.DestUnderlyingType { get; } = typeof(byte[]);
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        public byte[] ConvertToDest(string? value)
-        {
-            if (value == null)
-                return Array.Empty<byte>();
-
-            return Convert.FromBase64String(value);
-        }
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((string)value!);
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        public string ConvertToSrce(byte[] value)
-        {
-            return Convert.ToBase64String(value);
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
-        {
-            return ConvertToSrce((byte[])value!);
-        }
+        public StringToBase64Converter() : base(
+            s => s == null ? Array.Empty<byte>() : Convert.FromBase64String(s),
+            d => Convert.ToBase64String(d))
+        { }
     }
 }

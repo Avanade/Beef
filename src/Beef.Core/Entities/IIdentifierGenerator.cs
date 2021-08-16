@@ -11,22 +11,41 @@ namespace Beef.Entities
     public interface IIdentifierGenerator { }
 
     /// <summary>
-    /// Provides the <see cref="GenerateIdentifierAsync"/> for an <see cref="int"/>.
+    /// Provides the <see cref="GenerateIdentifierAsync"/> for an <see cref="Int32"/>.
     /// </summary>
-    public interface IIntIdentifierGenerator : IIdentifierGenerator
+    public interface IInt32IdentifierGenerator : IIdentifierGenerator
     {
         /// <summary>
-        /// Generate a new <see cref="int"/> identifier for a specified <see cref="Type"/>.
+        /// Generate a new <see cref="Int32"/> identifier for a specified <see cref="Type"/>.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/> that the identifier is required for.</typeparam>
         /// <returns>The newly generated identifier.</returns>
         Task<int> GenerateIdentifierAsync<T>();
 
         /// <summary>
-        /// Generate a new <see cref="int"/> identifier for a default <see cref="object"/> <see cref="Type"/>.
+        /// Generate a new <see cref="Int32"/> identifier for a default <see cref="object"/> <see cref="Type"/>.
         /// </summary>
         /// <returns>The newly generated identifier.</returns>
         Task<int> GenerateIdentifierAsync() => GenerateIdentifierAsync<object>();
+    }
+
+    /// <summary>
+    /// Provides the <see cref="GenerateIdentifierAsync"/> for an <see cref="Int64"/>.
+    /// </summary>
+    public interface IInt64IdentifierGenerator : IIdentifierGenerator
+    {
+        /// <summary>
+        /// Generate a new <see cref="Int64"/> identifier for a specified <see cref="Type"/>.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/> that the identifier is required for.</typeparam>
+        /// <returns>The newly generated identifier.</returns>
+        Task<long> GenerateIdentifierAsync<T>();
+
+        /// <summary>
+        /// Generate a new <see cref="Int64"/> identifier for a default <see cref="object"/> <see cref="Type"/>.
+        /// </summary>
+        /// <returns>The newly generated identifier.</returns>
+        Task<long> GenerateIdentifierAsync() => GenerateIdentifierAsync<object>();
     }
 
     /// <summary>

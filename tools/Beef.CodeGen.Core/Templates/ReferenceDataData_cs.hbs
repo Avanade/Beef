@@ -97,10 +97,10 @@ namespace {{Root.NamespaceBusiness}}.Data
 
   {{/ifeq}}
   {{#ifeq AutoImplement 'EntityFramework'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query({{Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery({{Name}}Mapper.CreateArgs("{{CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
             await DataInvoker.Current.InvokeAsync(this, async () => await {{Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)).ConfigureAwait(false);
@@ -113,27 +113,56 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments EntityFrameworkModel}}} property mapping.
+        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}> {{Name}}Mapper => EfDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>()
-            .HasProperty(s => s.Id, d => d.{{Name}}Id)
+        public partial class {{Name}}MapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="{{Name}}MapperProfile"/> class.
+            /// </summary>
+            public {{Name}}MapperProfile()
+            {
+                var d2s = CreateMap<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.{{Name}}Id));
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}})
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
-            .AddStandardProperties();
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                {{Name}}MapperProfileCtor(d2s);
+            }
+
+            partial void {{Name}}MapperProfileCtor(AutoMapper.IMappingExpression<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}> d2s); // Enables the constructor to be extended.
+        }
     {{/unless}}
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
     {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Cosmos {{{seecomments CosmosModel}}} property mapping.
+        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments CosmosModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}> {{Name}}Mapper => CosmosDbMapper.CreateAuto<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>()
+        public partial class {{Name}}MapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="{{Name}}MapperProfile"/> class.
+            /// </summary>
+            public {{Name}}MapperProfile()
+            {
+                var d2s = CreateMap<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>();
           {{#each CoreProperties}}
-            .HasProperty(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, p => p.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{#ifval DataConverterCode}}.SetConverter({{{DataConverterCode}}}){{/ifval}}{{#ifval CosmosMapper}}.SetMapper({{CosmosMapper}}.Default!){{/ifval}})
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
-            .AddStandardProperties();
+
+                {{Name}}MapperProfileCtor(d2s);
+            }
+
+            partial void {{Name}}MapperProfileCtor(AutoMapper.IMappingExpression<{{CosmosModel}}, {{RefDataQualifiedEntityName}}> d2s); // Enables the constructor to be extended.
+        }
     {{/unless}}
   {{/ifeq}}
 {{/each}}

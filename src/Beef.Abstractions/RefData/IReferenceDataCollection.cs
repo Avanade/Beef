@@ -23,6 +23,13 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
+        ReferenceDataBase? GetById(long id);
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
         ReferenceDataBase? GetById(Guid id);
 
         /// <summary>

@@ -34,6 +34,7 @@ namespace Beef.Entities
     /// <summary>
     /// Provides data for the <see cref="INotifyPropertyChanged.PropertyChanged"/> when an item within an <see cref="IEntityBaseCollection"/> is changed.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class ItemPropertyChangedEventArgs : PropertyChangedEventArgs
     {
         /// <summary>
@@ -53,6 +54,7 @@ namespace Beef.Entities
     /// Represents an <see cref="EntityBase"/> collection class.
     /// </summary>
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="System.Type"/>.</typeparam>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection, IEquatable<EntityBaseCollection<TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;

@@ -103,10 +103,22 @@ namespace Beef.Entities
         /// <typeparam name="T">The <see cref="Type"/>.</typeparam>
         /// <param name="value">The value to clean.</param>
         /// <returns>The cleaned value.</returns>
-        /// <remarks>A <paramref name="value"/> of <see cref="Type"/> <see cref="String"/> will leverage <see cref="Clean{String}"/>, <see cref="Type"/> <see cref="DateTime"/>
+        /// <remarks>A <paramref name="value"/> of <see cref="Type"/> <see cref="string"/> will leverage <see cref="Clean(string?)"/>, <see cref="Type"/> <see cref="DateTime"/>
         /// leverage <see cref="Clean(DateTime, DateTimeTransform)"/>, and a <see cref="Type"/> of <see cref="IReferenceData"/> are considered special and as such are never cleaned. Where
         /// the <b>value</b> is inherited from <see cref="EntityBasicBase"/> then <see cref="EntityBasicBase.AcceptChanges"/> will also be invoked.</remarks>
-        public static T Clean<T>(T value)
+        public static T Clean<T>(T value) => Clean(value, true);
+
+        /// <summary>
+        /// Cleans a value.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type"/>.</typeparam>
+        /// <param name="value">The value to clean.</param>
+        /// <param name="overrideWithNullWhenIsInitial">Indicates whether to override the value with <c>null</c> when the value is <see cref="ICleanUp.IsInitial"/>.</param>
+        /// <returns>The cleaned value.</returns>
+        /// <remarks>A <paramref name="value"/> of <see cref="Type"/> <see cref="string"/> will leverage <see cref="Clean(string?)"/>, <see cref="Type"/> <see cref="DateTime"/>
+        /// leverage <see cref="Clean(DateTime, DateTimeTransform)"/>, and a <see cref="Type"/> of <see cref="IReferenceData"/> are considered special and as such are never cleaned. Where
+        /// the <b>value</b> is inherited from <see cref="EntityBasicBase"/> then <see cref="EntityBasicBase.AcceptChanges"/> will also be invoked.</remarks>
+        public static T Clean<T>(T value, bool overrideWithNullWhenIsInitial)
         {
             if (value is string)
             {
@@ -125,7 +137,11 @@ namespace Beef.Entities
             }
 
             if (value is ICleanUp ic)
+            {
                 ic.CleanUp();
+                if (overrideWithNullWhenIsInitial && ic.IsInitial)
+                    return default!;
+            }
 
             if (value is EntityBasicBase e)
                 e.AcceptChanges();

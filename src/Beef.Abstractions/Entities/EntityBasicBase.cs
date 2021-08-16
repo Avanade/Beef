@@ -10,6 +10,7 @@ namespace Beef.Entities
     /// Represents the basic <b>Entity</b> class with <see cref="INotifyPropertyChanged"/> support.
     /// </summary>
     /// <remarks>The <see cref="EntityBasicBase"/> is not thread-safe; it does however, place a lock around all <b>set</b> operations to minimise concurrency challenges.</remarks>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class EntityBasicBase : INotifyPropertyChanged
     {
         internal const string ValueIsImmutableMessage = "Value is immutable; cannot be changed once already set to a value.";
@@ -36,7 +37,6 @@ namespace Beef.Entities
         /// Indicates whether the <see cref="INotifyPropertyChanged.PropertyChanged"/> event is raised when a property is set with a value that is the same as the existing overriding
         /// the <see cref="ShouldNotifyChangesWhenSameValue"/> for the specific instance. A value of <c>null</c> indicates to use the <see cref="ShouldNotifyChangesWhenSameValue"/> setting.
         /// </summary>
-        [Mapper.MapperIgnore]
         public bool? NotifyChangesWhenSameValue { get; set; } = null;
 
         /// <summary>
@@ -88,21 +88,13 @@ namespace Beef.Entities
         /// Raises the <see cref="PropertyChanged"/> event (typically overridden with additional logic).
         /// </summary>
         /// <param name="propertyName">The property name.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            RaisePropertyChanged(propertyName);
-        }
+        protected virtual void OnPropertyChanged(string propertyName) => RaisePropertyChanged(propertyName);
 
-#pragma warning disable CA1030 // Use events where appropriate; by-design, this enables the raising of the underlying event.
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event only (<see cref="OnPropertyChanged"/>).
         /// </summary>
         /// <param name="propertyName">The property name.</param>
-        public void RaisePropertyChanged(string propertyName)
-#pragma warning restore CA1030
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Check.NotNull(propertyName, nameof(propertyName))));
-        }
+        public void RaisePropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Check.NotNull(propertyName, nameof(propertyName))));
 
         /// <summary>
         /// Gets a property value (automatically instantiating new where current value is null).
@@ -131,9 +123,7 @@ namespace Beef.Entities
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
         protected bool SetValue<T>(ref T propertyValue, T setValue, bool immutable = false, bool bubblePropertyChanged = false, params string[] propertyNames)
-        {
-            return SetValue<T>(ref propertyValue, setValue, immutable, bubblePropertyChanged, null!, propertyNames);
-        }
+            => SetValue<T>(ref propertyValue, setValue, immutable, bubblePropertyChanged, null!, propertyNames);
 
         /// <summary>
         /// Sets a property value and raises the <see cref="PropertyChanged"/> event where applicable.
@@ -157,7 +147,7 @@ namespace Beef.Entities
             {
                 // Check and see if the value has changed or not; exit if being set to same value.
                 var isChanged = true;
-                T val = Cleaner.Clean(setValue);
+                T val = Cleaner.Clean(setValue, false);
                 if (propertyValue is IComparable<T>)
                 {
                     if (Comparer<T>.Default.Compare(val, propertyValue) == 0)
@@ -244,9 +234,7 @@ namespace Beef.Entities
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
         protected bool SetValue(ref string? propertyValue, string? setValue, bool immutable = false, StringTrim trim = StringTrim.End, StringTransform transform = StringTransform.EmptyToNull, params string[] propertyNames)
-        {
-            return SetValue(ref propertyValue, setValue, immutable, trim, transform, null!, propertyNames);
-        }
+            => SetValue(ref propertyValue, setValue, immutable, trim, transform, null!, propertyNames);
 
         /// <summary>
         /// Sets a <see cref="string"/> property value and raises the <see cref="PropertyChanged"/> event where applicable.
@@ -308,9 +296,7 @@ namespace Beef.Entities
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
         protected bool SetValue(ref DateTime propertyValue, DateTime setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, params string[] propertyNames)
-        {
-            return SetValue(ref propertyValue, setValue, immutable, transform, null, propertyNames);
-        }
+            => SetValue(ref propertyValue, setValue, immutable, transform, null, propertyNames);
 
         /// <summary>
         /// Sets a <see cref="DateTime"/> property value and raises the <see cref="PropertyChanged"/> event where applicable.
@@ -370,9 +356,7 @@ namespace Beef.Entities
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
         protected bool SetValue(ref DateTime? propertyValue, DateTime? setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, params string[] propertyNames)
-        {
-            return SetValue(ref propertyValue, setValue, immutable, transform, null!, propertyNames);
-        }
+            => SetValue(ref propertyValue, setValue, immutable, transform, null!, propertyNames);
 
         /// <summary>
         /// Sets a <see cref="Nullable{DateTime}"/> property value and raises the <see cref="PropertyChanged"/> event where applicable.
@@ -432,10 +416,7 @@ namespace Beef.Entities
         /// Indicates whether to raise the property changed event when same value by reviewing the current settings for <see cref="NotifyChangesWhenSameValue"/>
         /// and <see cref="ShouldNotifyChangesWhenSameValue"/>.
         /// </summary>
-        protected bool RaisePropertyChangedWhenSame
-        {
-            get { return NotifyChangesWhenSameValue ?? ShouldNotifyChangesWhenSameValue; }
-        }
+        protected bool RaisePropertyChangedWhenSame => NotifyChangesWhenSameValue ?? ShouldNotifyChangesWhenSameValue; 
 
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes.

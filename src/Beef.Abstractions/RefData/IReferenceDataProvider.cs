@@ -15,14 +15,12 @@ namespace Beef.RefData
         /// </summary>
         Type ProviderType { get; }
 
-#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design.
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
         IReferenceDataCollection this[Type type] { get; }
-#pragma warning restore CA1043 
 
         /// <summary>
         /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. 

@@ -26,7 +26,7 @@ namespace Beef.RefData
         [JsonProperty("id", Order = 0)]
         public new Guid Id
         {
-            get { return base.Id == null || !(base.Id is Guid) ? Guid.Empty : (Guid)base.Id; }
+            get { return base.Id == null || base.Id is not Guid gid ? Guid.Empty : gid; }
             set { base.Id = value; }
         }
     }

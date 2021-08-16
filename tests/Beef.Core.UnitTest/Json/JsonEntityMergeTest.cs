@@ -14,7 +14,7 @@ namespace Beef.Core.UnitTest.Json
     [TestFixture]
     public class JsonEntityMergeTest
     {
-        public class ReferData : ReferenceDataBaseInt
+        public class ReferData : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

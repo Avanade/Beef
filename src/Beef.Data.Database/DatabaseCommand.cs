@@ -323,7 +323,7 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
         /// <param name="action">The delegate to enable parameter addition.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        /// <param name="operationType">The single <see cref="Beef.Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The current <see cref="DatabaseCommand"/> instance to support chaining (fluent interface).</returns>
         public DatabaseCommand Params<T>(T value, Action<T, DatabaseParameters, OperationTypes, object> action, OperationTypes operationType)
         {

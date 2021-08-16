@@ -2,6 +2,15 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (except the database stored procedure mapping which will remain as-is). This has the advantage of broad industry support, and based on initial performance testing offers around a ~90% mapping performance improvement (after first execution).
+  - The existing `EntityMapper` has been removed. All capabilities to support `Beef.Data.Database.DatabaseMapper` have been moved to that `Assembly`.
+  - The existing `Converters` have been extended so that they can be used for `AutoMapper` and existing `Beef.Data.Database.DatabaseMapper`.
+  - Added a new `AutoMapperExtensions` class to add helper extension methods: `OperationTypes`, `Flatten` and `Unflatten` to simplify/improve usage in a _Beef_ context.
+  - Existing `Mapper`-related artefacts relocated from `Beef.Abstractions`.
+- *Enhancement:* Added support for the `IInt32Identifier` (rename) and `IInt64Identifier` (new).
+- *Enhancement:* Added validation `BetweenRule` to enable a value comparison between a from and to value.
+
 ## v4.2.2
 - *Enhancement:* After a review of the newly introduced `GenericValidator` and the existing `CommonValidator` it has been decided these will be combined because the functionality was so closely aligned (duplicated). To minimize usage impact, the `GenericValidator` will be deprecated, with its unique functionality migrated into the `CommonValidator`. The `Validator` static class has been extended to support the creation of a `CommonValidator` via a new `CreateCommon` method.
 - *Fixed:* There were inconsistencies with the `MessageItem.Property` output from `DictionaryRule` and `DictionaryValidator` with respect to the underlying property names. The property name was sometimes including the key value and suffixing with `Key` and `Value` (e.g. `Foo["bar"].Key` and `Foo["bar"].Value`), and others just the key value and no suffix (e.g. `Foo["bar"]` and `Foo["bar"]`) - the latter will be the standardized output.

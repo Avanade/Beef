@@ -295,7 +295,7 @@ properties: [
         [PropertySchema("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
             Description = "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored. " +
-                "See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
+                "See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
         public string? IdentifierGenerator { get; set; }
 
         #endregion
@@ -373,14 +373,6 @@ properties: [
         #region EntityFramework
 
         /// <summary>
-        /// Gets or sets the Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? EntityFrameworkMapper { get; set; }
-
-        /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
         /// </summary>
         [JsonProperty("entityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -392,14 +384,6 @@ properties: [
         #region Cosmos
 
         /// <summary>
-        /// Gets or sets the Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("cosmosMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "The Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? CosmosMapper { get; set; }
-
-        /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
         /// </summary>
         [JsonProperty("cosmosIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -409,14 +393,6 @@ properties: [
         #endregion
 
         #region OData
-
-        /// <summary>
-        /// Gets or sets the OData property `Mapper` class name where `Entity.AutoImplement` is selected.
-        /// </summary>
-        [JsonProperty("odataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The OData property `Mapper` class name where `Entity.AutoImplement` is selected.",
-            Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? ODataMapper { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
@@ -504,7 +480,7 @@ properties: [
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText => $"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).";
+        public string? SummaryRefDataText => ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
 
         /// <summary>
         /// Gets the formatted summary text when used in a parameter context.
@@ -554,6 +530,8 @@ properties: [
                     "ReferenceDataNullableGuidIdConverter" => "Guid?",
                     "ReferenceDataInt32IdConverter" => "int",
                     "ReferenceDataNullableInt32IdConverter" => "int?",
+                    "ReferenceDataInt64IdConverter" => "long",
+                    "ReferenceDataNullableInt64IdConverter" => "long?",
                     "ReferenceDataStringIdConverter" => "string?",
                     _ => DeclaredType
                 };
@@ -579,14 +557,19 @@ properties: [
         public string DataMapperPropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : CompareNullOrValue(DataConverter, "ReferenceDataCodeConverter") ? PropertyName : Name!;
 
         /// <summary>
+        /// Gets or sets the data converter name.
+        /// </summary>
+        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
+
+        /// <summary>
         /// Gets the data converter C# code.
         /// </summary>
-        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverterName}.Default!)";
 
         /// <summary>
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
-        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default.ConvertToSrce(";
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.Default.ConvertToSrce(";
 
         /// <summary>
         /// Gets the WebAPI parameter type.

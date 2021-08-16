@@ -26,49 +26,49 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="queryArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="ODataQuery{T, TModel}"/>.</returns>
-        ODataQuery<T, TModel> Query<T, TModel>(ODataArgs<T, TModel> queryArgs, Func<Soc.IBoundClient<TModel>, Soc.IBoundClient<TModel>>? query = null) where T : class, new() where TModel : class, new();
+        ODataQuery<T, TModel> Query<T, TModel>(ODataArgs queryArgs, Func<Soc.IBoundClient<TModel>, Soc.IBoundClient<TModel>>? query = null) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> (mapping from <typeparamref name="TModel"/> to <typeparamref name="T"/>) asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="getArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        Task<T?> GetAsync<T, TModel>(ODataArgs<T, TModel> getArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new();
+        Task<T?> GetAsync<T, TModel>(ODataArgs getArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Creates the entity (mapping from <typeparamref name="T"/> to <typeparamref name="TModel"/>) asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The created entity value.</returns>
-        Task<T> CreateAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+        Task<T> CreateAsync<T, TModel>(ODataArgs saveArgs, T value) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Updates the entity (mapping from <typeparamref name="T"/> to <typeparamref name="TModel"/>) asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="value">The value to update.</param>
         /// <returns>The updated entity value.</returns>
-        Task<T> UpdateAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+        Task<T> UpdateAsync<T, TModel>(ODataArgs saveArgs, T value) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Deletes the entity for the specified <paramref name="keys"/> asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The OData model <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="saveArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        Task DeleteAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new();
+        Task DeleteAsync<T, TModel>(ODataArgs saveArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new();
     }
 }

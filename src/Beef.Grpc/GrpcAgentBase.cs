@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using AutoMapper;
 using Beef.WebApi;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -20,12 +21,22 @@ namespace Beef.Grpc
         /// Initializes a new instance of the <see cref="GrpcAgentBase"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        protected GrpcAgentBase(IWebApiAgentArgs args) => Args = args ?? throw new ArgumentNullException(nameof(args));
+        /// <param name="mapper">The <see cref="IMapper"/>.</param>
+        protected GrpcAgentBase(IWebApiAgentArgs args, IMapper mapper)
+        {
+            Args = args ?? throw new ArgumentNullException(nameof(args));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
 
         /// <summary>
         /// Gets the underlying <see cref="System.Net.Http.HttpClient"/>.
         /// </summary>
         public IWebApiAgentArgs Args { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IMapper"/>.
+        /// </summary>
+        public IMapper Mapper { get; private set; }
     }
 
     /// <summary>
@@ -38,7 +49,8 @@ namespace Beef.Grpc
         /// Initializes a new instance of the <see cref="GrpcAgentBase{TClient}"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        protected GrpcAgentBase(IWebApiAgentArgs args) : base(args)
+        /// <param name="mapper">The <see cref="IMapper"/>.</param>
+        protected GrpcAgentBase(IWebApiAgentArgs args, IMapper mapper) : base(args, mapper)
         {
             // Create the channel and the client.
             var channel = GrpcChannel.ForAddress(args.HttpClient.BaseAddress, new GrpcChannelOptions { HttpClient = Args.HttpClient });
@@ -88,13 +100,12 @@ namespace Beef.Grpc
         /// <typeparam name="TResponse">The gRPC response <see cref="System.Type"/>.</typeparam>
         /// <param name="func">The <paramref name="func"/> to perform the gRPC call.</param>
         /// <param name="request">The gRPC request value (for auditing).</param>
-        /// <param name="mapper">The <see cref="Beef.Mapper.EntityMapper{TResult, TResponse}"/> to map the result from the response.</param>
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="GrpcAgentResult{T}"/>.</returns>
-        public Task<GrpcAgentResult<TResult>> InvokeAsync<TResult, TResponse>(Func<TClient, CallOptions, AsyncUnaryCall<TResponse>> func, IMessage? request, Beef.Mapper.EntityMapper<TResult, TResponse> mapper, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public Task<GrpcAgentResult<TResult>> InvokeAsync<TResult, TResponse>(Func<TClient, CallOptions, AsyncUnaryCall<TResponse>> func, IMessage? request, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             where TResult : class, new() where TResponse : class, new()
         {
             if (requestOptions?.ETag != null)
@@ -107,7 +118,7 @@ namespace Beef.Grpc
                     var options = new CallOptions(CreateRequestHeaders());
                     using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
                     var response = await call.ResponseAsync.ConfigureAwait(false);
-                    var result = Check.NotNull(mapper, nameof(mapper)).MapToSrce(response);
+                    var result = Mapper.Map<TResponse, TResult>(response);
                     return new GrpcAgentResult<TResult>(call.GetStatus(), call.GetTrailers(), request, response, result!);
                 }
                 catch (RpcException rex)

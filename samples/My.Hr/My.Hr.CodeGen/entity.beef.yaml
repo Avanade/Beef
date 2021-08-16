@@ -45,8 +45,8 @@ entities:
       { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
       { name: Termination, type: TerminationDetail, databaseMapper: TerminationDetailData.DbMapper, entityFrameworkIgnore: true },
       { name: PhoneNo },
-      { name: ETag },
-      { name: ChangeLog, type: ChangeLog }
+      { name: ETag, entityFrameworkIgnore: true },
+      { name: ChangeLog, type: ChangeLog, entityFrameworkIgnore: true }
     ]
   }
 
@@ -56,7 +56,7 @@ entities:
   # - The AutoImplement specifies that operations should be auto-implemented using Database (ADO.NET) unless explicitly overridden.
   # - The WebApiRoutePrefix is defined, which is in turn extended by each operation.
   # - The EntityFrameworkModel is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required).
-- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true, 
     properties: [
       { name: Id, text: '{{Employee}} identifier', type: Guid, uniqueKey: true, inherited: true, databaseIgnore: true },
       { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson },
@@ -84,7 +84,7 @@ entities:
       # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
       # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
       # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
-      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework, dataEntityMapper: EmployeeBaseData.EfMapper,
+      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework,
         parameters: [
           { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }
         ]

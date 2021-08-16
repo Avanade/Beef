@@ -5,6 +5,7 @@ namespace Beef.Entities
     /// <summary>
     /// Represents the resulting paging response including <see cref="TotalCount"/> and <see cref="TotalPages"/> where applicable for the subsequent query.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class PagingResult : PagingArgs
     {
         /// <summary>

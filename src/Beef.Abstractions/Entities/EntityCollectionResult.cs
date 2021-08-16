@@ -57,6 +57,8 @@ namespace Beef.Entities
     /// </summary>
     /// <typeparam name="TColl">The result collection <see cref="Type"/>.</typeparam>
     /// <typeparam name="TEntity">The underlying entity <see cref="Type"/>.</typeparam>
+
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class EntityCollectionResult<TColl, TEntity> : EntityBase, IEntityCollectionResult<TColl, TEntity>, IPagingResult
         where TColl : EntityBaseCollection<TEntity>, new()
         where TEntity : EntityBase

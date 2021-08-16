@@ -22,9 +22,9 @@ namespace Beef.Data.OData
         /// Initializes a new instance of the <see cref="ODataQuery{T, TModel}"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ODataBase"/>.</param>
-        /// <param name="queryArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
+        /// <param name="queryArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/></param>
-        internal ODataQuery(ODataBase odata, ODataArgs<T, TModel> queryArgs, Func<IBoundClient<TModel>, IBoundClient<TModel>>? query = null)
+        internal ODataQuery(ODataBase odata, ODataArgs queryArgs, Func<IBoundClient<TModel>, IBoundClient<TModel>>? query = null)
         {
             _odata = Check.NotNull(odata, nameof(odata));
             QueryArgs = Check.NotNull(queryArgs, nameof(queryArgs));
@@ -32,9 +32,9 @@ namespace Beef.Data.OData
         }
 
         /// <summary>
-        /// Gets the <see cref="ODataArgs{T, TModel}"/>.
+        /// Gets the <see cref="ODataArgs"/>.
         /// </summary>
-        public ODataArgs<T, TModel> QueryArgs { get; private set; }
+        public ODataArgs QueryArgs { get; private set; }
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
@@ -68,7 +68,7 @@ namespace Beef.Data.OData
         /// <returns>The single item.</returns>
         public T SelectSingle()
         {
-            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue<T, TModel>(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(2).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.Single();
@@ -81,7 +81,7 @@ namespace Beef.Data.OData
         /// <returns>The single item or default.</returns>
         public T? SelectSingleOrDefault()
         {
-            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue<T, TModel>(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(2).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.SingleOrDefault();
@@ -94,7 +94,7 @@ namespace Beef.Data.OData
         /// <returns>The first item.</returns>
         public T SelectFirst()
         {
-            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue<T, TModel>(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(1).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.First();
@@ -107,7 +107,7 @@ namespace Beef.Data.OData
         /// <returns>The single item or default.</returns>
         public T? SelectFirstOrDefault()
         {
-            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue<T, TModel>(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(1).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.FirstOrDefault();
@@ -123,7 +123,7 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <returns>A resultant collection.</returns>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ODataArgs{T, TModel}.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="ODataArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public TColl SelectQuery<TColl>() where TColl : ICollection<T>, new()
         {
             var coll = new TColl();
@@ -136,7 +136,7 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
-        /// <remarks>The <see cref="QueryArgs"/> <see cref="ODataArgs{T, TModel}.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
+        /// <remarks>The <see cref="QueryArgs"/> <see cref="ODataArgs.Paging"/> is also applied, including <see cref="PagingArgs.IsGetCount"/> where requested.</remarks>
         public void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>
         {
             ExecuteQuery(q =>
@@ -152,7 +152,7 @@ namespace Beef.Data.OData
 
                 foreach (var item in q.FindEntriesAsync(ann).GetAwaiter().GetResult())
                 {
-                    coll.Add(ODataBase.GetValue(QueryArgs, item)!);
+                    coll.Add(ODataBase.GetValue<T, TModel>(QueryArgs, item)!);
                 }
 
                 if (ann != null)

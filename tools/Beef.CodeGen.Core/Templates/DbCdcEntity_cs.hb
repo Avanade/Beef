@@ -26,7 +26,7 @@ namespace {{Root.NamespaceCdcPublisher}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : ITableKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
+    public partial class {{ModelName}}Cdc : ITableKey, IETag{{#ifval ColumnIsDeleted}}, ICdcLogicallyDeleted{{/ifval}}{{#if IdentifierMapping}}, IGlobalIdentifier{{/if}}{{#if UsesGlobalIdentifier}}, ICdcLinkIdentifierMapping{{/if}}
     {
 {{#if IdentifierMapping}}
         /// <summary>
@@ -103,14 +103,14 @@ namespace {{Root.NamespaceCdcPublisher}}.Entities
         /// Indicates whether the entity is logically deleted ('{{ColumnIsDeleted.Name}}' column).
         /// </summary>
         [MapperProperty("{{ColumnIsDeleted.Name}}")]
-        public bool IsDeleted { get; set; }
+        public bool? IsDeleted { get; set; }
 
         /// <summary>
         /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
         /// </summary>
         public void ClearWhereDeleted()
         {
-            if (!IsDeleted)
+            if (!IsDeleted.HasValue || !IsDeleted.Value)
                 return;
 
     {{#each SelectedEntityColumns}}

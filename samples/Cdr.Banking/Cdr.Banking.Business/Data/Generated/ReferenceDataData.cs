@@ -25,13 +25,15 @@ namespace Cdr.Banking.Business.Data
     public partial class ReferenceDataData : IReferenceDataData
     {
         private readonly ICosmosDb _cosmos;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public ReferenceDataData(ICosmosDb cosmos)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); DataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public ReferenceDataData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
 
         partial void DataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -42,7 +44,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.OpenStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(OpenStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.OpenStatus, Model.OpenStatus>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -53,7 +55,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
         {
             var __coll = new RefDataNamespace.ProductCategoryCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(ProductCategoryMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.ProductCategory, Model.ProductCategory>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -64,7 +66,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.AccountUTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(AccountUTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.AccountUType, Model.AccountUType>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -75,7 +77,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
         {
             var __coll = new RefDataNamespace.MaturityInstructionsCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(MaturityInstructionsMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -86,7 +88,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionType, Model.TransactionType>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -97,45 +99,117 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionStatus, Model.TransactionStatus>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> and Cosmos <see cref="Model.OpenStatus"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> and Entity Framework <see cref="Model.OpenStatus"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.OpenStatus, Model.OpenStatus> OpenStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.OpenStatus, Model.OpenStatus>()
-            .AddStandardProperties();
+        public partial class OpenStatusMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="OpenStatusMapperProfile"/> class.
+            /// </summary>
+            public OpenStatusMapperProfile()
+            {
+                var d2s = CreateMap<Model.OpenStatus, RefDataNamespace.OpenStatus>();
+
+                OpenStatusMapperProfileCtor(d2s);
+            }
+
+            partial void OpenStatusMapperProfileCtor(AutoMapper.IMappingExpression<Model.OpenStatus, RefDataNamespace.OpenStatus> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> and Cosmos <see cref="Model.ProductCategory"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> and Entity Framework <see cref="Model.ProductCategory"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.ProductCategory, Model.ProductCategory> ProductCategoryMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.ProductCategory, Model.ProductCategory>()
-            .AddStandardProperties();
+        public partial class ProductCategoryMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ProductCategoryMapperProfile"/> class.
+            /// </summary>
+            public ProductCategoryMapperProfile()
+            {
+                var d2s = CreateMap<Model.ProductCategory, RefDataNamespace.ProductCategory>();
+
+                ProductCategoryMapperProfileCtor(d2s);
+            }
+
+            partial void ProductCategoryMapperProfileCtor(AutoMapper.IMappingExpression<Model.ProductCategory, RefDataNamespace.ProductCategory> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.AccountUType"/> and Cosmos <see cref="Model.AccountUType"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.AccountUType"/> and Entity Framework <see cref="Model.AccountUType"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.AccountUType, Model.AccountUType> AccountUTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.AccountUType, Model.AccountUType>()
-            .AddStandardProperties();
+        public partial class AccountUTypeMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="AccountUTypeMapperProfile"/> class.
+            /// </summary>
+            public AccountUTypeMapperProfile()
+            {
+                var d2s = CreateMap<Model.AccountUType, RefDataNamespace.AccountUType>();
+
+                AccountUTypeMapperProfileCtor(d2s);
+            }
+
+            partial void AccountUTypeMapperProfileCtor(AutoMapper.IMappingExpression<Model.AccountUType, RefDataNamespace.AccountUType> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> and Cosmos <see cref="Model.MaturityInstructions"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> and Entity Framework <see cref="Model.MaturityInstructions"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions> MaturityInstructionsMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>()
-            .AddStandardProperties();
+        public partial class MaturityInstructionsMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MaturityInstructionsMapperProfile"/> class.
+            /// </summary>
+            public MaturityInstructionsMapperProfile()
+            {
+                var d2s = CreateMap<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions>();
+
+                MaturityInstructionsMapperProfileCtor(d2s);
+            }
+
+            partial void MaturityInstructionsMapperProfileCtor(AutoMapper.IMappingExpression<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionType"/> and Cosmos <see cref="Model.TransactionType"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.TransactionType"/> and Entity Framework <see cref="Model.TransactionType"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionType, Model.TransactionType> TransactionTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionType, Model.TransactionType>()
-            .AddStandardProperties();
+        public partial class TransactionTypeMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TransactionTypeMapperProfile"/> class.
+            /// </summary>
+            public TransactionTypeMapperProfile()
+            {
+                var d2s = CreateMap<Model.TransactionType, RefDataNamespace.TransactionType>();
+
+                TransactionTypeMapperProfileCtor(d2s);
+            }
+
+            partial void TransactionTypeMapperProfileCtor(AutoMapper.IMappingExpression<Model.TransactionType, RefDataNamespace.TransactionType> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> and Cosmos <see cref="Model.TransactionStatus"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> and Entity Framework <see cref="Model.TransactionStatus"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionStatus, Model.TransactionStatus> TransactionStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionStatus, Model.TransactionStatus>()
-            .AddStandardProperties();
+        public partial class TransactionStatusMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TransactionStatusMapperProfile"/> class.
+            /// </summary>
+            public TransactionStatusMapperProfile()
+            {
+                var d2s = CreateMap<Model.TransactionStatus, RefDataNamespace.TransactionStatus>();
+
+                TransactionStatusMapperProfileCtor(d2s);
+            }
+
+            partial void TransactionStatusMapperProfileCtor(AutoMapper.IMappingExpression<Model.TransactionStatus, RefDataNamespace.TransactionStatus> d2s); // Enables the constructor to be extended.
+        }
     }
 }
 

@@ -167,9 +167,15 @@ namespace Beef.Yaml
 
                     break;
 
-                case ReferenceDataBaseInt rdi:
+                case ReferenceDataBaseInt32 rdi:
                     if (rdi.Id == 0)
                         rdi.Id = index + 1;
+
+                    break;
+
+                case ReferenceDataBaseInt64 rdl:
+                    if (rdl.Id == 0)
+                        rdl.Id = index + 1;
 
                     break;
 

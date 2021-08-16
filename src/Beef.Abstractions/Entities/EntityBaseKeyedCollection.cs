@@ -15,6 +15,7 @@ namespace Beef.Entities
     /// </summary>
     /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="Type"/>.</typeparam>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class EntityBaseKeyedCollection<TKey, TEntity> : KeyedCollection<TKey, TEntity>, IEntityBaseCollection, INotifyCollectionChanged, IEquatable<EntityBaseKeyedCollection<TKey, TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;

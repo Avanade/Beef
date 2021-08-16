@@ -6,8 +6,6 @@
 #pragma warning disable
 
 using System;
-using Beef;
-using Beef.Data.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,7 +14,7 @@ namespace Beef.Demo.Business.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Test.Table'.
     /// </summary>
-    public partial class Table : ILogicallyDeleted, IMultiTenant
+    public partial class Table : Beef.Entities.ILogicallyDeleted, Beef.Entities.IMultiTenant
     {
         /// <summary>
         /// Gets or sets the 'TableId' column value.

@@ -11,6 +11,18 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the format string for the compare equal error message.
         /// </summary>
+        /// <remarks>Defaults to: <i>{0} must be between {2} and {3}.</i></remarks>
+        public static readonly LText BetweenInclusiveFormat = new("Beef.BetweenInclusiveFormat");
+
+        /// <summary>
+        /// Gets the format string for the compare equal error message.
+        /// </summary>
+        /// <remarks>Defaults to: <i>{0} must be between {2} and {3} (exclusive).</i></remarks>
+        public static readonly LText BetweenExclusiveFormat = new("Beef.BetweenExclusiveFormat");
+
+        /// <summary>
+        /// Gets the format string for the compare equal error message.
+        /// </summary>
         /// <remarks>Defaults to: <i>{0} must be equal to {2}.</i></remarks>
         public static readonly LText CompareEqualFormat = new("Beef.CompareEqualFormat");
 

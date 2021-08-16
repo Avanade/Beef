@@ -9,69 +9,21 @@ namespace Beef.Mapper.Converters
     /// Represents an <see cref="object"/> to JSON <see cref="string"/> converter.
     /// </summary>
     /// <typeparam name="TSrceProperty"></typeparam>
-    public class ObjectToJsonConverter<TSrceProperty> : Singleton<ObjectToJsonConverter<TSrceProperty>>, IPropertyMapperConverter<TSrceProperty, string?>
+    public class ObjectToJsonConverter<TSrceProperty> : CustomConverter<TSrceProperty, string?>
     {
-        /// <summary>
-        /// Gets the source value <see cref="Type"/>.
-        /// </summary>
-        Type IPropertyMapperConverter.SrceType { get; } = typeof(TSrceProperty);
+        private static readonly Lazy<ObjectToJsonConverter<TSrceProperty>> _default = new(() => new ObjectToJsonConverter<TSrceProperty>(), true);
 
         /// <summary>
-        /// Gets the destination value <see cref="Type"/>.
+        /// Gets the default (singleton) instance.
         /// </summary>
-        Type IPropertyMapperConverter.DestType { get; } = typeof(string);
+        public static ObjectToJsonConverter<TSrceProperty> Default { get { return _default.Value; } }
 
         /// <summary>
-        /// Gets the underlying source <see cref="Type"/> allowing for nullables.
+        /// Initializes a new instance of the <see cref="ObjectToJsonConverter{TSrceProperty}"/> class.
         /// </summary>
-        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = Nullable.GetUnderlyingType(typeof(TSrceProperty)) ?? typeof(TSrceProperty);
-
-        /// <summary>
-        /// Gets the underlying destination <see cref="Type"/> allowing for nullables.
-        /// </summary>
-        Type IPropertyMapperConverter.DestUnderlyingType { get; } = typeof(String);
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        public string? ConvertToDest(TSrceProperty value)
-        {
-            if (value == null)
-                return null;
-
-            return JsonConvert.SerializeObject(value);
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        public TSrceProperty ConvertToSrce(string? value)
-        {
-            return string.IsNullOrEmpty(value) ? default! : JsonConvert.DeserializeObject<TSrceProperty>(value)!;
-        }
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((TSrceProperty)value!);
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
-        {
-            return ConvertToSrce((string)value!);
-        }
+        public ObjectToJsonConverter() : base(
+            s => s == null ? null : JsonConvert.SerializeObject(s),
+            d => string.IsNullOrEmpty(d) ? default! : JsonConvert.DeserializeObject<TSrceProperty>(d)!)
+        { }
     }
 }

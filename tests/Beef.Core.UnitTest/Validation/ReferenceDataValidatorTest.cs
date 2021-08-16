@@ -15,7 +15,7 @@ namespace Beef.Core.UnitTest.Validation
         [OneTimeSetUp]
         public void OneTimeSetUp() => Beef.TextProvider.SetTextProvider(new DefaultTextProvider());
 
-        public class Gender : ReferenceDataBaseInt
+        public class Gender : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

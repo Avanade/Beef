@@ -84,7 +84,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{Outcome}} text (read-only where selected).
+        /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("outcomeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? OutcomeText { get => _outcomeText ?? GetRefDataText(() => Outcome); set => _outcomeText = value; }

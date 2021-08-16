@@ -291,6 +291,39 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
+        ReferenceDataBase IReferenceDataCollection.GetById(long id)
+        {
+            return GetById(id);
+        }
+
+        /// <summary>
+        /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The item where found; otherwise, null.</returns>
+        public TItem GetById(long id)
+        {
+            if (_rdcId.Contains(id))
+                return _rdcId[id];
+
+            return default!;
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
+        /// </summary>
+        /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
+        public bool ContainsId(long id)
+        {
+            return _rdcId.Contains(id);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
         ReferenceDataBase IReferenceDataCollection.GetById(Guid id)
         {
             return GetById(id);
@@ -406,6 +439,17 @@ namespace Beef.RefData
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[int id]
+        {
+            get { return GetById(id); }
+            private set { throw new NotSupportedException(); }
+        }
+
+        /// <summary>
+        /// Gets the item for the <see cref="ReferenceDataBase.Id"/> (see <see cref="GetById(long)"/>).
+        /// </summary>
+        /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
+        /// <returns>The item where found; otherwise, null.</returns>
+        public TItem this[long id]
         {
             get { return GetById(id); }
             private set { throw new NotSupportedException(); }

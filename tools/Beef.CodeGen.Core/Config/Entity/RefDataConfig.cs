@@ -56,6 +56,9 @@ namespace Beef.CodeGen.Config.Entity
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataName, Text = $"{{{{{Root!.ODataName}}}}}" });
 
+            if (UsesEntityFramework || UsesCosmos || UsesOData)
+                DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
+
             foreach (var ctor in DataCtorParameters)
             {
                 ctor.Prepare(Root!, oc);

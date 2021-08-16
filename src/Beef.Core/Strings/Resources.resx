@@ -129,6 +129,12 @@
   <data name="Beef.AuthorizationException" xml:space="preserve">
     <value>An authorization error occurred; you are not permitted to perform this action.</value>
   </data>
+  <data name="Beef.BetweenExclusiveFormat" xml:space="preserve">
+    <value>{0} must be between {2} and {3} (exclusive).</value>
+  </data>
+  <data name="Beef.BetweenInclusiveFormat" xml:space="preserve">
+    <value>{0} must be between {2} and {3}.</value>
+  </data>
   <data name="Beef.BusinessException" xml:space="preserve">
     <value>A business error occurred.</value>
   </data>

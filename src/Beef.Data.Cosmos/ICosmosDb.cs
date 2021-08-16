@@ -34,18 +34,18 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <returns>The <see cref="CosmosDbContainer{T, TModel}"/>.</returns>
-        CosmosDbContainer<T, TModel> Container<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new();
+        CosmosDbContainer<T, TModel> Container<T, TModel>(CosmosDbArgs dbArgs) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Gets (creates) the <see cref="CosmosDbValueContainer{T, TModel}"/> using the specified <paramref name="dbArgs"/>.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <returns>The <see cref="CosmosDbValueContainer{T, TModel}"/>.</returns>
-        CosmosDbValueContainer<T, TModel> ValueContainer<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new();
+        CosmosDbValueContainer<T, TModel> ValueContainer<T, TModel>(CosmosDbArgs dbArgs) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Replace or create the <see cref="Container"/> asynchronously.
@@ -58,17 +58,17 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets (creates) a <see cref="CosmosDbQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T, TModel}"/>.</returns>
-        CosmosDbQuery<T, TModel> Query<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new();
+        CosmosDbQuery<T, TModel> Query<T, TModel>(CosmosDbArgs dbArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new();
 
         /// <summary>
         /// Gets (creates) a <see cref="CosmosDbValueQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
-        CosmosDbValueQuery<T, TModel> ValueQuery<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null) where T : class, new() where TModel : class, new();
+        CosmosDbValueQuery<T, TModel> ValueQuery<T, TModel>(CosmosDbArgs dbArgs, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null) where T : class, new() where TModel : class, new();
     }
 }

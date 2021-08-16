@@ -64,7 +64,7 @@ The `GetByArgs` operation needs to be added to the `Employee` entity configurati
       # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
       # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
       # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
-      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework, dataEntityMapper: EmployeeBaseData.EfMapper,
+      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework,
         parameters: [
           { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }
         ]

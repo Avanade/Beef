@@ -82,7 +82,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
     {{/if}}
     {{#if UsesCosmos}}
-        private Action<ICosmosDbArgs>? _onDataArgsCreate;
+        private Action<CosmosDbArgs>? _onDataArgsCreate;
     {{/if}}
     {{#each DataOperations}}
       {{#ifeq Type 'GetColl'}}
@@ -163,13 +163,13 @@ namespace {{Root.NamespaceBusiness}}.Data
             var __dataArgs = {{DataEntityMapper}}.Default.CreateArgs("[{{Parent.DatabaseSchema}}].[{{DatabaseStoredProc}}]"{{#if Paging}}, __result.Paging!{{/if}});
       {{/ifeq}}
       {{#ifeq AutoImplement 'EntityFramework'}}
-            var __dataArgs = {{DataEntityMapper}}.Default.CreateArgs({{#if Paging}}__result.Paging!{{/if}});
+            var __dataArgs = EfDbArgs.Create(_mapper{{#if Paging}}, __result.Paging!{{/if}});
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
-            var __dataArgs = {{DataEntityMapper}}.Default.CreateArgs("{{Parent.CosmosContainerId}}"{{#if Paging}}, __result.Paging!{{/if}}, {{CosmosPartitionKeyCode}}, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "{{Parent.CosmosContainerId}}"{{#if Paging}}, __result.Paging!{{/if}}, {{CosmosPartitionKeyCode}}, onCreate: _onDataArgsCreate);
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}
-            var __dataArgs = {{DataEntityMapper}}.Default.CreateArgs({{#if Paging}}__result.Paging!{{/if}}{{#ifval ODataCollectionName}}{{#if Paging}}, {{/if}}"{{ODataCollectionName}}"{{/ifval}});
+            var __dataArgs = ODataArgs.Create(_mapper{{#if Paging}}, __result.Paging!{{/if}}{{#ifval ODataCollectionName}}, "{{ODataCollectionName}}"{{/ifval}});
       {{/ifeq}}
       {{#if DataExtensions}}
             await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each PagingLessDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -186,23 +186,23 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'EntityFramework'}}
         {{#ifeq Type 'GetColl'}}
-            __result.Result = {{DataArgs.Name}}.Query(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
+            __result.Result = {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{Parent.EntityFrameworkModel}}>(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.EntityFrameworkModel}}>(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
-            __result.Result = {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
+            __result.Result = {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{BaseReturnType}}, {{Parent.CosmosModel}}>(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.CosmosModel}}>(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}
         {{#ifeq Type 'GetColl'}}
-            __result.Result = {{DataArgs.Name}}.Query(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
+            __result.Result = {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{Parent.ODataModel}}>(__dataArgs, q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{Type}}Async(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.ODataModel}}>(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#if DataExtensions}}
@@ -268,9 +268,9 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#each DatabaseMapperProperties}}
                 Property(s => s.{{DataMapperPropertyName}}{{#ifval DataName}}, "{{DataName}}"{{/ifval}}{{#ifne DataOperationTypes 'Any'}}, operationTypes: OperationTypes.{{DataOperationTypes}}{{/ifne}}){{#if UniqueKey}}.SetUniqueKey({{#if DataAutoGenerated}}true{{else}}false{{/if}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval DatabaseMapper}}.SetMapper({{DatabaseMapper}}.Default!){{/ifval}};
     {{/each}}
-    {{#if MapperAddStandardProperties}}
-                AddStandardProperties();
-    {{/if}}
+    {{#ifor HasDatabaseETagProperty HasDatabaseChangeLogProperty}}
+                AddStandardProperties({{#unless HasDatabaseETagProperty}}excludeETag: true{{/unless}}{{#unless HasDatabaseChangeLogProperty}}excludeChangeLog: true{{/unless}});
+    {{/ifor}}
                 DbMapperCtor();
             }
             
@@ -282,28 +282,47 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments EntityFrameworkModel}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class EfMapper : EfDbMapper<{{EntityName}}, {{EntityFrameworkModel}}, EfMapper>
+        public partial class EfMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapper"/> class.
+            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
             /// </summary>
-            public EfMapper()
+            public EfMapperProfile()
             {
-    {{#ifval EntityFrameworkMapperInheritsFrom}}
-                InheritPropertiesFrom({{EntityFrameworkMapperInheritsFrom}}.Default);
-    {{/ifval}}
+                var s2d = CreateMap<{{EntityName}}, {{EntityFrameworkModel}}>();
     {{#each EntityFrameworkMapperProperties}}
-                Property(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}){{#ifne DataOperationTypes 'Any'}}.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{/ifne}}{{#if UniqueKey}}.SetUniqueKey({{#if DataAutoGenerated}}true{{else}}false{{/if}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval EntityFrameworkMapper}}.SetMapper({{EntityFrameworkMapper}}.Default!){{/ifval}};
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
-    {{#if MapperAddStandardProperties}}
-                AddStandardProperties();
+    {{#if HasEntityFrameworkETagProperty}}
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(StringToBase64Converter.Default.ToDest, s => s.ETag));
     {{/if}}
-                EfMapperCtor();
+    {{#if HasEntityFrameworkChangeLogProperty}}
+                s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
+                s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
+                s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
+                s2d.ForMember(d => d.UpdatedDate, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedDate));
+    {{/if}}
+
+                var d2s = CreateMap<{{EntityFrameworkModel}}, {{EntityName}}>();
+    {{#each EntityFrameworkAutoMapperProperties}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if EntityFrameworkIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+    {{/each}}
+    {{#if HasEntityFrameworkETagProperty}}
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+    {{/if}}
+    {{#if HasEntityFrameworkChangeLogProperty}}
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedDate));
+    {{/if}}
+
+                EfMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void EfMapperCtor(); // Enables the EfMapper constructor to be extended.
+
+            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<{{EntityName}}, {{EntityFrameworkModel}}> s2d, AutoMapper.IMappingExpression<{{EntityFrameworkModel}}, {{EntityName}}> d2s); // Enables the constructor to be extended.
         }
   {{/unless}}
 {{/if}}
@@ -311,28 +330,29 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Cosmos {{{seecomments EntityFrameworkModel}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments CosmosModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class CosmosMapper : CosmosDbMapper<{{EntityName}}, {{CosmosModel}}, CosmosMapper>
+        public partial class CosmosMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
+            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
             /// </summary>
-            public CosmosMapper()
+            public CosmosMapperProfile()
             {
-    {{#ifval CosmosMapperInheritsFrom}}
-                InheritPropertiesFrom({{CosmosMapperInheritsFrom}}.Default);
-    {{/ifval}}
-    {{#each CosmosMapperProperties}}
-                Property(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}){{#ifne DataOperationTypes 'Any'}}.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{/ifne}}{{#if UniqueKey}}.SetUniqueKey({{#if DataAutoGenerated}}true{{else}}false{{/if}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval CosmosMapper}}.SetMapper({{CosmosMapper}}.Default!){{/ifval}};
+                var s2d = CreateMap<{{EntityName}}, {{CosmosModel}}>();
+    {{#each CosmosAutoMapperProperties}}
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
-    {{#if MapperAddStandardProperties}}
-                AddStandardProperties();
-    {{/if}}
-                CosmosMapperCtor();
+
+                var d2s = CreateMap<{{CosmosModel}}, {{EntityName}}>();
+    {{#each CosmosAutoMapperProperties}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if CosmosIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+    {{/each}}
+
+                CosmosMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
+
+            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<{{EntityName}}, {{CosmosModel}}> s2d, AutoMapper.IMappingExpression<{{CosmosModel}}, {{EntityName}}> d2s); // Enables the constructor to be extended.
         }
   {{/unless}}
 {{/if}}
@@ -340,28 +360,29 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless ODataCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and OData {{{seecomments EntityFrameworkModel}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and OData {{{seecomments ODataModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
-        public partial class ODataMapper : ODataMapper<{{EntityName}}, {{ODataModel}}, ODataMapper>
+        public partial class ODataMapperProfile : AutoMapper.Profile
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ODataMapper"/> class.
+            /// Initializes a new instance of the <see cref="ODataMapperProfile"/> class.
             /// </summary>
-            public ODataMapper()
+            public ODataMapperProfile()
             {
-    {{#ifval ODataMapperInheritsFrom}}
-                InheritPropertiesFrom({{ODataMapperInheritsFrom}}.Default);
-    {{/ifval}}
+                var s2d = CreateMap<{{EntityName}}, {{ODataModel}}>();
     {{#each ODataMapperProperties}}
-                Property(s => s.{{DataMapperPropertyName}}, d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}){{#ifne DataOperationTypes 'Any'}}.SetOperationTypes(OperationTypes.{{DataOperationTypes}}){{/ifne}}{{#if UniqueKey}}.SetUniqueKey({{#if DataAutoGenerated}}true{{else}}false{{/if}}){{/if}}{{#ifval DataConverterCode}}{{{DataConverterCode}}}{{/ifval}}{{#ifval ODataMapper}}.SetMapper({{ODataMapper}}.Default!){{/ifval}};
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
-    {{#if MapperAddStandardProperties}}
-                AddStandardProperties();
-    {{/if}}
-                ODataMapperCtor();
+
+                var d2s = CreateMap<{{ODataModel}}, {{EntityName}}>();
+    {{#each ODataMapperProperties}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if ODataIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+    {{/each}}
+
+                ODataMapperProfileCtor(s2d, d2s);
             }
-            
-            partial void ODataMapperCtor(); // Enables the ODataMapper constructor to be extended.
+
+            partial void ODataMapperProfileCtor(AutoMapper.IMappingExpression<{{EntityName}}, {{ODataModel}}> s2d, AutoMapper.IMappingExpression<{{ODataModel}}, {{EntityName}}> d2s); // Enables the constructor to be extended.
         }
   {{/unless}}
 {{/if}}

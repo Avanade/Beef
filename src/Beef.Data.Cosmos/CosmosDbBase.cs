@@ -107,6 +107,41 @@ namespace Beef.Data.Cosmos
             }
         }
 
+        /// <summary>
+        /// Gets the <b>CosmosDb/DocumentDb</b> key from the specified keys.
+        /// </summary>
+        /// <param name="keys">The key values.</param>
+        /// <returns>The <b>CosmosDb/DocumentDb</b> key.</returns>
+        public static string GetCosmosKey(IComparable?[] keys)
+        {
+            if (keys == null || keys.Length == 0)
+                throw new ArgumentNullException(nameof(keys));
+
+            if (keys.Length != 1)
+                throw new NotSupportedException("Only a single key value is currently supported.");
+
+            var k = keys[0]?.ToString();
+            if (string.IsNullOrEmpty(k))
+                throw new InvalidOperationException("A key (non null) was unable to be derived from the value.");
+
+            return k;
+        }
+
+        /// <summary>
+        /// Gets the <b>CosmosDb/DocumentDb</b> key from the entity value.
+        /// </summary>
+        /// <param name="value">The entity value.</param>in
+        /// <returns>The <b>CosmosDb/DocumentDb</b> key.</returns>
+        public static string GetCosmosKey(object value) => value switch
+        {
+            IStringIdentifier si => si.Id!,
+            IGuidIdentifier gi => gi.Id.ToString(),
+            IInt32Identifier ii => ii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            IInt64Identifier ii => ii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            IUniqueKey uk => uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0]?.ToString()! : throw new NotSupportedException("Only a single key value is currently supported."),
+            _ => throw new NotSupportedException($"Value Type must be {nameof(IStringIdentifier)}, {nameof(IGuidIdentifier)}, {nameof(IInt32Identifier)}, {nameof(IInt64Identifier)}, or {nameof(IUniqueKey)}."),
+        };
+
         #endregion
 
         /// <summary>
@@ -159,9 +194,9 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <returns>The <see cref="CosmosDbContainer{T, TModel}"/>.</returns>
-        public CosmosDbContainer<T, TModel> Container<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
+        public CosmosDbContainer<T, TModel> Container<T, TModel>(CosmosDbArgs dbArgs) where T : class, new() where TModel : class, new()
             => new CosmosDbContainer<T, TModel>(this, dbArgs);
 
         /// <summary>
@@ -169,9 +204,9 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <returns>The <see cref="CosmosDbValueContainer{T, TModel}"/>.</returns>
-        public CosmosDbValueContainer<T, TModel> ValueContainer<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
+        public CosmosDbValueContainer<T, TModel> ValueContainer<T, TModel>(CosmosDbArgs dbArgs) where T : class, new() where TModel : class, new()
             => new CosmosDbValueContainer<T, TModel>(this, dbArgs);
 
         /// <summary>
@@ -206,7 +241,7 @@ namespace Beef.Data.Cosmos
 
         /// <summary>
         /// Sets the filter for all operations performed on the <typeparamref name="TModel"/> for the specified <paramref name="containerId"/> to ensure authorisation is applied. Applies automatically 
-        /// to all queries, plus create, update, delete and get operations. Can be overridden for a specific instance using the <see cref="CosmosDbArgs{T, TModel}.SetAuthorizeFilter(Func{IQueryable, IQueryable})"/>.
+        /// to all queries, plus create, update, delete and get operations. Can be overridden for a specific instance using the <see cref="CosmosDbArgs.SetAuthorizeFilter(Func{IQueryable, IQueryable})"/>.
         /// </summary>
         /// <typeparam name="TModel">The model <see cref="Type"/> persisted within the container.</typeparam>
         /// <param name="containerId">The <see cref="Microsoft.Azure.Cosmos.Container"/> identifier.</param>
@@ -271,8 +306,8 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
-        internal protected ItemRequestOptions GetItemRequestOptions<T, TModel>(CosmosDbArgs<T, TModel>? dbArgs = null) where T : class, new() where TModel : class, new()
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
+        internal protected ItemRequestOptions GetItemRequestOptions<T, TModel>(CosmosDbArgs? dbArgs = null) where T : class, new() where TModel : class, new()
         {
             var iro = dbArgs != null && dbArgs.ItemRequestOptions != null ? dbArgs.ItemRequestOptions : new ItemRequestOptions();
             UpdateRequestOptions(iro);
@@ -309,8 +344,8 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
-        internal protected QueryRequestOptions GetQueryRequestOptions<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
+        internal protected QueryRequestOptions GetQueryRequestOptions<T, TModel>(CosmosDbArgs dbArgs) where T : class, new() where TModel : class, new()
         {
             if (dbArgs == null)
                 throw new ArgumentNullException(nameof(dbArgs));
@@ -327,20 +362,20 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets (creates) a <see cref="CosmosDbQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T, TModel}"/>.</returns>
-        public CosmosDbQuery<T, TModel> Query<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new() =>
-            Container(dbArgs).Query(query);
+        public CosmosDbQuery<T, TModel> Query<T, TModel>(CosmosDbArgs dbArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new() =>
+            Container<T, TModel>(dbArgs).Query(query);
 
         /// <summary>
         /// Gets (creates) a <see cref="CosmosDbValueQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
-        public CosmosDbValueQuery<T, TModel> ValueQuery<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null) where T : class, new() where TModel : class, new() =>
-            ValueContainer(dbArgs).Query(query);
+        public CosmosDbValueQuery<T, TModel> ValueQuery<T, TModel>(CosmosDbArgs dbArgs, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null) where T : class, new() where TModel : class, new() =>
+            ValueContainer<T, TModel>(dbArgs).Query(query);
 
         #endregion
     }

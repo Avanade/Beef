@@ -98,7 +98,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{Gender}} text (read-only where selected).
+        /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("genderText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? GenderText { get => _genderText ?? GetRefDataText(() => Gender); set => _genderText = value; }

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Beef.Mapper
+namespace Beef.Data.Database.Mapper
 {
     /// <summary>
     /// Enables the base entity mapping capabilities. 

@@ -259,8 +259,12 @@ namespace Beef.Events
 
             switch (value)
             {
-                case IIntIdentifier ii:
+                case IInt32Identifier ii:
                     ed.Key = ii.Id;
+                    break;
+
+                case IInt64Identifier li:
+                    ed.Key = li.Id;
                     break;
 
                 case IGuidIdentifier gi:

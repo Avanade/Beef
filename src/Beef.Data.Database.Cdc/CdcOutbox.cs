@@ -9,7 +9,7 @@ namespace Beef.Data.Database.Cdc
     /// <summary>
     /// Represents the standard CDC (Change Data Capture) outbox.
     /// </summary>
-    public class CdcOutbox : IIntIdentifier
+    public class CdcOutbox : IInt32Identifier
     {
         /// <summary>
         /// Gets or sets the outbox outbox identifer.

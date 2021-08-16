@@ -82,13 +82,11 @@ namespace Beef.WebApi
         /// </summary>
         public abstract bool IsDefault { get; }
 
-#pragma warning disable CA1055 // Uri return values should not be strings; by-design to only return part of a query string.
         /// <summary>
         /// Returns the name and value formatted (see <see cref="QueryStringFormat"/>) for a URL query string.
         /// </summary>
         /// <returns>The URL string.</returns>
         public abstract string? ToUrlQueryString();
-#pragma warning restore CA1055
 
         /// <summary>
         /// Gets the underlying value.
@@ -114,12 +112,10 @@ namespace Beef.WebApi
             Value = value;
         }
 
-#pragma warning disable CA1721 // Property names should not match get methods; by-design as interface required GetValue.
         /// <summary>
         /// Gets (same as <see cref="GetValue"/>) or sets the argument value.
         /// </summary>
         public T Value { get; set; }
-#pragma warning restore CA1721
 
         /// <summary>
         /// Indicates whether the value is null or default and therefore should be ignored.
@@ -260,12 +256,10 @@ namespace Beef.WebApi
             return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, base.Name, Uri.EscapeDataString(value.ToString()));
         }
 
-#pragma warning disable CA1054 // Uri parameters should not be strings; by-design as only part-of.
         /// <summary>
         /// Appends the name+value pair value to the URI.
         /// </summary>
         protected void UriAppend(StringBuilder sb, string uriValue)
-#pragma warning restore CA1054 
         {
             if (Check.NotNull(sb, nameof(sb)).Length > 0)
                 sb.Append('&');
@@ -276,9 +270,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Formats the name+value URI.
         /// </summary>
-#pragma warning disable CA1055 // Uri parameters should not be strings; by-design as only part-of.
         protected string UriFormat(string name, string? value)
-#pragma warning restore CA1055 
         {
             Check.NotNull(name, nameof(name));
             if (value == null)

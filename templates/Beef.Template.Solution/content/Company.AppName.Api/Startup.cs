@@ -108,6 +108,9 @@ namespace Company.AppName.Api
             else
                 services.AddBeefNullEventPublisher();
 
+            // Add AutoMapper services via Assembly-based probing for Profiles.
+            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(PersonData).Assembly);
+
             // Add additional services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();

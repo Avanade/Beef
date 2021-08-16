@@ -11,7 +11,7 @@ namespace Beef.Demo.Business.Data
             _getByArgsOnQuery = GetByArgs_OnQuery;
         }
 
-        private IBoundClient<Model.Product> GetByArgs_OnQuery(IBoundClient<Model.Product> q, ProductArgs args, IODataArgs _)
+        private IBoundClient<Model.Product> GetByArgs_OnQuery(IBoundClient<Model.Product> q, ProductArgs args, ODataArgs _)
         {
             return q.FilterWildcard(p => p.Name, args?.Name)
                     .FilterWildcard(p => p.Description, args?.Description);

@@ -91,7 +91,7 @@ Provides the _Manager-layer_ configuration.
 
 Property | Description
 -|-
-`IdentifierGenerator` | The Identifier Generator Type to generate the identifier on create via Dependency Injection. Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.
+`IdentifierGenerator` | The Identifier Generator Type to generate the identifier on create via Dependency Injection. Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.
 
 <br/>
 
@@ -124,7 +124,6 @@ Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoIm
 
 Property | Description
 -|-
-`DataEntityFrameworkMapper` | The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `DataEntityFrameworkIgnore` | Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
 
 <br/>
@@ -134,7 +133,6 @@ Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or 
 
 Property | Description
 -|-
-`DataCosmosMapper` | The Cosmos property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `DataCosmosIgnore` | Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
 
 <br/>
@@ -144,7 +142,6 @@ Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Ope
 
 Property | Description
 -|-
-`DataODataMapper` | The OData property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `DataODataIgnore` | Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
 
 <br/>

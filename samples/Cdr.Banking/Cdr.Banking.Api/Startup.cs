@@ -79,6 +79,9 @@ namespace Cdr.Banking.Api
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 
+            // Add AutoMapper services via Assembly-based probing for Profiles.
+            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(AccountData).Assembly);
+
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();

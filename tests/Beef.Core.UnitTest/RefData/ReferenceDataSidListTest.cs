@@ -9,7 +9,7 @@ namespace Beef.Core.UnitTest.RefData
     [TestFixture]
     public class ReferenceDataSidListTest
     {
-        private class XyzRd : ReferenceDataBaseInt
+        private class XyzRd : ReferenceDataBaseInt32
         {
             public override object Clone()
             {

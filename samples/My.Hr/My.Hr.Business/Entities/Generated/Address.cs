@@ -81,7 +81,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding {{State}} text (read-only where selected).
+        /// Gets the corresponding <see cref="State"/> text (read-only where selected).
         /// </summary>
         [JsonProperty("stateText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? StateText { get => _stateText ?? GetRefDataText(() => State); set => _stateText = value; }

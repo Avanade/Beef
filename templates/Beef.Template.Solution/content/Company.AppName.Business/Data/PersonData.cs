@@ -37,7 +37,7 @@ namespace Company.AppName.Business.Data
         }
 #endif
 #if (implement_entityframework)
-        private IQueryable<EfModel.Person> GetByArgsOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args, IEfDbArgs efArgs)
+        private IQueryable<EfModel.Person> GetByArgsOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args, EfDbArgs efArgs)
         {
             _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
             _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
@@ -46,7 +46,7 @@ namespace Company.AppName.Business.Data
         }
 #endif
 #if (implement_cosmos)
-        private IQueryable<Model.Person> GetByArgsOnQuery(IQueryable<Model.Person> q, PersonArgs? args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Person> GetByArgsOnQuery(IQueryable<Model.Person> q, PersonArgs? args, CosmosDbArgs dbArgs)
         {
             q = q.WhereWildcard(x => x.FirstName, args?.FirstName);
             q = q.WhereWildcard(x => x.LastName, args?.LastName);

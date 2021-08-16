@@ -90,6 +90,7 @@ namespace Beef.Demo.Api
             services.AddScoped<Common.Agents.IPersonAgent, Common.Agents.PersonAgent>();
 
             // Add services; note Beef requires NewtonsoftJson.
+            services.AddAutoMapper(Mapper.AutoMapperProfile.Assembly, typeof(Beef.Demo.Common.Grpc.Transformers).Assembly, typeof(ContactData).Assembly);
             services.AddControllers().AddNewtonsoftJson();
             services.AddGrpc();
             services.AddHealthChecks();

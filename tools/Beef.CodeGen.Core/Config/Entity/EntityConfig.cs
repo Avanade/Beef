@@ -117,7 +117,7 @@ entities:
         /// Gets or sets the Const Type option.
         /// </summary>
         [JsonProperty("constType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "Guid", "string" },
+        [PropertySchema("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "long", "Guid", "string" },
             Description = "The .NET Type to be used for the `const` values. Defaults to `string`.")]
         public string? ConstType { get; set; }
 
@@ -137,7 +137,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "Guid", "string" },
+        [PropertySchema("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
 
@@ -174,7 +174,7 @@ entities:
         /// </summary>
         [JsonProperty("inherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Entity", Title = "The base class that the entity inherits from.",
-            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseInt` or `ReferenceDataBaseGuid` depending on the corresponding `RefDataType` value. " +
+            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. " +
                           "See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.")]
         public string? Inherits { get; set; }
 
@@ -190,7 +190,7 @@ entities:
         /// </summary>
         [JsonProperty("implementsAutoInfer", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Entity", Title = "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-            Description = "Will attempt to infer the following: `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
+            Description = "Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
         public bool? ImplementsAutoInfer { get; set; }
 
         /// <summary>
@@ -331,14 +331,6 @@ entities:
             Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.")]
         public string? AutoImplement { get; set; }
-
-        /// <summary>
-        /// Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`.
-        /// </summary>
-        [JsonProperty("mapperAddStandardProperties", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`.",
-            Description = "Defaults to `true`.")]
-        public bool? MapperAddStandardProperties { get; set; }
 
         /// <summary>
         /// Gets or sets the access modifier for the generated `Data` constructor.
@@ -877,12 +869,42 @@ entities:
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
+        public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
         public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false)).ToList();
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IChangeLog"/> property.
+        /// </summary>
+        public bool HasDatabaseChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.DatabaseIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IETag"/> property.
+        /// </summary>
+        public bool HasDatabaseETagProperty => Properties!.Any(x => x.Name == "ETag" && CompareNullOrValue(x.DatabaseIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IChangeLog"/> property.
+        /// </summary>
+        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
+
+        /// <summary>
+        /// Indicates where there is a <see cref="IETag"/> property.
+        /// </summary>
+        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
 
         /// <summary>
         /// Gets the list of properties that are to be used for gRPC.
@@ -1099,6 +1121,11 @@ entities:
         public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
 
         /// <summary>
+        /// Indicates whether AutoMapper is being used.
+        /// </summary>
+        public bool UsesAutoMapper { get; set; }
+
+        /// <summary>
         /// Indicates whether the data extensions section is required.
         /// </summary>
         public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
@@ -1141,7 +1168,6 @@ entities:
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
             ImplementsAutoInfer = DefaultWhereNull(ImplementsAutoInfer, () => true);
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
-            MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
@@ -1195,7 +1221,8 @@ entities:
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt",
+                "int" => "ReferenceDataBaseInt32",
+                "long" => "ReferenceDataBaseInt64",
                 "Guid" => "ReferenceDataBaseGuid",
                 "string" => "ReferenceDataBaseString",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
@@ -1203,7 +1230,8 @@ entities:
 
             ModelInherits = RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt",
+                "int" => "ReferenceDataBaseInt32",
+                "long" => "ReferenceDataBaseInt64",
                 "Guid" => "ReferenceDataBaseGuid",
                 "string" => "ReferenceDataBaseString",
                 _ => EntityInherits == "EntityBase" ? null : EntityInherits
@@ -1358,7 +1386,8 @@ entities:
                     var iid = id.Type switch
                     {
                         "Guid" => "IGuidIdentifier",
-                        "int" => "IIntIdentifier",
+                        "int" => "IInt32Identifier",
+                        "long" => "IInt64Identifier",
                         "string" => "IStringIdentifier",
                         _ => "IIdentifier",
                     };
@@ -1456,6 +1485,12 @@ entities:
 
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            if (UsesEntityFramework || UsesCosmos || UsesOData)
+            { 
+                DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
+                UsesAutoMapper = true;
+            }
 
             if (SupportsDataEvents)
                 DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });

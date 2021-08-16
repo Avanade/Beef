@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Enhancement:* `GrpcAgentBase` updated to support _AutoMapper_ mapping (removed existing`EntityMapper` functionality).
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 

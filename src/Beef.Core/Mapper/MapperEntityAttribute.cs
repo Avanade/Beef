@@ -5,7 +5,7 @@ using System;
 namespace Beef.Mapper
 {
     /// <summary>
-    /// Represents an attribute for defining entity characteristics for auto-mapping.
+    /// Represents an attribute for defining entity characteristics for <b>Beef.Data.Database.DatabaseMapper</b> mapping.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class MapperEntityAttribute : Attribute
@@ -14,10 +14,7 @@ namespace Beef.Mapper
         /// Initializes a new instance of the <see cref="MapperEntityAttribute"/> class.
         /// </summary>
         /// <param name="name">The entity name.</param>
-        public MapperEntityAttribute(string name)
-        {
-            Name = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
-        }
+        public MapperEntityAttribute(string name) => Name = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
 
         /// <summary>
         /// Gets the entity name.

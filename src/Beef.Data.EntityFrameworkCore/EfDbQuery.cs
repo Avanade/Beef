@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Beef.Mapper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -69,19 +70,19 @@ namespace Beef.Data.EntityFrameworkCore
         /// Initializes a new instance of the <see cref="EfDbQuery{T, TModel, TDbContext}"/> class.
         /// </summary>
         /// <param name="db">The <see cref="DbSet{TModel}"/>.</param>
-        /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="args">The <see cref="EfDbArgs"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
-        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
+        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs args, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
-            QueryArgs = queryArgs ?? throw new ArgumentNullException(nameof(queryArgs));
+            Args = args ?? throw new ArgumentNullException(nameof(args));
             _query = query;
         }
 
         /// <summary>
-        /// Gets the <see cref="EfDbArgs{T, TModel}"/>.
+        /// Gets the <see cref="EfDbArgs"/>.
         /// </summary>
-        public EfDbArgs<T, TModel> QueryArgs { get; private set; }
+        public EfDbArgs Args { get; private set; }
 
         /// <summary>
         /// Manages the DbContext and underlying query construction and lifetime.
@@ -122,43 +123,42 @@ namespace Beef.Data.EntityFrameworkCore
             return q.Take((int)(paging == null ? PagingArgs.DefaultTake : paging.Take));
         }
 
+        /// <summary>
+        /// Map to source.
+        /// </summary>
+        private T? MapToSrce(TModel? model)
+        {
+            if (model == null)
+                return null;
+
+            return Args.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
+        }
+
         #region SelectSingle/SelectFirst
 
         /// <summary>
         /// Selects a single item.
         /// </summary>
         /// <returns>The single item.</returns>
-        public T SelectSingle()
-        {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.Single()), Mapper.OperationTypes.Get)!;
-        }
+        public T SelectSingle() => MapToSrce(ExecuteQuery(q => q.Single()))!;
 
         /// <summary>
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T? SelectSingleOrDefault()
-        {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.SingleOrDefault()), Mapper.OperationTypes.Get);
-        }
+        public T? SelectSingleOrDefault() => MapToSrce(ExecuteQuery(q => q.SingleOrDefault()));
 
         /// <summary>
         /// Selects first item.
         /// </summary>
         /// <returns>The first item.</returns>
-        public T SelectFirst()
-        {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.First()), Mapper.OperationTypes.Get)!;
-        }
+        public T SelectFirst() => MapToSrce(ExecuteQuery(q => q.First()))!;
 
         /// <summary>
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T? SelectFirstOrDefault()
-        {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.FirstOrDefault()), Mapper.OperationTypes.Get);
-        }
+        public T? SelectFirstOrDefault() => MapToSrce(ExecuteQuery(q => q.FirstOrDefault()));
 
         #endregion
 
@@ -185,15 +185,15 @@ namespace Beef.Data.EntityFrameworkCore
         {
             ExecuteQuery(query =>
             {
-                var q = SetPaging(query, QueryArgs.Paging);
+                var q = SetPaging(query, Args.Paging);
 
                 foreach (var item in q)
                 {
-                    coll.Add(QueryArgs.Mapper.MapToSrce(item, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value."));
+                    coll.Add(MapToSrce(item) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value."));
                 }
 
-                if (QueryArgs.Paging != null && QueryArgs.Paging.IsGetCount)
-                    QueryArgs.Paging.TotalCount = query.LongCount();
+                if (Args.Paging != null && Args.Paging.IsGetCount)
+                    Args.Paging.TotalCount = query.LongCount();
             });
         }
 

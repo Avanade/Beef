@@ -19,7 +19,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Perform the query filering for the GetTransactions.
         /// </summary>
-        private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, ICosmosDbArgs? __)
+        private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, CosmosDbArgs? __)
         {
             if (args == null || args.IsInitial)
                 return query.OrderByDescending(x => x.TransactionDateTime);

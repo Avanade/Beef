@@ -42,7 +42,6 @@ namespace My.Hr.Business.Data
                 Property(s => s.LastName);
                 Property(s => s.PhoneNo);
                 Property(s => s.RelationshipSid, "RelationshipTypeCode");
-                AddStandardProperties();
                 DbMapperCtor();
             }
             

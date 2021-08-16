@@ -9,79 +9,25 @@ namespace Beef.Mapper.Converters
     /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="Nullable{Int32}"/>-based <see cref="ReferenceDataBase.Id"/> mapping.
     /// </summary>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
-    public sealed class ReferenceDataNullableInt32IdConverter<TSrceProperty> : Singleton<ReferenceDataNullableInt32IdConverter<TSrceProperty>>, IPropertyMapperConverter<TSrceProperty, int?> where TSrceProperty : ReferenceDataBaseInt
+    public sealed class ReferenceDataNullableInt32IdConverter<TSrceProperty> : CustomConverter<TSrceProperty, int?> where TSrceProperty : ReferenceDataBaseInt32
     {
+        private static readonly Lazy<ReferenceDataNullableInt32IdConverter<TSrceProperty>> _default = new(() => new ReferenceDataNullableInt32IdConverter<TSrceProperty>(), true);
+
         /// <summary>
-        /// Initialises a new instance of the <see cref="ReferenceDataNullableInt32IdConverter{TSrceProperty}"/> class.
+        /// Gets the default (singleton) instance.
         /// </summary>
-        public ReferenceDataNullableInt32IdConverter()
+        public static ReferenceDataNullableInt32IdConverter<TSrceProperty> Default { get { return _default.Value; } }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataNullableInt32IdConverter{TSrceProperty}"/> class.
+        /// </summary>
+        public ReferenceDataNullableInt32IdConverter() : base(
+            s => s?.Id,
+            d => d.HasValue ? (TSrceProperty)ReferenceDataManager.Current[typeof(TSrceProperty)].GetById(d.Value)! : default!)
         {
             var tc = ReferenceDataBase.GetIdTypeCode(typeof(TSrceProperty));
             if (tc != ReferenceDataIdTypeCode.Int32)
-                throw new InvalidOperationException($"ReferenceData '{GetType().Name}.Id' has Type of '{tc.ToString()}'; must be Type 'Int32' to use this Converter.");
-        }
-
-        /// <summary>
-        /// Gets the source value <see cref="Type"/>.
-        /// </summary>
-        Type IPropertyMapperConverter.SrceType { get; } = typeof(TSrceProperty);
-
-        /// <summary>
-        /// Gets the destination value <see cref="Type"/>.
-        /// </summary>
-        Type IPropertyMapperConverter.DestType { get; } = typeof(int?);
-
-        /// <summary>
-        /// Gets the underlying source <see cref="Type"/> allowing for nullables.
-        /// </summary>
-        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = Nullable.GetUnderlyingType(typeof(TSrceProperty)) ?? typeof(TSrceProperty);
-
-        /// <summary>
-        /// Gets the underlying destination <see cref="Type"/> allowing for nullables.
-        /// </summary>
-        Type IPropertyMapperConverter.DestUnderlyingType { get; } = Nullable.GetUnderlyingType(typeof(int?)) ?? typeof(int?);
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        public int? ConvertToDest(TSrceProperty value)
-        {
-            return value?.Id;
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        public TSrceProperty ConvertToSrce(int? value)
-        {
-            if (!value.HasValue)
-                return default!;
-
-            return (TSrceProperty)ReferenceDataManager.Current[typeof(TSrceProperty)].GetById(value.Value)!;
-        }
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value)
-        {
-            return ConvertToDest((TSrceProperty)value!);
-        }
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value)
-        {
-            return ConvertToSrce((int?)value);
+                throw new InvalidOperationException($"ReferenceData '{GetType().Name}.Id' has Type of '{tc}'; must be Type 'Int32' to use this Converter.");
         }
     }
 }

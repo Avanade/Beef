@@ -164,6 +164,12 @@
             "ReferenceDataNullableInt32IdConverter",
             "ReferenceDataNullableInt32IdConverter{T}",
             "ReferenceDataNullableInt32IdConverter<T>",
+            "ReferenceDataInt64IdConverter",
+            "ReferenceDataInt64IdConverter{T}",
+            "ReferenceDataInt64IdConverter<T>",
+            "ReferenceDataNullableInt64IdConverter",
+            "ReferenceDataNullableInt64IdConverter{T}",
+            "ReferenceDataNullableInt64IdConverter<T>",
             "ReferenceDataGuidIdConverter",
             "ReferenceDataGuidIdConverter{T}",
             "ReferenceDataGuidIdConverter<T>",
@@ -370,6 +376,7 @@
           "description": "The .NET Type to be used for the 'const' values. Defaults to 'string'.",
           "enum": [
             "int",
+            "long",
             "Guid",
             "string"
           ]
@@ -385,6 +392,7 @@
           "description": "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.",
           "enum": [
             "int",
+            "long",
             "Guid",
             "string"
           ]
@@ -413,7 +421,7 @@
         "inherits": {
           "type": "string",
           "title": "The base class that the entity inherits from.",
-          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseInt' or 'ReferenceDataBaseGuid' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
+          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseXxx' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
         },
         "implements": {
           "type": "string",
@@ -422,7 +430,7 @@
         "implementsAutoInfer": {
           "type": "boolean",
           "title": "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-          "description": "Will attempt to infer the following: 'IGuidIdentifier', 'IIntIdentifier', 'IStringIdentifier', 'IETag' and 'IChangeLog'. Defaults to 'true'."
+          "description": "Will attempt to infer the following: 'IGuidIdentifier', 'IInt32Identifier', 'IInt64Identifier', 'IStringIdentifier', 'IETag' and 'IChangeLog'. Defaults to 'true'."
         },
         "abstract": {
           "type": "boolean",
@@ -509,11 +517,6 @@
             "OData",
             "None"
           ]
-        },
-        "mapperAddStandardProperties": {
-          "type": "boolean",
-          "title": "Indicates that the 'AddStandardProperties' method call is to be included for the generated (corresponding) 'Mapper'.",
-          "description": "Defaults to 'true'."
         },
         "dataCtor": {
           "type": "string",
@@ -1025,7 +1028,7 @@
         "identifierGenerator": {
           "type": "string",
           "title": "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
-          "description": "Should be formatted as 'Type' + '^' + 'Name'; e.g. 'IGuidIdentifierGenerator^GuidIdGen'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored. See 'Beef.Entities.IIntIdentifierGenerator', 'Beef.Entities.IGuidIdentifierGenerator' or 'Beef.Entities.IStringIdentifierGenerator' for underlying implementation requirements."
+          "description": "Should be formatted as 'Type' + '^' + 'Name'; e.g. 'IGuidIdentifierGenerator^GuidIdGen'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored. See 'Beef.Entities.IInt32IdentifierGenerator', 'Beef.Entities.IInt64IdentifierGenerator', 'Beef.Entities.IGuidIdentifierGenerator' or 'Beef.Entities.IStringIdentifierGenerator' for underlying implementation requirements."
         },
         "dataName": {
           "type": "string",
@@ -1074,28 +1077,13 @@
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the database 'Mapper' generated output."
         },
-        "entityFrameworkMapper": {
-          "type": "string",
-          "title": "The Entity Framework property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
-        },
         "entityFrameworkIgnore": {
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the Entity Framework 'Mapper' generated output."
         },
-        "cosmosMapper": {
-          "type": "string",
-          "title": "The Cosmos property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
-        },
         "cosmosIgnore": {
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the Cosmos 'Mapper' generated output."
-        },
-        "odataMapper": {
-          "type": "string",
-          "title": "The OData property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
         },
         "odataIgnore": {
           "type": "boolean",

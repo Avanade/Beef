@@ -290,7 +290,7 @@ namespace Beef.Data.Database.Cdc
                 }
 
                 // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
-                if (item is ILogicallyDeleted ild && ild.IsDeleted)
+                if (item is ICdcLogicallyDeleted ild && ild.IsDeleted.HasValue && ild.IsDeleted.Value)
                 {
                     item.DatabaseOperationType = OperationType.Delete;
                     ild.ClearWhereDeleted();
@@ -419,7 +419,7 @@ namespace Beef.Data.Database.Cdc
                 .SelectQueryAsync(DatabaseMapper.CreateAuto<CdcIdentifierMapping>())
                 .ConfigureAwait(false);
 
-            if (imc.Count() != imcd.Count())
+            if (imc.Count() != imcd.Count)
                 throw new InvalidOperationException($"Stored procedure '{IdentifierMappingStoredProcedureName}' returned an unexpected result.");
 
             // Re-link the identifier mappings with the final value.

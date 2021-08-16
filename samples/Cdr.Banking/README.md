@@ -105,7 +105,7 @@ To demonstrate the authentication and authorisation the following is required:
 
 ### Execution Context
 
-A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _Beef_ [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
+A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _Beef_ [`ExecutionContext`](../../src/Beef.Abstractions/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
 
 ``` csharp
 /// <summary>
@@ -242,7 +242,7 @@ The `Account` filtering as required by `/banking/accounts` uses the [`AccountArg
 /// <summary>
 /// Perform the query filering for the GetAccounts.
 /// </summary>
-private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, ICosmosDbArgs dbArgs)
+private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, CosmosDbArgs dbArgs)
 {
     if (args == null || args.IsInitial)
         return query;
@@ -302,7 +302,7 @@ The `Transaction` filtering as required by `/banking/accounts/\{accountId\}/tran
 /// <summary>
 /// Perform the query filering for the GetTransactions.
 /// </summary>
-private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, ICosmosDbArgs? __)
+private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, CosmosDbArgs? __)
 {
     if (args == null || args.IsInitial)
         return query.OrderByDescending(x => x.TransactionDateTime);

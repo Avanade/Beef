@@ -24,13 +24,15 @@ namespace My.Hr.Business.Data
     public partial class ReferenceDataData : IReferenceDataData
     {
         private readonly IEfDb _ef;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public ReferenceDataData(IEfDb ef)
-            { _ef = Check.NotNull(ef, nameof(ef)); DataCtor(); }
+        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
+        public ReferenceDataData(IEfDb ef, AutoMapper.IMapper mapper)
+            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
 
         partial void DataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -41,7 +43,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
         {
             var __coll = new RefDataNamespace.GenderCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(GenderMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Gender, EfModel.Gender>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -52,7 +54,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync()
         {
             var __coll = new RefDataNamespace.TerminationReasonCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(TerminationReasonMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -63,7 +65,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.RelationshipTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(RelationshipTypeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -74,7 +76,7 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
         {
             var __coll = new RefDataNamespace.USStateCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(USStateMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.USState, EfModel.USState>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -85,44 +87,129 @@ namespace My.Hr.Business.Data
         public async Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync()
         {
             var __coll = new RefDataNamespace.PerformanceOutcomeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(PerformanceOutcomeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.Gender"/> and Entity Framework <see cref="EfModel.Gender"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.Gender"/> and Entity Framework <see cref="EfModel.Gender"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.Gender, EfModel.Gender> GenderMapper => EfDbMapper.CreateAuto<RefDataNamespace.Gender, EfModel.Gender>()
-            .HasProperty(s => s.Id, d => d.GenderId)
-            .AddStandardProperties();
+        public partial class GenderMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="GenderMapperProfile"/> class.
+            /// </summary>
+            public GenderMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.Gender, RefDataNamespace.Gender>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.GenderId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                GenderMapperProfileCtor(d2s);
+            }
+
+            partial void GenderMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.Gender, RefDataNamespace.Gender> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TerminationReason"/> and Entity Framework <see cref="EfModel.TerminationReason"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.TerminationReason"/> and Entity Framework <see cref="EfModel.TerminationReason"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.TerminationReason, EfModel.TerminationReason> TerminationReasonMapper => EfDbMapper.CreateAuto<RefDataNamespace.TerminationReason, EfModel.TerminationReason>()
-            .HasProperty(s => s.Id, d => d.TerminationReasonId)
-            .AddStandardProperties();
+        public partial class TerminationReasonMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TerminationReasonMapperProfile"/> class.
+            /// </summary>
+            public TerminationReasonMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.TerminationReason, RefDataNamespace.TerminationReason>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.TerminationReasonId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                TerminationReasonMapperProfileCtor(d2s);
+            }
+
+            partial void TerminationReasonMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.TerminationReason, RefDataNamespace.TerminationReason> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.RelationshipType"/> and Entity Framework <see cref="EfModel.RelationshipType"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.RelationshipType"/> and Entity Framework <see cref="EfModel.RelationshipType"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.RelationshipType, EfModel.RelationshipType> RelationshipTypeMapper => EfDbMapper.CreateAuto<RefDataNamespace.RelationshipType, EfModel.RelationshipType>()
-            .HasProperty(s => s.Id, d => d.RelationshipTypeId)
-            .AddStandardProperties();
+        public partial class RelationshipTypeMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RelationshipTypeMapperProfile"/> class.
+            /// </summary>
+            public RelationshipTypeMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.RelationshipType, RefDataNamespace.RelationshipType>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.RelationshipTypeId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                RelationshipTypeMapperProfileCtor(d2s);
+            }
+
+            partial void RelationshipTypeMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.RelationshipType, RefDataNamespace.RelationshipType> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.USState"/> and Entity Framework <see cref="EfModel.USState"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.USState"/> and Entity Framework <see cref="EfModel.USState"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.USState, EfModel.USState> USStateMapper => EfDbMapper.CreateAuto<RefDataNamespace.USState, EfModel.USState>()
-            .HasProperty(s => s.Id, d => d.USStateId)
-            .AddStandardProperties();
+        public partial class USStateMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="USStateMapperProfile"/> class.
+            /// </summary>
+            public USStateMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.USState, RefDataNamespace.USState>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.USStateId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                USStateMapperProfileCtor(d2s);
+            }
+
+            partial void USStateMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.USState, RefDataNamespace.USState> d2s); // Enables the constructor to be extended.
+        }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.PerformanceOutcome"/> and Entity Framework <see cref="EfModel.PerformanceOutcome"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.PerformanceOutcome"/> and Entity Framework <see cref="EfModel.PerformanceOutcome"/> <i>AutoMapper</i> mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome> PerformanceOutcomeMapper => EfDbMapper.CreateAuto<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>()
-            .HasProperty(s => s.Id, d => d.PerformanceOutcomeId)
-            .AddStandardProperties();
+        public partial class PerformanceOutcomeMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PerformanceOutcomeMapperProfile"/> class.
+            /// </summary>
+            public PerformanceOutcomeMapperProfile()
+            {
+                var d2s = CreateMap<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>();
+                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceOutcomeId));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+
+                PerformanceOutcomeMapperProfileCtor(d2s);
+            }
+
+            partial void PerformanceOutcomeMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome> d2s); // Enables the constructor to be extended.
+        }
     }
 }
 

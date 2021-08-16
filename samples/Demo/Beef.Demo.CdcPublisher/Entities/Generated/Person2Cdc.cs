@@ -18,7 +18,7 @@ namespace Beef.Demo.CdcPublisher.Entities
     /// Represents the CDC model for the root (parent) database table 'Demo.Person2'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person2Cdc : ITableKey, IETag, ILogicallyDeleted
+    public partial class Person2Cdc : ITableKey, IETag, ICdcLogicallyDeleted
     {
         /// <summary>
         /// Gets or sets the 'Person Id' (Demo.Person2.PersonId) column value.
@@ -103,14 +103,14 @@ namespace Beef.Demo.CdcPublisher.Entities
         /// Indicates whether the entity is logically deleted ('IsDeleted' column).
         /// </summary>
         [MapperProperty("IsDeleted")]
-        public bool IsDeleted { get; set; }
+        public bool? IsDeleted { get; set; }
 
         /// <summary>
         /// Clears all the non-key (i.e non <see cref="Beef.Entities.UniqueKey"/>) properties where <see cref="IsDeleted"/> as the data is technically non-existing.
         /// </summary>
         public void ClearWhereDeleted()
         {
-            if (!IsDeleted)
+            if (!IsDeleted.HasValue || !IsDeleted.Value)
                 return;
 
             FirstName = default!;

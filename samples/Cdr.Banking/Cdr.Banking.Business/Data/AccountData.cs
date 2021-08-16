@@ -1,6 +1,5 @@
 ﻿using Beef;
 using Beef.Data.Cosmos;
-using Beef.Mapper;
 using Cdr.Banking.Common.Entities;
 using Microsoft.Azure.Cosmos.Linq;
 using System.Linq;
@@ -10,10 +9,6 @@ namespace Cdr.Banking.Business.Data
 {
     public partial class AccountData
     {
-        // Create a mapper for, a) the Model.Account to support the balance query, and b) the Balance to Model.Balance.
-        private static readonly CosmosDbMapper<Model.Account, Model.Account> _accountMapper = CosmosDbMapper.CreateAuto<Model.Account, Model.Account>();
-        private static readonly EntityMapper<Balance, Model.Balance> _balanceMapper = EntityMapper.CreateAuto<Balance, Model.Balance>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class setting the required internal configurations.
         /// </summary>
@@ -25,7 +20,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Perform the query filering for the GetAccounts.
         /// </summary>
-        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, CosmosDbArgs dbArgs)
         {
             if (args == null || args.IsInitial)
                 return query;
@@ -50,18 +45,29 @@ namespace Cdr.Banking.Business.Data
         private Task<Balance?> GetBalanceOnImplementationAsync(string? accountId)
         {
             // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
-            var args = _accountMapper.CreateArgs("Account");
-            var val = (from a in _cosmos.Container(args).AsQueryable()
-                        where a.Id == accountId
-                        select new { a.Id, a.Balance }).SelectSingleOrDefault();
+            var args = CosmosDbArgs.Create(_mapper, "Account");
+            var val = (from a in _cosmos.Container<Model.Account, Model.Account>(args).AsQueryable()
+                       where a.Id == accountId
+                       select new { a.Id, a.Balance }).SelectSingleOrDefault();
 
             if (val == null)
                 return Task.FromResult<Balance?>(null);
 
             // Map the Model.Balance to Balance and return.
-            var bal = _balanceMapper.MapToSrce(val.Balance)!;
+            var bal = _mapper.Map<Model.Balance, Balance>(val.Balance)!;
             bal.Id = val.Id;
             return Task.FromResult<Balance?>(bal);
+        }
+
+        public partial class CosmosMapperProfile
+        {
+            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Account, Model.Account> s2d, AutoMapper.IMappingExpression<Model.Account, Account> d2s)
+            {
+                CreateMap<Model.CreditCardAccount, CreditCardAccount>();
+                CreateMap<Model.TermDepositAccount, TermDepositAccount>();
+                CreateMap<Model.Balance, Balance>();
+                CreateMap<Model.BalancePurse, BalancePurse>();
+            }
         }
     }
 }

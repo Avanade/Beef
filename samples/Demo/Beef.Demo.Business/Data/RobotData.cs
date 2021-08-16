@@ -11,7 +11,7 @@ namespace Beef.Demo.Business.Data
             _getByArgsOnQuery = GetByArgsOnQuery;
         }
 
-        private IQueryable<Model.Robot> GetByArgsOnQuery(IQueryable<Model.Robot> q, RobotArgs args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Robot> GetByArgsOnQuery(IQueryable<Model.Robot> q, RobotArgs args, CosmosDbArgs dbArgs)
         {
             q = q.WhereWildcard(x => x.ModelNo, args?.ModelNo);
             q = q.WhereWildcard(x => x.SerialNo, args?.SerialNo);

@@ -18,9 +18,9 @@ namespace Beef.Database.Core
         IGuidIdentifierGenerator? GuidGenerator { get => null; }
 
         /// <summary>
-        /// Gets the <see cref="IIntIdentifierGenerator"/>.
+        /// Gets the <see cref="IInt32IdentifierGenerator"/>.
         /// </summary>
-        IIntIdentifierGenerator? IntGenerator { get => null; }
+        IInt32IdentifierGenerator? IntGenerator { get => null; }
     }
 
     /// <summary>
