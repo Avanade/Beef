@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.2
+- *Enhancement:* Changes related to the introduction of AutoMapper. The _Beef_ custom mapping is now solely maintained for the ADO.NET stored procedure parameter and corresponding data reader mapping only.
+
 ## v4.2.1
 - *Enhancement:* Re-baseline all _Beef_ components to version v4.2.1 required by `Beef.Abstractions` introduction; including updating all dependent NuGet packages to their latest respective version.
 

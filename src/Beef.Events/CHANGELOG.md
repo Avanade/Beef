@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Updated for changes to `Beef.Abstractions` and `Beef.Core`.
+
 ## v4.2.2
 - *Enhancement:* Upgraded the `CloudNative.CloudEvents` NuGet packages to v2.0.0. This required code changes due to the breaking changes to the underlying API. The approach to writing the `EventMetadata` as extension attributes had to be changed to align correctly with the [specification](https://github.com/cloudevents/spec/blob/master/spec.md#extension-context-attributes).
 
