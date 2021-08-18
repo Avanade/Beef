@@ -62,7 +62,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{#each WebApiCtorParameters}}
             {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
   {{/each}}
-            {{Name}}DataCtor();
+            {{Name}}ControllerCtor();
         }
 {{/ifle}}
 
