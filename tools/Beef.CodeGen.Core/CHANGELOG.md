@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.8
+- *Fixed:* Issue [152](https://github.com/Avanade/Beef/issues/152) fixed. Code-gen for an API Controller when more than two parameters was invalid; this has been corrected.
+
 ## v4.2.7
 - *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (except the database stored procedure mapping which will remain as-is). This has the advantage of broad industry support, and based on initial performance testing offers around a ~90% mapping performance improvement (after first execution).
   - The `EntityData_cs` template has been updated to support `AutoMapper`.
