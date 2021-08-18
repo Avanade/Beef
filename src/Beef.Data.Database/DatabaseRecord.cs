@@ -42,7 +42,14 @@ namespace Beef.Data.Database
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return DataRecord.GetOrdinal(name);
+            try
+            {
+                return DataRecord.GetOrdinal(name);
+            }
+            catch (IndexOutOfRangeException iore)
+            {
+                throw new IndexOutOfRangeException($"Value not available for field '{name}'.", iore);
+            }
         }
 
         /// <summary>
@@ -56,17 +63,8 @@ namespace Beef.Data.Database
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            int ordinal;
-
-            try
-            {
-                ordinal = DataRecord.GetOrdinal(name);
-            }
-            catch (IndexOutOfRangeException iore)
-            {
-                throw new IndexOutOfRangeException($"Value not available for field '{name}'.", iore);
-            }
-
+            int ordinal = GetOrdinal(name);
+            
             return GetValue<T>(ordinal);
         }
 
