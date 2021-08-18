@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Fixed:* Issue [154](https://github.com/Avanade/Beef/issues/154) fixed. The field name is now included in the exception message when using `DatabaseRecord.GetOrdinal` to improve the usefulness of the message (i.e. it will identify the missing field).
+
 ## v4.2.2
 - *Enhancement:* Changes related to the introduction of AutoMapper. The _Beef_ custom mapping is now solely maintained for the ADO.NET stored procedure parameter and corresponding data reader mapping only.
 

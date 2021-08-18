@@ -23,17 +23,20 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Contact"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/contacts")]
     public partial class ContactController : ControllerBase
     {
         private readonly IContactManager _manager;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _config;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IContactManager"/>.</param>
-        public ContactController(IContactManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); ContactControllerCtor(); }
+        /// <param name="config">The <see cref="Microsoft.Extensions.Configuration.IConfiguration"/>.</param>
+        public ContactController(IContactManager manager, Microsoft.Extensions.Configuration.IConfiguration config)
+            { _manager = Check.NotNull(manager, nameof(manager)); _config = Check.NotNull(config, nameof(config)); ContactControllerCtor(); }
 
         partial void ContactControllerCtor(); // Enables additional functionality to be added to the constructor.
 
