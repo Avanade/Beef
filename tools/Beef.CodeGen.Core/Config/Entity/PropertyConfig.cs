@@ -567,11 +567,6 @@ properties: [
         /// <summary>
         /// Gets or sets the data converter name.
         /// </summary>
-        public string? DbTypeCode => string.IsNullOrEmpty(DatabaseDbType) ? null : $"System.Data.DbType.{DatabaseDbType}";
-
-        /// <summary>
-        /// Gets or sets the data converter name.
-        /// </summary>
         public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
 
         /// <summary>
