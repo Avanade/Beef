@@ -116,6 +116,7 @@ Property | Description
 -|-
 `DataDatabaseMapper` | The database property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).
 `DataDatabaseIgnore` | Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.
+**`DatabaseDbType`** | The database `DbType` override (versus inferring from the corresponding .NET Type). Overrides the inferred database type; i.e. can specify `Date` or `DateTime2`, for .NET Type `System.DateTime`.
 
 <br/>
 

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.9
+- *Fixed:* Issue [157](https://github.com/Avanade/Beef/issues/157) fixed. Added new `Property.DatabaseDbType` attribute to override the `DbType` for use within the `DatabaseMapper`.
+
 ## v4.2.8
 - *Fixed:* Issue [152](https://github.com/Avanade/Beef/issues/152) fixed. Code-gen for an API Controller when more than two parameters was invalid; this has been corrected.
 

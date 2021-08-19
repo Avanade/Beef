@@ -1077,6 +1077,11 @@
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the database 'Mapper' generated output."
         },
+        "databaseDbType": {
+          "type": "string",
+          "title": "The database 'DbType' override (versus inferring from the corresponding .NET Type).",
+          "description": "Overrides the inferred database type; i.e. can specify 'Date' or 'DateTime2', for .NET Type 'System.DateTime'."
+        },
         "entityFrameworkIgnore": {
           "type": "boolean",
           "title": "Indicates whether the property should be ignored (excluded) from the Entity Framework 'Mapper' generated output."

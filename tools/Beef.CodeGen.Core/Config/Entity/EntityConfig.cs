@@ -360,13 +360,6 @@ entities:
         #endregion
 
         #region Database
-        /// <summary>
-        /// Gets or sets the DbType.
-        /// </summary>
-        [JsonProperty("dbType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The data base type.", IsImportant = true,
-            Description = "Overriding inferred database type, I.E. Date or DateTime2 for system.DateTime.")]
-        public string? DbType { get; set; }
 
         /// <summary>
         /// Gets or sets the .NET database interface name used where `AutoImplement` is `Database`.

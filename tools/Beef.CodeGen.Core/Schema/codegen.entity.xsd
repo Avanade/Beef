@@ -243,11 +243,6 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
-                  <xs:attribute name="DbType" use="optional" type="xs:string">
-                    <xs:annotation>
-                      <xs:documentation>Overriding inferred database type, I.E. Date or DateTime2 for system.DateTime.</xs:documentation>
-                    </xs:annotation>
-                  </xs:attribute>
                   <xs:attribute name="DataDatabaseMapper" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The database property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).</xs:documentation>
@@ -256,6 +251,11 @@
                   <xs:attribute name="DataDatabaseIgnore" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DatabaseDbType" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The database `DbType` override (versus inferring from the corresponding .NET Type). Overrides the inferred database type; i.e. can specify `Date` or `DateTime2`, for .NET Type `System.DateTime`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="DataEntityFrameworkIgnore" use="optional" type="xs:boolean">
