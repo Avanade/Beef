@@ -371,7 +371,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.UniqueCode);
                 Property(s => s.Gender, "GenderId").SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default!);
                 Property(s => s.EyeColorSid, "EyeColorCode");
-                Property(s => s.Birthday);
+                Property(s => s.Birthday).SetDbType(System.Data.DbType.Date);
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
                 Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
                 AddStandardProperties();

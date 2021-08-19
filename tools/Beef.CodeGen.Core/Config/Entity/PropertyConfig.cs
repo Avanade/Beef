@@ -303,6 +303,14 @@ properties: [
         #region Data
 
         /// <summary>
+        /// Gets or sets the DbType.
+        /// </summary>
+        [JsonProperty("dbType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The data base type.", IsImportant = true,
+            Description = "Overriding inferred database type, I.E. Date or DateTime2 for system.DateTime.")]
+        public string? DbType { get; set; }
+    
+        /// <summary>
         /// Gets or sets the data name where `Entity.AutoImplement` is selected.
         /// </summary>
         [JsonProperty("dataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -555,6 +563,11 @@ properties: [
         /// Gets the computed data mapper property name.
         /// </summary>
         public string DataMapperPropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : CompareNullOrValue(DataConverter, "ReferenceDataCodeConverter") ? PropertyName : Name!;
+
+        /// <summary>
+        /// Gets or sets the data converter name.
+        /// </summary>
+        public string? DbTypeCode => string.IsNullOrEmpty(DbType) ? null : $"System.Data.DbType.{DbType}";
 
         /// <summary>
         /// Gets or sets the data converter name.

@@ -502,6 +502,35 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void E130_Create_Galileo()
+        {
+            var p = new Person
+            {
+                FirstName = "Galileo",
+                LastName = "Galilei",
+                GenderSid = "M",
+                Birthday = new DateTime(1564, 02, 15), //Date that is before the min value of SQL DateTime. Birthday is SQL Date
+                UniqueCode = "C789"
+            };
+
+            // Create a person.
+            p = AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.Created)
+                .ExpectChangeLogCreated()
+                .ExpectETag()
+                .ExpectUniqueKey()
+                .ExpectEvent("Demo.Person.*", "Create")
+                .ExpectValue((t) => p)
+                .Run(a => a.CreateAsync(p)).Value;
+
+            // Check the person was created properly.
+            AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue((t) => p)
+                .Run(a => a.GetAsync(p.Id));
+        }
+
+        [Test, TestSetUp]
         public void E210_CreateWithEf()
         {
             var p = new Person

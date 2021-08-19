@@ -38,6 +38,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
             (ConfigType.Entity, ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
             (ConfigType.Entity, ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DbType", "DbType"),
             (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseMapper", "databaseMapper"),
             (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseIgnore", "databaseIgnore"),
             (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkMapper", "entityFrameworkMapper"),

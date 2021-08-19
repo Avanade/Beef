@@ -243,6 +243,11 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="DbType" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>Overriding inferred database type, I.E. Date or DateTime2 for system.DateTime.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="DataDatabaseMapper" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The database property `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).</xs:documentation>
