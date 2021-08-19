@@ -42,7 +42,14 @@ namespace Beef.Data.Database
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return DataRecord.GetOrdinal(name);
+            try
+            {
+                return DataRecord.GetOrdinal(name);
+            }
+            catch (IndexOutOfRangeException iore)
+            {
+                throw new IndexOutOfRangeException($"Value not available for field '{name}'.", iore);
+            }
         }
 
         /// <summary>
@@ -51,24 +58,7 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant value <see cref="Type"/>.</typeparam>
         /// <param name="name">The field name.</param>
         /// <returns>The resultant value.</returns>
-        public T GetValue<T>(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name));
-
-            int ordinal;
-
-            try
-            {
-                ordinal = DataRecord.GetOrdinal(name);
-            }
-            catch (IndexOutOfRangeException iore)
-            {
-                throw new IndexOutOfRangeException($"Value not available for field '{name}'.", iore);
-            }
-
-            return GetValue<T>(ordinal);
-        }
+        public T GetValue<T>(string name) => GetValue<T>(GetOrdinal(name));
 
         /// <summary>
         /// Gets the <see cref="IDataRecord"/> value for the specified ordinal index.
