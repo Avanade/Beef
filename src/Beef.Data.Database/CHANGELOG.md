@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Issue [157](https://github.com/Avanade/Beef/issues/157) fixed. Renamed `DatabasePropertyMapper.DbType` method to be `SetDbType` to be consistent with the other related _set_ methods.
+
 ## v4.2.3
 - *Fixed:* Issue [154](https://github.com/Avanade/Beef/issues/154) fixed. The field name is now included in the exception message when using `DatabaseRecord.GetOrdinal` to improve the usefulness of the message (i.e. it will identify the missing field).
 

@@ -253,6 +253,11 @@
                       <xs:documentation>Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="DatabaseDbType" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The database `DbType` override (versus inferring from the corresponding .NET Type). Overrides the inferred database type; i.e. can specify `Date` or `DateTime2`, for .NET Type `System.DateTime`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="DataEntityFrameworkIgnore" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.</xs:documentation>

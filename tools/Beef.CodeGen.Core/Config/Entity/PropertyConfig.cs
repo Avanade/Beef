@@ -301,7 +301,7 @@ properties: [
         #endregion
 
         #region Data
-
+    
         /// <summary>
         /// Gets or sets the data name where `Entity.AutoImplement` is selected.
         /// </summary>
@@ -367,6 +367,14 @@ properties: [
         [JsonProperty("databaseIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Database", Title = "Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.")]
         public bool? DatabaseIgnore { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database DbType override (versus inferring from the corresponding .NET Type).
+        /// </summary>
+        [JsonProperty("databaseDbType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "The database `DbType` override (versus inferring from the corresponding .NET Type).", IsImportant = true,
+            Description = "Overrides the inferred database type; i.e. can specify `Date` or `DateTime2`, for .NET Type `System.DateTime`.")]
+        public string? DatabaseDbType { get; set; }
 
         #endregion
 

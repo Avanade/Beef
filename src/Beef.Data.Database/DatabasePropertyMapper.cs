@@ -135,7 +135,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="dbType">The <see cref="DbParameter"/> <see cref="DbParameter.DbType"/>.</param>
         /// <returns>The <see cref="DatabasePropertyMapper{TSrce, TSrceProperty}"/>.</returns>
-        public DatabasePropertyMapper<TSrce, TSrceProperty> DbType(DbType dbType)
+        public DatabasePropertyMapper<TSrce, TSrceProperty> SetDbType(DbType dbType)
         {
             DestDbType = dbType;
             return this;
