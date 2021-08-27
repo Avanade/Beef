@@ -6,10 +6,10 @@
   <ItemGroup>
     <PackageReference Include="Beef.Core" Version="4.2.3" />
     <!--#if (implement_database || implement_entityframework) -->
-    <PackageReference Include="Beef.Data.Database" Version="4.2.2" />
+    <PackageReference Include="Beef.Data.Database" Version="4.2.4" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
-    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.2.2" />
+    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.2.3" />
     <!--#endif -->
     <!--#if (implement_cosmos) -->
     <PackageReference Include="Beef.Data.Cosmos" Version="4.2.2" />
