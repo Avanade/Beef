@@ -1082,17 +1082,35 @@
           "title": "The database 'DbType' override (versus inferring from the corresponding .NET Type).",
           "description": "Overrides the inferred database type; i.e. can specify 'Date' or 'DateTime2', for .NET Type 'System.DateTime'."
         },
-        "entityFrameworkIgnore": {
-          "type": "boolean",
-          "title": "Indicates whether the property should be ignored (excluded) from the Entity Framework 'Mapper' generated output."
+        "entityFrameworkMapper": {
+          "type": "string",
+          "title": "The Entity Framework 'Mapper' approach for the property.",
+          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "enum": [
+            "Map",
+            "Ignore",
+            "Skip"
+          ]
         },
-        "cosmosIgnore": {
-          "type": "boolean",
-          "title": "Indicates whether the property should be ignored (excluded) from the Cosmos 'Mapper' generated output."
+        "cosmosMapper": {
+          "type": "string",
+          "title": "The Cosmos 'Mapper' approach for the property.",
+          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "enum": [
+            "Map",
+            "Ignore",
+            "Skip"
+          ]
         },
-        "odataIgnore": {
-          "type": "boolean",
-          "title": "Indicates whether the property should be ignored (excluded) from the OData 'Mapper' generated output."
+        "odataMapper": {
+          "type": "string",
+          "title": "The OData 'Mapper' approach for the property.",
+          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "enum": [
+            "Map",
+            "Ignore",
+            "Skip"
+          ]
         },
         "displayName": {
           "type": "string",

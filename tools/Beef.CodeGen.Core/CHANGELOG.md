@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.10
+- *Enhancement:* The following `PropertyConfig` properties have been renamed: `EntityFrameworkIgnore` to `EntityFrameworkMapper`, `CosmosIgnore` to `CosmosMapper`, and `ODataIgnore` to `ODataMapper`. The underlying type is no longer `bool`, and they each support the values: `Map` (default), `Ignore` and `Skip`. This is a breaking code-generation change and will need to be explicitly updated by the developer.
+
 ## v4.2.9
 - *Fixed:* Issue [157](https://github.com/Avanade/Beef/issues/157) fixed. Added new `Property.DatabaseDbType` attribute to override the `DbType` for use within the `DatabaseMapper`.
 

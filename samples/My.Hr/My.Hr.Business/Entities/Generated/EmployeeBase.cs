@@ -21,7 +21,7 @@ namespace My.Hr.Business.Entities
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class EmployeeBase : EntityBase, IGuidIdentifier, IUniqueKey, IETag, IChangeLog, IEquatable<EmployeeBase>
+    public partial class EmployeeBase : EntityBase, IGuidIdentifier, IUniqueKey, IEquatable<EmployeeBase>
     {
         #region Privates
 
@@ -35,8 +35,6 @@ namespace My.Hr.Business.Entities
         private DateTime _startDate;
         private TerminationDetail? _termination;
         private string? _phoneNo;
-        private string? _etag;
-        private ChangeLog? _changeLog;
 
         #endregion
 
@@ -158,28 +156,6 @@ namespace My.Hr.Business.Entities
             set => SetValue(ref _phoneNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PhoneNo));
         }
 
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="ETag")]
-        public string? ETag
-        {
-            get => _etag;
-            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
-        }
-
-        /// <summary>
-        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
-        /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Change Log")]
-        public ChangeLog? ChangeLog
-        {
-            get => _changeLog;
-            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
-        }
-
         #endregion
 
         #region IChangeTracking
@@ -191,7 +167,6 @@ namespace My.Hr.Business.Entities
         public override void AcceptChanges()
         {
             Termination?.AcceptChanges();
-            ChangeLog?.AcceptChanges();
             base.AcceptChanges();
         }
 
@@ -201,7 +176,6 @@ namespace My.Hr.Business.Entities
         public override void TrackChanges()
         {
             Termination?.TrackChanges();
-            ChangeLog?.TrackChanges();
             base.TrackChanges();
         }
 
@@ -258,9 +232,7 @@ namespace My.Hr.Business.Entities
                 && Equals(Birthday, value.Birthday)
                 && Equals(StartDate, value.StartDate)
                 && Equals(Termination, value.Termination)
-                && Equals(PhoneNo, value.PhoneNo)
-                && Equals(ETag, value.ETag)
-                && Equals(ChangeLog, value.ChangeLog);
+                && Equals(PhoneNo, value.PhoneNo);
         }
 
         /// <summary>
@@ -295,8 +267,6 @@ namespace My.Hr.Business.Entities
             hash.Add(StartDate);
             hash.Add(Termination);
             hash.Add(PhoneNo);
-            hash.Add(ETag);
-            hash.Add(ChangeLog);
             return base.GetHashCode() ^ hash.ToHashCode();
         }
     
@@ -333,8 +303,6 @@ namespace My.Hr.Business.Entities
             StartDate = from.StartDate;
             Termination = CopyOrClone(from.Termination, Termination);
             PhoneNo = from.PhoneNo;
-            ETag = from.ETag;
-            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
 
             OnAfterCopyFrom(from);
         }
@@ -373,8 +341,6 @@ namespace My.Hr.Business.Entities
             StartDate = Cleaner.Clean(StartDate, DateTimeTransform.DateOnly);
             Termination = Cleaner.Clean(Termination);
             PhoneNo = Cleaner.Clean(PhoneNo, StringTrim.UseDefault, StringTransform.UseDefault);
-            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
-            ChangeLog = Cleaner.Clean(ChangeLog);
 
             OnAfterCleanUp();
         }
@@ -395,9 +361,7 @@ namespace My.Hr.Business.Entities
                     && Cleaner.IsInitial(Birthday)
                     && Cleaner.IsInitial(StartDate)
                     && Cleaner.IsInitial(Termination)
-                    && Cleaner.IsInitial(PhoneNo)
-                    && Cleaner.IsInitial(ETag)
-                    && Cleaner.IsInitial(ChangeLog);
+                    && Cleaner.IsInitial(PhoneNo);
             }
         }
 

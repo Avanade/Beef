@@ -8,7 +8,7 @@
     <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" GrpcFieldNo="5" DataName="GenderId" DataConverter="ReferenceDataNullableGuidIdConverter{T}" />
     <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" PartitionKey="true" GrpcFieldNo="6" DataName="EyeColorCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" GrpcFieldNo="7" DatabaseDbType="Date"/>
-    <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" DataEntityFrameworkIgnore="true" />
+    <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" EntityFrameworkMapper="Ignore" />
     <Property Name="ETag" Type="string" GrpcFieldNo="500" />
     <Property Name="Metadata" Type="Dictionary&lt;string,string&gt;" DataConverter="ObjectToJsonConverter{T}" DataName="MetadataJson" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="501" />
@@ -168,7 +168,7 @@
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
     <Property Name="Status" Type="^Status" DataName="StatusCode" />
-    <Property Name="InternalCode" Type="string" InternalOnly="true" DataEntityFrameworkIgnore="true" />
+    <Property Name="InternalCode" Type="string" InternalOnly="true" EntityFrameworkMapper="Ignore" />
 
     <Operation Name="RaiseEvent" OperationType="Custom" WebApiRoute="raise" EventOutbox="Database">
       <Parameter Name="throwError" Text="throw a DivideByZero exception" Type="bool" />

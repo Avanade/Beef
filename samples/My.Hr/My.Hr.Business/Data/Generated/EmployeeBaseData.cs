@@ -47,7 +47,6 @@ namespace My.Hr.Business.Data
                 Property(s => s.StartDate);
                 Property(s => s.Termination).SetMapper(TerminationDetailData.DbMapper.Default!);
                 Property(s => s.PhoneNo);
-                AddStandardProperties();
                 DbMapperCtor();
             }
             
@@ -82,7 +81,6 @@ namespace My.Hr.Business.Data
                 d2s.ForMember(s => s.GenderSid, o => o.MapFrom(d => d.GenderCode));
                 d2s.ForMember(s => s.Birthday, o => o.MapFrom(d => d.Birthday));
                 d2s.ForMember(s => s.StartDate, o => o.MapFrom(d => d.StartDate));
-                d2s.ForMember(s => s.Termination, o => o.Ignore());
                 d2s.ForMember(s => s.PhoneNo, o => o.MapFrom(d => d.PhoneNo));
 
                 EfMapperProfileCtor(s2d, d2s);

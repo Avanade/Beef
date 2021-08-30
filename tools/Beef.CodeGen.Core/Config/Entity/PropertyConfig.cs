@@ -381,33 +381,36 @@ properties: [
         #region EntityFramework
 
         /// <summary>
-        /// Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
+        /// The Entity Framework `Mapper` approach for the property.
         /// </summary>
-        [JsonProperty("entityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.")]
-        public bool? EntityFrameworkIgnore { get; set; }
+        [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        public string? EntityFrameworkMapper { get; set; }
 
         #endregion
 
         #region Cosmos
 
         /// <summary>
-        /// Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
+        /// The Cosmos `Mapper` approach for the property.
         /// </summary>
-        [JsonProperty("cosmosIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.")]
-        public bool? CosmosIgnore { get; set; }
+        [JsonProperty("cosmosMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        public string? CosmosMapper { get; set; }
 
         #endregion
 
         #region OData
 
         /// <summary>
-        /// Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
+        /// The OData `Mapper` approach for the property.
         /// </summary>
-        [JsonProperty("odataIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.")]
-        public bool? ODataIgnore { get; set; }
+        [JsonProperty("odataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("OData", Title = "The OData `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        public string? ODataMapper { get; set; }
 
         #endregion
 
@@ -681,6 +684,10 @@ properties: [
                     IdentifierGeneratorName = pc.Name;
                 }
             }
+
+            EntityFrameworkMapper = DefaultWhereNull(EntityFrameworkMapper, () => "Map");
+            CosmosMapper = DefaultWhereNull(CosmosMapper, () => "Map");
+            ODataMapper = DefaultWhereNull(ODataMapper, () => "Map");
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
             GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;

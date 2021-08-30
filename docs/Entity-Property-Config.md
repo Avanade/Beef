@@ -142,7 +142,7 @@ Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoIm
 
 Property | Description
 -|-
-`entityFrameworkIgnore` | Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
+`entityFrameworkMapper` | The Entity Framework `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`. Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
 
 <br/>
 
@@ -151,7 +151,7 @@ Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or 
 
 Property | Description
 -|-
-`cosmosIgnore` | Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
+`cosmosMapper` | The Cosmos `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`. Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
 
 <br/>
 
@@ -160,7 +160,7 @@ Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Ope
 
 Property | Description
 -|-
-`odataIgnore` | Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
+`odataMapper` | The OData `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`. Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
 
 <br/>
 
