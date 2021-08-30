@@ -40,12 +40,6 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),
             (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseMapper", "databaseMapper"),
             (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseIgnore", "databaseIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkMapper", "entityFrameworkMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkIgnore", "entityFrameworkIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosMapper", "cosmosMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosIgnore", "cosmosIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataMapper", "odataMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataIgnore", "odataIgnore"),
 
             (ConfigType.Entity, ConfigurationEntity.Operation, "OperationType", "type"),
             (ConfigType.Entity, ConfigurationEntity.Operation, "PagingArgs", "paging"),

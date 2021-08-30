@@ -17,7 +17,7 @@ namespace My.Hr.Common.Entities
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class EmployeeBase : IGuidIdentifier, IUniqueKey, IETag, IChangeLog
+    public partial class EmployeeBase : IGuidIdentifier, IUniqueKey
     {
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.
@@ -72,18 +72,6 @@ namespace My.Hr.Common.Entities
         /// </summary>
         [JsonProperty("phoneNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? PhoneNo { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
-        /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public ChangeLog? ChangeLog { get; set; }
 
         /// <summary>
         /// Gets the list of property names that represent the unique key.

@@ -116,6 +116,30 @@ Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/D
         }
 ```
 
+Additionally to support the `AutoMapper` logic needed for the `TerminationDetail` reshaping, the existing `EmployeeBaseData` needs to be extended. This is performed similar to above using a partial class.
+
+Create a new non-generated `EmployeeBaseData.cs` (`My.Hr.Business/Data`) and replace with the following `AutoMapper` code. Note that only the EF to Entity mappings is required as the update occurs using Stored Procedures.
+
+``` csharp
+using My.Hr.Business.Entities;
+
+namespace My.Hr.Business.Data
+{
+    public partial class EmployeeBaseData
+    {
+        public partial class EfMapperProfile
+        {
+            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<EmployeeBase, EfModel.Employee> s2d, AutoMapper.IMappingExpression<EfModel.Employee, EmployeeBase> d2s)
+            {
+                // Reshape the Termination-related columns into a TermaintionDetail type.
+                d2s.ForPath(s => s.Termination!.Date, o => o.MapFrom(d => d.TerminationDate));
+                d2s.ForPath(s => s.Termination!.ReasonSid, o => o.MapFrom(d => d.TerminationReasonCode));
+            }
+        }
+    }
+}
+```
+
 <br/>
 
 ## Validation

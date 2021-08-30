@@ -17,7 +17,7 @@ namespace My.Hr.Common.Entities
     /// Represents the Employee entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Employee : EmployeeBase
+    public partial class Employee : EmployeeBase, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the Address (see <see cref="Common.Entities.Address"/>).
@@ -30,6 +30,18 @@ namespace My.Hr.Common.Entities
         /// </summary>
         [JsonProperty("emergencyContacts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public EmergencyContactCollection? EmergencyContacts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ETag.
+        /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? ETag { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
+        /// </summary>
+        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public ChangeLog? ChangeLog { get; set; }
     }
 }
 

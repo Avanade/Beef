@@ -134,6 +134,7 @@ namespace My.Hr.Business.Data
             {
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
                 Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default!);
+                AddStandardProperties();
                 DbMapperCtor();
             }
             

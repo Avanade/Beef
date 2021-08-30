@@ -864,27 +864,27 @@ entities:
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => CompareNullOrValue(x.EntityFrameworkIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => CompareValue(x.EntityFrameworkMapper, "Map") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Skip") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareValue(x.CosmosMapper, "Map") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false)).ToList();
+        public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Skip")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false)).ToList();
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => !CompareValue(x.ODataMapper, "Skip")).ToList();
 
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
@@ -899,12 +899,12 @@ entities:
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
         /// </summary>
-        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
+        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && !CompareValue(x.EntityFrameworkMapper, "Skip"));
 
         /// <summary>
         /// Indicates where there is a <see cref="IETag"/> property.
         /// </summary>
-        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && CompareNullOrValue(x.EntityFrameworkIgnore, false));
+        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && !CompareValue(x.EntityFrameworkMapper, "Skip"));
 
         /// <summary>
         /// Gets the list of properties that are to be used for gRPC.

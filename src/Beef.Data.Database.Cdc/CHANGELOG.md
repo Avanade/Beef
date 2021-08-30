@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.2
 - *Enhancement:* Renamed `ILogicallyDeleted` to `ICdcLogicallyDeleted`; inherit from new `Beef.Entities.ILogicallyDeleted`.
 

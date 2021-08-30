@@ -307,7 +307,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
                 var d2s = CreateMap<{{EntityFrameworkModel}}, {{EntityName}}>();
     {{#each EntityFrameworkAutoMapperProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if EntityFrameworkIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq EntityFrameworkMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
     {{#if HasEntityFrameworkETagProperty}}
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
@@ -346,7 +346,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
                 var d2s = CreateMap<{{CosmosModel}}, {{EntityName}}>();
     {{#each CosmosAutoMapperProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if CosmosIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq CosmosMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
 
                 CosmosMapperProfileCtor(s2d, d2s);
@@ -376,7 +376,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
                 var d2s = CreateMap<{{ODataModel}}, {{EntityName}}>();
     {{#each ODataMapperProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#if ODataIgnore}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/if}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq ODataMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
 
                 ODataMapperProfileCtor(s2d, d2s);

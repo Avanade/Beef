@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Database.Core" Version="4.2.1" />
-    <PackageReference Include="Beef.CodeGen.Core" Version="4.2.7" />
+    <PackageReference Include="Beef.Database.Core" Version="4.2.2" />
+    <PackageReference Include="Beef.CodeGen.Core" Version="4.2.10" />
   </ItemGroup>
 
   <ItemGroup>

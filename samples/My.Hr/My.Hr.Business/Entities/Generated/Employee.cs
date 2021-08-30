@@ -21,12 +21,14 @@ namespace My.Hr.Business.Entities
     /// Represents the Employee entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Employee : EmployeeBase, IEquatable<Employee>
+    public partial class Employee : EmployeeBase, IETag, IChangeLog, IEquatable<Employee>
     {
         #region Privates
 
         private Address? _address;
         private EmergencyContactCollection? _emergencyContacts;
+        private string? _etag;
+        private ChangeLog? _changeLog;
 
         #endregion
 
@@ -54,6 +56,28 @@ namespace My.Hr.Business.Entities
             set => SetValue(ref _emergencyContacts, value, false, false, nameof(EmergencyContacts));
         }
 
+        /// <summary>
+        /// Gets or sets the ETag.
+        /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="ETag")]
+        public string? ETag
+        {
+            get => _etag;
+            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
+        }
+
+        /// <summary>
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
+        /// </summary>
+        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Change Log")]
+        public ChangeLog? ChangeLog
+        {
+            get => _changeLog;
+            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
+        }
+
         #endregion
 
         #region IChangeTracking
@@ -65,6 +89,7 @@ namespace My.Hr.Business.Entities
         public override void AcceptChanges()
         {
             Address?.AcceptChanges();
+            ChangeLog?.AcceptChanges();
             base.AcceptChanges();
         }
 
@@ -74,6 +99,7 @@ namespace My.Hr.Business.Entities
         public override void TrackChanges()
         {
             Address?.TrackChanges();
+            ChangeLog?.TrackChanges();
             base.TrackChanges();
         }
 
@@ -102,7 +128,9 @@ namespace My.Hr.Business.Entities
 
             return base.Equals((object)value)
                 && Equals(Address, value.Address)
-                && Equals(EmergencyContacts, value.EmergencyContacts);
+                && Equals(EmergencyContacts, value.EmergencyContacts)
+                && Equals(ETag, value.ETag)
+                && Equals(ChangeLog, value.ChangeLog);
         }
 
         /// <summary>
@@ -130,6 +158,8 @@ namespace My.Hr.Business.Entities
             var hash = new HashCode();
             hash.Add(Address);
             hash.Add(EmergencyContacts);
+            hash.Add(ETag);
+            hash.Add(ChangeLog);
             return base.GetHashCode() ^ hash.ToHashCode();
         }
     
@@ -159,6 +189,8 @@ namespace My.Hr.Business.Entities
             CopyFrom((EmployeeBase)from);
             Address = CopyOrClone(from.Address, Address);
             EmergencyContacts = from.EmergencyContacts;
+            ETag = from.ETag;
+            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
 
             OnAfterCopyFrom(from);
         }
@@ -190,6 +222,8 @@ namespace My.Hr.Business.Entities
             base.CleanUp();
             Address = Cleaner.Clean(Address);
             EmergencyContacts = Cleaner.Clean(EmergencyContacts);
+            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
+            ChangeLog = Cleaner.Clean(ChangeLog);
 
             OnAfterCleanUp();
         }
@@ -206,7 +240,9 @@ namespace My.Hr.Business.Entities
                     return false;
 
                 return Cleaner.IsInitial(Address)
-                    && Cleaner.IsInitial(EmergencyContacts);
+                    && Cleaner.IsInitial(EmergencyContacts)
+                    && Cleaner.IsInitial(ETag)
+                    && Cleaner.IsInitial(ChangeLog);
             }
         }
 
