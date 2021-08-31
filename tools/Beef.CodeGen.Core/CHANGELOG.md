@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.11
+- *Fixed:* Issue [161](https://github.com/Avanade/Beef/issues/161) fixed. Added support for SQL data types `TEXT` and `NTEXT` as .NET `string` when querying database characteristics for code-gen purposes.
+- *Fixed:* A SQL `DateTimeOffset` type will no longer incorrectly identify as a `DateTime` using the `DbColumn.TypeIsDateTime`. It will correctly map to the .NET `DateTimeOffset`.
+
 ## v4.2.10
 - *Enhancement:* The following `PropertyConfig` properties have been renamed: `EntityFrameworkIgnore` to `EntityFrameworkMapper`, `CosmosIgnore` to `CosmosMapper`, and `ODataIgnore` to `ODataMapper`. The underlying type is no longer `bool`, and they each support the values: `Map` (default), `Ignore` and `Skip`. This is a breaking code-generation change and will need to be explicitly updated by the developer.
 

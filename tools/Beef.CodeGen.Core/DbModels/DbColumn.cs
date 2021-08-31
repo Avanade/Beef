@@ -71,7 +71,6 @@ namespace Beef.CodeGen.DbModels
                 case "DATE":
                 case "DATETIME":
                 case "DATETIME2":
-                case "DATETIMEOFFSET":
                     return true;
 
                 default:
