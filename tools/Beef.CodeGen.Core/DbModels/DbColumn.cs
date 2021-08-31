@@ -26,6 +26,8 @@ namespace Beef.CodeGen.DbModels
                 case "CHAR":
                 case "NVARCHAR":
                 case "VARCHAR":
+                case "TEXT":
+                case "NTEXT":
                     return true;
 
                 default:
@@ -69,7 +71,6 @@ namespace Beef.CodeGen.DbModels
                 case "DATE":
                 case "DATETIME":
                 case "DATETIME2":
-                case "DATETIMEOFFSET":
                     return true;
 
                 default:
