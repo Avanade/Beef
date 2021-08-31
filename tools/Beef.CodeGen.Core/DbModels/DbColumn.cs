@@ -26,6 +26,8 @@ namespace Beef.CodeGen.DbModels
                 case "CHAR":
                 case "NVARCHAR":
                 case "VARCHAR":
+                case "TEXT":
+                case "NTEXT":
                     return true;
 
                 default:
