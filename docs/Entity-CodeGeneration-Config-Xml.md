@@ -19,6 +19,7 @@ Category | Description
 [`EntityFramework`](#EntityFramework) | Provides the _Entity Framewotrk (EF) Data-layer_ configuration.
 [`Cosmos`](#Cosmos) | Provides the _CosmosDB Data-layer_ configuration.
 [`OData`](#OData) | Provides the _OData Data-layer_ configuration.
+[`HttpAgent`](#HttpAgent) | Provides the _HTTP Agent Data-layer_ configuration.
 [`gRPC`](#gRPC) | Provides the _gRPC_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
@@ -137,6 +138,15 @@ Property | Description
 -|-
 **`ODataName`** | The .NET OData interface name used where `Operation.AutoImplement` is `OData`. Defaults to `IOData`. This can be overridden within the `Entity`(s).
 `ODataUsingNamespace` | additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `OData`.
+
+<br/>
+
+## HttpAgent
+Provides the _HTTP Agent Data-layer_ configuration.
+
+Property | Description
+-|-
+**`HttpAgentName`** | The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`. Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).
 
 <br/>
 

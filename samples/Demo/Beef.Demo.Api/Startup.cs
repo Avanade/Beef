@@ -96,6 +96,11 @@ namespace Beef.Demo.Api
             services.AddHealthChecks();
             services.AddHttpClient();
 
+            // Set up services for calling http://api.zippopotam.us/.
+            services.AddHttpClient("zippo", c => c.BaseAddress = new Uri(_config.GetValue<string>("ZippoAgentUrl")));
+            services.AddScoped<IZippoAgentArgs>(sp => new ZippoAgentArgs(sp.GetService<System.Net.Http.IHttpClientFactory>().CreateClient("zippo")));
+            services.AddScoped<IZippoAgent, ZippoAgent>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Beef (Business Entity Execution Framework) Demo API", Version = "v1" });

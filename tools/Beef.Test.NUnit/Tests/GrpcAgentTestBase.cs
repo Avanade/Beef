@@ -57,7 +57,7 @@ namespace Beef.Test.NUnit.Tests
             else
                 TestContext.Out.WriteLine($"gRPC Status: {result.Status.StatusCode} ({result.Status.Detail})");
 
-            TestContext.Out.WriteLine($"HttpStatusCode: {result.HttpStatusCode} ({(int)result.HttpStatusCode})");
+            TestContext.Out.WriteLine($"HttpStatusCode: {result.StatusCode} ({(int)result.StatusCode})");
             TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
             TestContext.Out.WriteLine($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
 
@@ -108,8 +108,8 @@ namespace Beef.Test.NUnit.Tests
             TestContext.Out.WriteLine();
 
             // Perform checks.
-            if (_expectedStatusCode.HasValue && _expectedStatusCode != result.HttpStatusCode)
-                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.HttpStatusCode} ({(int)result.HttpStatusCode}).");
+            if (_expectedStatusCode.HasValue && _expectedStatusCode != result.StatusCode)
+                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).");
 
             if (_expectedErrorType.HasValue && _expectedErrorType != result.ErrorType)
                 Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.");

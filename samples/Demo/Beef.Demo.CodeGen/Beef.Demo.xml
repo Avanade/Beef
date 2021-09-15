@@ -186,5 +186,23 @@
     <Property Name="LastName" Type="string" />
     <Property Name="ETag" Type="string" JsonName="etag" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
-  </Entity> 
+  </Entity>
+
+  <Entity Name="PostalInfo" DataModel="true" WebApiRoutePrefix="api/v1/postal" HttpAgentName="IZippoAgent">
+    <Property Name="Country" Type="^Country" JsonDataModelName="country abbreviation" />
+    <Property Name="City" JsonDataModelName="place name" />
+    <Property Name="State" JsonDataModelName="state abbreviation" />
+    <Property Name="Places" Type="PlaceInfoCollection" />
+
+    <Operation Name="GetPostCodes" OperationType="Get" AutoImplement="HttpAgent" WebApiRoute="{country}/{state}/{city}" HttpAgentRoute="{country.Code}/{state}/{city}" HttpAgentReturnModel="Model.PostalInfo" >
+      <Parameter Name="Country" Type="^Country" IsMandatory="true" ValidatorFluent="IsValid()" />
+      <Parameter Name="State" IsMandatory="true" />
+      <Parameter Name="City" IsMandatory="true" />
+    </Operation>
+  </Entity>
+  
+  <Entity Name="PlaceInfo" Collection="true" DataModel="true">
+    <Property Name="Name" JsonDataModelName="place name" />
+    <Property Name="PostCode" JsonDataModelName="post code" />
+  </Entity>
  </CodeGeneration>

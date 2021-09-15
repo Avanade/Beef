@@ -43,6 +43,7 @@ entities:
     [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement` is `EntityFramework`.")]
     [CategorySchema("Cosmos", Title = "Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.")]
     [CategorySchema("OData", Title = "Provides the specific _OData_ configuration where `AutoImplement` is `OData`.")]
+    [CategorySchema("HttpAgent", Title = "Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.")]
     [CategorySchema("Model", Title = "Provides the data _Model_ configuration.")]
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     [CategorySchema("Exclude", Title = "Provides the _Exclude_ configuration.")]
@@ -327,7 +328,7 @@ entities:
         /// Gets or sets the data source auto-implementation option. 
         /// </summary>
         [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "None" },
+        [PropertySchema("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
             Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.")]
         public string? AutoImplement { get; set; }
@@ -526,6 +527,42 @@ entities:
         public bool? ODataCustomMapper { get; set; }
 
         #endregion
+
+        #region HttpAgent
+
+        /// <summary>
+        /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
+            Description = "Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`).")]
+        public string? HttpAgentName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HttpAgent API route prefix where `Operation.AutoImplement` is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The base HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`.",
+            Description = "This is the base (prefix) `URI` for the HTTP Agent endpoint and can be further extended when defining the underlying `Operation`(s).")]
+        public string? HttpAgentRoutePrefix { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).", IsImportant = true,
+            Description = "This can be overridden within the `Operation`(s).")]
+        public string? HttpAgentModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentReturnModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).",
+            Description = "This can be overridden within the `Operation`(s).")]
+        public string? HttpAgentReturnModel { get; set; }
+
+        #endregion 
 
         #region DataSvc
 
@@ -1121,6 +1158,11 @@ entities:
         public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
 
         /// <summary>
+        /// Indicates whether auto-implementing 'HttpAgent'.
+        /// </summary>
+        public bool UsesHttpAgent => AutoImplement == "HttpAgent" || HttpAgentModel != null || Operations.Any(x => x.AutoImplement == "HttpAgent");
+
+        /// <summary>
         /// Indicates whether AutoMapper is being used.
         /// </summary>
         public bool UsesAutoMapper { get; set; }
@@ -1176,6 +1218,7 @@ entities:
             CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
+            HttpAgentName = InterfaceiseName(DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
@@ -1486,7 +1529,10 @@ entities:
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
 
-            if (UsesEntityFramework || UsesCosmos || UsesOData)
+            if (UsesHttpAgent)
+                DataCtorParameters.Add(new ParameterConfig { Name = "HttpAgent", Type = HttpAgentName, Text = $"{{{{{HttpAgentName}}}}}" });
+
+            if (UsesEntityFramework || UsesCosmos || UsesOData || UsesHttpAgent)
             { 
                 DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
                 UsesAutoMapper = true;

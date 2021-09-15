@@ -45,7 +45,11 @@ namespace Beef.WebApi
         /// <summary>
         /// Creates the <see cref="HttpRequestMessage"/> and invokes the <see cref="IWebApiAgentArgs.BeforeRequest"/>.
         /// </summary>
-        private async Task<HttpRequestMessage> CreateRequestMessageAsync(HttpMethod method, Uri uri, StringContent? content = null, WebApiRequestOptions? requestOptions = null)
+        /// <param name="method">The <see cref="HttpMethod"/>.</param>
+        /// <param name="uri">The <see cref="Uri"/>.</param>
+        /// <param name="content">The optional <see cref="StringContent"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        protected async Task<HttpRequestMessage> CreateRequestMessageAsync(HttpMethod method, Uri uri, StringContent? content = null, WebApiRequestOptions? requestOptions = null)
         {
             var req = new HttpRequestMessage(method, uri);
             if (content != null)
@@ -77,7 +81,7 @@ namespace Beef.WebApi
                 request.Headers.IfMatch.Add(new EntityTagHeaderValue(etag));
         }
 
-        #region Get/Put/Post/Delete Async
+        #region Get/Put/Post/Delete/Patch Async
 
         /// <summary>
         /// Send a <see cref="HttpMethod.Get"/> request as an asynchronous operation.
@@ -549,9 +553,11 @@ namespace Beef.WebApi
         }
 
         /// <summary>
-        /// Create the content by JSON serializing the request value.
+        /// Create the <see cref="StringContent"/> by JSON serializing the request <paramref name="value"/>.
         /// </summary>
-        private static StringContent? CreateJsonContentFromValue(object? value)
+        /// <param name="value">The value.</param>
+        /// <returns>The <see cref="StringContent"/>.</returns>
+        protected static StringContent? CreateJsonContentFromValue(object? value)
         {
             if (value == null)
                 return null;

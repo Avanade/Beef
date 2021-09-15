@@ -9,6 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+{{#if UsesHttpAgent}}
+using System.Net.Http;
+{{/if}}
 using System.Text;
 using System.Threading.Tasks;
 {{#if UsesCosmos}}
@@ -46,6 +49,9 @@ using Beef.Events;
 {{/if}}
 using Beef.Mapper;
 using Beef.Mapper.Converters;
+{{#if UsesHttpAgent}}
+using Beef.WebApi;
+{{/if}}
 {{#ifeq EntityUsing 'Common' 'All'}}
 using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
@@ -171,6 +177,9 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq AutoImplement 'OData'}}
             var __dataArgs = ODataArgs.Create(_mapper{{#if Paging}}, __result.Paging!{{/if}}{{#ifval ODataCollectionName}}, "{{ODataCollectionName}}"{{/ifval}});
       {{/ifeq}}
+      {{#ifeq AutoImplement 'HttpAgent'}}
+            var __dataArgs = HttpSendArgs.Create({{#if HttpAgentRequiresMapper}}_mapper, {{/if}}HttpMethod.{{HttpAgentMethod}}, $"{{HttpAgentRoute}}"{{#if Paging}}, __result.Paging!{{/if}}{{#ifeq Type 'Get'}}, true{{/ifeq}});
+      {{/ifeq}}
       {{#if DataExtensions}}
             await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each PagingLessDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? Task.CompletedTask).ConfigureAwait(false);
       {{/if}}
@@ -204,6 +213,9 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{else}}
             {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.ODataModel}}>(__dataArgs{{#each PagingLessDataParameters}}, {{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
+      {{/ifeq}}
+      {{#ifeq AutoImplement 'HttpAgent'}}
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}{{HttpAgentSendStatement}}
       {{/ifeq}}
       {{#if DataExtensions}}
             await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each CoreDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{ArgumentName}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);

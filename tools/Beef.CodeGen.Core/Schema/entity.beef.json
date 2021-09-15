@@ -150,6 +150,11 @@
           "title": "The .NET OData interface name used where 'Operation.AutoImplement' is 'OData'.",
           "description": "Defaults to 'IOData'. This can be overridden within the 'Entity'(s)."
         },
+        "httpAgentName": {
+          "type": "string",
+          "title": "The default .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Defaults to 'IHttpAgent'. This can be overridden within the 'Entity'(s)."
+        },
         "refDataDefaultMapperConverter": {
           "type": "string",
           "title": "The default Reference Data property 'Converter' used by the generated 'Mapper'(s) where not specifically defined.",
@@ -515,6 +520,7 @@
             "EntityFramework",
             "Cosmos",
             "OData",
+            "HttpAgent",
             "None"
           ]
         },
@@ -632,6 +638,26 @@
           "type": "boolean",
           "title": "Indicates that a custom OData 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
+        },
+        "httpAgentName": {
+          "type": "string",
+          "title": "The .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Defaults to 'CodeGeneration.HttpAgentName' configuration property (its default value is 'IHttpAgent')."
+        },
+        "httpAgentRoutePrefix": {
+          "type": "string",
+          "title": "The base HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "This is the base (prefix) 'URI' for the HTTP Agent endpoint and can be further extended when defining the underlying 'Operation'(s)."
+        },
+        "httpAgentModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
+        },
+        "httpAgentReturnModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
         },
         "dataSvcCaching": {
           "type": "boolean",
@@ -1216,6 +1242,7 @@
             "EntityFramework",
             "Cosmos",
             "OData",
+            "HttpAgent",
             "None"
           ]
         },
@@ -1253,6 +1280,33 @@
           "type": "string",
           "title": "The override name of the underlying OData collection where 'Operation.AutoImplement' is 'OData'.",
           "description": "Overriddes the 'Entity.ODataCollectionName'; otherwise, the underlying 'Simple.OData.Client' will attempt to infer."
+        },
+        "httpAgentRoute": {
+          "type": "string",
+          "title": "The HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "This is appended to the 'Entity.HttpAgentRoutePrefix'."
+        },
+        "httpAgentMethod": {
+          "type": "string",
+          "title": "The HTTP Agent Method for the operation.",
+          "description": "Defaults to 'Operation.WebApiMethod'.",
+          "enum": [
+            "HttpGet",
+            "HttpPost",
+            "HttpPut",
+            "HttpDelete",
+            "HttpPatch"
+          ]
+        },
+        "httpAgentModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
+        },
+        "httpAgentReturnModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "Defaults to 'Operation.HttpAgentModel' where the 'Operation.ReturnType' is equal to 'Entity.Name' (same type). This can be overridden within the 'Operation'(s)."
         },
         "managerCustom": {
           "type": "boolean",

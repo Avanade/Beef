@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Enhancement:* Added `HttpAgentBase` (and other related classes) as the base class to enable a `SendAsync` of an optional JSON request and return an optional JSON response (where applicable) to/from an HTTP endpoint. Leverages the base capabilites of `WebApiAgentBase`. Also, supports AutoMapper mapping of request and response values where required. This functionality is needed to support the new code-generated auto implementation of `HttpAgent` as an alternate data source.
+
 ## v4.2.3
 - *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (except the database stored procedure mapping which will remain as-is). This has the advantage of broad industry support, and based on initial performance testing offers around a ~90% mapping performance improvement (after first execution).
   - The existing `EntityMapper` has been removed. All capabilities to support `Beef.Data.Database.DatabaseMapper` have been moved to that `Assembly`.

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Changed `WebApiAgentBase.CreateJsonContentFromValue` and `WebApiAgentBase.CreateRequestMessageAsync` from `private` to `protected` to improve reusability of functionality for inheriting classes.
+- *Enhancement:* Added `IWebApiAgentResult.StatusCode` which was previously missing.
+
 ## v4.2.2
 - *Enhancement:* Added `Clean<T>(T value, bool overrideWithNullWhenIsInitial)` method to `Cleaner`, with the option to override the value with `null` when the value implements `ICleanUp` and `ICleanUp.IsInitial` is `true`. The existing `Clean<T>(T value)` method now invokes new passing `true`; so in effect will always override with `null` unless explicitly requested not to; see next point.
 - *Enhancement:* The `EntityBasicBase.SetValue<T>(ref T propertyValue, T setValue, ...` has been updated to always _not_ override with null (i.e. `Cleaner.Clean<T>(value, false)`); this will ensure that the value is not nulled whilst being potentially updated.

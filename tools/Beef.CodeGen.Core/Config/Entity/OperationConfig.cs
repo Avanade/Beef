@@ -45,6 +45,10 @@ operations: [
     [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
     [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
+    [CategorySchema("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.")]
+    [CategorySchema("Cosmos", Title = "Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.")]
+    [CategorySchema("OData", Title = "Provides the specific _OData_ configuration where `AutoImplement` is `OData`.")]
+    [CategorySchema("HttpAgent", Title = "Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.")]
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     [CategorySchema("Exclude", Title = "Provides the _Exclude_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
@@ -144,7 +148,7 @@ operations: [
         /// Gets or sets the operation override for the `Entity.AutoImplement`.
         /// </summary>
         [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The operation override for the `Entity.AutoImplement`.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "None" },
+        [PropertySchema("Data", Title = "The operation override for the `Entity.AutoImplement`.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
             Description = "Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.")]
         public string? AutoImplement { get; set; }
 
@@ -172,19 +176,27 @@ operations: [
             Description = "Where using an `EventOutbox` this is ignored as it is implied through its usage.")]
         public bool? DataTransaction { get; set; }
 
+        #endregion
+
+        #region Database
+
         /// <summary>
         /// Gets or sets the database stored procedure name.
         /// </summary>
         [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The database stored procedure name used where `Operation.AutoImplement` is `Database`.",
+        [PropertySchema("Database", Title = "The database stored procedure name used where `Operation.AutoImplement` is `Database`.",
             Description = "Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.")]
         public string? DatabaseStoredProc { get; set; }
+
+        #endregion
+
+        #region Cosmos
 
         /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> override.
         /// </summary>
         [JsonProperty("cosmosContainerId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`.",
+        [PropertySchema("Cosmos", Title = "The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`.",
             Description = "Overrides the `Entity.CosmosContainerId`.")]
         public string? CosmosContainerId { get; set; }
 
@@ -192,9 +204,13 @@ operations: [
         /// Gets or sets the C# code override to be used for setting the optional Cosmos <c>PartitionKey</c>.
         /// </summary>
         [JsonProperty("cosmosPartitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`.",
+        [PropertySchema("Cosmos", Title = "The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`.",
             Description = "Overrides the `Entity.CosmosPartitionKey`.")]
         public string? CosmosPartitionKey { get; set; }
+
+        #endregion
+
+        #region OData
 
         /// <summary>
         /// Gets or sets the override name of the underlying OData collection name where <see cref="OperationConfig.AutoImplement"/> is <c>OData</c>.
@@ -205,6 +221,42 @@ operations: [
         public string? ODataCollectionName { get; set; }
 
         #endregion
+
+        #region HttpAgent
+
+        /// <summary>
+        /// Gets or sets the HTTP Agent API route prefix where `Operation.AutoImplement` is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`.",
+            Description = "This is appended to the `Entity.HttpAgentRoutePrefix`.")]
+        public string? HttpAgentRoute { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP Agent API Method for the operation.
+        /// </summary>
+        [JsonProperty("httpAgentMethod", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The HTTP Agent Method for the operation.", IsImportant = true, Options = new string[] { "HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch" },
+            Description = "Defaults to `Operation.WebApiMethod`.")]
+        public string? HttpAgentMethod { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).", IsImportant = true,
+            Description = "This can be overridden within the `Operation`(s).")]
+        public string? HttpAgentModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentReturnModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).",
+            Description = "Defaults to `Operation.HttpAgentModel` where the `Operation.ReturnType` is equal to `Entity.Name` (same type). This can be overridden within the `Operation`(s).")]
+        public string? HttpAgentReturnModel { get; set; }
+
+        #endregion 
 
         #region Manager
 
@@ -723,6 +775,16 @@ operations: [
         public bool DataEventSend { get; set; } = true;
 
         /// <summary>
+        /// Indicates whether the HTTP Agent operation requires a mapper.
+        /// </summary>
+        public bool HttpAgentRequiresMapper { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the HTTP agent sent statement - composed internally given complexity to construct.
+        /// </summary>
+        public string? HttpAgentSendStatement { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -817,9 +879,6 @@ operations: [
             DataEntityMapper = DefaultWhereNull(DataEntityMapper, () => AutoImplement switch
             {
                 "Database" => "DbMapper",
-                "EntityFramework" => "EfMapper",
-                "Cosmos" => "CosmosMapper",
-                "OData" => "ODataMapper",
                 _ => null
             });
 
@@ -930,6 +989,7 @@ operations: [
             }
 
             PrepareData();
+            PrepareHttpAgent();
 
             GrpcReturnMapper = SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
             GrpcReturnConverter = BaseReturnType switch
@@ -1059,7 +1119,7 @@ operations: [
                     DataArgs.Name = "_cosmos";
                     DataArgs.Type = "CosmosDbArgs";
 
-                    if (EventOutbox != "None" && EventOutbox != "Cosmos")
+                    if (EventOutbox != "None")
                         throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Cosmos' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
 
                     break;
@@ -1068,8 +1128,17 @@ operations: [
                     DataArgs.Name = "_odata";
                     DataArgs.Type = "ODataArgs";
 
-                    if (EventOutbox != "None" && EventOutbox != "OData")
+                    if (EventOutbox != "None")
                         throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'OData' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
+
+                    break;
+
+                case "HttpAgent":
+                    DataArgs.Name = "_httpAgent";
+                    DataArgs.Type = null;
+
+                    if (EventOutbox != "None")
+                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'HttpAgent' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
 
                     break;
 
@@ -1149,6 +1218,56 @@ operations: [
 
             if (WebApiLocation.FirstOrDefault() != '/')
                 WebApiLocation = "/" + WebApiLocation;
+        }
+
+        /// <summary>
+        /// Prepares the HTTP Agent properties.
+        /// </summary>
+        private void PrepareHttpAgent()
+        {
+            if (AutoImplement != "HttpAgent")
+                return;
+
+            HttpAgentRoute = string.IsNullOrEmpty(Parent!.HttpAgentRoutePrefix) ? HttpAgentRoute : Parent!.HttpAgentRoutePrefix + (string.IsNullOrEmpty(HttpAgentRoute) ? null : "/" + HttpAgentRoute);
+            HttpAgentMethod = DefaultWhereNull(HttpAgentMethod, () => WebApiMethod);
+            HttpAgentModel = DefaultWhereNull(HttpAgentModel, () => ValueType == null ? null : Parent!.HttpAgentModel);
+            HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => BaseReturnType == "void" || BaseReturnType != Parent!.Name ? null : Parent!.HttpAgentReturnModel);
+
+            //var _dataArgs = HttpAgentSendArgs.Create(_mapper, )
+            //(await httpAgent.SendAsync(HttpMethod.{HttpAgentMethod}, {HttpAgentRoute}, value)).Value;
+            var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}.Send");
+            if (HttpAgentModel != null && HttpAgentReturnModel != null)
+                sb.Append($"MappedRequestResponseAsync<{BaseReturnType}, {HttpAgentReturnModel}, {ReturnType}, {HttpAgentReturnModel}>(");
+            else if (HttpAgentModel != null)
+                sb.Append($"MappedRequestAsync<{BaseReturnType}, {HttpAgentReturnModel}>(");
+            else if (HttpAgentReturnModel != null)
+                sb.Append($"MappedResponseAsync<{ReturnType}, {HttpAgentReturnModel}>(");
+            else
+            {
+                sb.Append("Async(");
+                HttpAgentRequiresMapper = false;
+            }
+
+            sb.Append($"__dataArgs");
+            if (ValueType != null)
+                sb.Append(", value");
+
+            sb.Append(").ConfigureAwait(false)");
+            if (HttpAgentReturnModel == null)
+                sb.Append(";");
+            else
+                sb.Append(").Value;");
+
+            HttpAgentSendStatement = sb.ToString();
+
+            HttpAgentMethod = HttpAgentMethod switch
+            {
+                "HttpPost" => "Post",
+                "HttpPut" => "Put",
+                "HttpPatch" => "Patch",
+                "HttpDelete" => "Delete",
+                _ => "Get"
+            };
         }
     }
 }

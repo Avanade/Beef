@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using System.Net;
 
 namespace Beef.WebApi
 {
@@ -9,6 +10,11 @@ namespace Beef.WebApi
     /// </summary>
     public interface IWebApiAgentResult
     {
+        /// <summary>
+        /// Gets or sets the <see cref="HttpStatusCode"/>.
+        /// </summary>
+        HttpStatusCode StatusCode { get; }
+
         /// <summary>
         /// Gets or sets the <see cref="MessageItemCollection"/>.
         /// </summary>

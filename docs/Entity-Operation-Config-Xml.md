@@ -26,6 +26,10 @@ Category | Description
 [`Manager`](#Manager) | Provides the _Manager-layer_ configuration.
 [`DataSvc`](#DataSvc) | Provides the _Data Services-layer_ configuration.
 [`Data`](#Data) | Provides the generic _Data-layer_ configuration.
+[`Database`](#Database) | Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.
+[`Cosmos`](#Cosmos) | Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
+[`OData`](#OData) | Provides the specific _OData_ configuration where `AutoImplement` is `OData`.
+[`HttpAgent`](#HttpAgent) | Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.
 [`gRPC`](#gRPC) | Provides the _gRPC_ configuration.
 [`Exclude`](#Exclude) | Provides the _Exclude_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
@@ -117,14 +121,51 @@ Provides the generic _Data-layer_ configuration.
 
 Property | Description
 -|-
-**`AutoImplement`** | The operation override for the `Entity.AutoImplement`. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.
+**`AutoImplement`** | The operation override for the `Entity.AutoImplement`. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `HttpAgent`, `None`. Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.
 `DataEntityMapper` | The override for the data entity `Mapper`. Used where the default generated `Mapper` is not applicable.
 `DataExtensions` | Indicates whether the `Data` extensions logic should be generated. Defaults to `Entity.DataExtensions`.
 `DataTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer. Where using an `EventOutbox` this is ignored as it is implied through its usage.
+`ManagerExtensions` | Indicates whether the `Manager` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.
+
+<br/>
+
+## Database
+Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.
+
+Property | Description
+-|-
 `DatabaseStoredProc` | The database stored procedure name used where `Operation.AutoImplement` is `Database`. Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.
+
+<br/>
+
+## Cosmos
+Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
+
+Property | Description
+-|-
 `DataCosmosContainerId` | The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosContainerId`.
 `DataCosmosPartitionKey` | The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`. Overrides the `Entity.CosmosPartitionKey`.
-`ManagerExtensions` | Indicates whether the `Manager` extensions logic should be generated. Defaults to `Entity.ManagerExtensions`.
+
+<br/>
+
+## OData
+Provides the specific _OData_ configuration where `AutoImplement` is `OData`.
+
+Property | Description
+-|-
+**`ODataCollectionName`** | The override name of the underlying OData collection where `Operation.AutoImplement` is `OData`. Overriddes the `Entity.ODataCollectionName`; otherwise, the underlying `Simple.OData.Client` will attempt to infer.
+
+<br/>
+
+## HttpAgent
+Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.
+
+Property | Description
+-|-
+`HttpAgentRoute` | The HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`. This is appended to the `Entity.HttpAgentRoutePrefix`.
+**`HttpAgentMethod`** | The HTTP Agent Method for the operation. Valid options are: `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpPatch`. Defaults to `Operation.WebApiMethod`.
+**`HttpAgentModel`** | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). This can be overridden within the `Operation`(s).
+`HttpAgentReturnModel` | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). Defaults to `Operation.HttpAgentModel` where the `Operation.ReturnType` is equal to `Entity.Name` (same type). This can be overridden within the `Operation`(s).
 
 <br/>
 
