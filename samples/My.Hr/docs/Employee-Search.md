@@ -75,7 +75,7 @@ So that the code-gen knows what Entity Framework model is to be used this needs 
 
 ``` yaml
   # - The EntityFrameworkModel is required so that the GetByArgs code-gen knows what EfModel is to be used; however, EntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required).
-- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
 ```
 
 Execute the code-generation using the command line.

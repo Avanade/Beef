@@ -48,7 +48,7 @@ Property | Description
 **`refDataNamespace`** | The namespace for the Reference Data entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).
 **`refDataCommonNamespace`** | The namespace for the Reference Data common entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).
 **`refDataText`** | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`. This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
-**`refDataWebApiRoute`** | The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.
+**`refDataWebApiRoute`** | The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.
 `refDataCache` | The cache used for the ReferenceData providers. Valid options are: `ReferenceDataCache`, `ReferenceDataMultiTenantCache`. Defaults to `ReferenceDataCache`. A value of `ReferenceDataCache` specifies a single-tenant cache; otherwise, `ReferenceDataMultiTenantCache` for a multi-tenant cache leverageing the `ExecutionContext.TenantId`.
 `refDataAppendToNamespace` | The Reference Data entity namespace appended to end of the standard `company.appname.Common.Entities.{AppendToNamespace}`. Defaults to `null`; being nothing to append.
 `refDataBusNamespace` | The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.
@@ -91,6 +91,7 @@ Property | Description
 `webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).
 `appBasedAgentArgs` | Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.
 `webApiAutoLocation` | Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).
+**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).
 
 <br/>
 

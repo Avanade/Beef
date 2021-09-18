@@ -39,7 +39,9 @@ The APIs created will have the following capabilities out-of-the-box with limite
 - [gRPC](./src/Beef.Grpc/README.md) server (and client) integration.
 - [Event](./src/Beef.Events/README.md) publishing and subcribing to enable an event-driven architecture.
 
-To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined.
+To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined. The capabilities and implementations have been influenced by _Microsoft's best practices for cloud applications_; specifically:
+- [RESTful web API design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
+- [Web API implementation](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
 
 To [get started](#Getting-started) a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get a solution up and running in minutes.
 

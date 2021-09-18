@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.12
+- *Enhancement:* Updated the `EntityData` template to include the new `HttpAgent` data source functionality.
+- *Enhancement:* Added `CodeGeneration.WebApiRoutePrefix` which will prefix all underlying `Entity` and `Operation` routes.
+
 ## v4.2.11
 - *Fixed:* Issue [161](https://github.com/Avanade/Beef/issues/161) fixed. Added support for SQL data types `TEXT` and `NTEXT` as .NET `string` when querying database characteristics for code-gen purposes.
 - *Fixed:* A SQL `DateTimeOffset` type will no longer incorrectly identify as a `DateTime` using the `DbColumn.TypeIsDateTime`. It will correctly map to the .NET `DateTimeOffset`.

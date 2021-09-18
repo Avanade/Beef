@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Updated `WebApiQueryString.PagingArgsSkipQueryStringNames` to support `offset` value, and 
+`WebApiQueryString.PagingArgsTakeQueryStringNames` to support `limit` value.
+
 ## v4.2.2
 - *Fixed:* Updated internal _Beef_ dependencies to latest.
 

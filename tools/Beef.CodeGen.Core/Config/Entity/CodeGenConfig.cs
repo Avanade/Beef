@@ -68,7 +68,7 @@ entities:
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
         [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.", IsImportant = true)]
+        [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.", IsImportant = true)]
         public string? RefDataWebApiRoute { get; set; }
 
         /// <summary>
@@ -181,6 +181,14 @@ entities:
         [PropertySchema("WebApi", Title = "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
             Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).")]
         public bool? WebApiAutoLocation { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <c>RoutePrefixAtttribute</c> for the corresponding entity Web API controller.
+        /// </summary>
+        [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
+            Description = "This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).")]
+        public string? WebApiRoutePrefix { get; set; }
 
         #endregion
 
@@ -645,6 +653,10 @@ entities:
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter<T>");
+
+            if (!string.IsNullOrEmpty(WebApiRoutePrefix))
+                RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :
+                    $"{(WebApiRoutePrefix.EndsWith('/') ? WebApiRoutePrefix[..^1] : WebApiRoutePrefix)}/{(RefDataWebApiRoute.StartsWith('/') ? RefDataWebApiRoute[1..] : RefDataWebApiRoute)}";
 
             if (Entities != null && Entities.Count > 0)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Azure.Messaging.EventHubs.Producer;
+using Azure.Messaging.ServiceBus;
 using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
@@ -15,7 +15,7 @@ using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 #endif
 using Beef.Entities;
-using Beef.Events.EventHubs;
+using Beef.Events.ServiceBus;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -102,9 +102,9 @@ namespace Company.AppName.Api
 
 #endif
             // Add event publishing services.
-            var ehcs = _config.GetValue<string>("EventHubConnectionString");
-            if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
+            var sbcs = _config.GetValue<string>("ServiceBusConnectionString");
+            if (!string.IsNullOrEmpty(sbcs))
+                services.AddBeefServiceBusSender(new ServiceBusClient(sbcs));
             else
                 services.AddBeefNullEventPublisher();
 

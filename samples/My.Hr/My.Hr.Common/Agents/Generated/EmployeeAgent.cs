@@ -103,7 +103,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Employee?>("api/v1/employees/{id}", requestOptions: requestOptions,
+            GetAsync<Employee?>("api/employees/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> CreateAsync(Employee value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Employee>("api/v1/employees", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Employee>("api/employees", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> UpdateAsync(Employee value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Employee>("api/v1/employees/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Employee>("api/employees/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<Employee>("api/v1/employees/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<Employee>("api/employees/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            DeleteAsync("api/v1/employees/{id}", requestOptions: requestOptions,
+            DeleteAsync("api/employees/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null) =>
-            GetCollectionResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase>("api/v1/employees", requestOptions: requestOptions,
+            GetCollectionResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase>("api/employees", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<EmployeeArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> TerminateAsync(TerminationDetail value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Employee>("api/v1/employees/{id}/terminate", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Employee>("api/employees/{id}/terminate", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
     }
 }

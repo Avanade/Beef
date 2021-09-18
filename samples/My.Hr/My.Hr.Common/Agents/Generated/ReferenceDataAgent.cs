@@ -63,7 +63,7 @@ namespace My.Hr.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -90,7 +90,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<RefDataNamespace.GenderCollection>("api/v1/ref/genders", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+            GetAsync<RefDataNamespace.GenderCollection>("ref/genders", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.TerminationReason"/> items that match the filter arguments.
@@ -99,7 +99,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.TerminationReasonCollection>> TerminationReasonGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<RefDataNamespace.TerminationReasonCollection>("api/v1/ref/terminationReasons", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+            GetAsync<RefDataNamespace.TerminationReasonCollection>("ref/terminationReasons", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.RelationshipType"/> items that match the filter arguments.
@@ -108,7 +108,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.RelationshipTypeCollection>> RelationshipTypeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<RefDataNamespace.RelationshipTypeCollection>("api/v1/ref/relationshipTypes", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+            GetAsync<RefDataNamespace.RelationshipTypeCollection>("ref/relationshipTypes", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.USState"/> items that match the filter arguments.
@@ -117,7 +117,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<RefDataNamespace.USStateCollection>("api/v1/ref/usStates", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+            GetAsync<RefDataNamespace.USStateCollection>("ref/usStates", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.PerformanceOutcome"/> items that match the filter arguments.
@@ -126,10 +126,10 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<RefDataNamespace.PerformanceOutcomeCollection>("api/v1/ref/performanceOutcomes", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+            GetAsync<RefDataNamespace.PerformanceOutcomeCollection>("ref/performanceOutcomes", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -141,7 +141,7 @@ namespace My.Hr.Common.Agents
             if (names != null)
                 ro.UrlQueryString += string.Join("&", names);
                 
-            return GetAsync("api/v1/ref", requestOptions: ro);
+            return GetAsync("ref", requestOptions: ro);
         }
     }
 }

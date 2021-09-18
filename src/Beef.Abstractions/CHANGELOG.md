@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.2.3
 - *Enhancement:* Changed `WebApiAgentBase.CreateJsonContentFromValue` and `WebApiAgentBase.CreateRequestMessageAsync` from `private` to `protected` to improve reusability of functionality for inheriting classes.
+- *Enhancement:* Updated `WebApiAgentBase.CreateFullUri` to use `StringBuilder` to reduce string allocations.
 - *Enhancement:* Added `IWebApiAgentResult.StatusCode` which was previously missing.
 
 ## v4.2.2

@@ -24,7 +24,7 @@
         },
         "refDataWebApiRoute": {
           "type": "string",
-          "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching."
+          "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching. The 'WebApiRoutePrefix' will be prepended where specified."
         },
         "refDataCache": {
           "type": "string",
@@ -115,6 +115,11 @@
           "type": "boolean",
           "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
           "description": "This will automatically set the 'Operation.WebApiLocation' for an 'Operation' named 'Create' where there is a corresponding named 'Get'. This can be overridden within the 'Entity'(s)."
+        },
+        "webApiRoutePrefix": {
+          "type": "string",
+          "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
+          "description": "This is the base (prefix) 'URI' prepended to all entity and underlying 'Operation'(s)."
         },
         "validatorLayer": {
           "type": "string",
@@ -761,7 +766,7 @@
         "webApiRoutePrefix": {
           "type": "string",
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
-          "description": "This is the base (prefix) 'URI' for the entity and can be further extended when defining the underlying 'Operation'(s)."
+          "description": "This is the base (prefix) 'URI' for the entity and can be further extended when defining the underlying 'Operation'(s). The 'CodeGeneration.WebApiRoutePrefix' will be prepended where specified."
         },
         "webApiAuthorize": {
           "type": "string",

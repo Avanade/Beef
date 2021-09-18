@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Beef.WebApi
@@ -431,14 +432,17 @@ namespace Beef.WebApi
         protected Uri CreateFullUri(string? urlSuffix = null, WebApiArg[]? args = null, WebApiRequestOptions? requestOptions = null)
         {
             // Concatenate the base and specific url strings to form the full Url.
-            var fullUrl = Args.HttpClient.BaseAddress.AbsoluteUri;
+            var fullUrl = new StringBuilder(Args.HttpClient.BaseAddress.AbsoluteUri);
             if (!string.IsNullOrEmpty(urlSuffix))
             {
                 if (fullUrl[^1] != '/')
-                    fullUrl += "/";
+                    fullUrl.Append('/');
 
-                fullUrl += ((urlSuffix[0] == '/') ? urlSuffix[1..] : urlSuffix);
+                fullUrl.Append((urlSuffix[0] == '/') ? urlSuffix[1..] : urlSuffix);
             }
+
+            var urlTemplate = fullUrl.ToString();
+            bool hasQueryString = urlTemplate.Contains('?', StringComparison.InvariantCulture);
 
             // Replace known url tokens with passed argument values.
             if (args != null)
@@ -448,23 +452,19 @@ namespace Beef.WebApi
 
                 foreach (var arg in args.Where(x => x.ArgType != WebApiArgType.FromBody))
                 {
-                    var argUrl = "{" + arg.Name + "}";
-                    if (fullUrl.Contains(argUrl, StringComparison.InvariantCulture))
+                    var argUrl = $"{{{arg.Name}}}";
+                    if (urlTemplate.Contains(argUrl, StringComparison.Ordinal))
                     {
-                        fullUrl = fullUrl.Replace(argUrl, arg.ToString(), StringComparison.InvariantCulture);
+                        fullUrl.Replace(argUrl, arg.ToString());
                         arg.IsUsed = true;
                     }
                 }
 
-                bool firstTime = !fullUrl.Contains("?", StringComparison.InvariantCulture);
                 foreach (var arg in args.Where(x => !x.IsDefault && x.ArgType != WebApiArgType.FromBody && !x.IsUsed))
                 {
-                    var argUrl = arg.ToUrlQueryString();
-                    if (!string.IsNullOrEmpty(argUrl))
-                    {
-                        fullUrl = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}{1}{2}", fullUrl, firstTime ? "?" : "&", arg.ToUrlQueryString());
-                        firstTime = false;
-                    }
+                    var uqs = arg.ToUrlQueryString();
+                    if (!string.IsNullOrEmpty(uqs))
+                        hasQueryString = AppendQueryString(fullUrl, hasQueryString, uqs);
                 }
             }
 
@@ -472,22 +472,45 @@ namespace Beef.WebApi
             if (requestOptions != null)
             {
                 if (requestOptions.IncludeFields.Any())
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + WebApiRequestOptions.IncludeFieldsQueryStringName + "=" + Uri.EscapeDataString(string.Join(",", requestOptions.IncludeFields.Where(x => !string.IsNullOrEmpty(x))));
+                {
+                    hasQueryString = AppendQueryString(fullUrl, hasQueryString, WebApiRequestOptions.IncludeFieldsQueryStringName);
+                    fullUrl.Append('=');
+                    fullUrl.Append(string.Join(",", requestOptions.IncludeFields.Where(x => !string.IsNullOrEmpty(x))));
+                }
 
                 if (requestOptions.ExcludeFields.Any())
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + WebApiRequestOptions.ExcludeFieldsQueryStringName + "=" + Uri.EscapeDataString(string.Join(",", requestOptions.ExcludeFields.Where(x => !string.IsNullOrEmpty(x))));
+                {
+                    hasQueryString = AppendQueryString(fullUrl, hasQueryString, WebApiRequestOptions.ExcludeFieldsQueryStringName);
+                    fullUrl.Append('=');
+                    fullUrl.Append(string.Join(",", requestOptions.ExcludeFields.Where(x => !string.IsNullOrEmpty(x))));
+                }
 
                 if (requestOptions.IncludeRefDataText)
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + WebApiRequestOptions.IncludeRefDataTextQueryStringName + "=true";
+                {
+                    hasQueryString = AppendQueryString(fullUrl, hasQueryString, WebApiRequestOptions.IncludeRefDataTextQueryStringName);
+                    fullUrl.Append("=true");
+                }
 
                 if (requestOptions.IncludeInactive)
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + WebApiRequestOptions.IncludeInactiveQueryStringName + "=true";
+                {
+                    hasQueryString = AppendQueryString(fullUrl, hasQueryString, WebApiRequestOptions.IncludeInactiveQueryStringName);
+                    fullUrl.Append("=true");
+                }
 
                 if (!string.IsNullOrEmpty(requestOptions.UrlQueryString))
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString[1..] : requestOptions.UrlQueryString);
+                    hasQueryString = AppendQueryString(fullUrl, hasQueryString, (requestOptions.UrlQueryString[0] == '?' || requestOptions.UrlQueryString[0] == '&') ? requestOptions.UrlQueryString[1..] : requestOptions.UrlQueryString);
             }
 
-            return new Uri(fullUrl.Replace(" ", "%20", StringComparison.InvariantCulture));
+            return new Uri(fullUrl.Replace(" ", "%20").ToString());
+        }
+
+        /// <summary>
+        /// Appends the query to the query string.
+        /// </summary>
+        private static bool AppendQueryString(StringBuilder fullUrl, bool hasQueryString, string? query)
+        {
+            fullUrl.Append($"{(hasQueryString ? '&' : '?')}{query}");
+            return true;
         }
 
 #pragma warning disable CA1822 // Mark members as static; by-design as it can be overridden.

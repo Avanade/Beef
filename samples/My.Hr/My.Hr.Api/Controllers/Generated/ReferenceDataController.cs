@@ -33,7 +33,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.Gender collection.</returns>
         [HttpGet()]
-        [Route("api/v1/ref/genders")]
+        [Route("ref/genders")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GenderGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Gender>>(this, 
@@ -47,7 +47,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
         [HttpGet()]
-        [Route("api/v1/ref/terminationReasons")]
+        [Route("ref/terminationReasons")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult TerminationReasonGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TerminationReason>>(this, 
@@ -61,7 +61,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
         [HttpGet()]
-        [Route("api/v1/ref/relationshipTypes")]
+        [Route("ref/relationshipTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult RelationshipTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.RelationshipType>>(this, 
@@ -75,7 +75,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.USState collection.</returns>
         [HttpGet()]
-        [Route("api/v1/ref/usStates")]
+        [Route("ref/usStates")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult USStateGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.USState>>(this, 
@@ -89,7 +89,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
         [HttpGet()]
-        [Route("api/v1/ref/performanceOutcomes")]
+        [Route("ref/performanceOutcomes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult PerformanceOutcomeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.PerformanceOutcome>>(this, 
@@ -101,7 +101,7 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
-        [Route("api/v1/ref")]
+        [Route("ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetNamed()

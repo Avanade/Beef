@@ -1317,7 +1317,7 @@
             </xs:attribute>
             <xs:attribute name="WebApiRoutePrefix" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s).</xs:documentation>
+                <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="WebApiAuthorize" use="optional" type="xs:string">
@@ -1437,7 +1437,7 @@
       </xs:attribute>
       <xs:attribute name="RefDataWebApiRoute" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.</xs:documentation>
+          <xs:documentation>The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="RefDataCache" use="optional">
@@ -1540,6 +1540,11 @@
       <xs:attribute name="WebApiAutoLocation" use="optional" type="xs:boolean">
         <xs:annotation>
           <xs:documentation>Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="WebApiRoutePrefix" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">

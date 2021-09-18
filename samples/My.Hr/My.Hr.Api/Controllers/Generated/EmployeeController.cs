@@ -23,7 +23,7 @@ namespace My.Hr.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Employee"/> Web API functionality.
     /// </summary>
-    [Route("api/v1/employees")]
+    [Route("api/employees")]
     public partial class EmployeeController : ControllerBase
     {
         private readonly IEmployeeManager _manager;
@@ -58,7 +58,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Employee value) =>
             new WebApiPost<Employee>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/employees/{r.Id}", UriKind.Relative));
+                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.

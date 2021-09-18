@@ -22,12 +22,12 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Skip"/> query string names.
         /// </summary>
-        public static List<string> PagingArgsSkipQueryStringNames { get; } = new List<string>(new string[] { "$skip" });
+        public static List<string> PagingArgsSkipQueryStringNames { get; } = new List<string>(new string[] { "$skip", "$offset" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static List<string> PagingArgsTakeQueryStringNames { get; } = new List<string>(new string[] { "$take", "$top", "$size", "$pageSize" });
+        public static List<string> PagingArgsTakeQueryStringNames { get; } = new List<string>(new string[] { "$take", "$top", "$size", "$pageSize", "$limit" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.

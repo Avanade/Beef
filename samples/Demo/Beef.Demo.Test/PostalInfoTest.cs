@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PostalInfoTest : UsingAgentTesterServer<Startup>
     {
-        [Test, TestSetUp, Parallelizable]
+        [Test, TestSetUp]
         public void B110_GetPostCodes_NotFound()
         {
             AgentTester.Test<PostalInfoAgent, PostalInfo>()
@@ -24,7 +24,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("NZ", "Y", "Z"));
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, TestSetUp]
         public void B120_GetPostCodes_Found()
         {
             var p = AgentTester.Test<PostalInfoAgent, PostalInfo>()
@@ -33,7 +33,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp]
         public void B130_GetPostCodes_Mocked()
         {
             var v = new PostalInfo { CountrySid = "US", City = "Redmond", State = "WA", Places = new PlaceInfoCollection { new PlaceInfo { Name = "Redmond", PostCode = "98052" }, new PlaceInfo { Name = "Redmond", PostCode = "98053" }, new PlaceInfo { Name = "Redmond", PostCode = "98073" } } };
@@ -41,9 +41,7 @@ namespace Beef.Demo.Test
             var mock = new Mock<IZippoAgent>();
             mock.Setup(x => x.SendMappedResponseAsync<PostalInfo, Business.Data.Model.PostalInfo>(It.Is<HttpSendArgs>(x => x.HttpMethod == HttpMethod.Get && x.UrlSuffix == "US/WA/Redmond"))).ReturnsHttpAgentResultAsync(v);
 
-            var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped(mock.Object));
-
-            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => sc.ReplaceScoped(mock.Object));
 
             agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.OK)

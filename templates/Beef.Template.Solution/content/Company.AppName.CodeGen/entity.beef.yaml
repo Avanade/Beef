@@ -8,11 +8,12 @@ eventSourceKind: Relative
 eventOutbox: Database
 appBasedAgentArgs: true
 webApiAutoLocation: true
+webApiRoutePrefix:
 refDataText: true
 databaseSchema: AppName
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
       { name: FirstName },
@@ -34,7 +35,7 @@ webApiAutoLocation: true
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
       { name: FirstName },
@@ -56,7 +57,7 @@ refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing Cosmos DB.
 
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: api/v1/persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator },
       { name: FirstName },
