@@ -274,9 +274,9 @@ namespace Beef.WebApi
         {
             Check.NotNull(name, nameof(name));
             if (value == null)
-                return Uri.EscapeDataString(name);
+                return Uri.EscapeUriString(name);
             else
-                return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, Uri.EscapeDataString(name), Uri.EscapeDataString(value));
+                return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, Uri.EscapeUriString(name), Uri.EscapeDataString(value));
         }
 
         /// <summary>

@@ -116,14 +116,20 @@ namespace My.Hr.Test.Apis
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
-            var v = agentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var r = agentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1,2))).Value;
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1,2)));
 
+            var v = r.Value;
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
             Assert.AreEqual(2, v.Result.Count);
             Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Result.Select(x => x.LastName).ToArray());
+
+            // Query again with etag and ensure not modified.
+            agentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.NotModified)
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1, 2), new WebApiRequestOptions { ETag = r.Response.Headers.ETag.Tag }));
         }
 
         [Test, TestSetUp]

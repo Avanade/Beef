@@ -6,6 +6,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Changed `WebApiAgentBase.CreateJsonContentFromValue` and `WebApiAgentBase.CreateRequestMessageAsync` from `private` to `protected` to improve reusability of functionality for inheriting classes.
 - *Enhancement:* Updated `WebApiAgentBase.CreateFullUri` to use `StringBuilder` to reduce string allocations.
 - *Enhancement:* Added `IWebApiAgentResult.StatusCode` which was previously missing.
+- *Fixed:* Corrected the `UriFormat.UriFormat` to format the query string parameter name using `Uri.EscapeUriString` versus `Uri.EscapeDataString`.
 
 ## v4.2.2
 - *Enhancement:* Added `Clean<T>(T value, bool overrideWithNullWhenIsInitial)` method to `Cleaner`, with the option to override the value with `null` when the value implements `ICleanUp` and `ICleanUp.IsInitial` is `true`. The existing `Clean<T>(T value)` method now invokes new passing `true`; so in effect will always override with `null` unless explicitly requested not to; see next point.
