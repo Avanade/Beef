@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.Demo.Database</RootNamespace>
     <AssemblyName>Beef.Demo.Database</AssemblyName>
+    <RunWorkingDirectory>$(MSBuildThisFileDirectory)</RunWorkingDirectory>
   </PropertyGroup>
 
   <ItemGroup>
