@@ -1,0 +1,5 @@
+﻿name: Person
+properties:
+- { name: Name }
+- { name: Age, type: int }
+- { name: Salary, type: unknown, isNullable: true }

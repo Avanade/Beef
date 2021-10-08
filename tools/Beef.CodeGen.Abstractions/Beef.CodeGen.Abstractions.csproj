@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Beef.CodeGen</RootNamespace>
+    <Version>4.2.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Beef Developers</Authors>
+    <Company>Avanade</Company>
+    <Description>Business Entity Execution Framework (Beef) Code Generator abstractions.</Description>
+    <LangVersion>latest</LangVersion>
+    <Copyright>Avanade (c)</Copyright>
+    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+    <Product>Beef.CodeGen.Abstractions</Product>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Title>Business Entity Execution Framework (Beef) Code Generator abstractions.</Title>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <PackageTags>beef framework code-generation codegen abstractions</PackageTags>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\SelectTableAlwaysGeneratedColumns.sql" />
+    <None Remove="Resources\SelectTableAndColumns.sql" />
+    <None Remove="Resources\SelectTableForeignKeys.sql" />
+    <None Remove="Resources\SelectTableGeneratedColumns.sql" />
+    <None Remove="Resources\SelectTableIdentityColumns.sql" />
+    <None Remove="Resources\SelectTablePrimaryKey.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SelectTableAlwaysGeneratedColumns.sql" />
+    <EmbeddedResource Include="Resources\SelectTableAndColumns.sql" />
+    <EmbeddedResource Include="Resources\SelectTableForeignKeys.sql" />
+    <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
+    <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
+    <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Link="Logo256x256.png">
+      <PackagePath>\</PackagePath>
+      <Pack>true</Pack>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Handlebars.Net" Version="2.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+  </ItemGroup>
+
+</Project>
