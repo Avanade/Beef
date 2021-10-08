@@ -31,6 +31,7 @@ entities:
     [CategorySchema("EntityFramework", Title = "Provides the _Entity Framewotrk (EF) Data-layer_ configuration.")]
     [CategorySchema("Cosmos", Title = "Provides the _CosmosDB Data-layer_ configuration.")]
     [CategorySchema("OData", Title = "Provides the _OData Data-layer_ configuration.")]
+    [CategorySchema("HttpAgent", Title = "Provides the _HTTP Agent Data-layer_ configuration.")]
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
@@ -67,7 +68,7 @@ entities:
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
         [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.", IsImportant = true)]
+        [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.", IsImportant = true)]
         public string? RefDataWebApiRoute { get; set; }
 
         /// <summary>
@@ -181,6 +182,14 @@ entities:
             Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).")]
         public bool? WebApiAutoLocation { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <c>RoutePrefixAtttribute</c> for the corresponding entity Web API controller.
+        /// </summary>
+        [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
+            Description = "This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).")]
+        public string? WebApiRoutePrefix { get; set; }
+
         #endregion
 
         #region Manager
@@ -236,6 +245,14 @@ entities:
         [PropertySchema("OData", Title = "The .NET OData interface name used where `Operation.AutoImplement` is `OData`.", IsImportant = true,
             Description = "Defaults to `IOData`. This can be overridden within the `Entity`(s).")]
         public string? ODataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpRest`.
+        /// </summary>
+        [JsonProperty("httpAgentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("HttpAgent", Title = "The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
+            Description = "Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).")]
+        public string? HttpAgentName { get; set; }
 
         /// <summary>
         /// Gets or sets the default Reference Data property Converter used by the generated Mapper(s) where not specifically defined.
@@ -632,9 +649,14 @@ entities:
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
+            HttpAgentName = DefaultWhereNull(HttpAgentName, () => "IHttpAgent");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter<T>");
+
+            if (!string.IsNullOrEmpty(WebApiRoutePrefix))
+                RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :
+                    $"{(WebApiRoutePrefix.EndsWith('/') ? WebApiRoutePrefix[..^1] : WebApiRoutePrefix)}/{(RefDataWebApiRoute.StartsWith('/') ? RefDataWebApiRoute[1..] : RefDataWebApiRoute)}";
 
             if (Entities != null && Entities.Count > 0)
             {

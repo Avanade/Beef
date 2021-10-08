@@ -27,14 +27,14 @@ Replace the existing `Entity` YAML with the following.
 
 ``` yaml
 entityScope: Autonomous
-refDataWebApiRoute: api/v1/ref
+webApiRoutePrefix: ref
 appBasedAgentArgs: true
 databaseSchema: Hr
 entities:
-- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
-- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
-- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
-- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
+- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
+- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
 ```
 
 <br/>
@@ -83,6 +83,7 @@ Replace the existing `entity.beef.yaml` with the following. The comments include
 # - EventOutbox indicates that the code-generated event publish will occur in the Data-layer and should use the database to transactionally persist the event(s).
 # - AppBasedAgentArgs indicates to create a domain specific AgentArgs to simplify dependency injection usage.
 # - WebApiAutoLocation indicate to set the HTTP response location for a create.
+# - WebApiRoutrePrefix will prefix/prepend all route Entity and Operation routes with specified value.
 # - DatabaseSchema defaults the database schema name.
 entityScope: Autonomous
 refDataText: true
@@ -93,6 +94,7 @@ eventSourceRoot: My/Hr
 eventSourceKind: Relative
 eventOutbox: Database
 appBasedAgentArgs: true
+webApiRoutePrefix:
 webApiAutoLocation: true
 databaseSchema: Hr
 entities:
@@ -126,7 +128,7 @@ entities:
   # - The Validator is specified, which is then used by both the Create and Update operations.
   # - The AutoImplement specifies that operations should be auto-implemented using Database (ADO.NET) unless explicitly overridden.
   # - The WebApiRoutePrefix is defined, which is in turn extended by each operation.
-- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper,
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper,
     properties: [
       { name: Id, text: '{{Employee}} identifier', type: Guid, uniqueKey: true, inherited: true, databaseIgnore: true },
       { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson },

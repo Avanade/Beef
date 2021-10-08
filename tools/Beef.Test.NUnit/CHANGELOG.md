@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Updated `GrpcAgentTestBase` to accomodate `GrpcAgentResult.StatusCode` rename.
+- *Enhancement:* Added new `ReturnsHttpAgentResultAsync` extension methods for `IReturnsResult<TMock>` to enable dependency injection replacement of mocked responses.
+
 ## v4.2.2
 - *Enhancement:* Updated `GrpcAgentTestBase` to enable instantiation of `Agent` with new `AutoMapper.IMapper` requirement.
 - *Enhancement:* Added `ConfigureLocalServices` method to `UsingAgentTesterServer` to allow dependency injection (DI) configuration for local (non-server related) services.

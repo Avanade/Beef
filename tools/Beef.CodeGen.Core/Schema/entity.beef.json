@@ -24,7 +24,7 @@
         },
         "refDataWebApiRoute": {
           "type": "string",
-          "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching."
+          "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching. The 'WebApiRoutePrefix' will be prepended where specified."
         },
         "refDataCache": {
           "type": "string",
@@ -116,6 +116,11 @@
           "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
           "description": "This will automatically set the 'Operation.WebApiLocation' for an 'Operation' named 'Create' where there is a corresponding named 'Get'. This can be overridden within the 'Entity'(s)."
         },
+        "webApiRoutePrefix": {
+          "type": "string",
+          "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
+          "description": "This is the base (prefix) 'URI' prepended to all entity and underlying 'Operation'(s)."
+        },
         "validatorLayer": {
           "type": "string",
           "title": "The namespace for the Reference Data entities (adds as a c# 'using' statement).",
@@ -149,6 +154,11 @@
           "type": "string",
           "title": "The .NET OData interface name used where 'Operation.AutoImplement' is 'OData'.",
           "description": "Defaults to 'IOData'. This can be overridden within the 'Entity'(s)."
+        },
+        "httpAgentName": {
+          "type": "string",
+          "title": "The default .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Defaults to 'IHttpAgent'. This can be overridden within the 'Entity'(s)."
         },
         "refDataDefaultMapperConverter": {
           "type": "string",
@@ -515,6 +525,7 @@
             "EntityFramework",
             "Cosmos",
             "OData",
+            "HttpAgent",
             "None"
           ]
         },
@@ -633,6 +644,26 @@
           "title": "Indicates that a custom OData 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
         },
+        "httpAgentName": {
+          "type": "string",
+          "title": "The .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Defaults to 'CodeGeneration.HttpAgentName' configuration property (its default value is 'IHttpAgent')."
+        },
+        "httpAgentRoutePrefix": {
+          "type": "string",
+          "title": "The base HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "This is the base (prefix) 'URI' for the HTTP Agent endpoint and can be further extended when defining the underlying 'Operation'(s)."
+        },
+        "httpAgentModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
+        },
+        "httpAgentReturnModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
+        },
         "dataSvcCaching": {
           "type": "boolean",
           "title": "Indicates whether request-based 'IRequestCache' caching is to be performed at the 'DataSvc' layer to improve performance (i.e. reduce chattiness).",
@@ -735,7 +766,7 @@
         "webApiRoutePrefix": {
           "type": "string",
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
-          "description": "This is the base (prefix) 'URI' for the entity and can be further extended when defining the underlying 'Operation'(s)."
+          "description": "This is the base (prefix) 'URI' for the entity and can be further extended when defining the underlying 'Operation'(s). The 'CodeGeneration.WebApiRoutePrefix' will be prepended where specified."
         },
         "webApiAuthorize": {
           "type": "string",
@@ -1216,6 +1247,7 @@
             "EntityFramework",
             "Cosmos",
             "OData",
+            "HttpAgent",
             "None"
           ]
         },
@@ -1253,6 +1285,33 @@
           "type": "string",
           "title": "The override name of the underlying OData collection where 'Operation.AutoImplement' is 'OData'.",
           "description": "Overriddes the 'Entity.ODataCollectionName'; otherwise, the underlying 'Simple.OData.Client' will attempt to infer."
+        },
+        "httpAgentRoute": {
+          "type": "string",
+          "title": "The HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "This is appended to the 'Entity.HttpAgentRoutePrefix'."
+        },
+        "httpAgentMethod": {
+          "type": "string",
+          "title": "The HTTP Agent Method for the operation.",
+          "description": "Defaults to 'Operation.WebApiMethod'.",
+          "enum": [
+            "HttpGet",
+            "HttpPost",
+            "HttpPut",
+            "HttpDelete",
+            "HttpPatch"
+          ]
+        },
+        "httpAgentModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "This can be overridden within the 'Operation'(s)."
+        },
+        "httpAgentReturnModel": {
+          "type": "string",
+          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
+          "description": "Defaults to 'Operation.HttpAgentModel' where the 'Operation.ReturnType' is equal to 'Entity.Name' (same type). This can be overridden within the 'Operation'(s)."
         },
         "managerCustom": {
           "type": "boolean",

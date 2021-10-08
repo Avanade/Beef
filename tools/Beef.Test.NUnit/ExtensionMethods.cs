@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using AutoMapper;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -20,6 +21,11 @@ namespace Beef.Test.NUnit
     [DebuggerStepThrough]
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Gets a mocked <see cref="IMapper"/> with no mappings defined.
+        /// </summary>
+        public static Mock<IMapper> MapperMock => new Mock<IMapper>();
+
         /// <summary>
         /// Converts an <see cref="int"/> to a <see cref="Guid"/>; e.g. '1' will be '00000001-0000-0000-0000-000000000000'.
         /// </summary>
@@ -58,6 +64,60 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="WebApiAgentResult{TEntity}"/> with an entity result.</returns>
         public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, TEntity entity, HttpStatusCode statusCode = HttpStatusCode.OK) where TMock : class =>
             mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage(statusCode), entity));
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="HttpAgentResult{T}"/> with no result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <param name="sendArgs">Optional <see cref="HttpSendArgs"/>; defaults to <see cref="HttpMethod.Post"/>.</param>
+        /// <returns>The <see cref="HttpAgentResult{T}"/> with an entity result.</returns>
+        public static IReturnsResult<TMock> ReturnsHttpAgentResultAsync<TMock, T>(this IReturns<TMock, Task<HttpAgentResult<T>>> mock, HttpStatusCode statusCode = HttpStatusCode.NoContent, HttpSendArgs? sendArgs = null) where TMock : class =>
+            mock.ReturnsAsync(() => new HttpAgentResult<T>(sendArgs ?? new HttpSendArgs(HttpMethod.Post, null), new HttpResponseMessage() { StatusCode = statusCode }));
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="HttpAgentResult{T, TModel}"/> with no result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The resultant model <see cref="Type"/> where mapping (ignored, in that no mapping will occur).</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <param name="sendArgs">Optional <see cref="HttpSendArgs"/>; defaults to <see cref="HttpMethod.Post"/>.</param>
+        /// <param name="mapper">Optional <see cref="IMapper"/>; defaults to <see cref="MapperMock"/>.</param>
+        /// <returns>The <see cref="HttpAgentResult{T, TModel}"/> with an entity result.</returns>
+        public static IReturnsResult<TMock> ReturnsHttpAgentResultAsync<TMock, T, TModel>(this IReturns<TMock, Task<HttpAgentResult<T, TModel>>> mock, HttpStatusCode statusCode = HttpStatusCode.NoContent, HttpSendArgs? sendArgs = null, IMapper? mapper = null) where TMock : class =>
+            mock.ReturnsAsync(() => new HttpAgentResult<T, TModel>(sendArgs ?? new HttpSendArgs(HttpMethod.Post, null), mapper ?? MapperMock.Object, new HttpResponseMessage() { StatusCode = statusCode }));
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="HttpAgentResult{T}"/> with a result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The resultant entity <see cref="Type"/>.</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="value">The entity value.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <param name="sendArgs">Optional <see cref="HttpSendArgs"/>; defaults to <see cref="HttpMethod.Post"/>.</param>
+        /// <returns>The <see cref="HttpAgentResult{T}"/> with an entity result.</returns>
+        public static IReturnsResult<TMock> ReturnsHttpAgentResultAsync<TMock, T>(this IReturns<TMock, Task<HttpAgentResult<T>>> mock, T value, HttpStatusCode statusCode = HttpStatusCode.OK, HttpSendArgs? sendArgs = null) where TMock : class =>
+            mock.ReturnsAsync(() => new HttpAgentResult<T>(sendArgs ?? new HttpSendArgs(HttpMethod.Post, null), new HttpResponseMessage(statusCode), value));
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="HttpAgentResult{T, TModel}"/> with a result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The resultant entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The resultant model <see cref="Type"/> where mapping (ignored, in that no mapping will occur).</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="value">The entity value.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <param name="sendArgs">Optional <see cref="HttpSendArgs"/>; defaults to <see cref="HttpMethod.Post"/>.</param>
+        /// <param name="mapper">Optional <see cref="IMapper"/>; defaults to <see cref="MapperMock"/>.</param>
+        /// <returns>The <see cref="HttpAgentResult{T, TModel}"/> with an entity result.</returns>
+        public static IReturnsResult<TMock> ReturnsHttpAgentResultAsync<TMock, T, TModel>(this IReturns<TMock, Task<HttpAgentResult<T, TModel>>> mock, T value, HttpStatusCode statusCode = HttpStatusCode.OK, HttpSendArgs? sendArgs = null, IMapper? mapper = null) where TMock : class =>
+            mock.ReturnsAsync(() => new HttpAgentResult<T, TModel>(sendArgs ?? new HttpSendArgs(HttpMethod.Post, null), mapper ?? MapperMock.Object, new HttpResponseMessage(statusCode), value));
 
         /// <summary>
         /// Removes all items from the <see cref="IServiceCollection"/> for the specified <typeparamref name="TService"/>.

@@ -25,7 +25,8 @@ namespace Beef.Demo.Business.DataSvc
                            .AddScoped<IProductDataSvc, ProductDataSvc>()
                            .AddScoped<IRobotDataSvc, RobotDataSvc>()
                            .AddScoped<ITripPersonDataSvc, TripPersonDataSvc>()
-                           .AddScoped<IContactDataSvc, ContactDataSvc>();
+                           .AddScoped<IContactDataSvc, ContactDataSvc>()
+                           .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>();
         }
     }
 }

@@ -39,7 +39,9 @@ The APIs created will have the following capabilities out-of-the-box with limite
 - [gRPC](./src/Beef.Grpc/README.md) server (and client) integration.
 - [Event](./src/Beef.Events/README.md) publishing and subcribing to enable an event-driven architecture.
 
-To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined.
+To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined. The capabilities and implementations have been influenced by _Microsoft's best practices for cloud applications_; specifically:
+- [RESTful web API design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
+- [Web API implementation](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation)
 
 To [get started](#Getting-started) a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get a solution up and running in minutes.
 
@@ -219,6 +221,11 @@ The following are references to additional documentation (these are all accessib
 
 - [v4.1](./docs/Dependency-injection-v4-1.md)
 - [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
+
+### External links of potential interest
+
+- Versioning - [article](https://mathieu.fenniak.net/aint-nobody-got-time-for-that-api-versioning/), [implementation](https://github.com/dotnet/aspnet-api-versioning) - _Beef_ has no specific support or opinion with respect to versioning approach and/or implementation.
+- Domain-driven design - [Wikipedia](https://en.wikipedia.org/wiki/Domain-driven_design), [Fowler](https://martinfowler.com/bliki/DomainDrivenDesign.html), Microsoft authored articles: [article](https://docs.microsoft.com/en-us/azure/architecture/microservices/model/domain-analysis), [article](https://docs.microsoft.com/en-us/archive/msdn-magazine/2009/february/best-practice-an-introduction-to-domain-driven-design), [article](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/ddd-oriented-microservice) and [article](https://docs.microsoft.com/en-us/azure/architecture/microservices/migrate-monolith) - _Beef_ encourages the DDD approach, and is why _Entity_ naming and convention is foundational within.
 
 <br/>
 

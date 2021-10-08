@@ -121,6 +121,12 @@ namespace Beef.CodeGen.Generators
                 context.Inverse(writer, parameters);
             });
 
+            // Initiate a breakpoint in the debugger.
+            Handlebars.RegisterHelper("breakpoint", (writer, context, parameters, args) =>
+            {
+                System.Diagnostics.Debugger.Break();
+            });
+
             // Converts a value to lowercase.
             Handlebars.RegisterHelper("lower", (writer, context, parameters) => writer.WriteSafeString(parameters.FirstOrDefault()?.ToString()?.ToLowerInvariant() ?? ""));
 

@@ -533,6 +533,7 @@
                         <xs:enumeration value="EntityFramework" />
                         <xs:enumeration value="Cosmos" />
                         <xs:enumeration value="OData" />
+                        <xs:enumeration value="HttpAgent" />
                         <xs:enumeration value="None" />
                       </xs:restriction>
                     </xs:simpleType>
@@ -570,6 +571,35 @@
                   <xs:attribute name="ODataCollectionName" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The override name of the underlying OData collection where `Operation.AutoImplement` is `OData`. Overriddes the `Entity.ODataCollectionName`; otherwise, the underlying `Simple.OData.Client` will attempt to infer.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="HttpAgentRoute" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`. This is appended to the `Entity.HttpAgentRoutePrefix`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="HttpAgentMethod" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The HTTP Agent Method for the operation. Defaults to `Operation.WebApiMethod`.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="HttpGet" />
+                        <xs:enumeration value="HttpPost" />
+                        <xs:enumeration value="HttpPut" />
+                        <xs:enumeration value="HttpDelete" />
+                        <xs:enumeration value="HttpPatch" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="HttpAgentModel" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). This can be overridden within the `Operation`(s).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="HttpAgentReturnModel" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). Defaults to `Operation.HttpAgentModel` where the `Operation.ReturnType` is equal to `Entity.Name` (same type). This can be overridden within the `Operation`(s).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="ManagerCustom" use="optional" type="xs:boolean">
@@ -1033,6 +1063,7 @@
                   <xs:enumeration value="EntityFramework" />
                   <xs:enumeration value="Cosmos" />
                   <xs:enumeration value="OData" />
+                  <xs:enumeration value="HttpAgent" />
                   <xs:enumeration value="None" />
                 </xs:restriction>
               </xs:simpleType>
@@ -1159,6 +1190,26 @@
                 <xs:documentation>Indicates that a custom OData `Mapper` will be used; i.e. not generated. Otherwise, by default, a `Mapper` will be generated.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="HttpAgentName" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`. Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="HttpAgentRoutePrefix" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The base HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`. This is the base (prefix) `URI` for the HTTP Agent endpoint and can be further extended when defining the underlying `Operation`(s).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="HttpAgentModel" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). This can be overridden within the `Operation`(s).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="HttpAgentReturnModel" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`). This can be overridden within the `Operation`(s).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="DataSvcCaching" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.</xs:documentation>
@@ -1266,7 +1317,7 @@
             </xs:attribute>
             <xs:attribute name="WebApiRoutePrefix" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s).</xs:documentation>
+                <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="WebApiAuthorize" use="optional" type="xs:string">
@@ -1386,7 +1437,7 @@
       </xs:attribute>
       <xs:attribute name="RefDataWebApiRoute" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.</xs:documentation>
+          <xs:documentation>The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="RefDataCache" use="optional">
@@ -1491,6 +1542,11 @@
           <xs:documentation>Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="WebApiRoutePrefix" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">
         <xs:annotation>
           <xs:documentation>The namespace for the Reference Data entities (adds as a c# `using` statement). Defaults to `Business`. A value of `Business` indicates that the Validators will be defined within the `Business` namespace/assembly; otherwise, defined within the `Common` namespace/assembly.</xs:documentation>
@@ -1525,6 +1581,11 @@
       <xs:attribute name="ODataName" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The .NET OData interface name used where `Operation.AutoImplement` is `OData`. Defaults to `IOData`. This can be overridden within the `Entity`(s).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="HttpAgentName" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`. Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="MapperDefaultRefDataConverter" use="optional">

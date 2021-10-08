@@ -42,7 +42,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
             acp.Reset();
 
             Assert.IsTrue(acp.Expiry.HasValue);
-            Assert.IsTrue(acp.Expiry.Value > now && acp.Expiry.Value < now.AddMinutes(30));
+            Assert.IsTrue(acp.Expiry.Value > now && acp.Expiry.Value < now.AddMinutes(31));
         }
     }
 }

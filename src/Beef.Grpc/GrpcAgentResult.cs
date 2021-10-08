@@ -19,7 +19,7 @@ namespace Beef.Grpc
     public class GrpcAgentResult : IWebApiAgentResult
     {
         private MessageItemCollection? _messages = null;
-        private HttpStatusCode? _httpStatusCode;
+        private HttpStatusCode? _statusCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GrpcAgentResult"/> class that is considered successful.
@@ -96,6 +96,7 @@ namespace Beef.Grpc
             }
         }
 
+
         /// <summary>
         /// Gets the gRPC status.
         /// </summary>
@@ -122,35 +123,35 @@ namespace Beef.Grpc
         public bool IsSuccess { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="HttpStatusCode"/> that was returned in the <see cref="ResponseTrailers"/> (uses <see cref="GrpcConsts.HttpStatusCodeHeaderName"/>). Where no value was returned will
+        /// Gets the <see cref="StatusCode"/> that was returned in the <see cref="ResponseTrailers"/> (uses <see cref="GrpcConsts.HttpStatusCodeHeaderName"/>). Where no value was returned will
         /// attempt to infer from <see cref="Status"/>; otherwise, will default to either <see cref="HttpStatusCode.OK"/> or <see cref="HttpStatusCode.InternalServerError"/> depending on <see cref="IsSuccess"/>.
         /// </summary>
-        public HttpStatusCode HttpStatusCode
+        public HttpStatusCode StatusCode
         {
             get 
             {
-                if (_httpStatusCode.HasValue)
-                    return _httpStatusCode.Value;
+                if (_statusCode.HasValue)
+                    return _statusCode.Value;
 
                 var t = ResponseTrailers.Where(x => x.Key == GrpcConsts.HttpStatusCodeHeaderName).SingleOrDefault();
                 if (t != null && int.TryParse(t.Value, out var hsc))
-                    _httpStatusCode = (HttpStatusCode)hsc;
+                    _statusCode = (HttpStatusCode)hsc;
                 else
                 {
-                    _httpStatusCode = Status.StatusCode switch
+                    _statusCode = Status.StatusCode switch
                     {
-                        StatusCode.Unauthenticated => System.Net.HttpStatusCode.Unauthorized,
-                        StatusCode.PermissionDenied => System.Net.HttpStatusCode.Forbidden,
-                        StatusCode.InvalidArgument => System.Net.HttpStatusCode.BadRequest,
-                        StatusCode.Aborted => System.Net.HttpStatusCode.PreconditionFailed,
-                        StatusCode.FailedPrecondition => System.Net.HttpStatusCode.Conflict,
-                        StatusCode.AlreadyExists => System.Net.HttpStatusCode.Conflict,
-                        StatusCode.NotFound => System.Net.HttpStatusCode.NotFound,
+                        global::Grpc.Core.StatusCode.Unauthenticated => System.Net.HttpStatusCode.Unauthorized,
+                        global::Grpc.Core.StatusCode.PermissionDenied => System.Net.HttpStatusCode.Forbidden,
+                        global::Grpc.Core.StatusCode.InvalidArgument => System.Net.HttpStatusCode.BadRequest,
+                        global::Grpc.Core.StatusCode.Aborted => System.Net.HttpStatusCode.PreconditionFailed,
+                        global::Grpc.Core.StatusCode.FailedPrecondition => System.Net.HttpStatusCode.Conflict,
+                        global::Grpc.Core.StatusCode.AlreadyExists => System.Net.HttpStatusCode.Conflict,
+                        global::Grpc.Core.StatusCode.NotFound => System.Net.HttpStatusCode.NotFound,
                         _ => IsSuccess ? HttpStatusCode.OK : HttpStatusCode.InternalServerError
                     };
                 }
 
-                return _httpStatusCode.Value;
+                return _statusCode.Value;
             }
         }
 

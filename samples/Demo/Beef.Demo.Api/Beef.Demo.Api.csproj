@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events.ServiceBus\Beef.Events.ServiceBus.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Grpc\Beef.Grpc.csproj" />
     <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />

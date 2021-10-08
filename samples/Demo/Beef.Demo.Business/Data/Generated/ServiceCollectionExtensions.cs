@@ -25,7 +25,8 @@ namespace Beef.Demo.Business.Data
                            .AddScoped<IProductData, ProductData>()
                            .AddScoped<IRobotData, RobotData>()
                            .AddScoped<ITripPersonData, TripPersonData>()
-                           .AddScoped<IContactData, ContactData>();
+                           .AddScoped<IContactData, ContactData>()
+                           .AddScoped<IPostalInfoData, PostalInfoData>();
         }
     }
 }

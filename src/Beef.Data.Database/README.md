@@ -235,23 +235,10 @@ Additionally, the [Parameters](#Parameters) contain a `ParamWithWildcard` operat
 
 The _Beef_ framework encapsulates the ADO.NET [`DbCommand`](https://docs.microsoft.com/en-us/dotnet/api/system.data.common.dbcommand) and manages its lifetime. As such a developer need not concern themselves with opening and closing the ADO.NET [`DbConnection`](https://docs.microsoft.com/en-us/dotnet/api/system.data.common.dbconnection) (and disposing).
 
-The [`DataContextScope`](../Beef.Core/DataContextScope.cs) determines whether an existing or new connection is used ([`DataContextScopeOption`](../Beef.Core/DataContextScopeOption.cs)). Where using an existing, will determine if the existing is open, and will create on first access as required, closing and disposing automatically after usage. The connection usage will be tracked down and up the execution stack and closed/disposed where appropriate.
-
-For the most part this is automatically handled by the code-generation and nothing explicit needs to be performed.
-
-The following demonstrates the usage:
-
-``` csharp
-using (DataContextScope.Begin(DataContextScopeOption.UseExisting))
-{
-    // Data access statements...
-}
-```
-
 <br/>
 
 ## Transactions
 
-The [`ManagerInvoker`](../Beef.Core/Business/ManagerInvoker.cs), [`DataSvcInvoker`](../Beef.Core/Business/DataSvcInvoker.cs), and [`DataInvoker`](../Beef.Core/Business/DataInvoker.cs) accept a [`BusinessInvokerArgs`](../Beef.Core/Business/BusinessInvokerBase.cs). This drives the [connection management]()
+The [`ManagerInvoker`](../Beef.Core/Business/ManagerInvoker.cs), [`DataSvcInvoker`](../Beef.Core/Business/DataSvcInvoker.cs), and [`DataInvoker`](../Beef.Core/Business/DataInvoker.cs) accept a [`BusinessInvokerArgs`](../Beef.Core/Business/BusinessInvokerBase.cs). This also drives the connection management.
 
 These classes are used specifically by the primary domain _business_ logic (see [`Solution Structure`](../../docs/solution-structure.md)).

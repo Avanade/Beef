@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Renamed `GrpcAgentResult.HttpStatusCode` to `GrpcAgentResult.StatusCode` to accomodate `IWebApiAgentResult.StatusCode`. 
+
 ## v4.2.2
 - *Enhancement:* `GrpcAgentBase` updated to support _AutoMapper_ mapping (removed existing`EntityMapper` functionality).
 

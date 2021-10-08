@@ -95,7 +95,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PerformanceReview?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<PerformanceReview?>("api/v1/reviews/{id}", requestOptions: requestOptions,
+            GetAsync<PerformanceReview?>("api/reviews/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null) =>
-            GetCollectionResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview>("api/v1/employees/{employeeId}/reviews", requestOptions: requestOptions,
+            GetCollectionResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview>("api/employees/{employeeId}/reviews", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("employeeId", employeeId), new WebApiPagingArgsArg("paging", paging) });
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<PerformanceReview>("api/v1/employees/{employeeId}/reviews", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<PerformanceReview>("api/employees/{employeeId}/reviews", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("employeeId", employeeId) });
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<PerformanceReview>("api/v1/reviews/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<PerformanceReview>("api/reviews/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PerformanceReview>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<PerformanceReview>("api/v1/reviews/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<PerformanceReview>("api/reviews/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace My.Hr.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            DeleteAsync("api/v1/reviews/{id}", requestOptions: requestOptions,
+            DeleteAsync("api/reviews/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
     }
 }
