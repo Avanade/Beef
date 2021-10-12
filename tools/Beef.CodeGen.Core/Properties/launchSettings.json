@@ -2,7 +2,8 @@
   "profiles": {
     "Beef.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "--GENERATEENTITYJSONSCHEMA"
+      "commandLineArgs": "--GENERATEENTITYXMLMARKDOWN",
+      "workingDirectory": "C:\\Users\\eric\\source\\repos\\Beef\\tools\\Beef.CodeGen.Core"
     }
   }
 }

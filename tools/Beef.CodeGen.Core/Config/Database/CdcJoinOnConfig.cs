@@ -11,13 +11,13 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the table join on condition configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("CdcJoinOn", Title = "'CdcJoinOn' object (database-driven)",
+    [CodeGenClass("CdcJoinOn", Title = "'CdcJoinOn' object (database-driven)",
         Description = "The `CdcJoinOn` object defines the join on characteristics for a CDC join.",
         ExampleMarkdown = @"A YAML configuration example is as follows:
 ``` yaml
 
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
     public class CdcJoinOnConfig : ConfigBase<CodeGenConfig, CdcJoinConfig>
     {
         /// <summary>
@@ -32,14 +32,14 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the join column (from the `Join` table).
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the join column (from the `Join` table).", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The name of the join column (from the `Join` table).", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the join to column.
         /// </summary>
         [JsonProperty("toColumn", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the join to column.", IsImportant = true,
+        [CodeGenProperty("Key", Title = "The name of the join to column.", IsImportant = true,
             Description = "Defaults to `Name`; i.e. assumes same name.")]
         public string? ToColumn { get; set; }
 
@@ -47,7 +47,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the SQL statement for the join on bypassing the corresponding `Column` specification.
         /// </summary>
         [JsonProperty("toStatement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The SQL statement for the join on bypassing the corresponding `Column` specification.")]
+        [CodeGenProperty("Key", Title = "The SQL statement for the join on bypassing the corresponding `Column` specification.")]
         public string? ToStatement { get; set; }
 
         #endregion

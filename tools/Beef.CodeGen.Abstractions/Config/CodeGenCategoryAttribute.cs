@@ -5,19 +5,19 @@ using System;
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents the class category schema configuration.
+    /// Represents the <i>code-generation</i> class category configuration.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class CategorySchemaAttribute : Attribute
+    public sealed class CodeGenCategoryAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CategorySchemaAttribute"/> class.
+        /// Initializes a new instance of the <see cref="CodeGenCategoryAttribute"/> class.
         /// </summary>
-        /// <param name="category">The grouping category.</param>
-        public CategorySchemaAttribute(string category) => Category = category;
+        /// <param name="category">The grouping category name.</param>
+        public CodeGenCategoryAttribute(string category) => Category = category;
 
         /// <summary>
-        /// Gets or sets the category.
+        /// Gets or sets the category name.
         /// </summary>
         public string Category { get; }
 

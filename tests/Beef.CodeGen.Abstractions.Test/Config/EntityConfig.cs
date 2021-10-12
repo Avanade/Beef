@@ -7,17 +7,17 @@ using System.Collections.Generic;
 namespace Beef.CodeGen.Abstractions.Test.Config
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Entity", Title = "'Entity' object.", Description = "The `Entity` object.", Markdown = "This is a _sample_ markdown.", ExampleMarkdown = "This is an `example` markdown.")]
-    [CategorySchema("Key", Title = "Provides the _Key_ configuration.")]
-    [CategorySchema("Collection", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenClass("Entity", Title = "'Entity' object.", Description = "The `Entity` object.", Markdown = "This is a _sample_ markdown.", ExampleMarkdown = "This is an `example` markdown.")]
+    [CodeGenCategory("Key", Title = "Provides the _Key_ configuration.")]
+    [CodeGenCategory("Collection", Title = "Provides related child (hierarchical) configuration.")]
     public class EntityConfig : ConfigRootBase<EntityConfig>
     {
         [JsonProperty("name")]
-        [PropertySchema("Key", Title = "The entity name.", IsMandatory = true)]
+        [CodeGenProperty("Key", Title = "The entity name.", IsMandatory = true)]
         public string? Name { get; set; }
 
         [JsonProperty("properties")]
-        [PropertyCollectionSchema("Collection", Title = "The `Property` collection.", IsImportant = true)]
+        [CodeGenPropertyCollection("Collection", Title = "The `Property` collection.", IsImportant = true)]
         public List<PropertyConfig>? Properties { get; set; }
 
         protected override void Prepare()

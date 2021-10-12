@@ -1513,8 +1513,7 @@
         }
       },
       "required": [
-        "name",
-        "type"
+        "name"
       ]
     },
     "Parameter": {

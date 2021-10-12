@@ -13,8 +13,8 @@ namespace Beef.CodeGen.Scripts
     /// Represents the <see cref="HandlebarsCodeGenerator"/> script arguments used to define a <see cref="CodeGeneratorBase"/> (as specified by the <see cref="Type"/>) and other associated code-generation arguments.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Generate", Title = "'Generate' command.", Description = "The `Generate` command defines the execution parameters for a code-generation execution.")]
-    [CategorySchema("Key", Title = "Provides the _Key_ configuration.")]
+    [CodeGenClass("Generate", Title = "'Generate' command.", Description = "The `Generate` command defines the execution parameters for a code-generation execution.")]
+    [CodeGenCategory("Key", Title = "Provides the _Key_ configuration.")]
     public class CodeGenScript : ConfigBase<CodeGenScripts, CodeGenScripts>
     {
         private CodeGeneratorBase? _generator;
@@ -29,14 +29,14 @@ namespace Beef.CodeGen.Scripts
         /// Gets or sets the <see cref="CodeGeneratorBase"/> <see cref="System.Type"/>..
         /// </summary>
         [JsonProperty("type")]
-        [PropertySchema("Key", Title = "The .NET Generator (CodeGeneratorBase) Type.", IsMandatory = true)]
+        [CodeGenProperty("Key", Title = "The .NET Generator (CodeGeneratorBase) Type.", IsMandatory = true)]
         public string? Type { get; set; }
 
         /// <summary>
         /// Gets or sets the template resource name.
         /// </summary>
         [JsonProperty("template")]
-        [PropertySchema("Key", Title = "The template resource name.", IsMandatory = true)]
+        [CodeGenProperty("Key", Title = "The template resource name.", IsMandatory = true)]
         public string? Template { get; set; }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Beef.CodeGen.Scripts
         /// </summary>
         /// <remarks>The name supports <b>Handlebars</b> syntax.</remarks>
         [JsonProperty("file")]
-        [PropertySchema("Key", Title = "The file name.", IsMandatory = true, Description = "The name supports _Handlebars_ syntax.")]
+        [CodeGenProperty("Key", Title = "The file name.", IsMandatory = true, Description = "The name supports _Handlebars_ syntax.")]
         public string? File { get; set; }
 
         /// <summary>
@@ -52,21 +52,21 @@ namespace Beef.CodeGen.Scripts
         /// </summary>
         /// <remarks>The name supports <b>Handlebars</b> syntax.</remarks>
         [JsonProperty("directory")]
-        [PropertySchema("Key", Title = "The directory name.", Description = "The name supports _Handlebars_ syntax.")]
+        [CodeGenProperty("Key", Title = "The directory name.", Description = "The name supports _Handlebars_ syntax.")]
         public string? Directory { get; set; }
 
         /// <summary>
         /// Indicates whether the file is only generated once; i.e. only created where it does not already exist.
         /// </summary>
         [JsonProperty("genOnce")]
-        [PropertySchema("Key", Title = "Indicates whether the file is only generated once; i.e. only created where it does not already exist.")]
+        [CodeGenProperty("Key", Title = "Indicates whether the file is only generated once; i.e. only created where it does not already exist.")]
         public bool IsGenOnce { get; set; }
 
         /// <summary>
         /// Gets or sets the help text.
         /// </summary>
         [JsonProperty("text")]
-        [PropertySchema("Key", Title = "The additional text written to the log to enable additional context.")]
+        [CodeGenProperty("Key", Title = "The additional text written to the log to enable additional context.")]
         public string? Text { get; set; }
 
         /// <summary>

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Builders;
+using Beef.CodeGen.Config;
 using Beef.CodeGen.Generators;
+using Beef.CodeGen.Utility;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen
@@ -31,16 +31,17 @@ namespace Beef.CodeGen
             // Check for special case / internal use arguments.
             if (args.Length == 1)
             {
+                MarkdownDocumentationGenerator.OnFileCreation = fn => Logger.Default.LogWarning($" > {fn}");
                 switch (args[0].ToUpperInvariant())
                 {
                     case "--GENERATEENTITYXMLSCHEMA": return SpecialActivitiesCenter("Generate Entity XML Schema", "./Schema/codegen.entity.xsd", fn => XmlSchemaGenerator.Create<Config.Entity.CodeGenConfig>(ConfigType.Entity).Save(fn, System.Xml.Linq.SaveOptions.None));
-                    case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Entity.CodeGenConfig>("JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef).")));
+                    case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => JsonSchemaGenerator.Generate<Config.Entity.CodeGenConfig>(fn, "JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef)."));
                     case "--GENERATEDATABASEXMLSCHEMA": return SpecialActivitiesCenter("Generate Database XML Schema", "./Schema/codegen.table.xsd", fn => XmlSchemaGenerator.Create<Config.Database.CodeGenConfig>(ConfigType.Database).Save(fn, System.Xml.Linq.SaveOptions.None));
-                    case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Database.CodeGenConfig>("JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).")));
-                    case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Entity.CodeGenConfig>(fn, ConfigType.Entity, true));
-                    case "--GENERATEENTITYXMLMARKDOWN": return SpecialActivitiesCenter("Generate Entity XML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Entity.CodeGenConfig>(fn, ConfigType.Entity, false));
-                    case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Database.CodeGenConfig>(fn, ConfigType.Database, true));
-                    case "--GENERATEDATABASEXMLMARKDOWN": return SpecialActivitiesCenter("Generate Database XML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Database.CodeGenConfig>(fn, ConfigType.Database, false));
+                    case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => JsonSchemaGenerator.Generate<Config.Database.CodeGenConfig>(fn, "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef)."));
+                    case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity, true));
+                    case "--GENERATEENTITYXMLMARKDOWN": return SpecialActivitiesCenter("Generate Entity XML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity, false));
+                    case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database, true));
+                    case "--GENERATEDATABASEXMLMARKDOWN": return SpecialActivitiesCenter("Generate Database XML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database, false));
                 }
             }
 
@@ -65,5 +66,24 @@ namespace Beef.CodeGen
             Logger.Default.LogInformation(string.Empty);
             return 0;
         }
+
+        /// <summary>
+        /// Invoke the <see cref="MarkdownDocumentationGenerator"/>.
+        /// </summary>
+        private static void GenerateMarkdown<T>(string directory, ConfigType configType, bool isYaml) where T : ConfigBase, IRootConfig
+            => MarkdownDocumentationGenerator.Generate<T>(createFileName: (_, cgca) => $"{configType}-{cgca.Name}-{(isYaml ? "Config" : "Config-Xml")}.md",
+                directory: directory, includeExample: isYaml, addBreaksBetweenSections: true, propertyData: pd =>
+                {
+                    if (isYaml)
+                        return;
+
+                    if (!Enum.TryParse<ConfigurationEntity>(pd.Class!.Name, out var ce))
+                        ce = ConfigurationEntity.CodeGen;
+
+                    pd.Name = XmlYamlTranslate.GetXmlName(configType, ce, pd.Name!);
+                    var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(configType, ce, pd.Name).Attribute;
+                    if (xpsa != null)
+                        pd.Psa = xpsa;
+                });
     }
 }

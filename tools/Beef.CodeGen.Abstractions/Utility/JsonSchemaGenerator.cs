@@ -57,7 +57,7 @@ namespace Beef.CodeGen.Utility
             jtw.WriteStartArray();
             jtw.WriteStartObject();
             jtw.WritePropertyName("$ref");
-            jtw.WriteValue($"#/definitions/{type.GetCustomAttribute<ClassSchemaAttribute>()?.Name}");
+            jtw.WriteValue($"#/definitions/{type.GetCustomAttribute<CodeGenClassAttribute>()?.Name}");
             jtw.WriteEndObject();
             jtw.WriteEndArray();
 
@@ -71,7 +71,7 @@ namespace Beef.CodeGen.Utility
         {
             foreach (var pi in type.GetProperties())
             {
-                var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                var pcsa = pi.GetCustomAttribute<CodeGenPropertyCollectionAttribute>();
                 if (pcsa != null)
                 {
                     if (pi.PropertyType == typeof(List<string>))
@@ -92,7 +92,7 @@ namespace Beef.CodeGen.Utility
         /// </summary>
         private static void WriteDefinition(Type type, JsonTextWriter jtw)
         {
-            var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
+            var csa = type.GetCustomAttribute<CodeGenClassAttribute>();
             if (csa == null)
                 throw new InvalidOperationException($"Type {type.Name} does not have required ClassSchemaAttribute defined.");
 
@@ -123,7 +123,7 @@ namespace Beef.CodeGen.Utility
                 jtw.WritePropertyName(name);
                 jtw.WriteStartObject();
 
-                var psa = pi.GetCustomAttribute<PropertySchemaAttribute>();
+                var psa = pi.GetCustomAttribute<CodeGenPropertyAttribute>();
                 if (psa != null)
                 {
                     jtw.WritePropertyName("type");
@@ -152,7 +152,7 @@ namespace Beef.CodeGen.Utility
                 }
                 else
                 {
-                    var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                    var pcsa = pi.GetCustomAttribute<CodeGenPropertyCollectionAttribute>();
                     if (pcsa == null)
                         throw new InvalidOperationException($"Type '{type.Name}' Property '{pi.Name}' does not have a required PropertySchemaAttribute or PropertyCollectionSchemaAttribute.");
 
@@ -181,7 +181,7 @@ namespace Beef.CodeGen.Utility
 
                         jtw.WriteStartObject();
                         jtw.WritePropertyName("$ref");
-                        jtw.WriteValue($"#/definitions/{t.GetCustomAttribute<ClassSchemaAttribute>()!.Name}");
+                        jtw.WriteValue($"#/definitions/{t.GetCustomAttribute<CodeGenClassAttribute>()!.Name}");
                         jtw.WriteEndObject();
                     }
                 }

@@ -5,16 +5,16 @@ using System;
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents the property schema configuration.
+    /// Represents the <i>code-generation</i> property configuration.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class PropertySchemaAttribute : Attribute
+    public sealed class CodeGenPropertyAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertySchemaAttribute"/> class.
+        /// Initializes a new instance of the <see cref="CodeGenPropertyAttribute"/> class.
         /// </summary>
         /// <param name="category">The grouping category.</param>
-        public PropertySchemaAttribute(string category) => Category = category ?? throw new ArgumentNullException(nameof(category));
+        public CodeGenPropertyAttribute(string category) => Category = category ?? throw new ArgumentNullException(nameof(category));
 
         /// <summary>
         /// Gets or sets the category.

@@ -8,9 +8,7 @@ namespace Beef.Database.Core
     /// Represents the <see cref="DatabaseExecutor"/> commands.
     /// </summary>
     [Flags]
-#pragma warning disable CA1714 // Flags enums should have plural names; by-design, best name selected.
     public enum DatabaseExecutorCommand
-#pragma warning restore CA1714 
     {
         /// <summary>
         /// Nothing specified.

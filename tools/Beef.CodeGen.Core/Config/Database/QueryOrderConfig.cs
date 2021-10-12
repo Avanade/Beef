@@ -10,9 +10,9 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("QueryOrder", Title = "'QueryOrder' object (database-driven)",
+    [CodeGenClass("QueryOrder", Title = "'QueryOrder' object (database-driven)",
         Description = "The `QueryOrder` object that defines the query order.")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
     public class QueryOrderConfig : ConfigBase<CodeGenConfig, QueryConfig>
     {
         /// <summary>
@@ -27,7 +27,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the column to order by.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Column` to order by.", IsMandatory = true, IsImportant = true,
+        [CodeGenProperty("Key", Title = "The name of the `Column` to order by.", IsMandatory = true, IsImportant = true,
             Description = "See also `Schema` and `Table` as these all relate.")]
         public string? Name { get; set; }
 
@@ -35,7 +35,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the order by table schema.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of order by table schema. See also `Name` and `Column` as these all relate.",
+        [CodeGenProperty("Key", Title = "The name of order by table schema. See also `Name` and `Column` as these all relate.",
             Description = "Defaults to `Query.Schema`.")]
         public string? Schema { get; set; }
 
@@ -43,7 +43,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the order by table.
         /// </summary>
         [JsonProperty("table", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the order by table.",
+        [CodeGenProperty("Key", Title = "The name of the order by table.",
             Description = "Defaults to `Table.Name`; i.e. primary table. See also `Schema` and `Column` as these all relate.")]
         public string? Table { get; set; }
 
@@ -51,7 +51,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the sort order option.
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
+        [CodeGenProperty("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
             Description = "Defaults to `Ascending`.")]
         public string? Order { get; set; }
 

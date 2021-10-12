@@ -54,7 +54,7 @@ namespace Beef.CodeGen.Config
         /// </summary>
         /// <param name="root">The root <see cref="ConfigBase"/>.</param>
         /// <param name="parent">The parent <see cref="ConfigBase"/>.</param>
-        /// <remarks>Prior to <see cref="Prepare(TRoot, TParent)"/> invocation all properties marked up with <see cref="PropertySchemaAttribute.IsMandatory"/> and/or <see cref="PropertySchemaAttribute.Options"/> will be validated as such.</remarks>
+        /// <remarks>Prior to <see cref="Prepare(TRoot, TParent)"/> invocation all properties marked up with <see cref="CodeGenPropertyAttribute.IsMandatory"/> and/or <see cref="CodeGenPropertyAttribute.Options"/> will be validated as such.</remarks>
         public void Prepare(TRoot root, TParent parent)
         {
             Root = root;
@@ -70,7 +70,7 @@ namespace Beef.CodeGen.Config
         {
             foreach (var pi in GetType().GetProperties())
             {
-                foreach (var psa in pi.GetCustomAttributes(typeof(PropertySchemaAttribute), true).OfType<PropertySchemaAttribute>())
+                foreach (var psa in pi.GetCustomAttributes(typeof(CodeGenPropertyAttribute), true).OfType<CodeGenPropertyAttribute>())
                 {
                     if (psa.IsMandatory && pi.GetValue(this) == null)
                         throw new CodeGenException(this, pi.Name, "Value is mandatory.");
@@ -79,7 +79,7 @@ namespace Beef.CodeGen.Config
                         throw new CodeGenException(this, pi.Name, $"Value '{val}' is invalid; valid values are: {string.Join(", ", psa.Options.Select(x => $"'{x}'"))}.");
                 }
 
-                foreach (var pcsa in pi.GetCustomAttributes(typeof(PropertyCollectionSchemaAttribute), true).OfType<PropertyCollectionSchemaAttribute>())
+                foreach (var pcsa in pi.GetCustomAttributes(typeof(CodeGenPropertyCollectionAttribute), true).OfType<CodeGenPropertyCollectionAttribute>())
                 {
                     if (pcsa.IsMandatory && pi.GetValue(this) == null)
                         throw new CodeGenException(this, pi.Name, "Collection is mandatory.");

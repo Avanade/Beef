@@ -1,4 +1,4 @@
-# 'CodeGeneration' object (entity-driven) - YAML/JSON
+# 'CodeGeneration' object (entity-driven)
 
 The `CodeGeneration` object defines global properties that are used to drive the underlying entity-driven code generation.
 
@@ -18,7 +18,7 @@ entities:
 <br/>
 
 ## Property categories
-The `CodeGeneration` object supports a number of properties that control the generated code output. These properties are separated into a series of logical categories. The properties with a bold name are those that are more typically used (considered more important).
+The `CodeGeneration` object supports a number of properties that control the generated code output. These properties are separated into a series of logical categories.
 
 Category | Description
 -|-
@@ -38,6 +38,8 @@ Category | Description
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
+The properties with a bold name are those that are more typically used (considered more important).
+
 <br/>
 
 ## RefData
@@ -45,12 +47,12 @@ Provides the _Reference Data_ configuration.
 
 Property | Description
 -|-
-**`refDataNamespace`** | The namespace for the Reference Data entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).
-**`refDataCommonNamespace`** | The namespace for the Reference Data common entities (adds as a c# `using` statement). Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).
-**`refDataText`** | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`. This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
+**`refDataNamespace`** | The namespace for the Reference Data entities (adds as a c# `using` statement).<br/><br/>Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).
+**`refDataCommonNamespace`** | The namespace for the Reference Data common entities (adds as a c# `using` statement).<br/><br/>Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).
+**`refDataText`** | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`.<br/><br/>This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 **`refDataWebApiRoute`** | The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.
-`refDataCache` | The cache used for the ReferenceData providers. Valid options are: `ReferenceDataCache`, `ReferenceDataMultiTenantCache`. Defaults to `ReferenceDataCache`. A value of `ReferenceDataCache` specifies a single-tenant cache; otherwise, `ReferenceDataMultiTenantCache` for a multi-tenant cache leverageing the `ExecutionContext.TenantId`.
-`refDataAppendToNamespace` | The Reference Data entity namespace appended to end of the standard `company.appname.Common.Entities.{AppendToNamespace}`. Defaults to `null`; being nothing to append.
+`refDataCache` | The cache used for the ReferenceData providers. Valid options are: `ReferenceDataCache`, `ReferenceDataMultiTenantCache`.<br/><br/>Defaults to `ReferenceDataCache`. A value of `ReferenceDataCache` specifies a single-tenant cache; otherwise, `ReferenceDataMultiTenantCache` for a multi-tenant cache leverageing the `ExecutionContext.TenantId`.
+`refDataAppendToNamespace` | The Reference Data entity namespace appended to end of the standard `company.appname.Common.Entities.{AppendToNamespace}`.<br/><br/>Defaults to `null`; being nothing to append.
 `refDataBusNamespace` | The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.
 
 <br/>
@@ -60,12 +62,12 @@ Provides the _Entity class_ configuration.
 
 Property | Description
 -|-
-`entityUsing` | The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement). Valid options are: `Common`, `Business`, `All`, `None`. Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.
-`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`. Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
-`etagJsonName` | The default JSON name for the `ETag` property. Valid options are: `etag`, `eTag`, `_etag`, `_eTag`, `ETag`, `ETAG`. Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.
-`usingNamespace1` | The additional Namespace using statement to be added to the generated `Entity` code. Typically used where referening a `Type` from a Namespace that is not generated by default.
-`usingNamespace2` | The additional Namespace using statement to be added to the generated `Entity` code. Typically used where referening a `Type` from a Namespace that is not generated by default.
-`usingNamespace3` | The additional Namespace using statement to be added to the generated `Entity` code. Typically used where referening a `Type` from a Namespace that is not generated by default.
+`entityUsing` | The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement). Valid options are: `Common`, `Business`, `All`, `None`.<br/><br/>Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.
+`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`.<br/><br/>Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
+`etagJsonName` | The default JSON name for the `ETag` property. Valid options are: `etag`, `eTag`, `_etag`, `_eTag`, `ETag`, `ETAG`.<br/><br/>Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.
+`usingNamespace1` | The additional Namespace using statement to be added to the generated `Entity` code.<br/><br/>Typically used where referening a `Type` from a Namespace that is not generated by default.
+`usingNamespace2` | The additional Namespace using statement to be added to the generated `Entity` code.<br/><br/>Typically used where referening a `Type` from a Namespace that is not generated by default.
+`usingNamespace3` | The additional Namespace using statement to be added to the generated `Entity` code.<br/><br/>Typically used where referening a `Type` from a Namespace that is not generated by default.
 
 <br/>
 
@@ -74,12 +76,12 @@ Provides the _Events_ configuration.
 
 Property | Description
 -|-
-**`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`. Defaults to `DataSvc`; unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
-**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`. Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
-`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs. The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
-`eventSourceKind` | The URI kind for the event source URIs. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`. Defaults to `None` (being the event source is not updated).
-**`eventSubjectRoot`** | The root for the event Subject name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
-`eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`. Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
+**`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`.<br/><br/>Defaults to `DataSvc`; unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
+**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`.<br/><br/>Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
+`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs.<br/><br/>The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
+`eventSourceKind` | The URI kind for the event source URIs. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`.<br/><br/>Defaults to `None` (being the event source is not updated).
+**`eventSubjectRoot`** | The root for the event Subject name by prepending to all event subject names.<br/><br/>Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).
+`eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`.<br/><br/>Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
 
 <br/>
 
@@ -88,10 +90,10 @@ Provides the _Web API (Controller)_ configuration.
 
 Property | Description
 -|-
-`webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).
+`webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.<br/><br/>This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).
 `appBasedAgentArgs` | Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.
-`webApiAutoLocation` | Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred. This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).
-**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).
+`webApiAutoLocation` | Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.<br/><br/>This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).
+**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller.<br/><br/>This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).
 
 <br/>
 
@@ -100,7 +102,7 @@ Provides the _Manager-layer_ configuration.
 
 Property | Description
 -|-
-`validatorLayer` | The namespace for the Reference Data entities (adds as a c# `using` statement). Valid options are: `Business`, `Common`. Defaults to `Business`. A value of `Business` indicates that the Validators will be defined within the `Business` namespace/assembly; otherwise, defined within the `Common` namespace/assembly.
+`validatorLayer` | The namespace for the Reference Data entities (adds as a c# `using` statement). Valid options are: `Business`, `Common`.<br/><br/>Defaults to `Business`. A value of `Business` indicates that the Validators will be defined within the `Business` namespace/assembly; otherwise, defined within the `Common` namespace/assembly.
 
 <br/>
 
@@ -109,7 +111,7 @@ Provides the generic _Data-layer_ configuration.
 
 Property | Description
 -|-
-`refDataDefaultMapperConverter` | The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined. Valid options are: `ReferenceDataCodeConverter`, `ReferenceDataCodeConverter{T}`, `ReferenceDataCodeConverter<T>`, `ReferenceDataInt32IdConverter`, `ReferenceDataInt32IdConverter{T}`, `ReferenceDataInt32IdConverter<T>`, `ReferenceDataNullableInt32IdConverter`, `ReferenceDataNullableInt32IdConverter{T}`, `ReferenceDataNullableInt32IdConverter<T>`, `ReferenceDataInt64IdConverter`, `ReferenceDataInt64IdConverter{T}`, `ReferenceDataInt64IdConverter<T>`, `ReferenceDataNullableInt64IdConverter`, `ReferenceDataNullableInt64IdConverter{T}`, `ReferenceDataNullableInt64IdConverter<T>`, `ReferenceDataGuidIdConverter`, `ReferenceDataGuidIdConverter{T}`, `ReferenceDataGuidIdConverter<T>`, `ReferenceDataNullableGuidIdConverter`, `ReferenceDataNullableGuidIdConverter{T}`, `ReferenceDataNullableGuidIdConverter<T>`. Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Property.DataConverterIsGeneric` to `true`.
+`refDataDefaultMapperConverter` | The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined. Valid options are: `ReferenceDataCodeConverter`, `ReferenceDataCodeConverter{T}`, `ReferenceDataCodeConverter<T>`, `ReferenceDataInt32IdConverter`, `ReferenceDataInt32IdConverter{T}`, `ReferenceDataInt32IdConverter<T>`, `ReferenceDataNullableInt32IdConverter`, `ReferenceDataNullableInt32IdConverter{T}`, `ReferenceDataNullableInt32IdConverter<T>`, `ReferenceDataInt64IdConverter`, `ReferenceDataInt64IdConverter{T}`, `ReferenceDataInt64IdConverter<T>`, `ReferenceDataNullableInt64IdConverter`, `ReferenceDataNullableInt64IdConverter{T}`, `ReferenceDataNullableInt64IdConverter<T>`, `ReferenceDataGuidIdConverter`, `ReferenceDataGuidIdConverter{T}`, `ReferenceDataGuidIdConverter<T>`, `ReferenceDataNullableGuidIdConverter`, `ReferenceDataNullableGuidIdConverter{T}`, `ReferenceDataNullableGuidIdConverter<T>`.<br/><br/>Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Property.DataConverterIsGeneric` to `true`.
 `dataUsingNamespace` | The additional Namespace using statement to be added to the generated `Data` code.
 
 <br/>
@@ -119,8 +121,8 @@ Provides the _Database Data-layer_ configuration.
 
 Property | Description
 -|-
-**`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`). Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
-**`databaseSchema`** | The default database schema name. Defaults to `dbo`.
+**`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`).<br/><br/>Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
+**`databaseSchema`** | The default database schema name.<br/><br/>Defaults to `dbo`.
 `databaseUsingNamespace` | The additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `Database`.
 
 <br/>
@@ -130,7 +132,7 @@ Provides the _Entity Framewotrk (EF) Data-layer_ configuration.
 
 Property | Description
 -|-
-`entityFrameworkName` | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`. Defaults to `IEfDb`. This can be overridden within the `Entity`(s).
+`entityFrameworkName` | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.<br/><br/>Defaults to `IEfDb`. This can be overridden within the `Entity`(s).
 `entityFrameworkUsingNamespace` | The additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `EntityFramework`.
 
 <br/>
@@ -140,7 +142,7 @@ Provides the _CosmosDB Data-layer_ configuration.
 
 Property | Description
 -|-
-**`cosmosName`** | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `Cosmos`. Defaults to `ICosmosDb`. This can be overridden within the `Entity`(s).
+**`cosmosName`** | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `Cosmos`.<br/><br/>Defaults to `ICosmosDb`. This can be overridden within the `Entity`(s).
 `cosmosUsingNamespace` | additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `Cosmos`.
 
 <br/>
@@ -150,7 +152,7 @@ Provides the _OData Data-layer_ configuration.
 
 Property | Description
 -|-
-**`odataName`** | The .NET OData interface name used where `Operation.AutoImplement` is `OData`. Defaults to `IOData`. This can be overridden within the `Entity`(s).
+**`odataName`** | The .NET OData interface name used where `Operation.AutoImplement` is `OData`.<br/><br/>Defaults to `IOData`. This can be overridden within the `Entity`(s).
 `odataUsingNamespace` | additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `OData`.
 
 <br/>
@@ -160,7 +162,7 @@ Provides the _HTTP Agent Data-layer_ configuration.
 
 Property | Description
 -|-
-**`httpAgentName`** | The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`. Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).
+**`httpAgentName`** | The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.<br/><br/>Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).
 
 <br/>
 
@@ -169,7 +171,7 @@ Provides the _gRPC_ configuration.
 
 Property | Description
 -|-
-**`grpc`** | Indicates whether gRPC support (more specifically service-side) is required. gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically.
+**`grpc`** | Indicates whether gRPC support (more specifically service-side) is required.<br/><br/>gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically.
 
 <br/>
 
@@ -178,10 +180,10 @@ Provides the _Path (Directory)_ configuration for the generated artefacts.
 
 Property | Description
 -|-
-`pathBase` | The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
-`pathCommon` | The path (directory) for the Database-related artefacts. Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`.
-`pathBusiness` | The path (directory) for the Business-related (.NET) artefacts. Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`pathApi` | The path (directory) for the API-related (.NET) artefacts. Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
+`pathBase` | The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden.<br/><br/>Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
+`pathCommon` | The path (directory) for the Database-related artefacts.<br/><br/>Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`.
+`pathBusiness` | The path (directory) for the Business-related (.NET) artefacts.<br/><br/>Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.
+`pathApi` | The path (directory) for the API-related (.NET) artefacts.<br/><br/>Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
 
 <br/>
 
@@ -190,10 +192,10 @@ Provides the _.NET Namespace_ configuration for the generated artefacts.
 
 Property | Description
 -|-
-`namespaceBase` | The base Namespace (root) for the .NET artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
-`namespaceCommon` | The Namespace (root) for the Common-related .NET artefacts. Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.
-`namespaceBusiness` | The Namespace (root) for the Business-related .NET artefacts. Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`namespaceApi` | The Namespace (root) for the Api-related .NET artefacts. Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
+`namespaceBase` | The base Namespace (root) for the .NET artefacts.<br/><br/>Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
+`namespaceCommon` | The Namespace (root) for the Common-related .NET artefacts.<br/><br/>Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.
+`namespaceBusiness` | The Namespace (root) for the Business-related .NET artefacts.<br/><br/>Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.
+`namespaceApi` | The Namespace (root) for the Api-related .NET artefacts.<br/><br/>Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
 
 <br/>
 
@@ -202,8 +204,5 @@ Provides related child (hierarchical) configuration.
 
 Property | Description
 -|-
-**`entities`** | The corresponding [`Entity`](Entity-Entity-Config.md) collection. An `Entity` object provides the primary configuration for an entity, its properties and operations.
+**`entities`** | The corresponding [`Entity`](Entity-Entity-Config.md) collection.<br/><br/>An `Entity` object provides the primary configuration for an entity, its properties and operations.
 
-<br/>
-
-<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

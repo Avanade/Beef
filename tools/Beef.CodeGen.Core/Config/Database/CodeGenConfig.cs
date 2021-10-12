@@ -17,18 +17,18 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the global database code-generation configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("CodeGeneration", Title = "'CodeGeneration' object (database-driven)",
+    [CodeGenClass("CodeGeneration", Title = "'CodeGeneration' object (database-driven)",
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
         Markdown = "")]
-    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
-    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
-    [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
-    [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
-    [CategorySchema("Event", Title = "Provides the _Event_ configuration.")]
-    [CategorySchema("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
-    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
-    [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
+    [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
+    [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CodeGenCategory("Event", Title = "Provides the _Event_ configuration.")]
+    [CodeGenCategory("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
+    [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CodeGenCategory("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigRootBase<CodeGenConfig>, ISpecialColumnNames
     {
         #region Key
@@ -37,7 +37,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the `Schema` where the artefacts are defined in the database.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Schema` where the artefacts are defined in, or should be created in, the database.", IsImportant = true,
+        [CodeGenProperty("Key", Title = "The name of the `Schema` where the artefacts are defined in, or should be created in, the database.", IsImportant = true,
             Description = "This is used as the default `Schema` for all child objects.")]
         public string? Schema { get; set; }
 
@@ -49,7 +49,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `IsDeleted` capability.
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `IsDeleted` capability.",
             Description = "Defaults to `IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
@@ -57,7 +57,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `TenantId` capability.
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `TenantId` capability.",
             Description = "Defaults to `TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
@@ -65,7 +65,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `OrgUnitId` capability.
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `OrgUnitId` capability.",
             Description = "Defaults to `OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
@@ -73,7 +73,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `RowVersion` capability.
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `RowVersion` capability.",
             Description = "Defaults to `RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
@@ -81,7 +81,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `CreatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedBy` capability.",
             Description = "Defaults to `CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
@@ -89,7 +89,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `CreatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedDate` capability.",
             Description = "Defaults to `CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
@@ -97,7 +97,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `UpdatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedBy` capability.",
             Description = "Defaults to `UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
@@ -105,7 +105,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `UpdatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedDate` capability.",
             Description = "Defaults to `UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
@@ -113,7 +113,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `DeletedBy` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedBy` capability.",
             Description = "Defaults to `UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
@@ -121,7 +121,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `DeletedDate` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedDate` capability.",
             Description = "Defaults to `UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
@@ -129,7 +129,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.
         /// </summary>
         [JsonProperty("orgUnitJoinSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
+        [CodeGenProperty("Infer", Title = "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
             Description = "Defaults to `[Sec].[fnGetUserOrgUnits]()`.")]
         public string? OrgUnitJoinSql { get; set; }
 
@@ -137,7 +137,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the SQL stored procedure that is to be used for `Permission` verification.
         /// </summary>
         [JsonProperty("checkUserPermissionSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The SQL stored procedure that is to be used for `Permission` verification.",
+        [CodeGenProperty("Infer", Title = "The SQL stored procedure that is to be used for `Permission` verification.",
             Description = "Defaults to `[Sec].[spCheckUserHasPermission]`.")]
         public string? CheckUserPermissionSql { get; set; }
 
@@ -145,7 +145,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the SQL function that is to be used for `Permission` verification.
         /// </summary>
         [JsonProperty("getUserPermissionSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The SQL function that is to be used for `Permission` verification.",
+        [CodeGenProperty("Infer", Title = "The SQL function that is to be used for `Permission` verification.",
             Description = "Defaults to `[Sec].[fnGetUserHasPermission]`.")]
         public string? GetUserPermissionSql { get; set; }
 
@@ -157,7 +157,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the schema name for the `Cdc`-related database artefacts.
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
+        [CodeGenProperty("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
             Description = "Defaults to `XCdc` (literal).")]
         public string? CdcSchema { get; set; }
 
@@ -165,7 +165,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the table name for the `Cdc`-Tracking.
         /// </summary>
         [JsonProperty("cdcAuditTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The table name for the `Cdc`-Tracking.",
+        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-Tracking.",
             Description = "Defaults to `CdcTracking` (literal).")]
         public string? CdcTrackingTableName { get; set; }
 
@@ -173,14 +173,14 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
         /// </summary>
         [JsonProperty("cdcIdentifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.")]
+        [CodeGenProperty("CDC", Title = "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.")]
         public bool? CdcIdentifierMapping { get; set; }
 
         /// <summary>
         /// Gets or sets the table name for the `Cdc`-IdentifierMapping.
         /// </summary>
         [JsonProperty("cdcIdentifierMappingTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
+        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
             Description = "Defaults to `CdcIdentifierMapping` (literal).")]
         public string? CdcIdentifierMappingTableName { get; set; }
 
@@ -188,7 +188,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the stored procedure name for the `Cdc`-IdentifierMapping.
         /// </summary>
         [JsonProperty("cdcIdentifierMappingStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
+        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
             Description = "Defaults to `spCreateCdcIdentifierMapping` (literal).")]
         public string? CdcIdentifierMappingStoredProcedureName { get; set; }
 
@@ -196,14 +196,14 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("cdcExcludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
+        [CodeGenPropertyCollection("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
         public List<string>? CdcExcludeColumnsFromETag { get; set; }
 
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
+        [CodeGenProperty("CDC", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
             Description = "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).")]
         public string? JsonSerializer { get; set; }
 
@@ -211,14 +211,14 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether the .NET collection properties should be pluralized.
         /// </summary>
         [JsonProperty("pluralizeCollectionProperties", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether the .NET collection properties should be pluralized.")]
+        [CodeGenProperty("CDC", Title = "Indicates whether the .NET collection properties should be pluralized.")]
         public bool? PluralizeCollectionProperties { get; set; }
 
         /// <summary>
         /// Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.
         /// </summary>
         [JsonProperty("hasBeefDbo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
+        [CodeGenProperty("CDC", Title = "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
             Description = "Defaults to `true`.")]
         public bool? HasBeefDbo { get; set; }
 
@@ -230,7 +230,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the option to automatically rename the SQL Tables and Columns for use in .NET.
         /// </summary>
         [JsonProperty("autoDotNetRename", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
+        [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
 
@@ -238,7 +238,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the entity scope option.
         /// </summary>
         [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
+        [CodeGenProperty("DotNet", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
             Description = "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).")]
         public string? EntityScope { get; set; }
 
@@ -250,7 +250,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The root for the event name by prepending to all event subject names via CDC.",
+        [CodeGenProperty("Event", Title = "The root for the event name by prepending to all event subject names via CDC.",
             Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).", IsImportant = true)]
         public string? EventSubjectRoot { get; set; }
 
@@ -258,7 +258,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default formatting for the Subject when an Event is published.
         /// </summary>
         [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The default formatting for the Subject when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey" },
+        [CodeGenProperty("Event", Title = "The default formatting for the Subject when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey" },
             Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
         public string? EventSubjectFormat { get; set; }
 
@@ -266,7 +266,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The formatting for the Action when an Event is published via CDC.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+        [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published via CDC.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is).")]
         public string? EventActionFormat { get; set; }
 
@@ -274,7 +274,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
         /// </summary>
         [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The URI root for the event source by prepending to all event source URIs for CDC.",
+        [CodeGenProperty("Event", Title = "The URI root for the event source by prepending to all event source URIs for CDC.",
             Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
         public string? EventSourceRoot { get; set; }
 
@@ -282,7 +282,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the URI kind for the event source URIs.
         /// </summary>
         [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The URI kind for the event source URIs for CDC.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+        [CodeGenProperty("Event", Title = "The URI kind for the event source URIs for CDC.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
             Description = "Defaults to `None` (being the event source is not updated).")]
         public string? EventSourceKind { get; set; }
 
@@ -290,7 +290,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default formatting for the Source when an Event is published.
         /// </summary>
         [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Event", Title = "The default formatting for the Source when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+        [CodeGenProperty("Event", Title = "The default formatting for the Source when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
             Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
         public string? EventSourceFormat { get; set; }
 
@@ -302,14 +302,14 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
         /// </summary>
         [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Outbox", Title = "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.")]
+        [CodeGenProperty("Outbox", Title = "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.")]
         public bool? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the table name for the `EventOutbox`.
         /// </summary>
         [JsonProperty("eventOutboxTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Outbox", Title = "The table name for the `EventOutbox`.",
+        [CodeGenProperty("Outbox", Title = "The table name for the `EventOutbox`.",
             Description = "Defaults to `EventOutbox` (literal).")]
         public string? EventOutboxTableName { get; set; }
 
@@ -321,7 +321,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the base path (directory) prefix for the artefacts.
         /// </summary>
         [JsonProperty("pathBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
+        [CodeGenProperty("Path", Title = "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
             Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
         public string? PathBase { get; set; }
 
@@ -329,7 +329,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the path (directory) for the Schema Database-related artefacts.
         /// </summary>
         [JsonProperty("pathDatabaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
+        [CodeGenProperty("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
             Description = "Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`.")]
         public string? PathDatabaseSchema { get; set; }
 
@@ -337,7 +337,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the path (directory) for the Schema Database-related artefacts.
         /// </summary>
         [JsonProperty("pathDatabaseMigrations", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
+        [CodeGenProperty("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
             Description = "Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`.")]
         public string? PathDatabaseMigrations { get; set; }
 
@@ -345,7 +345,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the path (directory) for the Business-related (.NET) artefacts.
         /// </summary>
         [JsonProperty("pathBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
+        [CodeGenProperty("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? PathBusiness { get; set; }
 
@@ -353,7 +353,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the path (directory) for the CDC-related (.NET) artefacts.
         /// </summary>
         [JsonProperty("PathCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
+        [CodeGenProperty("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
         public string? PathCdcPublisher { get; set; }
 
@@ -365,7 +365,7 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
         /// </summary>
         [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
+        [CodeGenProperty("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
             Description = "This is only applicable for stored procedures.")]
         public bool? OrgUnitImmutable { get; set; }
 
@@ -377,7 +377,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the base Namespace (root) for the .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The base Namespace (root) for the .NET artefacts.",
+        [CodeGenProperty("Namespace", Title = "The base Namespace (root) for the .NET artefacts.",
             Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
         public string? NamespaceBase { get; set; }
 
@@ -385,7 +385,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the Namespace (root) for the Common-related .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The Namespace (root) for the Common-related .NET artefacts.",
+        [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Common-related .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.")]
         public string? NamespaceCommon { get; set; }
 
@@ -393,7 +393,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the Namespace (root) for the Business-related .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The Namespace (root) for the Business-related .NET artefacts.",
+        [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Business-related .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? NamespaceBusiness { get; set; }
 
@@ -401,7 +401,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the Namespace (root) for the CDC-related publisher .NET artefacts.
         /// </summary>
         [JsonProperty("NamespaceCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The Namespace (root) for the CDC-related publisher .NET artefacts.",
+        [CodeGenProperty("Namespace", Title = "The Namespace (root) for the CDC-related publisher .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`.")]
         public string? NamespaceCdcPublisher { get; set; }
 
@@ -411,7 +411,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
         [JsonProperty("tables", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Table` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Table` collection.", IsImportant = true,
             Markdown = "A `Table` object provides the relationship to an existing table within the database.")]
         public List<TableConfig>? Tables { get; set; }
 
@@ -419,7 +419,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="QueryConfig"/> collection.
         /// </summary>
         [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Query` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Query` collection.", IsImportant = true,
             Markdown = "A `Query` object provides the primary configuration for a query, including multiple table joins.")]
         public List<QueryConfig>? Queries { get; set; }
 
@@ -427,7 +427,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="CdcConfig"/> collection.
         /// </summary>
         [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
             Markdown = "A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.")]
         public List<CdcConfig>? Cdc { get; set; }
 

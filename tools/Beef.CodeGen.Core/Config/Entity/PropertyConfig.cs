@@ -9,7 +9,7 @@ namespace Beef.CodeGen.Config.Entity
     /// <summary>
     /// Represents the <b>Property</b> code-generation configuration.
     /// </summary>
-    [ClassSchema("Property", Title = "'Property' object (entity-driven)",
+    [CodeGenClass("Property", Title = "'Property' object (entity-driven)",
         Description = "The `Property` object defines an `Entity` property and its charateristics.", 
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
@@ -23,19 +23,19 @@ properties: [
   { name: ChangeLog, type: ChangeLog }
 ]
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
-    [CategorySchema("Property", Title = "Provides additional _Property_ configuration.")]
-    [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
-    [CategorySchema("Serialization", Title = "Provides the _Serialization_ configuration.")]
-    [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
-    [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
-    [CategorySchema("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Database`.")]
-    [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.")]
-    [CategorySchema("Cosmos", Title = "Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Cosmos`.")]
-    [CategorySchema("OData", Title = "Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `OData`.")]
-    [CategorySchema("Annotation", Title = "Provides additional property _Annotation_ configuration.")]
-    [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
-    [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Property", Title = "Provides additional _Property_ configuration.")]
+    [CodeGenCategory("RefData", Title = "Provides the _Reference Data_ configuration.")]
+    [CodeGenCategory("Serialization", Title = "Provides the _Serialization_ configuration.")]
+    [CodeGenCategory("Manager", Title = "Provides the _Manager-layer_ configuration.")]
+    [CodeGenCategory("Data", Title = "Provides the generic _Data-layer_ configuration.")]
+    [CodeGenCategory("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Database`.")]
+    [CodeGenCategory("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.")]
+    [CodeGenCategory("Cosmos", Title = "Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Cosmos`.")]
+    [CodeGenCategory("OData", Title = "Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `OData`.")]
+    [CodeGenCategory("Annotation", Title = "Provides additional property _Annotation_ configuration.")]
+    [CodeGenCategory("WebApi", Title = "Provides the data _Web API_ configuration.")]
+    [CodeGenCategory("gRPC", Title = "Provides the _gRPC_ configuration.")]
     public class PropertyConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
@@ -50,14 +50,14 @@ properties: [
         /// Gets or sets the unique property name.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The unique property name.", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The unique property name.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding text for use in comments.
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The overriding text for use in comments.",
+        [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
             Description = "By default the `Text` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. " +
             "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
         public string? Text { get; set; }
@@ -66,7 +66,7 @@ properties: [
         /// Gets or sets the .NET <see cref="Type"/>.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The .NET `Type`.", IsImportant = true,
+        [CodeGenProperty("Key", Title = "The .NET `Type`.", IsImportant = true,
             Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data " +
             "`using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
         public string? Type { get; set; }
@@ -75,21 +75,21 @@ properties: [
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether the .NET `Type` should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
+        [CodeGenProperty("Key", Title = "Indicates whether the .NET `Type` should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
         /// Indicates whether the property is inherited and therefore should not be output within the generated Entity class.
         /// </summary>
         [JsonProperty("inherited", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether the property is inherited and therefore should not be output within the generated Entity class.")]
+        [CodeGenProperty("Key", Title = "Indicates whether the property is inherited and therefore should not be output within the generated Entity class.")]
         public bool? Inherited { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding private name.
         /// </summary>
         [JsonProperty("privateName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The overriding private name.",
+        [CodeGenProperty("Key", Title = "The overriding private name.",
             Description = "Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.")]
         public string? PrivateName { get; set; }
 
@@ -97,7 +97,7 @@ properties: [
         /// Gets or sets the overriding argument name.
         /// </summary>
         [JsonProperty("argumentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The overriding argument name.",
+        [CodeGenProperty("Key", Title = "The overriding argument name.",
             Description = "Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.")]
         public string? ArgumentName { get; set; }
 
@@ -109,7 +109,7 @@ properties: [
         /// Indicates whether the property is considered part of the unique (primary) key.
         /// </summary>
         [JsonProperty("uniqueKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the property is considered part of the unique (primary) key.", IsImportant = true,
+        [CodeGenProperty("Property", Title = "Indicates whether the property is considered part of the unique (primary) key.", IsImportant = true,
             Description = "This is also used to simplify the parameter specification for an Entity Operation by inferrence.")]
         public bool? UniqueKey { get; set; }
 
@@ -117,7 +117,7 @@ properties: [
         /// Indicates that the property Type is another generated entity / collection and therefore specific capabilities can be assumed (e.g. CopyFrom and Clone).
         /// </summary>
         [JsonProperty("isEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates that the property `Type` is another generated entity / collection and therefore specific capabilities can be assumed (e.g. `CopyFrom` and `Clone`).", IsImportant = true,
+        [CodeGenProperty("Property", Title = "Indicates that the property `Type` is another generated entity / collection and therefore specific capabilities can be assumed (e.g. `CopyFrom` and `Clone`).", IsImportant = true,
             Description = "Will be inferred (default to `true`) where the `Type` is `ChangeLog` or the `Type` is found as another `Entity` within the code-generation configuration file.")]
         public bool? IsEntity { get; set; }
 
@@ -125,14 +125,14 @@ properties: [
         /// Indicates that the value is immutable and therefore cannot be changed once set.
         /// </summary>
         [JsonProperty("immutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates that the value is immutable and therefore cannot be changed once set.")]
+        [CodeGenProperty("Property", Title = "Indicates that the value is immutable and therefore cannot be changed once set.")]
         public bool? Immutable { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DateTime"/> transformation to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonProperty("dateTimeTransform", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The `DateTime` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "DateOnly", "DateTimeLocal", "DateTimeUtc", "DateTimeUnspecified" },
+        [CodeGenProperty("Property", Title = "The `DateTime` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "DateOnly", "DateTimeLocal", "DateTimeUtc", "DateTimeUnspecified" },
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `DateTime`.")]
         public string? DateTimeTransform { get; set; }
 
@@ -140,7 +140,7 @@ properties: [
         /// Gets or sets the <see cref="string"/> trimming of white space characters to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonProperty("stringTrim", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The `string` trimming of white space characters to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "Start", "End", "Both" },
+        [CodeGenProperty("Property", Title = "The `string` trimming of white space characters to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "Start", "End", "Both" },
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringTrim { get; set; }
 
@@ -148,7 +148,7 @@ properties: [
         /// Gets or sets the <see cref="string"/> transformation to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonProperty("stringTransform", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The `string` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "NullToEmpty", "EmptyToNull" },
+        [CodeGenProperty("Property", Title = "The `string` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "NullToEmpty", "EmptyToNull" },
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringTransform { get; set; }
 
@@ -156,14 +156,14 @@ properties: [
         /// Indicates whether an instance of the <see cref="Type"/> is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).
         /// </summary>
         [JsonProperty("autoCreate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether an instance of the `Type` is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).")]
+        [CodeGenProperty("Property", Title = "Indicates whether an instance of the `Type` is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).")]
         public bool? AutoCreate { get; set; }
 
         /// <summary>
         /// Gets or sets the C# code to default the value.
         /// </summary>
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The C# code to default the value.",
+        [CodeGenProperty("Property", Title = "The C# code to default the value.",
             Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
         public string? Default { get; set; }
 
@@ -171,7 +171,7 @@ properties: [
         /// Indicates whether the property is considered part of the Partition Key.
         /// </summary>
         [JsonProperty("partitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the property is considered part of the Partition Key.",
+        [CodeGenProperty("Property", Title = "Indicates whether the property is considered part of the Partition Key.",
             Description = "This will implement `IPartitionKey` for the generated entity.")]
         public bool? PartitionKey { get; set; }
 
@@ -179,14 +179,14 @@ properties: [
         /// Gets or sets the names of the secondary property(s), comma delimited, that are to be notified on a property change.
         /// </summary>
         [JsonProperty("secondaryPropertyChanged", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "The names of the secondary property(s), comma delimited, that are to be notified on a property change.")]
+        [CodeGenProperty("Property", Title = "The names of the secondary property(s), comma delimited, that are to be notified on a property change.")]
         public string? SecondaryPropertyChanged { get; set; }
 
         /// <summary>
         /// Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself.
         /// </summary>
         [JsonProperty("bubblePropertyChanges", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself.",
+        [CodeGenProperty("Property", Title = "Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself.",
             Description = "Note that the `IsEntity` property is also required to enable.")]
         public bool? BubblePropertyChanged { get; set; }
 
@@ -194,14 +194,14 @@ properties: [
         /// Indicates that CleanUp is not to be performed for the property within the Entity.CleanUp method.
         /// </summary>
         [JsonProperty("excludeCleanup", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.")]
+        [CodeGenProperty("Property", Title = "Indicates that `CleanUp` is not to be performed for the property within the `Entity.CleanUp` method.")]
         public bool? ExcludeCleanup { get; set; }
 
         /// <summary>
         /// Indicates whether the property is for internal use only; declared in the Business entities only.
         /// </summary>
         [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
+        [CodeGenProperty("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
             Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.")]
         public bool? InternalOnly { get; set; }
 
@@ -213,7 +213,7 @@ properties: [
         /// Gets or sets the underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).
         /// </summary>
         [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
+        [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
             Description = "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.` or `^`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.")]
         public string? RefDataType { get; set; }
 
@@ -221,7 +221,7 @@ properties: [
         /// Indicates that the Reference Data property is to be a serializable list (ReferenceDataSidList). 
         /// </summary>
         [JsonProperty("refDataList", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`).",
+        [CodeGenProperty("RefData", Title = "Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`).",
             Description = "This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.")]
         public bool? RefDataList { get; set; }
 
@@ -229,7 +229,7 @@ properties: [
         /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overriding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.",
+        [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.",
             Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
         public bool? RefDataText { get; set; }
 
@@ -237,7 +237,7 @@ properties: [
         /// Indicates whether the property should use the underlying Reference Data mapping capabilities. 
         /// </summary>
         [JsonProperty("refDataMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates whether the property should use the underlying Reference Data mapping capabilities.",
+        [CodeGenProperty("RefData", Title = "Indicates whether the property should use the underlying Reference Data mapping capabilities.",
             Description = "Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.")]
         public bool? RefDataMapping { get; set; }
 
@@ -249,7 +249,7 @@ properties: [
         /// Gets or sets the JSON property name.
         /// </summary>
         [JsonProperty("jsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Serialization", Title = "The JSON property name.",
+        [CodeGenProperty("Serialization", Title = "The JSON property name.",
             Description = "Defaults to `ArgumentName` where not specified (i.e. camelCase); however, where the property is `ETag` it will default to the `Config.ETagJsonName`.")]
         public string? JsonName { get; set; }
 
@@ -257,7 +257,7 @@ properties: [
         /// Gets or sets the JSON property name for the corresponding data model.
         /// </summary>
         [JsonProperty("jsonDataModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Serialization", Title = "The JSON property name for the corresponding data model (see `Entity.DataModel`).",
+        [CodeGenProperty("Serialization", Title = "The JSON property name for the corresponding data model (see `Entity.DataModel`).",
             Description = "Defaults to `JsonName` where not specified.")]
         public string? JsonDataModelName { get; set; }
 
@@ -265,7 +265,7 @@ properties: [
         /// Indicates whether the property is not to be serialized.
         /// </summary>
         [JsonProperty("serializationIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Serialization", Title = "Indicates whether the property is not to be serialized.",
+        [CodeGenProperty("Serialization", Title = "Indicates whether the property is not to be serialized.",
             Description = "All properties are serialized by default.")]
         public bool? SerializationIgnore { get; set; }
 
@@ -273,14 +273,14 @@ properties: [
         /// Indicates whether to emit the default value when serializing.
         /// </summary>
         [JsonProperty("serializationEmitDefault", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Serialization", Title = "Indicates whether to emit the default value when serializing.")]
+        [CodeGenProperty("Serialization", Title = "Indicates whether to emit the default value when serializing.")]
         public bool? SerializationEmitDefault { get; set; }
 
         /// <summary>
         /// Gets or sets the override JSON property name where outputting as a data model.
         /// </summary>
         [JsonProperty("dataModelJsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Serialization", Title = "The override JSON property name where outputting as a data model.",
+        [CodeGenProperty("Serialization", Title = "The override JSON property name where outputting as a data model.",
             Description = "Defaults to `JsonName` where not specified.")]
         public string? DataModelJsonName { get; set; }
 
@@ -292,7 +292,7 @@ properties: [
         /// Gets or sets the Identifier Generator Type to generate the identifier on create via Dependency Injection (<see cref="Entities.IIdentifierGenerator"/>).
         /// </summary>
         [JsonProperty("identifierGenerator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
+        [CodeGenProperty("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
             Description = "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored. " +
                 "See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
@@ -306,7 +306,7 @@ properties: [
         /// Gets or sets the data name where `Entity.AutoImplement` is selected.
         /// </summary>
         [JsonProperty("dataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The data name where Entity.AutoImplement is selected.", IsImportant = true,
+        [CodeGenProperty("Data", Title = "The data name where Entity.AutoImplement is selected.", IsImportant = true,
             Description = "Defaults to the property `Name`. Represents the column name for a `Database`, or the correspinding property name for the other options.")]
         public string? DataName { get; set; }
 
@@ -314,7 +314,7 @@ properties: [
         /// Gets or sets the data `Converter` class name where `Entity.AutoImplement` is selected.
         /// </summary>
         [JsonProperty("dataConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The data `Converter` class name where `Entity.AutoImplement` is selected.", IsImportant = true,
+        [CodeGenProperty("Data", Title = "The data `Converter` class name where `Entity.AutoImplement` is selected.", IsImportant = true,
             Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `DataConverterIsGeneric` to `true`.")]
         public string? DataConverter { get; set; }
 
@@ -322,14 +322,14 @@ properties: [
         /// Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.
         /// </summary>
         [JsonProperty("dataConverterIsGeneric", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.")]
+        [CodeGenProperty("Data", Title = "Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.")]
         public bool? DataConverterIsGeneric { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Data / DataMapper generated output. 
         /// </summary>
         [JsonProperty("dataMapperIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates whether the property should be ignored (excluded) from the `Data`-layer / data `Mapper` generated output.",
+        [CodeGenProperty("Data", Title = "Indicates whether the property should be ignored (excluded) from the `Data`-layer / data `Mapper` generated output.",
             Description = "All properties are included by default.")]
         public bool? DataMapperIgnore { get; set; }
 
@@ -337,14 +337,14 @@ properties: [
         /// Indicates whether the `UniqueKey` property value is automatically generated by the data source on `Create`.
         /// </summary>
         [JsonProperty("dataAutoGenerated", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates whether the `UniqueKey` property value is automatically generated by the data source on `Create`.")]
+        [CodeGenProperty("Data", Title = "Indicates whether the `UniqueKey` property value is automatically generated by the data source on `Create`.")]
         public bool? DataAutoGenerated { get; set; }
 
         /// <summary>
         /// Gets or sets the operations types (`ExecutionContext.OperationType`) selection to enable inclusion and exclusion of property mapping.
         /// </summary>
         [JsonProperty("dataOperationTypes", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The operations types (`ExecutionContext.OperationType`) selection to enable inclusion and exclusion of property mapping.",
+        [CodeGenProperty("Data", Title = "The operations types (`ExecutionContext.OperationType`) selection to enable inclusion and exclusion of property mapping.",
             Options = new string[] { "Any", "AnyExceptCreate", "AnyExceptUpdate", "AnyExceptGet", "Get", "Create", "Update", "Delete" },
             Description = "Defaults to `Any`.")]
         public string? DataOperationTypes { get; set; }
@@ -357,7 +357,7 @@ properties: [
         /// Gets or sets the database property `Mapper` class name where `Entity.AutoImplement` is selected.
         /// </summary>
         [JsonProperty("databaseMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The database property `Mapper` class name where `Entity.AutoImplement` is selected.",
+        [CodeGenProperty("Database", Title = "The database property `Mapper` class name where `Entity.AutoImplement` is selected.",
             Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
         public string? DatabaseMapper { get; set; }
 
@@ -365,14 +365,14 @@ properties: [
         /// Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.
         /// </summary>
         [JsonProperty("databaseIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.")]
+        [CodeGenProperty("Database", Title = "Indicates whether the property should be ignored (excluded) from the database `Mapper` generated output.")]
         public bool? DatabaseIgnore { get; set; }
 
         /// <summary>
         /// Gets or sets the database DbType override (versus inferring from the corresponding .NET Type).
         /// </summary>
         [JsonProperty("databaseDbType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The database `DbType` override (versus inferring from the corresponding .NET Type).", IsImportant = true,
+        [CodeGenProperty("Database", Title = "The database `DbType` override (versus inferring from the corresponding .NET Type).", IsImportant = true,
             Description = "Overrides the inferred database type; i.e. can specify `Date` or `DateTime2`, for .NET Type `System.DateTime`.")]
         public string? DatabaseDbType { get; set; }
 
@@ -384,7 +384,7 @@ properties: [
         /// The Entity Framework `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+        [CodeGenProperty("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
             Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
         public string? EntityFrameworkMapper { get; set; }
 
@@ -396,7 +396,7 @@ properties: [
         /// The Cosmos `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("cosmosMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+        [CodeGenProperty("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
             Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
         public string? CosmosMapper { get; set; }
 
@@ -408,7 +408,7 @@ properties: [
         /// The OData `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("odataMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The OData `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+        [CodeGenProperty("OData", Title = "The OData `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
             Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
         public string? ODataMapper { get; set; }
 
@@ -420,7 +420,7 @@ properties: [
         /// Gets or sets the display name used in the likes of error messages for the property.
         /// </summary>
         [JsonProperty("displayName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Annotation", Title = "The display name used in the likes of error messages for the property.",
+        [CodeGenProperty("Annotation", Title = "The display name used in the likes of error messages for the property.",
             Description = "Defaults to the `Name` as sentence case.")]
         public string? DisplayName { get; set; }
 
@@ -428,21 +428,21 @@ properties: [
         /// Gets or sets the property annotation (e.g. attribute) declaration code.
         /// </summary>
         [JsonProperty("annotation1", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
+        [CodeGenProperty("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
         public string? Annotation1 { get; set; }
 
         /// <summary>
         /// Gets or sets the property annotation (e.g. attribute) declaration code.
         /// </summary>
         [JsonProperty("annotation2", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
+        [CodeGenProperty("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
         public string? Annotation2 { get; set; }
 
         /// <summary>
         /// Gets or sets the property annotation (e.g. attribute) declaration code.
         /// </summary>
         [JsonProperty("annotation3", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
+        [CodeGenProperty("Annotation", Title = "The property annotation (e.g. attribute) declaration code.")]
         public string? Annotation3 { get; set; }
 
         #endregion
@@ -453,7 +453,7 @@ properties: [
         /// Gets or sets the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.
         /// </summary>
         [JsonProperty("webApiQueryStringConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
+        [CodeGenProperty("WebApi", Title = "The `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
         public string? WebApiQueryStringConverter { get; set; }
 
         #endregion
@@ -464,14 +464,14 @@ properties: [
         /// Gets or sets the unique (immutable) field number required to enable gRPC support.
         /// </summary>
         [JsonProperty("grpcFieldNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("gRPC", Title = "The unique (immutable) field number required to enable gRPC support.", IsImportant = true)]
+        [CodeGenProperty("gRPC", Title = "The unique (immutable) field number required to enable gRPC support.", IsImportant = true)]
         public int? GrpcFieldNo { get; set; }
 
         /// <summary>
         /// Gets or sets the underlying gRPC data type.
         /// </summary>
         [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("gRPC", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        [CodeGenProperty("gRPC", Title = "The underlying gRPC data type; will be inferred where not specified.")]
         public string? GrpcType { get; set; }
 
         #endregion

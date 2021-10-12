@@ -10,7 +10,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("StoredProcedure", Title = "'StoredProcedure' object (database-driven)",
+    [CodeGenClass("StoredProcedure", Title = "'StoredProcedure' object (database-driven)",
         Description = "The code generation for an `StoredProcedure` is primarily driven by the `Type` property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting `Upsert`, `Merge` and ad-hoc queries as required.",
         Markdown = @"The valid `Type` values are as follows:
 
@@ -43,12 +43,12 @@ tables:
     ]
   }
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
-    [CategorySchema("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
-    [CategorySchema("Additional", Title = "Provides _additional ad-hoc_ configuration.")]
-    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
-    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
+    [CodeGenCategory("Additional", Title = "Provides _additional ad-hoc_ configuration.")]
+    [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class StoredProcedureConfig : ConfigBase<CodeGenConfig, TableConfig>
     {
         /// <summary>
@@ -63,7 +63,7 @@ tables:
         /// Gets or sets the name of the `StoredProcedure`.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc.", IsMandatory = true, IsImportant = true,
+        [CodeGenProperty("Key", Title = "The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc.", IsMandatory = true, IsImportant = true,
             Description = "See `StoredProcedureName` for the actual name used in the database.")]
         public string? Name { get; set; }
 
@@ -71,7 +71,7 @@ tables:
         /// Gets or sets the stored procedure operation type.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The stored procedure operation type.", IsImportant = true,
+        [CodeGenProperty("Key", Title = "The stored procedure operation type.", IsImportant = true,
             Options = new string[] { "Get", "GetColl", "Create", "Update", "Upsert", "Delete", "Merge" },
             Description = "Defaults to `GetColl`.")]
         public string? Type { get; set; }
@@ -80,7 +80,7 @@ tables:
         /// Indicates whether standardized paging support should be added.
         /// </summary>
         [JsonProperty("paging", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether standardized paging support should be added.", IsImportant = true,
+        [CodeGenProperty("Key", Title = "Indicates whether standardized paging support should be added.", IsImportant = true,
             Description = "This only applies where the stored procedure operation `Type` is `GetColl`.")]
         public bool? Paging { get; set; }
 
@@ -88,7 +88,7 @@ tables:
         /// Gets or sets the `StoredProcedure` name in the database.
         /// </summary>
         [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `StoredProcedure` name in the database.",
+        [CodeGenProperty("Key", Title = "The `StoredProcedure` name in the database.",
             Description = "Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`.")]
         public string? StoredProcedureName { get; set; }
 
@@ -100,7 +100,7 @@ tables:
         /// Gets or sets the SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.
         /// </summary>
         [JsonProperty("reselectStatement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Additional", Title = "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
+        [CodeGenProperty("Additional", Title = "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
             Description = "Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s).")]
         public string? ReselectStatement { get; set; }
 
@@ -108,7 +108,7 @@ tables:
         /// Indicates whether to select into a `#TempTable` to allow other statements access to the selected data. 
         /// </summary>
         [JsonProperty("intoTempTable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Additional", Title = "Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.",
+        [CodeGenProperty("Additional", Title = "Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.",
             Description = "A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.")]
         public bool? IntoTempTable { get; set; }
 
@@ -116,7 +116,7 @@ tables:
         /// Gets or sets the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.
         /// </summary>
         [JsonProperty("withHints", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Additional", Title = "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.")]
+        [CodeGenProperty("Additional", Title = "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.")]
         public string? WithHints { get; set; }
 
         #endregion
@@ -127,7 +127,7 @@ tables:
         /// Gets or sets the column names to be used in the `Merge` statement to determine whether to insert, update or delete.
         /// </summary>
         [JsonProperty("mergeOverrideIdentityColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Merge", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+        [CodeGenPropertyCollection("Merge", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
             Description = "This is used to override the default behaviour of using the primary key column(s).")]
         public List<string>? MergeOverrideIdentityColumns { get; set; }
 
@@ -139,14 +139,14 @@ tables:
         /// Gets or sets the permission (full name being `name.action`) override to be used for security permission checking.
         /// </summary>
         [JsonProperty("permission", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Auth", Title = "The name of the `StoredProcedure` in the database.")]
+        [CodeGenProperty("Auth", Title = "The name of the `StoredProcedure` in the database.")]
         public string? Permission { get; set; }
 
         /// <summary>
         /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
         /// </summary>
         [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
+        [CodeGenProperty("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
             Description = "Defaults to `Table.OrgUnitImmutable`.")]
         public bool? OrgUnitImmutable { get; set; }
 
@@ -158,7 +158,7 @@ tables:
         /// Gets or sets the list of `Column` names to be included in the underlying generated output (further filters `Table.IncludeColumns`).
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -166,7 +166,7 @@ tables:
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output (further filters `Table.ExcludeColumns`).
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
         public List<string>? ExcludeColumns { get; set; }
 
@@ -178,28 +178,28 @@ tables:
         /// Gets or sets the corresponding <see cref="ParameterConfig"/> collection.
         /// </summary>
         [JsonProperty("parameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Parameter` collection.")]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Parameter` collection.")]
         public List<ParameterConfig>? Parameters { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="WhereConfig"/> collection.
         /// </summary>
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.")]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Where` collection.")]
         public List<WhereConfig>? Where { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="OrderByConfig"/> collection.
         /// </summary>
         [JsonProperty("orderby", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `OrderBy` collection.")]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `OrderBy` collection.")]
         public List<OrderByConfig>? OrderBy { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ExecuteConfig"/> collection.
         /// </summary>
         [JsonProperty("execute", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Execute` collection.")]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Execute` collection.")]
         public List<ExecuteConfig>? Execute { get; set; }
 
         #endregion

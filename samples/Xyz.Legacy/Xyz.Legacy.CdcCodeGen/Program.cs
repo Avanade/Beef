@@ -14,7 +14,7 @@ namespace Xyz.Legacy.CdcCodeGen
             // - DatabaseConnectionString - defaults the database connection string; will be overridden by command line arguments '-cs|--connectionString' or environment variable: Xyz_Legacy_ConnectionString
             .Create("Xyz", "Legacy")
             .Supports(entity: false, database: true)
-            .DatabaseScript("DatabaseCdcDacpac.xml")
+            .DatabaseScript("DatabaseCdcDacpac.yaml")
             .DatabaseConnectionString("Data Source=.;Initial Catalog=XyzLegacy;Integrated Security=True")
             .RunAsync(args);
     }

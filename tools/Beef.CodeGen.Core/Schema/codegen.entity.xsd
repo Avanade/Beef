@@ -467,7 +467,7 @@
                       <xs:documentation>The unique operation name.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="OperationType" use="required">
+                  <xs:attribute name="OperationType" use="optional">
                     <xs:annotation>
                       <xs:documentation>The type of operation that is to be code-generated.</xs:documentation>
                     </xs:annotation>

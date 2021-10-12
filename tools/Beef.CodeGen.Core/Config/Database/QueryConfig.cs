@@ -12,7 +12,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents a database query configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Query", Title = "'Query' object (database-driven)",
+    [CodeGenClass("Query", Title = "'Query' object (database-driven)",
         Description = "The `Query` object enables the definition of more complex multi-table queries (`Joins`) that would primarily result in a database _View_. The primary table `Name` for the query is required to be specified. Multiple queries can be specified for the same table(s)."
             + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name)."
             + " Additional `Where` and `Order` configuration can also be added as required.",
@@ -29,12 +29,12 @@ queries:
     ]
   }
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
-    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("View", Title = "Provides the _View_ configuration.")]
-    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
-    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CodeGenCategory("View", Title = "Provides the _View_ configuration.")]
+    [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class QueryConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
         /// <summary>
@@ -49,14 +49,14 @@ queries:
         /// Gets or sets the name of the primary table of the query.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the primary table of the query.", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The name of the primary table of the query.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the schema name of the primary table of the view.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The schema name of the primary table of the view.",
+        [CodeGenProperty("Key", Title = "The schema name of the primary table of the view.",
             Description = "Defaults to `CodeGeneration.dbo`.")]
         public string? Schema { get; set; }
 
@@ -64,7 +64,7 @@ queries:
         /// Gets or sets the `Schema.Table` alias name.
         /// </summary>
         [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `Schema.Table` alias name.",
+        [CodeGenProperty("Key", Title = "The `Schema.Table` alias name.",
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
 
@@ -76,7 +76,7 @@ queries:
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -84,7 +84,7 @@ queries:
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         public List<string>? ExcludeColumns { get; set; }
 
@@ -92,7 +92,7 @@ queries:
         /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
         public List<string>? AliasColumns { get; set; }
 
@@ -104,14 +104,14 @@ queries:
         /// Indicates whether a `View` is to be generated.
         /// </summary>
         [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "Indicates whether a `View` is to be generated.")]
+        [CodeGenProperty("View", Title = "Indicates whether a `View` is to be generated.")]
         public bool? View { get; set; }
 
         /// <summary>
         /// Gets or sets the `View` name.
         /// </summary>
         [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The `View` name.",
+        [CodeGenProperty("View", Title = "The `View` name.",
             Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
         public string? ViewName { get; set; }
 
@@ -119,7 +119,7 @@ queries:
         /// Gets or sets the schema name of the `View`.
         /// </summary>
         [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The schema name for the `View`.",
+        [CodeGenProperty("View", Title = "The schema name for the `View`.",
             Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
 
@@ -131,7 +131,7 @@ queries:
         /// Gets or sets the permission to be used for security permission checking.
         /// </summary>
         [JsonProperty("permission", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Auth", Title = "The permission to be used for security permission checking.", IsImportant = true,
+        [CodeGenProperty("Auth", Title = "The permission to be used for security permission checking.", IsImportant = true,
             Description = "The suffix is optional, and where not specified will default to `.READ`.")]
         public string? Permission { get; set; }
 
@@ -143,7 +143,7 @@ queries:
         /// Gets or sets the column name for the `IsDeleted` capability.
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `IsDeleted` capability.",
             Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
@@ -151,7 +151,7 @@ queries:
         /// Gets or sets the column name for the `TenantId` capability.
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `TenantId` capability.",
             Description = "Defaults to `CodeGeneration.TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
@@ -159,7 +159,7 @@ queries:
         /// Gets or sets the column name for the `OrgUnitId` capability.
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `OrgUnitId` capability.",
             Description = "Defaults to `CodeGeneration.OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
@@ -167,7 +167,7 @@ queries:
         /// Gets or sets the column name for the `RowVersion` capability.
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `RowVersion` capability.",
             Description = "Defaults to `CodeGeneration.RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
@@ -175,7 +175,7 @@ queries:
         /// Gets or sets the column name for the `CreatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedBy` capability.",
             Description = "Defaults to `CodeGeneration.CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
@@ -183,7 +183,7 @@ queries:
         /// Gets or sets the column name for the `CreatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedDate` capability.",
             Description = "Defaults to `CodeGeneration.CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
@@ -191,7 +191,7 @@ queries:
         /// Gets or sets the column name for the `UpdatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
@@ -199,7 +199,7 @@ queries:
         /// Gets or sets the column name for the `UpdatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
@@ -207,7 +207,7 @@ queries:
         /// Gets or sets the column name for the `DeletedBy` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
@@ -215,7 +215,7 @@ queries:
         /// Gets or sets the column name for the `DeletedDate` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
@@ -227,7 +227,7 @@ queries:
         /// Gets or sets the corresponding <see cref="QueryJoinConfig"/> collection.
         /// </summary>
         [JsonProperty("joins", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
             Markdown = "A `Join` object provides the configuration for a joining table.")]
         public List<QueryJoinConfig>? Joins { get; set; }
 
@@ -235,7 +235,7 @@ queries:
         /// Gets or sets the corresponding <see cref="QueryOrderConfig"/> collection.
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Order` collection.",
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Order` collection.",
             Markdown = "An `Order` object defines the order (sequence).")]
         public List<QueryOrderConfig>? Order { get; set; }
 
@@ -243,7 +243,7 @@ queries:
         /// Gets or sets the corresponding <see cref="WhereConfig"/> collection.
         /// </summary>
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.",
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Where` collection.",
             Markdown = "A `Where` object defines the selection/filtering.")]
         public List<QueryWhereConfig>? Where { get; set; }
 

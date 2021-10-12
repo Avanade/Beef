@@ -19,9 +19,9 @@ namespace Beef.Database.Core
     {
         private readonly List<Assembly> _assemblies = new List<Assembly>();
         private readonly List<string> _schemaOrder = new List<string>();
-        private string _exeDir;
+        private readonly string _exeDir;
         private string _outDir;
-        private string _script = "Database.xml";
+        private string _script = "Database.yaml";
         private DatabaseExecutorCommand _supports = DatabaseExecutorCommand.All;
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Sets (overrides) the execution script file or embedded resource name (defaults to <c>Database.Xml</c>).
+        /// Sets (overrides) the execution script file or embedded resource name (defaults to <c>Database.Yaml</c>).
         /// </summary>
         /// <param name="script">The execution script file or embedded resource name.</param>
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>

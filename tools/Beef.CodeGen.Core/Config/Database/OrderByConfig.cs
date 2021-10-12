@@ -9,7 +9,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("OrderBy", Title = "'OrderBy' object (database-driven)", 
+    [CodeGenClass("OrderBy", Title = "'OrderBy' object (database-driven)", 
         Description = "The `OrderBy` object defines the query order. Only valid for `StoredProcedure.Type` of `GetAll`.",
         ExampleMarkdown = @"A YAML example is as follows:
 ``` yaml
@@ -33,7 +33,7 @@ tables:
     ]
   }
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
     public class OrderByConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
         /// <summary>
@@ -48,14 +48,14 @@ tables:
         /// Gets or sets the name of the column to order by.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Column` to order by.", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The name of the `Column` to order by.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the sort order option.
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
+        [CodeGenProperty("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
             Description = "Defaults to `Ascending`.")]
         public string? Order { get; set; }
 

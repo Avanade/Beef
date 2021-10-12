@@ -5,19 +5,19 @@ using System;
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents the class schema configuration.
+    /// Represents the <i>code-generation</i> class configuration.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class ClassSchemaAttribute : Attribute
+    public sealed class CodeGenClassAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassSchemaAttribute"/> class.
+        /// Initializes a new instance of the <see cref="CodeGenClassAttribute"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
-        public ClassSchemaAttribute(string name) => Name = name ?? throw new ArgumentNullException(nameof(name));
+        /// <param name="name">The class name.</param>
+        public CodeGenClassAttribute(string name) => Name = name ?? throw new ArgumentNullException(nameof(name));
 
         /// <summary>
-        /// Gets the name.
+        /// Gets the class name.
         /// </summary>
         public string Name { get; }
 

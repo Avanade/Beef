@@ -6,7 +6,7 @@ using System.IO;
 namespace Beef.CodeGen.Abstractions.Test
 {
     [TestFixture]
-    public class MarkdownSchemaGeneratorTest
+    public class MarkdownDocumentationGeneratorTest
     {
         [Test]
         public void Generate()
@@ -15,7 +15,7 @@ namespace Beef.CodeGen.Abstractions.Test
                 Directory.Delete("MSG", true);
 
             Directory.CreateDirectory("MSG");
-            MarkdownSchemaGenerator.Generate<EntityConfig>(directory: "MSG", addBreaksBetweenSections: true);
+            MarkdownDocumentationGenerator.Generate<EntityConfig>(directory: "MSG", addBreaksBetweenSections: true);
 
             var fn = Path.Combine("MSG", "Entity.md");
             Assert.IsTrue(File.Exists(fn));

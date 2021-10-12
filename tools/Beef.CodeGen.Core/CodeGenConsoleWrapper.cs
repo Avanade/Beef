@@ -14,10 +14,10 @@ namespace Beef.CodeGen
     /// </summary>
     public class CodeGenConsoleWrapper
     {
-        private string _entityScript = "EntityWebApiCoreAgent.xml";
-        private string _refDataScript = "RefDataCoreCrud.xml";
-        private string _dataModelScript = "DataModelOnly.xml";
-        private string _databaseScript = "Database.xml";
+        private string _entityScript = "EntityWebApiCoreAgent.yaml";
+        private string _refDataScript = "RefDataCoreCrud.yaml";
+        private string _dataModelScript = "DataModelOnly.yaml";
+        private string _databaseScript = "Database.yaml";
         private readonly string _exeDir;
 
         /// <summary>

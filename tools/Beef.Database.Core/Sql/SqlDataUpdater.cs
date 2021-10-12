@@ -2,7 +2,7 @@
 
 using Beef.CodeGen;
 using Beef.CodeGen.Database;
-using Beef.CodeGen.Generators;
+using Beef.CodeGen.Utility;
 using Beef.Data.Database;
 using HandlebarsDotNet;
 using Newtonsoft.Json.Linq;
@@ -319,12 +319,11 @@ namespace Beef.Database.Core.Sql
 
             using var st = typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.hbs");
             using var tr = new StreamReader(st!);
-            HandlebarsHelpers.RegisterHelpers();
-            var hb = Handlebars.Compile(tr.ReadToEnd());
 
+            var cg = new HandlebarsCodeGenerator(tr);
             foreach (var t in Tables)
             {
-                codeGen(new CodeGeneratorEventArgs { Content = hb.Invoke(t), OutputFileName = $"{t.Schema}.{t.Name} SQL" });
+                codeGen(new CodeGeneratorEventArgs { Content = cg.Generate(t), OutputFileName = $"{t.Schema}.{t.Name} SQL" });
             }
 
             return Task.CompletedTask;

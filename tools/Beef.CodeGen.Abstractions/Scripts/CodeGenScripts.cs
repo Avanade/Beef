@@ -12,9 +12,9 @@ namespace Beef.CodeGen.Scripts
     /// Represents the <see cref="CodeGenScript"/> collection.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Script", Title = "'Script' object.", Description = "The `Script` object scripts the code-generation execution.")]
-    [CategorySchema("Key", Title = "Provides the _Key_ configuration.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenClass("Script", Title = "'Script' object.", Description = "The `Script` object scripts the code-generation execution.")]
+    [CodeGenCategory("Key", Title = "Provides the _Key_ configuration.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenScripts : ConfigRootBase<CodeGenScripts>
     {
         private Type? _configType;
@@ -24,28 +24,28 @@ namespace Beef.CodeGen.Scripts
         /// Gets or sets the .NET <see cref="ConfigRootBase{TRoot}"/> Type for the underlying <see cref="Generators"/>.
         /// </summary>
         [JsonProperty("configType")]
-        [PropertySchema("Key", Title = "The .NET ConfigRootBase Type for the underlying 'Generators'.", IsMandatory = true)]
+        [CodeGenProperty("Key", Title = "The .NET ConfigRootBase Type for the underlying 'Generators'.", IsMandatory = true)]
         public string? ConfigType { get; set; }
 
         /// <summary>
         /// Gets or sets the list of additional script resource names to inherit.
         /// </summary>
         [JsonProperty("inherits")]
-        [PropertyCollectionSchema("Key", Title = "The list of additional script resource names to inherit.")]
+        [CodeGenPropertyCollection("Key", Title = "The list of additional script resource names to inherit.")]
         public List<string>? Inherits { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IConfigEditor"/> <see cref="Type"/>.
         /// </summary>
         [JsonProperty("editorType")]
-        [PropertyCollectionSchema("Key", Title = "The .NET IConfigEditor Type for performing extended custom configuration prior to generation.")]
+        [CodeGenPropertyCollection("Key", Title = "The .NET IConfigEditor Type for performing extended custom configuration prior to generation.")]
         public string? EditorType { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CodeGenScript"/> collection.
         /// </summary>
         [JsonProperty("generators")]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Generator` collection.")]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Generator` collection.")]
         public List<CodeGenScript>? Generators { get; set; }
 
         /// <summary>

@@ -12,19 +12,19 @@ namespace Beef.CodeGen.Config.Database
     /// Represents a database query configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Cdc", Title = "'Cdc' object (database-driven)",
+    [CodeGenClass("Cdc", Title = "'Cdc' object (database-driven)",
         Description = "The `Cdc` object enables the definition of the primary table, one-or-more child tables and their relationships, to enable Change Data Capture (CDC) event publishing."
             + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required.",
         ExampleMarkdown = @"A YAML configuration example is as follows:
 ``` yaml
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
-    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
-    [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
-    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
-    [CategorySchema("IdentifierMapping", Title = "Provides the _identifier mapping_ configuration.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CodeGenCategory("Database", Title = "Provides the _database_ configuration.")]
+    [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("IdentifierMapping", Title = "Provides the _identifier mapping_ configuration.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumns
     {
         /// <summary>
@@ -39,14 +39,14 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the primary table.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the primary table.", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The name of the primary table.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the default schema name used where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The default schema name used where not otherwise explicitly specified.",
+        [CodeGenProperty("Key", Title = "The default schema name used where not otherwise explicitly specified.",
             Description = "Defaults to `CodeGeneration.Schema`.")]
         public string? Schema { get; set; }
 
@@ -54,7 +54,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the `Schema.Table` alias name.
         /// </summary>
         [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `Schema.Table` alias name.",
+        [CodeGenProperty("Key", Title = "The `Schema.Table` alias name.",
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
 
@@ -66,7 +66,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -74,7 +74,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         public List<string>? ExcludeColumns { get; set; }
 
@@ -82,7 +82,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
         public List<string>? AliasColumns { get; set; }
 
@@ -94,7 +94,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the `Cdc` execute outbox stored procedure name.
         /// </summary>
         [JsonProperty("executeStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The `CDC` _execute_ outbox stored procedure name.",
+        [CodeGenProperty("Database", Title = "The `CDC` _execute_ outbox stored procedure name.",
             Description = "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.")]
         public string? ExecuteStoredProcedureName { get; set; }
 
@@ -102,7 +102,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the `Cdc` complete outbox stored procedure name.
         /// </summary>
         [JsonProperty("completeStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The `CDC` _complete_ outbox stored procedure name.",
+        [CodeGenProperty("Database", Title = "The `CDC` _complete_ outbox stored procedure name.",
             Description = "Defaults to `spComplete` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spCompleteTableNameCdcOutbox`.")]
         public string? CompleteStoredProcedureName { get; set; }
 
@@ -110,7 +110,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the schema name for the `Cdc`-related database artefacts.
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The schema name for the generated `CDC`-related database artefacts.",
+        [CodeGenProperty("Database", Title = "The schema name for the generated `CDC`-related database artefacts.",
             Description = "Defaults to `CodeGeneration.CdcSchema`.")]
         public string? CdcSchema { get; set; }
 
@@ -118,7 +118,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding `Cdc` Outbox table name.
         /// </summary>
         [JsonProperty("outboxTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The corresponding `CDC` Outbox table name.",
+        [CodeGenProperty("Database", Title = "The corresponding `CDC` Outbox table name.",
             Description = "Defaults to `Name` + `Outbox` (literal).")]
         public string? OutboxTableName { get; set; }
 
@@ -130,7 +130,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the `Cdc` .NET model name.
         /// </summary>
         [JsonProperty("modelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The .NET model name.",
+        [CodeGenProperty("DotNet", Title = "The .NET model name.",
             Description = "Defaults to `Name`.")]
         public string? ModelName { get; set; }
 
@@ -138,7 +138,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the access modifier for the generated CDC `Data` constructor.
         /// </summary>
         [JsonProperty("dataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [CodeGenProperty("DotNet", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataCtor { get; set; }
 
@@ -146,7 +146,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of extended (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.
         /// </summary>
         [JsonProperty("dataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Data", Title = "The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.",
+        [CodeGenPropertyCollection("Data", Title = "The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.",
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred.")]
         public List<string>? DataCtorParams { get; set; }
 
@@ -154,7 +154,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the CDC .NET database interface name.
         /// </summary>
         [JsonProperty("databaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The .NET database interface name.",
+        [CodeGenProperty("DotNet", Title = "The .NET database interface name.",
             Description = "Defaults to `IDatabase`.")]
         public string? DatabaseName { get; set; }
 
@@ -162,7 +162,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The Event Source.",
+        [CodeGenProperty("CDC", Title = "The Event Source.",
             Description = "Defaults to `ModelName` (as lowercase). Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified.")]
         public string? EventSource { get; set; }
 
@@ -170,7 +170,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default formatting for the Source when an Event is published.
         /// </summary>
         [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
+        [CodeGenProperty("DataSvc", Title = "The default formatting for the Source when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
             Description = "Defaults to `CodeGeneration.EventSourceFormat`.")]
         public string? EventSourceFormat { get; set; }
 
@@ -178,7 +178,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The Event Subject.",
+        [CodeGenProperty("DotNet", Title = "The Event Subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
 
@@ -186,7 +186,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the default formatting for the Subject when an Event is published.
         /// </summary>
         [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
+        [CodeGenProperty("DataSvc", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
             Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
         public string? EventSubjectFormat { get; set; }
 
@@ -194,7 +194,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names that should be included (in addition to the primary key) for a logical delete.
         /// </summary>
         [JsonProperty("includeColumnsOnDelete", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
+        [CodeGenPropertyCollection("DotNet", Title = "The list of `Column` names that should be included (in addition to the primary key) for a logical delete.",
            Description = "Where a column is not specified in this list its corresponding .NET property will be automatically cleared by the `CdcDataOrchestrator` as the data is technically considered as non-existing.")]
         public List<string>? IncludeColumnsOnDelete { get; set; }
 
@@ -202,14 +202,14 @@ namespace Beef.CodeGen.Config.Database
         /// The option to exclude the generation of the <c>CdcHostedService</c> (background) class (<c>XxxHostedService.cs</c>).
         /// </summary>
         [JsonProperty("excludeHostedService", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DotNet", Title = "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).", IsImportant = true)]
+        [CodeGenProperty("DotNet", Title = "The option to exclude the generation of the `CdcHostedService` (background) class (`XxxHostedService.cs`).", IsImportant = true)]
         public bool? ExcludeHostedService { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
         /// </summary>
         [JsonProperty("excludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
+        [CodeGenPropertyCollection("DotNet", Title = "The list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).",
             Description = "Defaults to `CodeGeneration.CdcExcludeColumnsFromETag`.")]
         public List<string>? ExcludeColumnsFromETag { get; set; }
 
@@ -221,7 +221,7 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.
         /// </summary>
         [JsonProperty("identifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("IdentifierMapping", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
+        [CodeGenProperty("IdentifierMapping", Title = "Indicates whether to perform Identifier Mapping (mapping to `GlobalId`) for the primary key.", IsImportant = true,
            Description = "This indicates whether to create a new `GlobalId` property on the _entity_ to house the global mapping identifier to be the reference outside of the specific database realm as a replacement to the existing primary key column(s).")]
         public bool? IdentifierMapping { get; set; }
 
@@ -229,7 +229,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.
         /// </summary>
         [JsonProperty("identifierMappingColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("IdentifierMapping", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
+        [CodeGenPropertyCollection("IdentifierMapping", Title = "The list of `Column` with related `Schema`/`Table` values (all split by a `^` lookup character) to enable column one-to-one identifier mapping.", IsImportant = true,
             Description = "Each value is formatted as `Column` + `^` + `Schema` + `^` + `Table` where the schema is optional; e.g. `ContactId^dbo^Contact` or `ContactId^Contact`.")]
         public List<string>? IdentifierMappingColumns { get; set; }
 
@@ -241,7 +241,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the column name for the `IsDeleted` capability.
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `IsDeleted` capability.",
             Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
@@ -253,7 +253,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="CdcJoinConfig"/> collection.
         /// </summary>
         [JsonProperty("joins", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
             Markdown = "A `Join` object provides the configuration for a joining table.")]
         public List<CdcJoinConfig>? Joins { get; set; }
 

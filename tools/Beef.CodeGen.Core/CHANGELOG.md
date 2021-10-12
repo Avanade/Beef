@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.2.13
 - *Enhancement:* Core code-generation capabilities moved into new `Beef.CodeGen.Abstractions` and referenced.
+- *Enhancement:* All code-gen `Script` files converted to YAML; the embedded resources have all been updated and renamed with the `.yaml` file extension accordingly.
 
 ## v4.2.12
 - *Enhancement:* Updated the `EntityData` template to include the new `HttpAgent` data source functionality.

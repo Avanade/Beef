@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.CodeGen.Generators;
+using Beef.CodeGen.Utility;
 using Beef.Data.Database;
 using Beef.Database.Core.Sql;
 using Beef.Diagnostics;
@@ -592,10 +592,7 @@ namespace Beef.Database.Core
             using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream(rn))
             {
                 using var tr = new StreamReader(st!);
-                
-                HandlebarsHelpers.RegisterHelpers();
-                var hb = Handlebars.Compile(tr.ReadToEnd());
-                await File.WriteAllTextAsync(fi.FullName, hb.Invoke(data)).ConfigureAwait(false);
+                await File.WriteAllTextAsync(fi.FullName, new HandlebarsCodeGenerator(tr).Generate(data)).ConfigureAwait(false);
             }
 
             _logger.LogWarning($"Script file created: {fi.FullName}");

@@ -5,16 +5,17 @@ using System;
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents the property schema configuration.
+    /// Represents the <i>code-generation</i> property collection configuration.
     /// </summary>
+    /// <remarks>The property should be either a <c>List&lt;string&gt;</c> or <c>List&lt;T&gt;</c> where <c>T</c> inherits from <see cref="ConfigBase"/>.</remarks>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class PropertyCollectionSchemaAttribute : Attribute
+    public sealed class CodeGenPropertyCollectionAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyCollectionSchemaAttribute"/> class.
+        /// Initializes a new instance of the <see cref="CodeGenPropertyCollectionAttribute"/> class.
         /// </summary>
         /// <param name="category">The grouping category.</param>
-        public PropertyCollectionSchemaAttribute(string category) => Category = category;
+        public CodeGenPropertyCollectionAttribute(string category) => Category = category;
 
         /// <summary>
         /// Gets or sets the category.

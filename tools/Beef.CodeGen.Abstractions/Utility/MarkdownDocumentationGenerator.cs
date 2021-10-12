@@ -11,54 +11,64 @@ using System.Reflection;
 namespace Beef.CodeGen.Utility
 {
     /// <summary>
-    /// Represents a schema <c>Markdown</c> file <see cref="Generate">generator</see>.
+    /// Represents a <c>Markdown</c> documentation file <see cref="Generate">generator</see>.
     /// </summary>
-    public static class MarkdownSchemaGenerator
+    /// <remarks>Uses the <i>code-generation</i> attributes (<see cref="CodeGenClassAttribute"/>, <see cref="CodeGenCategoryAttribute"/>, <see cref="CodeGenPropertyAttribute"/> and <see cref="CodeGenPropertyCollectionAttribute"/>) as the documentation content source.</remarks>
+    public static class MarkdownDocumentationGenerator
     {
+        /// <summary>
+        /// Gets or sets the <see cref="Action{T}"/> invoked on file creation (passed the file name).
+        /// </summary>
+        /// <remarks>This is provided to facilitate the likes of logging.</remarks>
+        public static Action<string>? OnFileCreation { get; set; }
+
         /// <summary>
         /// Generates <c>Markdown</c> for each <see cref="Type"/> (recursively) from the specified root <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The root <see cref="Type"/> to derive the schema from.</typeparam>
-        /// <param name="createFileName">The function to create the file name; defaults to '<c>Xxx.md</c>' where 'Xxx' is the <see cref="ClassSchemaAttribute.Name"/>.</param>
+        /// <param name="createFileName">The function to create the file name; defaults to '<c>Xxx.md</c>' where 'Xxx' is the <see cref="CodeGenClassAttribute.Name"/>.</param>
         /// <param name="directory">The directory in which to create the markdown files; defaults to <see cref="Environment.CurrentDirectory"/>.</param>
-        /// <param name="includeExample">Indicates whether to include the <see cref="ClassSchemaAttribute.Markdown"/> in the file.</param>
+        /// <param name="includeExample">Indicates whether to include the <see cref="CodeGenClassAttribute.Markdown"/> in the file.</param>
         /// <param name="addBreaksBetweenSections">Indicates whether to include additional breaks (<c>&lt;br/&gt;</c>) between sections.</param>
-        /// <param name="propertyData">The action to optionally enable manipulation of the <see cref="MarkdownSchemaGeneratorPropertyData"/> before being written to the file.</param>
-        public static void Generate<T>(Func<ClassSchemaAttribute, string>? createFileName = null, string? directory = null, bool includeExample = true, bool addBreaksBetweenSections = false, Action<MarkdownSchemaGeneratorPropertyData>? propertyData = null) where T : ConfigBase, IRootConfig =>
-            WriteObject(typeof(T), createFileName ?? ((csa) => $"{csa.Name}.md"), directory ?? Environment.CurrentDirectory, includeExample, addBreaksBetweenSections, propertyData);
+        /// <param name="propertyData">The action to optionally enable manipulation of the <see cref="MarkdownDocumentationGeneratorPropertyData"/> before being written to the file.</param>
+        public static void Generate<T>(Func<Type, CodeGenClassAttribute, string>? createFileName = null, string? directory = null, bool includeExample = true, bool addBreaksBetweenSections = false, Action<MarkdownDocumentationGeneratorPropertyData>? propertyData = null) where T : ConfigBase, IRootConfig =>
+            WriteObject(typeof(T), createFileName ?? ((_, csa) => $"{csa.Name}.md"), directory ?? Environment.CurrentDirectory, includeExample, addBreaksBetweenSections, propertyData);
 
         /// <summary>
         /// Writes the markdown for the object.
         /// </summary>
-        private static void WriteObject(Type type, Func<ClassSchemaAttribute, string> createFileName, string directory, bool includeExample, bool addBreaksBetweenSections, Action<MarkdownSchemaGeneratorPropertyData>? propertyData)
+        private static void WriteObject(Type type, Func<Type, CodeGenClassAttribute, string> createFileName, string directory, bool includeExample, bool addBreaksBetweenSections, Action<MarkdownDocumentationGeneratorPropertyData>? propertyData)
         {
             // Where the type does not have ClassSchemaAttribute then continue.
-            var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
+            var csa = type.GetCustomAttribute<CodeGenClassAttribute>();
             if (csa == null)
                 return;
 
             // Get file name and create.
-            var fn = createFileName(csa) ?? throw new InvalidOperationException("The createFileName function must not return a null.");
-            using var tw = File.CreateText(Path.Combine(directory, fn));
+            var fn = createFileName(type, csa) ?? throw new InvalidOperationException("The createFileName function must not return a null.");
+            OnFileCreation?.Invoke(fn);
+            using var tw = File.CreateText(new FileInfo(Path.Combine(directory, fn)).FullName);
 
             // Get all the properties prior to write.
-            var pdlist = new List<MarkdownSchemaGeneratorPropertyData>();
+            var pdlist = new List<MarkdownDocumentationGeneratorPropertyData>();
             foreach (var pi in type.GetProperties())
             {
                 var jpa = pi.GetCustomAttribute<JsonPropertyAttribute>();
                 if (jpa == null)
                     continue;
 
-                var pd = new MarkdownSchemaGeneratorPropertyData
+                var pd = new MarkdownDocumentationGeneratorPropertyData
                 {
+                    Type = type,
+                    Class = csa,
                     Name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name),
                     Property = pi,
-                    Psa = pi.GetCustomAttribute<PropertySchemaAttribute>()
+                    Psa = pi.GetCustomAttribute<CodeGenPropertyAttribute>()
                 };
 
                 if (pd.Psa == null)
                 {
-                    pd.Pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                    pd.Pcsa = pi.GetCustomAttribute<CodeGenPropertyCollectionAttribute>();
                     if (pd.Pcsa == null)
                         throw new InvalidOperationException($"Type '{type.Name}' Property '{pi.Name}' does not have a required PropertySchemaAttribute or PropertyCollectionSchemaAttribute.");
 
@@ -105,7 +115,7 @@ namespace Beef.CodeGen.Utility
                 }
             }
 
-            var cats = type.GetCustomAttributes<CategorySchemaAttribute>();
+            var cats = type.GetCustomAttributes<CodeGenCategoryAttribute>();
 
             if (cats.Count() > 1)
             {
@@ -159,10 +169,10 @@ namespace Beef.CodeGen.Utility
                     else
                     {
                         var pt = JsonSchemaGenerator.GetItemType(p.Property!.PropertyType);
-                        var ptcsa = pt.GetCustomAttribute<ClassSchemaAttribute>()!;
+                        var ptcsa = pt.GetCustomAttribute<CodeGenClassAttribute>()!;
                         if (ptcsa != null)
                         {
-                            var ptfn = createFileName(ptcsa) ?? throw new InvalidOperationException("The createFileName function must not return a null.");
+                            var ptfn = createFileName(pt, ptcsa) ?? throw new InvalidOperationException("The createFileName function must not return a null.");
                             WriteTableItem(tw, p.Name, $"The corresponding [`{ptcsa.Name}`]({ptfn}) collection.", p.Pcsa!.Description, p.Pcsa.Markdown, p.Pcsa.IsMandatory, p.Pcsa.IsImportant);
                         }
                         else if (p.Pcsa != null)
@@ -224,10 +234,10 @@ namespace Beef.CodeGen.Utility
                 tw.Write(" [Mandatory]");
             
             if (description != null)
-                tw.Write($"<br/> {description}");
+                tw.Write($"<br/><br/>{description}");
 
             if (markdown != null)
-                tw.Write($"<br/> {markdown}");
+                tw.Write($"<br/><br/>{markdown}");
 
             tw.WriteLine();
         }
@@ -236,8 +246,18 @@ namespace Beef.CodeGen.Utility
     /// <summary>
     /// Provides the property data used for the markdown schema generation.
     /// </summary>
-    public class MarkdownSchemaGeneratorPropertyData
+    public class MarkdownDocumentationGeneratorPropertyData
     {
+        /// <summary>
+        /// Gets or sets the parent <see cref="Type"/>
+        /// </summary>
+        public Type? Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent <see cref="CodeGenClassAttribute"/>.
+        /// </summary>
+        public CodeGenClassAttribute? Class { get; set; }
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
@@ -254,13 +274,13 @@ namespace Beef.CodeGen.Utility
         public string? Category { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="PropertySchemaAttribute"/>.
+        /// Gets or sets the <see cref="CodeGenPropertyAttribute"/>.
         /// </summary>
-        public PropertySchemaAttribute? Psa { get; set; }
+        public CodeGenPropertyAttribute? Psa { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="PropertyCollectionSchemaAttribute"/>.
+        /// Gets or sets the <see cref="CodeGenPropertyCollectionAttribute"/>.
         /// </summary>
-        public PropertyCollectionSchemaAttribute? Pcsa { get; set; }
+        public CodeGenPropertyCollectionAttribute? Pcsa { get; set; }
     }
 }
