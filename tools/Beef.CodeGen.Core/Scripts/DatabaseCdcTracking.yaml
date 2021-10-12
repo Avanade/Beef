@@ -1,0 +1,3 @@
+﻿configType: Beef.CodeGen.Config.Database.CodeGenConfig, Beef.CodeGen.Core
+generators:
+- { type: 'Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator, Beef.CodeGen.Core', template: 'DbCdcTrackingTableCreate_sql.hb', file: '{{Root.UtcDateTimeStamp}}-create-{{lower CdcSchema}}-{{lower Root.CdcTrackingTableName}}.sql', directory: '{{Root.PathDatabaseMigrations}}', text: 'DatabaseCdcRootCodeGenerator: Database/Migrations' }

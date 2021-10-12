@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -306,9 +306,6 @@ queries:
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 

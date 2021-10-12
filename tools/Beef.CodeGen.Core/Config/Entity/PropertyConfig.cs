@@ -607,9 +607,6 @@ properties: [
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             Type = DefaultWhereNull(Type, () => "string");
             if (Type!.StartsWith("^"))
                 Type = $"RefDataNamespace.{Type[1..]}";
@@ -655,7 +652,7 @@ properties: [
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
-            Nullable = DefaultWhereNull(Nullable, () => !IgnoreNullableTypes.Contains(Type!));
+            Nullable = DefaultWhereNull(Nullable, () => !DotNet.IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : ArgumentName);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
@@ -690,7 +687,7 @@ properties: [
             ODataMapper = DefaultWhereNull(ODataMapper, () => "Map");
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
-            GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
             GrpcConverter = Type switch
             {
                 "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}{(DateTimeTransform == "DateOnly" ? "DateTimeToDateOnly" : "DateTimeToTimestamp")}",

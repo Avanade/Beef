@@ -1,0 +1,4 @@
+﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
+generators:
+- { type: 'Beef.CodeGen.Generators.EntityCodeGenerator, Beef.CodeGen.Core', template: 'Entity_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathCommon}}/Entities/Generated', EntityScope: 'Common', text: 'EntityCodeGenerator: Common/Entities' }
+- { type: 'Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathCommon}}/Entities/Generated', EntityScope: 'Common', text: 'EntityOmitBaseCodeGenerator: Common/Entities' }

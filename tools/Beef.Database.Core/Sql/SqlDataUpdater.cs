@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Database;
 using Beef.CodeGen.Generators;
 using Beef.Data.Database;
 using HandlebarsDotNet;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using YamlDotNet.Serialization;
 
 namespace Beef.Database.Core.Sql
@@ -29,11 +29,11 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Register the database.
         /// </summary>
-        /// <param name="db">The <see cref="DatabaseBase"/>.</param>
-        public static async Task RegisterDatabaseAsync(DatabaseBase db)
+        /// <param name="dbConn">The <see cref="DbConnection"/>.</param>
+        public static async Task RegisterDatabaseAsync(DbConnection dbConn)
         {
             if (DbTables == null)
-                DbTables = await DbTable.LoadTablesAndColumnsAsync(db, false).ConfigureAwait(false);
+                DbTables = await DbTable.LoadTablesAndColumnsAsync(dbConn, false).ConfigureAwait(false);
         }
 
         /// <summary>

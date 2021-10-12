@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -416,9 +415,6 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             Schema = DefaultWhereNull(Schema, () => Root!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)

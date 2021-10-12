@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Enhancement:* Updated for changes to `Beef.CodeGen.Core` and new `Beef.CodeGen.Abstractions`.
+
 ## v4.2.2
 - *Enhancement:* Updated for changes to `Beef.Abstractions` and `Beef.Core`.
 

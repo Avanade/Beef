@@ -64,8 +64,6 @@ consts: [
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
             DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
         }
     }

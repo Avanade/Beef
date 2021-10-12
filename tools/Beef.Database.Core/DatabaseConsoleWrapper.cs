@@ -105,7 +105,7 @@ namespace Beef.Database.Core
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public DatabaseConsoleWrapper Assemblies(params Assembly[] assemblies)
         {
-            _assemblies.AddRange(assemblies);
+            _assemblies.InsertRange(0, assemblies);
             return this;
         }
 

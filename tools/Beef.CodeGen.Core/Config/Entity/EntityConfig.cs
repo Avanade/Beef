@@ -1197,8 +1197,6 @@ entities:
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
             Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);

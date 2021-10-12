@@ -58,16 +58,16 @@ namespace Beef.CodeGen.Scripts
         /// <summary>
         /// Indicates whether the file is only generated once; i.e. only created where it does not already exist.
         /// </summary>
-        [JsonProperty("isGenOnce")]
+        [JsonProperty("genOnce")]
         [PropertySchema("Key", Title = "Indicates whether the file is only generated once; i.e. only created where it does not already exist.")]
         public bool IsGenOnce { get; set; }
 
         /// <summary>
         /// Gets or sets the help text.
         /// </summary>
-        [JsonProperty("helpText")]
-        [PropertySchema("Key", Title = "The additional help text written to the log to enable additional context.")]
-        public string? HelpText { get; set; }
+        [JsonProperty("text")]
+        [PropertySchema("Key", Title = "The additional text written to the log to enable additional context.")]
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets the runtime parameters (as specified via <see cref="ConfigBase.ExtraProperties"/>).

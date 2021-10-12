@@ -18,7 +18,7 @@ namespace Beef.CodeGen
         private string _refDataScript = "RefDataCoreCrud.xml";
         private string _dataModelScript = "DataModelOnly.xml";
         private string _databaseScript = "Database.xml";
-        private string _exeDir;
+        private readonly string _exeDir;
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
@@ -237,6 +237,7 @@ namespace Beef.CodeGen
             var sf = app.Option("-s|--scriptFile", "Override the filename for the script orchestration.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
             var enc = app.Option("-enc|--expectNoChanges", "Expect no changes in the artefact output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
             var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
+            var sim = app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation; i.e. does not update the artefacts.", CommandOptionType.NoValue);
 
             app.OnExecuteAsync(async (_) =>
             {
@@ -269,20 +270,21 @@ namespace Beef.CodeGen
                 }
 
                 var encArg = enc.HasValue() ? " --expectNoChanges" : string.Empty;
+                var simArg = sim.HasValue() ? " --simulation" : string.Empty;
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
                     rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Database, Company, AppName)}\"" + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" 
-                        : (string.IsNullOrEmpty(ConnectionString) ? "" : $" -p \"ConnectionString={ConnectionString}\"")) + encArg)).ConfigureAwait(false);
+                        : (string.IsNullOrEmpty(ConnectionString) ? "" : $" -p \"ConnectionString={ConnectionString}\"")) + encArg + simArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName)}\"" + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.RefData, Company, AppName)}\"" + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg + simArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Entity, Company, AppName)}\"" + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.Entity, Company, AppName)}\"" + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg + simArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.DataModel, Company, AppName)}\"" + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache($"\"{cfn ?? CodeGenFileManager.GetConfigFilename(_exeDir, CommandType.DataModel, Company, AppName)}\"" + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg + simArg)).ConfigureAwait(false);
 
                 return rc;
             });

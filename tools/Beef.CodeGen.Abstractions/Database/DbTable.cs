@@ -37,21 +37,22 @@ namespace Beef.CodeGen.Database
             DbTable? table = null;
 
             // Get all the tables and their columns.
-            await ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTableAndColumns.sql")!, (dr) =>
+            using var sr = StreamLocator.GetResourcesStreamReader("SelectTableAndColumns.sql");
+            await ExecuteSqlStatementAsync(dbConnection, sr!, (dr) =>
             {
-                var dt = new DbTable { Name = dr.GetFieldValue<string>("TABLE_NAME"), Schema = dr.GetFieldValue<string>("TABLE_SCHEMA"), IsAView = dr.GetFieldValue<string>("TABLE_TYPE") == "VIEW" };
+                var dt = new DbTable { Name = dr.GetValue<string>("TABLE_NAME"), Schema = dr.GetValue<string>("TABLE_SCHEMA"), IsAView = dr.GetValue<string>("TABLE_TYPE") == "VIEW" };
                 if (table == null || table.Schema != dt.Schema || table.Name != dt.Name)
                     tables.Add(table = dt);
 
                 var dc = new DbColumn
                 {
-                    Name = dr.GetFieldValue<string>("COLUMN_NAME"),
-                    Type = dr.GetFieldValue<string>("DATA_TYPE"),
-                    IsNullable = dr.GetFieldValue<string>("IS_NULLABLE").ToUpperInvariant() == "YES",
-                    Length = dr.GetFieldValue<int?>("CHARACTER_MAXIMUM_LENGTH"),
-                    Precision = dr.GetFieldValue<int?>("NUMERIC_PRECISION") ?? dr.GetFieldValue<int?>("DATETIME_PRECISION"),
-                    Scale = dr.GetFieldValue<int?>("NUMERIC_SCALE"),
-                    DefaultValue = dr.GetFieldValue<string>("COLUMN_DEFAULT")
+                    Name = dr.GetValue<string>("COLUMN_NAME"),
+                    Type = dr.GetValue<string>("DATA_TYPE"),
+                    IsNullable = dr.GetValue<string>("IS_NULLABLE").ToUpperInvariant() == "YES",
+                    Length = dr.GetValue<int?>("CHARACTER_MAXIMUM_LENGTH"),
+                    Precision = dr.GetValue<int?>("NUMERIC_PRECISION") ?? dr.GetValue<int?>("DATETIME_PRECISION"),
+                    Scale = dr.GetValue<int?>("NUMERIC_SCALE"),
+                    DefaultValue = dr.GetValue<string>("COLUMN_DEFAULT")
                 };
 
                 table.Columns.Add(dc);
@@ -64,15 +65,16 @@ namespace Beef.CodeGen.Database
             }
 
             // Configure all the single column primary and unique constraints.
-            foreach (var pks in ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTablePrimaryKey.sql")!, (dr) =>
+            using var sr2 = StreamLocator.GetResourcesStreamReader("SelectTablePrimaryKey.sql");
+            foreach (var pks in ExecuteSqlStatementAsync(dbConnection, sr2!, (dr) =>
             {
                 return new
                 {
-                    ConstraintName = dr.GetFieldValue<string>("CONSTRAINT_NAME"),
-                    TableSchema = dr.GetFieldValue<string>("TABLE_SCHEMA"),
-                    TableName = dr.GetFieldValue<string>("TABLE_NAME"),
-                    TableColumnName = dr.GetFieldValue<string>("COLUMN_NAME"),
-                    IsPrimaryKey = dr.GetFieldValue<string>("CONSTRAINT_TYPE").StartsWith("PRIMARY", StringComparison.InvariantCultureIgnoreCase),
+                    ConstraintName = dr.GetValue<string>("CONSTRAINT_NAME"),
+                    TableSchema = dr.GetValue<string>("TABLE_SCHEMA"),
+                    TableName = dr.GetValue<string>("TABLE_NAME"),
+                    TableColumnName = dr.GetValue<string>("COLUMN_NAME"),
+                    IsPrimaryKey = dr.GetValue<string>("CONSTRAINT_TYPE").StartsWith("PRIMARY", StringComparison.InvariantCultureIgnoreCase),
                 };
             }).ConfigureAwait(false).GetAwaiter().GetResult().GroupBy(x => x.ConstraintName))
             {
@@ -101,17 +103,18 @@ namespace Beef.CodeGen.Database
             if (!exlcudeSqlServerSpecific)
             {
                 // Configure all the single column foreign keys.
-                foreach (var fks in ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTableForeignKeys.sql")!, (dr) =>
+                using var sr3 = StreamLocator.GetResourcesStreamReader("SelectTableForeignKeys.sql");
+                foreach (var fks in ExecuteSqlStatementAsync(dbConnection, sr3!, (dr) =>
                 {
                     return new
                     {
-                        ConstraintName = dr.GetFieldValue<string>("FK_CONSTRAINT_NAME"),
-                        TableSchema = dr.GetFieldValue<string>("FK_SCHEMA_NAME"),
-                        TableName = dr.GetFieldValue<string>("FK_TABLE_NAME"),
-                        TableColumnName = dr.GetFieldValue<string>("FK_COLUMN_NAME"),
-                        ForeignSchema = dr.GetFieldValue<string>("UQ_SCHEMA_NAME"),
-                        ForeignTable = dr.GetFieldValue<string>("UQ_TABLE_NAME"),
-                        ForiegnColumn = dr.GetFieldValue<string>("UQ_COLUMN_NAME")
+                        ConstraintName = dr.GetValue<string>("FK_CONSTRAINT_NAME"),
+                        TableSchema = dr.GetValue<string>("FK_SCHEMA_NAME"),
+                        TableName = dr.GetValue<string>("FK_TABLE_NAME"),
+                        TableColumnName = dr.GetValue<string>("FK_COLUMN_NAME"),
+                        ForeignSchema = dr.GetValue<string>("UQ_SCHEMA_NAME"),
+                        ForeignTable = dr.GetValue<string>("UQ_TABLE_NAME"),
+                        ForiegnColumn = dr.GetValue<string>("UQ_COLUMN_NAME")
                     };
                 }).ConfigureAwait(false).GetAwaiter().GetResult().GroupBy(x => x.ConstraintName).Where(x => x.Count() == 1))
                 {
@@ -127,26 +130,29 @@ namespace Beef.CodeGen.Database
                     r.c.IsForeignRefData = r.t.IsRefData;
                 }
 
-                await ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTableIdentityColumns.sql")!, (dr) =>
+                using var sr4 = StreamLocator.GetResourcesStreamReader("SelectTableIdentityColumns.sql");
+                await ExecuteSqlStatementAsync(dbConnection, sr4!, (dr) =>
                 {
-                    var t = tables.Single(x => x.Schema == dr.GetFieldValue<string>("TABLE_SCHEMA") && x.Name == dr.GetFieldValue<string>("TABLE_NAME"));
-                    var c = t.Columns.Single(x => x.Name == dr.GetFieldValue<string>("COLUMN_NAME"));
+                    var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
+                    var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     c.IsIdentity = true;
                     c.IdentitySeed = 1;
                     c.IdentityIncrement = 1;
                 }).ConfigureAwait(false);
 
-                await ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTableAlwaysGeneratedColumns.sql")!, (dr) =>
+                using var sr5 = StreamLocator.GetResourcesStreamReader("SelectTableAlwaysGeneratedColumns.sql");
+                await ExecuteSqlStatementAsync(dbConnection, sr5!, (dr) =>
                 {
-                    var t = tables.Single(x => x.Schema == dr.GetFieldValue<string>("TABLE_SCHEMA") && x.Name == dr.GetFieldValue<string>("TABLE_NAME"));
-                    var c = t.Columns.Single(x => x.Name == dr.GetFieldValue<string>("COLUMN_NAME"));
+                    var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
+                    var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     t.Columns.Remove(c);
                 }).ConfigureAwait(false);
 
-                await ExecuteSqlStatementAsync(dbConnection, StreamLocator.GetResourcesStream("SelectTableGeneratedColumns.sql")!, (dr) =>
+                using var sr6 = StreamLocator.GetResourcesStreamReader("SelectTableGeneratedColumns.sql");
+                await ExecuteSqlStatementAsync(dbConnection, sr6!, (dr) =>
                 {
-                    var t = tables.Single(x => x.Schema == dr.GetFieldValue<string>("TABLE_SCHEMA") && x.Name == dr.GetFieldValue<string>("TABLE_NAME"));
-                    var c = t.Columns.Single(x => x.Name == dr.GetFieldValue<string>("COLUMN_NAME"));
+                    var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
+                    var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     c.IsComputed = true;
                 }).ConfigureAwait(false);
             }
@@ -202,9 +208,9 @@ namespace Beef.CodeGen.Database
         /// Executes the SQL statement asynchronously.
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        /// <param name="statement">The SQL statement <see cref="Stream"/> to execute.</param>
+        /// <param name="statement">The SQL statement <see cref="StreamReader"/> to execute.</param>
         /// <param name="action">The <see cref="DbDataReader"/> action.</param>
-        public static async Task ExecuteSqlStatementAsync(DbConnection dbConnection, Stream statement, Action<DbDataReader> action)
+        public static async Task ExecuteSqlStatementAsync(DbConnection dbConnection, StreamReader statement, Action<DbDataReader> action)
         {
             if (dbConnection == null)
                 throw new ArgumentNullException(nameof(dbConnection));
@@ -218,12 +224,10 @@ namespace Beef.CodeGen.Database
 
             var cmd = dbConnection.CreateCommand();
             cmd.CommandType = CommandType.Text;
+            cmd.CommandText = await statement.ReadToEndAsync().ConfigureAwait(false);
 
-            using var sr = new StreamReader(statement);
-            cmd.CommandText = await sr.ReadToEndAsync().ConfigureAwait(false);
-
-            DbDataReader? dr;
-            while ((dr = await cmd.ExecuteReaderAsync().ConfigureAwait(false)) != null)
+            using var dr = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+            while (await dr.ReadAsync().ConfigureAwait(false))
             {
                 action(dr);
             }
@@ -237,31 +241,13 @@ namespace Beef.CodeGen.Database
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="IEnumerable{T}"/> <see cref="Type"/>.</typeparam>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        /// <param name="statement">The SQL statement <see cref="Stream"/> to execute.</param>
+        /// <param name="statement">The SQL statement <see cref="StreamReader"/> to execute.</param>
         /// <param name="func">The <see cref="DbDataReader"/> function that returns a value.</param>
         /// <returns>The resultant collection.</returns>
-        public static async Task<IEnumerable<T>> ExecuteSqlStatementAsync<T>(DbConnection dbConnection, Stream statement, Func<DbDataReader, T> func)
+        public static async Task<IEnumerable<T>> ExecuteSqlStatementAsync<T>(DbConnection dbConnection, StreamReader statement, Func<DbDataReader, T> func)
         {
-            bool autoCloseConnection = dbConnection.State != ConnectionState.Open;
-            if (autoCloseConnection)
-                await dbConnection.OpenAsync().ConfigureAwait(false);
-
-            var cmd = dbConnection.CreateCommand();
-            cmd.CommandType = CommandType.Text;
-
-            using var sr = new StreamReader(statement);
-            cmd.CommandText = await sr.ReadToEndAsync().ConfigureAwait(false);
-
             var list = new List<T>();
-            DbDataReader? dr;
-            while ((dr = await cmd.ExecuteReaderAsync().ConfigureAwait(false)) != null)
-            {
-                list.Add(func(dr));
-            }
-
-            if (autoCloseConnection)
-                await dbConnection.CloseAsync().ConfigureAwait(false);
-
+            await ExecuteSqlStatementAsync(dbConnection, statement, (dr) => list.Add(func(dr)));
             return list;
         }
 

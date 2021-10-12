@@ -5,7 +5,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Represents the statistics from a <see cref="CodeGenerator"/>.
     /// </summary>
-    public class CodeGenStats
+    public class CodeGenStatistics
     {
         /// <summary>
         /// Gets the overall created (new) artefact count.
@@ -36,13 +36,20 @@ namespace Beef.CodeGen
         /// <summary>
         /// Adds other <paramref name="stats"/> to this instance.
         /// </summary>
-        /// <param name="stats">The other <see cref="CodeGenStats"/>.</param>
-        public void Add(CodeGenStats stats)
+        /// <param name="stats">The other <see cref="CodeGenStatistics"/>.</param>
+        public void Add(CodeGenStatistics stats)
         {
             CreatedCount += stats.CreatedCount;
             UpdatedCount += stats.UpdatedCount;
             NotChangedCount += stats.NotChangedCount;
             LinesOfCodeCount += stats.LinesOfCodeCount;
+            if (stats.ElapsedMilliseconds != null)
+            {
+                if (ElapsedMilliseconds == null)
+                    ElapsedMilliseconds = stats.ElapsedMilliseconds;
+                else
+                    ElapsedMilliseconds += stats.ElapsedMilliseconds;
+            }
         }
 
         /// <summary>
@@ -55,6 +62,6 @@ namespace Beef.CodeGen
         /// Provides a summary formatted <see cref="string"/> representation.
         /// </summary>
         /// <returns>A summary formatted <see cref="string"/> representation.</returns>
-        public string ToSummaryString() => $"[{ElapsedMilliseconds.ToString() ?? "-"}ms, Files: Unchanged = {NotChangedCount}, Updated = {UpdatedCount}, Created = {CreatedCount}, TotalLines = {LinesOfCodeCount}]";
+        public string ToSummaryString() => $"[{ElapsedMilliseconds?.ToString() ?? "-"}ms, Files: Unchanged = {NotChangedCount}, Updated = {UpdatedCount}, Created = {CreatedCount}, TotalLines = {LinesOfCodeCount}]";
     }
 }

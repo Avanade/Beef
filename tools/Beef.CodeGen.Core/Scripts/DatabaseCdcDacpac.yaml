@@ -1,0 +1,6 @@
+﻿configType: Beef.CodeGen.Config.Database.CodeGenConfig, Beef.CodeGen.Core
+inherits: [ 'DatabaseCdc.yaml' ]
+generators:
+- { type: 'Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator, Beef.CodeGen.Core', template: 'DbCdcTrackingTableCreate_sql.hb', file: '{{Root.CdcTrackingTableName}}.sql', directory: '{{Root.PathDatabaseSchema}}/{{Root.CdcSchema}}/Tables/Generated', text: 'DatabaseCdcRootCodeGenerator: Database/Schema/Xxx/Tables' }
+- { type: 'Beef.CodeGen.Generators.DatabaseCdcIdentifierMappingCodeGenerator, Beef.CodeGen.Core', template: 'DbCdcIdentifierMappingTableCreate_sql.hb', file: '{{Root.CdcIdentifierMappingTableName}}.sql', directory: '{{Root.PathDatabaseSchema}}/{{Root.CdcSchema}}/Tables/Generated', text: 'DatabaseCdcIdentifierMappingCodeGenerator: Database/Schema/Xxx/Tables' }
+- { type: 'Beef.CodeGen.Generators.DatabaseCdcCodeGenerator, Beef.CodeGen.Core', template: 'DbCdcOutboxTableCreate_sql.hb', file: '{{OutboxTableName}}.sql', directory: '{{Root.PathDatabaseSchema}}/{{CdcSchema}}/Tables/Generated', text: 'DatabaseCdcCodeGenerator: Database/Schema/Xxx/Tables' }

@@ -5,7 +5,7 @@ namespace Beef.Demo.CodeGen.Config
 {
     public class TestConfigEditor : IConfigEditor
     {
-        public void EditConfig(ConfigBase config)
+        public void AfterPrepare(IRootConfig config)
         {
             var cgc = (CodeGenConfig)config;
             foreach (var e in cgc.Entities)

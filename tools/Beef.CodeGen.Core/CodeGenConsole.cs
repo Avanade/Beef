@@ -22,12 +22,12 @@ namespace Beef.CodeGen
     {
         private readonly CommandArgument _configArg;
         private readonly CommandOption _scriptOpt;
-        private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _assembliesOpt;
         private readonly List<Assembly> _assemblies = new List<Assembly>();
         private readonly CommandOption _paramsOpt;
-        private readonly CommandOption _expectNoChange;
+        private readonly CommandOption _expectNoChangeOpt;
+        private readonly CommandOption _simulationOpt;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -59,9 +59,6 @@ namespace Beef.CodeGen
             _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name.", CommandOptionType.SingleValue)
                 .IsRequired();
 
-            _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources).", CommandOptionType.SingleValue)
-                .Accepts(v => v.ExistingDirectory());
-
             _outputOpt = App.Option("-o|--output", "Output path (defaults to current path).", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());
 
@@ -71,7 +68,8 @@ namespace Beef.CodeGen
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
 
-            _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
+            _expectNoChangeOpt = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
+            _simulationOpt = App.Option("--simulation", "Indicates whether the code-generation is a simulation; i.e. does not update the artefacts.", CommandOptionType.NoValue);
 
             _logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
 
@@ -133,10 +131,10 @@ namespace Beef.CodeGen
             var args = new CodeGenExecutorArgs(_logger, _assembliesOpt.HasValue() ? ((AssemblyValidator)_assembliesOpt.Validators.First()).Assemblies : _assemblies, CreateParamDict(_paramsOpt))
             {
                 ConfigFile = new FileInfo(_configArg.Value),
-                ScriptFile = new FileInfo(_scriptOpt.Value()),
-                TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
+                ScriptFile = _scriptOpt.Value(),
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
-                ExpectNoChange = _expectNoChange.HasValue()
+                ExpectNoChange = _expectNoChangeOpt.HasValue(),
+                IsSimulation = _simulationOpt.HasValue()
             };
 
             WriteHeader(args);
@@ -147,19 +145,19 @@ namespace Beef.CodeGen
             var result = await cge.RunAsync().ConfigureAwait(false);
 
             sw.Stop();
-            WriteFooter(_logger, sw, cge);
+            WriteFooter(_logger, cge);
             return result ? 0 : -1;
         }
 
         /// <summary>
         /// Creates a param (name=value) pair dictionary from the command option values.
         /// </summary>
-        public static Dictionary<string, string> CreateParamDict(CommandOption cmdOpt)
+        public static Dictionary<string, string?> CreateParamDict(CommandOption cmdOpt)
         {
             if (cmdOpt == null)
                 throw new ArgumentNullException(nameof(cmdOpt));
 
-            var pd = new Dictionary<string, string>();
+            var pd = new Dictionary<string, string?>();
             foreach (var p in cmdOpt.Values.Where(x => !string.IsNullOrEmpty(x)))
             {
                 string[] parts = CreateKeyValueParts(p!);
@@ -194,14 +192,10 @@ namespace Beef.CodeGen
             if (!paramsOnly)
             {
                 args.Logger.LogInformation($"  Config = {args.ConfigFile?.Name}");
-                if (args.ScriptFile == null)
-                    args.Logger.LogInformation("  Script = (none)");
-                else
-                    args.Logger.LogInformation($"  Script = {(args.ScriptFile.Exists ? args.ScriptFile?.FullName : args.ScriptFile?.Name)}");
-
-                args.Logger.LogInformation($"  Template = {args.TemplatePath?.FullName}");
-                args.Logger.LogInformation($"  Output = {args.OutputPath?.FullName}");
+                args.Logger.LogInformation($"  Script = {args.ScriptFile}");
+                args.Logger.LogInformation($"  OutputPath = {args.OutputPath?.FullName}");
                 args.Logger.LogInformation($"  ExpectNoChange = {args.ExpectNoChange}");
+                args.Logger.LogInformation($"  IsSimulation = {args.IsSimulation}");
             }
 
             args.Logger.LogInformation($"  Params{(args.Parameters.Count == 0 ? " = none" : ":")}");
@@ -242,10 +236,10 @@ namespace Beef.CodeGen
         /// <summary>
         /// Write the footer information.
         /// </summary>
-        public static void WriteFooter(ILogger logger, Stopwatch sw, CodeGenExecutor cge)
+        public static void WriteFooter(ILogger logger, CodeGenExecutor cge)
         {
             logger.LogInformation(string.Empty);
-            logger.LogInformation($"Beef Code-Gen Tool complete [{sw?.ElapsedMilliseconds}ms, Unchanged = {cge.OverallNotChangedCount}, Updated = {cge.OverallUpdatedCount}, Created = {cge.OverallCreatedCount}, TotalLines = {cge.OverallLinesOfCodeCount}].");
+            logger.LogInformation($"Beef Code-Gen Tool complete {cge.Statistics.ToSummaryString()}.");
             logger.LogInformation(string.Empty);
         }
     }

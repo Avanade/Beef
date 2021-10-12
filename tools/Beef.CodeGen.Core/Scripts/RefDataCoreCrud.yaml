@@ -1,0 +1,13 @@
+﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
+inherits: [ 'RefDataCore.yaml' ]
+generators:
+- { type: 'Beef.CodeGen.Generators.EntityIDataCodeGenerator, Beef.CodeGen.Core', template: 'EntityIData_cs.hbs', file: 'I{{Name}}Data.cs', directory: '{{Root.PathBusiness}}/Data/Generated', text: 'IEntityDataCodeGenerator: Business/Data' }
+- { type: 'Beef.CodeGen.Generators.EntityDataCodeGenerator, Beef.CodeGen.Core', template: 'EntityData_cs.hbs', file: '{{Name}}Data.cs', directory: '{{Root.PathBusiness}}/Data/Generated', text: 'EntityDataCodeGenerator: Business/Data' }
+- { type: 'Beef.CodeGen.Generators.EntityIDataSvcCodeGenerator, Beef.CodeGen.Core', template: 'EntityIDataSvc_cs.hbs', file: 'I{{Name}}DataSvc.cs', directory: '{{Root.PathBusiness}}/DataSvc/Generated', text: 'IEntityDataSvcCodeGenerator: Business/DataSvc' }
+- { type: 'Beef.CodeGen.Generators.EntityDataSvcCodeGenerator, Beef.CodeGen.Core', template: 'EntityDataSvc_cs.hbs', file: '{{Name}}DataSvc.cs', directory: '{{Root.PathBusiness}}/DataSvc/Generated', text: 'EntityDataSvcCodeGenerator: Business/DataSvc' }
+- { type: 'Beef.CodeGen.Generators.EntityIManagerCodeGenerator, Beef.CodeGen.Core', template: 'EntityIManager_cs.hbs', file: 'I{{Name}}Manager.cs', directory: '{{Root.PathBusiness}}/Generated', text: 'IEntityManagerCodeGenerator: Business' }
+- { type: 'Beef.CodeGen.Generators.EntityManagerCodeGenerator, Beef.CodeGen.Core', template: 'EntityManager_cs.hbs', file: '{{Name}}Manager.cs', directory: '{{Root.PathBusiness}}/Generated', text: 'EntityManagerCodeGenerator: Business' }
+
+- { type: 'Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiController_cs.hbs', file: '{{Name}}Controller.cs', directory: '{{Root.PathApi}}/Controllers/Generated', EntityScope: 'Common', text: 'EntityWebApiControllerCodeGenerator: Api/Controllers' }
+- { type: 'Beef.CodeGen.Generators.EntityWebApiAgentCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiAgent_cs.hbs', file: '{{Name}}Agent.cs', directory: '{{Root.PathCommon}}/Agents/Generated', EntityScope: 'Common', text: 'EntityWebApiAgentCodeGenerator: Common/Agents' }
+- { type: 'Beef.CodeGen.Generators.EntityWebApiAgentArgsCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiAgentArgs_cs.hbs', file: '{{Root.AppName}}WebApiAgentArgs.cs', directory: '{{Root.PathCommon}}/Agents/Generated', EntityScope: 'Common', text: 'EntityIWebApiAgentArgsCodeGenerator: Common/Agents' }

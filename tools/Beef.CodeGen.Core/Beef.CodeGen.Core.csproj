@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.2.12</Version>
+    <Version>4.2.13</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -39,14 +39,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\DatabaseCdc.xml" />
-    <None Remove="Scripts\DatabaseCdcDacpac.xml" />
-    <None Remove="Scripts\DatabaseCdcIdentifierMapping.xml" />
-    <None Remove="Scripts\DatabaseCdcOutbox.xml" />
-    <None Remove="Scripts\DatabaseCdcTracking.xml" />
-    <None Remove="Scripts\DatabaseEventOutbox.xml" />
-    <None Remove="Scripts\DatabaseWithCdc.xml" />
-    <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
+    <None Remove="Scripts\Database.yaml" />
+    <None Remove="Scripts\DatabaseCdc.yaml" />
+    <None Remove="Scripts\DatabaseCdcDacpac.yaml" />
+    <None Remove="Scripts\DatabaseCdcIdentifierMapping.yaml" />
+    <None Remove="Scripts\DatabaseCdcOutbox.yaml" />
+    <None Remove="Scripts\DatabaseCdcTracking.yaml" />
+    <None Remove="Scripts\DatabaseEventOutbox.yaml" />
+    <None Remove="Scripts\DatabaseWithCdc.yaml" />
+    <None Remove="Scripts\DatabaseWithCdcDacpac.yaml" />
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEntity_cs.hb" />
@@ -119,21 +120,21 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcIdentifierMapping.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseEventOutbox.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
-    <EmbeddedResource Include="Scripts\Database.xml" />
-    <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
-    <EmbeddedResource Include="Scripts\DataModelOnly.xml" />
-    <EmbeddedResource Include="Scripts\EntityOnly.xml" />
-    <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
-    <EmbeddedResource Include="Scripts\RefDataCore.xml" />
-    <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
+    <EmbeddedResource Include="Scripts\Database.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcIdentifierMapping.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseEventOutbox.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcTracking.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdc.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdc.yaml" />
+    <EmbeddedResource Include="Scripts\EntityBusiness.yaml" />
+    <EmbeddedResource Include="Scripts\DataModelOnly.yaml" />
+    <EmbeddedResource Include="Scripts\EntityOnly.yaml" />
+    <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.yaml" />
+    <EmbeddedResource Include="Scripts\RefDataCore.yaml" />
+    <EmbeddedResource Include="Scripts\RefDataCoreCrud.yaml" />
     <EmbeddedResource Include="Templates\DbCdcHostedExtensions_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcHostedService_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
@@ -200,7 +201,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="2.0.8" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.16" />
   </ItemGroup>
@@ -208,6 +208,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\Beef.CodeGen.Abstractions\Beef.CodeGen.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

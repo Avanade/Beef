@@ -45,9 +45,6 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare() 
-        {
-            CheckOptionsProperties();
-        }
+        protected override void Prepare() { }
     }
 }

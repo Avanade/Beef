@@ -1,5 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<Script ConfigType="Entity">
-  <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathBusiness}}/Data/Model/Generated" IsDataModel="true" HelpText="ModelCodeGenerator: Business/Data/Model" />
-</Script>

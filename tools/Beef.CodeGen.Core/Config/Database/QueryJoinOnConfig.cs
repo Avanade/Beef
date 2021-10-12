@@ -86,9 +86,6 @@ queries:
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 

@@ -255,7 +255,7 @@ namespace Beef.Database.Core
                     if (!await TimeExecutionAsync(async () =>
                     {
                         return await cge.RunAsync().ConfigureAwait(false);
-                    }, true, () => $", Unchanged = { cge.OverallNotChangedCount}, Updated = { cge.OverallUpdatedCount}, Created = { cge.OverallCreatedCount}, TotalLines = { cge.OverallLinesOfCodeCount}").ConfigureAwait(false))
+                    }, true, () => $", Unchanged = { cge.Statistics.NotChangedCount}, Updated = { cge.Statistics.UpdatedCount}, Created = { cge.Statistics.CreatedCount}, TotalLines = { cge.Statistics.LinesOfCodeCount}").ConfigureAwait(false))
                     {
                         return false;
                     }
@@ -534,7 +534,7 @@ namespace Beef.Database.Core
         {
             // Get all the database table schema information.
             _logger.LogInformation($"Querying database for all existing table and column configurations...");
-            await SqlDataUpdater.RegisterDatabaseAsync(_db!).ConfigureAwait(false);
+            await SqlDataUpdater.RegisterDatabaseAsync(_db!.GetConnection()!).ConfigureAwait(false);
 
             // Parse all resources and get ready for the SQL code gen.
             _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{DataNamespace}.*.yaml")))}");

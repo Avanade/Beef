@@ -73,7 +73,7 @@ operations: [
         /// Gets or sets the type of operation that is to be code-generated.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The type of operation that is to be code-generated.", IsMandatory = true, IsImportant = true,
+        [PropertySchema("Key", Title = "The type of operation that is to be code-generated.", IsImportant = true,
             Options = new string[] { "Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom" })]
         public string? Type { get; set; }
 
@@ -789,9 +789,6 @@ operations: [
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Get" => Parent!.EntityName,
@@ -991,7 +988,7 @@ operations: [
             PrepareData();
             PrepareHttpAgent();
 
-            GrpcReturnMapper = SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
+            GrpcReturnMapper = DotNet.SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
             GrpcReturnConverter = BaseReturnType switch
             {
                 "DateTime" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}DateTimeToTimestamp",
@@ -1254,7 +1251,7 @@ operations: [
 
             sb.Append(").ConfigureAwait(false)");
             if (HttpAgentReturnModel == null)
-                sb.Append(";");
+                sb.Append(';');
             else
                 sb.Append(").Value;");
 

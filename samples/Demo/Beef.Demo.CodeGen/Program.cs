@@ -10,7 +10,7 @@ namespace Beef.Demo.CodeGen
             return CodeGenConsoleWrapper
                 .Create("Beef", "Demo")
                 .Supports(entity: true, refData: true, dataModel: true)
-                .EntityScript("TestScript.xml")
+                .EntityScript("TestScript.yaml")
                 .RunAsync(args);
         }
     }

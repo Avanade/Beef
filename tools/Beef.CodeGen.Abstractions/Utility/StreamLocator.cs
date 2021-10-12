@@ -18,24 +18,24 @@ namespace Beef.CodeGen.Utility
         /// </summary>
         /// <param name="fileName">The file name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to specify).</param>
-        /// <returns>The resource <see cref="Stream"/> where found; otherwise, <c>null</c>.</returns>
-        public static Stream? GetResourcesStream(string fileName, params Assembly[]? assemblies) => GetStream(fileName, "Resources", assemblies);
+        /// <returns>The resource <see cref="StreamReader"/> where found; otherwise, <c>null</c>.</returns>
+        public static StreamReader? GetResourcesStreamReader(string fileName, params Assembly[]? assemblies) => GetStreamReader(fileName, "Resources", assemblies);
 
         /// <summary>
         /// Gets the <b>Script</b> content from the file system and then <c>Scripts</c> folder within the <paramref name="assemblies"/> until found.
         /// </summary>
         /// <param name="fileName">The file name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to specify).</param>
-        /// <returns>The resource <see cref="Stream"/> where found; otherwise, <c>null</c>.</returns>
-        public static Stream? GetScriptStream(string fileName, params Assembly[]? assemblies) => GetStream(fileName, "Scripts", assemblies);
+        /// <returns>The resource <see cref="StreamReader"/> where found; otherwise, <c>null</c>.</returns>
+        public static StreamReader? GetScriptStreamReader(string fileName, params Assembly[]? assemblies) => GetStreamReader(fileName, "Scripts", assemblies);
 
         /// <summary>
         /// Gets the <b>Template</b> content from the file system and then <c>Templates</c> folder within the <paramref name="assemblies"/> until found.
         /// </summary>
         /// <param name="fileName">The file name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to specify).</param>
-        /// <returns>The resource <see cref="Stream"/> where found; otherwise, <c>null</c>.</returns>
-        public static Stream? GetTemplateStream(string fileName, params Assembly[]? assemblies) => GetStream(fileName, "Templates", assemblies);
+        /// <returns>The resource <see cref="StreamReader"/> where found; otherwise, <c>null</c>.</returns>
+        public static StreamReader? GetTemplateStreamReader(string fileName, params Assembly[]? assemblies) => GetStreamReader(fileName, "Templates", assemblies);
 
         /// <summary>
         /// Gets the specified content from the file system and then <paramref name="contentType"/> folder within the <paramref name="assemblies"/> until found.
@@ -43,21 +43,21 @@ namespace Beef.CodeGen.Utility
         /// <param name="fileName">The file name.</param>
         /// <param name="contentType">The optional content type name.</param>
         /// <param name="assemblies">The assemblies to use to probe for the assembly resource (in defined sequence); will check this assembly also (no need to specify).</param>
-        /// <returns>The resource <see cref="Stream"/> where found; otherwise, <c>null</c>.</returns>
-        public static Stream? GetStream(string fileName, string? contentType = null, params Assembly[]? assemblies)
+        /// <returns>The resource <see cref="StreamReader"/> where found; otherwise, <c>null</c>.</returns>
+        public static StreamReader? GetStreamReader(string fileName, string? contentType = null, params Assembly[]? assemblies)
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
             var fi = new FileInfo(fileName);
             if (fi.Exists)
-                return fi.OpenRead();
+                return new StreamReader(fi.FullName);
 
             if (!string.IsNullOrEmpty(contentType))
             {
                 fi = new FileInfo(Path.Combine(fi.DirectoryName, contentType, fi.Name));
                 if (fi.Exists)
-                    return fi.OpenRead();
+                    return new StreamReader(fi.FullName);
 
                 foreach (var ass in new List<Assembly>(assemblies) { typeof(StreamLocator).Assembly })
                 {
@@ -66,7 +66,7 @@ namespace Beef.CodeGen.Utility
                     {
                         var ri = ass.GetManifestResourceInfo(rn);
                         if (ri != null)
-                            return ass.GetManifestResourceStream(rn)!;
+                            return new StreamReader(ass.GetManifestResourceStream(rn)!);
                     }
                 }
             }

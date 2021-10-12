@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.13
+- *Enhancement:* Core code-generation capabilities moved into new `Beef.CodeGen.Abstractions` and referenced.
+
 ## v4.2.12
 - *Enhancement:* Updated the `EntityData` template to include the new `HttpAgent` data source functionality.
 - *Enhancement:* Added `CodeGeneration.WebApiRoutePrefix` which will prefix all underlying `Entity` and `Operation` routes.

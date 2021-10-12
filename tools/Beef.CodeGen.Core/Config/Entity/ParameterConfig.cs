@@ -270,9 +270,6 @@ parameters: [
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Property);
             if (Property != null && pc == null)
                 throw new CodeGenException(this, nameof(Property), $"Specified Property '{Property}' not found in Entity.");
@@ -298,7 +295,7 @@ parameters: [
 
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
-            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
+            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !DotNet.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
             IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidator<{Type}>" : null);
@@ -314,7 +311,7 @@ parameters: [
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
 
             GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
-            GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
             GrpcConverter = Type switch
             {
                 "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DateTimeToTimestamp",

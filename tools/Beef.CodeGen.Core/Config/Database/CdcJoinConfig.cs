@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -344,9 +344,6 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 
@@ -489,13 +486,13 @@ namespace Beef.CodeGen.Config.Database
                 IsFirstInJoinHierarchy = isFirst,
                 On = new List<CdcJoinOnConfig>(),
                 DbTable = DbTable,
-                Root = Root,
-                Parent = Parent,
                 IndentIndex = indentIndex,
                 HierarchyParent = hierarchyParent,
                 IdentifierMapping = IdentifierMapping,
                 IdentifierMappingColumns = IdentifierMappingColumns
             };
+
+            j.OverrideRootAndParent(Root!, Parent!);
 
             foreach (var item in On!)
             {
@@ -506,11 +503,10 @@ namespace Beef.CodeGen.Config.Database
                     ToColumn = item.ToColumn,
                     ToColumnAlias = item.ToColumnAlias,
                     ToStatement = item.ToStatement,
-                    ToDbColumn = item.ToDbColumn,
-                    Root = j.Root,
-                    Parent = j
+                    ToDbColumn = item.ToDbColumn
                 };
 
+                jo.OverrideRootAndParent(j.Root!, j);
                 j.On.Add(jo);
             }
 

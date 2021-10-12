@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config.Database;
-using Beef.CodeGen.DbModels;
+using Beef.CodeGen.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +73,7 @@ namespace Beef.Database.Core.Sql
             try
             {
                 str = column.Value is DateTime time ? time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
-                switch (DbColumn.GetDotNetTypeName(col.Type))
+                switch (DbTypeHelper.GetDotNetTypeName(col.Type))
                 {
                     case "string": column.Value = str; break;
                     case "decimal": column.Value = decimal.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;

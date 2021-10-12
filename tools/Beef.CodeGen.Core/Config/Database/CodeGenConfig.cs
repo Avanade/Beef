@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
-using Beef.Data.Database;
+using Beef.CodeGen.Database;
 using Beef.Diagnostics;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -29,7 +29,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
-    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
+    public class CodeGenConfig : ConfigRootBase<CodeGenConfig>, ISpecialColumnNames
     {
         #region Key
 
@@ -407,74 +407,6 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region RuntimeParameters
-
-        /// <summary>
-        /// Gets the parameter overrides.
-        /// </summary>
-        public Dictionary<string, string> RuntimeParameters { get; internal set; } = new Dictionary<string, string>();
-
-        /// <summary>
-        /// Replaces the <see cref="RuntimeParameters"/> with the specified <paramref name="parameters"/> (copies values).
-        /// </summary>
-        /// <param name="parameters">The parameters to copy.</param>
-        public void ReplaceRuntimeParameters(Dictionary<string, string> parameters)
-        {
-            if (parameters == null)
-                return;
-
-            foreach (var p in parameters)
-            {
-                if (RuntimeParameters.ContainsKey(p.Key))
-                    RuntimeParameters[p.Key] = p.Value;
-                else
-                    RuntimeParameters.Add(p.Key, p.Value);
-            }
-        }
-
-        /// <summary>
-        /// Resets the runtime parameters.
-        /// </summary>
-        public void ResetRuntimeParameters() => RuntimeParameters.Clear();
-
-        /// <summary>
-        /// Gets the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="defaultValue">The default value where the property is not found.</param>
-        /// <returns>The value.</returns>
-        public T GetRuntimeParameter<T>(string key, T defaultValue = default!)
-        {
-            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
-                return (T)Convert.ChangeType(val.ToString(), typeof(T));
-            else
-                return defaultValue!;
-        }
-
-        /// <summary>
-        /// Trys to get the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The corresponding value.</param>
-        /// <returns><c>true</c> if the <paramref name="key"/> is found; otherwise, <c>false</c>.</returns>
-        public bool TryGetRuntimeParameter<T>(string key, out T value)
-        {
-            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
-            {
-                value = (T)Convert.ChangeType(val.ToString(), typeof(T));
-                return true;
-            }
-            else
-            {
-                value = default!;
-                return false;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
@@ -510,12 +442,12 @@ namespace Beef.CodeGen.Config.Database
         public List<DbTable>? DbTables { get; private set; }
 
         /// <summary>
-        /// Gets the company name from the <see cref="RuntimeParameters"/>.
+        /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
         public string? Company => GetRuntimeParameter<string?>("Company");
 
         /// <summary>
-        /// Gets the application name from the <see cref="RuntimeParameters"/>.
+        /// Gets the application name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
         public string? AppName => GetRuntimeParameter<string?>("AppName");
 
@@ -524,7 +456,6 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
-            CheckOptionsProperties();
             LoadDbTablesConfig();
 
             Schema = DefaultWhereNull(Schema, () => "dbo");
@@ -607,20 +538,12 @@ namespace Beef.CodeGen.Config.Database
                 throw new CodeGenException($"ConnectionString must be explicitly specified as a RuntimeParameter or using Environment Variable '{evn}'.");
 
             var sw = Stopwatch.StartNew();
-            using var db = new SqlServerDb(cs);
+            using var db = new SqlConnection(cs);
             DbTables = DbTable.LoadTablesAndColumnsAsync(db, false).GetAwaiter().GetResult();
 
             sw.Stop();
             Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
             Logger.Default.Log(LogLevel.Information, string.Empty);
-        }
-
-        /// <summary>
-        /// SQL Server DB.
-        /// </summary>
-        private class SqlServerDb : DatabaseBase
-        {
-            public SqlServerDb(string connectionString) : base(connectionString, Microsoft.Data.SqlClient.SqlClientFactory.Instance) { }
         }
 
         /// <summary>

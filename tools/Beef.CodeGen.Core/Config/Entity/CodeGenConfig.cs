@@ -36,7 +36,7 @@ entities:
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
-    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig
+    public class CodeGenConfig : ConfigRootBase<CodeGenConfig>
     {
         #region RefData
 
@@ -469,74 +469,6 @@ entities:
 
         #endregion
 
-        #region RuntimeParameters
-
-        /// <summary>
-        /// Gets the parameter overrides.
-        /// </summary>
-        public Dictionary<string, string> RuntimeParameters { get; internal set; } = new Dictionary<string, string>();
-
-        /// <summary>
-        /// Replaces the <see cref="RuntimeParameters"/> with the specified <paramref name="parameters"/> (copies values).
-        /// </summary>
-        /// <param name="parameters">The parameters to copy.</param>
-        public void ReplaceRuntimeParameters(Dictionary<string, string> parameters)
-        {
-            if (parameters == null)
-                return;
-
-            foreach (var p in parameters)
-            {
-                if (RuntimeParameters.ContainsKey(p.Key))
-                    RuntimeParameters[p.Key] = p.Value;
-                else
-                    RuntimeParameters.Add(p.Key, p.Value);
-            }
-        }
-
-        /// <summary>
-        /// Resets the runtime parameters.
-        /// </summary>
-        public void ResetRuntimeParameters() => RuntimeParameters.Clear();
-
-        /// <summary>
-        /// Gets the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="defaultValue">The default value where the property is not found.</param>
-        /// <returns>The value.</returns>
-        public T GetRuntimeParameter<T>(string key, T defaultValue = default!)
-        {
-            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
-                return (T)Convert.ChangeType(val.ToString(), typeof(T));
-            else
-                return defaultValue!;
-        }
-
-        /// <summary>
-        /// Trys to get the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The corresponding value.</param>
-        /// <returns><c>true</c> if the <paramref name="key"/> is found; otherwise, <c>false</c>.</returns>
-        public bool TryGetRuntimeParameter<T>(string key, out T value)
-        {
-            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
-            {
-                value = (T)Convert.ChangeType(val.ToString(), typeof(T));
-                return true;
-            }
-            else
-            {
-                value = default!;
-                return false;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Gets or sets the corresponding <see cref="EntityConfig"/> collection.
         /// </summary>
@@ -571,32 +503,32 @@ entities:
         public List<EntityConfig>? GrpcEntities => Entities.Where(x => CompareValue(x.Grpc, true) && CompareNullOrValue(x.Abstract, false)).ToList();
 
         /// <summary>
-        /// Gets the company name from the <see cref="RuntimeParameters"/>.
+        /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
         public string? Company => GetRuntimeParameter<string?>("Company")!;
 
         /// <summary>
-        /// Gets the application name from the <see cref="RuntimeParameters"/>.
+        /// Gets the application name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
         public string? AppName => GetRuntimeParameter<string?>("AppName")!;
 
         /// <summary>
-        /// Gets the API name from the <see cref="RuntimeParameters"/>.
+        /// Gets the API name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
         public string? ApiName => DefaultWhereNull(GetRuntimeParameter<string?>("ApiName"), () => "Api")!;
 
         /// <summary>
-        /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
+        /// Gets the entity scope from the from the <see cref="IRootConfig.RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
         public string RuntimeEntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
 
         /// <summary>
-        /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="RuntimeParameters"/>).
+        /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="IRootConfig.RuntimeParameters"/>).
         /// </summary>
         public bool ModelFromEntity => GetRuntimeParameter<bool>("ModelFromEntity");
 
         /// <summary>
-        /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/> (from the <see cref="RuntimeParameters"/>).
+        /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/> (from the <see cref="IRootConfig.RuntimeParameters"/>).
         /// </summary>
         public bool IsDataModel => GetRuntimeParameter<bool>("IsDataModel");
 
@@ -620,8 +552,6 @@ entities:
         /// </summary>
         protected override void Prepare()
         {
-            CheckOptionsProperties();
-
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
             PathCommon = DefaultWhereNull(PathCommon, () => $"{PathBase}.Common");
             PathBusiness = DefaultWhereNull(PathBusiness, () => $"{PathBase}.Business");

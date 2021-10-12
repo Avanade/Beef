@@ -8,49 +8,43 @@ using YamlDotNet.Serialization;
 namespace Beef.CodeGen.Utility
 {
     /// <summary>
-    /// Provides <see cref="Stream"/> extension methods.
+    /// Provides <see cref="TextReader"/> extension methods.
     /// </summary>
-    public static class StreamExtensions
+    public static class TextReaderExtensions
     {
         /// <summary>
-        /// Create an instance of <typeparamref name="T"/> from the <paramref name="json"/> <see cref="Stream"/>.
+        /// Create an instance of <typeparamref name="T"/> from the <paramref name="json"/> <see cref="TextReader"/>.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="json">The JSON <see cref="Stream"/>.</param>
+        /// <param name="json">The JSON <see cref="TextReader"/>.</param>
         /// <returns>The corresponding value.</returns>
-        public static T? DeserializeJson<T>(this Stream json) where T : class => (T?)DeserializeJson(json, typeof(T));
+        public static T? DeserializeJson<T>(this TextReader json) where T : class => (T?)DeserializeJson(json, typeof(T));
 
         /// <summary>
-        /// Create an instance of <paramref name="type"/> from the <paramref name="json"/> <see cref="Stream"/>.
+        /// Create an instance of <paramref name="type"/> from the <paramref name="json"/> <see cref="TextReader"/>.
         /// </summary>
-        /// <param name="json">The JSON <see cref="Stream"/>.</param>
+        /// <param name="json">The JSON <see cref="TextReader"/>.</param>
         /// <param name="type">The value <see cref="Type"/>.</param>
         /// <returns>The corresponding value.</returns>
-        public static object? DeserializeJson(this Stream json, Type? type)
-        {
-            using var jsr = new StreamReader(json ?? throw new ArgumentNullException(nameof(json)));
-            using var jr = new JsonTextReader(jsr);
-            return JsonSerializer.Create().Deserialize(jr, type);
-        }
+        public static object? DeserializeJson(this TextReader json, Type type) => JsonSerializer.Create().Deserialize(json ?? throw new ArgumentNullException(nameof(json)), type);
 
         /// <summary>
-        /// Create an instance of <typeparamref name="T"/> from the <paramref name="yaml"/> <see cref="Stream"/>.
+        /// Create an instance of <typeparamref name="T"/> from the <paramref name="yaml"/> <see cref="TextReader"/>.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="yaml">The YAML <see cref="Stream"/>.</param>
+        /// <param name="yaml">The YAML <see cref="TextReader"/>.</param>
         /// <returns>The corresponding value.</returns>
-        public static T? DeserializeYaml<T>(this Stream yaml) where T : class => (T?)DeserializeYaml(yaml, typeof(T));
+        public static T? DeserializeYaml<T>(this TextReader yaml) where T : class => (T?)DeserializeYaml(yaml, typeof(T));
 
         /// <summary>
-        /// Create an instance of <paramref name="type"/> from the <paramref name="yaml"/> <see cref="Stream"/>.
+        /// Create an instance of <paramref name="type"/> from the <paramref name="yaml"/> <see cref="TextReader"/>.
         /// </summary>
-        /// <param name="yaml">The YAML <see cref="Stream"/>.</param>
+        /// <param name="yaml">The YAML <see cref="TextReader"/>.</param>
         /// <param name="type">The value <see cref="Type"/>.</param>
         /// <returns>The corresponding value.</returns>
-        public static object? DeserializeYaml(this Stream yaml, Type? type)
+        public static object? DeserializeYaml(this TextReader yaml, Type type)
         {
-            using var ysr = new StreamReader(yaml ?? throw new ArgumentNullException(nameof(yaml)));
-            var yml = new DeserializerBuilder().Build().Deserialize(ysr);
+            var yml = new DeserializerBuilder().Build().Deserialize(yaml);
 
 #pragma warning disable IDE0063 // Use simple 'using' statement; cannot as need to be more explicit with managing the close and dispose.
             using (var ms = new MemoryStream())
@@ -61,7 +55,8 @@ namespace Beef.CodeGen.Utility
                     sw.Flush();
 
                     ms.Position = 0;
-                    return DeserializeJson(ms, type);
+                    using var sr = new StreamReader(ms);
+                    return DeserializeJson(sr, type);
                 }
             }
 #pragma warning restore IDE0063        

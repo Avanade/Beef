@@ -29,15 +29,14 @@ namespace Beef.CodeGen.Utility
         public HandlebarsCodeGenerator(string templateContent) => _template = Handlebars.Compile(templateContent ?? throw new ArgumentNullException(nameof(templateContent)));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HandlebarsCodeGenerator"/> from the <paramref name="stream"/>.
+        /// Initializes a new instance of the <see cref="HandlebarsCodeGenerator"/> from the <paramref name="sr"/>.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> containing the <c>handlebars.js</c> contents.</param>
-        public HandlebarsCodeGenerator(Stream stream)
+        /// <param name="sr">The <see cref="Stream"/> containing the <c>handlebars.js</c> contents.</param>
+        public HandlebarsCodeGenerator(StreamReader sr)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
+            if (sr == null)
+                throw new ArgumentNullException(nameof(sr));
 
-            using var sr = new StreamReader(stream);
             _template = Handlebars.Compile(sr.ReadToEnd());
         }
 

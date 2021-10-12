@@ -31,6 +31,18 @@ namespace Beef.CodeGen.Config
         internal override Type RootType => typeof(TRoot);
 
         /// <summary>
+        /// Overrides the <see cref="Root"/> and <see cref="Parent"/> values.
+        /// </summary>
+        /// <param name="root">The <see cref="Root"/>.</param>
+        /// <param name="parent">The <see cref="Parent"/>.</param>
+        /// <remarks>This method may result in unintended circumstances and is intended for advanced usage only.</remarks>
+        public void OverrideRootAndParent(TRoot root, TParent parent)
+        {
+            Root = root ?? throw new ArgumentNullException(nameof(root));
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        }
+
+        /// <summary>
         /// Prepares the configuration properties in advance of the code-generation execution (Internal use!).
         /// </summary>
         /// <param name="root">The root <see cref="ConfigBase"/>.</param>

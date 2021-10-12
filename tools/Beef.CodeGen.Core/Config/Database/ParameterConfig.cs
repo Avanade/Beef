@@ -140,9 +140,6 @@ tables:
         /// </summary>
         protected override void Prepare()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 
@@ -175,7 +172,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (Beef.CodeGen.DbModels.DbColumn.TypeIsString(c.Type))
+                    if (CodeGen.Database.DbTypeHelper.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch

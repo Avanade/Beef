@@ -28,7 +28,6 @@ namespace Beef.Database.Core
         private readonly List<Assembly> _scriptAssemblies = new List<Assembly>();
         private readonly CommandOption _configOpt;
         private readonly CommandOption _scriptOpt;
-        private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
         private readonly CommandOption _schemaOrder;
@@ -68,9 +67,6 @@ namespace Beef.Database.Core
                 .Accepts(v => v.ExistingFile());
 
             _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue);
-
-            _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources) for code generation.", CommandOptionType.SingleValue)
-                .Accepts(v => v.ExistingDirectory());
 
             _outputOpt = App.Option("-o|--output", "Output path (defaults to current path) for code generation.", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());
@@ -155,8 +151,7 @@ namespace Beef.Database.Core
             var args = new CodeGenExecutorArgs(_logger, _scriptAssemblies, CreateParamDict(_paramsOpt))
             {
                 ConfigFile = _configOpt.HasValue() ? new FileInfo(_configOpt.Value()) : null,
-                ScriptFile = _scriptOpt.HasValue() ? new FileInfo(_scriptOpt.Value()) : null,
-                TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
+                ScriptFile = _scriptOpt.HasValue() ? _scriptOpt.Value() : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory)
             };
 

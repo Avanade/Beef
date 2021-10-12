@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Data.Common;
 
 namespace Beef.CodeGen.Database
 {
@@ -18,19 +19,11 @@ namespace Beef.CodeGen.Database
             if (dbType == null)
                 return false;
 
-            switch (dbType.ToUpperInvariant())
+            return dbType.ToUpperInvariant() switch
             {
-                case "NCHAR":
-                case "CHAR":
-                case "NVARCHAR":
-                case "VARCHAR":
-                case "TEXT":
-                case "NTEXT":
-                    return true;
-
-                default:
-                    return false;
-            }
+                "NCHAR" or "CHAR" or "NVARCHAR" or "VARCHAR" or "TEXT" or "NTEXT" => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -42,17 +35,11 @@ namespace Beef.CodeGen.Database
             if (dbType == null)
                 return false;
 
-            switch (dbType.ToUpperInvariant())
+            return dbType.ToUpperInvariant() switch
             {
-                case "DECIMAL":
-                case "MONEY":
-                case "NUMERIC":
-                case "SMALLMONEY":
-                    return true;
-
-                default:
-                    return false;
-            }
+                "DECIMAL" or "MONEY" or "NUMERIC" or "SMALLMONEY" => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -64,16 +51,11 @@ namespace Beef.CodeGen.Database
             if (dbType == null)
                 return false;
 
-            switch (dbType.ToUpperInvariant())
+            return dbType.ToUpperInvariant() switch
             {
-                case "DATE":
-                case "DATETIME":
-                case "DATETIME2":
-                    return true;
-
-                default:
-                    return false;
-            }
+                "DATE" or "DATETIME" or "DATETIME2" => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -85,16 +67,11 @@ namespace Beef.CodeGen.Database
             if (dbType == null)
                 return false;
 
-            switch (dbType.ToUpperInvariant())
+            return dbType.ToUpperInvariant() switch
             {
-                case "INT":
-                case "BIGINT":
-                case "SMALLINT":
-                    return true;
-
-                default:
-                    return false;
-            }
+                "INT" or "BIGINT" or "SMALLINT" => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -161,6 +138,26 @@ namespace Beef.CodeGen.Database
                 "GUID" => typeof(Guid),
                 _ => throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined."),
             };
+        }
+
+        /// <summary>
+        /// Gets the named <see cref="DbDataReader"/> column value.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="dr">The <see cref="DbDataReader"/>.</param>
+        /// <param name="name">The column name.</param>
+        /// <returns>The value.</returns>
+        public static T GetValue<T>(this DbDataReader dr, string name)
+        {
+            var i = dr.GetOrdinal(name);
+            if (dr.IsDBNull(i))
+                return default!;
+
+            var nt = Nullable.GetUnderlyingType(typeof(T));
+            if (nt == null)
+                return dr.GetFieldValue<T>(i);
+            else
+                return (T)Convert.ChangeType(dr.GetValue(i), nt, System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

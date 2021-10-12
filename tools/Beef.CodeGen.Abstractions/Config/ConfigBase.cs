@@ -200,17 +200,6 @@ namespace Beef.CodeGen.Config
         }
 
         /// <summary>
-        /// Check that the key has a value and throw an error where not specified.
-        /// </summary>
-        /// <param name="keyValue">The key value.</param>
-        /// <param name="keyName">The corresponding key name; defaults to 'Name'.</param>
-        protected void CheckKeyHasValue(string? keyValue, string keyName = "Name")
-        {
-            if (string.IsNullOrEmpty(keyValue))
-                throw new CodeGenException(this, keyName, "Value is mandatory.");
-        }
-
-        /// <summary>
         /// Determines whether the <paramref name="type"/> is a subclass of the <paramref name="baseType"/>.
         /// </summary>
         /// <param name="baseType">The base generic <see cref="Type"/>.</param>
@@ -335,6 +324,6 @@ namespace Beef.CodeGen.Config
         /// <summary>
         /// Gets the <see cref="DateTime.UtcNow"/> as a formatted timestamp.
         /// </summary>
-        public string UtcDateTimeStamp => DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
+        public static string UtcDateTimeStamp => DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
     }
 }

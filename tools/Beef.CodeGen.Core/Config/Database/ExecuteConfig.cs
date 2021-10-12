@@ -59,8 +59,6 @@ tables:
         /// </summary>
         protected override void Prepare()
         {
-            CheckOptionsProperties();
-
             Location = DefaultWhereNull(Location, () => "After");
         }
     }

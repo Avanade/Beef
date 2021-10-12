@@ -9,7 +9,7 @@ namespace Beef.Demo.Database
         {
             return DatabaseConsoleWrapper
                 .Create("Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True", "Beef", "Demo")
-                .DatabaseScript("DatabaseWithCdc.xml")
+                .DatabaseScript("DatabaseWithCdc.yaml")
                 .RunAsync(args);
         }
     }

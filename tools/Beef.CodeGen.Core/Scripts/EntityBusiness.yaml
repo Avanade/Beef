@@ -1,0 +1,18 @@
+﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
+inherits: [ 'EntityOnly.yaml' ]
+generators:
+- { type: 'Beef.CodeGen.Generators.EntityCodeGenerator, Beef.CodeGen.Core', template: 'Entity_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Entities/Generated', EntityScope: 'Business', text: 'EntityCodeGenerator: Business/Entities' }
+- { type: 'Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Entities/Generated', EntityScope: 'Business', text: 'EntityOmitBaseCodeGenerator: Business/Entities' }
+- { type: 'Beef.CodeGen.Generators.EntityDataModelCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Data/Model/Generated', IsDataModel: 'true', EntityScope: 'Business', text: 'EntityModelCodeGenerator: Business/Data/Model' }
+
+- { type: 'Beef.CodeGen.Generators.EntityIDataCodeGenerator, Beef.CodeGen.Core', template: 'EntityIData_cs.hbs', file: 'I{{Name}}Data.cs', directory: '{{Root.PathBusiness}}/Data/Generated', text: 'IEntityDataCodeGenerator: Business/Data' }
+- { type: 'Beef.CodeGen.Generators.EntityDataCodeGenerator, Beef.CodeGen.Core', template: 'EntityData_cs.hbs', file: '{{Name}}Data.cs', directory: '{{Root.PathBusiness}}/Data/Generated', text: 'EntityDataCodeGenerator: Business/Data' }
+- { type: 'Beef.CodeGen.Generators.EntityIDataSvcCodeGenerator, Beef.CodeGen.Core', template: 'EntityIDataSvc_cs.hbs', file: 'I{{Name}}DataSvc.cs', directory: '{{Root.PathBusiness}}/DataSvc/Generated', text: 'IEntityDataSvcCodeGenerator: Business/DataSvc' }
+- { type: 'Beef.CodeGen.Generators.EntityDataSvcCodeGenerator, Beef.CodeGen.Core', template: 'EntityDataSvc_cs.hbs', file: '{{Name}}DataSvc.cs', directory: '{{Root.PathBusiness}}/DataSvc/Generated', text: 'EntityDataSvcCodeGenerator: Business/DataSvc' }
+- { type: 'Beef.CodeGen.Generators.EntityIManagerCodeGenerator, Beef.CodeGen.Core', template: 'EntityIManager_cs.hbs', file: 'I{{Name}}Manager.cs', directory: '{{Root.PathBusiness}}/Generated', text: 'IEntityManagerCodeGenerator: Business' }
+- { type: 'Beef.CodeGen.Generators.EntityManagerCodeGenerator, Beef.CodeGen.Core', template: 'EntityManager_cs.hbs', file: '{{Name}}Manager.cs', directory: '{{Root.PathBusiness}}/Generated', text: 'EntityManagerCodeGenerator: Business' }
+
+- { type: 'Beef.CodeGen.Generators.EntitySceManagerCodeGenerator, Beef.CodeGen.Core', template: 'ServiceCollectionExtensionsManager_cs.hbs', file: 'ServiceCollectionExtensions.cs', directory: '{{Root.NamespaceBusiness}}/Generated', text: 'EntitySceManagerCodeGenerator: Business' }
+- { type: 'Beef.CodeGen.Generators.EntitySceManagerCodeGenerator, Beef.CodeGen.Core', template: 'ServiceCollectionExtensionsValidation_cs.hbs', file: 'ServiceCollectionValidationExtensions.cs', directory: '{{Root.NamespaceBusiness}}/Generated', text: 'EntitySceManagerCodeGenerator: Business' }
+- { type: 'Beef.CodeGen.Generators.EntitySceDataSvcCodeGenerator, Beef.CodeGen.Core', template: 'ServiceCollectionExtensionsDataSvc_cs.hbs', file: 'ServiceCollectionExtensions.cs', directory: '{{Root.NamespaceBusiness}}/DataSvc/Generated', text: 'EntitySceDataSvcCodeGenerator: Business/DataSvc' }
+- { type: 'Beef.CodeGen.Generators.EntitySceDataCodeGenerator, Beef.CodeGen.Core', template: 'ServiceCollectionExtensionsData_cs.hbs', file: 'ServiceCollectionExtensions.cs', directory: '{{Root.NamespaceBusiness}}/Data/Generated', text: 'EntitySceDataCodeGenerator: Business/Data' }
