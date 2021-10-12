@@ -136,7 +136,7 @@ namespace Beef.Template.Solution.UnitTest
             {
                 Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
-                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.xml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.xml [database]");
+                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.yaml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.yaml [database]");
             }
 
             // Run the intra-integration tests.
