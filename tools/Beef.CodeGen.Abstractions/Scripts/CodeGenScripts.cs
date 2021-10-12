@@ -9,7 +9,7 @@ using System.Linq;
 namespace Beef.CodeGen.Scripts
 {
     /// <summary>
-    /// Represents the <see cref="CodeGenScript"/> collection.
+    /// Represents the root that encapsulates the underlying <see cref="Generators"/>.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Script", Title = "'Script' object.", Description = "The `Script` object scripts the code-generation execution.")]
