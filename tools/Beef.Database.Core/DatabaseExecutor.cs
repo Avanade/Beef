@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
+using Beef.CodeGen.Converters;
 using Beef.CodeGen.Utility;
 using Beef.Data.Database;
 using Beef.Database.Core.Sql;
@@ -19,75 +20,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Beef.Database.Core
 {
-    /// <summary>
-    /// The <see cref="CodeGenExecutor"/> arguments.
-    /// </summary>
-    public class DatabaseExecutorArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseExecutorArgs"/> class.
-        /// </summary>
-        /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
-        /// <param name="connectionString">The connection string.</param>
-        /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
-        public DatabaseExecutorArgs(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
-        {
-            Command = command;
-            ConnectionString = Check.NotNull(connectionString, nameof(connectionString));
-            Assemblies = new List<Assembly>(assemblies);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="DatabaseExecutorCommand"/>.
-        /// </summary>
-        public DatabaseExecutorCommand Command { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the support commands (<see cref="DatabaseExecutorCommand"/>).
-        /// </summary>
-        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All;
-
-        /// <summary>
-        /// Gets the connection string.
-        /// </summary>
-        public string ConnectionString { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="Assembly"/> list whose embedded resources will be probed.
-        /// </summary>
-        public List<Assembly> Assemblies { get; private set; }
-
-        /// <summary>
-        /// Indicates whether ot use the standard <i>Beef</i> <b>dbo</b> schema objects.
-        /// </summary>
-        public bool UseBeefDbo { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.
-        /// </summary>
-        public CodeGenExecutorArgs? CodeGenArgs { get; set; }
-
-        /// <summary>
-        /// Gets the list of schemas in priority order (used to sequence the drop (reverse order) and create (specified order) of the database objects). Where <see cref="UseBeefDbo"/>
-        /// is specified then <c>dbo</c> will automatically be inserted into first position (index zero) if not otherwise specified.
-        /// </summary>
-        public List<string?> SchemaOrder { get; private set; } = new List<string?>();
-
-        /// <summary>
-        /// Adds the <paramref name="schemas"/> to the <see cref="SchemaOrder"/>.
-        /// </summary>
-        /// <param name="schemas">The schemas.</param>
-        /// <returns>The <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
-        public DatabaseExecutorArgs AddSchemaOrder(params string[] schemas)
-        {
-            SchemaOrder.AddRange(schemas);
-            return this;
-        }
-    }
-
     /// <summary>
     /// Represents the database executor.
     /// </summary>
@@ -169,12 +105,8 @@ namespace Beef.Database.Core
             _args = Check.NotNull(args, nameof(args));
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(DatabaseConsole));
 
-            Check.IsFalse(_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.CodeGenArgs == null, nameof(args), "The code generation arguments must be provided when the 'command' includes 'CodeGen'.");
-            if (_args.CodeGenArgs != null && !_args.CodeGenArgs.Parameters.ContainsKey("ConnectionString"))
-                _args.CodeGenArgs.Parameters.Add("ConnectionString", _args.ConnectionString);
-
-            if (_args.UseBeefDbo)
-                _args.Assemblies.Insert(0, typeof(DatabaseConsoleWrapper).Assembly);
+            if (_args.UseBeefDbo && !_args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
+                _args.Assemblies.Insert(0, typeof(DatabaseConsole).Assembly);
 
             _args.Assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
         }
@@ -186,7 +118,7 @@ namespace Beef.Database.Core
         {
             try
             {
-                _db = new Db(_args.ConnectionString);
+                _db = new Db(_args.ConnectionString ?? throw new InvalidOperationException("Database connection string is required."));
                 LoggerSink? ls = null;
 
                 if (_args.Command.HasFlag(DatabaseExecutorCommand.Drop))
@@ -245,17 +177,22 @@ namespace Beef.Database.Core
 
                 if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
                 {
+                    var cga = _args.Clone();
+                    cga.Assemblies.Add(typeof(CodeGenConsole).Assembly);
+                    cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, _args.Company, _args.AppName);
+
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
-                    CodeGenConsole.LogCodeGenExecutionArgs(_args.CodeGenArgs!);
+                    CodeGen.Console.CodeGenConsole.WriteStandardizedArgs(cga);
 
-                    var cge = new CodeGenExecutor(_args.CodeGenArgs!);
+                    CodeGenStatistics stats = null!;
                     if (!await TimeExecutionAsync(async () =>
                     {
-                        return await cge.RunAsync().ConfigureAwait(false);
-                    }, true, () => $", Unchanged = { cge.Statistics.NotChangedCount}, Updated = { cge.Statistics.UpdatedCount}, Created = { cge.Statistics.CreatedCount}, TotalLines = { cge.Statistics.LinesOfCodeCount}").ConfigureAwait(false))
+                        stats = CodeGenConsole.ExecuteCodeGeneration(cga);
+                        return await Task.FromResult(true).ConfigureAwait(false);
+                    }, true, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}").ConfigureAwait(false))
                     {
                         return false;
                     }
@@ -390,12 +327,12 @@ namespace Beef.Database.Core
             var list = new List<SqlSchemaScript>();
 
             // See if there are any files out there (recently generated).
-            if (_args.CodeGenArgs?.OutputPath != null)
+            if (_args.OutputDirectory != null)
             {
-                _logger.LogInformation($"Probing for files: '{_args.CodeGenArgs.OutputPath.FullName}*.sql'");
+                _logger.LogInformation($"Probing for files: '{_args.OutputDirectory.FullName}*.sql'");
                 foreach (var ns in _namespaces)
                 {
-                    var di = new DirectoryInfo(Path.Combine(_args.CodeGenArgs.OutputPath.FullName, ns, SchemaNamespace));
+                    var di = new DirectoryInfo(Path.Combine(_args.OutputDirectory.FullName, ns, SchemaNamespace));
                     if (di.Exists)
                     {
                         foreach (var fi in di.GetFiles("*.sql", SearchOption.AllDirectories))
@@ -408,7 +345,7 @@ namespace Beef.Database.Core
                                 return false;
                             }
 
-                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName[(_args.CodeGenArgs.OutputPath.FullName.Length + 1)..] };
+                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName[(_args.OutputDirectory.FullName.Length + 1)..] };
                             sr.Order = _args.SchemaOrder.IndexOf(sr.Reader.Schema!);
                             if (sr.Order < 0)
                                 sr.Order = _args.SchemaOrder.Count;
@@ -483,7 +420,7 @@ namespace Beef.Database.Core
         /// </summary>
         private string RenameFileToResourceName(FileInfo fi)
         {
-            var dir = RenameFileToResourceNameReplace(fi.DirectoryName[(_args.CodeGenArgs!.OutputPath!.FullName.Length + 1)..]);
+            var dir = RenameFileToResourceNameReplace(fi.DirectoryName[(_args.OutputDirectory!.FullName.Length + 1)..]);
             var file = RenameFileToResourceNameReplace(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
             return dir + "." + file + RenameFileToResourceNameReplace(fi.Extension);
         }
@@ -551,7 +488,7 @@ namespace Beef.Database.Core
                     await sdm.GenerateSqlAsync((a) =>
                     {
                         _logger.LogInformation("");
-                        _logger.LogInformation($"---- Executing {a.OutputFileName}:");
+                        _logger.LogInformation($"---- Executing {a.FileName}:");
                         _logger.LogInformation(a.Content);
                         if (a.Content != null)
                         {
@@ -572,17 +509,17 @@ namespace Beef.Database.Core
         /// </summary>
         private async Task<bool> CreateScriptNewAsync()
         {
-            var data = new { _args.CodeGenArgs!.Parameters };
-            var p0 = _args.CodeGenArgs.Parameters?.SingleOrDefault(x => string.Compare(x.Key, "Param0", StringComparison.InvariantCultureIgnoreCase) == 0).Value;
+            var data = new { _args.Parameters };
+            var p0 = _args.Parameters?.SingleOrDefault(x => string.Compare(x.Key, "Param0", StringComparison.InvariantCultureIgnoreCase) == 0).Value;
             var rn = typeof(DatabaseExecutor).Assembly.GetManifestResourceNames().SingleOrDefault(x => string.Compare(x, $"Beef.Database.Core.Resources.{p0 ?? "Default"}_sql.hbs", StringComparison.InvariantCultureIgnoreCase) == 0);
             if (rn == null)
                 throw new InvalidOperationException($"The ScriptNew '{p0}' argument is invalid.");
             
             var fn = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
-            if (_args.CodeGenArgs!.Parameters == null || _args.CodeGenArgs!.Parameters.Count == 0)
+            if (_args.Parameters == null || _args.Parameters.Count == 0)
                 fn += "-comment-text";
             else
-                _args.CodeGenArgs!.Parameters.Where(x => x.Key.StartsWith("Param", StringComparison.InvariantCultureIgnoreCase)).ForEach(x => fn += $"-{x.Value}");
+                _args.Parameters.Where(x => x.Key.StartsWith("Param", StringComparison.InvariantCultureIgnoreCase)).ForEach(x => fn += $"-{x.Value}");
 
             var di = new DirectoryInfo(Environment.CurrentDirectory);
             var fi = new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{fn.ToLowerInvariant()}.sql"));

@@ -57,7 +57,7 @@ namespace Beef.CodeGen.Generators
 
             Handlebars.Configuration.TextEncoder = null;
 
-            using var stream = StreamLocator.GetTemplateStreamReader(script.Template!, script.Root!.CodeGenArgs!.Assemblies);
+            using var stream = StreamLocator.GetTemplateStreamReader(script.Template!, script.Root!.CodeGenArgs!.Assemblies.ToArray());
             var contentHandlebars = new HandlebarsCodeGenerator(stream!);
             var fileNameHandlebars = new HandlebarsCodeGenerator(script.File!);
             var directoryNameHandlebars = string.IsNullOrEmpty(script.Directory) ? null : new HandlebarsCodeGenerator(script.Directory);

@@ -12,7 +12,7 @@ namespace Beef.CodeGen.Config
         /// <summary>
         /// Gets the <see cref="CodeGeneratorArgs"/>.
         /// </summary>
-        CodeGeneratorArgs? CodeGenArgs { get; }
+        CodeGeneratorArgsBase? CodeGenArgs { get; }
 
         /// <summary>
         /// Gets the parameter overrides.
@@ -22,8 +22,8 @@ namespace Beef.CodeGen.Config
         /// <summary>
         /// Sets the <see cref="CodeGeneratorArgs"/>.
         /// </summary>
-        /// <param name="codeGenArgs">The <see cref="CodeGeneratorArgs"/>.</param>
-        void SetCodeGenArgs(CodeGeneratorArgs codeGenArgs);
+        /// <param name="codeGenArgs">The <see cref="CodeGeneratorArgsBase"/>.</param>
+        void SetCodeGenArgs(CodeGeneratorArgsBase codeGenArgs);
 
         /// <summary>
         /// Merges (adds or updates) <paramref name="parameters"/> into the <see cref="RuntimeParameters"/>.

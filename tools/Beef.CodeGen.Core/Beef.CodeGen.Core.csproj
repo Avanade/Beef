@@ -22,6 +22,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Title>Business Entity Execution Framework (Beef) Code Generator tool.</Title>
+    <Product>Business Entity Execution Framework (Beef) Code Generator tool</Product>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef codegen</PackageTags>
     <Nullable>enable</Nullable>

@@ -7,6 +7,7 @@ using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen
@@ -20,13 +21,13 @@ namespace Beef.CodeGen
         /// The main entry point.
         /// </summary>
         /// <param name="args">The console arguments.</param>
-        /// <returns>A statuc code.</returns>
+        /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
         public static async Task<int> Main(string[] args)
         {
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            Logger.Default = new ColoredConsoleLogger(nameof(CodeGenConsole));
+            Logger.Default = new ColoredConsoleLogger("CodeGenConsole");
 
             // Check for special case / internal use arguments.
             if (args.Length == 1)
@@ -45,7 +46,10 @@ namespace Beef.CodeGen
                 }
             }
 
-            return await CodeGenConsole.Create().RunAsync(args).ConfigureAwait(false);
+            var a = new CodeGeneratorArgs().AddAssembly(typeof(CodeGenConsole).Assembly).AddAssembly(Assembly.GetCallingAssembly());
+            var c = Console.CodeGenConsole.Create<CodeGenConsole>(name: Assembly.GetCallingAssembly().GetName().Name, options: Console.SupportedOptions.All);
+            c.MastheadText = CodeGenConsole.DefaultMastheadText;
+            return await c.RunAsync().ConfigureAwait(false);
         }
 
         /// <summary>

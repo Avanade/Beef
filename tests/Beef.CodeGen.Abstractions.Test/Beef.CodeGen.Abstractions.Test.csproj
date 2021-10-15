@@ -1,9 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
+    <Version>1.2.3</Version>
+    <Title>Test title.</Title>
+    <Description>The long description.</Description>
+    <Product>Product name.</Product>
     <IsPackable>false</IsPackable>
+    <Company>Company name.</Company>
+    <Authors>Authors</Authors>
   </PropertyGroup>
 
   <ItemGroup>

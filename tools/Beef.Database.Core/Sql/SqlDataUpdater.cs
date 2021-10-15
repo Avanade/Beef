@@ -312,7 +312,7 @@ namespace Beef.Database.Core.Sql
         /// Generates the SQL.
         /// </summary>
         /// <param name="codeGen">The code generation action to execute.</param>
-        public Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
+        public Task GenerateSqlAsync(Action<CodeGenOutputArgs> codeGen)
         {
             if (codeGen == null)
                 throw new ArgumentNullException(nameof(codeGen));
@@ -323,7 +323,7 @@ namespace Beef.Database.Core.Sql
             var cg = new HandlebarsCodeGenerator(tr);
             foreach (var t in Tables)
             {
-                codeGen(new CodeGeneratorEventArgs { Content = cg.Generate(t), OutputFileName = $"{t.Schema}.{t.Name} SQL" });
+                codeGen(new CodeGenOutputArgs(new CodeGen.Scripts.CodeGenScript(), null, $"{t.Schema}.{t.Name} SQL", cg.Generate(t)));
             }
 
             return Task.CompletedTask;

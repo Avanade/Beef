@@ -105,7 +105,7 @@ namespace Beef.CodeGen.Scripts
             catch (Exception ex) { throw new CodeGenException(this, nameof(Type), $"Type '{Type}' is invalid: {ex.Message}"); }
 
             // Make sure the template exists.
-            if (!StreamLocator.HasTemplateStream(Template!, Root!.CodeGenArgs!.Assemblies))
+            if (!StreamLocator.HasTemplateStream(Template!, Root!.CodeGenArgs!.Assemblies.ToArray()))
                 throw new CodeGenException(this, nameof(Template), $"Template '{Template}' does not exist.");
 
             // Convert any extra properties as runtime parameters.

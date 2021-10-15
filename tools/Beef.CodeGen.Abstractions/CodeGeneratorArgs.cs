@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Config;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,43 +10,83 @@ namespace Beef.CodeGen
     /// <summary>
     /// Defines the <see cref="CodeGenerator"/> arguments.
     /// </summary>
-    public class CodeGeneratorArgs
+    public class CodeGeneratorArgs : CodeGeneratorArgsBase
     {
+        /// <summary>
+        /// Creates a new <see cref="CodeGeneratorArgs"/> using the <typeparamref name="T"/> to infer the <see cref="Type.Assembly"/>.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type"/> to automatically infer the <see cref="Type.Assembly"/> to <see cref="AddAssembly(Assembly[])">add</see>.</typeparam>
+        /// <param name="scriptFileName">The script file name.</param>
+        /// <param name="configFileName">The configuration file name.</param>
+        /// <returns>A new <see cref="CodeGeneratorArgs"/>.</returns>
+        public static CodeGeneratorArgs Create<T>(string? scriptFileName = null, string? configFileName = null) => new CodeGeneratorArgs(scriptFileName, configFileName).AddAssembly(typeof(T).Assembly);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGeneratorArgs"/>.
         /// </summary>
-        /// <param name="scriptFileName"></param>
-        public CodeGeneratorArgs(string scriptFileName) => ScriptFileName = scriptFileName ?? throw new ArgumentNullException(nameof(scriptFileName));
+        /// <param name="scriptFileName">The script file name.</param>
+        /// <param name="configFileName">The configuration file name.</param>
+        public CodeGeneratorArgs(string? scriptFileName = null, string? configFileName = null)
+        {
+            ScriptFileName = scriptFileName;
+            ConfigFileName = configFileName;
+        }
 
         /// <summary>
-        /// Gets the <b>Script</b> filename to load the content from the <c>Scripts</c> folder within the file system (primary) or <see cref="Assemblies"/> (secondary, recursive until found).
+        /// Adds one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
         /// </summary>
-        public string ScriptFileName { get; }
+        /// <param name="assemblies">The assemblies to add.</param>
+        /// <remarks>The order in which they are specified is the order in which they will be probed for embedded resources.</remarks>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        public CodeGeneratorArgs AddAssembly(params Assembly[] assemblies)
+        {
+            if (assemblies != null)
+                Assemblies.InsertRange(0, assemblies);
+
+            return this;
+        }
 
         /// <summary>
-        /// Gets or sets the base <see cref="DirectoryInfo"/> where the generated artefacts are to be written.
+        /// Adds (merges) the parameter to the <see cref="CodeGeneratorArgsBase.Parameters"/>.
         /// </summary>
-        /// <remarks>Where not specified will default to <see cref="Environment.CurrentDirectory"/>.</remarks>
-        public DirectoryInfo? DirectoryBase { get; set; }
+        /// <param name="key">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        public CodeGeneratorArgs AddParameter(string key, string? value)
+        {
+            if (!Parameters.TryAdd(key, value))
+                Parameters[key] = value;
+
+            return this;
+        }
 
         /// <summary>
-        /// Gets or sets the assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to explicitly specify).
+        /// Adds (merges) the <paramref name="parameters"/> to the <see cref="CodeGeneratorArgsBase.Parameters"/>.
         /// </summary>
-        public Assembly[]? Assemblies { get; set; }
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        public CodeGeneratorArgs AddParameters(IDictionary<string, string?> parameters)
+        {
+            if (parameters != null)
+            {
+                foreach (var p in parameters)
+                {
+                    AddParameter(p.Key, p.Value);
+                }
+            }
+
+            return this;
+        }
 
         /// <summary>
-        /// Dictionary of <see cref="IRootConfig.RuntimeParameters"/> name/value pairs.
+        /// Clone the <see cref="CodeGeneratorArgs"/>.
         /// </summary>
-        public IDictionary<string, string?>? Parameters { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ILogger"/> to optionally log the underlying code-generation.
-        /// </summary>
-        public ILogger? Logger { get; set; }
-
-        /// <summary>
-        /// Indicates whether the code-generation is a simulation; i.e. does not update the artefacts.
-        /// </summary>
-        public bool IsSimulation { get; set; }
+        /// <returns>A new <see cref="CodeGeneratorArgs"/> instance.</returns>
+        public override CodeGeneratorArgsBase Clone()
+        {
+            var args = new CodeGeneratorArgs();
+            args.CopyFrom(this);
+            return args;
+        }
     }
 }

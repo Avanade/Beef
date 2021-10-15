@@ -76,7 +76,7 @@ namespace Beef.CodeGen
                 files.Add(fi.Name);
             }
 
-            throw new InvalidOperationException($"Configuration file not found; looked for one of the following: {string.Join(", ", files)}.");
+            throw new CodeGenException($"Configuration file not found; looked for one of the following: {string.Join(", ", files)}.");
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="type">The <see cref="CommandType"/>.</param>
         /// <param name="filename">The XML filename.</param>
-        /// <returns>The resulting return code.</returns>
-        public static async Task<int> ConvertXmlToYamlAsync(CommandType type, string filename)
+        /// <returns><c>true</c> indicates success; otherwise, <c>false</c>.</returns>
+        public static async Task<bool> ConvertXmlToYamlAsync(CommandType type, string filename)
         {
             var logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
             logger.LogInformation($"Convert XML to YAML file configuration: {filename}");
@@ -110,14 +110,14 @@ namespace Beef.CodeGen
             {
                 logger.LogError("File does not exist.");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             if (string.Compare(xfi.Extension, ".XML", StringComparison.OrdinalIgnoreCase) != 0)
             {
                 logger.LogError("File extension must be XML.");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             var yfi = new FileInfo(Path.Combine(xfi.DirectoryName, GetConfigFilenames(type).First()));
@@ -125,7 +125,7 @@ namespace Beef.CodeGen
             {
                 logger.LogError($"YAML file already exists: {yfi.Name}");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             try
@@ -159,10 +159,10 @@ namespace Beef.CodeGen
             {
                 logger.LogError(ex.Message);
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
-            return 0;
+            return true;
         }
     }
 }

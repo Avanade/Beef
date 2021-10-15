@@ -1,246 +1,341 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
+using Beef.CodeGen.Converters;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>CodeGen Console</b> that facilitates the code generation output by handling the standard console arguments invoking the underlying <see cref="CodeGeneratorEventArgs"/>.
+    /// <b>Beef</b>-specific code-generation console that encapsulates the standard <see cref="Console.CodeGenConsole"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
-    public class CodeGenConsole
+    public class CodeGenConsole : Console.CodeGenConsole
     {
-        private readonly CommandArgument _configArg;
-        private readonly CommandOption _scriptOpt;
-        private readonly CommandOption _outputOpt;
-        private readonly CommandOption _assembliesOpt;
-        private readonly List<Assembly> _assemblies = new List<Assembly>();
-        private readonly CommandOption _paramsOpt;
-        private readonly CommandOption _expectNoChangeOpt;
-        private readonly CommandOption _simulationOpt;
-        private readonly ILogger _logger;
+        private string _entityScript = "EntityWebApiCoreAgent.yaml";
+        private string _refDataScript = "RefDataCoreCrud.yaml";
+        private string _dataModelScript = "DataModelOnly.yaml";
+        private string _databaseScript = "Database.yaml";
+
+        private CommandArgument<CommandType>? _cmdArg;
+        private CommandOption? _x2yOpt;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="CodeGenConsole"/>.
+        /// Gets the 'Company' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
         /// </summary>
-        /// <returns>The <see cref="CodeGenConsole"/>.</returns>
-        public static CodeGenConsole Create()
+        public const string CompanyParamName = "Company";
+
+        /// <summary>
+        /// Gets the 'AppName' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
+        /// </summary>
+        public const string AppNameParamName = "AppName";
+
+        /// <summary>
+        /// Gets the 'ApiName' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
+        /// </summary>
+        public const string ApiNameParamName = "ApiName";
+
+        /// <summary>
+        /// Gets the default masthead text.
+        /// </summary>
+        /// <remarks>Defaults to 'Beef Code-Gen Tool' formatted using <see href="http://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=Beef%20Code-Gen%20Tool%0A"/>.</remarks>
+        public const string DefaultMastheadText = @"
+╔╗ ┌─┐┌─┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
+╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
+╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
+";
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="CodeGenConsole"/> class defaulting to <see cref="Assembly.GetCallingAssembly"/>.
+        /// </summary>
+        /// <param name="company">The company name.</param>
+        /// <param name="appName">The application/domain name.</param>
+        /// <param name="apiName">The Web API name.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="CodeGenFileManager.GetExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
+        public static CodeGenConsole Create(string company, string appName, string apiName = "Api", string? outputDirectory = null) => Create(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outputDirectory);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="CodeGenConsole"/> class.
+        /// </summary>
+        /// <param name="assemblies">The list of additional assemblies to probe for resources.</param>
+        /// <param name="company">The company name.</param>
+        /// <param name="appName">The application/domain name.</param>
+        /// <param name="apiName">The Web API name.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="CodeGenFileManager.GetExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
+        public static CodeGenConsole Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string? outputDirectory = null)
         {
-            return new CodeGenConsole();
+            var args = new CodeGeneratorArgs { OutputDirectory = string.IsNullOrEmpty(outputDirectory) ? new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent : new DirectoryInfo(outputDirectory) };
+            args.AddAssembly(typeof(CodeGenConsole).Assembly);
+            args.AddAssembly(assemblies);
+            args.AddParameter(CompanyParamName, Check.NotEmpty(company, nameof(company)));
+            args.AddParameter(AppNameParamName, Check.NotEmpty(appName, nameof(appName)));
+            args.AddParameter(ApiNameParamName, Check.NotEmpty(apiName, nameof(apiName)));
+            return new CodeGenConsole(args) { BypassOnWrites = true };
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
         /// </summary>
-        private CodeGenConsole()
+        private CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: Console.SupportedOptions.All)
         {
-            App = new CommandLineApplication()
-            {
-                Name = "beef.codegen",
-                Description = "Business Entity Execution Framework (Beef) Code Generator."
-            };
+            MastheadText = DefaultMastheadText;
 
-            App.HelpOption(true);
-
-            _configArg = App.Argument("config", "CodeGeneration configuration YAML/JSON/XML file.")
-                .IsRequired()
-                .Accepts(v => v.ExistingFile());
-
-            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name.", CommandOptionType.SingleValue)
-                .IsRequired();
-
-            _outputOpt = App.Option("-o|--output", "Output path (defaults to current path).", CommandOptionType.SingleValue)
-                .Accepts(v => v.ExistingDirectory());
-
-            _assembliesOpt = App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
-                .Accepts(v => v.Use(new AssemblyValidator(_assemblies)));
-
-            _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
-                .Accepts(v => v.Use(new ParamsValidator()));
-
-            _expectNoChangeOpt = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
-            _simulationOpt = App.Option("--simulation", "Indicates whether the code-generation is a simulation; i.e. does not update the artefacts.", CommandOptionType.NoValue);
-
-            _logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
-
-            App.OnExecuteAsync(async (_) => await RunRunAwayAsync().ConfigureAwait(false));
-        }
-    
-        /// <summary>
-        /// Gets the underlying <see cref="CommandLineApplication"/>.
-        /// </summary>
-        public CommandLineApplication App { get; }
-
-        /// <summary>
-        /// Runs the code generation using the passed <paramref name="args"/> string.
-        /// </summary>
-        /// <param name="args">The code generation arguments.</param>
-        /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public Task<int> RunAsync(string? args = null)
-        {
-            if (string.IsNullOrEmpty(args))
-                return RunAsync(Array.Empty<string>());
-
-            // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
-            var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
-            var array = regex.Cast<Match>()
-                         .Select(m => Regex.Replace(
-                             m.Groups[2].Success
-                                 ? m.Groups[2].Value
-                                 : m.Groups[4].Value, @"""""", @"""")).ToArray();
-
-            return RunAsync(array);
+            var (company, appName) = GetCompanyAndAppName();
+            Args.ConnectionStringEnvironmentVariableName = $"{company?.Replace(".", "_", StringComparison.InvariantCulture)}_{appName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
-        /// Runs the code generation using the passed array of <paramref name="args"/>.
+        /// Indicates whether <see cref="CommandType.Entity"/> is supported (defaults to <c>true</c>).
         /// </summary>
-        /// <param name="args">The code generation arguments.</param>
-        /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public async Task<int> RunAsync(string[] args)
+        public bool IsEntitySupported { get; set; } = true;
+
+        /// <summary>
+        /// Indicates whether <see cref="CommandType.Database"/> is supported (defaults to <c>false</c>).
+        /// </summary>
+        public bool IsDatabaseSupported { get; set; } = false;
+
+        /// <summary>
+        /// Indicates whether <see cref="CommandType.RefData"/> is supported (defaults to <c>false</c>).
+        /// </summary>
+        public bool IsRefDataSupported { get; set; } = false;
+
+        /// <summary>
+        /// Indicates whether <see cref="CommandType.DataModel"/> is supported (defaults to <c>false</c>).
+        /// </summary>
+        public bool IsDataModelSupported { get; set; } = false;
+
+        /// <summary>
+        /// Sets the <see cref="IsEntitySupported"/>, <see cref="IsDatabaseSupported"/> and <see cref="IsRefDataSupported"/> options.
+        /// </summary>
+        /// <param name="entity">Indicates whether the entity code generation should take place.</param>
+        /// <param name="database">Indicates whether the database generation should take place.</param>
+        /// <param name="refData">Indicates whether the reference data generation should take place.</param>
+        /// <param name="dataModel">Indicates whether the data model generation should take place.</param>
+        /// <returns>The <see cref="CodeGenConsole"/> to support method chaining/fluent style.</returns>
+        public CodeGenConsole Supports(bool entity = true, bool database = false, bool refData = false, bool dataModel = false)
         {
-            try
+            IsEntitySupported = entity;
+            IsDatabaseSupported = database;
+            IsRefDataSupported = refData;
+            IsDataModelSupported = dataModel;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.Database"/> (defaults to <c>EntityWebApiCoreAgent.yaml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole EntityScript(string script)
+        {
+            _entityScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.DataModel"/> (defaults to <c>DataModelOnly.yaml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole DataModelScript(string script)
+        {
+            _dataModelScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.RefData"/> (defaults to <c>RefDataCoreCrud.yaml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole RefDataScript(string script)
+        {
+            _refDataScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.Database"/> (defaults to <c>Database.yaml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole DatabaseScript(string script)
+        {
+            _databaseScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the default database connection string.
+        /// </summary>
+        /// <param name="connectionString">The database connection string.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        /// <remarks>Acts as the default; the command line option '<c>-cs|--connectionString</c>' and environment variable take precedence.</remarks>
+        public CodeGenConsole DatabaseConnectionString(string connectionString)
+        {
+            Args.ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
+            return this;
+        }
+
+        /// <inheritdoc/>
+        protected override void OnBeforeExecute(CommandLineApplication app)
+        {
+            _cmdArg = app.Argument<CommandType>("command", "Execution command type.", false).IsRequired();
+            _x2yOpt = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
+        }
+
+        /// <summary>
+        /// Get company and appname from parameters.
+        /// </summary>
+        /// <returns></returns>
+        private (string, string) GetCompanyAndAppName() => (Args.Parameters[CompanyParamName]!, Args.Parameters[AppNameParamName]!);
+
+        /// <inheritdoc/>
+        protected override ValidationResult? OnValidation(ValidationContext context)
+        {
+            Diagnostics.Logger.Default ??= Args.Logger;
+
+            var cmd = _cmdArg!.ParsedValue;
+            if (cmd == CommandType.All)
             {
-                return await App.ExecuteAsync(args).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(Args.ScriptFileName))
+                    return new ValidationResult("Command 'All' is not compatible with --scriptFile; the command must be more specific when using a specified configuration file.");
+
+                if (!string.IsNullOrEmpty(Args.ConfigFileName))
+                    return new ValidationResult("Command 'All' is not compatible with --configFile; the command must be more specific when using a specified configuration file.");
+
+                if (_x2yOpt!.HasValue())
+                    return new ValidationResult("Command 'All' is not compatible with --xmlToYaml; the command must be more specific when converting XML configuration to YAML.");
             }
-            catch (CommandParsingException cpex)
+            else
             {
-                _logger.LogError(cpex.Message);
-                if (cpex.InnerException != null)
-                    _logger.LogError(cpex.InnerException.Message);
-
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// Coordinates the run (overall execution).
-        /// </summary>
-        private async Task<int> RunRunAwayAsync() /* Inspired by https://www.youtube.com/watch?v=ikMiQZF-mAY */
-        {
-            var args = new CodeGenExecutorArgs(_logger, _assembliesOpt.HasValue() ? ((AssemblyValidator)_assembliesOpt.Validators.First()).Assemblies : _assemblies, CreateParamDict(_paramsOpt))
-            {
-                ConfigFile = new FileInfo(_configArg.Value),
-                ScriptFile = _scriptOpt.Value(),
-                OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
-                ExpectNoChange = _expectNoChangeOpt.HasValue(),
-                IsSimulation = _simulationOpt.HasValue()
-            };
-
-            WriteHeader(args);
-
-            var cge = new CodeGenExecutor(args);
-            var sw = Stopwatch.StartNew();
-
-            var result = await cge.RunAsync().ConfigureAwait(false);
-
-            sw.Stop();
-            WriteFooter(_logger, cge);
-            return result ? 0 : -1;
-        }
-
-        /// <summary>
-        /// Creates a param (name=value) pair dictionary from the command option values.
-        /// </summary>
-        public static Dictionary<string, string?> CreateParamDict(CommandOption cmdOpt)
-        {
-            if (cmdOpt == null)
-                throw new ArgumentNullException(nameof(cmdOpt));
-
-            var pd = new Dictionary<string, string?>();
-            foreach (var p in cmdOpt.Values.Where(x => !string.IsNullOrEmpty(x)))
-            {
-                string[] parts = CreateKeyValueParts(p!);
-                pd.Add(parts[0], parts[1]);
-            }
-
-            return pd;
-        }
-
-        /// <summary>
-        /// Creates Key=Value parts.
-        /// </summary>
-        internal static string[] CreateKeyValueParts(string text)
-        {
-            var pos = text.IndexOf("=", StringComparison.InvariantCultureIgnoreCase);
-            if (pos < 0)
-                return Array.Empty<string>();
-
-            return new string[] { text.Substring(0, pos), text[(pos + 1)..] };
-        }
-
-        /// <summary>
-        /// Logs (writes) the <see cref="CodeGenExecutorArgs"/>.
-        /// </summary>
-        /// <param name="args">The <see cref="CodeGenExecutorArgs"/>.</param>
-        /// <param name="paramsOnly">Indicates whether to log on the parameters collection only.</param>
-        public static void LogCodeGenExecutionArgs(CodeGenExecutorArgs args, bool paramsOnly = false)
-        {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
-
-            if (!paramsOnly)
-            {
-                args.Logger.LogInformation($"  Config = {args.ConfigFile?.Name}");
-                args.Logger.LogInformation($"  Script = {args.ScriptFile}");
-                args.Logger.LogInformation($"  OutputPath = {args.OutputPath?.FullName}");
-                args.Logger.LogInformation($"  ExpectNoChange = {args.ExpectNoChange}");
-                args.Logger.LogInformation($"  IsSimulation = {args.IsSimulation}");
+                var vr = CheckCommandIsSupported(cmd, CommandType.Entity, IsEntitySupported);
+                vr ??= CheckCommandIsSupported(cmd, CommandType.RefData, IsRefDataSupported);
+                vr ??= CheckCommandIsSupported(cmd, CommandType.DataModel, IsDataModelSupported);
+                vr ??= CheckCommandIsSupported(cmd, CommandType.Database, IsDatabaseSupported);
+                if (vr != null)
+                    return vr;
             }
 
-            args.Logger.LogInformation($"  Params{(args.Parameters.Count == 0 ? " = none" : ":")}");
+            return ValidationResult.Success;
+        }
 
-            foreach (var p in args.Parameters)
+        /// <summary>
+        /// Check command is supported.
+        /// </summary>
+        private static ValidationResult? CheckCommandIsSupported(CommandType act, CommandType exp, bool isSupported) => act == exp && !isSupported ? new ValidationResult($"Command '{act}' is not supported.") : null;
+
+        /// <inheritdoc/>
+        protected override CodeGenStatistics? OnCodeGeneration()
+        {
+            var cmd = _cmdArg!.ParsedValue;
+            var exedir = CodeGenFileManager.GetExeDirectory();
+            var (company, appName) = GetCompanyAndAppName();
+
+            OnWriteMasthead();
+            OnWriteHeader();
+
+            // Where XML to YAML requested do so, then exit.
+            if (_x2yOpt!.HasValue())
+                return CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName)).GetAwaiter().GetResult() ? new CodeGenStatistics() : null;
+
+            var count = 0;
+            var stats = new CodeGenStatistics();
+            if (IsDatabaseSupported && cmd.HasFlag(CommandType.Database))
+                stats.Add(ExecuteCodeGeneration(_databaseScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Database, company, appName), ref count));
+
+            if (IsRefDataSupported && cmd.HasFlag(CommandType.RefData))
+                stats.Add(ExecuteCodeGeneration(_refDataScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.RefData, company, appName), ref count));
+
+            if (IsEntitySupported && cmd.HasFlag(CommandType.Entity))
+                stats.Add(ExecuteCodeGeneration(_entityScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Entity, company, appName), ref count));
+
+            if (IsDataModelSupported && cmd.HasFlag(CommandType.DataModel))
+                stats.Add(ExecuteCodeGeneration(_dataModelScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.DataModel, company, appName), ref count));
+
+            if (count > 1)
             {
-                Console.WriteLine($"    {p.Key} = {p.Value}");
+                Args.Logger?.LogInformation(new string('-', 80));
+                Args.Logger?.LogInformation("");
+                Args.Logger?.LogInformation($"OVERALL. {stats.ToSummaryString()}");
+                Args.Logger?.LogInformation("");
             }
+
+            return stats;
         }
 
         /// <summary>
-        /// Writes the header information.
+        /// Execute the selection code-generation.
         /// </summary>
-        private void WriteHeader(CodeGenExecutorArgs args)
+        private CodeGenStatistics ExecuteCodeGeneration(string scriptName, string configName, ref int count)
         {
-            WriteMasthead(_logger);
-            LogCodeGenExecutionArgs(args);
-            _logger.LogInformation(string.Empty);
+            // Update the files.
+            var args = Args.Clone();
+            args.ScriptFileName ??= scriptName;
+            args.ConfigFileName ??= configName;
+
+            if (count++ > 0)
+            {
+                args.Logger?.LogInformation(new string('-', 80));
+                args.Logger?.LogInformation("");
+            }
+
+            OnWriteArgs(args);
+
+            // Execute the code-generation.
+            var stats = ExecuteCodeGeneration(args);
+
+            // Write results.
+            OnWriteFooter(stats);
+            return stats;
         }
 
         /// <summary>
-        /// Writes the mast head information.
+        /// Executes the code generation.
         /// </summary>
-        public static void WriteMasthead(ILogger? logger = null)
+        /// <param name="args">The <see cref="CodeGeneratorArgs"/>.</param>
+        /// <returns>The <see cref="CodeGenStatistics"/>.</returns>
+        public static CodeGenStatistics ExecuteCodeGeneration(CodeGeneratorArgsBase args)
         {
-            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
+            CodeGenStatistics stats;
+            var cg = new CodeGenerator(args);
+            var fi = new FileInfo(args.ConfigFileName);
+            switch (fi.Extension.ToUpperInvariant())
+            {
+                // XML not natively supported so must be converted to YAML.
+                case ".XML":
+                    using (var xfs = fi.OpenText())
+                    {
+                        var xml = XDocument.Load(xfs, LoadOptions.None);
+                        if (cg.Scripts.GetConfigType() == typeof(Config.Entity.CodeGenConfig))
+                        {
+                            var sr = new StringReader(new EntityXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
+                            stats = cg.Generate(sr, Utility.StreamContentType.Yaml, fi.FullName);
+                        }
+                        else if (cg.Scripts.GetConfigType() == typeof(Config.Database.CodeGenConfig))
+                        {
+                            var sr = new StringReader(new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
+                            stats = cg.Generate(sr, Utility.StreamContentType.Yaml, fi.FullName);
+                        }
+                        else
+                            throw new CodeGenException($"Configuration Type '{cg.Scripts.GetConfigType().FullName}' is not expected; must be either '{typeof(Config.Entity.CodeGenConfig).FullName}' or '{typeof(Config.Database.CodeGenConfig).FullName}'.");
+                    }
 
-            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Code-Gen%20Tool%0A
-            logger.LogInformation(@"
-╔╗ ┌─┐┌─┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
-╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
-╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
-");
-            logger.LogInformation($"Business Entity Execution Framework (Beef) Code Generator [v{typeof(CodeGenConsole).Assembly.GetName().Version?.ToString(3)}].");
-            logger.LogInformation(string.Empty);
-        }
+                    break;
 
-        /// <summary>
-        /// Write the footer information.
-        /// </summary>
-        public static void WriteFooter(ILogger logger, CodeGenExecutor cge)
-        {
-            logger.LogInformation(string.Empty);
-            logger.LogInformation($"Beef Code-Gen Tool complete {cge.Statistics.ToSummaryString()}.");
-            logger.LogInformation(string.Empty);
+                default:
+                    stats = cg.Generate(fi.FullName);
+                    break;
+            }
+
+            return stats;
         }
     }
 }

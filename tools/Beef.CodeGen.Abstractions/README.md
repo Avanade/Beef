@@ -192,6 +192,10 @@ var stats = cg.Generate("Configuration.yaml");
 
 <br/>
 
+## Console
+
+TBD - see [`CodeGenConsole`](./Console/CodeGenConsole.cs).
+
 ## Utility
 
 Some additional utility capabilites have been provided to support:

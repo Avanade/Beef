@@ -66,7 +66,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal abstract class XmlToYamlConverter
+    public abstract class XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.
@@ -78,7 +78,7 @@ namespace Beef.CodeGen.Converters
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
         /// <returns>The corresponding YAML and the list of unknown attributes.</returns>
-        internal (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
+        public (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -240,7 +240,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Entity XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal class EntityXmlToYamlConverter : XmlToYamlConverter
+    public class EntityXmlToYamlConverter : XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.
@@ -265,7 +265,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Database XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal class DatabaseXmlToYamlConverter : XmlToYamlConverter
+    public class DatabaseXmlToYamlConverter : XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.

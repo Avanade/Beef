@@ -527,23 +527,17 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         private void LoadDbTablesConfig()
         {
-            Logger.Default.Log(LogLevel.Information, string.Empty);
-            Logger.Default.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
+            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
 
-            var evn = $"{Company?.Replace(".", "_", StringComparison.InvariantCulture)}_{AppName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
-            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs) || string.IsNullOrEmpty(cs))
-                cs = Environment.GetEnvironmentVariable(evn);
-
-            if (string.IsNullOrEmpty(cs))
-                throw new CodeGenException($"ConnectionString must be explicitly specified as a RuntimeParameter or using Environment Variable '{evn}'.");
+            var cs = CodeGenArgs?.ConnectionString ?? throw new CodeGenException($"Connection string must be explicitly specified using Environment Variable '{CodeGenArgs?.ConnectionStringEnvironmentVariableName}' or as a runtime option.");
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlConnection(cs);
             DbTables = DbTable.LoadTablesAndColumnsAsync(db, false).GetAwaiter().GetResult();
 
             sw.Stop();
-            Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
-            Logger.Default.Log(LogLevel.Information, string.Empty);
+            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
+            CodeGenArgs?.Logger?.Log(LogLevel.Information, string.Empty);
         }
 
         /// <summary>

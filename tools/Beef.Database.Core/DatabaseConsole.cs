@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.Diagnostics;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,202 +10,393 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static Beef.CodeGen.CodeGenConsole;
 
 namespace Beef.Database.Core
 {
     /// <summary>
-    /// <b>Database Console</b> that facilitates the database tooling by handling the standard console arguments invoking the underlying <see cref="DatabaseExecutor"/>.
+    /// <b>Beef</b>-specific database console that encapsulates the database tooling functionality as specified by the <see cref="DatabaseExecutorCommand"/> flags.
     /// </summary>
-    /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
-    public class DatabaseConsole
+    public sealed class DatabaseConsole
     {
-        private readonly CommandArgument<DatabaseExecutorCommand> _commandArg;
-        private readonly CommandArgument _connectionStringArg;
-        private readonly List<Assembly> _scriptAssemblies = new List<Assembly>();
-        private readonly CommandOption _configOpt;
-        private readonly CommandOption _scriptOpt;
-        private readonly CommandOption _outputOpt;
-        private readonly CommandOption _paramsOpt;
-        private readonly CommandOption _schemaOrder;
-        private readonly CommandOption<int> _supportedOpt;
-        private readonly CommandOption _envVarNameOpt;
-        private string? _connectionString;
-        private readonly ILogger _logger;
+        private const string EntryAssemblyOnlyOptionName = "EO";
+        private const string XmlToYamlOptionName = "X2Y";
+        private readonly Dictionary<string, CommandOption> _options = new Dictionary<string, CommandOption>();
+        private CommandArgument<DatabaseExecutorCommand>? _cmdArg;
+        private CommandArgument? _scriptNewArg;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="DatabaseConsole"/>.
+        /// Gets the default database script name.
         /// </summary>
-        /// <returns>The <see cref="DatabaseConsole"/>.</returns>
-        public static DatabaseConsole Create()
-        {
-            return new DatabaseConsole();
-        }
+        public const string DefaultDatabaseScript = "Database.yaml";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
+        /// Gets the default masthead text.
         /// </summary>
-        private DatabaseConsole()
-        {
-            App = new CommandLineApplication()
-            {
-                Name = "beef.database",
-                Description = "Business Entity Execution Framework (Beef) Database Tooling."
-            };
-
-            App.HelpOption(true);
-
-            _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _connectionStringArg = App.Argument("connectionstring", "Database connection string.");
-            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified, in order of use).", CommandOptionType.MultipleValue)
-                .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
-
-            _configOpt = App.Option("-c|--config", "CodeGeneration configuration XML file.", CommandOptionType.SingleValue)
-                .Accepts(v => v.ExistingFile());
-
-            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue);
-
-            _outputOpt = App.Option("-o|--output", "Output path (defaults to current path) for code generation.", CommandOptionType.SingleValue)
-                .Accepts(v => v.ExistingDirectory());
-
-            _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
-                .Accepts(v => v.Use(new ParamsValidator()));
-
-            _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
-            _supportedOpt = App.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue);
-            _envVarNameOpt = App.Option<string>("-evn|--environmentVariableName", "Override the connection string using the specified environment variable name.", CommandOptionType.SingleValue);
-
-            Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
-
-            App.OnValidate((ctx) => OnValidate());
-            App.OnExecuteAsync((_) => RunRunAwayAsync());
-        }
-
-        /// <summary>
-        /// Performs addition validations.
-        /// </summary>
-        private ValidationResult OnValidate()
-        {
-            _connectionString = _envVarNameOpt.HasValue() ? Environment.GetEnvironmentVariable(_envVarNameOpt.Value()!) : _connectionStringArg.Value;
-            if (_connectionString == null)
-                return new ValidationResult($"The connectionString command and/or --environmentVariableName option must be specified; with the latter at least resulting in a non-null value.");
-
-            if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen) && _configOpt.Value() == null)
-                return new ValidationResult($"The --config option is required when CodeGen is selected.");
-
-            return ValidationResult.Success!;
-        }
-
-        /// <summary>
-        /// Gets the underlying <see cref="CommandLineApplication"/>.
-        /// </summary>
-        public CommandLineApplication App { get; }
-
-        /// <summary>
-        /// Runs the database tooling using the passed <paramref name="args"/> string.
-        /// </summary>
-        /// <param name="args">The database tooling arguments.</param>
-        /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public Task<int> RunAsync(string? args = null)
-        {
-            if (string.IsNullOrEmpty(args))
-                return RunAsync(Array.Empty<string>());
-
-            // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
-            var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
-            var array = regex.Cast<Match>()
-                .Select(m => Regex.Replace(
-                    m.Groups[2].Success
-                        ? m.Groups[2].Value
-                        : m.Groups[4].Value, @"""""", @"""")).ToArray();
-
-            return RunAsync(array);
-        }
-
-        /// <summary>
-        /// Runs the database tooling using the passed array of <paramref name="args"/>.
-        /// </summary>
-        /// <param name="args">The code generation arguments.</param>
-        /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public async Task<int> RunAsync(string[] args)
-        {
-            try
-            {
-                return await App.ExecuteAsync(args).ConfigureAwait(false);
-            }
-            catch (CommandParsingException cpex)
-            {
-                _logger.LogInformation(cpex.Message);
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// Coordinates the run (overall execution).
-        /// </summary>
-        private async Task<int> RunRunAwayAsync() /* Inspired by https://www.youtube.com/watch?v=ikMiQZF-mAY */
-        {
-            var args = new CodeGenExecutorArgs(_logger, _scriptAssemblies, CreateParamDict(_paramsOpt))
-            {
-                ConfigFile = _configOpt.HasValue() ? new FileInfo(_configOpt.Value()) : null,
-                ScriptFile = _scriptOpt.HasValue() ? _scriptOpt.Value() : null,
-                OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory)
-            };
-
-            WriteHeader(args);
-
-            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionString!, _scriptAssemblies.ToArray()) { CodeGenArgs = args, SupportedCommands = _supportedOpt.HasValue() ? (DatabaseExecutorCommand)_supportedOpt.ParsedValue : DatabaseExecutorCommand.All };
-            if (_schemaOrder.HasValue())
-                dea.SchemaOrder.AddRange(_schemaOrder.Values);
-
-            var de = new DatabaseExecutor(dea);
-            var sw = Stopwatch.StartNew();
-
-            var result = await de.RunAsync().ConfigureAwait(false);
-
-            sw.Stop();
-            WriteFooter(sw);
-            return result ? 0 : -1;
-        }
-
-        /// <summary>
-        /// Writes the header information.
-        /// </summary>
-        private void WriteHeader(CodeGenExecutorArgs args)
-        {
-            WriteMasthead(_logger);
-            _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");
-            _logger.LogInformation($"  ConnectionString = {_connectionStringArg.Value}");
-            LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
-        }
-
-        /// <summary>
-        /// Writes the mast head information.
-        /// </summary>
-        public static void WriteMasthead(ILogger? logger = null)
-        {
-            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
-
-            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Database%20Tool%0A
-            logger.LogInformation(@"
+        /// <remarks>Defaults to 'Beef Database Tool' formatted using <see href="http://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=Beef%20Database%20Tool%0A"/>.</remarks>
+        public const string DefaultMastheadText = @"
 ╔╗ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌┬┐┌─┐┌┐ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌─┐┬  
 ╠╩╗├┤ ├┤ ├┤    ║║├─┤ │ ├─┤├┴┐├─┤└─┐├┤    ║ │ ││ ││  
 ╚═╝└─┘└─┘└    ═╩╝┴ ┴ ┴ ┴ ┴└─┘┴ ┴└─┘└─┘   ╩ └─┘└─┘┴─┘
-");
-            logger.LogInformation("Business Entity Execution Framework (Beef) Database Tooling.");
-            logger.LogInformation(string.Empty);
+";
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DatabaseConsole"/> class using the specified parameters.
+        /// </summary>
+        /// <param name="connectionString">The default connection string.</param>
+        /// <param name="company">The company name.</param>
+        /// <param name="appName">The application/domain name.</param>
+        /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
+        /// <returns>The <see cref="DatabaseConsole"/> instance.</returns>
+        public static DatabaseConsole Create(string connectionString, string company, string appName, bool useBeefDbo = true)
+            => Create(new DatabaseConsoleArgs { ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString)), UseBeefDbo = useBeefDbo }
+                .AddParameter(CodeGenConsole.CompanyParamName, Check.NotEmpty(company, nameof(company)))
+                .AddParameter(CodeGenConsole.AppNameParamName, Check.NotEmpty(appName, nameof(appName)))
+                .AddAssembly(Assembly.GetEntryAssembly()!));
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DatabaseConsole"/> class using the <see cref="DatabaseConsoleArgs"/>.
+        /// </summary>
+        /// <param name="args">The <see cref="DatabaseConsoleArgs"/>.</param>
+        /// <returns>The <see cref="DatabaseConsole"/> instance.</returns>
+        public static DatabaseConsole Create(DatabaseConsoleArgs? args = null) => new DatabaseConsole(args ?? new DatabaseConsoleArgs());
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseConsole"/> class.
+        /// </summary>
+        /// <param name="args">The <see cref="DatabaseConsoleArgs"/>.</param>
+        private DatabaseConsole(DatabaseConsoleArgs args)
+        {
+            Args = args;
+
+            if (!Args.Parameters.ContainsKey(CodeGenConsole.CompanyParamName))
+                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGenConsole.CompanyParamName}.");
+
+            if (!Args.Parameters.ContainsKey(CodeGenConsole.AppNameParamName))
+                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGenConsole.AppNameParamName}.");
+
+            if (Args.OutputDirectory == null)
+                Args.OutputDirectory = new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent;
+
+            if (string.IsNullOrEmpty(Args.ScriptFileName))
+                Args.ScriptFileName = DefaultDatabaseScript;
+
+            var assembly = typeof(DatabaseConsole).Assembly!;
+            Name = assembly.GetName()?.Name ?? throw new InvalidOperationException("Unable to infer name.");
+            Text = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? throw new InvalidOperationException("Unable to infer text.");
+            Version = assembly.GetName()?.Version?.ToString(3);
+            Description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? Text;
+
+            Args.ConnectionStringEnvironmentVariableName = $"{Args.Company?.Replace(".", "_", StringComparison.InvariantCulture)}_{Args.AppName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
-        /// Write the footer information.
+        /// Gets the <see cref="DatabaseConsoleArgs"/>.
         /// </summary>
-        private void WriteFooter(Stopwatch sw)
+        public DatabaseConsoleArgs Args { get; }
+
+        /// <summary>
+        /// Gets the application/command name.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets the application/command short text.
+        /// </summary>
+        public string Text { get; }
+
+        /// <summary>
+        /// Gets the application/command description.
+        /// </summary>
+        public string? Description { get; }
+
+        /// <summary>
+        /// Gets the application/command version.
+        /// </summary>
+        public string? Version { get; }
+
+        /// <summary>
+        /// Gets or sets the masthead text.
+        /// </summary>
+        /// <remarks>Defaults to <see cref="DefaultMastheadText"/>.</remarks>
+        public string? MastheadText { get; set; } = DefaultMastheadText;
+
+        /// <summary>
+        /// Adds the <paramref name="assemblies"/> containing the embedded resources.
+        /// </summary>
+        /// <param name="assemblies">The assemblies containing the embedded resources.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsole Assemblies(params Assembly[] assemblies)
         {
-            _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"Beef Database Tool complete [{sw.ElapsedMilliseconds}ms].");
-            _logger.LogInformation(string.Empty);
+            Args.AddAssembly(assemblies);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the output <see cref="DirectoryInfo"/> where the generated artefacts are to be written.
+        /// </summary>
+        /// <param name="path">The output <see cref="DirectoryInfo"/>.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsole OutputDirectory(string path)
+        {
+            Args.OutputDirectory = new DirectoryInfo(Check.NotEmpty(path, nameof(path)));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name (defaults to <see cref="DefaultDatabaseScript"/>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsole DatabaseScript(string script)
+        {
+            Args.ScriptFileName = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the supported <see cref="DatabaseExecutorCommand"/> (defaults to <see cref="DatabaseExecutorCommand.All"/>.
+        /// </summary>
+        /// <param name="command">The supported <see cref="DatabaseExecutorCommand"/>.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsole Supports(DatabaseExecutorCommand command)
+        {
+            Args.SupportedCommands = command;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="schemas"/> to the schema order.
+        /// </summary>
+        /// <param name="schemas">The schema names to add.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public DatabaseConsole SchemaOrder(params string[] schemas)
+        {
+            Args.SchemaOrder.AddRange(schemas);
+            return this;
+        }
+
+        /// <summary>
+        /// Runs the code generation using the passed <paramref name="args"/> string.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
+        public async Task<int> RunAsync(string? args = null) => await RunAsync(CodeGen.Console.CodeGenConsole.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
+
+        /// <summary>
+        /// Runs the code generation using the passed <paramref name="args"/> array.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
+        public async Task<int> RunAsync(string[] args)
+        {
+            // Final set up of console arguments.
+            Args.Logger ??= new CodeGen.Console.ConsoleLogger(PhysicalConsole.Singleton);
+            Diagnostics.Logger.Default ??= Args.Logger;
+
+            // Set up the app.
+            using var app = new CommandLineApplication(PhysicalConsole.Singleton) { Name = Name, Description = Description };
+            app.HelpOption();
+
+            _cmdArg = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
+            _options.Add(nameof(DatabaseConsoleArgs.ConnectionString), app.Option("-cs|--connectionString", "Database connection string.", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), app.Option("-evn|--environmentVariableName", "Database connection string environment variable name.", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.SchemaOrder), app.Option("-so|--schemaorder", "Database schema name (multiple can be specified in priority order).", CommandOptionType.MultipleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.Assemblies), app.Option("-a|--assembly", "Assembly containing embedded resources (multiple can be specified in probing order).", CommandOptionType.MultipleValue));
+            _options.Add(EntryAssemblyOnlyOptionName, app.Option("-eo|--entry-assembly-only", "Use the entry assembly only.", CommandOptionType.NoValue));
+            _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified).", CommandOptionType.MultipleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.SupportedCommands), app.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ScriptFileName), app.Option("-s|--scriptFile", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ConfigFileName), app.Option("-c|--configFile", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.OutputDirectory), app.Option("-o|--output", "Output directory path. [CodeGen]", CommandOptionType.MultipleValue).Accepts(v => v.ExistingDirectory("Output directory path does not exist.")));
+            _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expectNoChanges", "Indicates to expect _no_ changes in the artefact output (e.g. within build pipeline). [CodeGen]", CommandOptionType.NoValue));
+            _options.Add(nameof(DatabaseConsoleArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
+            _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
+            _scriptNewArg = app.Argument("args", "Additional arguments. [ScriptNew]", multipleValues: true);
+
+            app.OnValidate(ctx =>
+            {
+                Args.Command = _cmdArg.ParsedValue;
+
+                UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
+                Args.UpdateConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
+
+                UpdateStringOptionMulti(nameof(DatabaseConsoleArgs.SchemaOrder), v =>
+                {
+                    Args.SchemaOrder.Clear();
+                    Args.SchemaOrder.AddRange(v);
+                });
+
+                var vr = new CodeGen.Console.AssemblyValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Assemblies)), ctx);
+                if (vr != ValidationResult.Success)
+                    return vr;
+
+                UpdateBooleanOption(EntryAssemblyOnlyOptionName, () =>
+                {
+                    Args.Assemblies.Clear();
+                    Args.AddAssembly(Assembly.GetEntryAssembly()!);
+                });
+
+                vr = new CodeGen.Console.ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Parameters)), ctx);
+                if (vr != ValidationResult.Success)
+                    return vr;
+
+                UpdateTypedOption<int>(nameof(DatabaseConsoleArgs.SupportedCommands), v => Args.SupportedCommands = (DatabaseExecutorCommand)v);
+                UpdateStringOption(nameof(DatabaseConsoleArgs.ScriptFileName), v => Args.ScriptFileName = v);
+                UpdateStringOption(nameof(DatabaseConsoleArgs.ConfigFileName), v => Args.ConfigFileName = v);
+                UpdateStringOption(nameof(DatabaseConsoleArgs.OutputDirectory), v => Args.OutputDirectory = new DirectoryInfo(v));
+                UpdateBooleanOption(nameof(DatabaseConsoleArgs.ExpectNoChanges), () => Args.ExpectNoChanges = true);
+                UpdateBooleanOption(nameof(DatabaseConsoleArgs.IsSimulation), () => Args.IsSimulation = true);
+
+                Args.AddScriptNewArguments(_scriptNewArg.Values.Where(x => !string.IsNullOrEmpty(x)).OfType<string>().Distinct().ToArray());
+                if (Args.ScriptNewArguments.Count > 0 && _cmdArg.ParsedValue != DatabaseExecutorCommand.ScriptNew)
+                    return new ValidationResult("Additional arguments can only be specified when the command is ScriptNew.", new string[] { "args" });
+
+                if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
+                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
+
+                return ValidationResult.Success!;
+            });
+
+            // Set up the code generation execution.
+            app.OnExecuteAsync(_ => RunRunaway());
+
+            // Execute the command-line app.
+            try
+            {
+                return await app.ExecuteAsync(args).ConfigureAwait(false);
+            }
+            catch (CommandParsingException cpex)
+            {
+                Args.Logger?.LogError(cpex.Message);
+                Args.Logger?.LogError(string.Empty);
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Gets the selected <see cref="CommandOption"/> for the specfied key.
+        /// </summary>
+        private CommandOption GetCommandOption(string key) => _options[key];
+
+        /// <summary>
+        /// Updates the command option from a string option.
+        /// </summary>
+        private void UpdateStringOption(string key, Action<string> action)
+        {
+            var co = GetCommandOption(key);
+            if (co.HasValue())
+            {
+                var v = co.Value();
+                if (!string.IsNullOrEmpty(v))
+                    action.Invoke(v);
+            }
+        }
+
+        /// <summary>
+        /// Updates the command option from a multiple string option.
+        /// </summary>
+        private void UpdateStringOptionMulti(string key, Action<string[]> action)
+        {
+            var co = GetCommandOption(key);
+            if (co.HasValue())
+                action.Invoke(co.Values.Where(x => !string.IsNullOrEmpty(x)).OfType<string>().Distinct().ToArray());
+        }
+
+        /// <summary>
+        /// Updates the command option from a boolean option.
+        /// </summary>
+        private void UpdateBooleanOption(string key, Action action)
+        {
+            var co = GetCommandOption(key);
+            if (co.HasValue())
+                action.Invoke();
+        }
+
+        /// <summary>
+        /// Updates the command opton from a typed option.
+        /// </summary>
+        private void UpdateTypedOption<T>(string key, Action<T> action)
+        {
+            var co = (CommandOption<T>)GetCommandOption(key);
+            if (co.HasValue())
+                action.Invoke(co.ParsedValue);
+        }
+
+        /// <summary>
+        /// Performs the actual database processing.
+        /// </summary>
+        private async Task<int> RunRunaway() /* Method name inspired by: Slade - Run Runaway - https://www.youtube.com/watch?v=gMxcGaAwy-Q */
+        {
+            try
+            {
+                // Write the masthead and headser.
+                if (MastheadText != null)
+                    Args.Logger?.LogInformation(MastheadText);
+
+                // Write the header.
+                Args.Logger?.LogInformation($"{Text}{(Version == null ? "" : $" [v{Version}]")}");
+                Args.Logger?.LogInformation(string.Empty);
+
+                if (GetCommandOption(XmlToYamlOptionName).HasValue())
+                {
+                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, Args.Company, Args.AppName)).ConfigureAwait(false);
+                    return success ? 0 : 4;
+                }
+
+                // Write the options.
+                Args.Logger?.LogInformation($"Command = {_cmdArg!.ParsedValue}");
+                Args.Logger?.LogInformation($"SchemaOrder = {string.Join(", ", Args.SchemaOrder.ToArray())}");
+
+                Args.Logger?.LogInformation($"Parameters{(Args.Parameters.Count == 0 ? " = none" : ":")}");
+                foreach (var p in Args.Parameters)
+                {
+                    Args.Logger?.LogInformation($"  {p.Key} = {p.Value}");
+                }
+
+                Args.Logger?.LogInformation($"Assemblies{(Args.Assemblies.Count == 0 ? " = none" : ":")}");
+                foreach (var a in Args.Assemblies)
+                {
+                    Args.Logger?.LogInformation($"  {a.FullName}");
+                }
+
+                Args.Logger?.LogInformation(string.Empty);
+
+                // Run the database executor.
+                var de = new DatabaseExecutor(new DatabaseExecutorArgs(Args));
+                var sw = Stopwatch.StartNew();
+
+                var ok = await de.RunAsync().ConfigureAwait(false);
+                if (!ok)
+                    return 5;
+
+                // Write the footer.
+                sw.Stop();
+                Args.Logger?.LogInformation(string.Empty);
+                Args.Logger?.LogInformation($"Complete. [{sw.ElapsedMilliseconds}ms]");
+                Args.Logger?.LogInformation(string.Empty);
+
+                return 0;
+            }
+            catch (CodeGenException gcex)
+            {
+                if (gcex.Message != null)
+                {
+                    Args.Logger?.LogError(gcex.Message);
+                    if (gcex.InnerException != null)
+                        Args.Logger?.LogError(gcex.InnerException.Message);
+
+                    Args.Logger?.LogError(string.Empty);
+                }
+
+                return 2;
+            }
+            catch (CodeGenChangesFoundException cgcfex)
+            {
+                Args.Logger?.LogError(cgcfex.Message);
+                Args.Logger?.LogError(string.Empty);
+                return 3;
+            }
         }
     }
 }

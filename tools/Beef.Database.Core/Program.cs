@@ -13,10 +13,7 @@ namespace Beef.Database.Core
         /// The main entry point.
         /// </summary>
         /// <param name="args">The console arguments.</param>
-        /// <returns>A statuc code.</returns>
-        public static Task<int> Main(string[] args)
-        {
-            return DatabaseConsole.Create().RunAsync(args);
-        }
+        /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
+        public static Task<int> Main(string[] args) => DatabaseConsole.Create().RunAsync(args);
     }
 }

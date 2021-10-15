@@ -20,13 +20,13 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenerator"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="CodeGeneratorArgs"/>.</param>
-        public CodeGenerator(CodeGeneratorArgs args)
+        /// <param name="args">The <see cref="CodeGeneratorArgsBase"/>.</param>
+        public CodeGenerator(CodeGeneratorArgsBase args)
         {
             CodeGenArgs = args ?? throw new ArgumentNullException(nameof(args));
-            CodeGenArgs.DirectoryBase ??= new DirectoryInfo(Environment.CurrentDirectory);
+            CodeGenArgs.OutputDirectory ??= new DirectoryInfo(Environment.CurrentDirectory);
 
-            using var s = StreamLocator.GetScriptStreamReader(CodeGenArgs.ScriptFileName, CodeGenArgs.Assemblies) ?? throw new CodeGenException($"Script '{CodeGenArgs.ScriptFileName}' does not exist.");
+            using var s = StreamLocator.GetScriptStreamReader(CodeGenArgs.ScriptFileName ?? throw new CodeGenException("Script file name must be specified."), CodeGenArgs.Assemblies.ToArray()) ?? throw new CodeGenException($"Script '{CodeGenArgs.ScriptFileName}' does not exist.");
             Scripts = LoadScriptStream(null, CodeGenArgs.ScriptFileName, s);
         }
 
@@ -66,7 +66,7 @@ namespace Beef.CodeGen
                 {
                     foreach (var ifn in scripts.Inherits)
                     {
-                        using var s = StreamLocator.GetScriptStreamReader(ifn, CodeGenArgs.Assemblies) ?? throw new CodeGenException($"Script '{ifn}' does not exist.");
+                        using var s = StreamLocator.GetScriptStreamReader(ifn, CodeGenArgs.Assemblies.ToArray()) ?? throw new CodeGenException($"Script '{ifn}' does not exist.");
                         var inherit = LoadScriptStream(rootScript, ifn, s);
                         foreach (var iscript in inherit.Generators!)
                         {
@@ -97,17 +97,20 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the <see cref="CodeGeneratorArgs"/>.
         /// </summary>
-        public CodeGeneratorArgs CodeGenArgs { get; }
+        public CodeGeneratorArgsBase CodeGenArgs { get; }
 
         /// <summary>
         /// Execute the code-generation; loads the configuration file and executes each of the scripted templates.
         /// </summary>
-        /// <param name="configFileName">The filename to load the content from the file system (primary) or <see cref="Beef.CodeGen.CodeGeneratorArgs.Assemblies"/> (secondary, recursive until found).</param>
+        /// <param name="configFileName">The filename (defaults to <see cref="CodeGenArgs"/>) to load the content from the file system (primary) or <see cref="Beef.CodeGen.CodeGeneratorArgsBase.Assemblies"/> (secondary, recursive until found).</param>
         /// <returns>The resultant <see cref="CodeGenStatistics"/>.</returns>
-        public CodeGenStatistics Generate(string configFileName)
+        /// <exception cref="CodeGenException">Thrown when an error is encountered during the code-generation.</exception>
+        /// <exception cref="CodeGenChangesFoundException">Thrown where the code-generation would result in changes to an underlying artefact. This is managed by setting <see cref="CodeGeneratorArgsBase.ExpectNoChanges"/> to <c>true</c>.</exception>
+        public CodeGenStatistics Generate(string? configFileName = null)
         {
-            using var sr = StreamLocator.GetStreamReader(configFileName, null, CodeGenArgs.Assemblies) ?? throw new CodeGenException($"Config '{configFileName}' does not exist.");
-            return Generate(configFileName, sr, StreamLocator.GetContentType(configFileName));
+            var fn = configFileName ?? CodeGenArgs.ConfigFileName ?? throw new CodeGenException("Config file must be specified.");
+            using var sr = StreamLocator.GetStreamReader(fn, null, CodeGenArgs.Assemblies.ToArray()) ?? throw new CodeGenException($"Config '{fn}' does not exist.");
+            return Generate(fn, sr, StreamLocator.GetContentType(fn));
         }
 
         /// <summary>
@@ -117,6 +120,8 @@ namespace Beef.CodeGen
         /// <param name="contentType">The corresponding <see cref="StreamContentType"/>.</param>
         /// <param name="configFileName">The optional configuration file name used specifically in error messages.</param>
         /// <returns>The resultant <see cref="CodeGenStatistics"/>.</returns>
+        /// <exception cref="CodeGenException">Thrown when an error is encountered during the code-generation.</exception>
+        /// <exception cref="CodeGenChangesFoundException">Thrown where the code-generation would result in changes to an underlying artefact. This is managed by setting <see cref="CodeGeneratorArgsBase.ExpectNoChanges"/> to <c>true</c>.</exception>
         public CodeGenStatistics Generate(TextReader configReader, StreamContentType contentType, string configFileName = "<stream>") =>
             Generate(configFileName, configReader, contentType);
 
@@ -213,7 +218,7 @@ namespace Beef.CodeGen
         /// <remarks>Default implementation will write files (on create or update), update the <paramref name="statistics"/> accordingly, and <see cref="ILogger">log</see> where appropriate.</remarks>
         protected virtual void OnCodeGenerated(CodeGenOutputArgs outputArgs, CodeGenStatistics statistics)
         {
-            var di = string.IsNullOrEmpty(outputArgs.DirectoryName) ? outputArgs.Script.Root!.CodeGenArgs!.DirectoryBase! : new DirectoryInfo(Path.Combine(outputArgs.Script.Root!.CodeGenArgs!.DirectoryBase!.FullName, outputArgs.DirectoryName));
+            var di = string.IsNullOrEmpty(outputArgs.DirectoryName) ? outputArgs.Script.Root!.CodeGenArgs!.OutputDirectory! : new DirectoryInfo(Path.Combine(outputArgs.Script.Root!.CodeGenArgs!.OutputDirectory!.FullName, outputArgs.DirectoryName));
             if (!Scripts!.CodeGenArgs!.IsSimulation && !di.Exists)
                 di.Create();
 
@@ -228,6 +233,9 @@ namespace Beef.CodeGen
                     statistics.NotChangedCount++;
                 else
                 {
+                    if (Scripts!.CodeGenArgs!.ExpectNoChanges)
+                        throw new CodeGenChangesFoundException($"File '{fi.FullName}' would be updated as a result of the code generation.");
+
                     if (!Scripts!.CodeGenArgs!.IsSimulation)
                         File.WriteAllText(fi.FullName, outputArgs.Content);
 
@@ -237,6 +245,9 @@ namespace Beef.CodeGen
             }
             else
             {
+                if (Scripts!.CodeGenArgs!.ExpectNoChanges)
+                    throw new CodeGenChangesFoundException($"File '{fi.FullName}' would be created as a result of the code generation.");
+
                 if (!Scripts!.CodeGenArgs!.IsSimulation)
                     File.WriteAllText(fi.FullName, outputArgs.Content);
 

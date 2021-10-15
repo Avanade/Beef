@@ -6,7 +6,7 @@ namespace Xyz.Legacy.CdcCodeGen
     class Program
     {
         // To run execute command line: dotnet run database
-        static Task<int> Main(string[] args) => CodeGenConsoleWrapper
+        static Task<int> Main(string[] args) => CodeGenConsole
             // Code generation configuration as follows:
             // - Create - creates the code-generator instance and sets the `Company` and `AppName` parameters.
             // - Supports - turns off the default `entity` support, and turns on `database` code-gen support only.

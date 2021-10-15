@@ -14,9 +14,9 @@ namespace Beef.CodeGen.Config
     public abstract class ConfigRootBase<TRoot> : ConfigBase<TRoot, TRoot>, IRootConfig where TRoot : ConfigRootBase<TRoot>
     {
         /// <summary>
-        /// Gets the <see cref="CodeGeneratorArgs"/>.
+        /// Gets the <see cref="CodeGeneratorArgsBase"/>.
         /// </summary>
-        public CodeGeneratorArgs? CodeGenArgs { get; private set; }
+        public CodeGeneratorArgsBase? CodeGenArgs { get; private set; }
 
         /// <summary>
         /// Gets the parameter overrides.
@@ -24,10 +24,10 @@ namespace Beef.CodeGen.Config
         public Dictionary<string, string?> RuntimeParameters { get; } = new Dictionary<string, string?>();
 
         /// <summary>
-        /// Sets the <see cref="CodeGeneratorArgs"/>.
+        /// Sets the <see cref="CodeGeneratorArgsBase"/>.
         /// </summary>
-        /// <param name="codeGenArgs">The <see cref="CodeGeneratorArgs"/>.</param>
-        public void SetCodeGenArgs(CodeGeneratorArgs codeGenArgs) => CodeGenArgs = codeGenArgs ?? throw new ArgumentNullException(nameof(codeGenArgs));
+        /// <param name="codeGenArgs">The <see cref="CodeGeneratorArgsBase"/>.</param>
+        public void SetCodeGenArgs(CodeGeneratorArgsBase codeGenArgs) => CodeGenArgs = codeGenArgs ?? throw new ArgumentNullException(nameof(codeGenArgs));
 
         /// <summary>
         /// Merges (adds or updates) <paramref name="parameters"/> into the <see cref="RuntimeParameters"/>.
