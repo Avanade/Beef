@@ -12,7 +12,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Represents the base arguments for a <see cref="CodeGenerator"/>.
     /// </summary>
-    public abstract class CodeGeneratorArgsBase
+    public abstract class CodeGeneratorArgsBase : ICodeGeneratorArgs
     {
         /// <summary>
         /// Gets or sets the <b>Script</b> file name to load the content from the <c>Scripts</c> folder within the file system (primary) or <see cref="Assemblies"/> (secondary, recursive until found).
@@ -81,11 +81,14 @@ namespace Beef.CodeGen
             }
         }
 
+        /// <inheritdoc/>
+        void ICodeGeneratorArgs.CopyFrom(ICodeGeneratorArgs args) => CopyFrom((CodeGeneratorArgsBase)args);
+
         /// <summary>
         /// Copy and replace from <paramref name="args"/>.
         /// </summary>
         /// <param name="args">The <see cref="CodeGeneratorArgsBase"/> to copy from.</param>
-        protected void CopyFrom(CodeGeneratorArgsBase args)
+        public void CopyFrom(CodeGeneratorArgsBase args)
         {
             ScriptFileName = (args ?? throw new ArgumentNullException(nameof(args))).ScriptFileName;
             ConfigFileName = args.ConfigFileName;
@@ -109,10 +112,27 @@ namespace Beef.CodeGen
             }
         }
 
+        /// <inheritdoc/>
+        ICodeGeneratorArgs ICodeGeneratorArgs.Clone() => Clone();
+
         /// <summary>
         /// Clone the <see cref="CodeGeneratorArgsBase"/>.
         /// </summary>
         /// <returns>A new <see cref="CodeGeneratorArgsBase"/> instance.</returns>
         public abstract CodeGeneratorArgsBase Clone();
+
+        /// <summary>
+        /// Gets the specified parameter from the <see cref="Parameters"/> collection.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="throwWhereNotFound">Indicates to throw a <see cref="KeyNotFoundException"/> when the specified key is not found.</param>
+        /// <returns>The parameter value where found; otherwise, <c>null</c>.</returns>
+        public string? GetParameter(string key, bool throwWhereNotFound = false)
+        {
+            if (Parameters.TryGetValue(key, out var value))
+                return value;
+
+            return !throwWhereNotFound ? null : throw new KeyNotFoundException($"Parameter '{key}' does not exist.");
+        }
     }
 }

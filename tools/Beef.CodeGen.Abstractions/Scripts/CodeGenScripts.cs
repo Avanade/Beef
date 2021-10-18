@@ -74,8 +74,9 @@ namespace Beef.CodeGen.Scripts
             // Make sure config type exists and is ConfigRootBase<>.
             try
             {
-                _configType = Type.GetType(ConfigType);
+                _configType = Type.GetType(ConfigType ?? throw new CodeGenException(this, nameof(ConfigType), $"Type must be specified."));
             }
+            catch (CodeGenException) { throw; }
             catch (Exception ex) { throw new CodeGenException(this, nameof(ConfigType), $"Type '{ConfigType}' is invalid: {ex.Message}"); }
 
             if (_configType == null)
@@ -90,12 +91,9 @@ namespace Beef.CodeGen.Scripts
                 Type configEditorType;
                 try
                 {
-                    configEditorType = Type.GetType(EditorType);
+                    configEditorType = Type.GetType(EditorType) ?? throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' does not exist.");
                 }
                 catch (Exception ex) { throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' is invalid: {ex.Message}"); }
-
-                if (configEditorType == null)
-                    throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' does not exist.");
 
                 if (!typeof(IConfigEditor).IsAssignableFrom(configEditorType) || configEditorType.GetConstructor(Array.Empty<Type>()) == null)
                     throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' does not implement IConfigEditor and/or have a default parameterless constructor.");

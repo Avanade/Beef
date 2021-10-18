@@ -224,7 +224,7 @@ namespace Beef.CodeGen.Config
                 else if (baseType == type)
                     return true;
 
-                type = type.BaseType;
+                type = type.BaseType!;
             }
 
             return false;

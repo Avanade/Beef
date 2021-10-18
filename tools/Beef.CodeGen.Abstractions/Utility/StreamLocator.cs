@@ -59,14 +59,17 @@ namespace Beef.CodeGen.Utility
                 if (fi.Exists)
                     return new StreamReader(fi.FullName);
 
-                foreach (var ass in new List<Assembly>(assemblies) { typeof(StreamLocator).Assembly })
+                if (assemblies != null)
                 {
-                    var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{contentType}.{fi.Name}", StringComparison.InvariantCulture)).FirstOrDefault();
-                    if (rn != null)
+                    foreach (var ass in new List<Assembly>(assemblies) { typeof(StreamLocator).Assembly })
                     {
-                        var ri = ass.GetManifestResourceInfo(rn);
-                        if (ri != null)
-                            return new StreamReader(ass.GetManifestResourceStream(rn)!);
+                        var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{contentType}.{fi.Name}", StringComparison.InvariantCulture)).FirstOrDefault();
+                        if (rn != null)
+                        {
+                            var ri = ass.GetManifestResourceInfo(rn);
+                            if (ri != null)
+                                return new StreamReader(ass.GetManifestResourceStream(rn)!);
+                        }
                     }
                 }
             }
@@ -120,11 +123,14 @@ namespace Beef.CodeGen.Utility
                 if (fi.Exists)
                     return true;
 
-                foreach (var ass in new List<Assembly>(assemblies) { typeof(StreamLocator).Assembly })
+                if (assemblies != null)
                 {
-                    var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{contentType}.{fi.Name}", StringComparison.InvariantCulture)).FirstOrDefault();
-                    if (rn != null)
-                        return true;
+                    foreach (var ass in new List<Assembly>(assemblies) { typeof(StreamLocator).Assembly })
+                    {
+                        var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{contentType}.{fi.Name}", StringComparison.InvariantCulture)).FirstOrDefault();
+                        if (rn != null)
+                            return true;
+                    }
                 }
             }
 

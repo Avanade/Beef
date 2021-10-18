@@ -34,9 +34,9 @@ namespace Beef.CodeGen.Console
         /// <param name="text">The application/command short text.</param>
         /// <param name="description">The application/command description; defaults to <paramref name="text"/> when not specified.</param>
         /// <param name="version">The application/command version number.</param>
-        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.AllExceptDatabase"/>.</param>
+        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.All"/>.</param>
         /// <returns>A new <see cref="CodeGenConsole"/>.</returns>
-        public static CodeGenConsole Create<T>(CodeGeneratorArgs? args = null, string ? name = null, string? text = null, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.AllExceptDatabase)
+        public static CodeGenConsole Create<T>(CodeGeneratorArgs? args = null, string ? name = null, string? text = null, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.All)
             => new(typeof(T).Assembly, args, name, text, description, version, options);
 
         /// <summary>
@@ -65,9 +65,9 @@ namespace Beef.CodeGen.Console
         /// <param name="text">The application/command short text.</param>
         /// <param name="description">The application/command description; will default to <paramref name="text"/> when not specified.</param>
         /// <param name="version">The application/command version number.</param>
-        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.AllExceptDatabase"/>.</param>
+        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.All"/>.</param>
         /// <param name="args">The default <see cref="CodeGeneratorArgs"/> that will be overridden or updated (<see cref="CodeGeneratorArgsBase.Assemblies"/> and <see cref="CodeGeneratorArgsBase.Parameters"/>) by the command-line argument values.</param>
-        public CodeGenConsole(string name, string text, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.AllExceptDatabase, CodeGeneratorArgs? args = null)
+        public CodeGenConsole(string name, string text, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.All, CodeGeneratorArgs? args = null)
         {
             Args = args ?? new CodeGeneratorArgs();
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -87,8 +87,8 @@ namespace Beef.CodeGen.Console
         /// <param name="text">The application/command short text.</param>
         /// <param name="description">The application/command description; defaults to <paramref name="text"/> when not specified.</param>
         /// <param name="version">The application/command version number.</param>
-        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.AllExceptDatabase"/>.</param>
-        public CodeGenConsole(Assembly assembly, CodeGeneratorArgs? args = null, string ? name = null, string? text = null, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.AllExceptDatabase)
+        /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.All"/>.</param>
+        public CodeGenConsole(Assembly assembly, CodeGeneratorArgs? args = null, string ? name = null, string? text = null, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.All)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -140,11 +140,11 @@ namespace Beef.CodeGen.Console
         /// <summary>
         /// Gets or sets the masthead text used by <see cref="OnWriteMasthead"/>.
         /// </summary>
-        /// <remarks>Defaults to 'Code-Gen Tool' formatted using <see href="https://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=Code-Gen%20Tool%0A"/>.</remarks>
+        /// <remarks>Defaults to 'Code-Gen Tool' formatted using <see href="https://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=OnRamp%20CodeGen%20Tool"/>.</remarks>
         public string? MastheadText { get; set; } = @"
-╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
-║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
-╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
+╔═╗┌┐┌╦═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
+║ ║│││╠╦╝├─┤│││├─┘  ║  │ │ ││├┤ ║ ╦├┤ │││   ║ │ ││ ││  
+╚═╝┘└┘╩╚═┴ ┴┴ ┴┴    ╚═╝└─┘─┴┘└─┘╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
 ";
 
         /// <summary>
@@ -167,15 +167,15 @@ namespace Beef.CodeGen.Console
             using var app = new CommandLineApplication(PhysicalConsole.Singleton) { Name = Name, Description = Description };
             app.HelpOption();
 
-            _options.Add(SupportedOptions.ScriptFileName, _supportedOptions.HasFlag(SupportedOptions.ScriptFileName) ? app.Option("-s|--scriptFile", "Script orchestration file name.", CommandOptionType.SingleValue) : null);
-            _options.Add(SupportedOptions.ConfigFileName, _supportedOptions.HasFlag(SupportedOptions.ConfigFileName) ? app.Option("-c|--configFile", "Configuration data file name.", CommandOptionType.SingleValue) : null);
+            _options.Add(SupportedOptions.ScriptFileName, _supportedOptions.HasFlag(SupportedOptions.ScriptFileName) ? app.Option("-s|--script", "Script orchestration file/resource name.", CommandOptionType.SingleValue) : null);
+            _options.Add(SupportedOptions.ConfigFileName, _supportedOptions.HasFlag(SupportedOptions.ConfigFileName) ? app.Option("-c|--config", "Configuration data file name.", CommandOptionType.SingleValue) : null);
             _options.Add(SupportedOptions.OutputDirectory, _supportedOptions.HasFlag(SupportedOptions.OutputDirectory) ? app.Option("-o|--output", "Output directory path.", CommandOptionType.MultipleValue).Accepts(v => v.ExistingDirectory("Output directory path does not exist.")) : null);
             _options.Add(SupportedOptions.Assemblies, _supportedOptions.HasFlag(SupportedOptions.Assemblies) ? app.Option("-a|--assembly", "Assembly containing embedded resources (multiple can be specified in probing order).", CommandOptionType.MultipleValue) : null);
             _options.Add(SupportedOptions.Parameters, _supportedOptions.HasFlag(SupportedOptions.Parameters) ? app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified).", CommandOptionType.MultipleValue) : null);
-            _options.Add(SupportedOptions.DatabaseConnectionString, _supportedOptions.HasFlag(SupportedOptions.DatabaseConnectionString) ? app.Option("-cs|--connectionString", "Database connection string.", CommandOptionType.SingleValue) : null);
-            _options.Add(SupportedOptions.DatabaseConnectionStringEnvironmentVariableName, _supportedOptions.HasFlag(SupportedOptions.DatabaseConnectionStringEnvironmentVariableName) ? app.Option("-evn|--environmentVariableName", "Database connection string environment variable name.", CommandOptionType.SingleValue) : null);
-            _options.Add(SupportedOptions.ExpectNoChanges, _supportedOptions.HasFlag(SupportedOptions.ExpectNoChanges) ? app.Option("-enc|--expectNoChanges", "Indicates to expect _no_ changes in the artefact output (e.g. within build pipeline).", CommandOptionType.NoValue) : null);
-            _options.Add(SupportedOptions.IsSimulation, _supportedOptions.HasFlag(SupportedOptions.IsSimulation) ? app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts).", CommandOptionType.NoValue) : null);
+            _options.Add(SupportedOptions.DatabaseConnectionString, _supportedOptions.HasFlag(SupportedOptions.DatabaseConnectionString) ? app.Option("-cs|--connection-string", "Database connection string.", CommandOptionType.SingleValue) : null);
+            _options.Add(SupportedOptions.DatabaseConnectionStringEnvironmentVariableName, _supportedOptions.HasFlag(SupportedOptions.DatabaseConnectionStringEnvironmentVariableName) ? app.Option("-cv|--connection-varname", "Database connection string environment variable name.", CommandOptionType.SingleValue) : null);
+            _options.Add(SupportedOptions.ExpectNoChanges, _supportedOptions.HasFlag(SupportedOptions.ExpectNoChanges) ? app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. within build pipeline).", CommandOptionType.NoValue) : null);
+            _options.Add(SupportedOptions.IsSimulation, _supportedOptions.HasFlag(SupportedOptions.IsSimulation) ? app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).", CommandOptionType.NoValue) : null);
 
             // Set up the code generation validation.
             app.OnValidate(ctx =>

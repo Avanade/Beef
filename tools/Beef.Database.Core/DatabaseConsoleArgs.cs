@@ -30,14 +30,24 @@ namespace Beef.Database.Core
         public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All;
 
         /// <summary>
-        /// Gets the list of <see cref="DatabaseExecutorCommand.ScriptNew"/> arguments.
-        /// </summary>
-        public List<string> ScriptNewArguments { get; } = new List<string>();
-
-        /// <summary>
         /// Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).
         /// </summary>
         public bool UseBeefDbo { get; set; } = true;
+
+        /// <summary>
+        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.CompanyParamName"/>.
+        /// </summary>
+        public string Company => GetParameter(CodeGenConsole.CompanyParamName, true)!;
+
+        /// <summary>
+        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.AppNameParamName"/>.
+        /// </summary>
+        public string AppName => GetParameter(CodeGenConsole.AppNameParamName, true)!;
+
+        /// <summary>
+        /// Gets the list of <see cref="DatabaseExecutorCommand.ScriptNew"/> arguments.
+        /// </summary>
+        public List<string> ScriptNewArguments { get; } = new List<string>();
 
         /// <summary>
         /// Adds one or more <paramref name="arguments"/> to <see cref="ScriptNewArguments"/>.
@@ -71,16 +81,14 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Adds one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
+        /// Adds (inserts) one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
         /// </summary>
         /// <param name="assemblies">The assemblies to add.</param>
         /// <remarks>The order in which they are specified is the order in which they will be probed for embedded resources.</remarks>
-        /// <returns>The current <see cref="DatabaseConsoleArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public DatabaseConsoleArgs AddAssembly(params Assembly[] assemblies)
         {
-            if (assemblies != null)
-                Assemblies.InsertRange(0, assemblies);
-
+            ((ICodeGeneratorArgs)this).AddAssembly(assemblies);
             return this;
         }
 
@@ -89,12 +97,10 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="key">The parameter name.</param>
         /// <param name="value">The parameter value.</param>
-        /// <returns>The current <see cref="DatabaseConsoleArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public DatabaseConsoleArgs AddParameter(string key, string? value)
         {
-            if (!Parameters.TryAdd(key, value))
-                Parameters[key] = value;
-
+            ((ICodeGeneratorArgs)this).AddParameter(key, value);
             return this;
         }
 
@@ -102,17 +108,10 @@ namespace Beef.Database.Core
         /// Adds (merges) the <paramref name="parameters"/> to the <see cref="CodeGeneratorArgsBase.Parameters"/>.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns>The current <see cref="DatabaseConsoleArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public DatabaseConsoleArgs AddParameters(IDictionary<string, string?> parameters)
         {
-            if (parameters != null)
-            {
-                foreach (var p in parameters)
-                {
-                    AddParameter(p.Key, p.Value);
-                }
-            }
-
+            ((ICodeGeneratorArgs)this).AddParameters(parameters);
             return this;
         }
 
@@ -131,21 +130,6 @@ namespace Beef.Database.Core
             SchemaOrder.Clear();
             SchemaOrder.AddRange(args.SchemaOrder);
         }
-
-        /// <summary>
-        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.CompanyParamName"/>.
-        /// </summary>
-        public string Company => GetParamater(CodeGenConsole.CompanyParamName);
-
-        /// <summary>
-        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.AppNameParamName"/>.
-        /// </summary>
-        public string AppName => GetParamater(CodeGenConsole.AppNameParamName);
-
-        /// <summary>
-        /// Gets the parameter using the specified key; must exist!
-        /// </summary>
-        private string GetParamater(string key) => !Parameters.TryGetValue(key, out var value) || string.IsNullOrEmpty(value) ? throw new InvalidOperationException($"Parameter '{key}' does not exist or is invalid.") : value;
 
         /// <summary>
         /// Clone the <see cref="DatabaseConsoleArgs"/>.

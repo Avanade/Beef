@@ -153,18 +153,19 @@ namespace Beef.CodeGen
                 rootConfig.MergeRuntimeParameters(CodeGenArgs.Parameters);
 
                 // Instantiate and execute any 'before' custom editors.
+                var editors = new List<IConfigEditor>();
                 foreach (var cet in Scripts.GetEditors().Distinct())
                 {
-                    var ce = (IConfigEditor)Activator.CreateInstance(cet);
+                    var ce = (IConfigEditor)(Activator.CreateInstance(cet) ?? throw new CodeGenException($"Config Editor {cet.FullName} could not be instantiated."));
+                    editors.Add(ce);
                     ce.BeforePrepare(rootConfig);
                 }
 
                 config!.Prepare(config!, config!);
 
-                // Instantiate and execute any 'after' custom editors.
-                foreach (var cet in Scripts.GetEditors().Distinct())
+                // Execute any 'after' custom editors.
+                foreach (var ce in editors)
                 {
-                    var ce = (IConfigEditor)Activator.CreateInstance(cet);
                     ce.AfterPrepare(rootConfig);
                 }
             }
@@ -255,8 +256,11 @@ namespace Beef.CodeGen
                 outputArgs.Script.Root?.CodeGenArgs?.Logger?.LogWarning("    Created -> {fileName}", fi.FullName);
             }
 
-            using var s = new StringReader(outputArgs.Content);
-            for (; s.ReadLine() != null; statistics.LinesOfCodeCount++) { }
+            if (outputArgs.Content != null)
+            {
+                using var s = new StringReader(outputArgs.Content);
+                for (; s.ReadLine() != null; statistics.LinesOfCodeCount++) { }
+            }
         }
 
         /// <summary>

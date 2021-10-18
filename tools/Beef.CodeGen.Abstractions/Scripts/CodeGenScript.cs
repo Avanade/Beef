@@ -26,7 +26,7 @@ namespace Beef.CodeGen.Scripts
         public override string? QualifiedKeyName => BuildQualifiedKeyName("Generate");
 
         /// <summary>
-        /// Gets or sets the <see cref="CodeGeneratorBase"/> <see cref="System.Type"/>..
+        /// Gets or sets the <see cref="CodeGeneratorBase"/> <see cref="System.Type"/>.
         /// </summary>
         [JsonProperty("type")]
         [CodeGenProperty("Key", Title = "The .NET Generator (CodeGeneratorBase) Type.", IsMandatory = true)]
@@ -89,15 +89,12 @@ namespace Beef.CodeGen.Scripts
             Type type;
             try
             {
-                type = System.Type.GetType(Type);
-
-                if (type == null)
-                    throw new CodeGenException(this, nameof(Type), $"Type '{Type}' does not exist.");
+                type = System.Type.GetType(Type ?? throw new CodeGenException(this, nameof(Type), $"Type must be specified.")) ?? throw new CodeGenException(this, nameof(Type), $"Type '{Type}' does not exist.");
 
                 if (!IsSubclassOfBaseType(typeof(CodeGeneratorBase), type) || type.GetConstructor(Array.Empty<Type>()) == null)
                     throw new CodeGenException(this, nameof(Type), $"Type '{Type}' does not implement CodeGeneratorBase and/or have a default parameterless constructor.");
 
-                _generator = (CodeGeneratorBase)Activator.CreateInstance(type) ?? throw new CodeGenException(this, nameof(Type), $"Type '{Type}' was unable to be instantiated.");
+                _generator = (CodeGeneratorBase)(Activator.CreateInstance(type) ?? throw new CodeGenException(this, nameof(Type), $"Type '{Type}' was unable to be instantiated."));
                 if (_generator.RootType != Root!.GetConfigType())
                     throw new CodeGenException(this, nameof(Type), $"Type '{Type}' RootType '{_generator.RootType.Name}' must be the same as the ConfigType '{Root!.GetConfigType().Name}'.");
             }

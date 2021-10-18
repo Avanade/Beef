@@ -7,7 +7,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Represents a Code Generation <see cref="Exception"/> where changes to a generated artefact were found.
     /// </summary>
-    /// <remarks>Raised where the code-generation would result in changes to an underlying artefact. This is managed by setting <see cref="CodeGeneratorArgs.ExpectNoChanges"/> to <c>true</c>.</remarks>
+    /// <remarks>Raised where the code-generation would result in changes to an underlying artefact. This is managed by setting <see cref="CodeGeneratorArgsBase.ExpectNoChanges"/> to <c>true</c>.</remarks>
     public class CodeGenChangesFoundException : Exception
     {
         /// <summary>

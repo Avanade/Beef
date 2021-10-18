@@ -62,7 +62,7 @@ namespace Beef.CodeGen.Config
         public T GetRuntimeParameter<T>(string key, T defaultValue = default!)
         {
             if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
-                return (T)Convert.ChangeType(val?.ToString(), typeof(T));
+                return (T)Convert.ChangeType(val?.ToString(), typeof(T))!;
             else
                 return defaultValue!;
         }
@@ -78,7 +78,7 @@ namespace Beef.CodeGen.Config
         {
             if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
             {
-                value = (T)Convert.ChangeType(val?.ToString(), typeof(T));
+                value = (T)Convert.ChangeType(val?.ToString(), typeof(T))!;
                 return true;
             }
             else

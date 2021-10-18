@@ -228,7 +228,7 @@ namespace Beef.CodeGen.Utility
                 throw new InvalidOperationException($"Type {type.Name} must be an Array or ICollection<T>.");
 
             if (type.IsArray)
-                return type.GetElementType();
+                return type.GetElementType() ?? throw new InvalidOperationException($"Type {type.Name} is an Array but the Element Type is unable to be determined.");
 
             var t = type.GetInterfaces().FirstOrDefault(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>));
             if (t != null)

@@ -2,20 +2,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// Defines the <see cref="CodeGenerator"/> arguments.
+    /// Provides the <see cref="CodeGenerator"/> arguments.
     /// </summary>
     public class CodeGeneratorArgs : CodeGeneratorArgsBase
     {
         /// <summary>
         /// Creates a new <see cref="CodeGeneratorArgs"/> using the <typeparamref name="T"/> to infer the <see cref="Type.Assembly"/>.
         /// </summary>
-        /// <typeparam name="T">The <see cref="Type"/> to automatically infer the <see cref="Type.Assembly"/> to <see cref="AddAssembly(Assembly[])">add</see>.</typeparam>
+        /// <typeparam name="T">The <see cref="Type"/> to automatically infer the <see cref="Type.Assembly"/> to <see cref="ICodeGeneratorArgs.AddAssembly(Assembly[])">add</see>.</typeparam>
         /// <param name="scriptFileName">The script file name.</param>
         /// <param name="configFileName">The configuration file name.</param>
         /// <returns>A new <see cref="CodeGeneratorArgs"/>.</returns>
@@ -33,16 +32,14 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Adds one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
+        /// Adds (inserts) one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
         /// </summary>
         /// <param name="assemblies">The assemblies to add.</param>
         /// <remarks>The order in which they are specified is the order in which they will be probed for embedded resources.</remarks>
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public CodeGeneratorArgs AddAssembly(params Assembly[] assemblies)
         {
-            if (assemblies != null)
-                Assemblies.InsertRange(0, assemblies);
-
+            ((ICodeGeneratorArgs)this).AddAssembly(assemblies);
             return this;
         }
 
@@ -54,9 +51,7 @@ namespace Beef.CodeGen
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public CodeGeneratorArgs AddParameter(string key, string? value)
         {
-            if (!Parameters.TryAdd(key, value))
-                Parameters[key] = value;
-
+            ((ICodeGeneratorArgs)this).AddParameter(key, value);
             return this;
         }
 
@@ -67,14 +62,7 @@ namespace Beef.CodeGen
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
         public CodeGeneratorArgs AddParameters(IDictionary<string, string?> parameters)
         {
-            if (parameters != null)
-            {
-                foreach (var p in parameters)
-                {
-                    AddParameter(p.Key, p.Value);
-                }
-            }
-
+            ((ICodeGeneratorArgs)this).AddParameters(parameters);
             return this;
         }
 
