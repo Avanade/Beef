@@ -1,10 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Database;
-using Beef.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
+using OnRamp.Database;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

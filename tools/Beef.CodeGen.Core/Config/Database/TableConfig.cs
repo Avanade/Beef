@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Database;
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
+using OnRamp.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ using System.Linq;
 namespace Beef.CodeGen.Config.Database
 {
     /// <summary>
-    /// 
+    /// Represents the table configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Table", Title = "'Table' object (entity-driven)", 

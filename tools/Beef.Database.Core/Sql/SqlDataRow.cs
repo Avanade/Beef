@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Config.Database;
-using Beef.CodeGen.Database;
+using OnRamp.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace Beef.Database.Core.Sql
 {

@@ -13,9 +13,6 @@ namespace Company.AppName.CodeGen
         /// </summary>
         /// <param name="args">The startup arguments.</param>
         /// <returns>The status code whereby zero indicates success.</returns>
-        public static Task<int> Main(string[] args)
-        {
-            return CodeGenConsoleWrapper.Create("Company", "AppName").Supports(entity: true, refData: true).RunAsync(args);
-        }
+        public static Task<int> Main(string[] args) => CodeGenConsole.Create("Company", "AppName").Supports(entity: true, refData: true).RunAsync(args);
     }
 }

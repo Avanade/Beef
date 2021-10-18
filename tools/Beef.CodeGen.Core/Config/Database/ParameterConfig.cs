@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
 using System;
 using System.Linq;
 using System.Text;
@@ -172,7 +174,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (CodeGen.Database.DbTypeHelper.TypeIsString(c.Type))
+                    if (OnRamp.Database.DbTypeHelper.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch

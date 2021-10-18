@@ -1,5 +1,5 @@
 ﻿using Beef.CodeGen.Config.Entity;
-using Beef.CodeGen.Generators;
+using OnRamp.Generators;
 using System.Collections.Generic;
 using System.Linq;
 

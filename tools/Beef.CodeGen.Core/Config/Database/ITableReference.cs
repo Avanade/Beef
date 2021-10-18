@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Database;
+using OnRamp.Database;
 
 namespace Beef.CodeGen.Config.Database
 {

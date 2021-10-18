@@ -2,9 +2,10 @@
 
 using Beef.CodeGen.Config;
 using Beef.CodeGen.Generators;
-using Beef.CodeGen.Utility;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
+using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -46,8 +47,8 @@ namespace Beef.CodeGen
                 }
             }
 
-            var a = new CodeGeneratorArgs().AddAssembly(typeof(CodeGenConsole).Assembly).AddAssembly(Assembly.GetCallingAssembly());
-            var c = Console.CodeGenConsole.Create<CodeGenConsole>(name: Assembly.GetCallingAssembly().GetName().Name, options: Console.SupportedOptions.All);
+            var a = new OnRamp.CodeGeneratorArgs().AddAssembly(typeof(CodeGenConsole).Assembly).AddAssembly(Assembly.GetCallingAssembly());
+            var c = OnRamp.Console.CodeGenConsole.Create<CodeGenConsole>(name: Assembly.GetCallingAssembly().GetName().Name, options: OnRamp.Console.SupportedOptions.All);
             c.MastheadText = CodeGenConsole.DefaultMastheadText;
             return await c.RunAsync().ConfigureAwait(false);
         }

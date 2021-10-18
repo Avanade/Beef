@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen;
+using OnRamp;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -40,7 +40,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="assemblies">The assemblies to add.</param>
         /// <remarks>The order in which they are specified is the order in which they will be probed for embedded resources.</remarks>
-        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
         public new DatabaseExecutorArgs AddAssembly(params Assembly[] assemblies)
         {
             base.AddAssembly(assemblies);
@@ -52,7 +52,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="key">The parameter name.</param>
         /// <param name="value">The parameter value.</param>
-        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
         public new DatabaseExecutorArgs AddParameter(string key, string? value)
         {
             base.AddParameter(key, value);
@@ -63,7 +63,7 @@ namespace Beef.Database.Core
         /// Adds (merges) the <paramref name="parameters"/> to the <see cref="CodeGeneratorArgsBase.Parameters"/>.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        /// <returns>The current <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
         public new DatabaseExecutorArgs AddParameters(IDictionary<string, string?> parameters)
         {
             base.AddParameters(parameters);

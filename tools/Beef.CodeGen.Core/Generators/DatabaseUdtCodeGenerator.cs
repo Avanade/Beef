@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config.Database;
+using OnRamp.Generators;
 using System.Collections.Generic;
 using System.Linq;
 

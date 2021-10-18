@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen;
-using Beef.CodeGen.Database;
-using Beef.CodeGen.Utility;
 using Beef.Data.Database;
 using HandlebarsDotNet;
 using Newtonsoft.Json.Linq;
+using OnRamp;
+using OnRamp.Database;
+using OnRamp.Scripts;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -323,7 +324,7 @@ namespace Beef.Database.Core.Sql
             var cg = new HandlebarsCodeGenerator(tr);
             foreach (var t in Tables)
             {
-                codeGen(new CodeGenOutputArgs(new CodeGen.Scripts.CodeGenScript(), null, $"{t.Schema}.{t.Name} SQL", cg.Generate(t)));
+                codeGen(new CodeGenOutputArgs(new CodeGenScript(), null, $"{t.Schema}.{t.Name} SQL", cg.Generate(t)));
             }
 
             return Task.CompletedTask;

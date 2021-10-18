@@ -1,5 +1,5 @@
-﻿using Beef.CodeGen.Config;
-using Beef.CodeGen.Config.Entity;
+﻿using Beef.CodeGen.Config.Entity;
+using OnRamp.Config;
 
 namespace Beef.Demo.CodeGen.Config
 {

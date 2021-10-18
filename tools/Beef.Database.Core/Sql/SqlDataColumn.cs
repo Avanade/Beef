@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Database;
+using OnRamp.Database;
 using System;
 
 namespace Beef.Database.Core.Sql
@@ -21,7 +21,7 @@ namespace Beef.Database.Core.Sql
         public object? Value { get; set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="CodeGen.Database.DbColumn"/> configuration.
+        /// Gets or sets the database <see cref="OnRamp.Database.DbColumn"/> configuration.
         /// </summary>
         public DbColumn? DbColumn { get; set; }
 

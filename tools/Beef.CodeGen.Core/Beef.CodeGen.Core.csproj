@@ -209,7 +209,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
-    <ProjectReference Include="..\Beef.CodeGen.Abstractions\Beef.CodeGen.Abstractions.csproj" />
+    <ProjectReference Include="..\OnRamp\OnRamp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

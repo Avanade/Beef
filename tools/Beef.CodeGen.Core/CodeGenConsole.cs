@@ -3,6 +3,7 @@
 using Beef.CodeGen.Converters;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using OnRamp;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -12,10 +13,10 @@ using System.Xml.Linq;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>Beef</b>-specific code-generation console that encapsulates the standard <see cref="Console.CodeGenConsole"/>.
+    /// <b>Beef</b>-specific code-generation console that encapsulates the standard <see cref="OnRamp.Console.CodeGenConsole"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
-    public class CodeGenConsole : Console.CodeGenConsole
+    public class CodeGenConsole : OnRamp.Console.CodeGenConsole
     {
         private string _entityScript = "EntityWebApiCoreAgent.yaml";
         private string _refDataScript = "RefDataCoreCrud.yaml";
@@ -83,7 +84,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
         /// </summary>
-        private CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: Console.SupportedOptions.All)
+        private CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: OnRamp.Console.SupportedOptions.All)
         {
             MastheadText = DefaultMastheadText;
 
@@ -317,12 +318,12 @@ namespace Beef.CodeGen
                         if (cg.Scripts.GetConfigType() == typeof(Config.Entity.CodeGenConfig))
                         {
                             var sr = new StringReader(new EntityXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = cg.Generate(sr, Utility.StreamContentType.Yaml, fi.FullName);
+                            stats = cg.Generate(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName);
                         }
                         else if (cg.Scripts.GetConfigType() == typeof(Config.Database.CodeGenConfig))
                         {
                             var sr = new StringReader(new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = cg.Generate(sr, Utility.StreamContentType.Yaml, fi.FullName);
+                            stats = cg.Generate(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName);
                         }
                         else
                             throw new CodeGenException($"Configuration Type '{cg.Scripts.GetConfigType().FullName}' is not expected; must be either '{typeof(Config.Entity.CodeGenConfig).FullName}' or '{typeof(Config.Database.CodeGenConfig).FullName}'.");

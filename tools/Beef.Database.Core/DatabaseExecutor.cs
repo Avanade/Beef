@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.CodeGen.Converters;
-using Beef.CodeGen.Utility;
 using Beef.Data.Database;
 using Beef.Database.Core.Sql;
 using Beef.Diagnostics;
@@ -11,6 +9,8 @@ using DbUp.Engine;
 using DbUp.Engine.Output;
 using HandlebarsDotNet;
 using Microsoft.Extensions.Logging;
+using OnRamp;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -20,7 +20,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Beef.Database.Core
 {
@@ -185,7 +184,7 @@ namespace Beef.Database.Core
                     _logger.LogInformation(new string('-', 80));
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
-                    CodeGen.Console.CodeGenConsole.WriteStandardizedArgs(cga);
+                    CodeGenConsole.WriteStandardizedArgs(cga);
 
                     CodeGenStatistics stats = null!;
                     if (!await TimeExecutionAsync(async () =>

@@ -3,6 +3,8 @@
 using Beef.CodeGen;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using OnRamp;
+using OnRamp.Console;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -50,8 +52,8 @@ namespace Beef.Database.Core
         /// <returns>The <see cref="DatabaseConsole"/> instance.</returns>
         public static DatabaseConsole Create(string connectionString, string company, string appName, bool useBeefDbo = true)
             => Create(new DatabaseConsoleArgs { ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString)), UseBeefDbo = useBeefDbo }
-                .AddParameter(CodeGenConsole.CompanyParamName, Check.NotEmpty(company, nameof(company)))
-                .AddParameter(CodeGenConsole.AppNameParamName, Check.NotEmpty(appName, nameof(appName)))
+                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, Check.NotEmpty(company, nameof(company)))
+                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, Check.NotEmpty(appName, nameof(appName)))
                 .AddAssembly(Assembly.GetEntryAssembly()!));
 
         /// <summary>
@@ -69,11 +71,11 @@ namespace Beef.Database.Core
         {
             Args = args;
 
-            if (!Args.Parameters.ContainsKey(CodeGenConsole.CompanyParamName))
-                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGenConsole.CompanyParamName}.");
+            if (!Args.Parameters.ContainsKey(CodeGen.CodeGenConsole.CompanyParamName))
+                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGen.CodeGenConsole.CompanyParamName}.");
 
-            if (!Args.Parameters.ContainsKey(CodeGenConsole.AppNameParamName))
-                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGenConsole.AppNameParamName}.");
+            if (!Args.Parameters.ContainsKey(CodeGen.CodeGenConsole.AppNameParamName))
+                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGen.CodeGenConsole.AppNameParamName}.");
 
             if (Args.OutputDirectory == null)
                 Args.OutputDirectory = new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent;
@@ -181,7 +183,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
-        public async Task<int> RunAsync(string? args = null) => await RunAsync(CodeGen.Console.CodeGenConsole.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
+        public async Task<int> RunAsync(string? args = null) => await RunAsync(OnRamp.Console.CodeGenConsole.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
 
         /// <summary>
         /// Runs the code generation using the passed <paramref name="args"/> array.
@@ -191,7 +193,7 @@ namespace Beef.Database.Core
         public async Task<int> RunAsync(string[] args)
         {
             // Final set up of console arguments.
-            Args.Logger ??= new CodeGen.Console.ConsoleLogger(PhysicalConsole.Singleton);
+            Args.Logger ??= new ConsoleLogger(PhysicalConsole.Singleton);
             Diagnostics.Logger.Default ??= Args.Logger;
 
             // Set up the app.
@@ -227,7 +229,7 @@ namespace Beef.Database.Core
                     Args.SchemaOrder.AddRange(v);
                 });
 
-                var vr = new CodeGen.Console.AssemblyValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Assemblies)), ctx);
+                var vr = new AssemblyValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Assemblies)), ctx);
                 if (vr != ValidationResult.Success)
                     return vr;
 
@@ -237,7 +239,7 @@ namespace Beef.Database.Core
                     Args.AddAssembly(Assembly.GetEntryAssembly()!);
                 });
 
-                vr = new CodeGen.Console.ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Parameters)), ctx);
+                vr = new ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Parameters)), ctx);
                 if (vr != ValidationResult.Success)
                     return vr;
 

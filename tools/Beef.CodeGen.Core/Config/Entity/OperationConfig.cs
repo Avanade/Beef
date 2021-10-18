@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
