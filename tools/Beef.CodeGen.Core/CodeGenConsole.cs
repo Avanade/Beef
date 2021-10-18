@@ -87,9 +87,7 @@ namespace Beef.CodeGen
         private CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: OnRamp.Console.SupportedOptions.All)
         {
             MastheadText = DefaultMastheadText;
-
-            var (company, appName) = GetCompanyAndAppName();
-            Args.ConnectionStringEnvironmentVariableName = $"{company?.Replace(".", "_", StringComparison.InvariantCulture)}_{appName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+            Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{csargs.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{csargs.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
@@ -189,14 +187,8 @@ namespace Beef.CodeGen
         protected override void OnBeforeExecute(CommandLineApplication app)
         {
             _cmdArg = app.Argument<CommandType>("command", "Execution command type.", false).IsRequired();
-            _x2yOpt = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
+            _x2yOpt = app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
         }
-
-        /// <summary>
-        /// Get company and appname from parameters.
-        /// </summary>
-        /// <returns></returns>
-        private (string, string) GetCompanyAndAppName() => (Args.Parameters[CompanyParamName]!, Args.Parameters[AppNameParamName]!);
 
         /// <inheritdoc/>
         protected override ValidationResult? OnValidation(ValidationContext context)
@@ -207,13 +199,13 @@ namespace Beef.CodeGen
             if (cmd == CommandType.All)
             {
                 if (!string.IsNullOrEmpty(Args.ScriptFileName))
-                    return new ValidationResult("Command 'All' is not compatible with --scriptFile; the command must be more specific when using a specified configuration file.");
+                    return new ValidationResult("Command 'All' is not compatible with --script; the command must be more specific when using a specified configuration file.");
 
                 if (!string.IsNullOrEmpty(Args.ConfigFileName))
-                    return new ValidationResult("Command 'All' is not compatible with --configFile; the command must be more specific when using a specified configuration file.");
+                    return new ValidationResult("Command 'All' is not compatible with --config; the command must be more specific when using a specified configuration file.");
 
                 if (_x2yOpt!.HasValue())
-                    return new ValidationResult("Command 'All' is not compatible with --xmlToYaml; the command must be more specific when converting XML configuration to YAML.");
+                    return new ValidationResult("Command 'All' is not compatible with --xml-to-yaml; the command must be more specific when converting XML configuration to YAML.");
             }
             else
             {
@@ -236,12 +228,16 @@ namespace Beef.CodeGen
         /// <inheritdoc/>
         protected override CodeGenStatistics? OnCodeGeneration()
         {
-            var cmd = _cmdArg!.ParsedValue;
-            var exedir = CodeGenFileManager.GetExeDirectory();
-            var (company, appName) = GetCompanyAndAppName();
-
             OnWriteMasthead();
             OnWriteHeader();
+            
+            var cmd = _cmdArg!.ParsedValue;
+            var exedir = CodeGenFileManager.GetExeDirectory();
+
+            var company = Args.GetCompany(false);
+            var appName = Args.GetAppName(false);
+            if (company == null || appName == null)
+                throw new CodeGenException($"Parameters '{CompanyParamName}' and {AppNameParamName}  must be specified.");
 
             // Where XML to YAML requested do so, then exit.
             if (_x2yOpt!.HasValue())
@@ -278,7 +274,8 @@ namespace Beef.CodeGen
         private CodeGenStatistics ExecuteCodeGeneration(string scriptName, string configName, ref int count)
         {
             // Update the files.
-            var args = Args.Clone();
+            var args = new CodeGeneratorArgs();
+            args.CopyFrom(Args);
             args.ScriptFileName ??= scriptName;
             args.ConfigFileName ??= configName;
 

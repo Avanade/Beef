@@ -445,12 +445,12 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? Company => GetRuntimeParameter<string?>("Company");
+        public string? Company => CodeGenArgs!.GetCompany(true);
 
         /// <summary>
         /// Gets the application name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? AppName => GetRuntimeParameter<string?>("AppName");
+        public string? AppName => CodeGenArgs!.GetAppName(true);
 
         /// <summary>
         /// <inheritdoc/>

@@ -71,12 +71,6 @@ namespace Beef.Database.Core
         {
             Args = args;
 
-            if (!Args.Parameters.ContainsKey(CodeGen.CodeGenConsole.CompanyParamName))
-                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGen.CodeGenConsole.CompanyParamName}.");
-
-            if (!Args.Parameters.ContainsKey(CodeGen.CodeGenConsole.AppNameParamName))
-                throw new ArgumentException($"Args.Parameters must contain a parameter named {CodeGen.CodeGenConsole.AppNameParamName}.");
-
             if (Args.OutputDirectory == null)
                 Args.OutputDirectory = new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent;
 
@@ -88,8 +82,6 @@ namespace Beef.Database.Core
             Text = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? throw new InvalidOperationException("Unable to infer text.");
             Version = assembly.GetName()?.Version?.ToString(3);
             Description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? Text;
-
-            Args.ConnectionStringEnvironmentVariableName = $"{Args.Company?.Replace(".", "_", StringComparison.InvariantCulture)}_{Args.AppName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
@@ -201,27 +193,24 @@ namespace Beef.Database.Core
             app.HelpOption();
 
             _cmdArg = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _options.Add(nameof(DatabaseConsoleArgs.ConnectionString), app.Option("-cs|--connectionString", "Database connection string.", CommandOptionType.SingleValue));
-            _options.Add(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), app.Option("-evn|--environmentVariableName", "Database connection string environment variable name.", CommandOptionType.SingleValue));
-            _options.Add(nameof(DatabaseConsoleArgs.SchemaOrder), app.Option("-so|--schemaorder", "Database schema name (multiple can be specified in priority order).", CommandOptionType.MultipleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ConnectionString), app.Option("-cs|--connection-string", "Database connection string.", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), app.Option("-cv|--connection-varname", "Database connection string environment variable name.", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.SchemaOrder), app.Option("-so|--schema-order", "Database schema name (multiple can be specified in priority order).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.Assemblies), app.Option("-a|--assembly", "Assembly containing embedded resources (multiple can be specified in probing order).", CommandOptionType.MultipleValue));
             _options.Add(EntryAssemblyOnlyOptionName, app.Option("-eo|--entry-assembly-only", "Use the entry assembly only.", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.SupportedCommands), app.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue));
-            _options.Add(nameof(DatabaseConsoleArgs.ScriptFileName), app.Option("-s|--scriptFile", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
-            _options.Add(nameof(DatabaseConsoleArgs.ConfigFileName), app.Option("-c|--configFile", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ConfigFileName), app.Option("-c|--config", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.OutputDirectory), app.Option("-o|--output", "Output directory path. [CodeGen]", CommandOptionType.MultipleValue).Accepts(v => v.ExistingDirectory("Output directory path does not exist.")));
-            _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expectNoChanges", "Indicates to expect _no_ changes in the artefact output (e.g. within build pipeline). [CodeGen]", CommandOptionType.NoValue));
+            _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
-            _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
-            _scriptNewArg = app.Argument("args", "Additional arguments. [ScriptNew]", multipleValues: true);
+            _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
+            _scriptNewArg = app.Argument("script-new-args", "Additional arguments. [ScriptNew]", multipleValues: true);
 
             app.OnValidate(ctx =>
             {
                 Args.Command = _cmdArg.ParsedValue;
-
-                UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
-                Args.UpdateConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
 
                 UpdateStringOptionMulti(nameof(DatabaseConsoleArgs.SchemaOrder), v =>
                 {
@@ -255,7 +244,18 @@ namespace Beef.Database.Core
                     return new ValidationResult("Additional arguments can only be specified when the command is ScriptNew.", new string[] { "args" });
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
-                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
+                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
+
+                var company = Args.GetCompany(false);
+                var appName = Args.GetAppName(false);
+                if (company == null || appName == null)
+                    return new ValidationResult($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName}  must be specified.", new string[] { "args" });
+
+                if (Args.ConnectionStringEnvironmentVariableName == null)
+                    Args.ConnectionStringEnvironmentVariableName = $"{company?.Replace(".", "_", StringComparison.InvariantCulture)}_{appName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+
+                UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
+                Args.OverrideConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
 
                 return ValidationResult.Success!;
             });
@@ -342,7 +342,7 @@ namespace Beef.Database.Core
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue())
                 {
-                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, Args.Company, Args.AppName)).ConfigureAwait(false);
+                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
                     return success ? 0 : 4;
                 }
 

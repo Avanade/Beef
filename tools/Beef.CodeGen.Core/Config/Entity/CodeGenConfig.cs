@@ -505,17 +505,17 @@ entities:
         /// <summary>
         /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? Company => GetRuntimeParameter<string?>("Company")!;
+        public string? Company => CodeGenArgs!.GetCompany(true);
 
         /// <summary>
         /// Gets the application name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? AppName => GetRuntimeParameter<string?>("AppName")!;
+        public string? AppName => CodeGenArgs!.GetAppName(true);
 
         /// <summary>
         /// Gets the API name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? ApiName => DefaultWhereNull(GetRuntimeParameter<string?>("ApiName"), () => "Api")!;
+        public string? ApiName => DefaultWhereNull(CodeGenArgs!.GetParameter(CodeGenConsole.ApiNameParamName), () => "Api")!;
 
         /// <summary>
         /// Gets the entity scope from the from the <see cref="IRootConfig.RuntimeParameters"/> (defaults to 'Common').

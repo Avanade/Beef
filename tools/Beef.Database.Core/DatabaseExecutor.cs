@@ -176,9 +176,10 @@ namespace Beef.Database.Core
 
                 if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
                 {
-                    var cga = _args.Clone();
+                    var cga = new CodeGeneratorArgs();
+                    cga.CopyFrom(_args);
                     cga.Assemblies.Add(typeof(CodeGenConsole).Assembly);
-                    cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, _args.Company, _args.AppName);
+                    cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
 
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));

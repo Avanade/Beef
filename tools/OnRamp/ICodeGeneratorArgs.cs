@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 using OnRamp.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -11,6 +12,7 @@ namespace OnRamp
     /// <summary>
     /// Defines the <see cref="CodeGenerator"/> arguments.
     /// </summary>
+    /// <remarks>Note that the <see cref="ConnectionString"/> treatment is managed by <see cref="OverrideConnectionString(string?)"/>.</remarks>
     public interface ICodeGeneratorArgs
     {
         /// <summary>
@@ -29,12 +31,12 @@ namespace OnRamp
         public DirectoryInfo? OutputDirectory { get; }
 
         /// <summary>
-        /// Gets or sets the assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to explicitly specify).
+        /// Gets the <see cref="Assembly"/> list to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to explicitly specify).
         /// </summary>
         List<Assembly> Assemblies { get; } 
 
         /// <summary>
-        /// Dictionary of <see cref="IRootConfig.RuntimeParameters"/> name/value pairs.
+        /// Gets the dictionary of <see cref="IRootConfig.RuntimeParameters"/> name/value pairs.
         /// </summary>
         Dictionary<string, string?> Parameters { get; }
 
@@ -46,7 +48,7 @@ namespace OnRamp
         /// <summary>
         /// Indicates whether the <see cref="CodeGenerator.Generate(string)"/> is expecting to generate <i>no</i> changes; e.g. within in a build pipeline.
         /// </summary>
-        /// <remarks>Where changes are found then </remarks>
+        /// <remarks>Where changes are found then a <see cref="CodeGenChangesFoundException"/> will be thrown.</remarks>
         bool ExpectNoChanges { get; }
 
         /// <summary>
@@ -57,18 +59,33 @@ namespace OnRamp
         /// <summary>
         /// Gets or sets the database connection string.
         /// </summary>
+        /// <remarks>See <see cref="OverrideConnectionString"/> for how used internally.</remarks>
         string? ConnectionString { get; }
 
         /// <summary>
         /// Gets or sets the environment variable name to get the connection string.
         /// </summary>
+        /// <remarks>See <see cref="OverrideConnectionString"/> for how used internally.</remarks>
         string? ConnectionStringEnvironmentVariableName { get; }
 
         /// <summary>
-        /// Updates the <see cref="ConnectionString"/> based on following order of precedence: <paramref name="overrideConnectionString"/>, from the <see cref="ConnectionStringEnvironmentVariableName"/>, then existing <see cref="ConnectionString"/>.
+        /// Gets or sets the function to determine the <see cref="ConnectionStringEnvironmentVariableName"/> at runtime.
+        /// </summary>
+        /// <remarks>See <see cref="OverrideConnectionString"/> for how used internally.</remarks>
+        public Func<CodeGeneratorArgsBase, string?>? CreateConnectionStringEnvironmentVariableName { get; set; }
+
+        /// <summary>
+        /// Overrides the <see cref="ConnectionString"/> based on following order of precedence: <paramref name="overrideConnectionString"/>, from the <see cref="ConnectionStringEnvironmentVariableName"/>,
+        /// from the <see cref="CreateConnectionStringEnvironmentVariableName"/>, then existing <see cref="ConnectionString"/>.
         /// </summary>
         /// <param name="overrideConnectionString">The connection string override.</param>
-        void UpdateConnectionString(string? overrideConnectionString = null);
+        /// <remarks>This will only override on first invocation; subsequent invocations will have no effect.</remarks>
+        void OverrideConnectionString(string? overrideConnectionString = null);
+
+        /// <summary>
+        /// Indicates whether the <see cref="OverrideConnectionString"/> has been perfomed; can only be executed once.
+        /// </summary>
+        bool HasOverriddenConnectionString { get; }
 
         /// <summary>
         /// Adds (inserts) one or more <paramref name="assemblies"/> to <see cref="CodeGeneratorArgsBase.Assemblies"/> (before any existing values).
@@ -104,15 +121,18 @@ namespace OnRamp
         }
 
         /// <summary>
+        /// Gets the specified parameter from the <see cref="Parameters"/> collection.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="throwWhereNotFound">Indicates to throw a <see cref="CodeGenException"/> when the specified key is not found.</param>
+        /// <returns>The parameter value where found; otherwise, <c>null</c>.</returns>
+        /// <exception cref="CodeGenException">The <see cref="CodeGenException"/>.</exception>
+        string? GetParameter(string key, bool throwWhereNotFound = false);
+
+        /// <summary>
         /// Copy and replace from <paramref name="args"/>.
         /// </summary>
         /// <param name="args">The <see cref="CodeGeneratorArgsBase"/> to copy from.</param>
         void CopyFrom(ICodeGeneratorArgs args);
-
-        /// <summary>
-        /// Clone the <see cref="CodeGeneratorArgsBase"/>.
-        /// </summary>
-        /// <returns>A new <see cref="CodeGeneratorArgsBase"/> instance.</returns>
-        ICodeGeneratorArgs Clone();
     }
 }

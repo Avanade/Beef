@@ -21,6 +21,12 @@ namespace Beef.Database.Core
         public static DatabaseConsoleArgs Create<T>() => new DatabaseConsoleArgs().AddAssembly(typeof(T).Assembly);
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseConsoleArgs"/> class.
+        /// </summary>
+        public DatabaseConsoleArgs()
+            => CreateConnectionStringEnvironmentVariableName = csargs => $"{csargs.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{csargs.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+
+        /// <summary>
         /// Gets or sets the <see cref="DatabaseExecutorCommand"/> to invoke.
         /// </summary>
         public DatabaseExecutorCommand Command { get; set; } = DatabaseExecutorCommand.None;
@@ -34,16 +40,6 @@ namespace Beef.Database.Core
         /// Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).
         /// </summary>
         public bool UseBeefDbo { get; set; } = true;
-
-        /// <summary>
-        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.CompanyParamName"/>.
-        /// </summary>
-        public string Company => GetParameter(CodeGenConsole.CompanyParamName, true)!;
-
-        /// <summary>
-        /// Gets the <see cref="CodeGeneratorArgsBase.Parameters"/> value with a key of <see cref="CodeGenConsole.AppNameParamName"/>.
-        /// </summary>
-        public string AppName => GetParameter(CodeGenConsole.AppNameParamName, true)!;
 
         /// <summary>
         /// Gets the list of <see cref="DatabaseExecutorCommand.ScriptNew"/> arguments.
@@ -130,17 +126,6 @@ namespace Beef.Database.Core
             ScriptNewArguments.AddRange(args.ScriptNewArguments);
             SchemaOrder.Clear();
             SchemaOrder.AddRange(args.SchemaOrder);
-        }
-
-        /// <summary>
-        /// Clone the <see cref="DatabaseConsoleArgs"/>.
-        /// </summary>
-        /// <returns>A new <see cref="DatabaseConsoleArgs"/> instance.</returns>
-        public override CodeGeneratorArgsBase Clone()
-        {
-            var args = new DatabaseConsoleArgs();
-            args.CopyFrom(this);
-            return args;
         }
     }
 }

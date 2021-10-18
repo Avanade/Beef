@@ -67,14 +67,9 @@ namespace OnRamp
         }
 
         /// <summary>
-        /// Clone the <see cref="CodeGeneratorArgs"/>.
+        /// Copy and replace from <paramref name="args"/>.
         /// </summary>
-        /// <returns>A new <see cref="CodeGeneratorArgs"/> instance.</returns>
-        public override CodeGeneratorArgsBase Clone()
-        {
-            var args = new CodeGeneratorArgs();
-            args.CopyFrom(this);
-            return args;
-        }
+        /// <param name="args">The <see cref="CodeGeneratorArgs"/> to copy from.</param>
+        public void CopyFrom(CodeGeneratorArgs args) => base.CopyFrom(args);
     }
 }

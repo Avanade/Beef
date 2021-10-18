@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/OnRamp
 
 using Microsoft.Extensions.Logging;
-using OnRamp.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,74 +11,85 @@ namespace OnRamp
     /// <summary>
     /// Represents the base arguments for a <see cref="CodeGenerator"/>.
     /// </summary>
+    /// <remarks>Note that the <see cref="ConnectionString"/> treatment is managed by <see cref="OverrideConnectionString(string?)"/>.</remarks>
     public abstract class CodeGeneratorArgsBase : ICodeGeneratorArgs
     {
-        /// <summary>
-        /// Gets or sets the <b>Script</b> file name to load the content from the <c>Scripts</c> folder within the file system (primary) or <see cref="Assemblies"/> (secondary, recursive until found).
-        /// </summary>
+        /// <inheritdoc/>
         public string? ScriptFileName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the <b>Configuration</b> file name.
-        /// </summary>
+        /// <inheritdoc/>
         public string? ConfigFileName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the output <see cref="DirectoryInfo"/> where the generated artefacts are to be written.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectoryInfo? OutputDirectory { get; set; }
 
-        /// <summary>
-        /// Gets or sets the assemblies to use to probe for assembly resource (in defined sequence); will check this assembly also (no need to explicitly specify).
-        /// </summary>
+        /// <inheritdoc/>
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
 
-        /// <summary>
-        /// Dictionary of <see cref="IRootConfig.RuntimeParameters"/> name/value pairs.
-        /// </summary>
+        /// <inheritdoc/>
         public Dictionary<string, string?> Parameters { get; } = new Dictionary<string, string?>();
 
-        /// <summary>
-        /// Gets or sets the <see cref="ILogger"/> to optionally log the underlying code-generation.
-        /// </summary>
+        /// <inheritdoc/>
         public ILogger? Logger { get; set; }
 
-        /// <summary>
-        /// Indicates whether the <see cref="CodeGenerator.Generate(string)"/> is expecting to generate <i>no</i> changes; e.g. within in a build pipeline.
-        /// </summary>
-        /// <remarks>Where changes are found then </remarks>
+        /// <inheritdoc/>
         public bool ExpectNoChanges { get; set; }
 
-        /// <summary>
-        /// Indicates whether the code-generation is a simulation; i.e. does not update the artefacts.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsSimulation { get; set; }
 
-        /// <summary>
-        /// Gets or sets the database connection string.
-        /// </summary>
+        /// <inheritdoc/>
         public string? ConnectionString { get; set; }
 
-        /// <summary>
-        /// Gets or sets the environment variable name to get the connection string.
-        /// </summary>
+        /// <inheritdoc/>
         public string? ConnectionStringEnvironmentVariableName { get; set; }
 
-        /// <summary>
-        /// Updates the <see cref="ConnectionString"/> based on following order of precedence: <paramref name="overrideConnectionString"/>, from the <see cref="ConnectionStringEnvironmentVariableName"/>, then existing <see cref="ConnectionString"/>.
-        /// </summary>
-        /// <param name="overrideConnectionString">The connection string override.</param>
-        public void UpdateConnectionString(string? overrideConnectionString = null)
+        /// <inheritdoc/>
+        public Func<CodeGeneratorArgsBase, string?>? CreateConnectionStringEnvironmentVariableName { get; set; }
+
+        /// <inheritdoc/>
+        public void OverrideConnectionString(string? overrideConnectionString = null)
         {
+            if (HasOverriddenConnectionString)
+                return;
+
             if (!string.IsNullOrEmpty(overrideConnectionString))
-                ConnectionString = overrideConnectionString;
-            else if (!string.IsNullOrEmpty(ConnectionStringEnvironmentVariableName))
             {
-                var ev = Environment.GetEnvironmentVariable(ConnectionStringEnvironmentVariableName);
-                if (!string.IsNullOrEmpty(ev))
-                    ConnectionString = ev;
+                ConnectionString = overrideConnectionString;
+                HasOverriddenConnectionString = true;
+                return;
+            }
+
+            string? cs = null;
+            if (!string.IsNullOrEmpty(ConnectionStringEnvironmentVariableName))
+            {
+                cs = Environment.GetEnvironmentVariable(ConnectionStringEnvironmentVariableName);
+                if (!string.IsNullOrEmpty(cs))
+                {
+                    ConnectionString = cs;
+                    HasOverriddenConnectionString = true;
+                    return;
+                }
+            }
+
+            if (CreateConnectionStringEnvironmentVariableName != null)
+            {
+                var evn = CreateConnectionStringEnvironmentVariableName(this);
+                if (!string.IsNullOrEmpty(evn))
+                {
+                    cs = Environment.GetEnvironmentVariable(evn);
+                    if (!string.IsNullOrEmpty(cs))
+                    {
+                        ConnectionString = cs;
+                        HasOverriddenConnectionString = true;
+                        return;
+                    }
+                }
             }
         }
+
+        /// <inheritdoc/>
+        public bool HasOverriddenConnectionString { get; private set; }
 
         /// <inheritdoc/>
         void ICodeGeneratorArgs.CopyFrom(ICodeGeneratorArgs args) => CopyFrom((CodeGeneratorArgsBase)args);
@@ -90,6 +100,7 @@ namespace OnRamp
         /// <param name="args">The <see cref="CodeGeneratorArgsBase"/> to copy from.</param>
         public void CopyFrom(CodeGeneratorArgsBase args)
         {
+            HasOverriddenConnectionString = args.HasOverriddenConnectionString;
             ScriptFileName = (args ?? throw new ArgumentNullException(nameof(args))).ScriptFileName;
             ConfigFileName = args.ConfigFileName;
             OutputDirectory = args.OutputDirectory == null ? null : new DirectoryInfo(args.OutputDirectory.FullName);
@@ -98,6 +109,7 @@ namespace OnRamp
             IsSimulation = args.IsSimulation;
             ConnectionString = args.ConnectionString;
             ConnectionStringEnvironmentVariableName = args.ConnectionStringEnvironmentVariableName;
+            CreateConnectionStringEnvironmentVariableName = args.CreateConnectionStringEnvironmentVariableName;
 
             Assemblies.Clear();
             Assemblies.AddRange(args.Assemblies);
@@ -113,26 +125,12 @@ namespace OnRamp
         }
 
         /// <inheritdoc/>
-        ICodeGeneratorArgs ICodeGeneratorArgs.Clone() => Clone();
-
-        /// <summary>
-        /// Clone the <see cref="CodeGeneratorArgsBase"/>.
-        /// </summary>
-        /// <returns>A new <see cref="CodeGeneratorArgsBase"/> instance.</returns>
-        public abstract CodeGeneratorArgsBase Clone();
-
-        /// <summary>
-        /// Gets the specified parameter from the <see cref="Parameters"/> collection.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="throwWhereNotFound">Indicates to throw a <see cref="KeyNotFoundException"/> when the specified key is not found.</param>
-        /// <returns>The parameter value where found; otherwise, <c>null</c>.</returns>
         public string? GetParameter(string key, bool throwWhereNotFound = false)
         {
             if (Parameters.TryGetValue(key, out var value))
                 return value;
 
-            return !throwWhereNotFound ? null : throw new KeyNotFoundException($"Parameter '{key}' does not exist.");
+            return !throwWhereNotFound ? null : throw new CodeGenException($"Parameter '{key}' does not exist.");
         }
     }
 }

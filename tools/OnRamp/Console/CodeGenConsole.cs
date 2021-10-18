@@ -66,7 +66,7 @@ namespace OnRamp.Console
         /// <param name="description">The application/command description; will default to <paramref name="text"/> when not specified.</param>
         /// <param name="version">The application/command version number.</param>
         /// <param name="options">The console command-line <see cref="SupportedOptions"/>; defaults to <see cref="SupportedOptions.All"/>.</param>
-        /// <param name="args">The default <see cref="CodeGeneratorArgs"/> that will be overridden or updated (<see cref="CodeGeneratorArgsBase.Assemblies"/> and <see cref="CodeGeneratorArgsBase.Parameters"/>) by the command-line argument values.</param>
+        /// <param name="args">The default <see cref="CodeGeneratorArgs"/> that will be overridden/updated by the command-line argument values.</param>
         public CodeGenConsole(string name, string text, string? description = null, string? version = null, SupportedOptions options = SupportedOptions.All, CodeGeneratorArgs? args = null)
         {
             Args = args ?? new CodeGeneratorArgs();
@@ -81,7 +81,7 @@ namespace OnRamp.Console
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class defaulting <see cref="Name"/> (with <see cref="AssemblyName.Name"/>), <see cref="Text"/> (with <see cref="AssemblyProductAttribute.Product"/>),
         /// <see cref="Description"/> (with <see cref="AssemblyDescriptionAttribute.Description"/>), and <see cref="Version"/> (with <see cref="AssemblyName.Version"/>) from the <paramref name="assembly"/> where not expressly provided.
         /// </summary>
-        /// <param name="args">The default <see cref="CodeGeneratorArgs"/> that will be overridden or updated (<see cref="CodeGeneratorArgsBase.Assemblies"/> and <see cref="CodeGeneratorArgsBase.Parameters"/>) by the command-line argument values.</param>
+        /// <param name="args">The default <see cref="CodeGeneratorArgs"/> that will be overridden/updated by the command-line argument values.</param>
         /// <param name="assembly">The <see cref="Assembly"/> to infer properties where not expressly provided.</param>
         /// <param name="name">The application/command name; defaults to <see cref="AssemblyName.Name"/>.</param>
         /// <param name="text">The application/command short text.</param>
@@ -140,11 +140,11 @@ namespace OnRamp.Console
         /// <summary>
         /// Gets or sets the masthead text used by <see cref="OnWriteMasthead"/>.
         /// </summary>
-        /// <remarks>Defaults to 'Code-Gen Tool' formatted using <see href="https://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=OnRamp%20CodeGen%20Tool"/>.</remarks>
+        /// <remarks>Defaults to 'OnRamp Code-Gen Tool' formatted using <see href="https://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=OnRamp%20Code-Gen%20Tool"/>.</remarks>
         public string? MastheadText { get; set; } = @"
-╔═╗┌┐┌╦═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
-║ ║│││╠╦╝├─┤│││├─┘  ║  │ │ ││├┤ ║ ╦├┤ │││   ║ │ ││ ││  
-╚═╝┘└┘╩╚═┴ ┴┴ ┴┴    ╚═╝└─┘─┴┘└─┘╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
+╔═╗┌┐┌╦═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
+║ ║│││╠╦╝├─┤│││├─┘  ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
+╚═╝┘└┘╩╚═┴ ┴┴ ┴┴    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
 ";
 
         /// <summary>
@@ -202,9 +202,9 @@ namespace OnRamp.Console
                     var evn = GetCommandOption(SupportedOptions.DatabaseConnectionStringEnvironmentVariableName)?.Value();
                     if (!string.IsNullOrEmpty(evn))
                         Args.ConnectionStringEnvironmentVariableName = evn;
-
-                    Args.UpdateConnectionString(cs.Value());
                 }
+
+                Args.OverrideConnectionString(cs?.Value());
 
                 // Invoke any additional.
                 return OnValidation(ctx)!;
