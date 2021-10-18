@@ -1,9 +1,9 @@
-﻿using Beef.CodeGen.Abstractions.Test.Config;
-using Beef.CodeGen.Utility;
+﻿using OnRamp.Test.Config;
+using OnRamp.Utility;
 using NUnit.Framework;
 using System.IO;
 
-namespace Beef.CodeGen.Abstractions.Test
+namespace OnRamp.Test
 {
     [TestFixture]
     public class JsonSchemaGeneratorTest

@@ -1,3 +1,0 @@
-﻿configType: Beef.CodeGen.Abstractions.Test.Config.EntityConfig, Beef.CodeGen.Abstractions.Test
-generators:
-- { type: 'Beef.CodeGen.Abstractions.Test.Generators.EntityGenerator, Beef.CodeGen.Abstractions.Test', template: EntityExample.hbs, file: y, Company: Xxx, AppName: Yyy }

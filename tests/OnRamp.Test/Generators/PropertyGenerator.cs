@@ -1,8 +1,8 @@
-﻿using Beef.CodeGen.Abstractions.Test.Config;
-using Beef.CodeGen.Generators;
+﻿using OnRamp.Test.Config;
+using OnRamp.Generators;
 using System.Collections.Generic;
 
-namespace Beef.CodeGen.Abstractions.Test.Generators
+namespace OnRamp.Test.Generators
 {
     public class PropertyGenerator : CodeGeneratorBase<EntityConfig, PropertyConfig>
     {

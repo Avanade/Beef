@@ -93,6 +93,7 @@ namespace OnRamp.Scripts
                 {
                     configEditorType = Type.GetType(EditorType) ?? throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' does not exist.");
                 }
+                catch (CodeGenException) { throw; }
                 catch (Exception ex) { throw new CodeGenException(this, nameof(EditorType), $"Type '{EditorType}' is invalid: {ex.Message}"); }
 
                 if (!typeof(IConfigEditor).IsAssignableFrom(configEditorType) || configEditorType.GetConstructor(Array.Empty<Type>()) == null)

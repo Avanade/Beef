@@ -1,2 +1,0 @@
-﻿configType: Beef.CodeGen.Scripts.CodeGenScripts
-inherits: [ InheritsSameConfigType2.yaml ]

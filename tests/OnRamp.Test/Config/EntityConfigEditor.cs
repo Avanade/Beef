@@ -1,6 +1,6 @@
-﻿using Beef.CodeGen.Config;
+﻿using OnRamp.Config;
 
-namespace Beef.CodeGen.Abstractions.Test.Config
+namespace OnRamp.Test.Config
 {
     public class EntityConfigEditor : IConfigEditor
     {

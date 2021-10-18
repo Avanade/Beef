@@ -1,0 +1,2 @@
+﻿configType: OnRamp.Scripts.CodeGenScripts
+inherits: [ InheritsSameConfigType2.yaml ]

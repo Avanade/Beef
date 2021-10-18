@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Beef.CodeGen.Abstractions.Test
+namespace OnRamp.Test
 {
     [TestFixture]
     public class CodeGeneratorTest
@@ -26,7 +26,7 @@ namespace Beef.CodeGen.Abstractions.Test
         public void A120_Script_InvalidYamlContent()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("InvalidYamlContent.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'InvalidYamlContent.yaml' is invalid: Error converting value \"<blah></blah>\" to type 'Beef.CodeGen.Scripts.CodeGenScripts'. Path '', line 1, position 15.", ex.Message);
+            Assert.AreEqual("Script 'InvalidYamlContent.yaml' is invalid: Error converting value \"<blah></blah>\" to type 'OnRamp.Scripts.CodeGenScripts'. Path '', line 1, position 15.", ex.Message);
         }
 
         [Test]
@@ -54,28 +54,28 @@ namespace Beef.CodeGen.Abstractions.Test
         public void A160_Script_InvalidConfigType()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("InvalidConfigType.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'InvalidConfigType.yaml' is invalid: [ConfigType] Type 'Beef.CodeGen.Scripts.CodeGenScript' must inherit from ConfigRootBase<TRoot>.", ex.Message);
+            Assert.AreEqual("Script 'InvalidConfigType.yaml' is invalid: [ConfigType] Type 'OnRamp.Scripts.CodeGenScript' must inherit from ConfigRootBase<TRoot>.", ex.Message);
         }
 
         [Test]
         public void B100_Generator_DoesNotExist()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("GeneratorDoesNotExist.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'GeneratorDoesNotExist.yaml' is invalid: [Generate.Type] Type 'Beef.CodeGen.Abstractions.Test.Generators.DoesNotExist, Beef.CodeGen.Abstractions.Test' does not exist.", ex.Message);
+            Assert.AreEqual("Script 'GeneratorDoesNotExist.yaml' is invalid: [Generate.Type] Type 'OnRamp.Test.Generators.DoesNotExist, OnRamp.Test' does not exist.", ex.Message);
         }
 
         [Test]
         public void B110_Generator_DiffConfigType()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("GeneratorDiffConfigType.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'GeneratorDiffConfigType.yaml' is invalid: [Generate.Type] Type 'Beef.CodeGen.Abstractions.Test.Generators.ScriptsGenerator, Beef.CodeGen.Abstractions.Test' RootType 'CodeGenScripts' must be the same as the ConfigType 'EntityConfig'.", ex.Message);
+            Assert.AreEqual("Script 'GeneratorDiffConfigType.yaml' is invalid: [Generate.Type] Type 'OnRamp.Test.Generators.ScriptsGenerator, OnRamp.Test' RootType 'CodeGenScripts' must be the same as the ConfigType 'EntityConfig'.", ex.Message);
         }
 
         [Test]
         public void B120_Generator_NotInherits()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("GeneratorNotInherits.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'GeneratorNotInherits.yaml' is invalid: [Generate.Type] Type 'Beef.CodeGen.Abstractions.Test.Generators.NotInheritsGenerator, Beef.CodeGen.Abstractions.Test' does not implement CodeGeneratorBase and/or have a default parameterless constructor.", ex.Message);
+            Assert.AreEqual("Script 'GeneratorNotInherits.yaml' is invalid: [Generate.Type] Type 'OnRamp.Test.Generators.NotInheritsGenerator, OnRamp.Test' does not implement CodeGeneratorBase and/or have a default parameterless constructor.", ex.Message);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace Beef.CodeGen.Abstractions.Test
         public void C100_Inherits_DiffConfigType()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("InheritsDiffConfigType.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'InheritsDiffConfigType.yaml' is invalid: Script 'InheritsDiffConfigType2.yaml' is invalid: [ConfigType] Inherited ConfigType 'Beef.CodeGen.Abstractions.Test.Config.InheritAlternateConfigType, Beef.CodeGen.Abstractions.Test' must be the same as root ConfigType 'Beef.CodeGen.Scripts.CodeGenScripts'.", ex.Message);
+            Assert.AreEqual("Script 'InheritsDiffConfigType.yaml' is invalid: Script 'InheritsDiffConfigType2.yaml' is invalid: [ConfigType] Inherited ConfigType 'OnRamp.Test.Config.InheritAlternateConfigType, OnRamp.Test' must be the same as root ConfigType 'OnRamp.Scripts.CodeGenScripts'.", ex.Message);
         }
 
         [Test]
@@ -117,14 +117,14 @@ namespace Beef.CodeGen.Abstractions.Test
         public void D100_Editor_TypeNotFound()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("EditorTypeNotFound.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'EditorTypeNotFound.yaml' is invalid: [EditorType] Type 'Beef.CodeGen.Scripts.NotFound' does not exist.", ex.Message);
+            Assert.AreEqual("Script 'EditorTypeNotFound.yaml' is invalid: [EditorType] Type 'OnRamp.Scripts.NotFound' does not exist.", ex.Message);
         }
 
         [Test]
         public void D110_Editor_InvalidType()
         {
             var ex = Assert.Throws<CodeGenException>(() => new CodeGenerator(new CodeGeneratorArgs("EditorInvalidType.yaml").AddAssembly(typeof(CodeGeneratorTest).Assembly)));
-            Assert.AreEqual("Script 'EditorInvalidType.yaml' is invalid: [EditorType] Type 'Beef.CodeGen.Scripts.CodeGenScripts' does not implement IConfigEditor and/or have a default parameterless constructor.", ex.Message);
+            Assert.AreEqual("Script 'EditorInvalidType.yaml' is invalid: [EditorType] Type 'OnRamp.Scripts.CodeGenScripts' does not implement IConfigEditor and/or have a default parameterless constructor.", ex.Message);
         }
 
         [Test]

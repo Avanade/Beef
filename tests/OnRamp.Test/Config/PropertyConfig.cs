@@ -1,9 +1,9 @@
-﻿using Beef.CodeGen.Config;
+﻿using OnRamp.Config;
 using Newtonsoft.Json;
 
 #nullable enable
 
-namespace Beef.CodeGen.Abstractions.Test.Config
+namespace OnRamp.Test.Config
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Property", Title = "'Property' object.", Description = "The `Property` object.")]

@@ -1,10 +1,10 @@
-﻿using Beef.CodeGen.Config;
+﻿using OnRamp.Config;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace Beef.CodeGen.Abstractions.Test.Config
+namespace OnRamp.Test.Config
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Entity", Title = "'Entity' object.", Description = "The `Entity` object.", Markdown = "This is a _sample_ markdown.", ExampleMarkdown = "This is an `example` markdown.")]

@@ -1,4 +1,0 @@
-﻿configType: Beef.CodeGen.Abstractions.Test.Config.EntityConfig, Beef.CodeGen.Abstractions.Test
-generators:
-- { type: 'Beef.CodeGen.Abstractions.Test.Generators.EntityGenerator, Beef.CodeGen.Abstractions.Test', template: EntityExample.hbs, directory: "{{lookup RuntimeParameters 'Directory'}}", file: '{{Name}}.txt', Company: Xxx, AppName: Yyy }
-- { type: 'Beef.CodeGen.Abstractions.Test.Generators.PropertyGenerator, Beef.CodeGen.Abstractions.Test', template: PropertyExample.hbs, directory: "{{lookup Root.RuntimeParameters 'Directory'}}", file: '{{Name}}.txt' }

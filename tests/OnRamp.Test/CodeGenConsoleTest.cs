@@ -1,9 +1,9 @@
-﻿using Beef.CodeGen.Console;
+﻿using OnRamp.Console;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Beef.CodeGen.Abstractions.Test
+namespace OnRamp.Test
 {
     [TestFixture]
     public class CodeGenConsoleTest
@@ -115,7 +115,7 @@ namespace Beef.CodeGen.Abstractions.Test
                 Directory.Delete("XB110", true);
 
             var c = CodeGenConsole.Create<CodeGenConsoleTest>();
-            var r = await c.RunAsync("-s ValidEntity.yaml -c Data/ValidEntity.yaml -p Directory=XB110 -p AppName=Zzz -a \"Beef.CodeGen.Abstractions.Test, Version=1.2.3.0, Culture=neutral, PublicKeyToken=null\"");
+            var r = await c.RunAsync("-s ValidEntity.yaml -c Data/ValidEntity.yaml -p Directory=XB110 -p AppName=Zzz -a \"OnRamp.Test, Version=1.2.3.0, Culture=neutral, PublicKeyToken=null\"");
             Assert.AreEqual(0, r);
 
             Assert.IsTrue(Directory.Exists("XB110"));
@@ -141,7 +141,7 @@ namespace Beef.CodeGen.Abstractions.Test
                 Directory.Delete("XC100", true);
 
             var c = CodeGenConsole.Create<CodeGenConsoleTest>();
-            var r = await c.RunAsync("-s ValidEntity.yaml -c Data/ValidEntity.yaml -enc -p Directory=XC100 -p AppName=Zzz -a \"Beef.CodeGen.Abstractions.Test, Version=1.2.3.0, Culture=neutral, PublicKeyToken=null\"");
+            var r = await c.RunAsync("-s ValidEntity.yaml -c Data/ValidEntity.yaml -enc -p Directory=XC100 -p AppName=Zzz -a \"OnRamp.Test, Version=1.2.3.0, Culture=neutral, PublicKeyToken=null\"");
             Assert.AreEqual(3, r);
         }
     }

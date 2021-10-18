@@ -1,3 +1,0 @@
-﻿configType: Beef.CodeGen.Scripts.CodeGenScripts
-generators:
-- { type: 'Beef.CodeGen.Abstractions.Test.Generators.DoesNotExist, Beef.CodeGen.Abstractions.Test', template: x, file: y }
