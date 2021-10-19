@@ -530,7 +530,7 @@ namespace Beef.CodeGen.Config.Database
         {
             CodeGenArgs?.Logger?.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
 
-            var cs = CodeGenArgs?.ConnectionString ?? throw new CodeGenException($"Connection string must be explicitly specified using Environment Variable '{CodeGenArgs?.ConnectionStringEnvironmentVariableName}' or as a runtime option.");
+            var cs = CodeGenArgs?.ConnectionString ?? throw new CodeGenException("Connection string must be specified via an environment variable or as a command-line option.");
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlConnection(cs);

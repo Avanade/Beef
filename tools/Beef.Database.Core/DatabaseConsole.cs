@@ -226,6 +226,10 @@ namespace Beef.Database.Core
                 {
                     Args.Assemblies.Clear();
                     Args.AddAssembly(Assembly.GetEntryAssembly()!);
+                }, () =>
+                {
+                    if (Args.UseBeefDbo && !Args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
+                        Args.Assemblies.Add(typeof(DatabaseConsole).Assembly);
                 });
 
                 vr = new ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Parameters)), ctx);
@@ -241,18 +245,10 @@ namespace Beef.Database.Core
 
                 Args.AddScriptNewArguments(_scriptNewArg.Values.Where(x => !string.IsNullOrEmpty(x)).OfType<string>().Distinct().ToArray());
                 if (Args.ScriptNewArguments.Count > 0 && _cmdArg.ParsedValue != DatabaseExecutorCommand.ScriptNew)
-                    return new ValidationResult("Additional arguments can only be specified when the command is ScriptNew.", new string[] { "args" });
+                    return new ValidationResult("Additional arguments can only be specified when the command is '{nameof(DatabaseExecutorCommand.ScriptNew)}'.", new string[] { "args" });
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
-                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
-
-                var company = Args.GetCompany(false);
-                var appName = Args.GetAppName(false);
-                if (company == null || appName == null)
-                    return new ValidationResult($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName}  must be specified.", new string[] { "args" });
-
-                if (Args.ConnectionStringEnvironmentVariableName == null)
-                    Args.ConnectionStringEnvironmentVariableName = $"{company?.Replace(".", "_", StringComparison.InvariantCulture)}_{appName?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{nameof(DatabaseExecutorCommand.CodeGen)}'.");
 
                 UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
                 Args.OverrideConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
@@ -308,11 +304,13 @@ namespace Beef.Database.Core
         /// <summary>
         /// Updates the command option from a boolean option.
         /// </summary>
-        private void UpdateBooleanOption(string key, Action action)
+        private void UpdateBooleanOption(string key, Action action, Action? elseAction = null)
         {
             var co = GetCommandOption(key);
             if (co.HasValue())
                 action.Invoke();
+            else
+                elseAction?.Invoke();
         }
 
         /// <summary>

@@ -48,9 +48,9 @@ namespace Beef.CodeGen
             }
 
             var a = new OnRamp.CodeGeneratorArgs().AddAssembly(typeof(CodeGenConsole).Assembly).AddAssembly(Assembly.GetCallingAssembly());
-            var c = OnRamp.Console.CodeGenConsole.Create<CodeGenConsole>(name: Assembly.GetCallingAssembly().GetName().Name, options: OnRamp.Console.SupportedOptions.All);
+            var c = OnRamp.Console.CodeGenConsole.Create<CodeGenConsole>();
             c.MastheadText = CodeGenConsole.DefaultMastheadText;
-            return await c.RunAsync().ConfigureAwait(false);
+            return await c.RunAsync(args).ConfigureAwait(false);
         }
 
         /// <summary>

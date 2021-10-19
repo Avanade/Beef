@@ -24,5 +24,17 @@ namespace Beef.CodeGen
         /// <param name="args">The <see cref="CodeGeneratorArgs"/>.</param>
         /// <param name="throwWhereNotFound">Indicates to throw a <see cref="KeyNotFoundException"/> when the specified key is not found.</param>
         public static string GetAppName(this CodeGeneratorArgsBase args, bool throwWhereNotFound = false) => (args ?? throw new ArgumentNullException(nameof(args))).GetParameter(CodeGenConsole.AppNameParamName, throwWhereNotFound)!;
+
+        /// <summary>
+        /// Validate that <see cref="CodeGeneratorArgsBase.Parameters"/> with a key of <see cref="CodeGenConsole.CompanyParamName"/> and <see cref="CodeGenConsole.AppNameParamName"/> have been specified and throw a
+        /// <see cref="CodeGenException"/> where invalid.
+        /// </summary>
+        /// <param name="args">The <see cref="CodeGeneratorArgs"/>.</param>
+        /// <exception cref="CodeGenException">A <see cref="CodeGenException"/> is thrown where not specified.</exception>
+        public static void ValidateCompanyAndAppName(this CodeGeneratorArgsBase args)
+        {
+            if (string.IsNullOrEmpty((args ?? throw new ArgumentNullException(nameof(args))).GetCompany()) || string.IsNullOrEmpty(args.GetAppName()))
+                throw new CodeGenException($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName}  must be specified.");
+        }
     }
 }

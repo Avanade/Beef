@@ -217,6 +217,8 @@ namespace Beef.CodeGen
                     return vr;
             }
 
+            Args.ValidateCompanyAndAppName();
+
             return ValidationResult.Success;
         }
 

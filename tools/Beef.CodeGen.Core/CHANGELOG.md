@@ -3,8 +3,28 @@
 Represents the **NuGet** versions.
 
 ## v4.2.13
-- *Enhancement:* Core code-generation capabilities moved into new `Beef.CodeGen.Abstractions` and referenced.
+- *Enhancement:* Core code-generation capabilities moved into new [OnRamp](https://github.com/Avanade/OnRamp) and referenced.
 - *Enhancement:* All code-gen `Script` files converted to YAML; the embedded resources have all been updated and renamed with the `.yaml` file extension accordingly.
+- *Enhancement:* `CodeGenConsoleWrapper` has been removed; use `CodeGenConsole` (breaking change).
+- *Enhancement:* Command-line options have been adjusted and may result in breaking change; they are as follows:
+
+```
+Business Entity Execution Framework (Beef) Code Generator tool.
+
+Usage: Beef.CodeGen.Core [options]
+
+Options:
+  -?|-h|--help              Show help information.
+  -s|--script               Script orchestration file/resource name.
+  -c|--config               Configuration data file name.
+  -o|--output               Output directory path.
+  -a|--assembly             Assembly containing embedded resources (multiple can be specified in probing order).
+  -p|--param                Parameter expressed as a 'Name=Value' pair (multiple can be specified).
+  -cs|--connection-string   Database connection string.
+  -cv|--connection-varname  Database connection string environment variable name.
+  -enc|--expect-no-changes  Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline).
+  -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
+```
 
 ## v4.2.12
 - *Enhancement:* Updated the `EntityData` template to include the new `HttpAgent` data source functionality.

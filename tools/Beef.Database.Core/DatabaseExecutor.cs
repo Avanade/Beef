@@ -105,7 +105,7 @@ namespace Beef.Database.Core
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(DatabaseConsole));
 
             if (_args.UseBeefDbo && !_args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
-                _args.Assemblies.Insert(0, typeof(DatabaseConsole).Assembly);
+                _args.Assemblies.Add(typeof(DatabaseConsole).Assembly);
 
             _args.Assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
         }
@@ -115,6 +115,8 @@ namespace Beef.Database.Core
         /// </summary>
         public async Task<bool> RunAsync()
         {
+            _args.ValidateCompanyAndAppName();
+
             try
             {
                 _db = new Db(_args.ConnectionString ?? throw new InvalidOperationException("Database connection string is required."));
@@ -185,7 +187,7 @@ namespace Beef.Database.Core
                     _logger.LogInformation(new string('-', 80));
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
-                    CodeGenConsole.WriteStandardizedArgs(cga);
+                    OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);
 
                     CodeGenStatistics stats = null!;
                     if (!await TimeExecutionAsync(async () =>
@@ -272,6 +274,11 @@ namespace Beef.Database.Core
 
                 _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms{summaryText?.Invoke() ?? ""}].");
                 return result;
+            }
+            catch (CodeGenException cgex)
+            {
+                _logger.LogError(cgex.Message);
+                return false;
             }
             catch (Exception ex)
             {
