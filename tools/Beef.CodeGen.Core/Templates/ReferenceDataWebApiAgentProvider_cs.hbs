@@ -59,9 +59,9 @@ namespace {{Root.NamespaceCommon}}.Agents
 {{#each RefDataEntities}}
 
         /// <summary>
-        /// Gets the {{seecomments RefDataQualifiedEntityCollectionName}}.
+        /// Gets the {{see-comments RefDataQualifiedEntityCollectionName}}.
         /// </summary>
-        /// <returns>The {{seecomments RefDataQualifiedEntityCollectionName}}.</returns>
+        /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
         public override {{RefDataQualifiedEntityCollectionName}} {{Name}} => ({{RefDataQualifiedEntityCollectionName}})this[typeof({{RefDataQualifiedEntityName}})];
 {{/each}}
 

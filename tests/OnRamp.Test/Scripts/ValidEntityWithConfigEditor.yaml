@@ -1,4 +1,0 @@
-﻿configType: OnRamp.Test.Config.EntityConfig, OnRamp.Test
-editorType: OnRamp.Test.Config.EntityConfigEditor, OnRamp.Test
-generators:
-- { type: 'OnRamp.Test.Generators.EntityGenerator, OnRamp.Test', template: EntityExample.hbs, directory: "{{lookup RuntimeParameters 'Directory'}}", file: '{{Name}}.txt', Company: Xxx, AppName: Yyy }

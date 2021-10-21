@@ -76,9 +76,9 @@ namespace {{Root.NamespaceBusiness}}.Data
 
   {{/unless}}
         /// <summary>
-        /// Gets all the {{seecomments RefDataQualifiedEntityName}} items.
+        /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
         /// </summary>
-        /// <returns>The {{seecomments RefDataQualifiedEntityCollectionName}}.</returns>
+        /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
         public async Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync()
         {
             var __coll = new {{RefDataQualifiedEntityCollectionName}}();
@@ -113,7 +113,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class {{Name}}MapperProfile : AutoMapper.Profile
         {
@@ -144,7 +144,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments CosmosModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments CosmosModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class {{Name}}MapperProfile : AutoMapper.Profile
         {

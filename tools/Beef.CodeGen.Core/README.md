@@ -30,69 +30,35 @@ Both [entity-driven](#Entity-driven-code-gen) and [database-driven](#Database-dr
 
 ## Composition
 
-The code-generation tooling is composed of the following:
+The base code-generation tooling is enabled by [`OnRamp`](https://github.com/Avanade/OnRamp); the _OnRamp_ code-generation tooling is composed of the following:
 
-- [Configuration](#Configuration) - this is the configuration that is used to both control the generated artefacts and their respective content.
-- [Templates](#Templates) - these are the [Handlebars](https://handlebarsjs.com/guide/) templates that define a specific artefact's content.
-- [Scripts](#Scripts) - these orchestrate the templates (one or more) that should be used to generate the artefacts.
+1. [Configuration](#Configuration) - data used as the input for to drive the code-generation and the underlying _templates_.
+2. [Templates](#Templates) - [Handlebars](https://handlebarsjs.com/guide/) templates that define a specific artefact's scripted content.
+3. [Scripts](#Scripts) - orchestrates one or more _templates_ that are used to generate artefacts for a given _configuration_ input.
 
 <br/>
 
 ### Configuration
 
-The code-gen is driven by a configuration data source, in this case YAML, JSON or XML. This acts as a type of DSL ([Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language)) to define the key characteristics / attributes that will be used to generate the required artefacts.
+The code-gen is driven by a configuration data source, in this case YAML, JSON or XML.
 
 The two supported configurations are:
 - [Entity-driven](#Entity-driven-code-gen) - the configuration root definition is [`Entity.CodeGenConfig`](./Config/Entity/CodeGenConfig.cs). All the related types are found [here](./Config/Entity).
 - [Database-driven](#Database-driven-code-gen) - the configuration root definition is [`Database.CodeGenConfig`](./Config/Database/CodeGenConfig.cs). All the related types are found [here](./Config/Database).
 
-The above root, and corresponding related (child) configurations must inherit from [`ConfigBase`](./Config/ConfigBase.cs) to get their required capabilities. The advantage of using a .NET typed class for the configuration is that additional properties (computed at runtime) can be added to aid the code-generation process. The underlying `Prepare` method provides a consistent means to implement this logic at runtime.
-
 <br/>
 
 ### Templates
 
-Once the code-gen data source(s) have been defined, one or more templates will be required to drive the artefact output. These templates are defined using [Handlebars](https://handlebarsjs.com/guide/) and its syntax, or more specifically [Handlebars.Net](https://github.com/Handlebars-Net/Handlebars.Net). Template files must be added as an embedded resource within the solution to enable runtime access.
+The _Beef_ templates (as per [`OnRamp`](https://github.com/Avanade/OnRamp)) are defined using [Handlebars](https://handlebarsjs.com/guide/) and its syntax, or more specifically [Handlebars.Net](https://github.com/Handlebars-Net/Handlebars.Net). 
 
-Additionally, Handlebars has been [extended](./Generators/HandlebarsHelpers.cs) to add additional capabilities beyond what is available natively to enable the required generated output.
-
-The _Beef_ standard templates can be found [here](./Templates).
+The template files have been added as embedded resources within the project to enable runtime access. The _Beef_ standard templates can be found [here](./Templates).
 
 <br/>
 
 ### Scripts
 
-To orchestrate the code generation, in terms of the [Templates](#Templates) to be used, an XML-based script-like file is used. The _Beef_ standard scripts can be found [here](./Scripts). Script files must be added as an embedded resource within the project to enable runtime access.
-
-The following are the `Script` element's attributes:
-
-Attribute | Description
--|-
-`ConfigType` | _Beef_ supports two configuration types; either [`Entity`](#Entity-driven-code-gen) or [`Database`](#Database-driven-code-gen). This informs the code generator which of the two is the intended configuration source.
-`Inherits` | A script file can inherit the script configuration from one or more parent files by specifying the name or names (semicolon '`;`' separated). This simplifies the addition of additional artefact generation without having to repeat configuration.
-`ConfigEditor` | This is the `Type` name (as used by [`Type.GetType`](https://docs.microsoft.com/en-us/dotnet/api/system.type.gettype#System_Type_GetType_System_String_)) that provides an opportunity to edit (modify) the loaded configuration. The `Type` must implement [`IConfigEditor`](./Config/IConfigEditor.cs).
-
-The following are the `Generate` element's attributes:
-
-Attribute | Description
--|-
-`GenType` | This is the `Type` name (as used by [`Type.GetType`](https://docs.microsoft.com/en-us/dotnet/api/system.type.gettype#System_Type_GetType_System_String_)) that will perform the underlying configuration data selection, where the corresponding `Template` will be invoked per selected item. This `Type` must inherit from [`CodeGeneratorBase`](./Generators/CodeGeneratorBase.cs); the _Beef_ standard code generators can be found [here](./Generators).
-`Template` | This is the unique name (case-sensitive) of the `Template` that should be used.
-`FileName` | This is the name of the file (artefact) that will be generated; this also supports Handlebars syntax to enable runtime computation.
-`OutDir` | This is the sub-directory (path name) where the file (artefact) will be generated; this also supports Handlebars syntax to enable runtime computation.
-`GenOnce` | This boolean (true/false) indicates whether the file is to be only generated once; i.e. only created where it does not already exist.
-`HelpText` | This is additional help text that is output to the console when the script generator is executed.
-
-Any other attributes specified for the `Generate` element will be passed as a runtime parameters (name/value pairs); see [`IRootConfig.RuntimeParameters`](./Config/ConfigBase.cs).
-
-An example of a Script XML file is as follows:
-
-``` xml
-<Script ConfigType="Entity" Inherits="EntityBusiness.xml">
-  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator" Template="EntityWebApiController_cs.hbs" FileName="{{Name}}Controller.cs" OutDir="{{Root.PathApi}}/Controllers/Generated" EntityScope="Common" HelpText="EntityWebApiControllerCodeGenerator: Api/Controllers" />
-  ...
-</Script>
-```
+To orchestrate the code generation, in terms of the [Templates](#Templates) to be used, a YAML-based script-like file is used. The _Beef_ standard scripts can be found [here](./Scripts). The Script files have been added as embedded resources within the project to enable runtime access.
 
 <br/>
 
@@ -188,21 +154,36 @@ The following commands are available for the console application (the enablement
 
 Command | Description
 -|-
-`Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.xml`](./Scripts/EntityWebApiCoreAgent.xml) script.
-`RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.xml`](./Scripts/RefDataCoreCrud.xml) script.
-`Database` | Performs code generation using the `Company.AppName.Database.xml` configuration and [`Database.xml`](./Scripts/Database.xml) script.
-`DataModel` | Performs code generation using the `Company.AppName.DataModel.xml` configuration and [`DataModelOnly.xml`](./Scripts/DataModelOnly.xml) script.
+`Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.xml`](./Scripts/EntityWebApiCoreAgent.yaml) script.
+`RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.xml`](./Scripts/RefDataCoreCrud.yaml) script.
+`Database` | Performs code generation using the `Company.AppName.Database.xml` configuration and [`Database.xml`](./Scripts/Database.yaml) script.
+`DataModel` | Performs code generation using the `Company.AppName.DataModel.xml` configuration and [`DataModelOnly.xml`](./Scripts/DataModelOnly.yaml) script.
 `All` | Performs all of the above (where each is supported as per set up).
 
 Additionally, there are a number of command line options that can be used.
 
-Option | Description
--|-
-`--connectionString` | Overrides the connection string for the database.
-`--configFile` | Overrides the filename for the configuration.
-`--scriptFile` | Overrides the filename for the script orchestration.
-`--expectNoChanges` | Expect no changes in the artefact output and error where changes are detected. This is intended for use with the likes of the build pipeline.
-`--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
+```
+Business Entity Execution Framework (Beef) Code Generator tool.
+
+Usage: Beef.CodeGen.Core [options] <command>
+
+Arguments:
+  command                   Execution command type.
+                            Allowed values are: Entity, Database, RefData, DataModel, All.
+
+Options:
+  -?|-h|--help              Show help information.
+  -s|--script               Script orchestration file/resource name.
+  -c|--config               Configuration data file name.
+  -o|--output               Output directory path.
+  -a|--assembly             Assembly containing embedded resources (multiple can be specified in probing order).
+  -p|--param                Parameter expressed as a 'Name=Value' pair (multiple can be specified).
+  -cs|--connection-string   Database connection string.
+  -cv|--connection-varname  Database connection string environment variable name.
+  -enc|--expect-no-changes  Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline).
+  -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
+  -x2y|--xml-to-yaml        Convert the XML configuration into YAML equivalent (will not codegen).
+```
 
 <br/>
 
@@ -213,13 +194,10 @@ The `Program.cs` for the new console application should be updated similar to th
 ``` csharp
 public class Program
 {
-    static int Main(string[] args)
-    {
-        return CodeGenConsoleWrapper
-            .Create("Company", "AppName")           // Create the wrapper setting Company and AppName.
-            .Supports(entity: true, refData: true)  // Set which of the Commands are supported.
-            .Run(args);                             // Run the console.
-    }
+    static int Main(string[] args) => CodeGenConsole
+        .Create("Company", "AppName")           // Create the Console setting Company and AppName.
+        .Supports(entity: true, refData: true)  // Set which of the Commands are supported.
+        .Run(args);                             // Run the console.
 }
 ```
 
@@ -242,7 +220,7 @@ dotnet run entity --configFile configfilename.xml
 
 As described above _Beef_ has a set of pre-defined (out-of-the-box) [Scripts](#Scripts) and [Templates](#Templates). These do not have to be used, or additional can be added, where an alternate code-generation outcome is required.
 
-To avoid the need to clone the solution, and update, add the `Templates` and `Scripts` folders into the console application and embed the required resources. The underlying `Beef.CodeGen.Core` will probe the embedded resources and use the overridden version where provided, falling back on the _Beef_ version where not overridden. 
+To avoid the need to clone the solution and update, add the `Templates` and `Scripts` folders into the new console application and embed the required resources. The underlying `Beef.CodeGen.Core` will probe the embedded resources and use the overridden version where provided, falling back on the _Beef_ version where not overridden. 
 
 One or more of the following options exist to enable personalization.
 
@@ -250,7 +228,7 @@ Option | Description
 -|-
 [Config](#Config) | There is currently _no_ means to extend the underlying configuration .NET types directly. However, as all the configuration types inherit from [`ConfigBase`](./Config/ConfigBase.cs) the `ExtraProperties` hash table is populated with any additional configurations during the deserialization process. These values can then be referenced direcly within the Templates as required. To perform further changes to the configuration at runtime an [`IConfigEditor`](./Config/IConfigEditor.cs) can be added and then referenced from within the corresponding `Scripts` file; it will then be invoked prior to the code generation enabling further changes to occur. The `ConfigBase.CustomProperties` hash table is further provided to enable additional properties to be set and referenced in a consistent manner.
 [Templates](#Templates) | Add new [Handlebars](https://handlebarsjs.com/guide/) file, as an embedded resource, to the `Templates` folder (add where not pre-existing) within the project. Where overriding use the same name as that provided out-of-the-box; otherwise, ensure the `Template` is referenced by the `Script`.
-[Scripts](#Scripts) | Add new `Scripts` XML file, as an embedded resource, to the `Scripts` folder (add where not pre-existing) within the project. Use the `Inherits` attribute where still wanting to execute the out-of-the-box code-generation.
+[Scripts](#Scripts) | Add new `Scripts` YAML file, as an embedded resource, to the `Scripts` folder (add where not pre-existing) within the project. Use the `Inherits` attribute where still wanting to execute the out-of-the-box code-generation.
 
 <br/>
 

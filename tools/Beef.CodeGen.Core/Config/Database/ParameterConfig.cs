@@ -174,7 +174,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (OnRamp.Database.DbTypeHelper.TypeIsString(c.Type))
+                    if (OnRamp.Database.DbType.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch

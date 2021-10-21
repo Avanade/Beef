@@ -1,2 +1,0 @@
-﻿configType: OnRamp.Scripts.CodeGenScripts
-inherits: [ InheritsDiffConfigType2.yaml ]

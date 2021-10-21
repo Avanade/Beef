@@ -534,7 +534,7 @@ namespace Beef.CodeGen.Config.Database
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlConnection(cs);
-            DbTables = DbTable.LoadTablesAndColumnsAsync(db, false).GetAwaiter().GetResult();
+            DbTables = OnRamp.Database.Database.GetSchemaAsync(db, false).GetAwaiter().GetResult();
 
             sw.Stop();
             CodeGenArgs?.Logger?.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");

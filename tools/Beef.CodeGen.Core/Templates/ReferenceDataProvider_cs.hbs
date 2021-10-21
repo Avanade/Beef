@@ -40,7 +40,7 @@ namespace {{Root.NamespaceBusiness}}
 
 {{#each RefDataEntities}}
         /// <summary> 
-        /// Gets the {{seecomments RefDataQualifiedEntityCollectionName}}.
+        /// Gets the {{see-comments RefDataQualifiedEntityCollectionName}}.
         /// </summary>
         public override {{RefDataQualifiedEntityCollectionName}} {{Name}} => ({{RefDataQualifiedEntityCollectionName}})this[typeof({{RefDataQualifiedEntityName}})];
 

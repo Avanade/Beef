@@ -1,3 +1,0 @@
-﻿configType: OnRamp.Scripts.CodeGenScripts
-generators:
-- { type: 'OnRamp.Test.Generators.DoesNotExist, OnRamp.Test', template: x, file: y }

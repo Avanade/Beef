@@ -204,12 +204,12 @@
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.16" />
+    <PackageReference Include="OnRamp" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
-    <ProjectReference Include="..\OnRamp\OnRamp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

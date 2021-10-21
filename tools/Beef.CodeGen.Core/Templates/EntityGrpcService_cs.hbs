@@ -61,7 +61,7 @@ namespace {{Root.NamespaceApi}}.Grpc
         /// </summary>
         /// <param name="request">The <see cref="proto.{{Parent.Name}}{{Name}}Request"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
-        /// <returns>The {{#if HasReturnValue}}{{seecomments ReturnType}}{{else}}{{seecomments 'Google.Protobuf.WellKnownTypes.Empty'}}{{/if}}.</returns>
+        /// <returns>The {{#if HasReturnValue}}{{see-comments ReturnType}}{{else}}{{see-comments 'Google.Protobuf.WellKnownTypes.Empty'}}{{/if}}.</returns>
   {{#ifval WebApiAuthorize}}
         [{{{WebApiAuthorize}}}]
   {{/ifval}}

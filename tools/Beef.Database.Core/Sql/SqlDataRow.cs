@@ -71,7 +71,7 @@ namespace Beef.Database.Core.Sql
             try
             {
                 str = column.Value is DateTime time ? time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
-                switch (DbTypeHelper.GetDotNetTypeName(col.Type))
+                switch (DbType.GetDotNetTypeName(col.Type))
                 {
                     case "string": column.Value = str; break;
                     case "decimal": column.Value = decimal.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;

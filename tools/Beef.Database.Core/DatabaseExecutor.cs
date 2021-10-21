@@ -9,7 +9,7 @@ using DbUp.Engine;
 using DbUp.Engine.Output;
 using HandlebarsDotNet;
 using Microsoft.Extensions.Logging;
-using OnRamp;
+using OnRamp.Console;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
@@ -115,8 +115,6 @@ namespace Beef.Database.Core
         /// </summary>
         public async Task<bool> RunAsync()
         {
-            _args.ValidateCompanyAndAppName();
-
             try
             {
                 _db = new Db(_args.ConnectionString ?? throw new InvalidOperationException("Database connection string is required."));
@@ -178,7 +176,7 @@ namespace Beef.Database.Core
 
                 if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
                 {
-                    var cga = new CodeGeneratorArgs();
+                    var cga = new OnRamp.CodeGeneratorArgs();
                     cga.CopyFrom(_args);
                     cga.Assemblies.Add(typeof(CodeGenConsole).Assembly);
                     cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
@@ -187,9 +185,11 @@ namespace Beef.Database.Core
                     _logger.LogInformation(new string('-', 80));
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
-                    OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);
+                    CodeGenConsoleBase.WriteStandardizedArgs(cga);
 
-                    CodeGenStatistics stats = null!;
+                    cga.ValidateCompanyAndAppName();
+
+                    OnRamp.CodeGenStatistics stats = null!;
                     if (!await TimeExecutionAsync(async () =>
                     {
                         stats = CodeGenConsole.ExecuteCodeGeneration(cga);
@@ -275,7 +275,7 @@ namespace Beef.Database.Core
                 _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms{summaryText?.Invoke() ?? ""}].");
                 return result;
             }
-            catch (CodeGenException cgex)
+            catch (OnRamp.CodeGenException cgex)
             {
                 _logger.LogError(cgex.Message);
                 return false;

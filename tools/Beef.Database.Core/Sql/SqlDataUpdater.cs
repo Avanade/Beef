@@ -34,7 +34,7 @@ namespace Beef.Database.Core.Sql
         public static async Task RegisterDatabaseAsync(DbConnection dbConn)
         {
             if (DbTables == null)
-                DbTables = await DbTable.LoadTablesAndColumnsAsync(dbConn, false).ConfigureAwait(false);
+                DbTables = await OnRamp.Database.Database.GetSchemaAsync(dbConn, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace Beef.Database.Core.Sql
             var cg = new HandlebarsCodeGenerator(tr);
             foreach (var t in Tables)
             {
-                codeGen(new CodeGenOutputArgs(new CodeGenScript(), null, $"{t.Schema}.{t.Name} SQL", cg.Generate(t)));
+                codeGen(new CodeGenOutputArgs(new CodeGenScriptItem(), null, $"{t.Schema}.{t.Name} SQL", cg.Generate(t)));
             }
 
             return Task.CompletedTask;

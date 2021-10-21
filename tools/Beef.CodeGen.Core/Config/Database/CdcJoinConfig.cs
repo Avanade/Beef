@@ -331,6 +331,11 @@ namespace Beef.CodeGen.Config.Database
         public int IndentIndex { get; set; } = 0;
 
         /// <summary>
+        /// Gets the indentation spaces based on the <see cref="IndentIndex"/>.
+        /// </summary>
+        public int IndentSpaces => IndentIndex * 4;
+
+        /// <summary>
         /// Gets the join <see cref="Type"/> as SQL.
         /// </summary>
         public string JoinTypeSql => Type?.ToUpperInvariant() switch

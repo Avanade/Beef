@@ -229,7 +229,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
             ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
-            : (DbTypeHelper.TypeIsInteger(DbColumn!.Type) || DbTypeHelper.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+            : (DbType.TypeIsInteger(DbColumn!.Type) || DbType.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
 
         /// <summary>
         /// Indicates where the column is the "TenantId" column.
@@ -324,7 +324,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
-        public string DotNetType => DbTypeHelper.GetDotNetTypeName(DbColumn!.Type);
+        public string DotNetType => DbType.GetDotNetTypeName(DbColumn!.Type);
 
         /// <summary>
         /// Indicates whether the .NET property is nullable.
@@ -361,7 +361,7 @@ namespace Beef.CodeGen.Config.Database
         private void UpdateSqlProperties()
         {
             var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
-            if (DbTypeHelper.TypeIsString(DbColumn!.Type))
+            if (DbType.TypeIsString(DbColumn!.Type))
                 sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
 
             sb.Append(DbColumn!.Type.ToUpperInvariant() switch

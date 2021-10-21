@@ -1,3 +1,0 @@
-﻿configType: OnRamp.Test.Config.EntityConfig, OnRamp.Test
-generators:
-- { type: 'OnRamp.Test.Generators.ScriptsGenerator, OnRamp.Test', template: x, file: y }

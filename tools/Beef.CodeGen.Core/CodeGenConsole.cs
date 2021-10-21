@@ -13,10 +13,10 @@ using System.Xml.Linq;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>Beef</b>-specific code-generation console that encapsulates the standard <see cref="OnRamp.Console.CodeGenConsole"/>.
+    /// <b>Beef</b>-specific code-generation console that inherits from <see cref="OnRamp.Console.CodeGenConsoleBase"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
-    public class CodeGenConsole : OnRamp.Console.CodeGenConsole
+    public class CodeGenConsole : OnRamp.Console.CodeGenConsoleBase
     {
         private string _entityScript = "EntityWebApiCoreAgent.yaml";
         private string _refDataScript = "RefDataCoreCrud.yaml";
@@ -84,7 +84,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
         /// </summary>
-        private CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: OnRamp.Console.SupportedOptions.All)
+        internal CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: OnRamp.Console.SupportedOptions.All)
         {
             MastheadText = DefaultMastheadText;
             Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{csargs.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{csargs.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
