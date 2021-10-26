@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.Config;
 using Newtonsoft.Json;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -212,7 +213,7 @@ namespace Beef.CodeGen.Converters
             foreach (var att in xml.Attributes())
             {
                 var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
-                var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
+                var pi = type.GetProperty(StringConverter.ToPascalCase(jname)!);
                 var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;

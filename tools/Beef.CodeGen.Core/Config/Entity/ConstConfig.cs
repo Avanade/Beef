@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 using OnRamp.Config;
+using OnRamp.Utility;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -65,7 +66,7 @@ consts: [
         /// </summary>
         protected override void Prepare()
         {
-            DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
+            DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name));
         }
     }
 }

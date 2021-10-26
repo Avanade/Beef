@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Database;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -363,11 +364,11 @@ namespace Beef.CodeGen.Config.Database
             if (DbTable.IsAView)
                 throw new CodeGenException(this, nameof(TableName), $"Specified Schema.Table '{Schema}.{TableName}' cannot be a view.");
 
-            ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
+            ModelName = DefaultWhereNull(ModelName, () => StringConverter.ToPascalCase(Name));
             JoinTo = DefaultWhereNull(JoinTo, () => Parent!.Name);
             JoinToSchema = DefaultWhereNull(JoinToSchema, () => Parent!.Schema);
             JoinCardinality = DefaultWhereNull(JoinCardinality, () => "OneToMany");
-            PropertyName = DefaultWhereNull(PropertyName, () => StringConversion.ToPascalCase(CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{TableName!}{(TableName!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : TableName));
+            PropertyName = DefaultWhereNull(PropertyName, () => StringConverter.ToPascalCase(CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{TableName!}{(TableName!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : TableName));
             if (ExcludeColumnsFromETag == null && Root!.CdcExcludeColumnsFromETag != null)
                 ExcludeColumnsFromETag = new List<string>(Root!.CdcExcludeColumnsFromETag!);
 

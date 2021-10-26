@@ -3,6 +3,7 @@
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -841,7 +842,7 @@ operations: [
                 _ => null
             });
 
-            Text = ToComments(DefaultWhereNull(Text, () => Type switch
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () => Type switch
                 {
                     "Get" => $"Gets the specified {{{{{ReturnType}}}}}",
                     "GetColl" => $"Gets the {{{{{ReturnType}}}}} that contains the items that match the selection criteria",
@@ -849,10 +850,10 @@ operations: [
                     "Update" => $"Updates an existing {{{{{ValueType}}}}}",
                     "Patch" => $"Patches an existing {{{{{ValueType}}}}}",
                     "Delete" => $"Deletes the specified {{{{{Parent!.EntityName}}}}}",
-                    _ => StringConversion.ToSentenceCase(Name)
+                    _ => StringConverter.ToSentenceCase(Name)
                 }));
 
-            ReturnText = ToComments(DefaultWhereNull(ReturnText, () => Type switch
+            ReturnText = StringConverter.ToComments(DefaultWhereNull(ReturnText, () => Type switch
             {
                 "Get" => $"The selected {{{{{ReturnType}}}}} where found",
                 "GetColl" => $"The {{{{{ReturnType}}}}}",
@@ -863,9 +864,9 @@ operations: [
                 _ => HasReturnValue ? $"A resultant {{{{{ReturnType}}}}}" : null
             })) + ".";
 
-            WebApiReturnText = Type == "GetColl" ? ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
+            WebApiReturnText = Type == "GetColl" ? StringConverter.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
-            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
             IValidator = DefaultWhereNull(IValidator, () => Validator != null ? Parent!.IValidator ?? $"IValidator<{ValueType}>" : null);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
@@ -968,7 +969,7 @@ operations: [
             {
                 PatchGetOperation = DefaultWhereNull(PatchGetOperation, () => "Get");
                 var parts = string.IsNullOrEmpty(PatchGetOperation) ? Array.Empty<string>() : PatchGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0][1..]);
+                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
                     PatchGetOperation = parts[1];
@@ -978,7 +979,7 @@ operations: [
 
                 PatchUpdateOperation = DefaultWhereNull(PatchUpdateOperation, () => "Update");
                 parts = string.IsNullOrEmpty(PatchUpdateOperation) ? Array.Empty<string>() : PatchUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0][1..]);
+                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
                     PatchUpdateOperation = parts[1];
@@ -1005,7 +1006,7 @@ operations: [
         /// </summary>
         private string ConvertEventAction(string action) => Root!.EventActionFormat switch
         {
-            "PastTense" => StringConversion.ToPastTense(action)!,
+            "PastTense" => StringConverter.ToPastTense(action)!,
             _ => action
         };
 

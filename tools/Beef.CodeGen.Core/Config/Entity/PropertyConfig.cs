@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Linq;
 
@@ -480,29 +481,29 @@ properties: [
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
+        public string? SummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
         public string? SummaryRefDataSid => CompareValue(RefDataList, true)
-            ? ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
-            : ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
+            ? StringConverter.ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
+            : StringConverter.ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText => ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
+        public string? SummaryRefDataText => StringConverter.ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
 
         /// <summary>
         /// Gets the formatted summary text when used in a parameter context.
         /// </summary>
-        public string? ParameterSummaryText => ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? ParameterSummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? PropertyNameSeeComments => ToSeeComments(Name);
+        public string? PropertyNameSeeComments => StringConverter.ToSeeComments(Name);
 
         /// <summary>
         /// Gets the computed declared property type.
@@ -626,28 +627,28 @@ properties: [
 
             DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
 
-            Text = ToComments(DefaultWhereNull(Text, () =>
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
 
                 if (Type == "ChangeLog")
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Beef.Entities." + Type)})";
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Beef.Entities." + Type)})";
 
                 var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
                 {
                     if (ent.EntityScope == null || ent.EntityScope == "Common")
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Common.Entities." + Type)})";
+                        return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Common.Entities." + Type)})";
                     else
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Business.Entities." + Type)})";
+                        return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Business.Entities." + Type)})";
                 }
 
-                return StringConversion.ToSentenceCase(Name);
+                return StringConverter.ToSentenceCase(Name);
             }));
 
-            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
@@ -703,7 +704,7 @@ properties: [
         /// </summary>
         private string GenerateDisplayName()
         {
-            var dn = StringConversion.ToSentenceCase(Name)!;
+            var dn = StringConverter.ToSentenceCase(Name)!;
             var parts = dn.Split(' ');
             if (parts.Length == 1)
                 return (parts[0] == "Id") ? "Identifier" : dn;

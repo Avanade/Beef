@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Database;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -358,7 +359,7 @@ queries:
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
-            Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
             ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
 

@@ -4,6 +4,7 @@ using Beef.Caching;
 using Beef.Entities;
 using Newtonsoft.Json;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1056,7 +1057,7 @@ entities:
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => ToComments($"Represents the {Text} entity.");
+        public string? SummaryText => StringConverter.ToComments($"Represents the {Text} entity.");
 
         /// <summary>
         /// Gets the entity name (accounts for <see cref="GenericWithT"/>).
@@ -1076,7 +1077,7 @@ entities:
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? EntityNameSeeComments => IsTrue(ExcludeEntity) ? $"<b>{Name}</b>" : ToSeeComments(Name);
+        public string? EntityNameSeeComments => IsTrue(ExcludeEntity) ? $"<b>{Name}</b>" : StringConverter.ToSeeComments(Name);
 
         /// <summary>
         /// Gets or sets the computed entity inherits.
@@ -1198,12 +1199,12 @@ entities:
         /// </summary>
         protected override void Prepare()
         {
-            Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
             EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : EntityScope);
-            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
@@ -1597,7 +1598,7 @@ entities:
                     pc.Name = pc.Name[1..];
             }
             else
-                pc.Name = StringConversion.ToPascalCase(parts[1]);
+                pc.Name = StringConverter.ToPascalCase(parts[1]);
 
             return pc;
         }

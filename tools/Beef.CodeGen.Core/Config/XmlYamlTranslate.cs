@@ -2,6 +2,7 @@
 
 using OnRamp;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -314,7 +315,7 @@ namespace Beef.CodeGen.Config
         internal static string GetYamlName(ConfigType convertType, ConfigurationEntity entity, string xmlName)
         {
             var item = _config.FirstOrDefault(x => x.ConvertType == convertType && x.Entity == entity && x.XmlName == xmlName);
-            return item.YamlName ?? (StringConversion.ToCamelCase(xmlName)!);
+            return item.YamlName ?? (StringConverter.ToCamelCase(xmlName)!);
         }
 
         /// <summary>
@@ -323,7 +324,7 @@ namespace Beef.CodeGen.Config
         internal static string GetXmlName(ConfigType convertType, ConfigurationEntity entity, string jsonName)
         {
             var item = _config.FirstOrDefault(x => x.ConvertType == convertType && x.Entity == entity && x.YamlName == jsonName);
-            return item.XmlName ?? (StringConversion.ToPascalCase(jsonName)!);
+            return item.XmlName ?? (StringConverter.ToPascalCase(jsonName)!);
         }
 
         /// <summary>

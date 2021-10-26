@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Database;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -427,8 +428,8 @@ namespace Beef.CodeGen.Config.Database
 
             Alias = DefaultWhereNull(Alias, () => DbTable.Alias);
 
-            ExecuteStoredProcedureName = DefaultWhereNull(ExecuteStoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
-            CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConversion.ToPascalCase(Name)}CdcOutbox");
+            ExecuteStoredProcedureName = DefaultWhereNull(ExecuteStoredProcedureName, () => $"spExecute{StringConverter.ToPascalCase(Name)}CdcOutbox");
+            CompleteStoredProcedureName = DefaultWhereNull(CompleteStoredProcedureName, () => $"spComplete{StringConverter.ToPascalCase(Name)}CdcOutbox");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => Root.RenameForDotNet(Name));

@@ -4,6 +4,7 @@ using Beef.Entities;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Linq;
 
@@ -224,8 +225,8 @@ parameters: [
         /// Gets the formatted summary text.
         /// </summary>
         public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
-            ? ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
-            : ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+            ? StringConverter.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the computed declared parameter type.
@@ -284,19 +285,19 @@ parameters: [
             }
 
             RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
-            Text = ToComments(DefaultWhereNull(Text, () =>
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
 
                 if (RelatedEntity != null)
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Entities." + Type)})";
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Entities." + Type)})";
 
-                return StringConversion.ToSentenceCase(Name);
+                return StringConverter.ToSentenceCase(Name);
             }));
 
-            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
-            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
+            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConverter.ToPrivateCase(Name) : pc.Name);
+            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConverter.ToCamelCase(Name) : pc.ArgumentName);
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !DotNet.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using OnRamp.Config;
+using OnRamp.Utility;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -39,8 +40,8 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
-            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
         }
     }
 }

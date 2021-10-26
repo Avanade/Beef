@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Database;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -552,11 +553,11 @@ namespace Beef.CodeGen.Config.Database
                 return name;
 
             if (AutoDotNetRename == "PascalCase")
-                return StringConversion.ToPascalCase(name);
+                return StringConverter.ToPascalCase(name);
 
             // That only leaves SnakeKebabToPascalCase.
             var sb = new StringBuilder();
-            name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConversion.ToPascalCase(part)));
+            name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
             return sb.ToString();
         }
     }

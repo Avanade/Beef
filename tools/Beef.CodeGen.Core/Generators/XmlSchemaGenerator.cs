@@ -4,6 +4,7 @@ using Beef.CodeGen.Config;
 using Beef.Reflection;
 using Newtonsoft.Json;
 using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -88,7 +89,7 @@ namespace Beef.CodeGen.Generators
                 if (jpa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
+                var name = jpa.PropertyName ?? StringConverter.ToCamelCase(pi.Name)!;
                 var xmlName = XmlYamlTranslate.GetXmlName(ct, ce, name);
                 var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, xmlName);
 
@@ -157,12 +158,12 @@ namespace Beef.CodeGen.Generators
         /// Gets the documentation text.
         /// </summary>
         private static string GetDocumentation(string name, CodeGenPropertyAttribute psa) =>
-            psa.Description == null ? (psa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{psa.Title ?? StringConversion.ToSentenceCase(name)!} {psa.Description}";
+            psa.Description == null ? (psa.Title ?? StringConverter.ToSentenceCase(name)!) : $"{psa.Title ?? StringConverter.ToSentenceCase(name)!} {psa.Description}";
 
         /// <summary>
         /// Gets the documentation text.
         /// </summary>
         private static string GetDocumentation(string name, CodeGenPropertyCollectionAttribute pcsa) =>
-            pcsa.Description == null ? (pcsa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{pcsa.Title ?? StringConversion.ToSentenceCase(name)!} {pcsa.Description}";
+            pcsa.Description == null ? (pcsa.Title ?? StringConverter.ToSentenceCase(name)!) : $"{pcsa.Title ?? StringConverter.ToSentenceCase(name)!} {pcsa.Description}";
     }
 }
