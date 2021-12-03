@@ -3,6 +3,7 @@
 using Newtonsoft.Json;
 using OnRamp.Config;
 using OnRamp.Utility;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -64,9 +65,10 @@ consts: [
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name));
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Schema;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -140,7 +142,7 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
@@ -174,7 +176,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (OnRamp.Database.DbType.TypeIsString(c.Type))
+                    if (DbTypeMapper.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch
@@ -216,6 +218,8 @@ tables:
                     return TreatColumnNullAs == null && CompareValue(Nullable, true) ? $"(@{Name} IS NULL OR {sql})" : sql;
                 }
             });
+
+            return Task.CompletedTask;
         }
     }
 }

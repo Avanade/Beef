@@ -5,6 +5,7 @@ using OnRamp;
 using OnRamp.Config;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -214,7 +215,7 @@ tables:
         /// <summary>
         /// Gets the selected columns.
         /// </summary>
-        public List<StoredProcedureColumnConfig> SelectedColumns => Parent!.CoreColumns.Where(x => IsSelectedColumn(x, false)).Select(c => { var cc = new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn }; cc.Prepare(Root!, this); return cc; }).ToList();
+        public List<StoredProcedureColumnConfig> SelectedColumns { get; } = new List<StoredProcedureColumnConfig>();
 
         /// <summary>
         /// Indicates whether the OrgUnitId column is included as a parameter.
@@ -289,7 +290,7 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"sp{Parent!.Name}{Name}");
             Type = DefaultWhereNull(Type, () => "GetColl");
@@ -323,33 +324,39 @@ tables:
 
             foreach (var parameter in Parameters.AsQueryable().Reverse())
             {
-                parameter.Prepare(Root!, this);
+                await parameter.PrepareAsync(Root!, this).ConfigureAwait(false);
                 if (parameter.IsWhere)
                     Where.Insert(0, new WhereConfig { Statement = parameter.WhereSql });
             }
 
             foreach (var where in Where)
             {
-                where.Prepare(Root!, this);
+                await where.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             foreach (var orderby in OrderBy)
             {
-                orderby.Prepare(Root!, this);
+                await orderby.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             foreach (var execute in Execute)
             {
-                execute.Prepare(Root!, this);
+                await execute.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             foreach (var settable in SettableColumns)
             {
-                settable.Prepare(Root!, this);
+                await settable.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             if (Paging == true && OrderBy.Count < 1)
                 throw new CodeGenException(this, nameof(OrderBy), $"At least one OrderBy column must be specified when using Paging.");
+
+            foreach (var cc in Parent!.CoreColumns.Where(x => IsSelectedColumn(x, false)).Select(c => new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn }))
+            {
+                await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
+                SelectedColumns.Add(cc);
+            }
         }
 
         /// <summary>

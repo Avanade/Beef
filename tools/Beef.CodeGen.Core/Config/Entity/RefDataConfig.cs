@@ -3,6 +3,7 @@
 using OnRamp.Config;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -39,10 +40,10 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             var oc = new OperationConfig { Name = "<internal>" };
-            oc.Prepare(Root!, new EntityConfig { Name = "RefData" });
+            await oc.PrepareAsync(Root!, new EntityConfig { Name = "RefData" }).ConfigureAwait(false);
 
             // Data constructors.
             if (UsesDatabase)
@@ -62,7 +63,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var ctor in DataCtorParameters)
             {
-                ctor.Prepare(Root!, oc);
+                await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
         }
     }

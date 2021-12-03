@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Schema;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
-using OnRamp.Database;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -456,7 +457,7 @@ tables:
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
-        public DbTable? DbTable { get; private set; }
+        public DbTableSchema? DbTable { get; private set; }
 
         /// <summary>
         /// Gets the fully qualified name schema.table name.
@@ -471,7 +472,7 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
@@ -500,7 +501,7 @@ tables:
             foreach (var c in DbTable.Columns)
             {
                 var cc = new TableColumnConfig { Name = c.Name, DbColumn = c };
-                cc.Prepare(Root!, this);
+                await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
 
                 // Certain special columns have to always be included.
                 if (cc.Name == ColumnNameTenantId)
@@ -526,7 +527,7 @@ tables:
 
             foreach (var storedProcedure in StoredProcedures!)
             {
-                storedProcedure.Prepare(Root!, this);
+                await storedProcedure.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             if (CompareValue(DbTable.IsAView, true))

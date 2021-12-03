@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using OnRamp.Config;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -515,7 +516,7 @@ entities:
         /// <summary>
         /// Gets the API name from the <see cref="IRootConfig.RuntimeParameters"/>.
         /// </summary>
-        public string? ApiName => DefaultWhereNull(CodeGenArgs!.GetParameter(CodeGenConsole.ApiNameParamName), () => "Api")!;
+        public string? ApiName => DefaultWhereNull(CodeGenArgs!.GetParameter<string>(CodeGenConsole.ApiNameParamName), () => "Api")!;
 
         /// <summary>
         /// Gets the entity scope from the from the <see cref="IRootConfig.RuntimeParameters"/> (defaults to 'Common').
@@ -550,7 +551,7 @@ entities:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
             PathCommon = DefaultWhereNull(PathCommon, () => $"{PathBase}.Common");
@@ -588,29 +589,20 @@ entities:
                 RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :
                     $"{(WebApiRoutePrefix.EndsWith('/') ? WebApiRoutePrefix[..^1] : WebApiRoutePrefix)}/{(RefDataWebApiRoute.StartsWith('/') ? RefDataWebApiRoute[1..] : RefDataWebApiRoute)}";
 
-            if (Entities != null && Entities.Count > 0)
-            {
-                foreach (var entity in Entities)
-                {
-                    entity.Prepare(Root!, this);
-                }
-            }
+            Entities = await PrepareCollectionAsync(Entities).ConfigureAwait(false);
 
             RefData = new RefDataConfig();
-            RefData.Prepare(Root!, this);
+            await RefData.PrepareAsync(Root!, this).ConfigureAwait(false);
 
-            if (Entities != null && Entities.Count > 0)
+            foreach (var e in Entities)
             {
-                foreach (var e in Entities)
+                foreach (var o in e.Operations!)
                 {
-                    foreach (var o in e.Operations!)
+                    foreach (var p in o.Parameters!.Where(x => x.IValidator != null))
                     {
-                        foreach (var p in o.Parameters!.Where(x => x.IValidator != null))
-                        {
-                            var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator };
-                            if (!Validators.Any(x => x.Type == pc.Type))
-                                Validators.Add(pc);
-                        }
+                        var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator };
+                        if (!Validators.Any(x => x.Type == pc.Type))
+                            Validators.Add(pc);
                     }
                 }
             }

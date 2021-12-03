@@ -3,6 +3,7 @@
 using Newtonsoft.Json;
 using OnRamp.Config;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -70,12 +71,13 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 
             Order = DefaultWhereNull(Order, () => "Ascending");
+            return Task.CompletedTask;
         }
     }
 }

@@ -5,6 +5,7 @@ using OnRamp.Config;
 using OnRamp.Utility;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -607,7 +608,7 @@ properties: [
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             Type = DefaultWhereNull(Type, () => "string");
             if (Type!.StartsWith("^"))
@@ -697,6 +698,8 @@ properties: [
                 "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
                 _ => null
             };
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

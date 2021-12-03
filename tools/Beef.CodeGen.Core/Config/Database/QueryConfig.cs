@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Schema;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
-using OnRamp.Database;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -275,69 +276,52 @@ queries:
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
+        public IColumnConfig? ColumnIsDeleted { get; private set; }
 
         /// <summary>
         /// Gets the related TenantId column.
         /// </summary>
-        public IColumnConfig? ColumnTenantId => GetSpecialColumn(ColumnNameTenantId);
+        public IColumnConfig? ColumnTenantId { get; private set; }
 
         /// <summary>
         /// Gets the related OrgUnitId column.
         /// </summary>
-        public IColumnConfig? ColumnOrgUnitId => GetSpecialColumn(ColumnNameOrgUnitId);
+        public IColumnConfig? ColumnOrgUnitId { get; private set; }
 
         /// <summary>
         /// Gets the related RowVersion column.
         /// </summary>
-        public IColumnConfig? ColumnRowVersion => GetSpecialColumn(ColumnNameRowVersion);
+        public IColumnConfig? ColumnRowVersion { get; private set; }
 
         /// <summary>
         /// Gets the related CreatedBy column.
         /// </summary>
-        public IColumnConfig? ColumnCreatedBy => GetSpecialColumn(ColumnNameCreatedBy);
+        public IColumnConfig? ColumnCreatedBy { get; private set; }
 
         /// <summary>
         /// Gets the related CreatedDate column.
         /// </summary>
-        public IColumnConfig? ColumnCreatedDate => GetSpecialColumn(ColumnNameCreatedDate);
+        public IColumnConfig? ColumnCreatedDate { get; private set; }
 
         /// <summary>
         /// Gets the related UpdatedBy column.
         /// </summary>
-        public IColumnConfig? ColumnUpdatedBy => GetSpecialColumn(ColumnNameUpdatedBy);
+        public IColumnConfig? ColumnUpdatedBy { get; private set; }
 
         /// <summary>
         /// Gets the related UpdatedDate column.
         /// </summary>
-        public IColumnConfig? ColumnUpdatedDate => GetSpecialColumn(ColumnNameUpdatedDate);
+        public IColumnConfig? ColumnUpdatedDate { get; private set; }
 
         /// <summary>
         /// Gets the related DeletedBy column.
         /// </summary>
-        public IColumnConfig? ColumnDeletedBy => GetSpecialColumn(ColumnNameDeletedBy);
+        public IColumnConfig? ColumnDeletedBy { get; private set; }
 
         /// <summary>
         /// Gets the related DeletedDate column.
         /// </summary>
-        public IColumnConfig? ColumnDeletedDate => GetSpecialColumn(ColumnNameDeletedDate);
-
-        /// <summary>
-        /// Gets the named special column.
-        /// </summary>
-        private IColumnConfig? GetSpecialColumn(string? name)
-        {
-            if (string.IsNullOrEmpty(name))
-                return null;
-
-            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
-            if (c == null)
-                return null;
-
-            var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
-            cc.Prepare(Root!, this);
-            return cc;
-        }
+        public IColumnConfig? ColumnDeletedDate { get; private set; }
 
         /// <summary>
         /// Gets the table name.
@@ -347,12 +331,12 @@ queries:
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
-        public DbTable? DbTable { get; private set; }
+        public DbTableSchema? DbTable { get; private set; }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             Schema = DefaultWhereNull(Schema, () => "dbo");
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
@@ -377,13 +361,14 @@ queries:
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Root!.ColumnNameDeletedBy);
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Root!.ColumnNameDeletedDate);
 
-            PrepareJoins();
+            await SetSpecialColumnsAsync().ConfigureAwait(false);
+            await PrepareJoinsAsync().ConfigureAwait(false);
 
             if (Order != null && Order.Count > 0)
             {
                 foreach (var order in Order)
                 {
-                    order.Prepare(Root!, this);
+                    await order.PrepareAsync(Root!, this).ConfigureAwait(false);
                 }
             }
 
@@ -392,7 +377,7 @@ queries:
                 if (c.IsPrimaryKey)
                 {
                     var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     PrimaryKeyColumns.Add(cc);
                 }
 
@@ -407,7 +392,7 @@ queries:
                             cc.NameAlias = parts[1];
                     }
 
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     Columns.Add(cc);
                 }
             }
@@ -430,7 +415,7 @@ queries:
                 if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
                 {
                     var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     SelectedColumns.Add(cc);
                 }
             }
@@ -448,7 +433,7 @@ queries:
                     if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
                     {
                         var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
-                        cc.Prepare(Root!, j);
+                        await cc.PrepareAsync(Root!, j).ConfigureAwait(false);
                         SelectedColumns.Add(cc);
                     }
                 }
@@ -457,7 +442,7 @@ queries:
             // Prepare the where clauses.
             foreach (var where in Where)
             {
-                where.Prepare(Root!, this);
+                await where.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             // Update the centralised view metadata.
@@ -473,7 +458,7 @@ queries:
         /// <summary>
         /// Prepares the joins.
         /// </summary>
-        private void PrepareJoins()
+        private async Task PrepareJoinsAsync()
         {
             if (Joins == null)
                 Joins = new List<QueryJoinConfig>();
@@ -482,7 +467,7 @@ queries:
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
             foreach (var join in Joins)
             {
-                join.Prepare(Root!, this);
+                await join.PrepareAsync(Root!, this).ConfigureAwait(false);
                 if (dict.TryGetValue(join.Alias!, out var val))
                 {
                     dict[join.Alias!] = val++;
@@ -495,7 +480,7 @@ queries:
             // Now that the alias has been updated we can prepare accordingly.
             foreach (var join in Joins)
             {
-                join.PrepareJoinOn();
+                await join.PrepareJoinOnAsync().ConfigureAwait(false);
             }
         }
 
@@ -504,12 +489,11 @@ queries:
         /// </summary>
         private void UpdateViewMetadata()
         {
-            var dt = new DbTable { Schema = ViewSchema, Name = ViewName, IsAView = true };
+            var dt = new DbTableSchema(ViewSchema!, ViewName!) { IsAView = true };
             foreach (var c in SelectedColumns)
             {
-                var dc = c.DbColumn!.Clone();
-                dc.DbTable = dt;
-                dc.Name = c.NameAlias;
+                var dc = new DbColumnSchema(dt, c.NameAlias!, c.DbColumn!.Type);
+                dc.CopyFrom(c.DbColumn);
                 dt.Columns.Add(dc);
             }
 
@@ -520,6 +504,40 @@ queries:
 
             // Add new/updated version.
             Root!.DbTables!.Add(dt);
+        }
+
+        /// <summary>
+        /// Sets the special columns.
+        /// </summary>
+        private async Task SetSpecialColumnsAsync()
+        {
+            ColumnIsDeleted = await GetSpecialColumnAsync(ColumnNameIsDeleted).ConfigureAwait(false);
+            ColumnTenantId = await GetSpecialColumnAsync(ColumnNameTenantId).ConfigureAwait(false);
+            ColumnOrgUnitId = await GetSpecialColumnAsync(ColumnNameOrgUnitId).ConfigureAwait(false);
+            ColumnRowVersion = await GetSpecialColumnAsync(ColumnNameRowVersion).ConfigureAwait(false);
+            ColumnCreatedBy = await GetSpecialColumnAsync(ColumnNameCreatedBy).ConfigureAwait(false);
+            ColumnCreatedDate = await GetSpecialColumnAsync(ColumnNameCreatedDate).ConfigureAwait(false);
+            ColumnUpdatedBy = await GetSpecialColumnAsync(ColumnNameUpdatedBy).ConfigureAwait(false);
+            ColumnUpdatedDate = await GetSpecialColumnAsync(ColumnNameUpdatedDate).ConfigureAwait(false);
+            ColumnDeletedBy = await GetSpecialColumnAsync(ColumnNameDeletedBy).ConfigureAwait(false);
+            ColumnDeletedDate = await GetSpecialColumnAsync(ColumnNameDeletedDate).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets the named special column.
+        /// </summary>
+        private async Task<IColumnConfig?> GetSpecialColumnAsync(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
+            if (c == null)
+                return null;
+
+            var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
+            await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
+            return cc;
         }
     }
 }

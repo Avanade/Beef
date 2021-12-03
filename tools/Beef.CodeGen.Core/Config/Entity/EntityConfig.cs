@@ -8,6 +8,7 @@ using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -1197,7 +1198,7 @@ entities:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
@@ -1236,11 +1237,11 @@ entities:
                     $"{(Parent!.WebApiRoutePrefix.EndsWith('/') ? Parent!.WebApiRoutePrefix[..^1] : Parent!.WebApiRoutePrefix)}/{(WebApiRoutePrefix.StartsWith('/') ? WebApiRoutePrefix[1..] : WebApiRoutePrefix)}";
 
             InferInherits();
-            PrepareConsts();
-            PrepareProperties();
-            PrepareOperations();
+            Consts = await PrepareCollectionAsync(Consts).ConfigureAwait(false);
+            await PreparePropertiesAsync().ConfigureAwait(false);
+            await PrepareOperationsAsync().ConfigureAwait(false);
             InferImplements();
-            PrepareConstructors();
+            await PrepareConstructorsAsync().ConfigureAwait(false);
 
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
             ExcludeAll = DefaultWhereNull(ExcludeAll, () => Operations!.Count == 0);
@@ -1301,23 +1302,9 @@ entities:
         }
 
         /// <summary>
-        /// Prepares the constants.
-        /// </summary>
-        private void PrepareConsts()
-        {
-            if (Consts == null)
-                Consts = new List<ConstConfig>();
-
-            foreach (var constant in Consts)
-            {
-                constant.Prepare(Root!, this);
-            }
-        }
-
-        /// <summary>
         /// Prepares the properties.
         /// </summary>
-        private void PrepareProperties()
+        private async Task PreparePropertiesAsync()
         {
             if (Properties == null)
                 Properties = new List<PropertyConfig>();
@@ -1336,7 +1323,7 @@ entities:
 
             foreach (var property in Properties)
             {
-                property.Prepare(Root!, this);
+                await property.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
         }
 
@@ -1357,7 +1344,7 @@ entities:
         /// <summary>
         /// Prepares the Operations.
         /// </summary>
-        private void PrepareOperations()
+        private async Task PrepareOperationsAsync()
         {
             if (Operations == null)
                 Operations = new List<OperationConfig>();
@@ -1384,7 +1371,7 @@ entities:
             // Prepare each operations.
             foreach (var operation in Operations)
             {
-                operation.Prepare(Root!, this);
+                await operation.PrepareAsync(Root!, this);
             }
 
             if (WebApiAutoLocation == true)
@@ -1478,11 +1465,11 @@ entities:
         /// <summary>
         /// Prepare the constructors.
         /// </summary>
-        private void PrepareConstructors()
+        private async Task PrepareConstructorsAsync()
         {
             // Manager constructors.
             var oc = new OperationConfig { Name = "<internal>" };
-            oc.Prepare(Root!, this);
+            await oc.PrepareAsync(Root!, this).ConfigureAwait(false);
 
             // Manager constructors.
             if (RequiresDataSvc)
@@ -1499,7 +1486,7 @@ entities:
 
             foreach (var ctor in ManagerCtorParameters)
             {
-                ctor.Prepare(Root!, oc);
+                await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
 
             // DataSvc constructors.
@@ -1517,7 +1504,7 @@ entities:
             AddConfiguredParameters(DataSvcCtorParams, DataSvcCtorParameters);
             foreach (var ctor in DataSvcCtorParameters)
             {
-                ctor.Prepare(Root!, oc);
+                await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
 
             // Data constructors.
@@ -1548,7 +1535,7 @@ entities:
             AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)
             {
-                ctor.Prepare(Root!, oc);
+                await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
 
             // WebAPI contstructors.
@@ -1558,7 +1545,7 @@ entities:
             AddConfiguredParameters(WebApiCtorParams, WebApiCtorParameters);
             foreach (var ctor in WebApiCtorParameters)
             {
-                ctor.Prepare(Root!, oc);
+                await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
         }
 

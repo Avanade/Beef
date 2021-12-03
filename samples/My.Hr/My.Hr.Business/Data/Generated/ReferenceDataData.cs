@@ -32,9 +32,9 @@ namespace My.Hr.Business.Data
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         public ReferenceDataData(IEfDb ef, AutoMapper.IMapper mapper)
-            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
+            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
 
-        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.

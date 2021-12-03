@@ -4,12 +4,14 @@ Represents the **NuGet** versions.
 
 ## v4.2.13
 - *Enhancement:* Core code-generation capabilities moved into new [OnRamp](https://github.com/Avanade/OnRamp) and referenced.
+- *Enhancement:* Database schema inference moved into new [DbEx](https://github.com/Avanade/DbEx) and referenced.
 - *Enhancement:* All code-gen `Script` files converted to YAML; the embedded resources have all been updated and renamed with the `.yaml` file extension accordingly.
 - *Enhancement:* `CodeGenConsoleWrapper` has been removed; use `CodeGenConsole` (breaking change).
+- *Enhancement:* All CDC-related capabilities have been removed; use new [nTangle](https://github.com/Avanade/NTangle).
 - *Enhancement:* Command-line options have been adjusted and may result in breaking change; they are as follows:
 
 ```
-Business Entity Execution Framework (Beef) Code Generator tool.
+Beef.CodeGen.Core Code Generator tool.
 
 Usage: Beef.CodeGen.Core [options]
 

@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using OnRamp.Database;
+using DbEx.Schema;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -26,8 +26,8 @@ namespace Beef.CodeGen.Config.Database
         string? Alias { get; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="DbTable"/>.
+        /// Gets the corresponding <see cref="DbTableSchema"/>.
         /// </summary>
-        DbTable? DbTable { get; }
+        DbTableSchema? DbTable { get; }
     }
 }

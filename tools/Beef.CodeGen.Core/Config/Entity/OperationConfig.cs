@@ -790,7 +790,7 @@ operations: [
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
             BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
@@ -955,7 +955,7 @@ operations: [
             if (Type == "Patch")
                 ExcludeIData = ExcludeData = ExcludeIDataSvc = ExcludeDataSvc = ExcludeIManager = ExcludeManager = true;
 
-            PrepareParameters();
+            await PrepareParametersAsync().ConfigureAwait(false);
             PrepareEvents();
 
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
@@ -988,7 +988,7 @@ operations: [
                 }
             }
 
-            PrepareData();
+            await PrepareDataAsync().ConfigureAwait(false);
             PrepareHttpAgent();
 
             GrpcReturnMapper = DotNet.SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
@@ -1013,7 +1013,7 @@ operations: [
         /// <summary>
         /// Prepares the parameters.
         /// </summary>
-        private void PrepareParameters()
+        private async Task PrepareParametersAsync()
         {
             if (Parameters == null)
                 Parameters = new List<ParameterConfig>();
@@ -1036,7 +1036,7 @@ operations: [
 
             foreach (var parameter in Parameters)
             {
-                parameter.Prepare(Root!, this);
+                await parameter.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
         }
 
@@ -1092,7 +1092,7 @@ operations: [
         /// <summary>
         /// Prepares for the data access.
         /// </summary>
-        private void PrepareData()
+        private async Task PrepareDataAsync()
         {
             DataArgs = new ParameterConfig { Name = "<internal>", PrivateName = "__dataArgs" };
             switch (AutoImplement != "None" ? AutoImplement : Parent!.AutoImplement)
@@ -1149,7 +1149,7 @@ operations: [
                     break;
             }
 
-            DataArgs.Prepare(Root!, this);
+            await DataArgs.PrepareAsync(Root!, this).ConfigureAwait(false);
 
             if (EventOutbox != "None")
             {

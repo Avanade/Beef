@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.Core\Beef.Core.csproj" />
-    <ProjectReference Include="..\..\..\tools\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,2 +1,0 @@
-﻿configType: Beef.CodeGen.Config.Database.CodeGenConfig, Beef.CodeGen.Core
-inherits: [ 'Database.yaml', 'DatabaseCdc.yaml' ]

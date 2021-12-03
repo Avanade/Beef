@@ -100,7 +100,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
-    <ProjectReference Include="..\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

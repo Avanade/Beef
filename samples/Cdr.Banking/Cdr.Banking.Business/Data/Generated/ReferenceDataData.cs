@@ -33,9 +33,9 @@ namespace Cdr.Banking.Business.Data
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         public ReferenceDataData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
 
-        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> items.

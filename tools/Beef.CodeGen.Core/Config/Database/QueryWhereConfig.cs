@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 using OnRamp.Config;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -28,6 +29,6 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare() { }
+        protected override Task PrepareAsync() => Task.CompletedTask;
     }
 }

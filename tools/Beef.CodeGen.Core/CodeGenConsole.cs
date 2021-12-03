@@ -8,6 +8,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -84,10 +85,10 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
         /// </summary>
-        internal CodeGenConsole(CodeGeneratorArgs args) : base(typeof(CodeGenConsole).Assembly, args, Assembly.GetEntryAssembly()!.GetName().Name, options: OnRamp.Console.SupportedOptions.All)
+        internal CodeGenConsole(CodeGeneratorArgs args) : base(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), args, OnRamp.Console.SupportedOptions.All)
         {
             MastheadText = DefaultMastheadText;
-            Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{csargs.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{csargs.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
+            Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{args.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{args.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
@@ -228,7 +229,7 @@ namespace Beef.CodeGen
         private static ValidationResult? CheckCommandIsSupported(CommandType act, CommandType exp, bool isSupported) => act == exp && !isSupported ? new ValidationResult($"Command '{act}' is not supported.") : null;
 
         /// <inheritdoc/>
-        protected override CodeGenStatistics? OnCodeGeneration()
+        protected override async Task<CodeGenStatistics> OnCodeGenerationAsync()
         {
             OnWriteMasthead();
             OnWriteHeader();
@@ -243,27 +244,32 @@ namespace Beef.CodeGen
 
             // Where XML to YAML requested do so, then exit.
             if (_x2yOpt!.HasValue())
-                return CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName)).GetAwaiter().GetResult() ? new CodeGenStatistics() : null;
+            {
+                if (await CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName)).ConfigureAwait(false))
+                    return new CodeGenStatistics();
+                else
+                    throw new CodeGenException("An error occured whilst converting XML to YAML.");
+            }
 
             var count = 0;
             var stats = new CodeGenStatistics();
             if (IsDatabaseSupported && cmd.HasFlag(CommandType.Database))
-                stats.Add(ExecuteCodeGeneration(_databaseScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Database, company, appName), ref count));
+                stats.Add(await ExecuteCodeGenerationAsync(_databaseScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Database, company, appName), count++).ConfigureAwait(false));
 
             if (IsRefDataSupported && cmd.HasFlag(CommandType.RefData))
-                stats.Add(ExecuteCodeGeneration(_refDataScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.RefData, company, appName), ref count));
+                stats.Add(await ExecuteCodeGenerationAsync(_refDataScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.RefData, company, appName), count++).ConfigureAwait(false));
 
             if (IsEntitySupported && cmd.HasFlag(CommandType.Entity))
-                stats.Add(ExecuteCodeGeneration(_entityScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Entity, company, appName), ref count));
+                stats.Add(await ExecuteCodeGenerationAsync(_entityScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.Entity, company, appName), count++).ConfigureAwait(false));
 
             if (IsDataModelSupported && cmd.HasFlag(CommandType.DataModel))
-                stats.Add(ExecuteCodeGeneration(_dataModelScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.DataModel, company, appName), ref count));
+                stats.Add(await ExecuteCodeGenerationAsync(_dataModelScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.DataModel, company, appName), count++).ConfigureAwait(false));
 
             if (count > 1)
             {
                 Args.Logger?.LogInformation(new string('-', 80));
                 Args.Logger?.LogInformation("");
-                Args.Logger?.LogInformation($"OVERALL. {stats.ToSummaryString()}");
+                Args.Logger?.LogInformation($"{AppName} OVERALL. {stats.ToSummaryString()}");
                 Args.Logger?.LogInformation("");
             }
 
@@ -273,7 +279,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Execute the selection code-generation.
         /// </summary>
-        private CodeGenStatistics ExecuteCodeGeneration(string scriptName, string configName, ref int count)
+        private async Task<CodeGenStatistics> ExecuteCodeGenerationAsync(string scriptName, string configName, int count)
         {
             // Update the files.
             var args = new CodeGeneratorArgs();
@@ -281,7 +287,7 @@ namespace Beef.CodeGen
             args.ScriptFileName ??= scriptName;
             args.ConfigFileName ??= configName;
 
-            if (count++ > 0)
+            if (count > 0)
             {
                 args.Logger?.LogInformation(new string('-', 80));
                 args.Logger?.LogInformation("");
@@ -290,7 +296,7 @@ namespace Beef.CodeGen
             OnWriteArgs(args);
 
             // Execute the code-generation.
-            var stats = ExecuteCodeGeneration(args);
+            var stats = await ExecuteCodeGenerationAsync(args).ConfigureAwait(false);
 
             // Write results.
             OnWriteFooter(stats);
@@ -302,10 +308,10 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="args">The <see cref="CodeGeneratorArgs"/>.</param>
         /// <returns>The <see cref="CodeGenStatistics"/>.</returns>
-        public static CodeGenStatistics ExecuteCodeGeneration(CodeGeneratorArgsBase args)
+        public static async Task<CodeGenStatistics> ExecuteCodeGenerationAsync(CodeGeneratorArgsBase args)
         {
             CodeGenStatistics stats;
-            var cg = new CodeGenerator(args);
+            var cg = await CodeGenerator.CreateAsync(args).ConfigureAwait(false);
             var fi = new FileInfo(args.ConfigFileName);
             switch (fi.Extension.ToUpperInvariant())
             {
@@ -317,12 +323,12 @@ namespace Beef.CodeGen
                         if (cg.Scripts.GetConfigType() == typeof(Config.Entity.CodeGenConfig))
                         {
                             var sr = new StringReader(new EntityXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = cg.Generate(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName);
+                            stats = await cg.GenerateAsync(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName).ConfigureAwait(false);
                         }
                         else if (cg.Scripts.GetConfigType() == typeof(Config.Database.CodeGenConfig))
                         {
                             var sr = new StringReader(new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = cg.Generate(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName);
+                            stats = await cg.GenerateAsync(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName).ConfigureAwait(false);
                         }
                         else
                             throw new CodeGenException($"Configuration Type '{cg.Scripts.GetConfigType().FullName}' is not expected; must be either '{typeof(Config.Entity.CodeGenConfig).FullName}' or '{typeof(Config.Database.CodeGenConfig).FullName}'.");
@@ -331,7 +337,7 @@ namespace Beef.CodeGen
                     break;
 
                 default:
-                    stats = cg.Generate(fi.FullName);
+                    stats = await cg.GenerateAsync(fi.FullName).ConfigureAwait(false);
                     break;
             }
 

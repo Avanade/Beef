@@ -5,6 +5,7 @@ using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -67,7 +68,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
@@ -97,6 +98,7 @@ namespace Beef.CodeGen.Config.Database
             }
 
             OrderBySql += $" {(Order!.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "DESC" : "ASC")}";
+            return Task.CompletedTask;
         }
     }
 }

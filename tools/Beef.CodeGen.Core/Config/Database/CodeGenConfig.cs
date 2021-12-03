@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Schema;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
-using OnRamp.Database;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -426,14 +427,6 @@ namespace Beef.CodeGen.Config.Database
         public List<QueryConfig>? Queries { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding <see cref="CdcConfig"/> collection.
-        /// </summary>
-        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
-            Markdown = "A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.")]
-        public List<CdcConfig>? Cdc { get; set; }
-
-        /// <summary>
         /// Gets all the tables that require an EfModel to be generated.
         /// </summary>
         public List<TableConfig> EFModels => Tables!.Where(x => CompareValue(x.EfModel, true)).ToList();
@@ -441,7 +434,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the list of tables that exist within the database.
         /// </summary>
-        public List<DbTable>? DbTables { get; private set; }
+        public List<DbTableSchema>? DbTables { get; private set; }
 
         /// <summary>
         /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.
@@ -456,9 +449,9 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
-            LoadDbTablesConfig();
+            await LoadDbTablesConfigAsync().ConfigureAwait(false);
 
             Schema = DefaultWhereNull(Schema, () => "dbo");
 
@@ -499,46 +492,25 @@ namespace Beef.CodeGen.Config.Database
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "SnakeKebabToPascalCase");
 
-            if (Queries == null)
-                Queries = new List<QueryConfig>();
-
-            foreach (var query in Queries)
-            {
-                query.Prepare(Root!, this);
-            }
-
-            if (Tables == null)
-                Tables = new List<TableConfig>();
-
-            foreach (var table in Tables)
-            {
-                table.Prepare(Root!, this);
-            }
-
-            if (Cdc == null)
-                Cdc = new List<CdcConfig>();
-
-            foreach (var cdc in Cdc)
-            {
-                cdc.Prepare(Root!, this);
-            }
+            Queries = await PrepareCollectionAsync(Queries).ConfigureAwait(false);
+            Tables = await PrepareCollectionAsync(Tables).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Load the database table and columns configuration.
         /// </summary>
-        private void LoadDbTablesConfig()
+        private async Task LoadDbTablesConfigAsync()
         {
-            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
+            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) schema configuration...");
 
             var cs = CodeGenArgs?.ConnectionString ?? throw new CodeGenException("Connection string must be specified via an environment variable or as a command-line option.");
 
             var sw = Stopwatch.StartNew();
-            using var db = new SqlConnection(cs);
-            DbTables = OnRamp.Database.Database.GetSchemaAsync(db, false).GetAwaiter().GetResult();
+            using var db = new DbEx.Database<SqlConnection>(() => new SqlConnection(cs));
+            DbTables = await db.SelectSchemaAsync().ConfigureAwait(false);
 
             sw.Stop();
-            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
+            CodeGenArgs?.Logger?.Log(LogLevel.Information, $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");
             CodeGenArgs?.Logger?.Log(LogLevel.Information, string.Empty);
         }
 
