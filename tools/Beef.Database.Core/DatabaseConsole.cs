@@ -72,7 +72,7 @@ namespace Beef.Database.Core
             Args = args;
 
             if (Args.OutputDirectory == null)
-                Args.OutputDirectory = new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent;
+                Args.OutputDirectory = new DirectoryInfo(CodeGenConsoleBase.GetBaseExeDirectory()).Parent;
 
             if (string.IsNullOrEmpty(Args.ScriptFileName))
                 Args.ScriptFileName = DefaultDatabaseScript;
@@ -197,7 +197,7 @@ namespace Beef.Database.Core
             _options.Add(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), app.Option("-cv|--connection-varname", "Database connection string environment variable name.", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.SchemaOrder), app.Option("-so|--schema-order", "Database schema name (multiple can be specified in priority order).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.Assemblies), app.Option("-a|--assembly", "Assembly containing embedded resources (multiple can be specified in probing order).", CommandOptionType.MultipleValue));
-            _options.Add(EntryAssemblyOnlyOptionName, app.Option("-eo|--entry-assembly-only", "Use the entry assembly only.", CommandOptionType.NoValue));
+            _options.Add(EntryAssemblyOnlyOptionName, app.Option("-eo|--entry-assembly-only", "Use the entry assembly only (ignore all other assemblies).", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.SupportedCommands), app.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
@@ -340,7 +340,7 @@ namespace Beef.Database.Core
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue())
                 {
-                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
+                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenConsoleBase.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
                     return success ? 0 : 4;
                 }
 

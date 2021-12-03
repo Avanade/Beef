@@ -40,24 +40,6 @@ namespace Beef.CodeGen
         public static List<string> DatabaseFilenames { get; } = new List<string>(new string[] { "database.beef.yaml", "database.beef.yml", "database.beef.json", "database.beef.xml", "{{Company}}.{{AppName}}.Database.xml" });
 
         /// <summary>
-        /// Gets the executable directory. Uses <see cref="Environment.CurrentDirectory"/> and removes <c>bin/debug</c> and <c>bin/release</c> where found to get back to root directory where configuration etc. should reside.
-        /// </summary>
-        /// <returns>The executable directory path.</returns>
-        public static string GetExeDirectory()
-        {
-            var exeDir = Environment.CurrentDirectory;
-            var i = exeDir.IndexOf(Path.Combine("bin", "debug"), StringComparison.InvariantCultureIgnoreCase);
-            if (i > 0)
-                exeDir = exeDir[0..i];
-
-            i = exeDir.IndexOf(Path.Combine("bin", "release"), StringComparison.InvariantCultureIgnoreCase);
-            if (i > 0)
-                exeDir = exeDir[0..i];
-
-            return exeDir;
-        }
-
-        /// <summary>
         /// Get the configuration filename.
         /// </summary>
         /// <param name="directory">The directory/path.</param>

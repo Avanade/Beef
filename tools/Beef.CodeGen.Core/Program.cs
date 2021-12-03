@@ -25,15 +25,11 @@ namespace Beef.CodeGen
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
         public static async Task<int> Main(string[] args)
         {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
-
             Logger.Default = new ColoredConsoleLogger("CodeGenConsole");
 
             // Check for special case / internal use arguments.
             if (args.Length == 1)
             {
-                MarkdownDocumentationGenerator.OnFileCreation = fn => Logger.Default.LogWarning($" > {fn}");
                 switch (args[0].ToUpperInvariant())
                 {
                     case "--GENERATEENTITYXMLSCHEMA": return SpecialActivitiesCenter("Generate Entity XML Schema", "./Schema/codegen.entity.xsd", fn => XmlSchemaGenerator.Create<Config.Entity.CodeGenConfig>(ConfigType.Entity).Save(fn, System.Xml.Linq.SaveOptions.None));
@@ -48,8 +44,7 @@ namespace Beef.CodeGen
             }
 
             var a = new OnRamp.CodeGeneratorArgs().AddAssembly(typeof(CodeGenConsole).Assembly).AddAssembly(Assembly.GetCallingAssembly());
-            var c = new CodeGenConsole(a) { MastheadText = CodeGenConsole.DefaultMastheadText };
-            return await c.RunAsync(args).ConfigureAwait(false);
+            return await new CodeGenConsole(a).RunAsync(args).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -88,6 +83,6 @@ namespace Beef.CodeGen
                     var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(configType, ce, pd.Name).Attribute;
                     if (xpsa != null)
                         pd.Psa = xpsa;
-                });
+                }, fileCreation: fn => Logger.Default.LogWarning($" > {fn}"));
     }
 }

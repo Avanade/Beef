@@ -179,7 +179,7 @@ namespace Beef.Database.Core
                     var cga = new OnRamp.CodeGeneratorArgs();
                     cga.CopyFrom(_args);
                     cga.Assemblies.Add(typeof(CodeGenConsole).Assembly);
-                    cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenFileManager.GetExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
+                    cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(CodeGenConsoleBase.GetBaseExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
 
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));

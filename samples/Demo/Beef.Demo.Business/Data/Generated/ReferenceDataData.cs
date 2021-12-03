@@ -39,9 +39,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
+            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
 
-        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Country"/> items.

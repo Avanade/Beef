@@ -133,7 +133,7 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [AllowAnonymous]

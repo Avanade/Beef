@@ -67,9 +67,9 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}ReferenceDataDataCtor(); }
 
-        partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
 {{#each RefDataEntities}}
   {{#unless @first}}

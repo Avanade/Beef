@@ -57,7 +57,7 @@ namespace Beef.CodeGen
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
         /// <param name="apiName">The Web API name.</param>
-        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="CodeGenFileManager.GetExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsoleBase.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
         /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
         public static CodeGenConsole Create(string company, string appName, string apiName = "Api", string? outputDirectory = null) => Create(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outputDirectory);
 
@@ -68,11 +68,11 @@ namespace Beef.CodeGen
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
         /// <param name="apiName">The Web API name.</param>
-        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="CodeGenFileManager.GetExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsoleBase.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
         /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
         public static CodeGenConsole Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string? outputDirectory = null)
         {
-            var args = new CodeGeneratorArgs { OutputDirectory = string.IsNullOrEmpty(outputDirectory) ? new DirectoryInfo(CodeGenFileManager.GetExeDirectory()).Parent : new DirectoryInfo(outputDirectory) };
+            var args = new CodeGeneratorArgs { OutputDirectory = string.IsNullOrEmpty(outputDirectory) ? new DirectoryInfo(GetBaseExeDirectory()).Parent : new DirectoryInfo(outputDirectory) };
             args.AddAssembly(typeof(CodeGenConsole).Assembly);
             args.AddAssembly(assemblies);
             args.AddParameter(CompanyParamName, Check.NotEmpty(company, nameof(company)));
@@ -234,7 +234,7 @@ namespace Beef.CodeGen
             OnWriteHeader();
             
             var cmd = _cmdArg!.ParsedValue;
-            var exedir = CodeGenFileManager.GetExeDirectory();
+            var exedir = GetBaseExeDirectory();
 
             var company = Args.GetCompany(false);
             var appName = Args.GetAppName(false);
