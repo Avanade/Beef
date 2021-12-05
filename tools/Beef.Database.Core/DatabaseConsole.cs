@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
+using DbEx.Migration.SqlServer;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp;
@@ -19,13 +20,13 @@ namespace Beef.Database.Core
     /// <summary>
     /// <b>Beef</b>-specific database console that encapsulates the database tooling functionality as specified by the <see cref="DatabaseExecutorCommand"/> flags.
     /// </summary>
-    public sealed class DatabaseConsole
+    public class DatabaseConsole
     {
         private const string EntryAssemblyOnlyOptionName = "EO";
         private const string XmlToYamlOptionName = "X2Y";
         private readonly Dictionary<string, CommandOption> _options = new Dictionary<string, CommandOption>();
         private CommandArgument<DatabaseExecutorCommand>? _cmdArg;
-        private CommandArgument? _scriptNewArg;
+        private CommandArgument? _scriptArgs;
 
         /// <summary>
         /// Gets the default database script name.
@@ -72,16 +73,12 @@ namespace Beef.Database.Core
             Args = args;
 
             if (Args.OutputDirectory == null)
-                Args.OutputDirectory = new DirectoryInfo(CodeGenConsoleBase.GetBaseExeDirectory()).Parent;
+                Args.OutputDirectory = new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
 
             if (string.IsNullOrEmpty(Args.ScriptFileName))
                 Args.ScriptFileName = DefaultDatabaseScript;
 
-            var assembly = typeof(DatabaseConsole).Assembly!;
-            Name = assembly.GetName()?.Name ?? throw new InvalidOperationException("Unable to infer name.");
-            Text = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? throw new InvalidOperationException("Unable to infer text.");
-            Version = assembly.GetName()?.Version?.ToString(3);
-            Description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? Text;
+            Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{args.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{args.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
         }
 
         /// <summary>
@@ -92,28 +89,18 @@ namespace Beef.Database.Core
         /// <summary>
         /// Gets the application/command name.
         /// </summary>
-        public string Name { get; }
+        public virtual string AppName => (Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly()).GetName()?.Name ?? "UNKNOWN";
 
         /// <summary>
-        /// Gets the application/command short text.
+        /// Gets the application/command title. 
         /// </summary>
-        public string Text { get; }
-
-        /// <summary>
-        /// Gets the application/command description.
-        /// </summary>
-        public string? Description { get; }
-
-        /// <summary>
-        /// Gets the application/command version.
-        /// </summary>
-        public string? Version { get; }
+        public virtual string AppTitle => $"{AppName} Database Tool.";
 
         /// <summary>
         /// Gets or sets the masthead text.
         /// </summary>
         /// <remarks>Defaults to <see cref="DefaultMastheadText"/>.</remarks>
-        public string? MastheadText { get; set; } = DefaultMastheadText;
+        public string? MastheadText { get; protected set; } = DefaultMastheadText;
 
         /// <summary>
         /// Adds the <paramref name="assemblies"/> containing the embedded resources.
@@ -175,7 +162,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
-        public async Task<int> RunAsync(string? args = null) => await RunAsync(CodeGenConsoleBase.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
+        public async Task<int> RunAsync(string? args = null) => await RunAsync(OnRamp.Console.CodeGenConsole.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
 
         /// <summary>
         /// Runs the code generation using the passed <paramref name="args"/> array.
@@ -189,7 +176,7 @@ namespace Beef.Database.Core
             Diagnostics.Logger.Default ??= Args.Logger;
 
             // Set up the app.
-            using var app = new CommandLineApplication(PhysicalConsole.Singleton) { Name = Name, Description = Description };
+            using var app = new CommandLineApplication(PhysicalConsole.Singleton) { Name = AppName, Description = AppTitle };
             app.HelpOption();
 
             _cmdArg = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
@@ -198,15 +185,15 @@ namespace Beef.Database.Core
             _options.Add(nameof(DatabaseConsoleArgs.SchemaOrder), app.Option("-so|--schema-order", "Database schema name (multiple can be specified in priority order).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.Assemblies), app.Option("-a|--assembly", "Assembly containing embedded resources (multiple can be specified in probing order).", CommandOptionType.MultipleValue));
             _options.Add(EntryAssemblyOnlyOptionName, app.Option("-eo|--entry-assembly-only", "Use the entry assembly only (ignore all other assemblies).", CommandOptionType.NoValue));
-            _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified).", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.SupportedCommands), app.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.ConfigFileName), app.Option("-c|--config", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
             _options.Add(nameof(DatabaseConsoleArgs.OutputDirectory), app.Option("-o|--output", "Output directory path. [CodeGen]", CommandOptionType.MultipleValue).Accepts(v => v.ExistingDirectory("Output directory path does not exist.")));
+            _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified). [CodeGen]", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
-            _scriptNewArg = app.Argument("script-new-args", "Additional arguments. [ScriptNew]", multipleValues: true);
+            _scriptArgs = app.Argument("script-args", "Script arguments (first being the script name). [Script]", multipleValues: true);
 
             app.OnValidate(ctx =>
             {
@@ -243,9 +230,8 @@ namespace Beef.Database.Core
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.ExpectNoChanges), () => Args.ExpectNoChanges = true);
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.IsSimulation), () => Args.IsSimulation = true);
 
-                Args.AddScriptNewArguments(_scriptNewArg.Values.Where(x => !string.IsNullOrEmpty(x)).OfType<string>().Distinct().ToArray());
-                if (Args.ScriptNewArguments.Count > 0 && _cmdArg.ParsedValue != DatabaseExecutorCommand.ScriptNew)
-                    return new ValidationResult("Additional arguments can only be specified when the command is '{nameof(DatabaseExecutorCommand.ScriptNew)}'.", new string[] { "args" });
+                if (_scriptArgs.Values.Count > 0 && _cmdArg.ParsedValue != DatabaseExecutorCommand.Script)
+                    return new ValidationResult($"Additional arguments can only be specified when the command is '{nameof(DatabaseExecutorCommand.Script)}'.", new string[] { "script-args" });
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
                     return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{nameof(DatabaseExecutorCommand.CodeGen)}'.");
@@ -330,24 +316,39 @@ namespace Beef.Database.Core
         {
             try
             {
+                // Execute script and then get out of here!
+                if (Args.Command.HasFlag(DatabaseExecutorCommand.Script))
+                {
+                    string? sn = null;
+                    var sa = new Dictionary<string, string?>();
+                    for (int i = 0; i < _scriptArgs!.Values.Count; i++)
+                    {
+                        if (i == 0)
+                            sn = _scriptArgs.Values[i];
+                        else
+                            sa.Add($"Param{i}", _scriptArgs.Values[i]);
+                    }
+
+                    return (await new SqlServerMigrator(Args.ConnectionString!, DbEx.Migration.MigrationCommand.Script, Args.Logger!, Args.Assemblies.ToArray()).CreateScriptAsync(sn, sa).ConfigureAwait(false)) ? 0 : 1;
+                }
+
                 // Write the masthead and headser.
                 if (MastheadText != null)
                     Args.Logger?.LogInformation(MastheadText);
 
                 // Write the header.
-                Args.Logger?.LogInformation($"{Text}{(Version == null ? "" : $" [v{Version}]")}");
+                Args.Logger?.LogInformation(AppTitle);
                 Args.Logger?.LogInformation(string.Empty);
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue())
                 {
-                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CodeGenConsoleBase.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
+                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
                     return success ? 0 : 4;
                 }
 
                 // Write the options.
                 Args.Logger?.LogInformation($"Command = {_cmdArg!.ParsedValue}");
                 Args.Logger?.LogInformation($"SchemaOrder = {string.Join(", ", Args.SchemaOrder.ToArray())}");
-
                 Args.Logger?.LogInformation($"Parameters{(Args.Parameters.Count == 0 ? " = none" : ":")}");
                 foreach (var p in Args.Parameters)
                 {
@@ -360,20 +361,17 @@ namespace Beef.Database.Core
                     Args.Logger?.LogInformation($"  {a.FullName}");
                 }
 
-                Args.Logger?.LogInformation(string.Empty);
-
                 // Run the database executor.
-                var de = new DatabaseExecutor(new DatabaseExecutorArgs(Args));
                 var sw = Stopwatch.StartNew();
-
-                var ok = await de.RunAsync().ConfigureAwait(false);
-                if (!ok)
+                if ((await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(Args)).ConfigureAwait(false)) != 0)
                     return 5;
 
                 // Write the footer.
                 sw.Stop();
                 Args.Logger?.LogInformation(string.Empty);
-                Args.Logger?.LogInformation($"Complete. [{sw.ElapsedMilliseconds}ms]");
+                Args.Logger?.LogInformation(new string('-', 80));
+                Args.Logger?.LogInformation(string.Empty);
+                Args.Logger?.LogInformation($"{AppName} Complete. [{sw.ElapsedMilliseconds}ms]");
                 Args.Logger?.LogInformation(string.Empty);
 
                 return 0;
@@ -383,9 +381,6 @@ namespace Beef.Database.Core
                 if (gcex.Message != null)
                 {
                     Args.Logger?.LogError(gcex.Message);
-                    if (gcex.InnerException != null)
-                        Args.Logger?.LogError(gcex.InnerException.Message);
-
                     Args.Logger?.LogError(string.Empty);
                 }
 

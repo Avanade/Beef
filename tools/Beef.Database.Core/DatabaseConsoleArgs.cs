@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen;
 using OnRamp;
 using System;
 using System.Collections.Generic;
@@ -21,12 +20,6 @@ namespace Beef.Database.Core
         public static DatabaseConsoleArgs Create<T>() => new DatabaseConsoleArgs().AddAssembly(typeof(T).Assembly);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseConsoleArgs"/> class.
-        /// </summary>
-        public DatabaseConsoleArgs()
-            => CreateConnectionStringEnvironmentVariableName = csargs => $"{csargs.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{csargs.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
-
-        /// <summary>
         /// Gets or sets the <see cref="DatabaseExecutorCommand"/> to invoke.
         /// </summary>
         public DatabaseExecutorCommand Command { get; set; } = DatabaseExecutorCommand.None;
@@ -34,30 +27,13 @@ namespace Beef.Database.Core
         /// <summary>
         /// Gets or sets the supported <see cref="DatabaseExecutorCommand"/>(s).
         /// </summary>
-        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All;
+        /// <remarks>Defaults to everything: <see cref="DatabaseExecutorCommand.All"/>, <see cref="DatabaseExecutorCommand.Reset"/> and <see cref="DatabaseExecutorCommand.Script"/>.</remarks>
+        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All | DatabaseExecutorCommand.Reset | DatabaseExecutorCommand.Script;
 
         /// <summary>
         /// Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).
         /// </summary>
         public bool UseBeefDbo { get; set; } = true;
-
-        /// <summary>
-        /// Gets the list of <see cref="DatabaseExecutorCommand.ScriptNew"/> arguments.
-        /// </summary>
-        public List<string> ScriptNewArguments { get; } = new List<string>();
-
-        /// <summary>
-        /// Adds one or more <paramref name="arguments"/> to <see cref="ScriptNewArguments"/>.
-        /// </summary>
-        /// <param name="arguments">The arguments to add.</param>
-        /// <returns>The current <see cref="DatabaseConsoleArgs"/> instance to support fluent-style method-chaining.</returns>
-        public DatabaseConsoleArgs AddScriptNewArguments(params string[] arguments)
-        {
-            if (arguments != null)
-                ScriptNewArguments.AddRange(arguments);
-
-            return this;
-        }
 
         /// <summary>
         /// Gets the schema priority order list.
@@ -72,7 +48,13 @@ namespace Beef.Database.Core
         public DatabaseConsoleArgs AddSchemaOrder(params string[] schemas)
         {
             if (schemas != null)
-                SchemaOrder.AddRange(schemas);
+            {
+                foreach (var s in schemas)
+                {
+                    if (!SchemaOrder.Contains(s))
+                        SchemaOrder.Add(s);
+                }
+            }
 
             return this;
         }
@@ -106,7 +88,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
-        public DatabaseConsoleArgs AddParameters(IDictionary<string, string?> parameters)
+        public DatabaseConsoleArgs AddParameters(IDictionary<string, object?> parameters)
         {
             ((ICodeGeneratorArgs)this).AddParameters(parameters);
             return this;
@@ -122,8 +104,6 @@ namespace Beef.Database.Core
             Command = args.Command;
             SupportedCommands = args.SupportedCommands;
             UseBeefDbo = args.UseBeefDbo;
-            ScriptNewArguments.Clear();
-            ScriptNewArguments.AddRange(args.ScriptNewArguments);
             SchemaOrder.Clear();
             SchemaOrder.AddRange(args.SchemaOrder);
         }

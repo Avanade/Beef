@@ -3,19 +3,20 @@
 Represents the **NuGet** versions.
 
 ## v4.2.3
+- *Enhancement:* Database migration capabilities moved into new [DbEx](https://github.com/Avanade/DbEx) and referenced.
 - *Enhancement:* Updated to account for changes to `Beef.CodeGen.Core` and newly extracted base [OnRamp](https://github.com/Avanade/OnRamp) capabilities.
 - *Enhancement:* `DatabaseConsoleWrapper` has been removed; use `DatabaseConsole` (breaking change).
 - *Enhancement:* Command-line arguments and options have been adjusted and may result in breaking change; they are as follows:
 
 ```
-Business Entity Execution Framework (Beef) SQL Server Database tool.
+Beef.Database.Core Database Tool.
 
-Usage: Beef.Database.Core [options] <command> <script-new-args>
+Usage: Beef.Database.Core [options] <command> <script-args>
 
 Arguments:
   command                    Database command.
-                             Allowed values are: None, Drop, Create, Migrate, CodeGen, Schema, Reset, Data, Database, DropAndDatabase, All, DropAndAll, ResetAndData, ResetAndDatabase, ResetAndAll, ScriptNew.
-  script-new-args            Additional arguments. [ScriptNew]
+                             Allowed values are: None, Drop, Create, Migrate, CodeGen, Schema, Deploy, Reset, Data, DeployWithData, Database, DropAndDatabase, All, DropAndAll, ResetAndData, ResetAndDatabase, ResetAndAll, Script.
+  script-args                Script arguments (first being the script name). [Script]
 
 Options:
   -?|-h|--help               Show help information.
@@ -23,17 +24,16 @@ Options:
   -cv|--connection-varname   Database connection string environment variable name.
   -so|--schema-order         Database schema name (multiple can be specified in priority order).
   -a|--assembly              Assembly containing embedded resources (multiple can be specified in probing order).
-  -eo|--entry-assembly-only  Use the entry assembly only.
-  -p|--param                 Parameter expressed as a 'Name=Value' pair (multiple can be specified).
+  -eo|--entry-assembly-only  Use the entry assembly only (ignore all other assemblies).
   -su|--supported            Supported commands (integer)
   -s|--script                Script orchestration file name. [CodeGen]
   -c|--config                Configuration data file name. [CodeGen]
   -o|--output                Output directory path. [CodeGen]
+  -p|--param                 Parameter expressed as a 'Name=Value' pair (multiple can be specified). [CodeGen]
   -enc|--expect-no-changes   Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]
   -sim|--simulation          Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]
   -x2y|--xml-to-yaml         Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]
 ```
-
 
 ## v4.2.2
 - *Enhancement:* Updated for changes to `Beef.Abstractions` and `Beef.Core`.

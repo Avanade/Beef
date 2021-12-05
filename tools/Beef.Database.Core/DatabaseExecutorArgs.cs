@@ -70,7 +70,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="parameters">The parameters.</param>
         /// <returns>The current <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
-        public new DatabaseExecutorArgs AddParameters(IDictionary<string, string?> parameters)
+        public new DatabaseExecutorArgs AddParameters(IDictionary<string, object?> parameters)
         {
             base.AddParameters(parameters);
             return this;

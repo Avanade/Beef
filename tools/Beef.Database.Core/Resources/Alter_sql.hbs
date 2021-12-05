@@ -1,9 +1,0 @@
-﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
--- Alter table: {{lookup Parameters 'Param1'}}.{{lookup Parameters 'Param2'}}
-
-BEGIN TRANSACTION
-
-ALTER TABLE [{{lookup Parameters 'Param1'}}].[{{lookup Parameters 'Param2'}}]
-  ADD [Column] NVARCHAR(50) NULL
-
-COMMIT TRANSACTION

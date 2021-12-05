@@ -7,7 +7,6 @@ namespace Beef.Demo.Database
     {
         static Task<int> Main(string[] args) => DatabaseConsole
             .Create("Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True", "Beef", "Demo")
-            .DatabaseScript("DatabaseWithCdc.yaml")
             .RunAsync(args);
     }
 }

@@ -34,7 +34,7 @@ namespace Beef.CodeGen
         public static void ValidateCompanyAndAppName(this ICodeGeneratorArgs args)
         {
             if (string.IsNullOrEmpty((args ?? throw new ArgumentNullException(nameof(args))).GetCompany()) || string.IsNullOrEmpty(args.GetAppName()))
-                throw new CodeGenException($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName}  must be specified.");
+                throw new CodeGenException($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName} must be specified.");
         }
     }
 }

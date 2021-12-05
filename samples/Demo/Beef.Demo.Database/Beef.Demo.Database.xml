@@ -18,63 +18,6 @@
   <Table Name="Table2" Schema="Test" Get="true" Create="true" Update="true" Delete="true" Upsert="true" />
   <Table Name="Table3" Schema="Test" Get="true" Create="true" Update="true" Delete="true" Upsert="true" />
 
-  <!-- Set up CDC for primary table Legacy.Contact. -->
-  <Cdc Name="Contact" Schema="Legacy" EventSubject="Legacy.Contact" EventSubjectFormat="NameAndKey" IdentifierMapping="true" IdentifierMappingColumns="AlternateContactId^Contact" AliasColumns="ContactId^CID" ExcludeColumnsFromETag="legacy_system_code">
-    <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
-         Join on Address.Id = Contact.AddressId. -->
-    <CdcJoin Name="Address" JoinCardinality="OneToOne" IdentifierMapping="true" IdentifierMappingColumns="AlternateAddressId^Address" AliasColumns="Id^AID">
-      <CdcJoinOn Name="Id" ToColumn="AddressId" />
-    </CdcJoin>
-    
-    <!-- Set up inner join relationship from Legacy.Contact to Legacy.ContactMapping.
-         Left Outer Join (does not have to exist) on ContactMapping.ContactId = Contact.ContactId. 
-         Only include the joined 'UniqueId' column. -->
-    <CdcJoin Name="ContactMapping" Type="Left" IncludeColumns="UniqueId">
-      <CdcJoinOn Name="ContactId" />
-    </CdcJoin>
-  </Cdc>
-
-  <!-- Set up CDC for primary table Legacy.Posts. 
-       Relational hierarchy: Legacy.Posts
-                              - Legacy.Comments (1:n)
-                                 - Legacy.Tags (1:n)
-                              - Legacy.Tags (1:n). -->
-  <Cdc Name="Posts" Schema="Legacy" EventSubject="Legacy.Post" EventSubjectFormat="NameOnly">
-    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Comments (1:n).
-         Join on Comments.PostsId = Posts.PostsId. -->
-    <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
-      <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
-    </CdcJoin>
-    
-    <!-- Set up secondary One-To-Many relationship from Legacy.Comments to Legacy.Tags (1:n).
-         Name as 'CommentsTags' for uniqueness for join referencing.
-         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
-         Rename 'ParentId' column to `CommentsId`.
-         Join on Tags.ParentType = 'C' AND Tags.ParentId = Comments.CommentsId. -->
-    <CdcJoin Name="CommentsTags" Schema="Legacy" TableName="Tags" JoinTo="Comments" ExcludeColumns="ParentType" AliasColumns="ParentId^CommentsId">
-      <CdcJoinOn Name="ParentType" ToStatement="'C'" />
-      <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
-    </CdcJoin>
-    
-    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Tags (1:n).
-         Name as 'PostsTags' for uniqueness for join referencing.
-         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
-         Rename 'ParentId' column to `PostsId`.
-         Join on Tags.ParentType = 'P' AND Tags.ParentId = Posts.PostsId. -->
-    <CdcJoin Name="PostsTags" Schema="Legacy" TableName="Tags" JoinTo="Posts" ExcludeColumns="ParentType" AliasColumns="ParentId^PostsId">
-      <CdcJoinOn Name="ParentType" ToStatement="'P'" />
-      <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
-    </CdcJoin>
-  </Cdc>
-  
-  <!-- Set up CDC for primary table Demo.Person (this is a _non-legacy_ scenario).
-       Relational hierarchy is not important as the primary table *is* (must be) updated always (ETag and Audit columns); therefore, they can be ignored.
-       Will retrieve the Id column only as the Get Business-logic will be used to retrieve and publish (as this enables the required Entity DTO). -->
-  <Cdc Name="Person" Schema="Demo" IncludeColumns="PersonId" EventSubject="Demo.Cdc.Person" DataCtorParams="Beef.Demo.Business.IPersonManager" />
-
-  <!-- As above for Person2; validate logical delete. -->
-  <Cdc Name="Person2" Schema="Demo" EventSubject="Demo.Cdc.Person2" IncludeColumnsOnDelete="UpdatedBy, UpdatedDate" ExcludeHostedService="true" />
-
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" OrgUnitImmutable="true" Permission="TestSec">
     <StoredProcedure Name="GetByArgs" Type="GetAll" ExcludeColumns="Count">

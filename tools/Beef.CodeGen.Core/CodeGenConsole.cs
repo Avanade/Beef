@@ -14,10 +14,10 @@ using System.Xml.Linq;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>Beef</b>-specific code-generation console that inherits from <see cref="OnRamp.Console.CodeGenConsoleBase"/>.
+    /// <b>Beef</b>-specific code-generation console that inherits from <see cref="OnRamp.Console.CodeGenConsole"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
-    public class CodeGenConsole : OnRamp.Console.CodeGenConsoleBase
+    public class CodeGenConsole : OnRamp.Console.CodeGenConsole
     {
         private string _entityScript = "EntityWebApiCoreAgent.yaml";
         private string _refDataScript = "RefDataCoreCrud.yaml";
@@ -58,7 +58,7 @@ namespace Beef.CodeGen
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
         /// <param name="apiName">The Web API name.</param>
-        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsoleBase.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsole.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
         /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
         public static CodeGenConsole Create(string company, string appName, string apiName = "Api", string? outputDirectory = null) => Create(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outputDirectory);
 
@@ -69,7 +69,7 @@ namespace Beef.CodeGen
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
         /// <param name="apiName">The Web API name.</param>
-        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsoleBase.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
+        /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsole.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
         /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
         public static CodeGenConsole Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string? outputDirectory = null)
         {
@@ -85,7 +85,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenConsole"/> class.
         /// </summary>
-        internal CodeGenConsole(CodeGeneratorArgs args) : base(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), args, OnRamp.Console.SupportedOptions.All)
+        internal CodeGenConsole(CodeGeneratorArgs args) : base(args, OnRamp.Console.SupportedOptions.All)
         {
             MastheadText = DefaultMastheadText;
             Args.CreateConnectionStringEnvironmentVariableName ??= csargs => $"{args.GetCompany()?.Replace(".", "_", StringComparison.InvariantCulture)}_{args.GetAppName()?.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString";
