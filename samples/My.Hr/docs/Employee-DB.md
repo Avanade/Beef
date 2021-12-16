@@ -25,23 +25,32 @@ erDiagram
 
 ## Clean up existing migrations
 
-Within the `Migrations` folder there will three entries that were created during the initial solution skeleton creation. The last two of these should be removed. The first creates the `Hr` database schema. 
+Within the `Migrations` folder there will three entries that were created during the initial solution skeleton creation. These should all be removed. 
 
 ```
 └── Migrations
-  └── 20190101-000001-create-Hr-schema.sql     <- leave
+  └── 20190101-000001-create-Hr-schema.sql     <- remove
   └── 20190101-000002-create-Hr-gender.sql     <- remove
   └── 20190101-000003-create-Hr-person.sql     <- remove
 ```
 
 <br/>
 
-## Create Employee table
+## Create HR schema
 
-First step is to create the migration script for the `Employee` table table within the `Hr` schema following a similar naming convention to ensure it is executed (applied) in the correct order. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
+Create the `Hr` schema using the database tooling. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
 
 ```
-dotnet run scriptnew create Hr Employee
+dotnet run script schema Hr
+```
+
+
+## Create Employee table
+
+Create the migration script for the `Employee` table table within the `Hr` schema following a similar naming convention to ensure it is executed (applied) in the correct order. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
+
+```
+dotnet run script create Hr Employee
 ```
 
 For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable.
@@ -80,7 +89,7 @@ COMMIT TRANSACTION
 Use the following command line to generate the migration script to create the `EmergencyContact` table within the `Hr` schema.
 
 ```
-dotnet run scriptnew create Hr EmergencyContact
+dotnet run script create Hr EmergencyContact
 ```
 
 Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
@@ -115,10 +124,10 @@ To support the capabilities of the tables above the following Reference Data tab
 At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `creatref` option specified. No further changes will be needed for these tables.
 
 ```
-dotnet run scriptnew createref Hr Gender
-dotnet run scriptnew createref Hr TerminationReason
-dotnet run scriptnew createref Hr RelationshipType
-dotnet run scriptnew createref Hr USState
+dotnet run script refdata Hr Gender
+dotnet run script refdata Hr TerminationReason
+dotnet run script refdata Hr RelationshipType
+dotnet run script refdata Hr USState
 ```
 
 <br/>
@@ -272,15 +281,15 @@ Where tables need indexes and other constraints added these would be created usi
 To support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) there is the need to have the backing event queue tables. The migration scripts to create these can be code generated using the following.
 
 ```
-dotnet run codegen --script DatabaseEventOutbox.xml
+dotnet run codegen --script DatabaseEventOutbox
 ```
 
 This should create two migrations script files with names similar as follows.
 
 ```
 └── Migrations
-  └── 20210430-170605-create-hr-eventoutbox.sql
-  └── 20210430-170605-create-hr-eventoutboxdata.sql
+  └── 20210430-170605-create-hr-eventoutbox-table.sql
+  └── 20210430-170605-create-hr-eventoutboxdata-table.sql
 ```
 
 

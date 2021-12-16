@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+#if (implement_httpagent)
+using System.Net.Http;
+#endif
 using System.Reflection;
 using Azure.Messaging.ServiceBus;
 using Beef;
@@ -79,6 +82,13 @@ namespace Company.AppName.Api
 #if (implement_cosmos)
             // Add the beef cosmos services (singleton).
             services.AddBeefCosmosDbServices<AppNameCosmosDb>(_config.GetSection("CosmosDb"));
+
+#endif
+#if (implement_httpagent)
+            // Add the HTTP agent services.
+            services.AddHttpClient("Xxx", c => c.BaseAddress = new Uri(_config.GetValue<string>("XxxAgentUrl")));
+            services.AddScoped<IXxxAgentArgs>(sp => new XxxAgentArgs(sp.GetService<IHttpClientFactory>().CreateClient("Xxx")));
+            services.AddScoped<IXxxAgent, XxxAgent>();
 
 #endif
             // Add the generated reference data services.

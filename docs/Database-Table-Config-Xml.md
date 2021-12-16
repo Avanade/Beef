@@ -34,8 +34,8 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`Name`** | The name of the `Table` in the database. [Mandatory]
-**`Schema`** | The name of the `Schema` where the `Table` is defined in the database.<br/><br/>Defaults to `CodeGeneration.Schema`.
-`Alias` | The `Schema.Table` alias name.<br/><br/>Will automatically default where not specified.
+**`Schema`** | The name of the `Schema` where the `Table` is defined in the database.<br/>&dagger; Defaults to `CodeGeneration.Schema`.
+`Alias` | The `Schema.Table` alias name.<br/>&dagger; Will automatically default where not specified.
 
 <br/>
 
@@ -44,8 +44,8 @@ Provides the _Columns_ configuration.
 
 Property | Description
 -|-
-**`IncludeColumns`** | The comma separated list of `Column` names to be included in the underlying generated output.<br/><br/>Where not specified this indicates that all `Columns` are to be included.
-**`ExcludeColumns`** | The comma seperated list of `Column` names to be excluded from the underlying generated output.<br/><br/>Where not specified this indicates no `Columns` are to be excluded.
+**`IncludeColumns`** | The comma separated list of `Column` names to be included in the underlying generated output.<br/>&dagger; Where not specified this indicates that all `Columns` are to be included.
+**`ExcludeColumns`** | The comma seperated list of `Column` names to be excluded from the underlying generated output.<br/>&dagger; Where not specified this indicates no `Columns` are to be excluded.
 
 <br/>
 
@@ -55,13 +55,13 @@ Provides the _Code Generation_ configuration. These primarily provide a shorthan
 Property | Description
 -|-
 `Get` | Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified.
-`GetAll` | Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.<br/><br/>The `GetAllOrderBy` is used to specify the `GetAll` query sort order.
+`GetAll` | Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.<br/>&dagger; The `GetAllOrderBy` is used to specify the `GetAll` query sort order.
 `GetAllOrderBy` | The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order.
 `Create` | Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified.
 `Update` | Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified.
 `Upsert` | Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified.
 `Delete` | Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.
-`Merge` | Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.<br/><br/>This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.
+`Merge` | Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.<br/>&dagger; This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.
 
 <br/>
 
@@ -71,7 +71,7 @@ Provides the _Entity Framework (EF) model_ configuration.
 Property | Description
 -|-
 `EfModel` | Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
-`EfModelName` | The .NET (C#) EntityFramework (EF) model name.<br/><br/>Defaults to `Name`.
+`EfModelName` | The .NET (C#) EntityFramework (EF) model name.<br/>&dagger; Defaults to `Name`.
 
 <br/>
 
@@ -81,9 +81,9 @@ Provides the _User Defined Table_ and _Table-Valued Parameter_ configuration.
 Property | Description
 -|-
 **`Udt`** | Indicates whether a `User Defined Table (UDT)` type should be created.
-`UdtExcludeColumns` | The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`.<br/><br/>Where not specified this indicates that no `Columns` are to be excluded.
+`UdtExcludeColumns` | The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`.<br/>&dagger; Where not specified this indicates that no `Columns` are to be excluded.
 **`Tvp`** | The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
-`EntityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`.<br/><br/>Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
+`EntityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`.<br/>&dagger; Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
 
 <br/>
 
@@ -93,7 +93,7 @@ Provides the _Authorization_ configuration.
 Property | Description
 -|-
 **`Permission`** | The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).
-**`OrgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.<br/><br/>Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.
+**`OrgUnitImmutable`** | Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.<br/>&dagger; Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.
 
 <br/>
 
@@ -102,16 +102,16 @@ Provides the _special Column Name inference_ configuration.
 
 Property | Description
 -|-
-`ColumnNameIsDeleted` | The column name for the `IsDeleted` capability.<br/><br/>Defaults to `CodeGeneration.IsDeleted`.
-`ColumnNameTenantId` | The column name for the `TenantId` capability.<br/><br/>Defaults to `CodeGeneration.TenantId`.
-`ColumnNameOrgUnitId` | The column name for the `OrgUnitId` capability.<br/><br/>Defaults to `CodeGeneration.OrgUnitId`.
-`ColumnNameRowVersion` | The column name for the `RowVersion` capability.<br/><br/>Defaults to `CodeGeneration.RowVersion`.
-`ColumnNameCreatedBy` | The column name for the `CreatedBy` capability.<br/><br/>Defaults to `CodeGeneration.CreatedBy`.
-`ColumnNameCreatedDate` | The column name for the `CreatedDate` capability.<br/><br/>Defaults to `CodeGeneration.CreatedDate`.
-`ColumnNameUpdatedBy` | The column name for the `UpdatedBy` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedBy`.
-`ColumnNameUpdatedDate` | The column name for the `UpdatedDate` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedDate`.
-`ColumnNameDeletedBy` | The column name for the `DeletedBy` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedBy`.
-`ColumnNameDeletedDate` | The column name for the `DeletedDate` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedDate`.
+`ColumnNameIsDeleted` | The column name for the `IsDeleted` capability.<br/>&dagger; Defaults to `CodeGeneration.IsDeleted`.
+`ColumnNameTenantId` | The column name for the `TenantId` capability.<br/>&dagger; Defaults to `CodeGeneration.TenantId`.
+`ColumnNameOrgUnitId` | The column name for the `OrgUnitId` capability.<br/>&dagger; Defaults to `CodeGeneration.OrgUnitId`.
+`ColumnNameRowVersion` | The column name for the `RowVersion` capability.<br/>&dagger; Defaults to `CodeGeneration.RowVersion`.
+`ColumnNameCreatedBy` | The column name for the `CreatedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.CreatedBy`.
+`ColumnNameCreatedDate` | The column name for the `CreatedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.CreatedDate`.
+`ColumnNameUpdatedBy` | The column name for the `UpdatedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedBy`.
+`ColumnNameUpdatedDate` | The column name for the `UpdatedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedDate`.
+`ColumnNameDeletedBy` | The column name for the `DeletedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedBy`.
+`ColumnNameDeletedDate` | The column name for the `DeletedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedDate`.
 
 <br/>
 

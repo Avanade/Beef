@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit.Tests
@@ -111,6 +112,26 @@ namespace Beef.Test.NUnit.Tests
             _expectValueFunc = Check.NotNull(valueFunc, nameof(valueFunc));
             _comparisonConfig.MembersToIgnore.AddRange(membersToIgnore);
             return this;
+        }
+
+        /// <summary>
+        /// Expect a response comparing the specified <paramref name="value"/> (and optionally any additional <paramref name="membersToIgnore"/> from the comparison).
+        /// </summary>
+        /// <param name="value">The expected response value to compare.</param>
+        /// <param name="membersToIgnore">The members to ignore from the comparison.</param>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTest<TStartup, TAgent, TValue> ExpectValue(TValue value, params string[] membersToIgnore) => ExpectValue(_ => value, membersToIgnore);
+
+        /// <summary>
+        /// Expect a response comparing the deserialized JSON value within the named embedded resource (and optionally any additional <paramref name="membersToIgnore"/> from the comparison).
+        /// </summary>
+        /// <param name="resourceName">The embedded resource name (matches to the end of the fully qualifed resource name) within the <see cref="Assembly.GetCallingAssembly()"/>.</param>
+        /// <param name="membersToIgnore">The members to ignore from the comparison.</param>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTest<TStartup, TAgent, TValue> ExpectJsonResourceValue(string resourceName, params string[] membersToIgnore)
+        {
+            var ass = Assembly.GetCallingAssembly();
+            return ExpectValue(_ => TestSetUp.GetValueFromJsonResource<TValue>(resourceName, ass), membersToIgnore);
         }
 
         /// <summary>

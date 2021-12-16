@@ -882,9 +882,14 @@ entities:
         public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && !(x.InternalOnly == true && Root!.RuntimeEntityScope == "Common" && Root.IsDataModel == false)).ToList();
 
         /// <summary>
-        /// Gets the list of properties that form the unique key.
+        /// Gets the list of properties that form the unique key; excluding inherited.
         /// </summary>
-        public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+        public List<PropertyConfig> UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that form the unique key; including inherited.
+        /// </summary>
+        public List<PropertyConfig> UniqueKeyPropertiesIncludeInherited => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the partition key.
@@ -912,19 +917,24 @@ entities:
         public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Skip") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
-        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
         public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareValue(x.CosmosMapper, "Map") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
-        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
         public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Skip")).ToList();
 
         /// <summary>
-        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// Gets the list of properties that are to be used for odata mapping.
         /// </summary>
         public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => !CompareValue(x.ODataMapper, "Skip")).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for http agent mapping.
+        /// </summary>
+        public List<PropertyConfig>? HttpAgentMapperProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Skip")).ToList();
 
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
@@ -1235,6 +1245,30 @@ entities:
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
                     $"{(Parent!.WebApiRoutePrefix.EndsWith('/') ? Parent!.WebApiRoutePrefix[..^1] : Parent!.WebApiRoutePrefix)}/{(WebApiRoutePrefix.StartsWith('/') ? WebApiRoutePrefix[1..] : WebApiRoutePrefix)}";
+
+            if (IsTrue(DataModel))
+            {
+                switch (AutoImplement)
+                {
+                    case "EntityFramework":
+                        EntityFrameworkModel = DefaultWhereNull(EntityFrameworkModel, () => $"Model.{Name}");
+                        break;
+
+                    case "Cosmos":
+                        CosmosModel = DefaultWhereNull(CosmosModel, () => $"Model.{Name}");
+                        break;
+
+                    case "OData":
+                        ODataModel = DefaultWhereNull(ODataModel, () => $"Model.{Name}");
+                        break;
+
+                    case "HttpAgent":
+                        HttpAgentModel = DefaultWhereNull(HttpAgentModel, () => $"Model.{Name}");
+                        break;
+                }
+            }
+
+            HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => HttpAgentModel);
 
             InferInherits();
             Consts = await PrepareCollectionAsync(Consts).ConfigureAwait(false);

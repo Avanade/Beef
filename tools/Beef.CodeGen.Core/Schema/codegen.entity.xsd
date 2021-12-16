@@ -294,6 +294,18 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="HttpAgentMapper" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The HttpAgent `Mapper` approach for the property. Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Map" />
+                        <xs:enumeration value="Ignore" />
+                        <xs:enumeration value="Skip" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
                   <xs:attribute name="DisplayName" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The display name used in the likes of error messages for the property. Defaults to the `Name` as sentence case.</xs:documentation>

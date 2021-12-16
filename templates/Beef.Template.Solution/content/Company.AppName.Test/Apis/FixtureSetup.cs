@@ -13,8 +13,10 @@ using NUnit.Framework;
 #if (implement_database || implement_entityframework)
 using System.Reflection;
 #endif
+#if (!implement_httpagent)
 using System.Threading.Tasks;
 using Company.AppName.Api;
+#endif
 using Company.AppName.Common.Agents;
 #if (implement_cosmos)
 using Company.AppName.Business.Data;
@@ -95,6 +97,15 @@ namespace Company.AppName.Test.Apis
         {
             if (_cosmosDb != null && _removeAfterUse)
                 await _cosmosDb.Database.DeleteAsync().ConfigureAwait(false);
+        }
+#endif
+#if (implement_httpagent || implement_none)
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
+            TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
+            TestSetUp.DefaultExpectNoEvents = false;
         }
 #endif
     }

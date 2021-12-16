@@ -27,8 +27,8 @@ namespace Beef.Database.Core
         /// <summary>
         /// Gets or sets the supported <see cref="DatabaseExecutorCommand"/>(s).
         /// </summary>
-        /// <remarks>Defaults to everything: <see cref="DatabaseExecutorCommand.All"/>, <see cref="DatabaseExecutorCommand.Reset"/> and <see cref="DatabaseExecutorCommand.Script"/>.</remarks>
-        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All | DatabaseExecutorCommand.Reset | DatabaseExecutorCommand.Script;
+        /// <remarks>Defaults to everything: <see cref="DatabaseExecutorCommand.All"/>, <see cref="DatabaseExecutorCommand.Reset"/>, <see cref="DatabaseExecutorCommand.Drop"/>, <see cref="DatabaseExecutorCommand.Execute"/> and <see cref="DatabaseExecutorCommand.Script"/>.</remarks>
+        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All | DatabaseExecutorCommand.Reset | DatabaseExecutorCommand.Drop | DatabaseExecutorCommand.Execute | DatabaseExecutorCommand.Script;
 
         /// <summary>
         /// Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).
@@ -106,6 +106,28 @@ namespace Beef.Database.Core
             UseBeefDbo = args.UseBeefDbo;
             SchemaOrder.Clear();
             SchemaOrder.AddRange(args.SchemaOrder);
+            ScriptName = args.ScriptName;
+            if (args.ScriptArguments != null)
+                ScriptArguments = new Dictionary<string, string?>(args.ScriptArguments);
+
+            if (args.ExecuteStatements != null)
+                ExecuteStatements = new List<string>(args.ExecuteStatements);
         }
+
+
+        /// <summary>
+        /// Gets or sets the <see cref="DatabaseExecutorCommand.Script"/> name.
+        /// </summary>
+        public string? ScriptName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DatabaseExecutorCommand.Script"/> arguments.
+        /// </summary>
+        public IDictionary<string, string?>? ScriptArguments { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DatabaseExecutorCommand.Execute"/> statements.
+        /// </summary>
+        public List<string>? ExecuteStatements { get; set; }
     }
 }

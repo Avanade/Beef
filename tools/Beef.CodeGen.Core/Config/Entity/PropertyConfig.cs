@@ -36,6 +36,7 @@ properties: [
     [CodeGenCategory("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.")]
     [CodeGenCategory("Cosmos", Title = "Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Cosmos`.")]
     [CodeGenCategory("OData", Title = "Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `OData`.")]
+    [CodeGenCategory("HttpAgent", Title = "Provides the specific _HTTP Agent_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `HttpAgent`.")]
     [CodeGenCategory("Annotation", Title = "Provides additional property _Annotation_ configuration.")]
     [CodeGenCategory("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CodeGenCategory("gRPC", Title = "Provides the _gRPC_ configuration.")]
@@ -417,6 +418,18 @@ properties: [
 
         #endregion
 
+        #region HttpAgent
+
+        /// <summary>
+        /// The HttpAgent `Mapper` approach for the property.
+        /// </summary>
+        [JsonProperty("httpAgentMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("HttpAgent", Title = "The HttpAgent `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        public string? HttpAgentMapper { get; set; }
+
+        #endregion
+
         #region Annotation
 
         /// <summary>
@@ -573,12 +586,23 @@ properties: [
         /// <summary>
         /// Gets or sets the data converter name.
         /// </summary>
-        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
+        /// <remarks>Where the name contains a '.' assume it is referencing a static and '.Default' is not required; otherwise, add.</remarks>
+        public string? DataConverterName
+        {
+            get
+            {
+                var n = string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
+                if (string.IsNullOrEmpty(n))
+                    return null;
+                else
+                    return DataConverter!.Contains(".") ? n : $"{n}.Default";
+            }
+        }
 
         /// <summary>
         /// Gets the data converter C# code.
         /// </summary>
-        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverterName}.Default!)";
+        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverterName})";
 
         /// <summary>
         /// Gets the data converter C# code for reference data data access.
@@ -688,6 +712,7 @@ properties: [
             EntityFrameworkMapper = DefaultWhereNull(EntityFrameworkMapper, () => "Map");
             CosmosMapper = DefaultWhereNull(CosmosMapper, () => "Map");
             ODataMapper = DefaultWhereNull(ODataMapper, () => "Map");
+            HttpAgentMapper = DefaultWhereNull(HttpAgentMapper, () => "Map");
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
             GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;

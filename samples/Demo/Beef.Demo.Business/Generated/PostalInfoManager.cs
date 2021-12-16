@@ -53,6 +53,50 @@ namespace Beef.Demo.Business
 
             return Cleaner.Clean(await _dataService.GetPostCodesAsync(country, state, city).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+
+        /// <summary>
+        /// Creates a new <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The created <see cref="PostalInfo"/>.</returns>
+        public async Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        {
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+
+            Cleaner.CleanUp(value, country, state, city);
+            await MultiValidator.Create()
+                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
+                .Add(state.Validate(nameof(state)).Mandatory())
+                .Add(city.Validate(nameof(city)).Mandatory())
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
+
+            return Cleaner.Clean(await _dataService.CreatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+
+        /// <summary>
+        /// Updates an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The updated <see cref="PostalInfo"/>.</returns>
+        public async Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        {
+            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+
+            Cleaner.CleanUp(value, country, state, city);
+            await MultiValidator.Create()
+                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
+                .Add(state.Validate(nameof(state)).Mandatory())
+                .Add(city.Validate(nameof(city)).Mandatory())
+                .RunAsync(throwOnError: true).ConfigureAwait(false);
+
+            return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
     }
 }
 

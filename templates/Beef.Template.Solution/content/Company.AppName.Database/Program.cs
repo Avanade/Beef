@@ -14,10 +14,10 @@ namespace Company.AppName.Database
         /// <param name="args">The startup arguments.</param>
         /// <returns>The status code whereby zero indicates success.</returns>
 #if (implement_database)
-        public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: true).RunAsync(args);
+        public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True;TrustServerCertificate=true", "Company", "AppName", useBeefDbo: true).RunAsync(args);
 #endif
 #if (implement_entityframework)
-        public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: true).RunAsync(args);
+        public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True;TrustServerCertificate=true", "Company", "AppName", useBeefDbo: true).RunAsync(args);
 #endif
     }
 }

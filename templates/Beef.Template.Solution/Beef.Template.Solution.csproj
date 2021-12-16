@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <None Remove="content\Company.AppName.Business\Data\PersonData.cs" />
+    <None Remove="content\Company.AppName.Business\Data\ReferenceDataData.cs" />
+    <None Remove="content\Company.AppName.Business\Data\XxxAgent.cs" />
     <None Remove="content\Company.AppName.Business\Validation\PersonArgsValidator.cs" />
     <None Remove="content\Company.AppName.Test\Cosmos\Person.yaml" />
     <None Remove="content\Company.AppName.Test\Cosmos\RefData.yaml" />

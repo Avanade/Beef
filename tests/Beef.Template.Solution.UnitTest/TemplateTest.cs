@@ -118,6 +118,13 @@ namespace Beef.Template.Solution.UnitTest
             SolutionCreateGenerateTest("Foo.Co", "Bar", "Cosmos");
         }
 
+        [Test]
+        public void HttpAgent()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.Ha", "Bar", "HttpAgent");
+        }
+
         private static void SolutionCreateGenerateTest(string company, string appName, string datasource)
         {
             // Mkdir and create solution from template. 

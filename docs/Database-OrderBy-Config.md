@@ -37,5 +37,5 @@ The `OrderBy` object supports a number of properties that control the generated 
 Property | Description
 -|-
 **`name`** | The name of the `Column` to order by. [Mandatory]
-**`order`** | The corresponding sort order. Valid options are: `Ascending`, `Descending`.<br/><br/>Defaults to `Ascending`.
+**`order`** | The corresponding sort order. Valid options are: `Ascending`, `Descending`.<br/>&dagger; Defaults to `Ascending`.
 

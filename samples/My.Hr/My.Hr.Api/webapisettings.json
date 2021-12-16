@@ -8,7 +8,7 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "Database": "Data Source=.;Initial Catalog=My.Hr;Integrated Security=True"
+    "Database": "Data Source=.;Initial Catalog=My.Hr;Integrated Security=True;TrustServerCertificate=true"
   },
   "BeefDatabaseEventOutboxPublisherService": {
     "MaxDequeueCount": 10,

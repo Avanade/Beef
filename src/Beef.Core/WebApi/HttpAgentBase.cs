@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using AutoMapper;
+using Beef.Mapper;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -150,13 +151,31 @@ namespace Beef.WebApi
         }
 
         /// <summary>
+        /// Gets the corresponding <see cref="OperationTypes"/> for the mapping from the <see cref="ExecutionContext.OperationType"/>.
+        /// </summary>
+        private static OperationTypes GetOperationTypes()
+        {
+            if (!ExecutionContext.HasCurrent)
+                return OperationTypes.Any;
+
+            return ExecutionContext.Current.OperationType switch
+            {
+                OperationType.Read => OperationTypes.Get,
+                OperationType.Create => OperationTypes.Create,
+                OperationType.Update => OperationTypes.Update,
+                OperationType.Delete => OperationTypes.Delete,
+                _ => OperationTypes.Any
+            };
+        }
+
+        /// <summary>
         /// Performs the actual <see cref="HttpClient.SendAsync(HttpRequestMessage)"/> and verifies the result.
         /// </summary>
         private async Task<HttpAgentResult> SendAsyncInternal<TReq>(HttpSendArgs args, TReq value) => await (Invoker ??= WebApiAgentInvoker.Current).InvokeAsync(this, async () =>
         {
             var uri = CreateFullUri(args.UrlSuffix);
             var result = (HttpAgentResult)VerifyResult(new HttpAgentResult(args, await Args.HttpClient.SendAsync(await CreateRequestMessageAsync(args.HttpMethod, uri, CreateJsonContentFromValue(value)).ConfigureAwait(false)).ConfigureAwait(false)));
-            result.Content = await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            result.Content = result.Response.Content == null ? null : await result.Response.Content.ReadAsStringAsync().ConfigureAwait(false);
             Args.AfterResponse?.Invoke(result);
             await (Args.AfterResponseAsync?.Invoke(result) ?? Task.CompletedTask).ConfigureAwait(false);
             return result;
@@ -191,7 +210,7 @@ namespace Beef.WebApi
         /// <param name="value">The request value.</param>
         /// <returns>The <see cref="HttpAgentResult"/>.</returns>
         public async Task<HttpAgentResult> SendMappedRequestAsync<TReq, TReqModel>(HttpSendArgs args, TReq value)
-            => await SendAsync(CheckSendArgs(args, true), args.Mapper!.Map<TReq, TReqModel>(value)).ConfigureAwait(false);
+            => await SendAsync(CheckSendArgs(args, true), args.Mapper!.Map<TReq, TReqModel>(value, GetOperationTypes())).ConfigureAwait(false);
 
         #endregion
 
@@ -230,7 +249,7 @@ namespace Beef.WebApi
         /// <param name="value">The request value.</param>
         /// <returns>The <see cref="HttpAgentResult{TResp}"/>.</returns>
         public async Task<HttpAgentResult<TResp>> SendAsync<TReq, TResp>(HttpSendArgs args, TReq value)
-            => new HttpAgentResult<TResp>(await SendAsyncInternal<TReq>(CheckSendArgs(args), value).ConfigureAwait(false));
+            => new HttpAgentResult<TResp>(await SendAsyncInternal(CheckSendArgs(args), value).ConfigureAwait(false));
 
         /// <summary>
         /// Send an HTTP request asynchronously with request body <paramref name="value"/> (mapped to <typeparamref name="TReqModel"/>) expecting a <typeparamref name="TResp"/> response value.
@@ -242,8 +261,7 @@ namespace Beef.WebApi
         /// <param name="value">The request value.</param>
         /// <returns>The <see cref="HttpAgentResult{TResp}"/>.</returns>
         public async Task<HttpAgentResult<TResp>> SendMappedRequestAsync<TReq, TReqModel, TResp>(HttpSendArgs args, TReq value)
-            => new HttpAgentResult<TResp>(await SendAsyncInternal(CheckSendArgs(args, true), args.Mapper!.Map<TReq, TReqModel>(value)).ConfigureAwait(false));
-
+            => new HttpAgentResult<TResp>(await SendAsyncInternal(CheckSendArgs(args, true), args.Mapper!.Map<TReq, TReqModel>(value, GetOperationTypes())).ConfigureAwait(false));
 
         /// <summary>
         /// Send an HTTP request asynchronously with request body <paramref name="value"/> expecting a <typeparamref name="TResp"/> response value (mapped from <typeparamref name="TRespModel"/>).
@@ -268,7 +286,7 @@ namespace Beef.WebApi
         /// <param name="value">The request value.</param>
         /// <returns>The <see cref="HttpAgentResult{TResp, TRespModel}"/>.</returns>
         public async Task<HttpAgentResult<TResp, TRespModel>> SendMappedRequestResponseAsync<TReq, TReqModel, TResp, TRespModel>(HttpSendArgs args, TReq value)
-            => new HttpAgentResult<TResp, TRespModel>(CheckSendArgs(args, true).Mapper!, await SendAsyncInternal(args, args.Mapper!.Map<TReq, TReqModel>(value)).ConfigureAwait(false));
+            => new HttpAgentResult<TResp, TRespModel>(CheckSendArgs(args, true).Mapper!, await SendAsyncInternal(args, args.Mapper!.Map<TReq, TReqModel>(value, GetOperationTypes())).ConfigureAwait(false));
 
         #endregion
     }

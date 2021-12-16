@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+#if (implement_httpagent)
+using System.Net.Http;
+#endif
 using Company.AppName.Api;
 using Company.AppName.Common.Agents;
 using Company.AppName.Common.Entities;
@@ -15,7 +18,8 @@ namespace Company.AppName.Test.Apis
     [TestFixture, NonParallelizable]
     public class PersonTest
     {
-        #region Get
+#if (!implement_httpagent)
+#       region Get
 
         [Test, TestSetUp]
         public void A110_Get_NotFound()
@@ -323,7 +327,7 @@ namespace Company.AppName.Test.Apis
             // Try updating the value with an eTag header (json payload eTag is ignored).
             agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
+                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": \"{TestSetUp.ConcurrencyErrorETag}\" }}", id));
         }
 
         [Test, TestSetUp]
@@ -391,4 +395,46 @@ namespace Company.AppName.Test.Apis
 
         #endregion
     }
+#else
+        #region Get
+
+        [Test, TestSetUp]
+        public void A110_Get_NotFound()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            mcf.CreateClient("Xxx").Request(HttpMethod.Get, $"/people/{404.ToGuid()}").Respond.With(HttpStatusCode.NotFound);
+
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+
+            agentTester.Test<PersonAgent, Person?>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(404.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void A120_Get_Found()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            mcf.CreateClient("Xxx").Request(HttpMethod.Get, $"/people/{1.ToGuid()}").Respond.With(new Business.Data.Model.Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", Birthday = new DateTime(1985, 03, 18) });
+
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+
+            agentTester.Test<PersonAgent, Person?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .IgnoreChangeLog()
+                .IgnoreETag()
+                .ExpectValue(_ => new Person
+                {
+                    Id = 1.ToGuid(),
+                    FirstName = "Wendy",
+                    LastName = "Jones",
+                    Gender = "F",
+                    Birthday = new DateTime(1985, 03, 18)
+                })
+                .Run(a => a.GetAsync(1.ToGuid()));
+        }
+
+        #endregion
+    }
+#endif
 }

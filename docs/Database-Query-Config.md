@@ -44,8 +44,8 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The name of the primary table of the query. [Mandatory]
-`schema` | The schema name of the primary table of the view.<br/><br/>Defaults to `CodeGeneration.dbo`.
-`alias` | The `Schema.Table` alias name.<br/><br/>Will automatically default where not specified.
+`schema` | The schema name of the primary table of the view.<br/>&dagger; Defaults to `CodeGeneration.dbo`.
+`alias` | The `Schema.Table` alias name.<br/>&dagger; Will automatically default where not specified.
 
 <br/>
 
@@ -54,9 +54,9 @@ Provides the _Columns_ configuration.
 
 Property | Description
 -|-
-**`includeColumns`** | The list of `Column` names to be included in the underlying generated output.<br/><br/>Where not specified this indicates that all `Columns` are to be included.
-**`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output.<br/><br/>Where not specified this indicates no `Columns` are to be excluded.
-**`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/><br/>Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`
+**`includeColumns`** | The list of `Column` names to be included in the underlying generated output.<br/>&dagger; Where not specified this indicates that all `Columns` are to be included.
+**`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output.<br/>&dagger; Where not specified this indicates no `Columns` are to be excluded.
+**`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/>&dagger; Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`
 
 <br/>
 
@@ -66,8 +66,8 @@ Provides the _View_ configuration.
 Property | Description
 -|-
 `view` | Indicates whether a `View` is to be generated.
-`viewName` | The `View` name.<br/><br/>Defaults to `vw` + `Name`; e.g. `vwTableName`.
-`viewSchema` | The schema name for the `View`.<br/><br/>Defaults to `Schema`.
+`viewName` | The `View` name.<br/>&dagger; Defaults to `vw` + `Name`; e.g. `vwTableName`.
+`viewSchema` | The schema name for the `View`.<br/>&dagger; Defaults to `Schema`.
 
 <br/>
 
@@ -76,7 +76,7 @@ Provides the _Authorization_ configuration.
 
 Property | Description
 -|-
-**`permission`** | The permission to be used for security permission checking.<br/><br/>The suffix is optional, and where not specified will default to `.READ`.
+**`permission`** | The permission to be used for security permission checking.<br/>&dagger; The suffix is optional, and where not specified will default to `.READ`.
 
 <br/>
 
@@ -85,16 +85,16 @@ Provides the _special Column Name inference_ configuration.
 
 Property | Description
 -|-
-`columnNameIsDeleted` | The column name for the `IsDeleted` capability.<br/><br/>Defaults to `CodeGeneration.IsDeleted`.
-`columnNameTenantId` | The column name for the `TenantId` capability.<br/><br/>Defaults to `CodeGeneration.TenantId`.
-`columnNameOrgUnitId` | The column name for the `OrgUnitId` capability.<br/><br/>Defaults to `CodeGeneration.OrgUnitId`.
-`columnNameRowVersion` | The column name for the `RowVersion` capability.<br/><br/>Defaults to `CodeGeneration.RowVersion`.
-`columnNameCreatedBy` | The column name for the `CreatedBy` capability.<br/><br/>Defaults to `CodeGeneration.CreatedBy`.
-`columnNameCreatedDate` | The column name for the `CreatedDate` capability.<br/><br/>Defaults to `CodeGeneration.CreatedDate`.
-`columnNameUpdatedBy` | The column name for the `UpdatedBy` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedBy`.
-`columnNameUpdatedDate` | The column name for the `UpdatedDate` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedDate`.
-`columnNameDeletedBy` | The column name for the `DeletedBy` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedBy`.
-`columnNameDeletedDate` | The column name for the `DeletedDate` capability.<br/><br/>Defaults to `CodeGeneration.UpdatedDate`.
+`columnNameIsDeleted` | The column name for the `IsDeleted` capability.<br/>&dagger; Defaults to `CodeGeneration.IsDeleted`.
+`columnNameTenantId` | The column name for the `TenantId` capability.<br/>&dagger; Defaults to `CodeGeneration.TenantId`.
+`columnNameOrgUnitId` | The column name for the `OrgUnitId` capability.<br/>&dagger; Defaults to `CodeGeneration.OrgUnitId`.
+`columnNameRowVersion` | The column name for the `RowVersion` capability.<br/>&dagger; Defaults to `CodeGeneration.RowVersion`.
+`columnNameCreatedBy` | The column name for the `CreatedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.CreatedBy`.
+`columnNameCreatedDate` | The column name for the `CreatedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.CreatedDate`.
+`columnNameUpdatedBy` | The column name for the `UpdatedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedBy`.
+`columnNameUpdatedDate` | The column name for the `UpdatedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedDate`.
+`columnNameDeletedBy` | The column name for the `DeletedBy` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedBy`.
+`columnNameDeletedDate` | The column name for the `DeletedDate` capability.<br/>&dagger; Defaults to `CodeGeneration.UpdatedDate`.
 
 <br/>
 

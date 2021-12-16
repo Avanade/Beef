@@ -10,5 +10,5 @@ The `OrderBy` object supports a number of properties that control the generated 
 Property | Description
 -|-
 **`Name`** | The name of the `Column` to order by. [Mandatory]
-`Order` | The corresponding sort order. Valid options are: `Asc`, `Desc`.<br/><br/>Defaults to `Asc`.
+`Order` | The corresponding sort order. Valid options are: `Asc`, `Desc`.<br/>&dagger; Defaults to `Asc`.
 

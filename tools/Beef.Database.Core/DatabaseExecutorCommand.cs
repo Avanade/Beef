@@ -96,8 +96,15 @@ namespace Beef.Database.Core
         ResetAndData = Reset | Data,
 
         /// <summary>
+        /// Executes the SQL statement passed as the first additional argument.
+        /// </summary>
+        /// <remarks>This can not be used with any of the other commands.</remarks>
+        Execute = 1024,
+
+        /// <summary>
         /// Creates a new script file using the defined naming convention.
         /// </summary>
-        Script = 2048,
+        /// <remarks>This can not be used with any of the other commands.</remarks>
+        Script = 2048
     }
 }

@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Fixed:* `HttpAgentBase.SendAsyncInternal` updated to check that the `Response.Content` is not `null`; corrects possible `NullReferenceException`.
+- *Fixed:* `HttpAgentBase.SendAsyncInternal` to use the `ExecutionContext.OperationType` (converting to the equivalent `OperationTypes`) when using an `IMapper` to map source to destinatio, and vice versa.
+- *Enhancement:* `ReferenceDataMappingConverter` updated to support runtime instance creation using `ReferenceDataMappingConverter.Create` versus previously having to inherit from abstract base class.
+
 ## v4.2.4
 - *Enhancement:* Added `HttpAgentBase` (and other related classes) as the base class to enable a `SendAsync` of an optional JSON request and return an optional JSON response (where applicable) to/from an HTTP endpoint. Leverages the base capabilites of `WebApiAgentBase`. Also, supports AutoMapper mapping of request and response values where required. This functionality is needed to support the new code-generated auto implementation of `HttpAgent` as an alternate data source.
 

@@ -1,0 +1,19 @@
+﻿{
+  "country": "US",
+  "city": "Redmond",
+  "state": "WA",
+  "places": [
+    {
+      "name": "Redmond",
+      "postCode": "98052"
+    },
+    {
+      "name": "Redmond",
+      "postCode": "98053"
+    },
+    {
+      "name": "Redmond",
+      "postCode": "98073"
+    }
+  ]
+}

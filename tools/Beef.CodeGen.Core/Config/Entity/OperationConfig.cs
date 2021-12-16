@@ -700,7 +700,7 @@ operations: [
         /// <summary>
         /// Indicates whether the operation supports caching.
         /// </summary>
-        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type);
+        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.UniqueKeyPropertiesIncludeInherited.Count > 0;
 
         /// <summary>
         /// Gets or sets the data arguments.
@@ -1228,16 +1228,27 @@ operations: [
             if (AutoImplement != "HttpAgent")
                 return;
 
+            if (HttpAgentRoute == null && !string.IsNullOrEmpty(WebApiRoute))
+            {
+                if (Type == "Update")
+                    HttpAgentRoute = string.Join(",", Parameters.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}"));
+                else
+                    HttpAgentRoute = WebApiRoute;
+            }
+
             HttpAgentRoute = string.IsNullOrEmpty(Parent!.HttpAgentRoutePrefix) ? HttpAgentRoute : Parent!.HttpAgentRoutePrefix + (string.IsNullOrEmpty(HttpAgentRoute) ? null : "/" + HttpAgentRoute);
+            HttpAgentRoute = DefaultWhereNull(HttpAgentRoute, () => WebApiRoute);
+
             HttpAgentMethod = DefaultWhereNull(HttpAgentMethod, () => WebApiMethod);
             HttpAgentModel = DefaultWhereNull(HttpAgentModel, () => ValueType == null ? null : Parent!.HttpAgentModel);
-            HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => BaseReturnType == "void" || BaseReturnType != Parent!.Name ? null : Parent!.HttpAgentReturnModel);
+            HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => BaseReturnType == "void" || BaseReturnType != Parent!.Name ? null : Parent!.HttpAgentReturnModel ?? Parent!.HttpAgentModel);
 
-            //var _dataArgs = HttpAgentSendArgs.Create(_mapper, )
-            //(await httpAgent.SendAsync(HttpMethod.{HttpAgentMethod}, {HttpAgentRoute}, value)).Value;
+            if (string.IsNullOrEmpty(HttpAgentModel) && new string[] { "Create", "Update", "Patch" }.Contains(Type))
+                throw new CodeGenException(this, nameof(HttpAgentModel), $"Type '{Type}' requires a {nameof(HttpAgentModel)} to be specified.");
+
             var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}.Send");
             if (HttpAgentModel != null && HttpAgentReturnModel != null)
-                sb.Append($"MappedRequestResponseAsync<{BaseReturnType}, {HttpAgentReturnModel}, {ReturnType}, {HttpAgentReturnModel}>(");
+                sb.Append($"MappedRequestResponseAsync<{ValueType}, {HttpAgentModel}, {BaseReturnType}, {HttpAgentReturnModel}>(");
             else if (HttpAgentModel != null)
                 sb.Append($"MappedRequestAsync<{BaseReturnType}, {HttpAgentReturnModel}>(");
             else if (HttpAgentReturnModel != null)

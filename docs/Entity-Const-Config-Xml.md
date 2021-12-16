@@ -10,6 +10,6 @@ The `Const` object supports a number of properties that control the generated co
 Property | Description
 -|-
 **`Name`** | The unique constant name. [Mandatory]
-**`Value`** | The .NET (C#) code for the constant value. [Mandatory]<br/><br/>The code generation will ensure the value is delimited properly to output correctly formed (delimited) .NET (C#) code.
-`Text` | The overriding text for use in comments.<br/><br/>By default the `Text` will be the `Name` reformatted as sentence casing. It will be formatted as: `Represents a {text} constant value.` To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. `{{Xxx}}`).
+**`Value`** | The .NET (C#) code for the constant value. [Mandatory]<br/>&dagger; The code generation will ensure the value is delimited properly to output correctly formed (delimited) .NET (C#) code.
+`Text` | The overriding text for use in comments.<br/>&dagger; By default the `Text` will be the `Name` reformatted as sentence casing. It will be formatted as: `Represents a {text} constant value.` To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. `{{Xxx}}`).
 

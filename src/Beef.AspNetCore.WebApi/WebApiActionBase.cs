@@ -3,6 +3,7 @@
 using Beef.Caching;
 using Beef.Entities;
 using Beef.Json;
+using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -868,7 +868,7 @@ namespace Beef.AspNetCore.WebApi
             Func<Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
-            _value = value;
+            _value = value ?? throw new ValidationException(new MessageItem[] { MessageItem.CreateErrorMessage(nameof(value), ValidatorStrings.InvalidFormat, Validator.ValueNameDefault) });
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncNoResult = updateFuncNoResult ?? throw new ArgumentNullException(nameof(updateFuncNoResult));
             _locationUriNoResult = locationUri;
@@ -894,7 +894,7 @@ namespace Beef.AspNetCore.WebApi
             Func<T, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
-            BodyValue = _value = value;
+            BodyValue = _value = value ?? throw new ValidationException(new MessageItem[] { MessageItem.CreateErrorMessage(nameof(value), ValidatorStrings.InvalidFormat, Validator.ValueNameDefault) });
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncWithResult = updateFuncWithResult ?? throw new ArgumentNullException(nameof(updateFuncWithResult));
             _locationUriWithResult = locationUri;

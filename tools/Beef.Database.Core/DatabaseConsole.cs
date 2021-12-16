@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using DbEx.Migration.SqlServer;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp;
@@ -26,7 +25,7 @@ namespace Beef.Database.Core
         private const string XmlToYamlOptionName = "X2Y";
         private readonly Dictionary<string, CommandOption> _options = new Dictionary<string, CommandOption>();
         private CommandArgument<DatabaseExecutorCommand>? _cmdArg;
-        private CommandArgument? _scriptArgs;
+        private CommandArgument? _additionalArgs;
 
         /// <summary>
         /// Gets the default database script name.
@@ -193,7 +192,8 @@ namespace Beef.Database.Core
             _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
-            _scriptArgs = app.Argument("script-args", "Script arguments (first being the script name). [Script]", multipleValues: true);
+            _additionalArgs = app.Argument("args", "Additional arguments; 'Script' arguments (first being the script name) -or- 'Execute' (each a SQL statement to invoke).", multipleValues: true);
+
 
             app.OnValidate(ctx =>
             {
@@ -213,10 +213,6 @@ namespace Beef.Database.Core
                 {
                     Args.Assemblies.Clear();
                     Args.AddAssembly(Assembly.GetEntryAssembly()!);
-                }, () =>
-                {
-                    if (Args.UseBeefDbo && !Args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
-                        Args.Assemblies.Add(typeof(DatabaseConsole).Assembly);
                 });
 
                 vr = new ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(DatabaseConsoleArgs.Parameters)), ctx);
@@ -230,14 +226,40 @@ namespace Beef.Database.Core
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.ExpectNoChanges), () => Args.ExpectNoChanges = true);
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.IsSimulation), () => Args.IsSimulation = true);
 
-                if (_scriptArgs.Values.Count > 0 && _cmdArg.ParsedValue != DatabaseExecutorCommand.Script)
-                    return new ValidationResult($"Additional arguments can only be specified when the command is '{nameof(DatabaseExecutorCommand.Script)}'.", new string[] { "script-args" });
-
                 if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
                     return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{nameof(DatabaseExecutorCommand.CodeGen)}'.");
 
                 UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
                 Args.OverrideConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
+
+                if (_additionalArgs.Values.Count > 0 && !(Args.Command.HasFlag(DatabaseExecutorCommand.Script) || Args.Command.HasFlag(DatabaseExecutorCommand.Execute)))
+                    return new ValidationResult($"Additional arguments can only be specified when the command is '{nameof(DatabaseExecutorCommand.Script)}' or '{nameof(DatabaseExecutorCommand.Execute)}'.", new string[] { "args" });
+
+                if (Args.Command.HasFlag(DatabaseExecutorCommand.Script))
+                {
+                    for (int i = 0; i < _additionalArgs.Values.Count; i++)
+                    {
+                        if (i == 0)
+                            Args.ScriptName = _additionalArgs.Values[i];
+                        else
+                        {
+                            Args.ScriptArguments ??= new Dictionary<string, string?>();
+                            Args.ScriptArguments.Add($"Param{i}", _additionalArgs.Values[i]);
+                        }
+                    }
+                }
+
+                if (Args.Command.HasFlag(DatabaseExecutorCommand.Execute))
+                {
+                    for (int i = 0; i < _additionalArgs.Values.Count; i++)
+                    {
+                        if (string.IsNullOrEmpty(_additionalArgs.Values[i]))
+                            continue;
+
+                        Args.ExecuteStatements ??= new List<string>();
+                        Args.ExecuteStatements.Add(_additionalArgs.Values[i]!);
+                    }
+                }
 
                 return ValidationResult.Success!;
             });
@@ -316,22 +338,6 @@ namespace Beef.Database.Core
         {
             try
             {
-                // Execute script and then get out of here!
-                if (Args.Command.HasFlag(DatabaseExecutorCommand.Script))
-                {
-                    string? sn = null;
-                    var sa = new Dictionary<string, string?>();
-                    for (int i = 0; i < _scriptArgs!.Values.Count; i++)
-                    {
-                        if (i == 0)
-                            sn = _scriptArgs.Values[i];
-                        else
-                            sa.Add($"Param{i}", _scriptArgs.Values[i]);
-                    }
-
-                    return (await new SqlServerMigrator(Args.ConnectionString!, DbEx.Migration.MigrationCommand.Script, Args.Logger!, Args.Assemblies.ToArray()).CreateScriptAsync(sn, sa).ConfigureAwait(false)) ? 0 : 1;
-                }
-
                 // Write the masthead and headser.
                 if (MastheadText != null)
                     Args.Logger?.LogInformation(MastheadText);

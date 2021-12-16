@@ -37,10 +37,10 @@ The `Parameter` object supports a number of properties that control the generate
 Property | Description
 -|-
 **`name`** | The parameter name (without the `@` prefix). [Mandatory]
-`column` | The corresponding column name; used to infer characteristics.<br/><br/>Defaults to `Name`.
+`column` | The corresponding column name; used to infer characteristics.<br/>&dagger; Defaults to `Name`.
 `sqlType` | The SQL type definition (overrides inherited Column definition) including length/precision/scale.
-`nullable` | Indicates whether the parameter is nullable.<br/><br/>Note that when the parameter value is `NULL` it will not be included in the query.
+`nullable` | Indicates whether the parameter is nullable.<br/>&dagger; Note that when the parameter value is `NULL` it will not be included in the query.
 `treatColumnNullAs` | Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.
 `collection` | Indicates whether the parameter is a collection (one or more values to be included `IN` the query).
-**`operator`** | The where clause equality operator Valid options are: `EQ`, `NE`, `LT`, `LE`, `GT`, `GE`, `LIKE`.<br/><br/>Defaults to `EQ`.
+**`operator`** | The where clause equality operator Valid options are: `EQ`, `NE`, `LT`, `LE`, `GT`, `GE`, `LIKE`.<br/>&dagger; Defaults to `EQ`.
 

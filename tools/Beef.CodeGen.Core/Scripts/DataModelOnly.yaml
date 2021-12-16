@@ -1,3 +1,3 @@
 ﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
 generators:
-- { type: 'Beef.CodeGen.Generators.EntityModelCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs.hbs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Data/Model/Generated', IsDataModel: true, text: 'ModelCodeGenerator: Business/Data/Model' }
+- { type: 'Beef.CodeGen.Generators.EntityModelCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Data/Model/Generated', IsDataModel: true, text: 'ModelCodeGenerator: Business/Data/Model' }

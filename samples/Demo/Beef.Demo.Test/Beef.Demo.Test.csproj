@@ -21,12 +21,16 @@
   <ItemGroup>
     <None Remove="Cosmos\Data.yaml" />
     <None Remove="Cosmos\RefData.yaml" />
+    <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
+    <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
     <None Remove="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Cosmos\RefData.yaml" />
     <EmbeddedResource Include="Cosmos\Data.yaml" />
+    <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
+    <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
     <EmbeddedResource Include="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
@@ -41,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.Data.Database.Cdc\Beef.Data.Database.Cdc.csproj" />
     <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />

@@ -1,5 +1,4 @@
-﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE TABLE [{{Schema}}].[{{EventOutboxTableName}}Data] (
+CREATE TABLE [Demo].[EventOutboxData] (
   /*
    * This is automatically generated; any changes will be lost.
    */
@@ -10,6 +9,7 @@ CREATE TABLE [{{Schema}}].[{{EventOutboxTableName}}Data] (
   [Action] NVARCHAR(128) NULL,
   [CorrelationId] NVARCHAR(64) NULL,
   [TenantId] UNIQUEIDENTIFIER NULL,
+  [PartitionKey] NVARCHAR(128) NULL,
   [ValueType] NVARCHAR(1024) NULL,
   [EventData] VARBINARY(MAX) NULL
 );

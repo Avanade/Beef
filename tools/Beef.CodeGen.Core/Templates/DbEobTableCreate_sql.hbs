@@ -6,6 +6,7 @@ CREATE TABLE [{{Schema}}].[{{EventOutboxTableName}}] (
 
   [EventOutboxId] BIGINT IDENTITY (1, 1) NOT NULL PRIMARY KEY NONCLUSTERED ([EventOutboxId] ASC),
   [EnqueuedDate] DATETIME2 NOT NULL,
+  [PartitionKey] NVARCHAR(128) NULL,
   [DequeuedDate] DATETIME2 NULL,
   CONSTRAINT [IX_{{Schema}}_{{EventOutboxTableName}}_DequeuedDate] UNIQUE CLUSTERED ([DequeuedDate], [EventOutboxId])
 );

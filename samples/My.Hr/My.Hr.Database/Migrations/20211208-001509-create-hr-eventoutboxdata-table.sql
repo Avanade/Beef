@@ -9,6 +9,7 @@ CREATE TABLE [Hr].[EventOutboxData] (
   [Action] NVARCHAR(128) NULL,
   [CorrelationId] NVARCHAR(64) NULL,
   [TenantId] UNIQUEIDENTIFIER NULL,
+  [PartitionKey] NVARCHAR(128) NULL,
   [ValueType] NVARCHAR(1024) NULL,
   [EventData] VARBINARY(MAX) NULL
 );

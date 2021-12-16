@@ -41,6 +41,7 @@ namespace Beef.Data.Database
             Action = @event.Action;
             CorrelationId = @event.CorrelationId;
             TenantId = @event.TenantId;
+            PartitionKey = @event.PartitionKey;
             ValueType = @event.ValueType?.AssemblyQualifiedName;
             EventData = stream.ToArray();
         }
@@ -69,6 +70,11 @@ namespace Beef.Data.Database
         /// Gets or sets the <see cref="EventMetadata.TenantId"/>.
         /// </summary>
         public Guid? TenantId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="EventMetadata.PartitionKey"/>.
+        /// </summary>
+        public string? PartitionKey { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Type.AssemblyQualifiedName"/> for the <see cref="EventData{T}.Value"/>; used to aid in the deserialization of the <see cref="EventData"/>.

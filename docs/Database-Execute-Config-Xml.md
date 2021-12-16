@@ -10,5 +10,5 @@ The `Execute` object supports a number of properties that control the generated 
 Property | Description
 -|-
 **`Statement`** | The additional TSQL statement. [Mandatory]
-**`Location`** | The location of the statement in relation to the underlying primary stored procedure statement. Valid options are: `Before`, `After`.<br/><br/>Defaults to `After`.
+**`Location`** | The location of the statement in relation to the underlying primary stored procedure statement. Valid options are: `Before`, `After`.<br/>&dagger; Defaults to `After`.
 

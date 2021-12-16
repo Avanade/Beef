@@ -442,7 +442,7 @@ namespace My.Hr.Test.Apis
             v.ETag = TestSetUp.ConcurrencyErrorETag;
             agentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
+                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": \"{TestSetUp.ConcurrencyErrorETag}\" }}", id));
         }
 
         [Test, TestSetUp]

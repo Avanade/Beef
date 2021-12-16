@@ -1143,6 +1143,16 @@
             "Skip"
           ]
         },
+        "httpAgentMapper": {
+          "type": "string",
+          "title": "The HttpAgent 'Mapper' approach for the property.",
+          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "enum": [
+            "Map",
+            "Ignore",
+            "Skip"
+          ]
+        },
         "displayName": {
           "type": "string",
           "title": "The display name used in the likes of error messages for the property.",

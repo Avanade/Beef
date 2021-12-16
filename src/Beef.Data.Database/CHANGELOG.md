@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Enhancement:* Upgraded the `Microsoft.Data.SqlClient` to the latest version. This may break existing tooling and testing; to correct add `;TrustServerCertificate=true` to the connection string.
+
 ## v4.2.4
 - *Fixed:* Issue [157](https://github.com/Avanade/Beef/issues/157) fixed. Renamed `DatabasePropertyMapper.DbType` method to be `SetDbType` to be consistent with the other related _set_ methods.
 

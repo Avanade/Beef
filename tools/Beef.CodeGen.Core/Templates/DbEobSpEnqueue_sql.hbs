@@ -28,15 +28,16 @@ BEGIN
             @action NVARCHAR(128),
             @correlationId NVARCHAR(64),
             @TenantId UNIQUEIDENTIFIER,
+            @partitionKey NVARCHAR(128),
             @ValueType NVARCHAR(1024),
             @EventData VARBINARY(MAX)
 
     -- Declare, open, and fetch first event from cursor.
     DECLARE c CURSOR FORWARD_ONLY 
-      FOR SELECT [EventId], [Subject], [Action], [CorrelationId], [TenantId], [ValueType], [EventData] FROM @EventList
+      FOR SELECT [EventId], [Subject], [Action], [CorrelationId], [TenantId], [PartitionKey], [ValueType], [EventData] FROM @EventList
 
     OPEN c
-    FETCH NEXT FROM c INTO @eventId, @subject, @action, @correlationId, @tenantId, @valueType, @eventdata
+    FETCH NEXT FROM c INTO @eventId, @subject, @action, @correlationId, @tenantId, @partitionKey, @valueType, @eventdata
 
     -- Iterate the event(s).
     WHILE @@FETCH_STATUS = 0
@@ -55,7 +56,8 @@ BEGIN
           [Subject], 
           [Action], 
           [CorrelationId], 
-          [TenantId], 
+          [TenantId],
+          [PartitionKey], 
           [ValueType], 
           [EventData]
         ) 
@@ -66,12 +68,13 @@ BEGIN
           @action,
           @correlationId, 
           @tenantId, 
+          @partitionKey,
           @valueType, 
           @eventdata
         )
 
         -- Fetch the next event from the cursor.
-        FETCH NEXT FROM c INTO @eventId, @subject, @action, @correlationId, @tenantId, @valueType, @eventdata
+        FETCH NEXT FROM c INTO @eventId, @subject, @action, @correlationId, @tenantId, @partitionKey, @valueType, @eventdata
     END
 
     -- Close the cursor.

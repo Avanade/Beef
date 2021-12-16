@@ -52,6 +52,62 @@ namespace Beef.Demo.Business.Data
             var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Get, $"{country.Code}/{state}/{city}", true);
             return (await _httpAgent.SendMappedResponseAsync<PostalInfo, Model.PostalInfo>(__dataArgs).ConfigureAwait(false)).Value;
         });
+
+        /// <summary>
+        /// Creates a new <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The created <see cref="PostalInfo"/>.</returns>
+        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async () =>
+        {
+            var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Post, $"{country.Code}/{state}/{city}");
+            return (await _httpAgent.SendMappedRequestResponseAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>(__dataArgs, value).ConfigureAwait(false)).Value;
+        });
+
+        /// <summary>
+        /// Updates an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The updated <see cref="PostalInfo"/>.</returns>
+        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async () =>
+        {
+            var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Put, $"{country.Code}/{state}/{city}");
+            return (await _httpAgent.SendMappedRequestResponseAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>(__dataArgs, value).ConfigureAwait(false)).Value;
+        });
+
+        /// <summary>
+        /// Provides the <see cref="PostalInfo"/> and HttpAgent <see cref="Model.PostalInfo"/> <i>AutoMapper</i> mapping.
+        /// </summary>
+        public partial class HttpAgentMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="HttpAgentMapperProfile"/> class.
+            /// </summary>
+            public HttpAgentMapperProfile()
+            {
+                var s2d = CreateMap<PostalInfo, Model.PostalInfo>();
+                s2d.ForMember(d => d.Country, o => o.MapFrom(s => s.CountrySid));
+                s2d.ForMember(d => d.City, o => o.MapFrom(s => s.City));
+                s2d.ForMember(d => d.State, o => o.MapFrom(s => s.State));
+                s2d.ForMember(d => d.Places, o => o.MapFrom(s => s.Places));
+
+                var d2s = CreateMap<Model.PostalInfo, PostalInfo>();
+                d2s.ForMember(s => s.CountrySid, o => o.MapFrom(d => d.Country));
+                d2s.ForMember(s => s.City, o => o.MapFrom(d => d.City));
+                d2s.ForMember(s => s.State, o => o.MapFrom(d => d.State));
+                d2s.ForMember(s => s.Places, o => o.MapFrom(d => d.Places));
+
+                HttpAgentMapperProfileCtor(s2d, d2s);
+            }
+
+            partial void HttpAgentMapperProfileCtor(AutoMapper.IMappingExpression<PostalInfo, Model.PostalInfo> s2d, AutoMapper.IMappingExpression<Model.PostalInfo, PostalInfo> d2s); // Enables the constructor to be extended.
+        }
     }
 }
 

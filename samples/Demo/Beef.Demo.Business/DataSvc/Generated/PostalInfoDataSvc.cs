@@ -11,8 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
-using Beef.Caching;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
@@ -25,15 +25,15 @@ namespace Beef.Demo.Business.DataSvc
     public partial class PostalInfoDataSvc : IPostalInfoDataSvc
     {
         private readonly IPostalInfoData _data;
-        private readonly IRequestCache _cache;
+        private readonly IEventPublisher _evtPub;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostalInfoDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IPostalInfoData"/>.</param>
-        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public PostalInfoDataSvc(IPostalInfoData data, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); PostalInfoDataSvcCtor(); }
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher evtPub)
+            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); PostalInfoDataSvcCtor(); }
 
         partial void PostalInfoDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -46,12 +46,38 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
         public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __key = new UniqueKey(country, state, city);
-            if (_cache.TryGetValue(__key, out PostalInfo? __val))
-                return __val;
-
             var __result = await _data.GetPostCodesAsync(country, state, city).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__key, __result);
+            return __result;
+        });
+
+        /// <summary>
+        /// Creates a new <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The created <see cref="PostalInfo"/>.</returns>
+        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        {
+            var __result = await _data.CreatePostCodesAsync(Check.NotNull(value, nameof(value)), country, state, city).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, new Uri($"/postalinfo/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.PostalInfo.{_evtPub.FormatKey(__result)}", "Create", country.Code, state, city).SendAsync().ConfigureAwait(false);
+            return __result;
+        });
+
+        /// <summary>
+        /// Updates an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <returns>The updated <see cref="PostalInfo"/>.</returns>
+        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        {
+            var __result = await _data.UpdatePostCodesAsync(Check.NotNull(value, nameof(value)), country, state, city).ConfigureAwait(false);
+            await _evtPub.PublishValue(__result, new Uri($"/postalinfo/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.PostalInfo.{_evtPub.FormatKey(__result)}", "Update", country.Code, state, city).SendAsync().ConfigureAwait(false);
+            return __result;
         });
     }
 }
