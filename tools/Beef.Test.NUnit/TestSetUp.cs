@@ -393,12 +393,12 @@ namespace Beef.Test.NUnit
         {
             assembly ??= Assembly.GetCallingAssembly();
             var coll = assembly.GetManifestResourceNames().Where(x => x.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
-            switch (coll.Count())
+            return coll.Count() switch
             {
-                case 0: throw new ArgumentException($"No embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName));
-                case 1: return new StreamReader(assembly.GetManifestResourceStream(coll.First())!);
-                default: throw new ArgumentException($"More than one embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName));
-            }
+                0 => throw new ArgumentException($"No embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName)),
+                1 => new StreamReader(assembly.GetManifestResourceStream(coll.First())!),
+                _ => throw new ArgumentException($"More than one embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName)),
+            };
         }
 
         /// <summary>

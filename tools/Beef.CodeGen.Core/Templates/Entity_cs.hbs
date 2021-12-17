@@ -118,9 +118,9 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
-        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+          {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        {{/ifeq}}
+          {{/ifeq}}
         public string? {{Name}}Text { get => {{PrivateName}}Text ?? GetRefDataText(() => {{Name}}); set => {{PrivateName}}Text = value; }
         {{/if}}
       {{/unless}}

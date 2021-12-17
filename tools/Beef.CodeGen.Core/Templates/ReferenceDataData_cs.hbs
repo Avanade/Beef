@@ -27,6 +27,9 @@ using {{Root.DatabaseUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if RefData.UsesEntityFramework}}
+  {{#unless RefData.UsesDatabase}}
+using Beef.Data.Database;
+  {{/unless}}
 using Beef.Data.EntityFrameworkCore;
   {{#ifval Root.EntityFrameworkUsingNamespace}}
 using {{Root.EntityFrameworkUsingNamespace}};
@@ -125,9 +128,9 @@ namespace {{Root.NamespaceBusiness}}.Data
                 var d2s = CreateMap<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.{{Name}}Id));
           {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -155,7 +158,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             {
                 var d2s = CreateMap<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>();
           {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
 
                 {{Name}}MapperProfileCtor(d2s);

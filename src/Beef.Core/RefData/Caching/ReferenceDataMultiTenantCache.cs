@@ -2,6 +2,7 @@
 
 using Beef.Caching;
 using Beef.Caching.Policy;
+using Beef.Entities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -120,7 +121,7 @@ namespace Beef.RefData.Caching
                     coll = new TColl();
             }
 
-            coll.GenerateETag();
+            coll.ETag = ETagGenerator.Generate(coll);
             return coll;
         }
 
@@ -158,7 +159,7 @@ namespace Beef.RefData.Caching
                     }
                 }
 
-                coll.GenerateETag();
+                coll.ETag = ETagGenerator.Generate(coll);
                 GetPolicyForTenant(tenantId).Reset();
             }
         }

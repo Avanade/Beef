@@ -44,6 +44,12 @@ namespace My.Hr.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("genderText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? GenderText { get; set ; }
+
+        /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [JsonProperty("gender", DefaultValueHandling = DefaultValueHandling.Ignore)]

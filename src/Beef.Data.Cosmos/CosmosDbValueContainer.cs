@@ -65,7 +65,6 @@ namespace Beef.Data.Cosmos
         /// <returns>The entity value.</returns>
         internal T GetValue(CosmosDbValue<TModel> model)
         {
-            CosmosDbBase.ReformatValueETag(model);
             ((ICosmosDbValue)model).PrepareAfter();
             return DbArgs.Mapper.Map<TModel, T>(model.Value, Mapper.OperationTypes.Get)!;
         }

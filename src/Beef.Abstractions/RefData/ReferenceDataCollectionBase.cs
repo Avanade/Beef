@@ -57,13 +57,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The code value.</param>
         /// <returns>The converted code value.</returns>
-        protected string? ConvertCode(string? code)
-        {
-            if (code == null)
-                return null;
-            else
-                return IsCodeCaseSensitive ? code : code.ToUpperInvariant();
-        }
+        protected string? ConvertCode(string? code) => code == null ? null : (IsCodeCaseSensitive ? code : code.ToUpperInvariant());
 
         #region PrivateCollections
 
@@ -91,10 +85,7 @@ namespace Beef.RefData
             /// Initializes a new instance of the <see cref="ReferenceDataCodeCollection"/> class.
             /// </summary>
             /// <param name="owner">The owner collection.</param>
-            public ReferenceDataCodeCollection(ReferenceDataCollectionBase<TItem> owner)
-            {
-                _owner = owner;
-            }
+            public ReferenceDataCodeCollection(ReferenceDataCollectionBase<TItem> owner) => _owner = owner;
 
             /// <summary>
             /// Gets the key (<see cref="ReferenceDataBase.Code"/>) for the <see cref="ReferenceDataBase"/> item.
@@ -209,19 +200,13 @@ namespace Beef.RefData
         /// Supports an iteration over the collection (only items that are <see cref="IsItemValid"/> are enumerated).
         /// </summary>
         /// <remarks>There is no implied sort order; use <see cref="GetList"/> for sorted lists.</remarks>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// Supports an iteration over the collection (only items that are <see cref="IsItemValid"/> are enumerated).
         /// </summary>
         /// <returns>There is no implied sort order; use <see cref="GetList"/> for sorted lists.</returns>
-        IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// Determines whether the <paramref name="item"/> is considered valid and therefore accessible from within the collection.
@@ -258,142 +243,91 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetById(int id)
-        {
-            return GetById(id);
-        }
+        ReferenceDataBase IReferenceDataCollection.GetById(int id) => GetById(id);
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetById(int id)
-        {
-            if (_rdcId.Contains(id))
-                return _rdcId[id];
-
-            return default!;
-        }
+        public TItem GetById(int id) => _rdcId.Contains(id) ? _rdcId[id] : default!;
 
         /// <summary>
         /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
         /// </summary>
         /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsId(int id)
-        {
-            return _rdcId.Contains(id);
-        }
+        public bool ContainsId(int id) => _rdcId.Contains(id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetById(long id)
-        {
-            return GetById(id);
-        }
+        ReferenceDataBase IReferenceDataCollection.GetById(long id) => GetById(id);
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetById(long id)
-        {
-            if (_rdcId.Contains(id))
-                return _rdcId[id];
-
-            return default!;
-        }
+        public TItem GetById(long id) => _rdcId.Contains(id) ? _rdcId[id] : default!;
 
         /// <summary>
         /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
         /// </summary>
         /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsId(long id)
-        {
-            return _rdcId.Contains(id);
-        }
+        public bool ContainsId(long id) => _rdcId.Contains(id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetById(Guid id)
-        {
-            return GetById(id);
-        }
+        ReferenceDataBase IReferenceDataCollection.GetById(Guid id) => GetById(id);
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetById(Guid id)
-        {
-            if (_rdcId.Contains(id))
-                return _rdcId[id];
-
-            return default!;
-        }
+        public TItem GetById(Guid id) => _rdcId.Contains(id) ?  _rdcId[id] : default!;
 
         /// <summary>
         /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
         /// </summary>
         /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsId(Guid id)
-        {
-            return _rdcId.Contains(id);
-        }
+        public bool ContainsId(Guid id) => _rdcId.Contains(id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetById(string? id)
-        {
-            return GetById(id);
-        }
+        ReferenceDataBase IReferenceDataCollection.GetById(string? id) => GetById(id);
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetById(string? id)
-        {
-            if (_rdcId.Contains(id))
-                return _rdcId[id];
-
-            return default!;
-        }
+        public TItem GetById(string? id) => _rdcId.Contains(id) ? _rdcId[id] : default!;
 
         /// <summary>
         /// Determines whether the specified <see cref="ReferenceDataBase.Id"/> exists within the collection.
         /// </summary>
         /// <param name="id">The <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsId(string? id)
-        {
-            return _rdcId.Contains(id);
-        }
+        public bool ContainsId(string? id) => _rdcId.Contains(id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Code"/>.
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase? IReferenceDataCollection.GetByCode(string? code)
-        {
-            return GetByCode(code);
-        }
+        ReferenceDataBase? IReferenceDataCollection.GetByCode(string? code) => GetByCode(code);
 
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Code"/>.
@@ -440,8 +374,8 @@ namespace Beef.RefData
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[int id]
         {
-            get { return GetById(id); }
-            private set { throw new NotSupportedException(); }
+            get => GetById(id);
+            private set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -451,8 +385,8 @@ namespace Beef.RefData
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[long id]
         {
-            get { return GetById(id); }
-            private set { throw new NotSupportedException(); }
+            get => GetById(id);
+            private set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -462,8 +396,8 @@ namespace Beef.RefData
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[Guid id]
         {
-            get { return GetById(id); }
-            private set { throw new NotSupportedException(); }
+            get => GetById(id);
+            private set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -473,8 +407,8 @@ namespace Beef.RefData
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[string code]
         {
-            get { return GetByCode(code); }
-            private set { throw new NotSupportedException(); }
+            get => GetByCode(code);
+            private set => throw new NotSupportedException();
         }
 
         #endregion
@@ -486,20 +420,14 @@ namespace Beef.RefData
         /// </summary>
         /// <value>A <see cref="IList{TItem}"/>.</value>
         /// <remarks>This is provided as a property to more easily support binding; it encapsulates the following method invocation: <c><see cref="GetList"/>(SortOrder, null, null);</c></remarks>
-        public List<TItem> AllList
-        {
-            get { return GetList(SortOrder, null, null); }
-        }
+        public List<TItem> AllList => GetList(SortOrder, null, null);
 
         /// <summary>
         /// Gets a list of the <see cref="IsItemValid"/> and <see cref="ReferenceDataBase.IsActive"/> items sorted by the <see cref="SortOrder"/> value.
         /// </summary>
         /// <value>A <see cref="IList{TItem}"/>.</value>
         /// <remarks>This is provided as a property to more easily support binding; it encapsulates the following method invocation: <c><see cref="GetList"/>(SortOrder, true, true);</c></remarks>
-        public List<TItem> ActiveList
-        {
-            get { return GetList(SortOrder, true, true); }
-        }
+        public List<TItem> ActiveList => GetList(SortOrder, true, true);
 
         /// <summary>
         /// Gets a list of <see cref="ReferenceDataBase"/> items from the collection using the specified criteria.
@@ -536,10 +464,7 @@ namespace Beef.RefData
         /// Raises the <see cref="CollectionChanged"/> event with the provided arguments.
         /// </summary>
         /// <param name="e">Arguments of the event being raised.</param>
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
-        }
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
         /// <summary>
         /// Occurs when an item is added, removed, changed, moved, or the entire list is refreshed.
@@ -553,51 +478,34 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the number of items in the collection.
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return _rdcId.Count;
-            }
-        }
+        public int Count => _rdcId.Count;
+
 
         /// <summary>
         /// Indicates whether the collection is read only; it is not (returns <c>false</c>).
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false; 
 
         /// <summary>
         /// Determines whether the item exists within the collection.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool Contains(TItem item)
-        {
-            return _rdcId.Contains<TItem>(item);
-        }
+        public bool Contains(TItem item) => _rdcId.Contains<TItem>(item);
 
         /// <summary>
         /// This method is not supported (a <see cref="NotSupportedException"/> is thrown).
         /// </summary>
         /// <param name="array">The item array.</param>
         /// <param name="arrayIndex">The array index.</param>
-        void ICollection<TItem>.CopyTo(TItem[] array, int arrayIndex)
-        {
-            throw new NotSupportedException();
-        }
+        void ICollection<TItem>.CopyTo(TItem[] array, int arrayIndex) => throw new NotSupportedException();
 
         /// <summary>
         /// This method is not supported (a <see cref="NotSupportedException"/> is thrown).
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>A <see cref="NotSupportedException"/> is thrown.</returns>
-        bool ICollection<TItem>.Remove(TItem item)
-        {
-            throw new NotSupportedException();
-        }
+        bool ICollection<TItem>.Remove(TItem item) => throw new NotSupportedException();
 
         #endregion
 
@@ -607,19 +515,6 @@ namespace Beef.RefData
         /// Gets the <see cref="IETag.ETag"/> for the collection contents.
         /// </summary>
         public string? ETag { get; set; }
-
-        /// <summary>
-        /// Generates (updates) an <see cref="ETag"/> as an <see cref="System.Security.Cryptography.SHA1"/> hash of the collection contents.
-        /// </summary>
-        public void GenerateETag()
-        {
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; by-design, used for hashing (speed considered over security).
-            using var md5 = System.Security.Cryptography.MD5.Create();
-#pragma warning restore CA5351
-            var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(this));
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
-            ETag = Convert.ToBase64String(hash);
-        }
 
         #endregion
     }

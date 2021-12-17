@@ -33,12 +33,10 @@ namespace Beef.WebApi
         /// </summary>
         public HttpResponseMessage Response { get; private set; }
 
-#pragma warning disable CA2227 // Collection properties should be read only; by-design, can be updated.
         /// <summary>
         /// Gets or sets the <see cref="MessageItemCollection"/>.
         /// </summary>
         public MessageItemCollection? Messages { get; set; }
-#pragma warning restore CA2227
 
         /// <summary>
         /// Gets or sets the <see cref="HttpStatusCode"/>.

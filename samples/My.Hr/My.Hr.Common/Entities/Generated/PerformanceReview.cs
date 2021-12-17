@@ -38,6 +38,12 @@ namespace My.Hr.Common.Entities
         public DateTime Date { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("outcomeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? OutcomeText { get; set ; }
+
+        /// <summary>
         /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).
         /// </summary>
         [JsonProperty("outcome", DefaultValueHandling = DefaultValueHandling.Ignore)]

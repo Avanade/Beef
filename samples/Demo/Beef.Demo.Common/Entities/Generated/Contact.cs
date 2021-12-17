@@ -38,6 +38,12 @@ namespace Beef.Demo.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("statusText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? StatusText { get; set ; }
+
+        /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).
         /// </summary>
         [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]

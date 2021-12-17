@@ -12,7 +12,7 @@
     <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.2.3" />
     <!--#endif -->
     <!--#if (implement_cosmos) -->
-    <PackageReference Include="Beef.Data.Cosmos" Version="4.2.2" />
+    <PackageReference Include="Beef.Data.Cosmos" Version="4.2.3" />
     <!--#endif -->
   </ItemGroup>
   <ItemGroup>

@@ -32,6 +32,9 @@ using {{Root.DatabaseUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if UsesEntityFramework}}
+  {{#unless UsesDatabase}}
+using Beef.Data.Database;
+  {{/unless}}
 using Beef.Data.EntityFrameworkCore;
   {{#ifval Root.EntityFrameworkUsingNamespace}}
 using {{Root.EntityFrameworkUsingNamespace}};
@@ -308,7 +311,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
     {{#if HasEntityFrameworkETagProperty}}
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(StringToBase64Converter.Default.ToDest, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToDest, s => s.ETag));
     {{/if}}
     {{#if HasEntityFrameworkChangeLogProperty}}
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
@@ -322,7 +325,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq EntityFrameworkMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
     {{#if HasEntityFrameworkETagProperty}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
     {{/if}}
     {{#if HasEntityFrameworkChangeLogProperty}}
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));

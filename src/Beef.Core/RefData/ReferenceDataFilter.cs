@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using Beef.Validation;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -80,20 +81,7 @@ namespace Beef.RefData
                 .WhereWhen(x => filter.Codes.Contains(x.Code, StringComparer.OrdinalIgnoreCase), filter.Codes != null && filter.Codes.FirstOrDefault() != null)
                 .WhereWildcard(x => x.Text, filter.Text);
 
-            return new ReferenceDataFilterResult<TItem>(list) { ETag = GenerateETag(list) };
-        }
-
-        /// <summary>
-        /// Generates an ETag as an <see cref="System.Security.Cryptography.SHA1"/> hash of the collection contents.
-        /// </summary>
-        private static string GenerateETag(IEnumerable<ReferenceDataBase> items)
-        {
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; by-design, used for hashing (speed considered over security).
-            using var md5 = System.Security.Cryptography.MD5.Create();
-#pragma warning restore CA5351
-            var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(items));
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
-            return Convert.ToBase64String(hash);
+            return new ReferenceDataFilterResult<TItem>(list) { ETag = ETagGenerator.Generate(list) };
         }
     }
 }

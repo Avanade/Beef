@@ -58,17 +58,6 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Reformats the <see cref="IETag.ETag"/> for the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <remarks>The CosmosDB ETag value is formatted with a leading and trailing double-quote which are removed to enable consistency of handling within the <i>Beef</i> pipeline.</remarks>
-        public static void ReformatValueETag(object value)
-        {
-            if (value is IETag etag && etag.ETag != null)
-                etag.ETag = (etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) && etag.ETag.EndsWith("\"", StringComparison.InvariantCultureIgnoreCase)) ? etag.ETag[1..^1] : etag.ETag;
-        }
-
-        /// <summary>
         /// Prepares the entity value for a 'Create' by setting the IChangeLog.
         /// </summary>
         /// <param name="value">The entity value.</param>

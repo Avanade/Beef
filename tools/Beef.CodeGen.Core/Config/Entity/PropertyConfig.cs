@@ -607,7 +607,7 @@ properties: [
         /// <summary>
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
-        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.Default.ConvertToSrce(";
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ConvertToSrce(";
 
         /// <summary>
         /// Gets the WebAPI parameter type.

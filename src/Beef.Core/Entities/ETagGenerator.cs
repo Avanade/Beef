@@ -17,7 +17,7 @@ namespace Beef.Entities
         public const char DividerCharacter = '|';
 
         /// <summary>
-        /// Generates an ETag for a value by serializing to JSON and performing an <see cref="System.Security.Cryptography.MD5"/> hash.
+        /// Generates an ETag for a value by serializing to JSON and performing an <see cref="System.Security.Cryptography.SHA256"/> hash.
         /// </summary>
         /// <typeparam name="T">The <paramref name="value"/> <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
@@ -44,22 +44,19 @@ namespace Beef.Entities
                 txt = sb.ToString();
             }
 
-            return GenerateHash(txt);
+            return $"\"{GenerateHash(txt)}\"";
         }
 
         /// <summary>
-        /// Generates a hash of the string using <see cref="System.Security.Cryptography.MD5"/>.
+        /// Generates a hash of the string using <see cref="System.Security.Cryptography.SHA256"/>.
         /// </summary>
         /// <param name="value">The text value to hash.</param>
         /// <returns>The hashed value.</returns>
-        /// <remarks>The hash is <b>not</b> intended for <i>Cryptographic</i> usage; therefore using the MD5 algorithm is acceptable.</remarks>
         internal static string? GenerateHash(string? value)
         {
             var buf = Encoding.UTF8.GetBytes(value ?? throw new ArgumentNullException(nameof(value)));
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate a hash/etag.
-            using var md5 = System.Security.Cryptography.MD5.Create();
-#pragma warning restore CA5351 
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            var hash = sha.ComputeHash(buf);
             return Convert.ToBase64String(hash);
         }
 

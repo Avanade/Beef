@@ -50,6 +50,24 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
   {{#unless @first}}
 
   {{/unless}}
+  {{#ifval RefDataType}}
+    {{#unless SerializationIgnore}}
+      {{#unless RefDataList}}
+        {{#unless Root.IsDataModel}}
+          {{#if RefDataText}}
+        /// <summary>
+        /// {{{SummaryRefDataText}}}
+        /// </summary>
+            {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            {{/ifeq}}
+        public string? {{Name}}Text { get; set ; }
+
+          {{/if}}
+        {{/unless}}
+      {{/unless}}
+    {{/unless}}
+  {{/ifval}}
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
@@ -58,7 +76,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
-    {{#unless IsDataModel}}
+    {{#unless Root.IsDataModel}}
       {{#ifval Annotation1}}
         {{Annotation1}}
       {{/ifval}}

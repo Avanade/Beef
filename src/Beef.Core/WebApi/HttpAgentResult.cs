@@ -53,7 +53,13 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="sendArgs">The corresponding <see cref="HttpSendArgs"/>.</param>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
-        public HttpAgentResult(HttpSendArgs sendArgs, HttpResponseMessage response) : base(response) => SendArgs = Check.NotNull(sendArgs, nameof(sendArgs));
+        public HttpAgentResult(HttpSendArgs sendArgs, HttpResponseMessage response) : base(response)
+        {
+            SendArgs = Check.NotNull(sendArgs, nameof(sendArgs));
+
+            if (response.IsSuccessStatusCode && response.Headers.ETag != null && ExecutionContext.HasCurrent)
+                ExecutionContext.Current.ETag = response.Headers.ETag.Tag;
+        }
 
         /// <summary>
         /// Gets the corresponding <see cref="HttpSendArgs"/>.
@@ -174,11 +180,8 @@ namespace Beef.WebApi
                     else
                     {
                         _value = JsonConvert.DeserializeObject<T>(Content)!;
-                        if (_value != null && _value is IETag eTag)
-                        {
-                            if (eTag.ETag == null && Response.Headers.ETag != null)
-                                eTag.ETag = Response.Headers.ETag.Tag;
-                        }
+                        if (_value != null && Response.Headers.ETag != null && _value is IETag eTag && eTag.ETag == null)
+                            eTag.ETag = Response.Headers.ETag.Tag;
                     }
                 }
 

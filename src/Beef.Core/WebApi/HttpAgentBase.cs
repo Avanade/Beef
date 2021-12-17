@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using AutoMapper;
+using Beef.Entities;
 using Beef.Mapper;
 using System;
 using System.Net.Http;
@@ -117,8 +118,8 @@ namespace Beef.WebApi
     /// <summary>
     /// Represents the base HTTP Agent capability for invoking external HTTP RESTful (JSON) endpoints.
     /// </summary>
-    /// <remarks>Extends the <see cref="WebApiAgentBase"/> adding additional generic <c>Send</c> methods, including <see cref="IMapper"/>-based for request/response mapping, to enable the invocation of external HTTP RESTful (JSON) endpoints.</remarks>
-    public abstract class HttpAgentBase : WebApiAgentBase
+    /// <remarks>Extends the <see cref="WebApiAgentCoreBase"/> adding generic <c>Send</c> methods, including <see cref="IMapper"/>-based for request/response mapping, to enable the invocation of external HTTP RESTful (JSON) endpoints.</remarks>
+    public abstract class HttpAgentBase : WebApiAgentCoreBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpAgentBase"/> class.

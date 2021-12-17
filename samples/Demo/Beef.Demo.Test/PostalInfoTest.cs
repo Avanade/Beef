@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PostalInfoTest : UsingAgentTesterServer<Startup>
     {
-        [Test, TestSetUp]
+        [Test, TestSetUp(needsSetUp: false)]
         public void B110_GetPostCodes_NotFound()
         {
             AgentTester.Test<PostalInfoAgent, PostalInfo>()
@@ -24,7 +24,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("NZ", "Y", "Z"));
         }
 
-        [Test, TestSetUp]
+        [Test, TestSetUp(needsSetUp: false)]
         public void B120_GetPostCodes_Found()
         {
             var p = AgentTester.Test<PostalInfoAgent, PostalInfo>()
@@ -33,7 +33,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
         }
 
-        [Test, TestSetUp]
+        [Test, TestSetUp(needsSetUp: false)]
         public void B130_GetPostCodes_MockedAgent()
         {
             var v = new PostalInfo { CountrySid = "US", City = "Redmond", State = "WA", Places = new PlaceInfoCollection { new PlaceInfo { Name = "Redmond", PostCode = "98052" }, new PlaceInfo { Name = "Redmond", PostCode = "98053" }, new PlaceInfo { Name = "Redmond", PostCode = "98073" } } };
@@ -49,7 +49,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
         }
 
-        [Test, TestSetUp]
+        [Test, TestSetUp(needsSetUp: false)]
         public void B140_GetPostCodes_MockedHttpClient_NotFound()
         {
             var mcf = MockHttpClientFactory.Create();
@@ -63,7 +63,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetPostCodesAsync("US", "WA", "Bananas"));
         }
 
-        [Test, TestSetUp]
+        [Test, TestSetUp(needsSetUp: false)]
         public void B140_GetPostCodes_MockedHttpClient_Found() // The benefit of validating using HttpClient is any deserialization and automapping etc. is performed/exercised.
         {
             var mcf = MockHttpClientFactory.Create();
@@ -86,15 +86,18 @@ namespace Beef.Demo.Test
 
             var mcf = MockHttpClientFactory.Create();
             mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"))
-                .Request(HttpMethod.Post, "US/WA/Bananas").Assert<Business.Data.Model.PostalInfo>().ExpectJsonResourceValue(rn).Respond.WithJsonResource(rn, HttpStatusCode.Created);
+                .Request(HttpMethod.Post, "US/WA/Bananas").Assert<Business.Data.Model.PostalInfo>().ExpectJsonResourceValue(rn).Respond.WithJsonResource(rn, HttpStatusCode.Created, r => r.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue("\"MyTestETag\""));
 
             using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
 
-            agentTester.Test<PostalInfoAgent, PostalInfo>()
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectJsonResourceValue("B140_GetPostCodes_MockedHttpClient_Found_Response.json")
                 .ExpectValue(_ => v)
                 .Run(a => a.CreatePostCodesAsync(v, "US", "WA", "Bananas"));
+
+            // Check that the etag flows all the way through.
+            Assert.AreEqual("\"MyTestETag\"", res.Response.Headers.ETag.Tag);
         }
     }
 }

@@ -84,11 +84,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param>The model value.</param>
         /// <returns>The entity value.</returns>
-        internal T GetValue(TModel model)
-        {
-            CosmosDbBase.ReformatValueETag(model);
-            return DbArgs.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
-        }
+        internal T GetValue(TModel model) => DbArgs.Mapper.Map<TModel, T>(model, Mapper.OperationTypes.Get)!;
 
         /// <summary>
         /// Check the value to determine whether users are authorised using the CosmosDbArgs.AuthorizationFilter.

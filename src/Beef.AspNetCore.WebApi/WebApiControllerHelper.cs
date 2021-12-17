@@ -41,7 +41,7 @@ namespace Beef.AspNetCore.WebApi
                 throw new ArgumentNullException(nameof(response));
 
             if (!string.IsNullOrEmpty(eTag))
-                response.GetTypedHeaders().ETag = new EntityTagHeaderValue(eTag.StartsWith("\"", StringComparison.OrdinalIgnoreCase) ? eTag : "\"" + eTag + "\"");
+                response.GetTypedHeaders().ETag = new EntityTagHeaderValue(eTag.StartsWith('\"') && eTag.StartsWith('\"') ? eTag : $"\"{eTag}\"");
         }
 
         /// <summary>

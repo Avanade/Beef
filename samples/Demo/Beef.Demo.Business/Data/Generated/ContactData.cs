@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
 using Beef.Events;

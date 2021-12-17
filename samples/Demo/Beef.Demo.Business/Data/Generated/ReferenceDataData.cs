@@ -149,7 +149,7 @@ namespace Beef.Demo.Business.Data
             {
                 var d2s = CreateMap<EfModel.EyeColor, RefDataNamespace.EyeColor>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EyeColorId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -192,7 +192,7 @@ namespace Beef.Demo.Business.Data
             {
                 var d2s = CreateMap<EfModel.Status, RefDataNamespace.Status>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.StatusId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));

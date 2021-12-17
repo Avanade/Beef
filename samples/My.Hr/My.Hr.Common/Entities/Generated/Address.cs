@@ -38,6 +38,12 @@ namespace My.Hr.Common.Entities
         public string? City { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="State"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("stateText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? StateText { get; set ; }
+
+        /// <summary>
         /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
         /// </summary>
         [JsonProperty("state", DefaultValueHandling = DefaultValueHandling.Ignore)]

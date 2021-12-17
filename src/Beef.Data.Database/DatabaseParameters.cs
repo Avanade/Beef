@@ -447,10 +447,7 @@ namespace Beef.Data.Database
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="Convert.FromBase64String(string)">encoded</see> <see cref="string"/> value.</remarks>
         public DbParameter AddRowVersionParameter(string name, string? value, ParameterDirection direction = ParameterDirection.Input)
         {
-            if (value == null)
-                return AddParameter(name, DbType.Byte, 8, direction);
-            else
-                return AddParameter(name, Convert.FromBase64String(value), direction);
+            return value == null ? AddParameter(name, DbType.Byte, 8, direction) :  AddParameter(name, DatabaseRowVersionConverter.Default.ConvertToDest(value), direction);
         }
 
         /// <summary>

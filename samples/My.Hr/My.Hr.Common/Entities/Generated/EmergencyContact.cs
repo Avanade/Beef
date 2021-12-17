@@ -44,6 +44,12 @@ namespace My.Hr.Common.Entities
         public string? PhoneNo { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("relationshipText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? RelationshipText { get; set ; }
+
+        /// <summary>
         /// Gets or sets the Relationship (see <see cref="RefDataNamespace.RelationshipType"/>).
         /// </summary>
         [JsonProperty("relationship", DefaultValueHandling = DefaultValueHandling.Ignore)]

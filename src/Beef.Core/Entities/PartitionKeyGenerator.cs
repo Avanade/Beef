@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Newtonsoft.Json;
-using System;
 using System.Text;
 
 namespace Beef.Entities
@@ -12,7 +10,7 @@ namespace Beef.Entities
     public static class PartitionKeyGenerator
     {
         /// <summary>
-        /// Generates a <see cref="IPartitionKey.PartitionKey"/> by serializing to JSON and performing an <see cref="System.Security.Cryptography.MD5"/> hash.
+        /// Generates a <see cref="IPartitionKey.PartitionKey"/> by serializing to JSON and performing an <see cref="System.Security.Cryptography.SHA256"/> hash.
         /// </summary>
         /// <param name="args">The value or values that represent the <see cref="IPartitionKey.PartitionKey"/>.</param>
         /// <returns>The generated PartitionKey.</returns>

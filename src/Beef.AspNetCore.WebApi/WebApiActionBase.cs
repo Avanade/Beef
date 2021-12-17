@@ -158,7 +158,7 @@ namespace Beef.AspNetCore.WebApi
                 var l = new List<string>();
                 foreach (var v in vals)
                 {
-                    var etag = v?.Trim().Trim('"');
+                    var etag = v?.Trim();
                     if (!string.IsNullOrEmpty(etag))
                         l.Add(etag);
                 }
@@ -172,7 +172,7 @@ namespace Beef.AspNetCore.WebApi
                 var l = new List<string>();
                 foreach (var v in vals)
                 {
-                    var etag = v?.Trim().Trim('"');
+                    var etag = v?.Trim();
                     if (!string.IsNullOrEmpty(etag))
                         l.Add(etag);
                 }
