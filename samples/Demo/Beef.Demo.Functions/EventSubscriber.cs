@@ -1,9 +1,9 @@
+using Azure.Messaging.EventHubs.Consumer;
 using Beef.Events.EventHubs;
-using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using AzureEventHubs = Microsoft.Azure.EventHubs;
+using AzureEventHubs = Azure.Messaging.EventHubs;
 
 namespace Beef.Demo.Functions
 {
@@ -18,6 +18,6 @@ namespace Beef.Demo.Functions
         [FunctionName("EventSubscriber")]
         [ExponentialBackoffRetry(-1, "00:00:05", "00:00:30")] // https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-error-pages?tabs=csharp
         public async Task Run([EventHubTrigger("testhub", Connection = "EventHubConnectionString")] AzureEventHubs.EventData @event, ILogger logger, PartitionContext partitionContext) 
-            => await _subscriber.UseLogger(logger).ReceiveAsync(new EventHubData(partitionContext, @event));
+            => await _subscriber.UseLogger(logger).ReceiveAsync(_subscriber.CreateEventHubData(@event, partitionContext, "testhub"));
     }
 }

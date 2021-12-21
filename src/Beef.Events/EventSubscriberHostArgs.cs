@@ -47,7 +47,7 @@ namespace Beef.Events
             foreach (var type in (subscribersAssembly ?? throw new ArgumentNullException(nameof(subscribersAssembly))).GetTypes().Where(x => typeof(IEventSubscriber).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract))
             {
                 var esa = type.GetCustomAttributes<EventSubscriberAttribute>();
-                if (esa == null || esa.Count() == 0)
+                if (esa == null || !esa.Any())
                     throw new ArgumentException($"Assembly contains Type '{type.Name}' that implements IEventSubscriber but is not decorated with the required EventSubscriberAttribute.", nameof(subscribersAssembly));
 
                 esa.ForEach(x => subscribers.Add(new EventSubscriberConfig(x.SubjectTemplate, x.Actions, type)));
@@ -81,7 +81,7 @@ namespace Beef.Events
                 if (typeof(IEventSubscriber).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 {
                     var esa = type.GetCustomAttributes<EventSubscriberAttribute>();
-                    if (esa == null || esa.Count() == 0)
+                    if (esa == null || !esa.Any())
                         throw new ArgumentException($"Type '{type.Name}' implements IEventSubscriber but is not decorated with the required EventSubscriberAttribute.", nameof(eventSubscriberTypes));
 
                     esa.ForEach(x => _subscribers.Add(new EventSubscriberConfig(x.SubjectTemplate, x.Actions, type)));

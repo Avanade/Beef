@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using AzureEventHubs = Microsoft.Azure.EventHubs;
-using AzureConsumer = Microsoft.Azure.EventHubs.Processor;
-using System;
+using AzureEventHubs = Azure.Messaging.EventHubs;
 
 namespace Beef.Events.EventHubs
 {
@@ -24,14 +22,6 @@ namespace Beef.Events.EventHubs
             ConsumerGroupName = Check.NotNull(consumerGroupName, nameof(consumerGroupName));
             PartitionId = Check.NotNull(partitionId, nameof(partitionId));
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubData"/> class using a <see cref="AzureConsumer.PartitionContext"/>.
-        /// </summary>
-        /// <param name="partitionContext">The <see cref="AzureConsumer.PartitionContext"/>.</param>
-        /// <param name="originating">The <see cref="EventSubscriberData{TOriginating}.Originating"/> <see cref="AzureEventHubs.EventData"/>.</param>
-        public EventHubData(AzureConsumer.PartitionContext partitionContext, AzureEventHubs.EventData originating)
-            : this((partitionContext ?? throw new ArgumentNullException(nameof(partitionContext))).EventHubPath, partitionContext.ConsumerGroupName, partitionContext.PartitionId, originating) { }
 
         /// <summary>
         /// Gets or sets the Event Hubs path.

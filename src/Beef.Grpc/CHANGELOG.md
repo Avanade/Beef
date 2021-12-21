@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.3
 - *Enhancement:* Renamed `GrpcAgentResult.HttpStatusCode` to `GrpcAgentResult.StatusCode` to accomodate `IWebApiAgentResult.StatusCode`. 
 

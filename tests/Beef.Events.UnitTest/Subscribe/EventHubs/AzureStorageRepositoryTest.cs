@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AzureEventHubs = Microsoft.Azure.EventHubs;
 
 namespace Beef.Events.UnitTest.Subscribers.EventHubs
 {
@@ -30,7 +29,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             return _config;
         }
 
-        private static async Task<EventHubData> CreateEventDataAsync(string offset, long seqNo)
+        private static async Task<EventHubData> CreateEventDataAsync(long offset, long seqNo)
         {
             var ed = new EventData
             {
@@ -38,17 +37,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
                 Action = "Verify",
             };
 
-            var e = await new MicrosoftEventHubsEventConverter().ConvertToAsync(ed);
+            var e = await new EventHubsEventConverter().ConvertToAsync(ed);
+            var raw = e.GetRawAmqpMessage();
 
-            var type = typeof(AzureEventHubs.EventData);
-            var pi = type.GetProperty("SystemProperties");
-            pi.SetValue(e, Activator.CreateInstance(pi.PropertyType, true));
-
-            var dict = (Dictionary<string, object>)e.SystemProperties;
-            dict.Add("x-opt-enqueued-time", DateTime.UtcNow);
-            dict.Add("x-opt-offset", offset);
-            dict.Add("x-opt-sequence-number", seqNo);
-            dict.Add("x-opt-partition-key", "0");
+            raw.MessageAnnotations["x-opt-enqueued-time"] = DateTimeOffset.UtcNow;
+            raw.MessageAnnotations["x-opt-offset"] = offset;
+            raw.MessageAnnotations["x-opt-sequence-number"] = seqNo;
+            raw.MessageAnnotations["x-opt-partition-key"] = "0";
 
             var ehd = new EventHubData("testhub", "$Default", "0", e);
             ((IEventSubscriberData)ehd).SetMetadata(ed);
@@ -98,7 +93,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = await CreateEventDataAsync("100", 1);
+            var ed = await CreateEventDataAsync(100, 1);
 
             // Checking and removing with unknown is a-ok.
             var ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
@@ -126,7 +121,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("Data not found.", ear.Reason);
             Assert.IsNull(ear.OriginatingStatus);
             Assert.IsNull(ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
             Assert.AreEqual(1, ear.Attempts);
@@ -149,7 +144,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("Bad data.", ear.Reason);
             Assert.IsNull(ear.OriginatingStatus);
             Assert.IsNull(ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
             Assert.AreEqual(2, ear.Attempts);
@@ -169,7 +164,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("Bad data.", ear.Reason);
             Assert.IsNull(ear.OriginatingStatus);
             Assert.IsNull(ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(true, ear.SkipProcessing);
             Assert.AreEqual(2, ear.Attempts);
@@ -191,7 +186,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("EventData was identified as Poison and was marked as SkipMessage; this event is skipped (i.e. not processed).", ear.Reason);
             Assert.AreEqual("InvalidData", ear.OriginatingStatus);
             Assert.AreEqual("Bad data.", ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(true, ear.SkipProcessing);
             Assert.AreEqual(2, ear.Attempts);
@@ -218,7 +213,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = await CreateEventDataAsync("100", 1);
+            var ed = await CreateEventDataAsync(100, 1);
 
             // Add events as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found.")), 3).ConfigureAwait(false);
@@ -246,7 +241,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("EventData was identified as Poison and has been configured to automatically SkipMessage after 3 attempts; this event is skipped (i.e. not processed).", ear.Reason);
             Assert.AreEqual("DataNotFound", ear.OriginatingStatus);
             Assert.AreEqual("Data not found.", ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
             Assert.AreEqual(3, ear.Attempts);
@@ -273,7 +268,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             var amt = await asr.GetAuditMessageTableAsync().ConfigureAwait(false);
             await DeleteAuditRecords(amt).ConfigureAwait(false);
 
-            var ed = await CreateEventDataAsync("100", 1);
+            var ed = await CreateEventDataAsync(100, 1);
 
             // Add an event as poison.
             await asr.MarkAsPoisonedAsync(ed, HandleResult(Result.DataNotFound("Data not found."))).ConfigureAwait(false);
@@ -293,13 +288,13 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("Data not found.", ear.Reason);
             Assert.IsNull(ear.OriginatingStatus);
             Assert.IsNull(ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
             Assert.AreEqual(1, ear.Attempts);
 
             // Pretend to check a different event to that poisoned.
-            ed = await CreateEventDataAsync("200", 2);
+            ed = await CreateEventDataAsync(200, 2);
             ar = await asr.CheckPoisonedAsync(ed).ConfigureAwait(false);
             Assert.AreEqual(PoisonMessageAction.NotPoison, ar.Action);
             Assert.AreEqual(0, ar.Attempts);
@@ -316,7 +311,7 @@ namespace Beef.Events.UnitTest.Subscribers.EventHubs
             Assert.AreEqual("Current EventData (Seq#: '2' Offset#: '200') being processed is out of sync with previous Poison (Seq#: '1' Offset#: '100'); current assumed correct with previous Poison now deleted.", ear.Reason);
             Assert.AreEqual("DataNotFound", ear.OriginatingStatus);
             Assert.AreEqual("Data not found.", ear.OriginatingReason);
-            Assert.AreEqual("100", ear.Offset);
+            Assert.AreEqual(100, ear.Offset);
             Assert.AreEqual(1, ear.SequenceNumber);
             Assert.AreEqual(false, ear.SkipProcessing);
             Assert.AreEqual(1, ear.Attempts);

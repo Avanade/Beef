@@ -7,6 +7,7 @@ Represents the **NuGet** versions.
 - *Fixed:* `HttpAgentBase.SendAsyncInternal` to use the `ExecutionContext.OperationType` (converting to the equivalent `OperationTypes`) when using an `IMapper` to map source to destinatio, and vice versa.
 - *Enhancement:* `ReferenceDataMappingConverter` updated to support runtime instance creation using `ReferenceDataMappingConverter.Create` versus previously having to inherit from abstract base class.
 - *Fixed:* Due to collision problems with MD5/SHA1 the `ETagGenerator.GenerateHash` has been updated to use SHA256; this will now result in a longer `ETag` value in these scenarios. This will invalidate any preivously cached data even though the underlying content is the same.
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
 
 ## v4.2.4
 - *Enhancement:* Added `HttpAgentBase` (and other related classes) as the base class to enable a `SendAsync` of an optional JSON request and return an optional JSON response (where applicable) to/from an HTTP endpoint. Leverages the base capabilites of `WebApiAgentBase`. Also, supports AutoMapper mapping of request and response values where required. This functionality is needed to support the new code-generated auto implementation of `HttpAgent` as an alternate data source.

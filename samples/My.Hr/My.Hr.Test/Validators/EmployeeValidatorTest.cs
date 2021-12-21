@@ -17,7 +17,6 @@ namespace My.Hr.Test.Validators
     public class EmployeeValidatorTest
     {
         private Func<IServiceCollection, IServiceCollection>? _testSetup;
-        private readonly Mock<IEmployeeDataSvc> _employeeDataSvc = new Mock<IEmployeeDataSvc>();
 
         [OneTimeSetUp]
         public void OneTimeSetUp()

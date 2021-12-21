@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.3
 - *Enhancement:* Updated for changes to `Beef.Abstractions` and `Beef.Core`.
 

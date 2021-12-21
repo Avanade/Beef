@@ -158,7 +158,7 @@ namespace Beef.Events
         /// </summary>
         private void SetMetadataAttribute<T>(CloudEvent ce, string name, T value)
         {
-            if (Comparer<T>.Default.Compare(value, default(T)!) == 0)
+            if (Comparer<T>.Default.Compare(value, default!) == 0)
                 return;
 
             if (IncludeEventMetadataProperties == null || IncludeEventMetadataProperties.Length == 0 || IncludeEventMetadataProperties.Any(x => string.Equals(x, name, StringComparison.InvariantCultureIgnoreCase)))
@@ -168,7 +168,7 @@ namespace Beef.Events
         /// <summary>
         /// Gets the configured metadata attributes.
         /// </summary>
-        private void GetMetadataAttributes(CloudEvent ce, EventMetadata md)
+        private static void GetMetadataAttributes(CloudEvent ce, EventMetadata md)
         {
             var tenantId = GetMetadataAttribute<string?>(ce, nameof(EventMetadata.TenantId));
             if (Guid.TryParse(tenantId, out var guid))

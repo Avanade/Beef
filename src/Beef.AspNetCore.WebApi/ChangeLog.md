@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.2.4
 - *Fixed:* The `WebApiPatch` will now throw a `ValidationException` if the patch value JSON is `null`; i.e. there must be a patch instruction of some sort.
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
 
 ## v4.2.3
 - *Enhancement:* Updated `WebApiQueryString.PagingArgsSkipQueryStringNames` to support `offset` value, and 

@@ -26,8 +26,8 @@ namespace Beef.Core.UnitTest.Entities
             Assert.AreEqual(g.ToString(), PartitionKeyGenerator.Generate(g));
 
             var p = new Person { First = "Jane", Last = "Doe" };
-            Assert.AreEqual("XCmFjH2zioLOelNdmU8hEQ==", PartitionKeyGenerator.Generate(p));
-            Assert.AreEqual("E9ik+Agqes6hzHMezoJigw==", PartitionKeyGenerator.Generate(p, "XYZ"));
+            Assert.AreEqual("2I0QhKAlJMdHjCAocBhQeuzmze73jSnnWqyOkofhRn4=", PartitionKeyGenerator.Generate(p));
+            Assert.AreEqual("471H/SShWDDr5wOVpMnhcu00Fw3nhOHN1aE8VNpXCsY=", PartitionKeyGenerator.Generate(p, "XYZ"));
         }
     }
 }
