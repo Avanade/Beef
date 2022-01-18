@@ -1,0 +1,19 @@
+﻿{
+  "country abbreviation": "US",
+  "place name": "Redmond",
+  "state abbreviation": "WA",
+  "places": [
+    {
+      "place name": "Redmond",
+      "post code": "98052"
+    },
+    {
+      "place name": "Redmond",
+      "post code": "98053"
+    },
+    {
+      "place name": "Redmond",
+      "post code": "98073"
+    }
+  ]
+}

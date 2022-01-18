@@ -23,6 +23,7 @@
     <None Remove="Cosmos\RefData.yaml" />
     <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
     <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
+    <None Remove="Expected\C110_CreatePostCodes_MockedHttpClient_Request.json" />
     <None Remove="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
@@ -31,6 +32,7 @@
     <EmbeddedResource Include="Cosmos\Data.yaml" />
     <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
     <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
+    <EmbeddedResource Include="Expected\C110_CreatePostCodes_MockedHttpClient_Request.json" />
     <EmbeddedResource Include="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 

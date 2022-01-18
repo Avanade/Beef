@@ -78,6 +78,7 @@ Replace the existing `entity.beef.yaml` with the following. The comments include
 # - EventSubjectRoot specifies the root for the event subject.
 # - EventSubjectFormat specifies the name only; i.e. not include the key.
 # - EventActionFormat specifies past tense for the event action.
+# - EventCasing specifies that the subject and action are formatted as lower case.
 # - EventSourceRoot specifies the root for the event source.
 # - EventSourceKind will be a relative path URI.
 # - EventOutbox indicates that the code-generated event publish will occur in the Data-layer and should use the database to transactionally persist the event(s).
@@ -90,6 +91,7 @@ refDataText: true
 eventSubjectRoot: My
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: My/Hr
 eventSourceKind: Relative
 eventOutbox: Database
@@ -306,11 +308,6 @@ namespace My.Hr.Business.Validation
         public static CommonValidator<string?> Street = CommonValidator.Create<string?>(cv => cv.String(100));
 
         /// <summary>
-        /// Provides a common email validator, ensure max length is 250, is all lowercase, and use validator.
-        /// </summary>
-        public static CommonValidator<string?> Email = CommonValidator.Create<string?>(cv => cv.String(250).Override(v => v.Value!.ToLowerInvariant()).Must(v => _emailValidator.IsValid(v.Value)));
-
-        /// <summary>
         /// Provides a common phone number validator, just length, but could be regex or other.
         /// </summary>
         public static CommonValidator<string?> PhoneNo = CommonValidator.Create<string?>(cv => cv.String(50));
@@ -361,7 +358,7 @@ namespace My.Hr.Business.Validation
         {
             _employeeDataSvc = Check.NotNull(employeeDataSvc, nameof(employeeDataSvc));
 
-            Property(x => x.Email).Mandatory().Common(CommonValidators.Email);
+            Property(x => x.Email).Mandatory().Email();
             Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.Gender).Mandatory().IsValid();

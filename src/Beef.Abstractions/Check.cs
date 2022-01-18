@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Beef
 {
@@ -21,7 +22,7 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <returns>The value.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="value"/> is null.</exception>
-        public static T NotNull<T>(T? value, string paramName, string? message = null) where T : class
+        public static T NotNull<T>([NotNull] T? value, string paramName, string? message = null) where T : class
         {
             if (value == null)
                 throw new ArgumentNullException(paramName, message);
@@ -38,9 +39,9 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="value"/> is the default value for the <see cref="Type"/>.</exception>
         /// <returns>The value.</returns>
-        public static T NotDefault<T>(T value, string paramName, string? message = null)
+        public static T NotDefault<T>([NotNull] T? value, string paramName, string? message = null)
         {
-            if (Comparer<T>.Default.Compare(value, default!) == 0)
+            if (value == null || Comparer<T>.Default.Compare(value, default!) == 0)
                 throw new ArgumentException(message ?? "Argument with a default value is considered invalid.", paramName);
             else
                 return value;

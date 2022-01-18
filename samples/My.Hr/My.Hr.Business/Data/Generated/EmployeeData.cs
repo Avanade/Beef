@@ -68,7 +68,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> CreateAsync(Employee value) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __result = await CreateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Created");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "created");
             return __result;
         });
 
@@ -80,7 +80,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> UpdateAsync(Employee value) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __result = await UpdateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Updated");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "updated");
             return __result;
         });
 
@@ -92,7 +92,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = DbMapper.Default.CreateArgs("[Hr].[spEmployeeDelete]");
             await _db.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.Publish(new Uri($"my/hr/employee/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.Employee", "Deleted", id);
+            _evtPub.Publish(new Uri($"my/hr/employee/{_evtPub.FormatKey(id)}", UriKind.Relative), $"my.hr.employee", "deleted", id);
         });
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
         {
             var __result = await TerminateOnImplementationAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.Employee", "Terminated", id);
+            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "terminated", id);
             return __result;
         });
 

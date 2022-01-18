@@ -63,7 +63,7 @@ namespace Beef.Test.NUnit.Logging
             if (string.IsNullOrEmpty(message))
                 return;
 
-            message = $"{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {CorrelationIdLogger.GetLogLevel(logLevel)}: {message} [{_name}]";
+            message = $"{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffff", DateTimeFormatInfo.InvariantInfo)} {CorrelationIdLogger.GetLogLevel(logLevel)}: {message} [{_name}]";
 
             if (exception != null)
                 message += Environment.NewLine + exception;

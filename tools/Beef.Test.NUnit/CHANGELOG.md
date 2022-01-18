@@ -3,7 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v4.2.4
-- *Enhancement:* Added new `MockHttpClientFactory` to support direct mocking of `HttpClient`.
+- *Enhancement:* Added [`UnitTestEx`](https://github.com/Avanade/unittestex) support to enable `MockHttpClientFactory` for testing of mocked `HttpClient`.
 - *Enhancement:* Added new `TestSetUp.GetValueFromJsonResource<T>` to enable the creation of value from an embedded resource file containing JSON.
 - *Enhancement:* Added new `ExpectJsonResourceValue` to `AgentTester` to expect the value from an embedded resource file containing JSON.
 

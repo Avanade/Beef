@@ -61,14 +61,14 @@ namespace Beef.Events
                 Time = @event.Timestamp == null ? (DateTimeOffset?)null : new DateTimeOffset(@event.Timestamp.Value, TimeSpan.Zero)
             };
 
+            if (IncludeEventMetadata)
+                SetMetadataAttributes(ce, @event);
+
             if (@event.HasValue)
             {
                 ce.DataContentType = MediaTypeNames.Application.Json;
                 ce.Data = @event.GetValue();
             };
-
-            if (IncludeEventMetadata)
-                SetMetadataAttributes(ce, @event);
 
             return Task.FromResult(new JsonEventFormatter().EncodeStructuredModeMessage(ce, out var _).ToArray());
         }

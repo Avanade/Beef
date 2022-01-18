@@ -3,6 +3,7 @@ entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 eventOutbox: Database
@@ -44,6 +45,7 @@ entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 eventOutbox: Database
@@ -84,6 +86,7 @@ entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 appBasedAgentArgs: true
@@ -124,6 +127,7 @@ entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 appBasedAgentArgs: true
@@ -149,6 +153,7 @@ entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 appBasedAgentArgs: true

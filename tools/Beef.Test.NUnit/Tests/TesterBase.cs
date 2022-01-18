@@ -168,7 +168,7 @@ namespace Beef.Test.NUnit.Tests
                 if (first)
                     TestContext.Out.WriteLine($"{l}");
                 else
-                    TestContext.Out.WriteLine($"{new string(' ', 31)}{l}");
+                    TestContext.Out.WriteLine($"{new string(' ', 32)}{l}");
 
                 first = false;
             }

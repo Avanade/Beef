@@ -32,7 +32,7 @@ namespace My.Hr.Common.Entities
         public string? ReasonText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the Reason (see <see cref="RefDataNamespace.TerminationReason"/>).
+        /// Gets or sets the Reason.
         /// </summary>
         [JsonProperty("reason", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Reason { get; set; }

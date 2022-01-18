@@ -295,7 +295,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("My.Hr.Employee", "Created")
+                .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
@@ -395,7 +395,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Updated")
+                .ExpectEvent($"my.hr.employee", "updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -493,7 +493,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Updated")
+                .ExpectEvent($"my.hr.employee", "updated")
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\", \"emergencyContacts\": null }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value;
 
             // Check the value was updated properly.
@@ -528,13 +528,13 @@ namespace My.Hr.Test.Apis
             // Create an employee in the future.
             v = agentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Created)
-                .ExpectEvent("My.Hr.Employee", "Created")
+                .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value;
 
             // Delete value.
             agentTester.Test<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"My.Hr.Employee", "Deleted")
+                .ExpectEvent($"my.hr.employee", "deleted")
                 .Run(a => a.DeleteAsync(v.Id));
 
             // Check value no longer exists.
@@ -601,7 +601,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Terminated")
+                .ExpectEvent($"my.hr.employee", "terminated")
                 .Run(a => a.TerminateAsync(v.Termination, 1.ToGuid())).Value!;
 
             agentTester.Test<EmployeeAgent, Employee?>()

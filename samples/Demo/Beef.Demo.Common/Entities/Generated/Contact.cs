@@ -44,7 +44,7 @@ namespace Beef.Demo.Common.Entities
         public string? StatusText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).
+        /// Gets or sets the Status.
         /// </summary>
         [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Status { get; set; }

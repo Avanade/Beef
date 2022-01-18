@@ -44,7 +44,7 @@ namespace My.Hr.Common.Entities
         public string? StateText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
+        /// Gets or sets the State.
         /// </summary>
         [JsonProperty("state", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? State { get; set; }

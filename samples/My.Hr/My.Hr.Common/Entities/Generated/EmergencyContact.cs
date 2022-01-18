@@ -50,7 +50,7 @@ namespace My.Hr.Common.Entities
         public string? RelationshipText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the Relationship (see <see cref="RefDataNamespace.RelationshipType"/>).
+        /// Gets or sets the Relationship.
         /// </summary>
         [JsonProperty("relationship", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Relationship { get; set; }

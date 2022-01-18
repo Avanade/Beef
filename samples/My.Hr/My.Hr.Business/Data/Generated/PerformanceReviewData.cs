@@ -79,7 +79,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "created");
             return __result;
         });
 
@@ -92,7 +92,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "updated");
             return __result;
         });
 
@@ -104,7 +104,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted", id);
+            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"my.hr.performancereview", "deleted", id);
         });
 
         /// <summary>

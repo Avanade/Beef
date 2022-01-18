@@ -38,7 +38,7 @@ namespace My.Hr.Business.Validation
         {
             _employeeDataSvc = Check.NotNull(employeeDataSvc, nameof(employeeDataSvc));
 
-            Property(x => x.Email).Mandatory().Common(CommonValidators.Email);
+            Property(x => x.Email).Mandatory().Email();
             Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.Gender).Mandatory().IsValid();

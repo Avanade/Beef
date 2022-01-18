@@ -67,6 +67,15 @@ properties: [
         public string? Text { get; set; }
 
         /// <summary>
+        /// Gets or sets the overriding model text for use in comments.
+        /// </summary>
+        [JsonProperty("modelText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Key", Title = "The overriding model text for use in comments.",
+            Description = "By default the `ModelText` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. " +
+            "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+        public string? ModelText { get; set; }
+
+        /// <summary>
         /// Gets or sets the .NET <see cref="Type"/>.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -498,6 +507,11 @@ properties: [
         public string? SummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
 
         /// <summary>
+        /// Gets the formatted model summary text.
+        /// </summary>
+        public string? ModelSummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {ModelText}.");
+
+        /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
         public string? SummaryRefDataSid => CompareValue(RefDataList, true)
@@ -652,6 +666,8 @@ properties: [
 
             DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
 
+            ModelText = StringConverter.ToComments(DefaultWhereNull(ModelText, () => Text ?? StringConverter.ToSentenceCase(Name)));
+
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
@@ -663,7 +679,7 @@ properties: [
                 var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
                 {
-                    if (ent.EntityScope == null || ent.EntityScope == "Common")
+                    if ((ent.EntityScope ?? Root.EntityScope) == "Common")
                         return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Common.Entities." + Type)})";
                     else
                         return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Business.Entities." + Type)})";

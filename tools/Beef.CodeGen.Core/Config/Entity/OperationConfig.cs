@@ -1063,6 +1063,19 @@ operations: [
                 if (Root!.EventSubjectRoot != null)
                     ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
 
+                switch (Parent!.EventCasing)
+                {
+                    case "Lower":
+                        ed.Action = ed.Action?.ToLowerInvariant();
+                        ed.Subject = ed.Subject?.ToLowerInvariant();
+                        break;
+
+                    case "Upper":
+                        ed.Action = ed.Action?.ToUpperInvariant();
+                        ed.Subject = ed.Subject?.ToUpperInvariant();
+                        break;
+                }
+
                 if (Root!.EventSourceKind != "None")
                     ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);
 

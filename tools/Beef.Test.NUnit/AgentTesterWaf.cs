@@ -31,7 +31,6 @@ namespace Beef.Test.NUnit
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Class has a Dispose method.")]
         internal AgentTesterWaf(Action<IWebHostBuilder> configuration, string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, bool configureLocalRefData = true) : base(configureLocalRefData)
         {
             if (configuration == null)

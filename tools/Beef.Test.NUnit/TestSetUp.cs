@@ -8,13 +8,11 @@ using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -389,17 +387,7 @@ namespace Beef.Test.NUnit
         /// <param name="resourceName">The embedded resource name (matches to the end of the fully qualifed resource name).</param>
         /// <param name="assembly">The <see cref="Assembly"/> that contains the embedded resource; defaults to <see cref="Assembly.GetCallingAssembly"/>.</param>
         /// <returns>The <see cref="StreamReader"/>; otherwise, an <see cref="ArgumentException"/> will be thrown.</returns>
-        public static StreamReader GetResourceStream(string resourceName, Assembly? assembly = null)
-        {
-            assembly ??= Assembly.GetCallingAssembly();
-            var coll = assembly.GetManifestResourceNames().Where(x => x.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
-            return coll.Count() switch
-            {
-                0 => throw new ArgumentException($"No embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName)),
-                1 => new StreamReader(assembly.GetManifestResourceStream(coll.First())!),
-                _ => throw new ArgumentException($"More than one embedded resource ending with '{resourceName}' was found in {assembly.FullName}.", nameof(resourceName)),
-            };
-        }
+        public static StreamReader GetResourceStream(string resourceName, Assembly? assembly = null) => UnitTestEx.Resource.GetStream(resourceName, assembly ?? Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Gets the value by deserializing the JSON within the named embedded resource.
@@ -407,10 +395,6 @@ namespace Beef.Test.NUnit
         /// <param name="resourceName">The embedded resource name (matches to the end of the fully qualifed resource name).</param>
         /// <param name="assembly">The <see cref="Assembly"/> that contains the embedded resource; defaults to <see cref="Assembly.GetCallingAssembly"/>.</param>
         /// <returns>The deserialized value.</returns>
-        public static T GetValueFromJsonResource<T>(string resourceName, Assembly? assembly = null)
-        {
-            using var sr = GetResourceStream(resourceName, assembly ?? Assembly.GetCallingAssembly());
-            return (T)JsonConvert.DeserializeObject(sr.ReadToEnd(), typeof(T))!;
-        }
+        public static T GetValueFromJsonResource<T>(string resourceName, Assembly? assembly = null) => UnitTestEx.Resource.GetJsonValue<T>(resourceName, assembly ?? Assembly.GetCallingAssembly());
     }
 }

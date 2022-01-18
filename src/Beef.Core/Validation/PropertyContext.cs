@@ -105,7 +105,7 @@ namespace Beef.Validation
             Name = Check.NotEmpty(name, nameof(name));
             JsonName = jsonName ?? Name;
             UseJsonName = context.UseJsonNames;
-            Text = text ?? ValidationExtensions.ToSentenceCase(name)!;
+            Text = text ?? Name.ToSentenceCase();
             Value = value;
             FullyQualifiedPropertyName = CreateFullyQualifiedPropertyName(Name);
             FullyQualifiedJsonPropertyName = CreateFullyQualifiedJsonPropertyName(JsonName);
@@ -124,7 +124,7 @@ namespace Beef.Validation
             FullyQualifiedJsonPropertyName = Parent.FullyQualifiedJsonEntityName ?? Validator.ValueNameDefault;
             Name = FullyQualifiedPropertyName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
             JsonName = FullyQualifiedJsonPropertyName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
-            Text = text ?? ValidationExtensions.ToSentenceCase(Name)!;
+            Text = text ?? Name.ToSentenceCase();
             Value = value;
             _doNotAppendName = true;
         }

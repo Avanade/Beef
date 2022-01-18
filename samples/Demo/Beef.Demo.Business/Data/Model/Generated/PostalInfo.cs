@@ -20,7 +20,7 @@ namespace Beef.Demo.Business.Data.Model
     public partial class PostalInfo
     {
         /// <summary>
-        /// Gets or sets the Country (see <see cref="RefDataNamespace.Country"/>).
+        /// Gets or sets the Country.
         /// </summary>
         [JsonProperty("country abbreviation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Country { get; set; }

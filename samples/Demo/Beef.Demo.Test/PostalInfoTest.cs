@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System;
 using System.Net;
 using System.Net.Http;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
@@ -38,6 +39,7 @@ namespace Beef.Demo.Test
         {
             var v = new PostalInfo { CountrySid = "US", City = "Redmond", State = "WA", Places = new PlaceInfoCollection { new PlaceInfo { Name = "Redmond", PostCode = "98052" }, new PlaceInfo { Name = "Redmond", PostCode = "98053" }, new PlaceInfo { Name = "Redmond", PostCode = "98073" } } };
 
+            // Example of direct mocking...
             var mock = new Mock<IZippoAgent>();
             mock.Setup(x => x.SendMappedResponseAsync<PostalInfo, Business.Data.Model.PostalInfo>(It.Is<HttpSendArgs>(x => x.HttpMethod == HttpMethod.Get && x.UrlSuffix == "US/WA/Redmond"))).ReturnsHttpAgentResultAsync(v);
 
@@ -56,7 +58,7 @@ namespace Beef.Demo.Test
             mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"))
                 .Request(HttpMethod.Get, "US/WA/Bananas").Respond.With(HttpStatusCode.NotFound);
 
-            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
 
             agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
@@ -70,7 +72,7 @@ namespace Beef.Demo.Test
             mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"))
                 .Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
 
-            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
 
             agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -82,13 +84,13 @@ namespace Beef.Demo.Test
         public void C110_CreatePostCodes_MockedHttpClient()
         {
             var v = TestSetUp.GetValueFromJsonResource<PostalInfo>("B140_GetPostCodes_MockedHttpClient_Found_Response.json");
-            var rn = "B140_GetPostCodes_MockedHttpClient_Found.json";
 
             var mcf = MockHttpClientFactory.Create();
             mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"))
-                .Request(HttpMethod.Post, "US/WA/Bananas").Assert<Business.Data.Model.PostalInfo>().ExpectJsonResourceValue(rn).Respond.WithJsonResource(rn, HttpStatusCode.Created, r => r.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue("\"MyTestETag\""));
+                .Request(HttpMethod.Post, "US/WA/Bananas").WithJsonResourceBody("C110_CreatePostCodes_MockedHttpClient_Request.json")
+                .Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json", HttpStatusCode.Created, r => r.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue("\"MyTestETag\""));
 
-            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
 
             var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.Created)

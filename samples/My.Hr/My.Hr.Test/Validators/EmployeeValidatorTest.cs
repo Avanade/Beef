@@ -80,7 +80,7 @@ namespace My.Hr.Test.Validators
             await ValidationTester.Test()
                 .ConfigureServices(_testSetup!)
                 .ExpectMessages(
-                    "Email is invalid.",
+                    "Email is not a valid e-mail address.",
                     "First Name must not exceed 100 characters in length.",
                     "Last Name must not exceed 100 characters in length.",
                     "Gender is invalid.",

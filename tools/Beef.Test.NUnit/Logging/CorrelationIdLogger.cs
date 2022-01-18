@@ -108,7 +108,7 @@ namespace Beef.Test.NUnit.Logging
             var id = ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null ? ExecutionContext.Current.CorrelationId : DefaultId;
 
             var timestamp = DateTime.Now;
-            message = $"{timestamp.ToString("yyyy-MM-ddTHH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)}: {message} [{_name}]{(id == DefaultId ? "*" : "")}";
+            message = $"{timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)}: {message} [{_name}]{(id == DefaultId ? "*" : "")}";
 
             if (exception != null)
                 message += Environment.NewLine + exception;
@@ -120,16 +120,15 @@ namespace Beef.Test.NUnit.Logging
         /// <summary>
         /// Gets the shortened log level.
         /// </summary>
-        internal static string GetLogLevel(LogLevel level) =>
-            level switch
-            {
-                LogLevel.Critical => "cri",
-                LogLevel.Error => "err ",
-                LogLevel.Warning => "wrn",
-                LogLevel.Information => "inf",
-                LogLevel.Debug => "dbg",
-                LogLevel.Trace => "trc",
-                _ => "???",
-            };
+        internal static string GetLogLevel(LogLevel level) => level switch
+        {
+            LogLevel.Critical => "crit",
+            LogLevel.Error => "fail",
+            LogLevel.Warning => "warn",
+            LogLevel.Information => "info",
+            LogLevel.Debug => "dbug",
+            LogLevel.Trace => "trce",
+            _ => "???"
+        };
     }
 }

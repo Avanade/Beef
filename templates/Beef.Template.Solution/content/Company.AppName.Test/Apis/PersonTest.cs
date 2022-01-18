@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 #if (implement_httpagent)
 using System.Net.Http;
+using UnitTestEx.NUnit;
 #endif
 using Company.AppName.Api;
 using Company.AppName.Common.Agents;
@@ -19,7 +20,7 @@ namespace Company.AppName.Test.Apis
     public class PersonTest
     {
 #if (!implement_httpagent)
-#       region Get
+        #region Get
 
         [Test, TestSetUp]
         public void A110_Get_NotFound()
@@ -203,7 +204,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("Company.AppName.Person", "Created")
+                .ExpectEvent("Company.AppName.Person".ToLowerInvariant(), "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
@@ -278,7 +279,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person", "Updated")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -351,7 +352,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person", "Updated")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value!;
 
             // Check the value was updated properly.
@@ -379,7 +380,7 @@ namespace Company.AppName.Test.Apis
             // Delete value.
             agentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Company.AppName.Person", "Deleted")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.
@@ -396,15 +397,15 @@ namespace Company.AppName.Test.Apis
         #endregion
     }
 #else
-        #region Get
+    #region Get
 
         [Test, TestSetUp]
         public void A110_Get_NotFound()
         {
             var mcf = MockHttpClientFactory.Create();
-            mcf.CreateClient("Xxx").Request(HttpMethod.Get, $"/people/{404.ToGuid()}").Respond.With(HttpStatusCode.NotFound);
+            mcf.CreateClient("Xxx", "http://unittest").Request(HttpMethod.Get, $"/people/{404.ToGuid()}").Respond.With(HttpStatusCode.NotFound);
 
-            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
 
             agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
@@ -415,9 +416,9 @@ namespace Company.AppName.Test.Apis
         public void A120_Get_Found()
         {
             var mcf = MockHttpClientFactory.Create();
-            mcf.CreateClient("Xxx").Request(HttpMethod.Get, $"/people/{1.ToGuid()}").Respond.With(new Business.Data.Model.Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", Birthday = new DateTime(1985, 03, 18) });
+            mcf.CreateClient("Xxx", "http://unittest").Request(HttpMethod.Get, $"/people/{1.ToGuid()}").Respond.WithJson(new Business.Data.Model.Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", Birthday = new DateTime(1985, 03, 18) });
 
-            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.ReplaceSingleton(sc));
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
 
             agentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -434,7 +435,7 @@ namespace Company.AppName.Test.Apis
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
-        #endregion
+    #endregion
     }
 #endif
 }

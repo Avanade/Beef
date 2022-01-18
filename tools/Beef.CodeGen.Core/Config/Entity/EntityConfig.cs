@@ -640,6 +640,14 @@ entities:
         public string? EventSubjectFormat { get; set; }
 
         /// <summary>
+        /// Gets or sets the casing for the Subject and Action (with the exception of the key).
+        /// </summary>
+        [JsonProperty("eventCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Event", Title = "The casing for the Subject and Action (with the exception of the key)", Options = new string[] { "None", "Lower", "Upper" }, IsImportant = true,
+            Description = "Defaults to `CodeGeneration.EventCasing`.")]
+        public string? EventCasing { get; set; }
+
+        /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -1233,6 +1241,7 @@ entities:
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
+            EventCasing = DefaultWhereNull(EventCasing, () => Parent!.EventCasing);
             EventSource = DefaultWhereNull(EventSource, () => $"{Name!.ToLowerInvariant()}/{{$key}}");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
             EventOutbox = DefaultWhereNull(EventOutbox, () => Parent!.EventOutbox);

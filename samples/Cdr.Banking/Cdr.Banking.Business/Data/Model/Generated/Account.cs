@@ -98,19 +98,19 @@ namespace Cdr.Banking.Business.Data.Model
         public string? SpecificAccountUType { get; set; }
 
         /// <summary>
-        /// Gets or sets the Term Deposit (see <see cref="Common.Entities.TermDepositAccount"/>).
+        /// Gets or sets the Term Deposit.
         /// </summary>
         [JsonProperty("termDeposit", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public TermDepositAccount? TermDeposit { get; set; }
 
         /// <summary>
-        /// Gets or sets the Credit Card (see <see cref="Common.Entities.CreditCardAccount"/>).
+        /// Gets or sets the Credit Card.
         /// </summary>
         [JsonProperty("creditCard", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public CreditCardAccount? CreditCard { get; set; }
 
         /// <summary>
-        /// Gets or sets the Balance (see <see cref="Common.Entities.Balance"/>).
+        /// Gets or sets the Balance.
         /// </summary>
         [JsonProperty("balance", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Balance? Balance { get; set; }

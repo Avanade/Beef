@@ -135,7 +135,7 @@ namespace My.Hr.Business.Entities
         }
 
         /// <summary>
-        /// Gets or sets the Termination (see <see cref="Common.Entities.TerminationDetail"/>).
+        /// Gets or sets the Termination (see <see cref="Business.Entities.TerminationDetail"/>).
         /// </summary>
         [JsonProperty("termination", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Termination")]

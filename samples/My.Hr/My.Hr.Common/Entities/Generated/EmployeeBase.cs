@@ -50,7 +50,7 @@ namespace My.Hr.Common.Entities
         public string? GenderText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
+        /// Gets or sets the Gender.
         /// </summary>
         [JsonProperty("gender", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Gender { get; set; }
@@ -68,7 +68,7 @@ namespace My.Hr.Common.Entities
         public DateTime StartDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the Termination (see <see cref="Common.Entities.TerminationDetail"/>).
+        /// Gets or sets the Termination.
         /// </summary>
         [JsonProperty("termination", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public TerminationDetail? Termination { get; set; }

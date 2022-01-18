@@ -44,7 +44,7 @@ namespace My.Hr.Common.Entities
         public string? OutcomeText { get; set ; }
 
         /// <summary>
-        /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).
+        /// Gets or sets the Outcome.
         /// </summary>
         [JsonProperty("outcome", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Outcome { get; set; }
@@ -68,7 +68,7 @@ namespace My.Hr.Common.Entities
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
+        /// Gets or sets the Change Log.
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }

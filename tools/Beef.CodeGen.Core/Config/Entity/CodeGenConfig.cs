@@ -375,6 +375,14 @@ entities:
         public string? EventActionFormat { get; set; }
 
         /// <summary>
+        /// Gets or sets the casing for the Subject and Action (with the exception of the key).
+        /// </summary>
+        [JsonProperty("eventCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Event", Title = "The casing for the Subject and Action (with the exception of the key)", Options = new string[] { "None", "Lower", "Upper" }, IsImportant = true,
+            Description = "Defaults to `None` (no casing required, i.e. as-is)`.")]
+        public string? EventCasing { get; set; }
+
+        /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -571,6 +579,7 @@ entities:
             EventOutbox = DefaultWhereNull(EventOutbox, () => "None");
             EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
+            EventCasing = DefaultWhereNull(EventCasing, () => "None");
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
             EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : "Common");
             RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.{EntityUsing}.Entities");

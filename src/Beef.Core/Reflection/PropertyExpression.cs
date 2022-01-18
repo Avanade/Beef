@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Validation;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -144,7 +145,7 @@ namespace Beef.Reflection
                 }
 
                 // Create expression (with compilation also).
-                var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca?.Name == null ? StringConversion.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
+                var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca?.Name == null ? me.Member.Name.ToSentenceCase() : ca.Name, propertyExpression.Compile())
                 {
                     JsonPropertyAttribute = jpa
                 };
