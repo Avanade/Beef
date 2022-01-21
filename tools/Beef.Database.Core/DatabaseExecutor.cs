@@ -6,6 +6,7 @@ using DbEx.Migration;
 using DbEx.Migration.SqlServer;
 using Microsoft.Extensions.Logging;
 using OnRamp;
+using OnRamp.Console;
 using System;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Private constructor.
         /// </summary>
-        private DatabaseExecutor(DatabaseExecutorArgs args) : base(args.ConnectionString!, ConvertMigrationCommand(args.Command, args.SupportedCommands), args.Logger ?? new ColoredConsoleLogger(nameof(DatabaseConsole)), args.Assemblies.ToArray())
+        private DatabaseExecutor(DatabaseExecutorArgs args) : base(args.ConnectionString!, ConvertMigrationCommand(args.Command, args.SupportedCommands), args.Logger ?? new ConsoleLogger(), args.Assemblies.ToArray())
         {
             _args = args;
             if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
@@ -96,7 +97,7 @@ namespace Beef.Database.Core
 
                 try
                 {
-                    stats = await CodeGenConsole.ExecuteCodeGenerationAsync(cga).ConfigureAwait(false);
+                    stats = await CodeGen.CodeGenConsole.ExecuteCodeGenerationAsync(cga).ConfigureAwait(false);
                     return true;
                 }
                 catch (CodeGenException cgex)

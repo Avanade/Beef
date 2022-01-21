@@ -4,6 +4,7 @@ using Beef.CodeGen.Converters;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using OnRamp;
+using OnRamp.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -84,7 +85,7 @@ namespace Beef.CodeGen
         /// <returns><c>true</c> indicates success; otherwise, <c>false</c>.</returns>
         public static async Task<bool> ConvertXmlToYamlAsync(CommandType type, string filename)
         {
-            var logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
+            var logger = (Logger.Default ??= new ConsoleLogger());
             logger.LogInformation($"Convert XML to YAML file configuration: {filename}");
             logger.LogInformation(string.Empty);
 

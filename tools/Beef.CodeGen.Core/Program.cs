@@ -5,6 +5,7 @@ using Beef.CodeGen.Generators;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using OnRamp.Config;
+using OnRamp.Console;
 using OnRamp.Utility;
 using System;
 using System.Diagnostics;
@@ -25,7 +26,7 @@ namespace Beef.CodeGen
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
         public static async Task<int> Main(string[] args)
         {
-            Logger.Default = new ColoredConsoleLogger("CodeGenConsole");
+            Logger.Default = new ConsoleLogger(null);
 
             // Check for special case / internal use arguments.
             if (args.Length == 1)

@@ -21,6 +21,7 @@ namespace Beef.Test.NUnit
         private readonly IConfiguration? _config;
         private readonly Action<IServiceCollection>? _services;
         private readonly bool _configureLocalRefData;
+        private readonly bool? _includeLoggingScopesInOutput;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsingAgentTesterServer{TStartup}"/> class.
@@ -30,13 +31,15 @@ namespace Beef.Test.NUnit
         /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
         /// <param name="services">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        protected UsingAgentTesterServer(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        protected UsingAgentTesterServer(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
         {
             _environmentVariablePrefix = environmentVariablePrefix;
             _environment = environment;
             _config = config;
             _services = services;
             _configureLocalRefData = configureLocalRefData;
+            _includeLoggingScopesInOutput = includeLoggingScopesInOutput;
         }
 
         /// <summary>
@@ -56,7 +59,7 @@ namespace Beef.Test.NUnit
         public void UsingOneTimeSetUp()
         {
             TestSetUp.Reset(true, null);
-            _agentTester = new AgentTesterServer<TStartup>(_environmentVariablePrefix, _environment, _config, _services, _configureLocalRefData);
+            _agentTester = new AgentTesterServer<TStartup>(_environmentVariablePrefix, _environment, _config, _services, _configureLocalRefData, _includeLoggingScopesInOutput);
         }
 
         /// <summary>

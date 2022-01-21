@@ -213,6 +213,11 @@ namespace Beef.Test.NUnit
         public static string? DefaultEnvironmentVariablePrefix { get; set; }
 
         /// <summary>
+        /// Indicates whether to include scopes in log output (overall default used where not explicitly overridden).
+        /// </summary>
+        public static bool IncludeLoggingScopesInOutput { get; set; }
+
+        /// <summary>
         /// Sets the username converter function for when a non-string identifier is specified.
         /// </summary>
         /// <param name="converter">The converter function.</param>
@@ -331,13 +336,14 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Creates an <see cref="ILogger"/> instance that logs to the <see cref="System.Console"/>.
+        /// Creates an <see cref="ILogger"/> instance that logs to the <see cref="System.Console"/> using the <see cref="TestContextLogger"/>.
         /// </summary>
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>The <see cref="ILogger"/> instance.</returns>
-        public static ILogger CreateLogger()
+        public static ILogger CreateLogger(bool? includeLoggingScopesInOutput = null)
         {
             var services = new ServiceCollection();
-            services.AddLogging(configure => configure.AddTestContext());
+            services.AddLogging(configure => configure.AddTestContext(includeLoggingScopesInOutput));
             var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
             return logger;
         }
@@ -347,11 +353,12 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="serviceCollection">An optional action to allow further additions to the underlying <see cref="IServiceCollection"/>.</param>
         /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>An <see cref="IServiceProvider"/>.</returns>
-        public static IServiceProvider CreateServiceProvider(Action<IServiceCollection>? serviceCollection = null, Func<IServiceProvider, ExecutionContext>? createExecutionContext = null)
+        public static IServiceProvider CreateServiceProvider(Action<IServiceCollection>? serviceCollection = null, Func<IServiceProvider, ExecutionContext>? createExecutionContext = null, bool? includeLoggingScopesInOutput = null)
         {
             var services = new ServiceCollection();
-            services.AddLogging(configure => configure.AddTestContext());
+            services.AddLogging(configure => configure.AddTestContext(includeLoggingScopesInOutput));
             services.AddBeefExecutionContext(createExecutionContext);
             serviceCollection?.Invoke(services);
             var sp = services.BuildServiceProvider();

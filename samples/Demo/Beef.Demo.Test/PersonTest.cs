@@ -20,6 +20,8 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PersonTest : UsingAgentTesterServer<Startup>
     {
+        public PersonTest() : base(includeLoggingScopesInOutput: true) { }
+
         #region Validators
 
         [Test, TestSetUp]

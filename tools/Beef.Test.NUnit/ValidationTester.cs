@@ -35,23 +35,27 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>A <see cref="ValidationTester"/> instance.</returns>
-        public static ValidationTester Test(string? username = null, object? args = null) => new ValidationTester(username, args);
+        public static ValidationTester Test(string? username = null, object? args = null, bool? includeLoggingScopesInOutput = null) => new ValidationTester(username, args, includeLoggingScopesInOutput);
 
         /// <summary>
         /// Create a new <see cref="ValidationTester"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="TestSetUp.ConvertUsername(object?)"/>).
         /// </summary>
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>A <see cref="ValidationTester"/> instance.</returns>
-        public static ValidationTester Test(object? userIdentifier, object? args = null) => new ValidationTester(TestSetUp.ConvertUsername(userIdentifier), args);
+        public static ValidationTester Test(object? userIdentifier, object? args = null, bool? includeLoggingScopesInOutput = null) => new ValidationTester(TestSetUp.ConvertUsername(userIdentifier), args, includeLoggingScopesInOutput);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationTester"/> class.
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        private ValidationTester(string? username = null, object? args = null) : base(configureLocalRefData: true, inheritServiceCollection: true)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        private ValidationTester(string? username = null, object? args = null, bool? includeLoggingScopesInOutput = null) 
+            : base(configureLocalRefData: true, inheritServiceCollection: true, includeLoggingScopesInOutput: includeLoggingScopesInOutput)
         {
             _username = username;
             _args = args;

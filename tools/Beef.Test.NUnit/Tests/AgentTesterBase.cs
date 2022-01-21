@@ -23,7 +23,8 @@ namespace Beef.Test.NUnit.Tests
         /// Initializes a new instance of the <see cref="AgentTesterBase"/> class.
         /// </summary>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        protected AgentTesterBase(bool configureLocalRefData = true) : base(configureLocalRefData, true) 
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        protected AgentTesterBase(bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) : base(configureLocalRefData, true, includeLoggingScopesInOutput: includeLoggingScopesInOutput) 
         {
             ConfigureLocalServices(sc =>
             {

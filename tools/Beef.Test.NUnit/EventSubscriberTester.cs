@@ -11,7 +11,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,8 +26,9 @@ namespace Beef.Test.NUnit
         /// Creates an <see cref="EventSubscriberTester{TStartup}"/> to manage the orchestration of one or more <see cref="EventSubscriberBase"/> integration tests against.
         /// </summary>
         /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>An <see cref="EventSubscriberTester{TStartup}"/> instance.</returns>
-        public static EventSubscriberTester<TStartup> Create<TStartup>() where TStartup : class, new() => new EventSubscriberTester<TStartup>();
+        public static EventSubscriberTester<TStartup> Create<TStartup>(bool? includeLoggingScopesInOutput = null) where TStartup : class, new() => new EventSubscriberTester<TStartup>(includeLoggingScopesInOutput);
     }
 
     /// <summary>
@@ -55,7 +55,8 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberTester{TStartup}"/> class.
         /// </summary>
-        internal EventSubscriberTester() : base(configureLocalRefData: true)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        internal EventSubscriberTester(bool? includeLoggingScopesInOutput) : base(configureLocalRefData: true, includeLoggingScopesInOutput: includeLoggingScopesInOutput)
         {
             // TODO: Come back and revisit.
             // string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string environment = TestSetUp.DefaultEnvironment, Action<ConfigurationBuilder>? configurationBuilder = null, Action<IServiceCollection>? services = null
@@ -71,7 +72,7 @@ namespace Beef.Test.NUnit
                 mi.Invoke(new TStartup(), new object[] { new Fhb(sc) });
 
                 // Finish up and build the service provider.
-                sc.AddLogging(configure => configure.AddCorrelationId());
+                sc.AddLogging(configure => configure.AddCorrelationId(includeLoggingScopesInOutput));
                 ReplaceEventPublisher(sc);
             });
         }

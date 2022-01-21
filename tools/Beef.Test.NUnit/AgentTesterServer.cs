@@ -33,12 +33,14 @@ namespace Beef.Test.NUnit
         /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
         /// <param name="services">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        internal AgentTesterServer(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true) : base(configureLocalRefData)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        internal AgentTesterServer(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
+            : base(configureLocalRefData, includeLoggingScopesInOutput)
         {
             var action = new Action<IServiceCollection>(sc =>
             {
                 services?.Invoke(sc);
-                sc.AddLogging(configure => configure.AddCorrelationId());
+                sc.AddLogging(configure => configure.AddCorrelationId(includeLoggingScopesInOutput));
                 ReplaceEventPublisher(sc);
             });
 

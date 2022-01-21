@@ -31,7 +31,9 @@ namespace Beef.Test.NUnit
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        internal AgentTesterWaf(Action<IWebHostBuilder> configuration, string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, bool configureLocalRefData = true) : base(configureLocalRefData)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        internal AgentTesterWaf(Action<IWebHostBuilder> configuration, string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
+            : base(configureLocalRefData, includeLoggingScopesInOutput)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -49,7 +51,7 @@ namespace Beef.Test.NUnit
 
                 whb.ConfigureServices(sc =>
                 {
-                    sc.AddLogging(configure => { configure.ClearProviders(); configure.AddCorrelationId(); }); 
+                    sc.AddLogging(configure => { configure.ClearProviders(); configure.AddCorrelationId(includeLoggingScopesInOutput); }); 
                 });
 
                 whb.ConfigureTestServices(sc =>
@@ -69,8 +71,9 @@ namespace Beef.Test.NUnit
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        internal AgentTesterWaf(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, Action<IServiceCollection>? services = null, bool configureLocalRefData = true) 
-            : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), environmentVariablePrefix, environment, configureLocalRefData) { }
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        internal AgentTesterWaf(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) 
+            : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), environmentVariablePrefix, environment, configureLocalRefData, includeLoggingScopesInOutput) { }
 
         /// <summary>
         /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="TesterBase.LocalServiceProvider"/>).

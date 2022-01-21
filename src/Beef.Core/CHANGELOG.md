@@ -7,7 +7,8 @@ Represents the **NuGet** versions.
 - *Fixed:* `HttpAgentBase.SendAsyncInternal` to use the `ExecutionContext.OperationType` (converting to the equivalent `OperationTypes`) when using an `IMapper` to map source to destinatio, and vice versa.
 - *Enhancement:* `ReferenceDataMappingConverter` updated to support runtime instance creation using `ReferenceDataMappingConverter.Create` versus previously having to inherit from abstract base class.
 - *Fixed:* Due to collision problems with MD5/SHA1 the `ETagGenerator.GenerateHash` has been updated to use SHA256; this will now result in a longer `ETag` value in these scenarios. This will invalidate any preivously cached data even though the underlying content is the same.
-- *Fixed:* `StringConversion` has been removed as capability exists within `OnRamp` package as primarily used for code-generation purposes. The `ToSentenceCase` logic has been moved into the `ValidationExtensions`.
+- *Enhancement:* `StringConversion` has been removed as capability exists within `OnRamp` package as primarily used for code-generation purposes. The `ToSentenceCase` logic has been moved into the `ValidationExtensions`.
+- *Enhancement:* `ColoredConsoleLogger` removed as not used in _Beef_ outside of tooling; tooing uses `OnRamp.Console.ConsoleLogger` as replacement.
 - *Enhancement:* Added `EmailRule` to simplify validations of e-mail addresses.
 - *Fixed:* Updated internal _Beef_ dependencies to latest.
 
