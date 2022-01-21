@@ -1,0 +1,5 @@
+﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
+inherits: [ 'EntityWebApiCoreAgent.yaml' ]
+editorType: Beef.Demo.CodeGen.Config.TestConfigEditor, Beef.Demo.CodeGen
+generators:
+- { type: 'Beef.Demo.CodeGen.Generators.TestCodeGenerator, Beef.Demo.CodeGen', template: 'Test_cs.hbs', file: '{{Name}}CodeGenTest.cs', directory: '{{Root.PathBase}}.CodeGen/Generated', text: 'TestCodeGenerator: Beef.Demo.CodeGen (Testing only!)' }

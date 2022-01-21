@@ -189,6 +189,9 @@
   <data name="Beef.DuplicateValueFormat" xml:space="preserve">
     <value>{0} contains duplicates; {2} value '{3}' specified more than once.</value>
   </data>
+  <data name="Beef.EmailFormat" xml:space="preserve">
+    <value>{0} is not a valid e-mail address.</value>
+  </data>
   <data name="Beef.ExistsFormat" xml:space="preserve">
     <value>{0} is not found; a valid value is required.</value>
   </data>

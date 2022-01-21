@@ -32,6 +32,40 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Creates a new <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Updates an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Patches an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<PostalInfo>> PatchPostCodesAsync(WebApiPatchOption patchOption, JToken value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
     }
 
     /// <summary>
@@ -55,6 +89,46 @@ namespace Beef.Demo.Common.Agents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
             GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+
+        /// <summary>
+        /// Creates a new <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
+            PostAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+
+        /// <summary>
+        /// Updates an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
+            PutAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+
+        /// <summary>
+        /// Patches an existing <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<PostalInfo>> PatchPostCodesAsync(WebApiPatchOption patchOption, JToken value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
+            PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
     }
 }

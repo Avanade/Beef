@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<!-- This is intended for DbUp Migration Script use only; executed directly as: dotnet run codegen ... -->
-<Script ConfigType="Database">
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseEobRootCodeGenerator" Template="DbEobTableCreate_sql.hb" FileName="{{Root.UtcDateTimeStamp}}-create-{{lower Schema}}-{{lower Root.EventOutboxTableName}}.sql" OutDir="{{Root.PathDatabaseMigrations}}" HelpText="DatabaseEobRootCodeGenerator: Database/Migrations" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseEobRootCodeGenerator" Template="DbEobDataTableCreate_sql.hb" FileName="{{Root.UtcDateTimeStamp}}-create-{{lower Schema}}-{{lower Root.EventOutboxTableName}}data.sql" OutDir="{{Root.PathDatabaseMigrations}}" HelpText="DatabaseEobRootCodeGenerator: Database/Migrations" />
-</Script>

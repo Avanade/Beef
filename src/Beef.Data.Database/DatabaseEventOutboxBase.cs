@@ -43,6 +43,7 @@ namespace Beef.Data.Database
             Property(s => s.Action);
             Property(s => s.CorrelationId);
             Property(s => s.TenantId);
+            Property(s => s.PartitionKey);
             Property(s => s.ValueType);
             Property(s => s.EventData);
         }
@@ -75,6 +76,7 @@ namespace Beef.Data.Database
             dt.Columns.Add(nameof(DatabaseEventOutboxItem.Action), typeof(string));
             dt.Columns.Add(nameof(DatabaseEventOutboxItem.CorrelationId), typeof(string));
             dt.Columns.Add(nameof(DatabaseEventOutboxItem.TenantId), typeof(Guid));
+            dt.Columns.Add(nameof(DatabaseEventOutboxItem.PartitionKey), typeof(string));
             dt.Columns.Add(nameof(DatabaseEventOutboxItem.ValueType), typeof(string));
             dt.Columns.Add("EventData", typeof(SqlBinary));
 

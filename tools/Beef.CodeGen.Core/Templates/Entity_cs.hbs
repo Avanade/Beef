@@ -118,9 +118,9 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
-        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+          {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        {{/ifeq}}
+          {{/ifeq}}
         public string? {{Name}}Text { get => {{PrivateName}}Text ?? GetRefDataText(() => {{Name}}); set => {{PrivateName}}Text = value; }
         {{/if}}
       {{/unless}}
@@ -503,12 +503,12 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     {
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionName}}} class.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class.
         /// </summary>
         public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
 
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionName}}} class with an entities range.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with an entities range.
         /// </summary>
         /// <param name="entities">The {{{EntityNameSeeComments}}} entities.</param>
         public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> entities){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(entities);
@@ -522,9 +522,9 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{#ifnull RefDataType}}
 
         /// <summary>
-        /// Creates a deep copy of the {{{seecomments EntityCollectionName}}}.
+        /// Creates a deep copy of the {{{see-comments EntityCollectionName}}}.
         /// </summary>
-        /// <returns>A deep copy of the {{{seecomments EntityCollectionName}}}.</returns>
+        /// <returns>A deep copy of the {{{see-comments EntityCollectionName}}}.</returns>
         public override object Clone()
         {
             var clone = new {{{EntityCollectionName}}}();
@@ -539,10 +539,10 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{#if CollectionResult}}
 
         /// <summary>
-        /// An implicit cast from the {{{seecomments EntityCollectionResultName}}} to a corresponding {{{seecomments EntityCollectionName}}}.
+        /// An implicit cast from the {{{see-comments EntityCollectionResultName}}} to a corresponding {{{see-comments EntityCollectionName}}}.
         /// </summary>
-        /// <param name="result">The {{{seecomments EntityCollectionResultName}}}.</param>
-        /// <returns>The corresponding {{{seecomments EntityCollectionName}}}.</returns>
+        /// <param name="result">The {{{see-comments EntityCollectionResultName}}}.</param>
+        /// <returns>The corresponding {{{see-comments EntityCollectionName}}}.</returns>
         public static implicit operator {{{EntityCollectionName}}}({{{EntityCollectionResultName}}} result) => result?.Result!;
   {{/if}}
     }
@@ -560,27 +560,27 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     public class {{{EntityCollectionResultName}}} : {{{EntityCollectionResultInherits}}}
     {
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
         /// </summary>
         public {{{EntityCollectionResultName}}}() { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with <paramref name="paging"/>.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
         
         /// <summary>
-        /// Creates a deep copy of the {{{seecomments EntityCollectionResultName}}}.
+        /// Creates a deep copy of the {{{see-comments EntityCollectionResultName}}}.
         /// </summary>
-        /// <returns>A deep copy of the {{{seecomments EntityCollectionResultName}}}.</returns>
+        /// <returns>A deep copy of the {{{see-comments EntityCollectionResultName}}}.</returns>
         public override object Clone()
         {
             var clone = new {{{EntityCollectionResultName}}}();

@@ -33,7 +33,8 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="inheritServiceCollection">Indicates whether to use the inherit (copy) the tester <see cref="ServiceCollection"/> (advanced use only).</param>
         /// <param name="useCorrelationIdLogger">Indicates whether to use the <see cref="CorrelationIdLogger"/> versus defaulting to <see cref="TestContextLogger"/>.</param>
-        protected TesterBase(bool configureLocalRefData = true, bool inheritServiceCollection = false, bool useCorrelationIdLogger = false)
+        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        protected TesterBase(bool configureLocalRefData = true, bool inheritServiceCollection = false, bool useCorrelationIdLogger = false, bool? includeLoggingScopesInOutput = null)
         {
             // Where inheriting then copy the service collection.
             if (inheritServiceCollection && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ServiceCollectionKey, out var sc))
@@ -52,9 +53,9 @@ namespace Beef.Test.NUnit.Tests
             _serviceCollection.AddLogging(configure =>
             {
                 if (useCorrelationIdLogger)
-                    configure.AddCorrelationId();
+                    configure.AddCorrelationId(includeLoggingScopesInOutput);
                 else
-                    configure.AddTestContext();
+                    configure.AddTestContext(includeLoggingScopesInOutput);
             });
 
             _serviceCollection.AddTransient<IWebApiAgentArgs, WebApiAgentArgs>();
@@ -168,7 +169,7 @@ namespace Beef.Test.NUnit.Tests
                 if (first)
                     TestContext.Out.WriteLine($"{l}");
                 else
-                    TestContext.Out.WriteLine($"{new string(' ', 31)}{l}");
+                    TestContext.Out.WriteLine($"{new string(' ', 32)}{l}");
 
                 first = false;
             }

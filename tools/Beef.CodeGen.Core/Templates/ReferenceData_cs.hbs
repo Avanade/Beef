@@ -62,7 +62,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
 
 {{#each RefDataEntities}}
         /// <summary> 
-        /// Gets the {{seecomments RefDataQualifiedEntityCollectionName}}.
+        /// Gets the {{see-comments RefDataQualifiedEntityCollectionName}}.
         /// </summary>
         public abstract {{RefDataQualifiedEntityCollectionName}} {{Name}} { get; }
 

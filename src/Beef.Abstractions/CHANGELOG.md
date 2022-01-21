@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Enhancement:* Extracted `WebApiAgentCoreBase` from `WebApiAgentBase` to enable greater reusability.
+- *Fixed:* The `WebApiRequestOptions.ETag` will ensure that the value is quoted correctly to be compliant. See https://datatracker.ietf.org/doc/html/rfc7232#page-9 where specification states `entity-tag = [ weak ] opaque-tag`, and `opaque-tag = DQUOTE *etagc DQUOTE`; therefore, should be formatted as: `"value"`.
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.3
 - *Enhancement:* Changed `WebApiAgentBase.CreateJsonContentFromValue` and `WebApiAgentBase.CreateRequestMessageAsync` from `private` to `protected` to improve reusability of functionality for inheriting classes.
 - *Enhancement:* Updated `WebApiAgentBase.CreateFullUri` to use `StringBuilder` to reduce string allocations.

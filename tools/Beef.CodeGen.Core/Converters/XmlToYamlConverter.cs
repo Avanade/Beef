@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.Config;
 using Newtonsoft.Json;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal abstract class XmlToYamlConverter
+    public abstract class XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.
@@ -78,7 +79,7 @@ namespace Beef.CodeGen.Converters
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
         /// <returns>The corresponding YAML and the list of unknown attributes.</returns>
-        internal (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
+        public (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -212,7 +213,7 @@ namespace Beef.CodeGen.Converters
             foreach (var att in xml.Attributes())
             {
                 var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
-                var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
+                var pi = type.GetProperty(StringConverter.ToPascalCase(jname)!);
                 var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;
@@ -240,7 +241,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Entity XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal class EntityXmlToYamlConverter : XmlToYamlConverter
+    public class EntityXmlToYamlConverter : XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.
@@ -265,7 +266,7 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Database XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    internal class DatabaseXmlToYamlConverter : XmlToYamlConverter
+    public class DatabaseXmlToYamlConverter : XmlToYamlConverter
     {
         /// <summary>
         /// Gets the <see cref="CodeGen.ConfigType"/>.
@@ -284,9 +285,6 @@ namespace Beef.CodeGen.Converters
             "QueryJoinOn" => (ConfigurationEntity.QueryJoinOn, typeof(Config.Database.QueryJoinOnConfig), "on"),
             "QueryOrder" => (ConfigurationEntity.QueryOrder, typeof(Config.Database.QueryOrderConfig), "order"),
             "QueryWhere" => (ConfigurationEntity.QueryWhere, typeof(Config.Database.QueryWhereConfig), "where"),
-            "Cdc" => (ConfigurationEntity.Cdc, typeof(Config.Database.CdcConfig), "cdc"),
-            "CdcJoin" => (ConfigurationEntity.CdcJoin, typeof(Config.Database.CdcJoinConfig), "joins"),
-            "CdcJoinOn" => (ConfigurationEntity.CdcJoinOn, typeof(Config.Database.CdcJoinOnConfig), "on"),
             "StoredProcedure" => (ConfigurationEntity.StoredProcedure, typeof(Config.Database.StoredProcedureConfig), "storedProcedures"),
             "Parameter" => (ConfigurationEntity.Parameter, typeof(Config.Database.ParameterConfig), "parameters"),
             "OrderBy" => (ConfigurationEntity.OrderBy, typeof(Config.Database.OrderByConfig), "orderby"),

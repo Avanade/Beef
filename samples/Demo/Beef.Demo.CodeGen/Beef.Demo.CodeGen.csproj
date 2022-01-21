@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\TestScript.xml" />
+    <None Remove="Scripts\TestScript.yaml" />
     <None Remove="Templates\Test_cs.hbs" />
   </ItemGroup>
   
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\TestScript.xml" />
+    <EmbeddedResource Include="Scripts\TestScript.yaml" />
     <EmbeddedResource Include="Templates\Test_cs.hbs" />
   </ItemGroup>
 

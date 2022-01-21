@@ -16,6 +16,11 @@ namespace Beef.Validation
     /// </summary>
     public static class ValidationExtensions
     {
+        /// <summary>
+        /// The <see cref="Regex"/> expression pattern for splitting strings into words.
+        /// </summary>
+        public const string WordSplitPattern = "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))";
+
         #region Text
 
         /// <summary>
@@ -514,7 +519,26 @@ namespace Beef.Validation
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new StringRule<TEntity> { Regex = regex, ErrorText = errorText });
         }
-#pragma warning restore CA1720 
+#pragma warning restore CA1720
+
+        #endregion
+
+        #region Email
+
+        /// <summary>
+        /// Adds an e-mail validation (see <see cref="EmailRule{TEntity}"/>).
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, String}"/> being extended.</param>
+        /// <param name="maxLength">The maximum string length for the e-mail address; defaults to 254.</param>
+        /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
+        /// <returns>A <see cref="PropertyRule{TEntity, String}"/>.</returns>
+        /// <remarks>The maximum length for an email address is '<c>254</c>' as per this <see href="https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address#:~:text=%20The%20length%20limits%20are%20as%20follows%3A%20,i.e.%2C%20example.com%20--%20254%20characters%20maximum.%20More%20">article</see>,
+        /// hence the default.</remarks>
+        public static PropertyRuleBase<TEntity, string?> Email<TEntity>(this PropertyRuleBase<TEntity, string?> rule, int? maxLength = 254, LText? errorText = null) where TEntity : class
+        {
+            return Check.NotNull(rule, nameof(rule)).AddRule(new EmailRule<TEntity> { MaxLength = maxLength, ErrorText = errorText });
+        }
 
         #endregion
 
@@ -927,13 +951,25 @@ namespace Beef.Validation
         /// <summary>
         /// Converts a <see cref="string"/> into sentence case.
         /// </summary>
-        /// <param name="value">The value to convert.</param>
+        /// <param name="text">The text to convert.</param>
         /// <returns>The <see cref="string"/> as sentence case.</returns>
         /// <remarks>For example a value of 'VarNameDB' would return 'Var Name DB'.</remarks>
-        public static string? ToSentenceCase(this string? value)
+        public static string ToSentenceCase(this string text)
         {
-            return StringConversion.ToSentenceCase(value);
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
+            return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s[1..]; // Make sure the first character is always upper case.
         }
+
+        /// <summary>
+        /// Converts a <see cref="string"/> into sentence case.
+        /// </summary>
+        /// <param name="text">The text to convert.</param>
+        /// <returns>The <see cref="string"/> as sentence case.</returns>
+        /// <remarks>For example a value of 'VarNameDB' would return 'Var Name DB'.</remarks>
+        public static string? ConvertToSentenceCase(string? text) => string.IsNullOrEmpty(text) ? text : text.ToSentenceCase();
 
         #endregion
 

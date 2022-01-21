@@ -32,7 +32,7 @@ namespace My.Hr.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
+        /// Gets or sets the Genders.
         /// </summary>
         [JsonProperty("genders", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<string>? Genders { get; set; }

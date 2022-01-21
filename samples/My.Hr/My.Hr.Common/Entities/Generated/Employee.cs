@@ -20,7 +20,7 @@ namespace My.Hr.Common.Entities
     public partial class Employee : EmployeeBase, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the Address (see <see cref="Common.Entities.Address"/>).
+        /// Gets or sets the Address.
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Address? Address { get; set; }
@@ -38,7 +38,7 @@ namespace My.Hr.Common.Entities
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
+        /// Gets or sets the Change Log.
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }

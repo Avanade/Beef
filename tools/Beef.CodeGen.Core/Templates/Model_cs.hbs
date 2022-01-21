@@ -50,15 +50,33 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
   {{#unless @first}}
 
   {{/unless}}
+  {{#ifval RefDataType}}
+    {{#unless SerializationIgnore}}
+      {{#unless RefDataList}}
+        {{#unless Root.IsDataModel}}
+          {{#if RefDataText}}
         /// <summary>
-        /// {{{SummaryText}}}
+        /// {{{SummaryRefDataText}}}
+        /// </summary>
+            {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            {{/ifeq}}
+        public string? {{Name}}Text { get; set ; }
+
+          {{/if}}
+        {{/unless}}
+      {{/unless}}
+    {{/unless}}
+  {{/ifval}}
+        /// <summary>
+        /// {{{ModelSummaryText}}}
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
         [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
-    {{#unless IsDataModel}}
+    {{#unless Root.IsDataModel}}
       {{#ifval Annotation1}}
         {{Annotation1}}
       {{/ifval}}
@@ -112,18 +130,18 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
     {
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
         /// </summary>
         public {{{EntityCollectionResultName}}}() { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with <paramref name="paging"/>.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>

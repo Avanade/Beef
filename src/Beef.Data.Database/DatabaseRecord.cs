@@ -100,20 +100,14 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="index">The ordinal index for the column.</param>
         /// <returns><c>true</c> indicates that the column value has a <see cref="DBNull"/> value; otherwise, <c>false</c>.</returns>
-        public bool IsDBNull(int index)
-        {
-            return DataRecord.IsDBNull(index);
-        }
+        public bool IsDBNull(int index) => DataRecord.IsDBNull(index);
 
         /// <summary>
         /// Indicates whether the column value is <see cref="DBNull"/> for the specified column name.
         /// </summary>
         /// <param name="columnName">The name of the column.</param>
         /// <returns><c>true</c> indicates that the column value has a <see cref="DBNull"/> value; otherwise, <c>false</c>.</returns>
-        public bool IsDBNull(string columnName)
-        {
-            return DataRecord.IsDBNull(GetOrdinal(columnName));
-        }
+        public bool IsDBNull(string columnName) => DataRecord.IsDBNull(GetOrdinal(columnName));
 
         /// <summary>
         /// Gets the named <b>RowVersion</b> <see cref="IDataRecord"/> value for the specified column.
@@ -132,11 +126,9 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="index">The ordinal index for the column.</param>
         /// <returns>The resultant value.</returns>
-        /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted to an <see cref="Convert.ToBase64String(byte[])">encoded</see> <see cref="string"/> value.</remarks>
-        public string GetRowVersion(int index)
-        {
-            return Convert.ToBase64String(GetValue<byte[]>(index));
-        }
+        /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted to an <see cref="Convert.ToBase64String(byte[])">encoded</see> <see cref="string"/> value. This string will also be enclosed with double-quote characters to
+        /// be compliant.</remarks>
+        public string GetRowVersion(int index) => DatabaseRowVersionConverter.Default.ConvertToSrce(GetValue<byte[]>(index))!;
 
         /// <summary>
         /// Gets the <see cref="ChangeLog"/> <see cref="IDataRecord"/> value.
@@ -161,9 +153,6 @@ namespace Beef.Data.Database
         /// Gets the <see cref="DatabaseRecordFieldCollection"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
         /// <returns>The <see cref="DatabaseRecordFieldCollection"/>.</returns>
-        public DatabaseRecordFieldCollection GetFields()
-        {
-            return new DatabaseRecordFieldCollection(this);
-        }
+        public DatabaseRecordFieldCollection GetFields() => new DatabaseRecordFieldCollection(this);
     }
 }

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.3
 - *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (remove existing `EntityMapper`-based functionality) - may result in _breaking changes_:
   - `EfDbArgs<T, TModel>` renamed to `EfDbArgs` and updated to support the new AutoMapper requirements.

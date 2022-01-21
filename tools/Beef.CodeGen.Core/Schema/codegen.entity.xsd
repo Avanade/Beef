@@ -27,6 +27,11 @@
                       <xs:documentation>The overriding text for use in comments. By default the `Text` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. Otherwise, it will be: Gets or sets the {text}.'. To create a `&lt;see cref="XXX"/&gt;` within use moustache shorthand (e.g. {{Xxx}}).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="ModelText" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The overriding model text for use in comments. By default the `ModelText` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. Otherwise, it will be: Gets or sets the {text}.'. To create a `&lt;see cref="XXX"/&gt;` within use moustache shorthand (e.g. {{Xxx}}).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="Type" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The .NET `Type`. Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`</xs:documentation>
@@ -294,6 +299,18 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="HttpAgentMapper" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The HttpAgent `Mapper` approach for the property. Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Map" />
+                        <xs:enumeration value="Ignore" />
+                        <xs:enumeration value="Skip" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
                   <xs:attribute name="DisplayName" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The display name used in the likes of error messages for the property. Defaults to the `Name` as sentence case.</xs:documentation>
@@ -467,7 +484,7 @@
                       <xs:documentation>The unique operation name.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="OperationType" use="required">
+                  <xs:attribute name="OperationType" use="optional">
                     <xs:annotation>
                       <xs:documentation>The type of operation that is to be code-generated.</xs:documentation>
                     </xs:annotation>
@@ -1278,6 +1295,18 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="EventCasing" use="optional">
+              <xs:annotation>
+                <xs:documentation>The casing for the Subject and Action (with the exception of the key) Defaults to `CodeGeneration.EventCasing`.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="None" />
+                  <xs:enumeration value="Lower" />
+                  <xs:enumeration value="Upper" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
             <xs:attribute name="EventTransaction" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.</xs:documentation>
@@ -1715,6 +1744,18 @@
           <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
             <xs:enumeration value="PastTense" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventCasing" use="optional">
+        <xs:annotation>
+          <xs:documentation>The casing for the Subject and Action (with the exception of the key) Defaults to `None` (no casing required, i.e. as-is)`.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Lower" />
+            <xs:enumeration value="Upper" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

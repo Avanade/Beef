@@ -21,31 +21,35 @@
   <ItemGroup>
     <None Remove="Cosmos\Data.yaml" />
     <None Remove="Cosmos\RefData.yaml" />
+    <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
+    <None Remove="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
+    <None Remove="Expected\C110_CreatePostCodes_MockedHttpClient_Request.json" />
     <None Remove="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Cosmos\RefData.yaml" />
     <EmbeddedResource Include="Cosmos\Data.yaml" />
+    <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found_Response.json" />
+    <EmbeddedResource Include="Expected\B140_GetPostCodes_MockedHttpClient_Found.json" />
+    <EmbeddedResource Include="Expected\C110_CreatePostCodes_MockedHttpClient_Request.json" />
     <EmbeddedResource Include="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.16" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.22" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.Data.Database.Cdc\Beef.Data.Database.Cdc.csproj" />
     <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
-    <ProjectReference Include="..\Beef.Demo.CdcPublisher\Beef.Demo.CdcPublisher.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Functions\Beef.Demo.Functions.csproj" />
   </ItemGroup>

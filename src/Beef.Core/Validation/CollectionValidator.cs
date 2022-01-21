@@ -104,7 +104,7 @@ namespace Beef.Validation
                 i++;
             }
 
-            var text = new Lazy<LText>(() => Text ?? Beef.StringConversion.ToSentenceCase(args?.FullyQualifiedEntityName) ?? StringConversion.ToSentenceCase(Validator.ValueNameDefault)!);
+            var text = new Lazy<LText>(() => Text ?? ValidationExtensions.ConvertToSentenceCase(args?.FullyQualifiedEntityName) ?? ValidationExtensions.ConvertToSentenceCase(Validator.ValueNameDefault)!);
             if (hasNullItem)
                 context.AddMessage(Entities.MessageType.Error, ValidatorStrings.CollectionNullItemFormat, new object?[] { text.Value, null });
 

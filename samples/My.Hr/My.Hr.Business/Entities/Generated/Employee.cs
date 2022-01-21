@@ -35,7 +35,7 @@ namespace My.Hr.Business.Entities
         #region Properties
 
         /// <summary>
-        /// Gets or sets the Address (see <see cref="Common.Entities.Address"/>).
+        /// Gets or sets the Address (see <see cref="Business.Entities.Address"/>).
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Address")]

@@ -1,16 +1,13 @@
-# 'QueryWhere' object (database-driven) - YAML/JSON
+# 'QueryWhere' object (database-driven)
 
 The `QueryWhere` object defines an additional where `Statement` to be added.
 
 <br/>
 
 ## Properties
-The `QueryWhere` object supports a number of properties that control the generated code output. The properties with a bold name are those that are more typically used (considered more important).
+The `QueryWhere` object supports a number of properties that control the generated code output. The following properties with a bold name are those that are more typically used (considered more important).
 
 Property | Description
 -|-
-**`statement`** | The where TSQL statement.
+**`statement`** | The where TSQL statement. [Mandatory]
 
-<br/>
-
-<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

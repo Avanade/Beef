@@ -14,6 +14,11 @@ entities:
 //#endif
 //#if (implement_cosmos)
 entities:
-  # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
+  # The following is an example read-only reference data Entity accessing Cosmos DB.
   - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, dataModel: true, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.Gender }
+//#endif
+//#if (implement_httpagent)
+entities:
+  # The following is an example read-only reference data Entity accessing data with no auto implementation.
+  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders }
 //#endif

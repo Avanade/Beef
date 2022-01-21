@@ -6,6 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+#if (implement_httpagent)
+using System.Net.Http;
+using UnitTestEx.NUnit;
+#endif
 using Company.AppName.Api;
 using Company.AppName.Common.Agents;
 using Company.AppName.Common.Entities;
@@ -15,6 +19,7 @@ namespace Company.AppName.Test.Apis
     [TestFixture, NonParallelizable]
     public class PersonTest
     {
+#if (!implement_httpagent)
         #region Get
 
         [Test, TestSetUp]
@@ -199,7 +204,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("Company.AppName.Person", "Created")
+                .ExpectEvent("Company.AppName.Person".ToLowerInvariant(), "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
@@ -274,7 +279,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person", "Updated")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -323,7 +328,7 @@ namespace Company.AppName.Test.Apis
             // Try updating the value with an eTag header (json payload eTag is ignored).
             agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
+                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": \"{TestSetUp.ConcurrencyErrorETag}\" }}", id));
         }
 
         [Test, TestSetUp]
@@ -347,7 +352,7 @@ namespace Company.AppName.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"Company.AppName.Person", "Updated")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value!;
 
             // Check the value was updated properly.
@@ -375,7 +380,7 @@ namespace Company.AppName.Test.Apis
             // Delete value.
             agentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Company.AppName.Person", "Deleted")
+                .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.
@@ -391,4 +396,46 @@ namespace Company.AppName.Test.Apis
 
         #endregion
     }
+#else
+    #region Get
+
+        [Test, TestSetUp]
+        public void A110_Get_NotFound()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            mcf.CreateClient("Xxx", "http://unittest").Request(HttpMethod.Get, $"/people/{404.ToGuid()}").Respond.With(HttpStatusCode.NotFound);
+
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            agentTester.Test<PersonAgent, Person?>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(404.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void A120_Get_Found()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            mcf.CreateClient("Xxx", "http://unittest").Request(HttpMethod.Get, $"/people/{1.ToGuid()}").Respond.WithJson(new Business.Data.Model.Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", Birthday = new DateTime(1985, 03, 18) });
+
+            using var agentTester = AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            agentTester.Test<PersonAgent, Person?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .IgnoreChangeLog()
+                .IgnoreETag()
+                .ExpectValue(_ => new Person
+                {
+                    Id = 1.ToGuid(),
+                    FirstName = "Wendy",
+                    LastName = "Jones",
+                    Gender = "F",
+                    Birthday = new DateTime(1985, 03, 18)
+                })
+                .Run(a => a.GetAsync(1.ToGuid()));
+        }
+
+    #endregion
+    }
+#endif
 }

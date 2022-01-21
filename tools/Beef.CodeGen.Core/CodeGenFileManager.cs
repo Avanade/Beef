@@ -3,6 +3,8 @@
 using Beef.CodeGen.Converters;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
+using OnRamp;
+using OnRamp.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,24 +41,6 @@ namespace Beef.CodeGen
         public static List<string> DatabaseFilenames { get; } = new List<string>(new string[] { "database.beef.yaml", "database.beef.yml", "database.beef.json", "database.beef.xml", "{{Company}}.{{AppName}}.Database.xml" });
 
         /// <summary>
-        /// Gets the executable directory. Uses <see cref="Environment.CurrentDirectory"/> and removes <c>bin/debug</c> and <c>bin/release</c> where found to get back to root directory where configuration etc. should reside.
-        /// </summary>
-        /// <returns>The executable directory path.</returns>
-        public static string GetExeDirectory()
-        {
-            var exeDir = Environment.CurrentDirectory;
-            var i = exeDir.IndexOf(Path.Combine("bin", "debug"), StringComparison.InvariantCultureIgnoreCase);
-            if (i > 0)
-                exeDir = exeDir[0..i];
-
-            i = exeDir.IndexOf(Path.Combine("bin", "release"), StringComparison.InvariantCultureIgnoreCase);
-            if (i > 0)
-                exeDir = exeDir[0..i];
-
-            return exeDir;
-        }
-
-        /// <summary>
         /// Get the configuration filename.
         /// </summary>
         /// <param name="directory">The directory/path.</param>
@@ -76,7 +60,7 @@ namespace Beef.CodeGen
                 files.Add(fi.Name);
             }
 
-            throw new InvalidOperationException($"Configuration file not found; looked for one of the following: {string.Join(", ", files)}.");
+            throw new CodeGenException($"Configuration file not found; looked for one of the following: {string.Join(", ", files)}.");
         }
 
         /// <summary>
@@ -98,10 +82,10 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="type">The <see cref="CommandType"/>.</param>
         /// <param name="filename">The XML filename.</param>
-        /// <returns>The resulting return code.</returns>
-        public static async Task<int> ConvertXmlToYamlAsync(CommandType type, string filename)
+        /// <returns><c>true</c> indicates success; otherwise, <c>false</c>.</returns>
+        public static async Task<bool> ConvertXmlToYamlAsync(CommandType type, string filename)
         {
-            var logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
+            var logger = (Logger.Default ??= new ConsoleLogger());
             logger.LogInformation($"Convert XML to YAML file configuration: {filename}");
             logger.LogInformation(string.Empty);
 
@@ -110,14 +94,14 @@ namespace Beef.CodeGen
             {
                 logger.LogError("File does not exist.");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             if (string.Compare(xfi.Extension, ".XML", StringComparison.OrdinalIgnoreCase) != 0)
             {
                 logger.LogError("File extension must be XML.");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             var yfi = new FileInfo(Path.Combine(xfi.DirectoryName, GetConfigFilenames(type).First()));
@@ -125,7 +109,7 @@ namespace Beef.CodeGen
             {
                 logger.LogError($"YAML file already exists: {yfi.Name}");
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
             try
@@ -159,10 +143,10 @@ namespace Beef.CodeGen
             {
                 logger.LogError(ex.Message);
                 logger.LogInformation(string.Empty);
-                return -1;
+                return false;
             }
 
-            return 0;
+            return true;
         }
     }
 }

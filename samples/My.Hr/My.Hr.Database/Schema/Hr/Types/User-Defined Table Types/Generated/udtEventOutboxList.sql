@@ -8,6 +8,7 @@ CREATE TYPE [Hr].[udtEventOutboxList] AS TABLE (
   [Action] NVARCHAR(128) NULL,
   [CorrelationId] NVARCHAR(64) NULL,
   [TenantId] UNIQUEIDENTIFIER NULL,
+  [PartitionKey] NVARCHAR(128) NULL,
   [ValueType] NVARCHAR(1024),
   [EventData] VARBINARY(MAX)
 )

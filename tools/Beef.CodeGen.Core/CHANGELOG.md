@@ -2,6 +2,32 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.13
+- *Enhancement:* Core code-generation capabilities moved into new [OnRamp](https://github.com/Avanade/OnRamp) and referenced.
+- *Enhancement:* Database schema inference moved into new [DbEx](https://github.com/Avanade/DbEx) and referenced.
+- *Enhancement:* All code-gen `Script` files converted to YAML; the embedded resources have all been updated and renamed with the `.yaml` file extension accordingly.
+- *Enhancement:* `CodeGenConsoleWrapper` has been removed; use `CodeGenConsole` (breaking change).
+- *Enhancement:* All CDC-related capabilities have been removed; use new [nTangle](https://github.com/Avanade/NTangle).
+- *Enhancement:* Command-line options have been adjusted and may result in breaking change; they are as follows:
+
+```
+Beef.CodeGen.Core Code Generator tool.
+
+Usage: Beef.CodeGen.Core [options]
+
+Options:
+  -?|-h|--help              Show help information.
+  -s|--script               Script orchestration file/resource name.
+  -c|--config               Configuration data file name.
+  -o|--output               Output directory path.
+  -a|--assembly             Assembly containing embedded resources (multiple can be specified in probing order).
+  -p|--param                Parameter expressed as a 'Name=Value' pair (multiple can be specified).
+  -cs|--connection-string   Database connection string.
+  -cv|--connection-varname  Database connection string environment variable name.
+  -enc|--expect-no-changes  Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline).
+  -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
+```
+
 ## v4.2.12
 - *Enhancement:* Updated the `EntityData` template to include the new `HttpAgent` data source functionality.
 - *Enhancement:* Added `CodeGeneration.WebApiRoutePrefix` which will prefix all underlying `Entity` and `Operation` routes.
@@ -122,7 +148,7 @@ Represents the **NuGet** versions.
 - *Fixed:* A return type of `string` will always be treated as nullable. This is because the `Cleaner.Clean` (based on settings) could override the return value with `null`.
 - *Enhancement:* The code-gen `Scripts` XML files support a new `Inherits` attribute to enable references to one or more other `Scripts` files. This allows referencing to remove the need to duplicate setting across multiple files.
 - *Enhancement:* The code-gen has been updated to enable [personalization of code-generation](./README.md#personalization-andor-overriding); to either override an existing template or execute entirely new templates; including the ability to access additive configuration.
-- *Enhancement:* Added new configuration and templates to support Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capability. Additionally, [`Beef.Data.Database.Cdc`](./../../src/Beef.Data.Database.Cdc/README.md) has been added to support; this documentation also describes its usage.
+- *Enhancement:* Added new configuration and templates to support Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capability. Additionally, `Beef.Data.Database.Cdc` has been added to support; this documentation also describes its usage.
 - *Enhancment:* To simplify the addition of additional constructor parameters for DI the following `Entity` configuration can be specified `DataCtorParams`, `DataSvcCtorParams`, `ManagerCtorParams` and `WebApiCtorParams`. This is a comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. "here the `Type` matches an already inferred value it will be ignored.
 - *Enhancement*: Added new `Property.IdentifierGenerator` to specify the `Type` (via dependency injection) to generate the identifier value on `Create` (within `XxxManager`).
 - *Enhancement*: Added new `CodeGeneration.EventTransaction` and `Entity.EventTransaction` as a shorthand to set the `Operation.DataSvcTransaction` whereever an event is being published; this will rollback any updates where the event publish fails (only functional where the data source supports `System.TransactionScope`). 

@@ -15,6 +15,7 @@ refDataText: true
 eventSubjectRoot: My
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
+eventCasing: Lower
 eventSourceRoot: My/Hr
 eventSourceKind: Relative
 eventOutbox: Database

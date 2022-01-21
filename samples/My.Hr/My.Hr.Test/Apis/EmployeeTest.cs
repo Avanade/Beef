@@ -52,7 +52,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A120_Get_Found_WithAddress()
+        public void A130_Get_Found_WithAddress()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -77,7 +77,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A120_Get_Modified_NotModified()
+        public void A140_Get_Modified_NotModified()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -90,6 +90,32 @@ namespace My.Hr.Test.Apis
             agentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetAsync(1.ToGuid(), new WebApiRequestOptions { ETag = v.ETag }));
+        }
+
+        [Test, TestSetUp]
+        public void A150_Get_IncludeRefDataText()
+        {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var v = agentTester.Test<EmployeeAgent, Employee?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid(), new WebApiRequestOptions { IncludeRefDataText = true})).Value!;
+
+            Assert.NotNull(v);
+            Assert.AreEqual("Female", v.GenderText);
+        }
+
+        [Test, TestSetUp]
+        public void A160_Get_IncludeFields()
+        {
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<EmployeeAgent, Employee?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid(), new WebApiRequestOptions().Include(new string[] { "firstName", "lastName" })));
+
+            Assert.NotNull(r);
+            Assert.AreEqual("{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}", r.Content);
         }
 
         #endregion
@@ -112,7 +138,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A210_GetByArgs_All_Paging()
+        public void A220_GetByArgs_All_Paging()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -133,7 +159,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A220_GetByArgs_FirstName()
+        public void A230_GetByArgs_FirstName()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -148,7 +174,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A230_GetByArgs_LastName()
+        public void A240_GetByArgs_LastName()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -163,7 +189,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A230_GetByArgs_LastName_IncludeTerminated()
+        public void A250_GetByArgs_LastName_IncludeTerminated()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -178,7 +204,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A240_GetByArgs_Gender()
+        public void A260_GetByArgs_Gender()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -193,7 +219,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A250_GetByArgs_Empty()
+        public void A270_GetByArgs_Empty()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -207,7 +233,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A260_GetByArgs_FieldSelection()
+        public void A280_GetByArgs_FieldSelection()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -224,7 +250,7 @@ namespace My.Hr.Test.Apis
         }
 
         [Test, TestSetUp]
-        public void A270_GetByArgs_RefDataText()
+        public void A290_GetByArgs_RefDataText()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
 
@@ -269,7 +295,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("My.Hr.Employee", "Created")
+                .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
@@ -369,7 +395,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Updated")
+                .ExpectEvent($"my.hr.employee", "updated")
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
@@ -442,7 +468,7 @@ namespace My.Hr.Test.Apis
             v.ETag = TestSetUp.ConcurrencyErrorETag;
             agentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
+                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": \"{TestSetUp.ConcurrencyErrorETag}\" }}", id));
         }
 
         [Test, TestSetUp]
@@ -467,7 +493,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Updated")
+                .ExpectEvent($"my.hr.employee", "updated")
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\", \"emergencyContacts\": null }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value;
 
             // Check the value was updated properly.
@@ -502,13 +528,13 @@ namespace My.Hr.Test.Apis
             // Create an employee in the future.
             v = agentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Created)
-                .ExpectEvent("My.Hr.Employee", "Created")
+                .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value;
 
             // Delete value.
             agentTester.Test<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"My.Hr.Employee", "Deleted")
+                .ExpectEvent($"my.hr.employee", "deleted")
                 .Run(a => a.DeleteAsync(v.Id));
 
             // Check value no longer exists.
@@ -575,7 +601,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent($"My.Hr.Employee", "Terminated")
+                .ExpectEvent($"my.hr.employee", "terminated")
                 .Run(a => a.TerminateAsync(v.Termination, 1.ToGuid())).Value!;
 
             agentTester.Test<EmployeeAgent, Employee?>()

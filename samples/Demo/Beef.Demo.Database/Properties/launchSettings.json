@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.Demo.Database": {
       "commandName": "Project",
-      "commandLineArgs": "data"
+      "commandLineArgs": "all"
     }
   }
 }

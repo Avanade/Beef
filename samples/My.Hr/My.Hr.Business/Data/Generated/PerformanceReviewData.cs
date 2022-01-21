@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Entities;
 using Beef.Events;
@@ -78,7 +79,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "created");
             return __result;
         });
 
@@ -91,7 +92,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "updated");
             return __result;
         });
 
@@ -103,7 +104,7 @@ namespace My.Hr.Business.Data
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted", id);
+            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"my.hr.performancereview", "deleted", id);
         });
 
         /// <summary>
@@ -123,7 +124,7 @@ namespace My.Hr.Business.Data
                 s2d.ForMember(d => d.PerformanceOutcomeCode, o => o.MapFrom(s => s.OutcomeSid));
                 s2d.ForMember(d => d.Reviewer, o => o.MapFrom(s => s.Reviewer));
                 s2d.ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(StringToBase64Converter.Default.ToDest, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToDest, s => s.ETag));
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
                 s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
                 s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
@@ -136,7 +137,7 @@ namespace My.Hr.Business.Data
                 d2s.ForMember(s => s.OutcomeSid, o => o.MapFrom(d => d.PerformanceOutcomeCode));
                 d2s.ForMember(s => s.Reviewer, o => o.MapFrom(d => d.Reviewer));
                 d2s.ForMember(s => s.Notes, o => o.MapFrom(d => d.Notes));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedBy));

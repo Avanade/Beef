@@ -27,6 +27,9 @@ using {{Root.DatabaseUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if RefData.UsesEntityFramework}}
+  {{#unless RefData.UsesDatabase}}
+using Beef.Data.Database;
+  {{/unless}}
 using Beef.Data.EntityFrameworkCore;
   {{#ifval Root.EntityFrameworkUsingNamespace}}
 using {{Root.EntityFrameworkUsingNamespace}};
@@ -67,18 +70,18 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}ReferenceDataDataCtor(); }
 
-        partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
 {{#each RefDataEntities}}
   {{#unless @first}}
 
   {{/unless}}
         /// <summary>
-        /// Gets all the {{seecomments RefDataQualifiedEntityName}} items.
+        /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
         /// </summary>
-        /// <returns>The {{seecomments RefDataQualifiedEntityCollectionName}}.</returns>
+        /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
         public async Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync()
         {
             var __coll = new {{RefDataQualifiedEntityCollectionName}}();
@@ -113,7 +116,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class {{Name}}MapperProfile : AutoMapper.Profile
         {
@@ -125,9 +128,9 @@ namespace {{Root.NamespaceBusiness}}.Data
                 var d2s = CreateMap<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.{{Name}}Id));
           {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -144,7 +147,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{seecomments RefDataQualifiedEntityName}} and Entity Framework {{{seecomments CosmosModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments CosmosModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class {{Name}}MapperProfile : AutoMapper.Profile
         {
@@ -155,7 +158,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             {
                 var d2s = CreateMap<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>();
           {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
 
                 {{Name}}MapperProfileCtor(d2s);

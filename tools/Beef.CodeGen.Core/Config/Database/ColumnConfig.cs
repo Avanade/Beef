@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using DbEx.Schema;
+using OnRamp.Config;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -17,9 +19,9 @@ namespace Beef.CodeGen.Config.Database
         string? Name { get; }
 
         /// <summary>
-        /// Gets the database <see cref="DbModels.DbColumn"/> configuration.
+        /// Gets the database <see cref="DbColumnSchema"/> configuration.
         /// </summary>
-        DbColumn? DbColumn { get; }
+        DbColumnSchema? DbColumn { get; }
 
         /// <summary>
         /// Gets the qualified name (includes the alias).
@@ -179,9 +181,9 @@ namespace Beef.CodeGen.Config.Database
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="DbModels.DbColumn"/> configuration.
+        /// Gets or sets the database <see cref="DbColumnSchema"/> configuration.
         /// </summary>
-        public DbColumn? DbColumn { get; set; }
+        public DbColumnSchema? DbColumn { get; set; }
 
         /// <summary>
         /// Gets the qualified name (includes the alias).
@@ -228,7 +230,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
             ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
-            : (DbColumn.TypeIsInteger(DbColumn!.Type) || DbColumn.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+            : (DbTypeMapper.TypeIsInteger(DbColumn!.Type) || DbTypeMapper.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
 
         /// <summary>
         /// Indicates where the column is the "TenantId" column.
@@ -323,7 +325,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
-        public string DotNetType => DbColumn.GetDotNetTypeName(DbColumn!.Type);
+        public string DotNetType => DbTypeMapper.GetDotNetTypeName(DbColumn!.Type);
 
         /// <summary>
         /// Indicates whether the .NET property is nullable.
@@ -348,10 +350,11 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
             NameAlias = DefaultWhereNull(NameAlias, () => Root!.RenameForDotNet(Name));
             UpdateSqlProperties();
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -360,7 +363,7 @@ namespace Beef.CodeGen.Config.Database
         private void UpdateSqlProperties()
         {
             var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
-            if (DbColumn.TypeIsString(DbColumn!.Type))
+            if (DbTypeMapper.TypeIsString(DbColumn!.Type))
                 sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
 
             sb.Append(DbColumn!.Type.ToUpperInvariant() switch
@@ -421,57 +424,5 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the identifier mapping parent column configuration.
         /// </summary>
         T? IdentifierMappingParent { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the <see cref="QueryConfig"/> column configuration.
-    /// </summary>
-    public class CdcColumnConfig : ColumnConfigBase<CdcConfig>, IIdentifierMappingColumn<CdcColumnConfig>
-    {
-        /// <summary>
-        /// Gets or sets the identifier mapping schema name.
-        /// </summary>
-        public string? IdentifierMappingSchema { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping table name.
-        /// </summary>
-        public string? IdentifierMappingTable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping alias.
-        /// </summary>
-        public string? IdentifierMappingAlias { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping parent column configuration.
-        /// </summary>
-        public CdcColumnConfig? IdentifierMappingParent { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the <see cref="QueryJoinConfig"/> column configuration.
-    /// </summary>
-    public class CdcJoinColumnConfig : ColumnConfigBase<CdcJoinConfig>, IIdentifierMappingColumn<CdcJoinColumnConfig>
-    {
-        /// <summary>
-        /// Gets or sets the identifier mapping schema name.
-        /// </summary>
-        public string? IdentifierMappingSchema { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping table name.
-        /// </summary>
-        public string? IdentifierMappingTable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping alias.
-        /// </summary>
-        public string? IdentifierMappingAlias { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier mapping parent column configuration.
-        /// </summary>
-        public CdcJoinColumnConfig? IdentifierMappingParent { get; set; }
     }
 }

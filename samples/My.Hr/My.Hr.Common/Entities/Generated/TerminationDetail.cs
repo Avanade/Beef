@@ -26,7 +26,13 @@ namespace My.Hr.Common.Entities
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// Gets or sets the Reason (see <see cref="RefDataNamespace.TerminationReason"/>).
+        /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("reasonText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? ReasonText { get; set ; }
+
+        /// <summary>
+        /// Gets or sets the Reason.
         /// </summary>
         [JsonProperty("reason", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Reason { get; set; }

@@ -1,10 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using DbEx.Schema;
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -12,7 +16,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents a database query configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Query", Title = "'Query' object (database-driven)",
+    [CodeGenClass("Query", Title = "'Query' object (database-driven)",
         Description = "The `Query` object enables the definition of more complex multi-table queries (`Joins`) that would primarily result in a database _View_. The primary table `Name` for the query is required to be specified. Multiple queries can be specified for the same table(s)."
             + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name)."
             + " Additional `Where` and `Order` configuration can also be added as required.",
@@ -29,12 +33,12 @@ queries:
     ]
   }
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
-    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("View", Title = "Provides the _View_ configuration.")]
-    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
-    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
-    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CodeGenCategory("View", Title = "Provides the _View_ configuration.")]
+    [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class QueryConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
         /// <summary>
@@ -49,14 +53,14 @@ queries:
         /// Gets or sets the name of the primary table of the query.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the primary table of the query.", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The name of the primary table of the query.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the schema name of the primary table of the view.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The schema name of the primary table of the view.",
+        [CodeGenProperty("Key", Title = "The schema name of the primary table of the view.",
             Description = "Defaults to `CodeGeneration.dbo`.")]
         public string? Schema { get; set; }
 
@@ -64,7 +68,7 @@ queries:
         /// Gets or sets the `Schema.Table` alias name.
         /// </summary>
         [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `Schema.Table` alias name.",
+        [CodeGenProperty("Key", Title = "The `Schema.Table` alias name.",
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
 
@@ -76,7 +80,7 @@ queries:
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -84,7 +88,7 @@ queries:
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         public List<string>? ExcludeColumns { get; set; }
 
@@ -92,7 +96,7 @@ queries:
         /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
         public List<string>? AliasColumns { get; set; }
 
@@ -104,14 +108,14 @@ queries:
         /// Indicates whether a `View` is to be generated.
         /// </summary>
         [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "Indicates whether a `View` is to be generated.")]
+        [CodeGenProperty("View", Title = "Indicates whether a `View` is to be generated.")]
         public bool? View { get; set; }
 
         /// <summary>
         /// Gets or sets the `View` name.
         /// </summary>
         [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The `View` name.",
+        [CodeGenProperty("View", Title = "The `View` name.",
             Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
         public string? ViewName { get; set; }
 
@@ -119,7 +123,7 @@ queries:
         /// Gets or sets the schema name of the `View`.
         /// </summary>
         [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The schema name for the `View`.",
+        [CodeGenProperty("View", Title = "The schema name for the `View`.",
             Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
 
@@ -131,7 +135,7 @@ queries:
         /// Gets or sets the permission to be used for security permission checking.
         /// </summary>
         [JsonProperty("permission", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Auth", Title = "The permission to be used for security permission checking.", IsImportant = true,
+        [CodeGenProperty("Auth", Title = "The permission to be used for security permission checking.", IsImportant = true,
             Description = "The suffix is optional, and where not specified will default to `.READ`.")]
         public string? Permission { get; set; }
 
@@ -143,7 +147,7 @@ queries:
         /// Gets or sets the column name for the `IsDeleted` capability.
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `IsDeleted` capability.",
             Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
@@ -151,7 +155,7 @@ queries:
         /// Gets or sets the column name for the `TenantId` capability.
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `TenantId` capability.",
             Description = "Defaults to `CodeGeneration.TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
@@ -159,7 +163,7 @@ queries:
         /// Gets or sets the column name for the `OrgUnitId` capability.
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `OrgUnitId` capability.",
             Description = "Defaults to `CodeGeneration.OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
@@ -167,7 +171,7 @@ queries:
         /// Gets or sets the column name for the `RowVersion` capability.
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `RowVersion` capability.",
             Description = "Defaults to `CodeGeneration.RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
@@ -175,7 +179,7 @@ queries:
         /// Gets or sets the column name for the `CreatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedBy` capability.",
             Description = "Defaults to `CodeGeneration.CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
@@ -183,7 +187,7 @@ queries:
         /// Gets or sets the column name for the `CreatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `CreatedDate` capability.",
             Description = "Defaults to `CodeGeneration.CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
@@ -191,7 +195,7 @@ queries:
         /// Gets or sets the column name for the `UpdatedBy` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
@@ -199,7 +203,7 @@ queries:
         /// Gets or sets the column name for the `UpdatedDate` capability.
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `UpdatedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
@@ -207,7 +211,7 @@ queries:
         /// Gets or sets the column name for the `DeletedBy` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
@@ -215,7 +219,7 @@ queries:
         /// Gets or sets the column name for the `DeletedDate` capability.
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
+        [CodeGenProperty("Infer", Title = "The column name for the `DeletedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
@@ -227,7 +231,7 @@ queries:
         /// Gets or sets the corresponding <see cref="QueryJoinConfig"/> collection.
         /// </summary>
         [JsonProperty("joins", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
             Markdown = "A `Join` object provides the configuration for a joining table.")]
         public List<QueryJoinConfig>? Joins { get; set; }
 
@@ -235,7 +239,7 @@ queries:
         /// Gets or sets the corresponding <see cref="QueryOrderConfig"/> collection.
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Order` collection.",
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Order` collection.",
             Markdown = "An `Order` object defines the order (sequence).")]
         public List<QueryOrderConfig>? Order { get; set; }
 
@@ -243,7 +247,7 @@ queries:
         /// Gets or sets the corresponding <see cref="WhereConfig"/> collection.
         /// </summary>
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.",
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding `Where` collection.",
             Markdown = "A `Where` object defines the selection/filtering.")]
         public List<QueryWhereConfig>? Where { get; set; }
 
@@ -272,69 +276,52 @@ queries:
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
+        public IColumnConfig? ColumnIsDeleted { get; private set; }
 
         /// <summary>
         /// Gets the related TenantId column.
         /// </summary>
-        public IColumnConfig? ColumnTenantId => GetSpecialColumn(ColumnNameTenantId);
+        public IColumnConfig? ColumnTenantId { get; private set; }
 
         /// <summary>
         /// Gets the related OrgUnitId column.
         /// </summary>
-        public IColumnConfig? ColumnOrgUnitId => GetSpecialColumn(ColumnNameOrgUnitId);
+        public IColumnConfig? ColumnOrgUnitId { get; private set; }
 
         /// <summary>
         /// Gets the related RowVersion column.
         /// </summary>
-        public IColumnConfig? ColumnRowVersion => GetSpecialColumn(ColumnNameRowVersion);
+        public IColumnConfig? ColumnRowVersion { get; private set; }
 
         /// <summary>
         /// Gets the related CreatedBy column.
         /// </summary>
-        public IColumnConfig? ColumnCreatedBy => GetSpecialColumn(ColumnNameCreatedBy);
+        public IColumnConfig? ColumnCreatedBy { get; private set; }
 
         /// <summary>
         /// Gets the related CreatedDate column.
         /// </summary>
-        public IColumnConfig? ColumnCreatedDate => GetSpecialColumn(ColumnNameCreatedDate);
+        public IColumnConfig? ColumnCreatedDate { get; private set; }
 
         /// <summary>
         /// Gets the related UpdatedBy column.
         /// </summary>
-        public IColumnConfig? ColumnUpdatedBy => GetSpecialColumn(ColumnNameUpdatedBy);
+        public IColumnConfig? ColumnUpdatedBy { get; private set; }
 
         /// <summary>
         /// Gets the related UpdatedDate column.
         /// </summary>
-        public IColumnConfig? ColumnUpdatedDate => GetSpecialColumn(ColumnNameUpdatedDate);
+        public IColumnConfig? ColumnUpdatedDate { get; private set; }
 
         /// <summary>
         /// Gets the related DeletedBy column.
         /// </summary>
-        public IColumnConfig? ColumnDeletedBy => GetSpecialColumn(ColumnNameDeletedBy);
+        public IColumnConfig? ColumnDeletedBy { get; private set; }
 
         /// <summary>
         /// Gets the related DeletedDate column.
         /// </summary>
-        public IColumnConfig? ColumnDeletedDate => GetSpecialColumn(ColumnNameDeletedDate);
-
-        /// <summary>
-        /// Gets the named special column.
-        /// </summary>
-        private IColumnConfig? GetSpecialColumn(string? name)
-        {
-            if (string.IsNullOrEmpty(name))
-                return null;
-
-            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
-            if (c == null)
-                return null;
-
-            var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
-            cc.Prepare(Root!, this);
-            return cc;
-        }
+        public IColumnConfig? ColumnDeletedDate { get; private set; }
 
         /// <summary>
         /// Gets the table name.
@@ -344,22 +331,19 @@ queries:
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
-        public DbTable? DbTable { get; private set; }
+        public DbTableSchema? DbTable { get; private set; }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override async Task PrepareAsync()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             Schema = DefaultWhereNull(Schema, () => "dbo");
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
-            Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
             ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
 
@@ -377,13 +361,14 @@ queries:
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Root!.ColumnNameDeletedBy);
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Root!.ColumnNameDeletedDate);
 
-            PrepareJoins();
+            await SetSpecialColumnsAsync().ConfigureAwait(false);
+            await PrepareJoinsAsync().ConfigureAwait(false);
 
             if (Order != null && Order.Count > 0)
             {
                 foreach (var order in Order)
                 {
-                    order.Prepare(Root!, this);
+                    await order.PrepareAsync(Root!, this).ConfigureAwait(false);
                 }
             }
 
@@ -392,7 +377,7 @@ queries:
                 if (c.IsPrimaryKey)
                 {
                     var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     PrimaryKeyColumns.Add(cc);
                 }
 
@@ -407,7 +392,7 @@ queries:
                             cc.NameAlias = parts[1];
                     }
 
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     Columns.Add(cc);
                 }
             }
@@ -430,7 +415,7 @@ queries:
                 if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
                 {
                     var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
-                    cc.Prepare(Root!, this);
+                    await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
                     SelectedColumns.Add(cc);
                 }
             }
@@ -448,7 +433,7 @@ queries:
                     if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
                     {
                         var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
-                        cc.Prepare(Root!, j);
+                        await cc.PrepareAsync(Root!, j).ConfigureAwait(false);
                         SelectedColumns.Add(cc);
                     }
                 }
@@ -457,7 +442,7 @@ queries:
             // Prepare the where clauses.
             foreach (var where in Where)
             {
-                where.Prepare(Root!, this);
+                await where.PrepareAsync(Root!, this).ConfigureAwait(false);
             }
 
             // Update the centralised view metadata.
@@ -473,7 +458,7 @@ queries:
         /// <summary>
         /// Prepares the joins.
         /// </summary>
-        private void PrepareJoins()
+        private async Task PrepareJoinsAsync()
         {
             if (Joins == null)
                 Joins = new List<QueryJoinConfig>();
@@ -482,7 +467,7 @@ queries:
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
             foreach (var join in Joins)
             {
-                join.Prepare(Root!, this);
+                await join.PrepareAsync(Root!, this).ConfigureAwait(false);
                 if (dict.TryGetValue(join.Alias!, out var val))
                 {
                     dict[join.Alias!] = val++;
@@ -495,7 +480,7 @@ queries:
             // Now that the alias has been updated we can prepare accordingly.
             foreach (var join in Joins)
             {
-                join.PrepareJoinOn();
+                await join.PrepareJoinOnAsync().ConfigureAwait(false);
             }
         }
 
@@ -504,12 +489,11 @@ queries:
         /// </summary>
         private void UpdateViewMetadata()
         {
-            var dt = new DbTable { Schema = ViewSchema, Name = ViewName, IsAView = true };
+            var dt = new DbTableSchema(ViewSchema!, ViewName!) { IsAView = true };
             foreach (var c in SelectedColumns)
             {
-                var dc = c.DbColumn!.Clone();
-                dc.DbTable = dt;
-                dc.Name = c.NameAlias;
+                var dc = new DbColumnSchema(dt, c.NameAlias!, c.DbColumn!.Type);
+                dc.CopyFrom(c.DbColumn);
                 dt.Columns.Add(dc);
             }
 
@@ -520,6 +504,40 @@ queries:
 
             // Add new/updated version.
             Root!.DbTables!.Add(dt);
+        }
+
+        /// <summary>
+        /// Sets the special columns.
+        /// </summary>
+        private async Task SetSpecialColumnsAsync()
+        {
+            ColumnIsDeleted = await GetSpecialColumnAsync(ColumnNameIsDeleted).ConfigureAwait(false);
+            ColumnTenantId = await GetSpecialColumnAsync(ColumnNameTenantId).ConfigureAwait(false);
+            ColumnOrgUnitId = await GetSpecialColumnAsync(ColumnNameOrgUnitId).ConfigureAwait(false);
+            ColumnRowVersion = await GetSpecialColumnAsync(ColumnNameRowVersion).ConfigureAwait(false);
+            ColumnCreatedBy = await GetSpecialColumnAsync(ColumnNameCreatedBy).ConfigureAwait(false);
+            ColumnCreatedDate = await GetSpecialColumnAsync(ColumnNameCreatedDate).ConfigureAwait(false);
+            ColumnUpdatedBy = await GetSpecialColumnAsync(ColumnNameUpdatedBy).ConfigureAwait(false);
+            ColumnUpdatedDate = await GetSpecialColumnAsync(ColumnNameUpdatedDate).ConfigureAwait(false);
+            ColumnDeletedBy = await GetSpecialColumnAsync(ColumnNameDeletedBy).ConfigureAwait(false);
+            ColumnDeletedDate = await GetSpecialColumnAsync(ColumnNameDeletedDate).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets the named special column.
+        /// </summary>
+        private async Task<IColumnConfig?> GetSpecialColumnAsync(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
+            if (c == null)
+                return null;
+
+            var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
+            await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
+            return cc;
         }
     }
 }

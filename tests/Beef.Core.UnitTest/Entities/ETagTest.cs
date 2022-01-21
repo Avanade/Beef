@@ -33,8 +33,8 @@ namespace Beef.Core.UnitTest.Entities
         public void Generate()
         {
             var p = new Person { First = "Jane", Last = "Doe" };
-            Assert.AreEqual("XCmFjH2zioLOelNdmU8hEQ==", ETagGenerator.Generate(p));
-            Assert.AreEqual("E9ik+Agqes6hzHMezoJigw==", ETagGenerator.Generate(p, "XYZ"));
+            Assert.AreEqual("\"2I0QhKAlJMdHjCAocBhQeuzmze73jSnnWqyOkofhRn4=\"", ETagGenerator.Generate(p));
+            Assert.AreEqual("\"471H/SShWDDr5wOVpMnhcu00Fw3nhOHN1aE8VNpXCsY=\"", ETagGenerator.Generate(p, "XYZ"));
         }
     }
 }

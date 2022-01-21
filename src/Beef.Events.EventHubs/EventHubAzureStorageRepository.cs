@@ -47,16 +47,16 @@ namespace Beef.Events.EventHubs
                 EventHubName = data.EventHubName,
                 ConsumerGroupName = data.ConsumerGroupName,
                 PartitionId = data.PartitionId,
-                Offset = data.Originating.SystemProperties.Offset,
-                SequenceNumber = data.Originating.SystemProperties.SequenceNumber,
-                EnqueuedTimeUtc = data.Originating.SystemProperties.EnqueuedTimeUtc,
+                Offset = data.Originating.Offset,
+                SequenceNumber = data.Originating.SequenceNumber,
+                EnqueuedTimeUtc = data.Originating.EnqueuedTime,
                 EventId = data.Metadata.EventId,
                 Attempts = data.Attempt <= 0 ? 1 : data.Attempt,
                 Subject = result.Subject,
                 Action = result.Action,
                 Reason = result.Reason,
                 Status = result.Status.ToString(),
-                Body = TruncateText(Encoding.UTF8.GetString(data.Originating.Body)),
+                Body = TruncateText(Encoding.UTF8.GetString(data.Originating.Body.ToArray())),
                 Exception = TruncateText(result.Exception?.ToString()),
             };
 
@@ -69,9 +69,9 @@ namespace Beef.Events.EventHubs
         protected override async Task<(PoisonMessageAction Action, int Attempts)> CheckPoisonedAdditionalAsync(EventHubData data, EventHubAuditRecord audit)
         {
             // Where the message (event) exists with a different sequence number - this means things are slightly out of whack! Remove, audit and assume not poison.
-            if (data.Originating.SystemProperties.SequenceNumber != audit.SequenceNumber)
+            if (data.Originating.SequenceNumber != audit.SequenceNumber)
             {
-                var reason = $"Current EventData (Seq#: '{data.Originating.SystemProperties.SequenceNumber}' Offset#: '{data.Originating.SystemProperties.Offset}') being processed is out of sync with previous Poison (Seq#: '{audit.SequenceNumber}' Offset#: '{audit.Offset}'); current assumed correct with previous Poison now deleted.";
+                var reason = $"Current EventData (Seq#: '{data.Originating.SequenceNumber}' Offset#: '{data.Originating.Offset}') being processed is out of sync with previous Poison (Seq#: '{audit.SequenceNumber}' Offset#: '{audit.Offset}'); current assumed correct with previous Poison now deleted.";
                 var result = EventSubscriberHost.CreatePoisonMismatchResult(audit.Subject, audit.Action, reason);
                 await WriteAuditAsync(audit, result, null).ConfigureAwait(false);
                 var pt = await GetPoisonMessageTableAsync().ConfigureAwait(false);

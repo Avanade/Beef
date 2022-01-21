@@ -43,6 +43,7 @@ namespace Beef.Demo.Business.Data
 
         private Task MarkOnImplementationAsync()
         {
+            using var scope = _logger.BeginScope(new Dictionary<string, object> { { "MyKey", "MyValue" } });
             _logger.LogWarning("Mark operation implementation currently does not exist.");
             return Task.CompletedTask;
         }

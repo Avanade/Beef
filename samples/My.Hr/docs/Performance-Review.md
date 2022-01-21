@@ -12,7 +12,7 @@ In simple terms an employee performance review can occur at any time during an e
 
 ## Data repository
 
-A new `PerformanceReview` table and related Entity Framework model will be required to support.
+A new `PerformanceReview` table and related Entity Framework (EF) model will be required to support.
 
 <br/>
 
@@ -21,7 +21,7 @@ A new `PerformanceReview` table and related Entity Framework model will be requi
 First step, as was previously the case, is to create the `PerformanceReview` table migration script. Execute the following to create the migration script for the `My.Hr.Database` project.
 
 ```
-dotnet run scriptnew create Hr PerformanceReview
+dotnet run script create Hr PerformanceReview
 ```
 
 Open the newly created migration script and replace its contents with the following.
@@ -55,7 +55,7 @@ COMMIT TRANSACTION
 To support the above a `Hr.PerformanceOutcome` table is also required. Execute the following to create the migration script. No further changes will be needed.
 
 ```
-dotnet run scriptnew createref Hr PerformanceOutcome
+dotnet run scriptnew create Hr PerformanceOutcome
 ```
 
 <br/>

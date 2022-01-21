@@ -369,11 +369,11 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.FirstName);
                 Property(s => s.LastName);
                 Property(s => s.UniqueCode);
-                Property(s => s.Gender, "GenderId").SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default!);
+                Property(s => s.Gender, "GenderId").SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default);
                 Property(s => s.EyeColorSid, "EyeColorCode");
                 Property(s => s.Birthday).SetDbType(System.Data.DbType.Date);
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
-                Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default!);
+                Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string,string>>.Default);
                 AddStandardProperties();
                 DbMapperCtor();
             }
@@ -400,7 +400,7 @@ namespace Beef.Demo.Business.Data
                 s2d.ForMember(d => d.EyeColorCode, o => o.MapFrom(s => s.EyeColorSid));
                 s2d.ForMember(d => d.Birthday, o => o.MapFrom(s => s.Birthday));
                 s2d.ForMember(d => d.MetadataJson, o => o.ConvertUsing(ObjectToJsonConverter<Dictionary<string,string>>.Default.ToDest, s => s.Metadata));
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(StringToBase64Converter.Default.ToDest, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToDest, s => s.ETag));
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
                 s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
                 s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
@@ -416,7 +416,7 @@ namespace Beef.Demo.Business.Data
                 d2s.ForMember(s => s.Birthday, o => o.MapFrom(d => d.Birthday));
                 d2s.ForMember(s => s.Address, o => o.Ignore());
                 d2s.ForMember(s => s.Metadata, o => o.ConvertUsing(ObjectToJsonConverter<Dictionary<string,string>>.Default.ToSrce, d => d.MetadataJson));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedBy));

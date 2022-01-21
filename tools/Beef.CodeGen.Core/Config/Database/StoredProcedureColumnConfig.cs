@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.DbModels;
+using DbEx.Schema;
+using OnRamp.Config;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -27,7 +29,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the database column configuration.
         /// </summary>
-        public DbColumn? DbColumn { get; set; }
+        public DbColumnSchema? DbColumn { get; set; }
 
         /// <summary>
         /// Indicates whether the column is considered an audit column.
@@ -112,9 +114,10 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare() 
+        protected override Task PrepareAsync() 
         {
             MergeValueSql = DefaultWhereNull(MergeValueSql, () => AuditParameterName);
+            return Task.CompletedTask;
         }
     }
 }

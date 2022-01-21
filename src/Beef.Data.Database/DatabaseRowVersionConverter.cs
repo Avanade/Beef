@@ -8,60 +8,21 @@ namespace Beef.Data.Database
     /// <summary>
     /// Represents a database <b>RowVersion</b> converter.
     /// </summary>
-    public class DatabaseRowVersionConverter : Singleton<DatabaseRowVersionConverter>, IPropertyMapperConverter<string?, byte[]>
+    public class DatabaseRowVersionConverter : CustomConverter<string?, byte[]>
     {
-        /// <summary>
-        /// Gets the source value <see cref="Type"/>.
-        /// </summary>
-        Type IPropertyMapperConverter.SrceType { get; } = typeof(string);
+        private static readonly Lazy<DatabaseRowVersionConverter> _default = new Lazy<DatabaseRowVersionConverter>(() => new DatabaseRowVersionConverter(), true);
 
         /// <summary>
-        /// Gets the destination value <see cref="Type"/>.
+        /// Gets the default (singleton) instance.
         /// </summary>
-        Type IPropertyMapperConverter.DestType { get; } = typeof(byte[]);
+        public static DatabaseRowVersionConverter Default { get { return _default.Value; } }
 
         /// <summary>
-        /// Gets the underlying source <see cref="Type"/> allowing for nullables.
+        /// Initializes a new instance of the <see cref="JObjectToJsonConverter"/> class.
         /// </summary>
-        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = typeof(string);
-
-        /// <summary>
-        /// Gets the underlying destination <see cref="Type"/> allowing for nullables.
-        /// </summary>
-        Type IPropertyMapperConverter.DestUnderlyingType { get; } = typeof(byte[]);
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        public byte[] ConvertToDest(string? value)
-        {
-            if (value == null)
-                return new byte[8];
-
-            return Convert.FromBase64String(value);
-        }
-
-        /// <summary>
-        /// Converts the source <paramref name="value"/> to the destination equivalent.
-        /// </summary>
-        /// <param name="value">The source value.</param>
-        /// <returns>The destination value.</returns>
-        object? IPropertyMapperConverter.ConvertToDest(object? value) => ConvertToDest((string)value!);
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        public string? ConvertToSrce(byte[] value) => value == null || value.Length == 0 ? null : Convert.ToBase64String(value);
-
-        /// <summary>
-        /// Converts the destination <paramref name="value"/> to the source equivalent.
-        /// </summary>
-        /// <param name="value">The destination value.</param>
-        /// <returns>The source value.</returns>
-        object? IPropertyMapperConverter.ConvertToSrce(object? value) => ConvertToSrce((byte[])value!);
+        public DatabaseRowVersionConverter() : base(
+            s => s == null ? Array.Empty<byte>() : Convert.FromBase64String(s.StartsWith('\"') && s.EndsWith('\"') ? s[1..^1] : s),
+            d => $"\"{Convert.ToBase64String(d)}\"")
+        { }
     }
 }

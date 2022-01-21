@@ -20,6 +20,8 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PersonTest : UsingAgentTesterServer<Startup>
     {
+        public PersonTest() : base(includeLoggingScopesInOutput: true) { }
+
         #region Validators
 
         [Test, TestSetUp]
@@ -185,7 +187,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), beforeRequestAsync: async r =>
                 {
-                    r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + p.ETag + "\""));
+                    r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue(p.ETag));
                     await Task.CompletedTask;
                 })).GetAsync(3.ToGuid()));
         }

@@ -34,7 +34,7 @@ namespace Beef.Events.ServiceBus
         /// </summary>
         /// <param name="data">The <see cref="ServiceBusData"/>.</param>
         /// <returns>The row key.</returns>
-        public override string CreateRowKey(ServiceBusData data) => data.Originating.SystemProperties.SequenceNumber.ToString("000000000000000000#", System.Globalization.CultureInfo.InvariantCulture);
+        public override string CreateRowKey(ServiceBusData data) => data.Originating.SequenceNumber.ToString("000000000000000000#", System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Creates the <see cref="ServiceBusAuditRecord"/> from the event <paramref name="data"/> <paramref name="result"/>.
@@ -48,8 +48,8 @@ namespace Beef.Events.ServiceBus
                 ServiceBusName = data.ServiceBusName,
                 QueueName = data.QueueName,
                 SubscriptionName = data.SubscriptionName,
-                SequenceNumber = data.Originating.SystemProperties.SequenceNumber,
-                EnqueuedTimeUtc = data.Originating.SystemProperties.EnqueuedTimeUtc,
+                SequenceNumber = data.Originating.SequenceNumber,
+                EnqueuedTimeUtc = data.Originating.EnqueuedTime,
                 EventId = data.Metadata.EventId,
                 Attempts = data.Attempt <= 0 ? 1 : data.Attempt,
                 Subject = result.Subject,

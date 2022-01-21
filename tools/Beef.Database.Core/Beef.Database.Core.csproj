@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>4.2.2</Version>
+    <Version>4.2.3</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -38,63 +38,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Alter_sql.hbs" />
-    <None Remove="Resources\CdcDb_sql.hbs" />
-    <None Remove="Resources\Cdc_sql.hbs" />
-    <None Remove="Resources\Createref_sql.hbs" />
-    <None Remove="Resources\Create_sql.hbs" />
-    <None Remove="Resources\Default_sql.hbs" />
-    <None Remove="Resources\DeleteAllAndReset.sql" />
-    <None Remove="Resources\TableInsertOrMerge_sql.hbs" />
-    <None Remove="Schema\dbo\Functions\fnGetTenantId.sql" />
-    <None Remove="Schema\dbo\Functions\fnGetTimestamp.sql" />
-    <None Remove="Schema\dbo\Functions\fnGetUsername.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spSetSessionContext.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowAuthorizationException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowBusinessException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowConcurrencyException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowConflictException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowDuplicateException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowNotFoundException.sql" />
-    <None Remove="Schema\dbo\Stored Procedures\spThrowValidationException.sql" />
-    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtBigIntList.sql" />
-    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtDateTime2List.sql" />
-    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtIntList.sql" />
-    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtNVarCharList.sql" />
-    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtUniqueIdentfierList.sql" />
-    <None Remove="ScriptNew.sql" />
+    <EmbeddedResource Include="Schema\**\*" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Cdc_sql.hbs" />
-    <EmbeddedResource Include="Resources\CdcDb_sql.hbs" />
-    <EmbeddedResource Include="Resources\CreateRef_sql.hbs" />
-    <EmbeddedResource Include="Resources\Alter_sql.hbs" />
-    <EmbeddedResource Include="Resources\DeleteAllAndReset.sql" />
-    <EmbeddedResource Include="Resources\Default_sql.hbs" />
-    <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.hbs" />
-    <EmbeddedResource Include="Resources\Create_sql.hbs" />
-    <EmbeddedResource Include="Schema\dbo\Functions\fnGetTenantId.sql" />
-    <EmbeddedResource Include="Schema\dbo\Functions\fnGetTimestamp.sql" />
-    <EmbeddedResource Include="Schema\dbo\Functions\fnGetUsername.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spSetSessionContext.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowAuthorizationException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowBusinessException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowDuplicateException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowConcurrencyException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowConflictException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowNotFoundException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowValidationException.sql" />
-    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtBigIntList.sql" />
-    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtDateTime2List.sql" />
-    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtIntList.sql" />
-    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtNVarCharList.sql" />
-    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtUniqueIdentfierList.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="DbEx" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>

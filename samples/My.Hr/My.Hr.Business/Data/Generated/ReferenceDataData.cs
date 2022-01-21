@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
@@ -32,9 +33,9 @@ namespace My.Hr.Business.Data
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         public ReferenceDataData(IEfDb ef, AutoMapper.IMapper mapper)
-            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
+            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
 
-        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
@@ -103,7 +104,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.Gender, RefDataNamespace.Gender>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.GenderId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -127,7 +128,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.TerminationReason, RefDataNamespace.TerminationReason>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.TerminationReasonId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -151,7 +152,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.RelationshipType, RefDataNamespace.RelationshipType>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.RelationshipTypeId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -175,7 +176,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.USState, RefDataNamespace.USState>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.USStateId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -199,7 +200,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceOutcomeId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));

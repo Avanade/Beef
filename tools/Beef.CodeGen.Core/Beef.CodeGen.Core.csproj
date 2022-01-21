@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.2.12</Version>
+    <Version>4.2.13</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -22,6 +22,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Title>Business Entity Execution Framework (Beef) Code Generator tool.</Title>
+    <Product>Business Entity Execution Framework (Beef) Code Generator tool</Product>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef codegen</PackageTags>
     <Nullable>enable</Nullable>
@@ -39,37 +40,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\DatabaseCdc.xml" />
-    <None Remove="Scripts\DatabaseCdcDacpac.xml" />
-    <None Remove="Scripts\DatabaseCdcIdentifierMapping.xml" />
-    <None Remove="Scripts\DatabaseCdcOutbox.xml" />
-    <None Remove="Scripts\DatabaseCdcTracking.xml" />
-    <None Remove="Scripts\DatabaseEventOutbox.xml" />
-    <None Remove="Scripts\DatabaseWithCdc.xml" />
-    <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
-    <None Remove="Templates\DbCdcDataSce_cs.hb" />
-    <None Remove="Templates\DbCdcData_cs.hb" />
-    <None Remove="Templates\DbCdcEntity_cs.hb" />
-    <None Remove="Templates\DbCdcHostedExtensions_cs.hb" />
-    <None Remove="Templates\DbCdcHostedService_cs.hb" />
-    <None Remove="Templates\DbCdcIdentifierMappingTableCreate_sql.hb" />
-    <None Remove="Templates\DbCdcIdentifierMappingTvp_cs.hb" />
-    <None Remove="Templates\DbCdcIdentifierMappingUdt_sql.hb" />
-    <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
-    <None Remove="Templates\DbCdcSpCompleteOutbox_sql.hb" />
-    <None Remove="Templates\DbCdcSpCreateIdentifierMapping_sql.hb" />
-    <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
-    <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
-    <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
-    <None Remove="Templates\DbCdcTrackingUdt_sql.hb" />
+    <None Remove="Scripts\Database.yaml" />
+    <None Remove="Scripts\DatabaseEventOutbox.yaml" />
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
-    <None Remove="Templates\DbEobDataTableCreate_sql.hb" />
-    <None Remove="Templates\DbEobOutbox_cs.hb" />
-    <None Remove="Templates\DbEobSpDequeue_sql.hb" />
-    <None Remove="Templates\DbEobSpEnqueue_sql.hb" />
-    <None Remove="Templates\DbEobTableCreate_sql.hb" />
-    <None Remove="Templates\DbEobUdt_sql.hb" />
+    <None Remove="Templates\DbEobDataTableCreate_sql.hbs" />
+    <None Remove="Templates\DbEobOutbox_cs.hbs" />
+    <None Remove="Templates\DbEobSpDequeue_sql.hbs" />
+    <None Remove="Templates\DbEobSpEnqueue_sql.hbs" />
+    <None Remove="Templates\DbEobTableCreate_sql.hbs" />
+    <None Remove="Templates\DbEobUdt_sql.hbs" />
     <None Remove="Templates\DbSpTableCreate_sql.hbs" />
     <None Remove="Templates\DbSpTableDelete_sql.hbs" />
     <None Remove="Templates\DbSpTableGetColl_sql.hbs" />
@@ -119,45 +99,23 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcIdentifierMapping.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseEventOutbox.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
-    <EmbeddedResource Include="Scripts\Database.xml" />
-    <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
-    <EmbeddedResource Include="Scripts\DataModelOnly.xml" />
-    <EmbeddedResource Include="Scripts\EntityOnly.xml" />
-    <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
-    <EmbeddedResource Include="Scripts\RefDataCore.xml" />
-    <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
-    <EmbeddedResource Include="Templates\DbCdcHostedExtensions_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcHostedService_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcDataSce_cs.hb" />
-    <EmbeddedResource Include="Templates\DbEobOutbox_cs.hb" />
-    <EmbeddedResource Include="Templates\DbEobSpDequeue_sql.hb" />
-    <EmbeddedResource Include="Templates\DbEobSpEnqueue_sql.hb" />
-    <EmbeddedResource Include="Templates\DbEobDataTableCreate_sql.hb" />
-    <EmbeddedResource Include="Templates\DbEobTableCreate_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcSpCreateIdentifierMapping_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcSpCompleteOutbox_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingTableCreate_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingTvp_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcIdentifierMappingUdt_sql.hb" />
-    <EmbeddedResource Include="Templates\DbEobUdt_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
-    <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
+    <EmbeddedResource Include="Scripts\Database.yaml" />
+    <EmbeddedResource Include="Scripts\DatabaseEventOutbox.yaml" />
+    <EmbeddedResource Include="Scripts\EntityBusiness.yaml" />
+    <EmbeddedResource Include="Scripts\DataModelOnly.yaml" />
+    <EmbeddedResource Include="Scripts\EntityOnly.yaml" />
+    <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.yaml" />
+    <EmbeddedResource Include="Scripts\RefDataCore.yaml" />
+    <EmbeddedResource Include="Scripts\RefDataCoreCrud.yaml" />
+    <EmbeddedResource Include="Templates\DbEobOutbox_cs.hbs" />
+    <EmbeddedResource Include="Templates\DbEobSpDequeue_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbEobSpEnqueue_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbEobDataTableCreate_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbEobTableCreate_sql.hbs" />
+    <EmbeddedResource Include="Templates\DbEobUdt_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbCdcEntity_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcOutboxTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <EmbeddedResource Include="Templates\DbVwQuery_sql.hbs" />
     <EmbeddedResource Include="Templates\DbVwTable_sql.hbs" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.hbs" />
@@ -200,9 +158,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="2.0.8" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.16" />
+    <PackageReference Include="DbEx" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

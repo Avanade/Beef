@@ -56,17 +56,17 @@ namespace Beef.Events.ServiceBus
         /// <summary>
         /// Gets or sets the date and time of the enqueue time in UTC.
         /// </summary>
-        public DateTime EnqueuedTimeUtc { get; set; }
+        public DateTimeOffset EnqueuedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when initially poisoned in UTC.
         /// </summary>
-        public DateTime? PoisonedTimeUtc { get; set; }
+        public DateTimeOffset? PoisonedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the message was skipped in UTC.
         /// </summary>
-        public DateTime? SkippedTimeUtc { get; set; }
+        public DateTimeOffset? SkippedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the number of invocation attempts counter.

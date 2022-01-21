@@ -1,4 +1,4 @@
-# 'Where' object (database-driven) - YAML/JSON
+# 'Where' object (database-driven)
 
 The `Where` object defines an additional where `Statement` to be added. This is in addition to those automatically added based on the `StoredProcedure.Type`.
 
@@ -32,12 +32,9 @@ tables:
 <br/>
 
 ## Properties
-The `Where` object supports a number of properties that control the generated code output. The properties with a bold name are those that are more typically used (considered more important).
+The `Where` object supports a number of properties that control the generated code output. The following properties with a bold name are those that are more typically used (considered more important).
 
 Property | Description
 -|-
-**`statement`** | The where statement (TSQL).
+**`statement`** | The where statement (TSQL). [Mandatory]
 
-<br/>
-
-<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

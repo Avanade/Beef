@@ -8,9 +8,7 @@ namespace Beef.Database.Core
     /// Represents the <see cref="DatabaseExecutor"/> commands.
     /// </summary>
     [Flags]
-#pragma warning disable CA1714 // Flags enums should have plural names; by-design, best name selected.
     public enum DatabaseExecutorCommand
-#pragma warning restore CA1714 
     {
         /// <summary>
         /// Nothing specified.
@@ -53,43 +51,60 @@ namespace Beef.Database.Core
         Data = 64,
 
         /// <summary>
-        /// Performs <b>all</b> commands as follows; <see cref="DatabaseExecutorCommand.Create"/>, <see cref="DatabaseExecutorCommand.Migrate"/>, <see cref="DatabaseExecutorCommand.CodeGen"/>, <see cref="DatabaseExecutorCommand.Schema"/> and <see cref="DatabaseExecutorCommand.Data"/>.
+        /// Performs <b>all</b> commands as follows; <see cref="Create"/>, <see cref="Migrate"/>, <see cref="CodeGen"/>, <see cref="Schema"/> and <see cref="Data"/>.
         /// </summary>
         All = Create | Migrate | CodeGen | Schema | Data,
 
         /// <summary>
-        /// Performs <see cref="DatabaseExecutorCommand.Drop"/> and <see cref="DatabaseExecutorCommand.All"/>.
+        /// Performs <see cref="Migrate"/> and <see cref="Schema"/>.
+        /// </summary>
+        Deploy = Migrate | Schema,
+
+        /// <summary>
+        /// Performs <see cref="Deploy"/> with <see cref="Data"/>.
+        /// </summary>
+        DeployWithData = Deploy | Data,
+
+        /// <summary>
+        /// Performs <see cref="Drop"/> and <see cref="All"/>.
         /// </summary>
         DropAndAll = Drop | All,
 
         /// <summary>
-        /// Performs <see cref="DatabaseExecutorCommand.Reset"/> and <see cref="DatabaseExecutorCommand.All"/>.
+        /// Performs <see cref="Reset"/> and <see cref="All"/>.
         /// </summary>
         ResetAndAll = Reset | All,
 
         /// <summary>
-        /// Performs only the <b>database</b> commands as follows: <see cref="DatabaseExecutorCommand.Create"/>, <see cref="DatabaseExecutorCommand.Migrate"/>, <see cref="DatabaseExecutorCommand.Schema"/> and <see cref="DatabaseExecutorCommand.Data"/>.
+        /// Performs only the <b>database</b> commands as follows: <see cref="Create"/>, <see cref="Migrate"/>, <see cref="Schema"/> and <see cref="Data"/>.
         /// </summary>
         Database = Create | Migrate | Schema | Data,
 
         /// <summary>
-        /// Performs <see cref="DatabaseExecutorCommand.Drop"/> and <see cref="DatabaseExecutorCommand.Database"/>.
+        /// Performs <see cref="Drop"/> and <see cref="Database"/>.
         /// </summary>
         DropAndDatabase = Drop | Database,
 
         /// <summary>
-        /// Performs <see cref="DatabaseExecutorCommand.Reset"/> and <see cref="DatabaseExecutorCommand.Database"/>.
+        /// Performs <see cref="Reset"/> and <see cref="Database"/>.
         /// </summary>
         ResetAndDatabase = Reset | Database,
 
         /// <summary>
-        /// Performs <see cref="DatabaseExecutorCommand.Reset"/> and <see cref="DatabaseExecutorCommand.Data"/>.
+        /// Performs <see cref="Reset"/> and <see cref="Data"/>.
         /// </summary>
         ResetAndData = Reset | Data,
 
         /// <summary>
+        /// Executes the SQL statement passed as the first additional argument.
+        /// </summary>
+        /// <remarks>This can not be used with any of the other commands.</remarks>
+        Execute = 1024,
+
+        /// <summary>
         /// Creates a new script file using the defined naming convention.
         /// </summary>
-        ScriptNew = 2048,
+        /// <remarks>This can not be used with any of the other commands.</remarks>
+        Script = 2048
     }
 }

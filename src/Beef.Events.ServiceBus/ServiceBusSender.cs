@@ -50,7 +50,7 @@ namespace Beef.Events.ServiceBus
         public string? QueueName { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureServiceBusMessageConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.
+        /// Gets or sets the <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="ServiceBusMessageConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.
         /// </summary>
         public IEventDataConverter<AzureServiceBus.ServiceBusMessage>? EventDataConverter { get; set; }
 
@@ -86,7 +86,7 @@ namespace Beef.Events.ServiceBus
             if (events == null || events.Length == 0)
                 return;
 
-            EventDataConverter ??= new AzureServiceBusMessageConverter(new NewtonsoftJsonCloudEventSerializer());
+            EventDataConverter ??= new ServiceBusMessageConverter(new NewtonsoftJsonCloudEventSerializer());
 
             // Why this logic: https://github.com/Azure/azure-sdk-for-net/tree/Azure.Messaging.ServiceBus_7.1.0/sdk/servicebus/Azure.Messaging.ServiceBus/#send-and-receive-a-batch-of-messages
             var dict = new Dictionary<string, Queue<AzureServiceBus.ServiceBusMessage>>();

@@ -175,5 +175,11 @@ namespace Beef.Validation
         /// </summary>
         /// <remarks>Defaults to: <i>{0} contains one or more values that are not specified.</i></remarks>
         public static readonly LText DictionaryNullValueFormat = new("Beef.DictionaryNullValueFormat");
+
+        /// <summary>
+        /// Gets the format string for the invalid email message.
+        /// </summary>
+        /// <remarks>Defaults to: <i>{0} is an invalid e-mail address.</i></remarks>
+        public static readonly LText EmailFormat = new("Beef.EmailFormat");
     }
 }

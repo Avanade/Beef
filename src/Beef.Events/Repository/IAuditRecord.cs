@@ -22,17 +22,17 @@ namespace Beef.Events.Repository
         /// <summary>
         /// Gets or sets the date and time of the enqueue in UTC.
         /// </summary>
-        DateTime EnqueuedTimeUtc { get; set; }
+        DateTimeOffset EnqueuedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when initially poisoned in UTC.
         /// </summary>
-        DateTime? PoisonedTimeUtc { get; set; }
+        DateTimeOffset? PoisonedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the message was skipped in UTC.
         /// </summary>
-        DateTime? SkippedTimeUtc { get; set; }
+        DateTimeOffset? SkippedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the number of invocation attempts counter.

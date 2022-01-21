@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Schema;
 using Newtonsoft.Json;
+using OnRamp;
+using OnRamp.Config;
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -11,7 +15,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure parameter configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "'Parameter' object (database-driven)", 
+    [CodeGenClass("Parameter", Title = "'Parameter' object (database-driven)", 
         Description = "The `Parameter` is used to define a stored procedure parameter and its charateristics. These are in addition to those that are automatically inferred (added) by the selected `StoredProcedure.Type`.",
         ExampleMarkdown = @"A YAML example is as follows:
 ``` yaml
@@ -35,7 +39,7 @@ tables:
     ]
   }
 ```")]
-    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CodeGenCategory("Key", Title = "Provides the _key_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
         /// <summary>
@@ -50,14 +54,14 @@ tables:
         /// Gets or sets the parameter name (without the `@` prefix).
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The parameter name (without the `@` prefix).", IsMandatory = true, IsImportant = true)]
+        [CodeGenProperty("Key", Title = "The parameter name (without the `@` prefix).", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding column name; used to infer characteristics.
         /// </summary>
         [JsonProperty("column", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The corresponding column name; used to infer characteristics.",
+        [CodeGenProperty("Key", Title = "The corresponding column name; used to infer characteristics.",
             Description = "Defaults to `Name`.")]
         public string? Column { get; set; }
 
@@ -65,14 +69,14 @@ tables:
         /// Gets or sets the SQL type definition (overrides inherited Column definition) including length/precision/scale.
         /// </summary>
         [JsonProperty("sqlType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The SQL type definition (overrides inherited Column definition) including length/precision/scale.")]
+        [CodeGenProperty("Key", Title = "The SQL type definition (overrides inherited Column definition) including length/precision/scale.")]
         public string? SqlType { get; set; }
 
         /// <summary>
         /// Indicates whether the parameter is nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether the parameter is nullable.",
+        [CodeGenProperty("Key", Title = "Indicates whether the parameter is nullable.",
             Description = "Note that when the parameter value is `NULL` it will not be included in the query.")]
         public bool? Nullable { get; set; }
 
@@ -80,21 +84,21 @@ tables:
         /// Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.
         /// </summary>
         [JsonProperty("treatColumnNullAs", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.")]
+        [CodeGenProperty("Key", Title = "Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.")]
         public bool? TreatColumnNullAs { get; set; }
 
         /// <summary>
         /// Indicates whether the parameter is a collection (one or more values to be included `IN` the query).
         /// </summary>
         [JsonProperty("collection", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether the parameter is a collection (one or more values to be included `IN` the query).")]
+        [CodeGenProperty("Key", Title = "Indicates whether the parameter is a collection (one or more values to be included `IN` the query).")]
         public bool? Collection { get; set; }
 
         /// <summary>
         /// Gets or sets the where clause equality operator.
         /// </summary>
         [JsonProperty("operator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The where clause equality operator", IsImportant = true, Options = new string[] { "EQ", "NE", "LT", "LE", "GT", "GE", "LIKE" },
+        [CodeGenProperty("Key", Title = "The where clause equality operator", IsImportant = true, Options = new string[] { "EQ", "NE", "LT", "LE", "GT", "GE", "LIKE" },
             Description = "Defaults to `EQ`.")]
         public string? Operator { get; set; }
 
@@ -138,11 +142,8 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare()
+        protected override Task PrepareAsync()
         {
-            CheckKeyHasValue(Name);
-            CheckOptionsProperties();
-
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
                 Name = Name[1..];
 
@@ -175,7 +176,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (Beef.CodeGen.DbModels.DbColumn.TypeIsString(c.Type))
+                    if (DbTypeMapper.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch
@@ -217,6 +218,8 @@ tables:
                     return TreatColumnNullAs == null && CompareValue(Nullable, true) ? $"(@{Name} IS NULL OR {sql})" : sql;
                 }
             });
+
+            return Task.CompletedTask;
         }
     }
 }

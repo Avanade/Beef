@@ -1,5 +1,6 @@
 CREATE PROCEDURE [Hr].[spEventOutboxDequeue]
-  @MaxDequeueCount INT = 10  -- Maximum number of events to dequeue
+  @MaxDequeueCount INT = 10,  -- Maximum number of events to dequeue.
+  @PartitionKey NVARCHAR(128) NULL = NULL  -- Partition key; null indicates all.
 AS
 BEGIN
   /*
@@ -16,11 +17,12 @@ BEGIN
     DECLARE @dequeuedIdentity TABLE([EventOutboxId] BIGINT);
 
     -- Dequeue event -> ROWLOCK+UPDLOCK maintain singular access for ordering and concurrency
-    WITH cte([EventOutboxId], [DequeuedDate]) AS 
+    WITH cte([EventOutboxId], [PartitionKey], [DequeuedDate]) AS 
     (
-       SELECT TOP(@MaxDequeueCount) [EventOutboxId], [DequeuedDate]
+       SELECT TOP(@MaxDequeueCount) [EventOutboxId], [PartitionKey], [DequeuedDate]
          FROM [Hr].[EventOutbox] WITH (ROWLOCK, UPDLOCK)
          WHERE [DequeuedDate] IS NULL
+           AND (@PartitionKey IS NULL OR [PartitionKey] = @PartitionKey)
          ORDER BY [EventOutboxId]
     ) 
     UPDATE Cte
@@ -34,7 +36,8 @@ BEGIN
         [Subject], 
         [Action], 
         [CorrelationId], 
-        [TenantId], 
+        [TenantId],
+        [PartitionKey],
         [ValueType], 
         [EventData]
       FROM [Hr].[EventOutboxData]

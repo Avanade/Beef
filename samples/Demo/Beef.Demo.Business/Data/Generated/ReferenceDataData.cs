@@ -39,9 +39,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); DataCtor(); }
+            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
 
-        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Country"/> items.
@@ -149,7 +149,7 @@ namespace Beef.Demo.Business.Data
             {
                 var d2s = CreateMap<EfModel.EyeColor, RefDataNamespace.EyeColor>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EyeColorId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
@@ -192,7 +192,7 @@ namespace Beef.Demo.Business.Data
             {
                 var d2s = CreateMap<EfModel.Status, RefDataNamespace.Status>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.StatusId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));

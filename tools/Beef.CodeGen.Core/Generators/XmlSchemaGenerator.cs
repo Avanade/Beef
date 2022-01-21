@@ -3,6 +3,8 @@
 using Beef.CodeGen.Config;
 using Beef.Reflection;
 using Newtonsoft.Json;
+using OnRamp.Config;
+using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -41,7 +43,7 @@ namespace Beef.CodeGen.Generators
         /// </summary>
         private static void WriteObject(ConfigType ct, Type type, XNamespace ns, XElement xe, bool isRoot)
         {
-            var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
+            var csa = type.GetCustomAttribute<CodeGenClassAttribute>();
             if (csa == null)
                 throw new InvalidOperationException($"Type '{type.Name}' does not have a required ClassSchemaAttribute.");
 
@@ -65,7 +67,7 @@ namespace Beef.CodeGen.Generators
             xs.Add(new XAttribute("maxOccurs", "unbounded"));
             foreach (var pi in type.GetProperties())
             {
-                var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                var pcsa = pi.GetCustomAttribute<CodeGenPropertyCollectionAttribute>();
                 if (pcsa == null)
                     continue;
 
@@ -87,17 +89,17 @@ namespace Beef.CodeGen.Generators
                 if (jpa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
+                var name = jpa.PropertyName ?? StringConverter.ToCamelCase(pi.Name)!;
                 var xmlName = XmlYamlTranslate.GetXmlName(ct, ce, name);
                 var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, xmlName);
 
-                var psa = xmlOverride.Attribute ?? pi.GetCustomAttribute<PropertySchemaAttribute>();
+                var psa = xmlOverride.Attribute ?? pi.GetCustomAttribute<CodeGenPropertyAttribute>();
                 if (psa == null)
                 {
                     // Properties with List<string> are not compatible with XML and should be picked up as comma separated strings.
                     if (pi.PropertyType == typeof(List<string>))
                     {
-                        var pcsa = pi.GetCustomAttribute<PropertyCollectionSchemaAttribute>();
+                        var pcsa = pi.GetCustomAttribute<CodeGenPropertyCollectionAttribute>();
                         if (pcsa == null)
                             continue;
 
@@ -155,13 +157,13 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Gets the documentation text.
         /// </summary>
-        private static string GetDocumentation(string name, PropertySchemaAttribute psa) =>
-            psa.Description == null ? (psa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{psa.Title ?? StringConversion.ToSentenceCase(name)!} {psa.Description}";
+        private static string GetDocumentation(string name, CodeGenPropertyAttribute psa) =>
+            psa.Description == null ? (psa.Title ?? StringConverter.ToSentenceCase(name)!) : $"{psa.Title ?? StringConverter.ToSentenceCase(name)!} {psa.Description}";
 
         /// <summary>
         /// Gets the documentation text.
         /// </summary>
-        private static string GetDocumentation(string name, PropertyCollectionSchemaAttribute pcsa) =>
-            pcsa.Description == null ? (pcsa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{pcsa.Title ?? StringConversion.ToSentenceCase(name)!} {pcsa.Description}";
+        private static string GetDocumentation(string name, CodeGenPropertyCollectionAttribute pcsa) =>
+            pcsa.Description == null ? (pcsa.Title ?? StringConverter.ToSentenceCase(name)!) : $"{pcsa.Title ?? StringConverter.ToSentenceCase(name)!} {pcsa.Description}";
     }
 }

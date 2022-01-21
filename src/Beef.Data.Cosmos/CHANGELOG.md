@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.3
+- *Fixed:* The `ETag` must be quoted to be compliant; thq quotes were previously being removed (incorrectly). See https://datatracker.ietf.org/doc/html/rfc7232#page-9 where specification states `entity-tag = [ weak ] opaque-tag`, and `opaque-tag = DQUOTE *etagc DQUOTE`; therefore, should be formatted as: `"value"`.
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.2
 - *Enhancement:* Add support for using [AutoMapper](https://docs.automapper.org/en/stable/index.html) for the entity-to-entity based mapping (remove existing `EntityMapper`-based functionality) - may result in _breaking changes_:
   - `CosmosDbArgs<T, TModel>` renamed to `CosmosDbArgs` and updated to support the new AutoMapper requirements.

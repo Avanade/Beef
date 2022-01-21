@@ -118,6 +118,13 @@ namespace Beef.Template.Solution.UnitTest
             SolutionCreateGenerateTest("Foo.Co", "Bar", "Cosmos");
         }
 
+        [Test]
+        public void HttpAgent()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.Ha", "Bar", "HttpAgent");
+        }
+
         private static void SolutionCreateGenerateTest(string company, string appName, string datasource)
         {
             // Mkdir and create solution from template. 
@@ -136,7 +143,7 @@ namespace Beef.Template.Solution.UnitTest
             {
                 Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
-                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.xml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.xml [database]");
+                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.yaml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.yaml [database]");
             }
 
             // Run the intra-integration tests.

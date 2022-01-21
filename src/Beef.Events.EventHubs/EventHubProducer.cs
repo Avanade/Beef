@@ -43,7 +43,7 @@ namespace Beef.Events.EventHubs
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="AzureEventHubsEventConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.
+        /// Gets or sets the <see cref="IEventDataConverter{T}"/>. Defaults to <see cref="EventHubsEventConverter"/> using the <see cref="NewtonsoftJsonCloudEventSerializer"/>.
         /// </summary>
         public IEventDataConverter<AzureEventHubs.EventData>? EventDataConverter { get; set; }
 
@@ -68,7 +68,7 @@ namespace Beef.Events.EventHubs
             if (events == null || events.Length == 0)
                 return;
 
-            EventDataConverter ??= new AzureEventHubsEventConverter(new NewtonsoftJsonCloudEventSerializer());
+            EventDataConverter ??= new EventHubsEventConverter(new NewtonsoftJsonCloudEventSerializer());
 
             // Why this logic: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/eventhub/Azure.Messaging.EventHubs/samples/Sample04_PublishingEvents.md
             EventDataBatch batch = null!;

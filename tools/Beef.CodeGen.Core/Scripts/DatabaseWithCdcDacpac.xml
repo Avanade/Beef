@@ -1,4 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<!-- As DACPAC supports table create statements this extends support; DbUp will need to execute directly as required. -->
-<Script ConfigType="Database" Inherits="Database.xml;DatabaseCdcDacpac.xml" />

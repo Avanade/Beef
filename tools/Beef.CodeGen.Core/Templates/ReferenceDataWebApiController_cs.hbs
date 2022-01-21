@@ -36,7 +36,7 @@ namespace {{Root.NamespaceApi}}.Controllers
     {
 {{#each RefDataEntities}}
         /// <summary> 
-        /// Gets all of the {{seecomments RefDataQualifiedEntityName}} reference data items that match the specified criteria.
+        /// Gets all of the {{see-comments RefDataQualifiedEntityName}} reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
@@ -56,7 +56,7 @@ namespace {{Root.NamespaceApi}}.Controllers
 
 {{/each}}
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Config.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Root.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
 {{#ifval WebApiAuthorize}}

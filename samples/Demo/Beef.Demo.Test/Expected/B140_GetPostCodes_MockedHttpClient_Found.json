@@ -1,0 +1,27 @@
+﻿{
+  "country abbreviation": "US",
+  "places": [
+    {
+      "place name": "Redmond",
+      "longitude": "-122.1232",
+      "post code": "98052",
+      "latitude": "47.6718"
+    },
+    {
+      "place name": "Redmond",
+      "longitude": "-122.0386",
+      "post code": "98053",
+      "latitude": "47.6462"
+    },
+    {
+      "place name": "Redmond",
+      "longitude": "-121.8034",
+      "post code": "98073",
+      "latitude": "47.4323"
+    }
+  ],
+  "country": "United States",
+  "place name": "Redmond",
+  "state": "Washington",
+  "state abbreviation": "WA"
+}

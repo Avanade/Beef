@@ -96,7 +96,6 @@ namespace Beef.Test.NUnit
 
                     context.CurrentResult = innerCommand.Execute(context);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design, need to catch them all and bubble out so that NUnit reports correctly.
                 catch (Exception exception)
                 {
                     Exception ex = exception;
@@ -111,7 +110,6 @@ namespace Beef.Test.NUnit
 
                     context.CurrentResult.RecordException(ex);
                 }
-#pragma warning restore CA1031
                 finally
                 {
                     ExecutionContext.Reset();

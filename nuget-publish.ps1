@@ -52,7 +52,6 @@ param(
         "src\Beef.Core",
         "src\Beef.AspNetCore.WebApi",
         "src\Beef.Data.Database",
-        "src\Beef.Data.Database.Cdc",
 	    "src\Beef.Data.EntityFrameworkCore",
 	    "src\Beef.Data.OData",
 	    "src\Beef.Data.Cosmos",

@@ -10,10 +10,10 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.3" />
-    <PackageReference Include="Beef.Events" Version="4.2.3" />
-    <PackageReference Include="Beef.Events.EventHubs" Version="4.2.2" />
-    <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.2" />
+    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.4" />
+    <PackageReference Include="Beef.Events" Version="4.2.4" />
+    <PackageReference Include="Beef.Events.EventHubs" Version="4.2.3" />
+    <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.4" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />

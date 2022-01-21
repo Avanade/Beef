@@ -41,7 +41,7 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Gets or sets the offset of the data relative to the Event Hubs partition stream.
         /// </summary>
-        public string? Offset { get; set; }
+        public long Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the logical sequence number of the event within the partition stream of the Event Hubs.
@@ -62,17 +62,17 @@ namespace Beef.Events.EventHubs
         /// <summary>
         /// Gets or sets the date and time of the enqueue time in UTC.
         /// </summary>
-        public DateTime EnqueuedTimeUtc { get; set; }
+        public DateTimeOffset EnqueuedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when initially poisoned in UTC.
         /// </summary>
-        public DateTime? PoisonedTimeUtc { get; set; }
+        public DateTimeOffset? PoisonedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the message was skipped in UTC.
         /// </summary>
-        public DateTime? SkippedTimeUtc { get; set; }
+        public DateTimeOffset? SkippedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the number of invocation attempts counter.

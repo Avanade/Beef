@@ -32,6 +32,9 @@ using {{Root.DatabaseUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if UsesEntityFramework}}
+  {{#unless UsesDatabase}}
+using Beef.Data.Database;
+  {{/unless}}
 using Beef.Data.EntityFrameworkCore;
   {{#ifval Root.EntityFrameworkUsingNamespace}}
 using {{Root.EntityFrameworkUsingNamespace}};
@@ -294,7 +297,7 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{see-comments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class EfMapperProfile : AutoMapper.Profile
         {
@@ -305,10 +308,10 @@ namespace {{Root.NamespaceBusiness}}.Data
             {
                 var s2d = CreateMap<{{EntityName}}, {{EntityFrameworkModel}}>();
     {{#each EntityFrameworkMapperProperties}}
-                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
     {{#if HasEntityFrameworkETagProperty}}
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(StringToBase64Converter.Default.ToDest, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToDest, s => s.ETag));
     {{/if}}
     {{#if HasEntityFrameworkChangeLogProperty}}
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
@@ -319,10 +322,10 @@ namespace {{Root.NamespaceBusiness}}.Data
 
                 var d2s = CreateMap<{{EntityFrameworkModel}}, {{EntityName}}>();
     {{#each EntityFrameworkAutoMapperProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq EntityFrameworkMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq EntityFrameworkMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
     {{#if HasEntityFrameworkETagProperty}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(StringToBase64Converter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
     {{/if}}
     {{#if HasEntityFrameworkChangeLogProperty}}
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
@@ -342,7 +345,7 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments CosmosModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{see-comments CosmosModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class CosmosMapperProfile : AutoMapper.Profile
         {
@@ -372,7 +375,7 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless ODataCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and OData {{{seecomments ODataModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and OData {{{see-comments ODataModel}}} <i>AutoMapper</i> mapping.
         /// </summary>
         public partial class ODataMapperProfile : AutoMapper.Profile
         {
@@ -383,18 +386,48 @@ namespace {{Root.NamespaceBusiness}}.Data
             {
                 var s2d = CreateMap<{{EntityName}}, {{ODataModel}}>();
     {{#each ODataMapperProperties}}
-                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
     {{/each}}
 
                 var d2s = CreateMap<{{ODataModel}}, {{EntityName}}>();
     {{#each ODataMapperProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq ODataMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.Default.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq ODataMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
     {{/each}}
 
                 ODataMapperProfileCtor(s2d, d2s);
             }
 
             partial void ODataMapperProfileCtor(AutoMapper.IMappingExpression<{{EntityName}}, {{ODataModel}}> s2d, AutoMapper.IMappingExpression<{{ODataModel}}, {{EntityName}}> d2s); // Enables the constructor to be extended.
+        }
+  {{/unless}}
+{{/if}}
+{{#if UsesHttpAgent}}
+  {{#unless HttpAgentCustomMapper}}
+
+        /// <summary>
+        /// Provides the {{{EntityNameSeeComments}}} and HttpAgent {{{see-comments HttpAgentModel}}} <i>AutoMapper</i> mapping.
+        /// </summary>
+        public partial class HttpAgentMapperProfile : AutoMapper.Profile
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="HttpAgentMapperProfile"/> class.
+            /// </summary>
+            public HttpAgentMapperProfile()
+            {
+                var s2d = CreateMap<{{EntityName}}, {{HttpAgentModel}}>();
+    {{#each HttpAgentMapperProperties}}
+                s2d.ForMember(d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}, o => o.{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToDest, {{else}}MapFrom({{/ifval}}s => s.{{DataMapperPropertyName}}));
+    {{/each}}
+
+                var d2s = CreateMap<{{HttpAgentModel}}, {{EntityName}}>();
+    {{#each HttpAgentMapperProperties}}
+                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifeq HttpAgentMapper "Ignore"}}Ignore());{{else}}{{#ifne DataOperationTypes 'Any'}}OperationTypes(OperationTypes.{{DataOperationTypes}}).{{/ifne}}{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));{{/ifeq}}
+    {{/each}}
+
+                HttpAgentMapperProfileCtor(s2d, d2s);
+            }
+
+            partial void HttpAgentMapperProfileCtor(AutoMapper.IMappingExpression<{{EntityName}}, {{HttpAgentModel}}> s2d, AutoMapper.IMappingExpression<{{HttpAgentModel}}, {{EntityName}}> d2s); // Enables the constructor to be extended.
         }
   {{/unless}}
 {{/if}}

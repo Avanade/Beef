@@ -9,28 +9,17 @@ namespace Beef.Mapper.Converters
     /// <summary>
     /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="ReferenceDataBase"/> mapping <see cref="ReferenceDataBase.SetMapping{T}(string, T)"/> conversion.
     /// </summary>
-    /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
-    public abstract class ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> : IPropertyMapperConverter<TSrceProperty, TDestProperty>
-        where TDefault : ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty>, new()
+    public class ReferenceDataMappingConverter<TSrceProperty, TDestProperty> : IPropertyMapperConverter<TSrceProperty, TDestProperty>
         where TSrceProperty : ReferenceDataBase
         where TDestProperty : IComparable
     {
-        private static readonly Lazy<TDefault> _default = new(() => new TDefault(), true);
-
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
-        /// <summary>
-        /// Gets the default (singleton) instance.
-        /// </summary>
-        public static TDefault Default { get { return _default.Value; } }
-#pragma warning restore CA1000 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataMappingConverter{TDefault, TSrceProperty, TDestProperty}"/> class.
         /// </summary>
         /// <param name="name">The <see cref="ReferenceDataBase"/> mapping name.</param>
-        protected ReferenceDataMappingConverter(string name)
+        public ReferenceDataMappingConverter(string name)
         {
             Name = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
             ToDest = new ReferenceDataMappingConverterToDest(this);
@@ -121,12 +110,12 @@ namespace Beef.Mapper.Converters
         /// </summary>
         public class ReferenceDataMappingConverterToDest : IValueConverter<TSrceProperty, TDestProperty>
         {
-            private readonly ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> _parent;
+            private readonly ReferenceDataMappingConverter<TSrceProperty, TDestProperty> _parent;
 
             /// <summary>
             /// Initializes a new instance of the class.
             /// </summary>
-            internal ReferenceDataMappingConverterToDest(ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> parent) => _parent = parent;
+            internal ReferenceDataMappingConverterToDest(ReferenceDataMappingConverter<TSrceProperty, TDestProperty> parent) => _parent = parent;
 
             /// <summary>
             /// <inheritdoc/>
@@ -142,12 +131,12 @@ namespace Beef.Mapper.Converters
         /// </summary>
         public class ReferenceDataMappingConverterToSrce : IValueConverter<TDestProperty, TSrceProperty>
         {
-            private readonly ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> _parent;
+            private readonly ReferenceDataMappingConverter<TSrceProperty, TDestProperty> _parent;
 
             /// <summary>
             /// Initializes a new instance of the class.
             /// </summary>
-            internal ReferenceDataMappingConverterToSrce(ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> parent) => _parent = parent;
+            internal ReferenceDataMappingConverterToSrce(ReferenceDataMappingConverter<TSrceProperty, TDestProperty> parent) => _parent = parent;
 
             /// <summary>
             /// <inheritdoc/>
@@ -157,5 +146,49 @@ namespace Beef.Mapper.Converters
             /// <returns><inheritdoc/></returns>
             public TSrceProperty Convert(TDestProperty sourceMember, ResolutionContext context) => _parent.ConvertToSrce(sourceMember);
         }
+    }
+
+    /// <summary>
+    /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="ReferenceDataBase"/> mapping <see cref="ReferenceDataBase.SetMapping{T}(string, T)"/> conversion with a <see cref="Default"/>.
+    /// </summary>
+    /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
+    public abstract class ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> : ReferenceDataMappingConverter<TSrceProperty, TDestProperty>
+        where TDefault : ReferenceDataMappingConverter<TSrceProperty, TDestProperty>, new()
+        where TSrceProperty : ReferenceDataBase
+        where TDestProperty : IComparable
+    {
+        private static readonly Lazy<TDefault> _default = new(() => new TDefault(), true);
+
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
+        /// <summary>
+        /// Gets the default (singleton) instance.
+        /// </summary>
+        public static TDefault Default { get { return _default.Value; } }
+#pragma warning restore CA1000
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataMappingConverter{TDefault, TSrceProperty, TDestProperty}"/> class.
+        /// </summary>
+        /// <param name="name">The <see cref="ReferenceDataBase"/> mapping name.</param>
+        protected ReferenceDataMappingConverter(string name) : base(name) { }
+    }
+
+    /// <summary>
+    /// Provides the ability to <see cref="Create"/> a <see cref="ReferenceDataMappingConverter{TSrceProperty, TDestProperty}"/> without having to implement directly.
+    /// </summary>
+    public static class ReferenceDataMappingConverter
+    {
+        /// <summary>
+        /// Creates a new <see cref="ReferenceDataMappingConverter{TSrceProperty, TDestProperty}"/> instance.
+        /// </summary>
+        /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
+        /// <param name="name">The <see cref="ReferenceDataBase"/> mapping name.</param>
+        /// <returns>A new <see cref="ReferenceDataMappingConverter{TSrceProperty, TDestProperty}"/> instance.</returns>
+        public static ReferenceDataMappingConverter<TSrceProperty, TDestProperty> Create<TSrceProperty, TDestProperty>(string name)
+            where TSrceProperty : ReferenceDataBase where TDestProperty : IComparable
+            => new(name);
     }
 }
