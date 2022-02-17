@@ -50,7 +50,7 @@ namespace Beef.RefData.Caching
             var sw = Stopwatch.StartNew();
             var coll = await loadCollection().ConfigureAwait(false);
             sw.Stop();
-            Logger.Create<ReferenceDataCacheLoader>().LogDebug("ReferenceData Cache Type '{0}' loaded with {1} item(s) [{3}ms].", typeof(TItem).Name, coll.Count, Thread.CurrentThread.ManagedThreadId, sw.ElapsedMilliseconds);
+            Logger.Create<ReferenceDataCacheLoader>().LogDebug("ReferenceData Cache Type '{CacheName}' loaded with {Count} item(s) on Thread {Thread} [{Elapsed}ms].", typeof(TItem).Name, coll.Count, Thread.CurrentThread.ManagedThreadId, sw.ElapsedMilliseconds);
             return coll;
         }
     }

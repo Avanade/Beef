@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.14
+- *Enhancement:* New `Operation.WebApiConcurrency` (or `Entity.WebApiConcurrency`) indicates whether the Web API is responsible for managing concurrency via auto-generated ETag (with corresponding `Operation.WebApiGetOperation` and/or `Entity.WebApiGetOperation`).
+- *Enhancement:* The existing `Operation.PatchGetOperation` has been renamed to `Operation.WebApiGetOperation` and `Operation.PatchUpdateOperation` has been renamed to `Operation.WebApiUpdateOperation` for consistency and reuse. The tool will error (and advise remediation) at runtime where existing value(s) are being used and they will need to be corrected to continue.
+
 ## v4.2.13
 - *Enhancement:* Core code-generation capabilities moved into new [OnRamp](https://github.com/Avanade/OnRamp) and referenced.
 - *Enhancement:* Database schema inference moved into new [DbEx](https://github.com/Avanade/DbEx) and referenced.

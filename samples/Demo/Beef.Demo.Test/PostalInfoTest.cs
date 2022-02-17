@@ -101,5 +101,152 @@ namespace Beef.Demo.Test
             // Check that the etag flows all the way through.
             Assert.AreEqual("\"MyTestETag\"", res.Response.Headers.ETag.Tag);
         }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void D110_UpdatePostCodes_MockHttpClient_ETagError()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            var v = res.Value;
+            v.Places[0].PostCode += "0";
+            v.Places[1].PostCode += "0";
+            v.Places[2].PostCode += "0";
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.UpdatePostCodesAsync(v, "US", "WA", "Redmond"));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void D120_UpdatePostCodes_MockHttpClient_ConcurrencyError()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            var v = res.Value;
+            v.Places[0].PostCode += "0";
+            v.Places[1].PostCode += "0";
+            v.Places[2].PostCode += "0";
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.UpdatePostCodesAsync(v, "US", "WA", "Redmond", new WebApiRequestOptions { ETag = "XXX" }));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void D130_UpdatePostCodes_MockHttpClient_NotModifiedSuccess()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            var v = res.Value;
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(v)
+                .Run(a => a.UpdatePostCodesAsync(v, "US", "WA", "Redmond", new WebApiRequestOptions { ETag = res.Response.Headers.ETag.Tag }));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void D140_UpdatePostCodes_MockHttpClient_ModifiedSuccess()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+            mc.Request(HttpMethod.Put, "US/WA/Redmond").WithJsonResourceBody("E130_PatchPostCodes_MockHttpClient_Success_Request.json").Respond.WithJsonResource("E130_PatchPostCodes_MockHttpClient_Success_Response.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            var v = res.Value;
+            v.Places[0].PostCode += "0";
+            v.Places[1].PostCode += "0";
+            v.Places[2].PostCode += "0";
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(v)
+                .Run(a => a.UpdatePostCodesAsync(v, "US", "WA", "Redmond", new WebApiRequestOptions { ETag = res.Response.Headers.ETag.Tag }));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void E110_PatchPostCodes_MockHttpClient_ETagError()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.PatchPostCodesAsync(WebApiPatchOption.MergePatch, TestSetUp.GetResourceStream("E110_PatchPostCodes_Request.json").ReadToEnd(), "US", "WA", "Redmond"));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void E120_PatchPostCodes_MockHttpClient_ConcurrenyError()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.PatchPostCodesAsync(WebApiPatchOption.MergePatch, TestSetUp.GetResourceStream("E110_PatchPostCodes_Request.json").ReadToEnd(), "US", "WA", "Redmond", new WebApiRequestOptions { ETag = "XXX" }));
+        }
+
+        [Test, TestSetUp(needsSetUp: false)]
+        public void E130_PatchPostCodes_MockHttpClient_Success()
+        {
+            var mcf = MockHttpClientFactory.Create();
+            var mc = mcf.CreateClient("zippo", new Uri("http://api.zippopotam.us/"));
+            mc.Request(HttpMethod.Get, "US/WA/Redmond").Respond.WithJsonResource("B140_GetPostCodes_MockedHttpClient_Found.json");
+            mc.Request(HttpMethod.Put, "US/WA/Redmond").WithJsonResourceBody("E130_PatchPostCodes_MockHttpClient_Success_Request.json").Respond.WithJsonResource("E130_PatchPostCodes_MockHttpClient_Success_Response.json");
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(sc => mcf.Replace(sc));
+
+            var res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"));
+
+            res = agentTester.Test<PostalInfoAgent, PostalInfo>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.PatchPostCodesAsync(WebApiPatchOption.MergePatch, TestSetUp.GetResourceStream("E110_PatchPostCodes_Request.json").ReadToEnd(), "US", "WA", "Redmond", new WebApiRequestOptions { ETag = res.Response.Headers.ETag.Tag }));
+        }
     }
 }

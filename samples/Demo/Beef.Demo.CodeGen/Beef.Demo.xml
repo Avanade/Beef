@@ -41,7 +41,7 @@
 
     <Operation Name="GetDetail" OperationType="Get" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
     <Operation Name="UpdateDetail" OperationType="Update" ValueType="PersonDetail" ReturnType="PersonDetail" Validator="PersonDetailValidator" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
-    <Operation Name="PatchDetail" OperationType="Patch" ValueType="PersonDetail" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" PatchGetOperation="GetDetail" PatchUpdateOperation="IPersonManager.UpdateDetail" />
+    <Operation Name="PatchDetail" OperationType="Patch" ValueType="PersonDetail" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" WebApiGetOperation="GetDetail" WebApiUpdateOperation="IPersonManager.UpdateDetail" />
 
     <Operation Name="Add" Text="Actually validating the FromBody parameter generation" OperationType="Custom" WebApiRoute="fromBody" WebApiStatus="Created" ManagerCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeDataSvc="true" ExcludeIDataSvc="true">
       <Parameter Name="Person" Type="Person" Nullable="false" WebApiFrom="FromBody"/>
@@ -188,7 +188,7 @@
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   </Entity>
 
-  <Entity Name="PostalInfo" DataModel="true" AutoImplement="HttpAgent" WebApiRoutePrefix="api/v1/postal" HttpAgentName="IZippoAgent" HttpAgentModel="Model.PostalInfo">
+  <Entity Name="PostalInfo" DataModel="true" AutoImplement="HttpAgent" WebApiRoutePrefix="api/v1/postal" HttpAgentName="IZippoAgent" HttpAgentModel="Model.PostalInfo" WebApiConcurrency="true" WebApiGetOperation="GetPostCodes">
     <Property Name="Country" Type="^Country" JsonDataModelName="country abbreviation" />
     <Property Name="City" JsonDataModelName="place name" />
     <Property Name="State" JsonDataModelName="state abbreviation" />
@@ -212,7 +212,7 @@
       <Parameter Name="City" IsMandatory="true" />
     </Operation>
     
-    <Operation Name="PatchPostCodes" OperationType="Patch" WebApiRoute="{country}/{state}/{city}" HttpAgentRoute="{country.Code}/{state}/{city}" PatchGetOperation="GetPostCodes" PatchUpdateOperation="UpdatePostCodes">
+    <Operation Name="PatchPostCodes" OperationType="Patch" WebApiRoute="{country}/{state}/{city}" HttpAgentRoute="{country.Code}/{state}/{city}" WebApiUpdateOperation="UpdatePostCodes">
       <Parameter Name="Country" Type="^Country" IsMandatory="true" ValidatorFluent="IsValid()" />
       <Parameter Name="State" IsMandatory="true" />
       <Parameter Name="City" IsMandatory="true" />

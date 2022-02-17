@@ -10,7 +10,7 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.4" />
+    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.5" />
     <PackageReference Include="Beef.Events" Version="4.2.4" />
     <PackageReference Include="Beef.Events.EventHubs" Version="4.2.3" />
     <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.3" />

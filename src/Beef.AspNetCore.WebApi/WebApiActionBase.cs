@@ -312,7 +312,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri)
         {
-            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, convertNotfoundToNoContent, locationUri),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultInternalAsync(context, func, convertNotfoundToNoContent, locationUri),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -320,7 +320,7 @@ namespace Beef.AspNetCore.WebApi
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
         [DebuggerStepThrough()]
-        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri)
+        internal async Task ExecuteResultInternalAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent, Func<Uri>? locationUri)
         {
             try
             {
@@ -359,7 +359,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         protected virtual Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
-            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, locationUri),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultInternalAsync(context, func, locationUri),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -367,7 +367,7 @@ namespace Beef.AspNetCore.WebApi
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
         [DebuggerStepThrough()]
-        private async Task ExecuteResultAsyncInternal<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
+        internal async Task ExecuteResultInternalAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
             try
             {
@@ -495,6 +495,61 @@ namespace Beef.AspNetCore.WebApi
                 return false;
 
             return !IfMatchETags.Contains(etag);
+        }
+
+        /// <summary>
+        /// Get current value and checks ETag.
+        /// </summary>
+        /// <param name="context">The <see cref="ActionContext"/>.</param>
+        /// <param name="getFunc">The GET function.</param>
+        /// <param name="autoConcurrency">Indicates whether automatic concurrency (ETag) checking/generation is performed as underlying data source does not support.</param>
+        protected async Task<(bool success, T? value)> GetCurrentValueAsync<T>(ActionContext context, Func<Task<T?>> getFunc, bool autoConcurrency)
+        {
+            // Get the existing value.
+            var value = await getFunc().ConfigureAwait(false);
+            if (value == null)
+            {
+                await CreateResultFromException(context, new NotFoundException())!.ExecuteResultAsync(context).ConfigureAwait(false);
+                return (false, value);
+            }
+
+            // Check the concurrency etag match.
+            if (autoConcurrency)
+            {
+                if (IfMatchETags == null || IfMatchETags.Count == 0)
+                {
+                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required where the underlying entity supports concurrency (ETag)."))!.ExecuteResultAsync(context).ConfigureAwait(false);
+                    return (false, default(T));
+                }
+
+                if (IsIfMatchModified(ETagGenerator.Generate(value)))
+                {
+                    await CreateResultFromException(context, new ConcurrencyException())!.ExecuteResultAsync(context).ConfigureAwait(false);
+                    return (false, value);
+                }
+            }
+            else if (value is IETag et)
+            {
+                if (IfMatchETags == null || IfMatchETags.Count == 0)
+                {
+                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag)."))!.ExecuteResultAsync(context).ConfigureAwait(false);
+                    return (false, default(T));
+                }
+
+                if (IsIfMatchModified(et.ETag))
+                {
+                    await CreateResultFromException(context, new ConcurrencyException())!.ExecuteResultAsync(context).ConfigureAwait(false);
+                    return (false, value);
+                }
+            }
+
+            // Where possible clone the value to differentiate to that which may be cached as a result of the Get; otherwise, remove from cache.
+            if (value is Entities.ICloneable ic)
+                value = (T)ic.Clone();
+            else if (value is IUniqueKey uk)
+                ExecutionContext.GetService<IRequestCache>(throwExceptionOnNull: false)?.Remove<T>(uk.UniqueKey);
+
+            return (true, value);
         }
     }
 
@@ -755,14 +810,15 @@ namespace Beef.AspNetCore.WebApi
     /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
     public class WebApiPut<TResult> : WebApiActionBase
     {
-        private readonly Func<Task<TResult>> _func;
+        private readonly Func<Task<TResult?>>? _getFunc;
+        private readonly Func<Task<TResult>> _putFunc;
         private readonly Func<TResult, Uri>? _locationUri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPut{TResult}"/> class.
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
-        /// <param name="func">The function to invoke.</param>
+        /// <param name="putFunc">The PUT function to invoke.</param>
         /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
@@ -770,13 +826,39 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
-        public WebApiPut(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Unspecified,
+        public WebApiPut(ControllerBase controller, Func<Task<TResult>> putFunc, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
             [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
             Func<TResult, Uri>? locationUri = null)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
-            _func = func ?? throw new ArgumentNullException(nameof(func));
+            _putFunc = putFunc ?? throw new ArgumentNullException(nameof(putFunc));
+            _locationUri = locationUri;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebApiPut{TResult}"/> class with automatic concurrency (ETag) checking/generation.
+        /// </summary>
+        /// <param name="controller">The <see cref="ControllerBase"/>.</param>
+        /// <param name="value">The value to update.</param>
+        /// <param name="getFunc">The GET function to invoke.</param>
+        /// <param name="putFunc">The PUT function to invoke.</param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
+        /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
+        public WebApiPut(ControllerBase controller, object? value, Func<Task<TResult?>> getFunc, Func<Task<TResult>> putFunc, OperationType operationType = OperationType.Unspecified,
+            HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
+            Func<TResult, Uri>? locationUri = null)
+            : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
+        {
+            BodyValue = value;
+            _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
+            _putFunc = putFunc ?? throw new ArgumentNullException(nameof(putFunc));
             _locationUri = locationUri;
         }
 
@@ -786,7 +868,25 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        public override Task ExecuteResultAsync(ActionContext context) => ExecuteResultAsync(context, _func, _locationUri);
+        public override async Task ExecuteResultAsync(ActionContext context)
+        {
+            if (_getFunc != null)
+            {
+                // Get the existing value; make sure it exists and matches the supplied etag.
+                var (success, value) = await GetCurrentValueAsync(context, _getFunc, autoConcurrency: true).ConfigureAwait(false);
+                if (!success)
+                    return;
+
+                if (value is EntityBase eb && eb!.Equals(BodyValue!))
+                {
+                    //await ExecuteResultInternalAsync(context, () => Task.FromResult(value), false, null).ConfigureAwait(false);
+                    await ExecuteResultAsync(context, () => Task.FromResult(value), _locationUri).ConfigureAwait(false);
+                    return;
+                }
+            }
+
+            await ExecuteResultAsync(context, _putFunc, _locationUri).ConfigureAwait(false);
+        }
     }
 
     #endregion
@@ -847,6 +947,7 @@ namespace Beef.AspNetCore.WebApi
         private readonly Func<T, Task<T>>? _updateFuncWithResult;
         private readonly Func<Uri>? _locationUriNoResult;
         private readonly Func<T, Uri>? _locationUriWithResult;
+        private readonly bool _autoConcurrency;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPatch{T}"/> class.
@@ -888,16 +989,18 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <param name="locationUri">The function to invoke to get the <see cref="System.Net.Http.Headers.HttpResponseHeaders.Location"/> <see cref="Uri"/>.</param>
+        /// <param name="autoConcurrency">Indicates whether automatic concurrency (ETag) checking/generation is performed as underlying data source does not support.</param>
         public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
             [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0,
-            Func<T, Uri>? locationUri = null)
+            Func<T, Uri>? locationUri = null, bool autoConcurrency = false)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             BodyValue = _value = value ?? throw new ValidationException(new MessageItem[] { MessageItem.CreateErrorMessage(nameof(value), ValidatorStrings.InvalidFormat, Validator.ValueNameDefault) });
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncWithResult = updateFuncWithResult ?? throw new ArgumentNullException(nameof(updateFuncWithResult));
             _locationUriWithResult = locationUri;
+            _autoConcurrency = autoConcurrency;
         }
 
         /// <summary>
@@ -953,7 +1056,7 @@ namespace Beef.AspNetCore.WebApi
                     return;
 
                 // Get the existing value; make sure it exists and matches the supplied etag.
-                var (success, value) = await GetCurrentValueAsync(context).ConfigureAwait(false);
+                var (success, value) = await GetCurrentValueAsync(context, _getFunc, _autoConcurrency).ConfigureAwait(false);
                 if (!success)
                     return;
 
@@ -1014,7 +1117,7 @@ namespace Beef.AspNetCore.WebApi
                     return;
 
                 // Get the existing value; make sure it exists and matches the supplied etag.
-                var (success, value) = await GetCurrentValueAsync(context).ConfigureAwait(false);
+                var (success, value) = await GetCurrentValueAsync(context, _getFunc, _autoConcurrency).ConfigureAwait(false);
                 if (!success)
                     return;
 
@@ -1106,44 +1209,6 @@ namespace Beef.AspNetCore.WebApi
                 await new ObjectResult($"Unsupported Content-Type for a PATCH; support JSON-Patch: 'application/json-patch+json' or, JSON-Merge: `application/merge-patch+json` or `{MediaTypeNames.Application.Json}`.") { StatusCode = (int)HttpStatusCode.UnsupportedMediaType }.ExecuteResultAsync(context).ConfigureAwait(false);
                 return (WebApiPatchOption.NotSpecified, null);
             }
-        }
-
-        /// <summary>
-        /// Get current value before attempting to patch.
-        /// </summary>
-        private async Task<(bool success, T? value)> GetCurrentValueAsync(ActionContext context)
-        {
-            // Get the existing value.
-            var value = await _getFunc().ConfigureAwait(false);
-            if (value == null)
-            {
-                await CreateResultFromException(context, new NotFoundException())!.ExecuteResultAsync(context).ConfigureAwait(false);
-                return (false, value);
-            }
-
-            // Check the concurrency etag match.
-            if (value is IETag et)
-            {
-                if (IfMatchETags == null || IfMatchETags.Count == 0)
-                {
-                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag)."))!.ExecuteResultAsync(context).ConfigureAwait(false);
-                    return (false, default(T));
-                }
-
-                if (IsIfMatchModified(et.ETag))
-                {
-                    await CreateResultFromException(context, new ConcurrencyException())!.ExecuteResultAsync(context).ConfigureAwait(false);
-                    return (false, value);
-                }
-            }
-
-            // Where possible clone the value to differentiate to that which may be cached as a result of the Get; otherwise, remove from cache.
-            if (value is Entities.ICloneable ic)
-                value = (T)ic.Clone();
-            else if (value is IUniqueKey uk)
-                ExecutionContext.GetService<IRequestCache>(throwExceptionOnNull: false)?.Remove<T>(uk.UniqueKey);
-
-            return (true, value);
         }
 
         /// <summary>

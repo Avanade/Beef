@@ -76,7 +76,7 @@ namespace Beef.Demo.Api.Controllers
         [HttpPut("{country}/{state}/{city}")]
         [ProducesResponseType(typeof(PostalInfo), (int)HttpStatusCode.OK)]
         public IActionResult UpdatePostCodes([FromBody] PostalInfo value, string? country, string? state, string? city) =>
-            new WebApiPut<PostalInfo>(this, () => _manager.UpdatePostCodesAsync(WebApiActionBase.Value(value), country, state, city),
+            new WebApiPut<PostalInfo>(this, value, () => _manager.GetPostCodesAsync(country, state, city), () => _manager.UpdatePostCodesAsync(WebApiActionBase.Value(value), country, state, city),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(PostalInfo), (int)HttpStatusCode.OK)]
         public IActionResult PatchPostCodes([FromBody] JToken value, string? country, string? state, string? city) =>
             new WebApiPatch<PostalInfo>(this, value, () => _manager.GetPostCodesAsync(country, state, city), (__value) => _manager.UpdatePostCodesAsync(__value, country, state, city),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null, autoConcurrency: true);
     }
 }
 

@@ -17,7 +17,7 @@ namespace Beef.CodeGen.Config.Entity
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Operation", Title = "'CodeGeneration' object (entity-driven)",
-        Description = "The code generation for an `Operation` is primarily driven by the `Type` property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.", 
+        Description = "The code generation for an `Operation` is primarily driven by the `Type` property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.",
         Markdown = @"The valid `Type` values are as follows:
 
 - **`Get`** - indicates a get (read) returning a single entity value.
@@ -428,20 +428,30 @@ operations: [
         public string? WebApiLocation { get; set; }
 
         /// <summary>
-        /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
+        /// Indicates whether the Web API is responsible for managing concurrency via auto-generated ETag.
         /// </summary>
-        [JsonProperty("patchGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
+        [CodeGenProperty("WebApi", Title = "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
+            Description = "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the `Operation.Type` is `Update` or `Patch`, the request ETag will " +
+            "be matched against the response for a corresponding `Get` operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the `Get` must be the same as that returned from " +
+            "the corresponding `Create`, `Update` and `Patch` (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. Defaults to `Entity.WebApiConcurrency`.")]
+        [JsonProperty("webApiConcurrency", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool? WebApiConcurrency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) either where, the `Operation.Type` is `Update` and `WebApiConcurrency` is `true`, or the `Operation.Type` is `Patch`.
+        /// </summary>
+        [JsonProperty("webApiGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Update` and `SimulateConcurrency` is `true`.",
             Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
-        public string? PatchGetOperation { get; set; }
+        public string? WebApiGetOperation { get; set; }
 
         /// <summary>
         /// Gets or sets the override for the corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
         /// </summary>
-        [JsonProperty("patchUpdateOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("webApiUpdateOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("WebApi", Title = "The corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
             Description = "Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
-        public string? PatchUpdateOperation { get; set; }
+        public string? WebApiUpdateOperation { get; set; }
 
         #endregion
 
@@ -589,7 +599,7 @@ operations: [
         /// <summary>
         /// Indicates whether there is only a single parameter to be validated.
         /// </summary>
-        public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count <= 1; 
+        public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count <= 1;
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
@@ -723,14 +733,14 @@ operations: [
         public bool IsPatch => Type == "Patch";
 
         /// <summary>
-        /// Gets or sets the PATCH Get variable.
+        /// Gets or sets the UPDATE/PATCH Get variable.
         /// </summary>
-        public string? PatchGetVariable { get; set; }
+        public string? WebApiGetVariable { get; set; }
 
         /// <summary>
         /// Gets or sets the PATCH Update variable.
         /// </summary>
-        public string? PatchUpdateVariable { get; set; }
+        public string? WebApiUpdateVariable { get; set; }
 
         /// <summary>
         /// Gets or sets the gRPC converter for the return value.
@@ -887,6 +897,7 @@ operations: [
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
 
+            WebApiConcurrency = DefaultWhereNull(WebApiConcurrency, () => Parent!.WebApiConcurrency);
             WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : (HasReturnValue ? "OK" : "NoContent"));
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
             {
@@ -965,24 +976,24 @@ operations: [
                 _ => string.Join(",", Parameters.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
 
-            if (Type == "Patch")
+            if (Type == "Patch" || Type == "Update")
             {
-                PatchGetOperation = DefaultWhereNull(PatchGetOperation, () => "Get");
-                var parts = string.IsNullOrEmpty(PatchGetOperation) ? Array.Empty<string>() : PatchGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
+                WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => Parent!.WebApiGetOperation);
+                var parts = string.IsNullOrEmpty(WebApiGetOperation) ? Array.Empty<string>() : WebApiGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
+                WebApiGetVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
-                    PatchGetOperation = parts[1];
+                    WebApiGetOperation = parts[1];
                     if (!Parent!.WebApiCtorParameters.Any(x => x.Type == parts[0]))
                         Parent!.WebApiCtorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
 
-                PatchUpdateOperation = DefaultWhereNull(PatchUpdateOperation, () => "Update");
-                parts = string.IsNullOrEmpty(PatchUpdateOperation) ? Array.Empty<string>() : PatchUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
+                WebApiUpdateOperation = DefaultWhereNull(WebApiUpdateOperation, () => "Update");
+                parts = string.IsNullOrEmpty(WebApiUpdateOperation) ? Array.Empty<string>() : WebApiUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
+                WebApiUpdateVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
-                    PatchUpdateOperation = parts[1];
+                    WebApiUpdateOperation = parts[1];
                     if (!Parent!.WebApiCtorParameters.Any(x => x.Type == parts[0]))
                         Parent!.WebApiCtorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
@@ -999,6 +1010,8 @@ operations: [
                 "decimal" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
                 _ => null
             };
+
+            CheckDeprecatedProperties();
         }
 
         /// <summary>
@@ -1292,6 +1305,23 @@ operations: [
                 "HttpDelete" => "Delete",
                 _ => "Get"
             };
+        }
+
+        /// <summary>
+        /// Check for any deprecate properties and error.
+        /// </summary>
+        private void CheckDeprecatedProperties()
+        {
+            if (ExtraProperties == null || ExtraProperties.Count == 0)
+                return;
+
+            var ep = ExtraProperties.Where(x => string.Compare(x.Key, "patchGetOperation", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
+            if (ep.Key != null)
+                throw new CodeGenException(this, ep.Key, $"The 'patchGetOperation' configuration has been renamed to 'webApiGetOperation'; please update the configuration accordingly.");
+
+            ep = ExtraProperties.Where(x => string.Compare(x.Key, "patchUpdateOperation", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
+            if (ep.Key != null)
+                throw new CodeGenException(this, nameof(EventOutbox), $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
         }
     }
 }

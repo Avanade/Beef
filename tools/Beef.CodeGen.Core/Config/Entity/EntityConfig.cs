@@ -747,6 +747,24 @@ entities:
             Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This is defaulted from the `CodeGen.WebApiAutoLocation`.")]
         public bool? WebApiAutoLocation { get; set; }
 
+        /// <summary>
+        /// Indicates whether the Web API is responsible for managing concurrency via auto-generated ETag.
+        /// </summary>
+        [JsonProperty("webApiConcurrency", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("WebApi", Title = "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
+            Description = "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the `Operation.Type` is `Update` or `Patch`, the request ETag will " +
+            "be matched against the response for a corresponding `Get` operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the `Get` must be the same as that returned from " +
+            "the corresponding `Create`, `Update` and `Patch` (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. This defaults the `Operation.WebApiConcurrency`.")]
+        public bool? WebApiConcurrency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) either where, the `Operation.Type` is `Update` and `WebApiConcurrency` is `true`, or the `Operation.Type` is `Patch`.
+        /// </summary>
+        [JsonProperty("webApiGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Update` and `SimulateConcurrency` is `true`.",
+            Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
+        public string? WebApiGetOperation { get; set; }
+
         #endregion
 
         #region Model
@@ -1250,6 +1268,8 @@ entities:
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
+            WebApiConcurrency = DefaultWhereNull(WebApiConcurrency, () => false);
+            WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => "Get");
 
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :

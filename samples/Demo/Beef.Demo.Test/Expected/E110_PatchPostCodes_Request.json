@@ -1,0 +1,16 @@
+﻿{
+  "places": [
+    {
+      "name": "Redmond",
+      "postCode": "980520"
+    },
+    {
+      "name": "Redmond",
+      "postCode": "980530"
+    },
+    {
+      "name": "Redmond",
+      "postCode": "980730"
+    }
+  ]
+}
