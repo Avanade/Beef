@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Enhancement*: Added support within `WebApiActionBase` et al for automatic concurrency (ETag) checking/generation when the underlying data source does not support.
+
 ## v4.2.4
 - *Fixed:* The `WebApiPatch` will now throw a `ValidationException` if the patch value JSON is `null`; i.e. there must be a patch instruction of some sort.
 - *Fixed:* Updated internal _Beef_ dependencies to latest.

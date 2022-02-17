@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Fixed:* `ETagGenerator.Generate` updated to support any value type, not just a class.
+
 ## v4.2.5
 - *Fixed:* `HttpAgentBase.SendAsyncInternal` updated to check that the `Response.Content` is not `null`; corrects possible `NullReferenceException`.
 - *Fixed:* `HttpAgentBase.SendAsyncInternal` to use the `ExecutionContext.OperationType` (converting to the equivalent `OperationTypes`) when using an `IMapper` to map source to destinatio, and vice versa.

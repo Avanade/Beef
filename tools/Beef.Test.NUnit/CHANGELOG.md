@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Enhancement:* Upgraded [`UnitTestEx`](https://github.com/Avanade/unittestex) to latest.
+
 ## v4.2.4
 - *Enhancement:* Added [`UnitTestEx`](https://github.com/Avanade/unittestex) support to enable `MockHttpClientFactory` for testing of mocked `HttpClient`.
 - *Enhancement:* Added new `TestSetUp.GetValueFromJsonResource<T>` to enable the creation of value from an embedded resource file containing JSON.

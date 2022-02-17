@@ -23,7 +23,7 @@ namespace Beef.Entities
         /// <param name="value">The value.</param>
         /// <param name="parts">Optional extra part(s) to append to the JSON to include in the underlying hash computation.</param>
         /// <returns>The generated ETag.</returns>
-        public static string? Generate<T>(T? value, params string[] parts) where T : class
+        public static string? Generate<T>(T? value, params string[] parts)
         {
             if (value == null)
                 return null;

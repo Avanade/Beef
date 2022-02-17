@@ -92,6 +92,9 @@ namespace Beef.Template.Solution.UnitTest
             // Build Beef and package (nuget) - only local package, no deployment.
             Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} packageonly").exitCode, "nuget publish");
 
+            // Uninstall any previous beef templates.
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "new -u beef.template.solution").exitCode, "uninstall beef.template.solution");
+
             // Install the Beef template solution from local package.
             // dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
             Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "packageonly")}").exitCode, "install beef.template.solution");
