@@ -29,12 +29,12 @@ dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/ind
 
 ## Create solution
 
-To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname`; which is also the recommended directory name (it will also represent the .NET namespace). For this tutorial we will also choose the `Database` data source (this uses stored procedures).
+To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname`; which is also the recommended directory name (it will also represent the .NET namespace). For this tutorial we will also choose the `EntityFramework` data source.
 
 ```
 mkdir Foo.Bar
 cd Foo.Bar
-dotnet run beef --company Foo --appname Bar --datasource EntityFramework
+dotnet new beef --company Foo --appname Bar --datasource EntityFramework
 ```
 
 The solution should now have been created; and the file system should look like the following:
