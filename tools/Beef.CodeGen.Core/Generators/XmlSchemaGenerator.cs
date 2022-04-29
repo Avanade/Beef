@@ -33,7 +33,7 @@ namespace Beef.CodeGen.Generators
                     new XAttribute("attributeFormDefault", "unqualified"),
                     new XAttribute("elementFormDefault", "unqualified")));
 
-            WriteObject(configType, typeof(T), ns, xdoc.Root, true);
+            WriteObject(configType, typeof(T), ns, xdoc!.Root!, true);
 
             return xdoc;
         }

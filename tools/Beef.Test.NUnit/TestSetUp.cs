@@ -39,6 +39,11 @@ namespace Beef.Test.NUnit
         private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername! ?? throw new InvalidOperationException($"{nameof(DefaultUsername)} must not be null.") };
         internal static readonly Dictionary<Type, Type> _webApiAgentArgsTypes = new Dictionary<Type, Type>() { { typeof(IWebApiAgentArgs), typeof(WebApiAgentArgs) } };
 
+        /// <summary>
+        /// Static constructor; override the default JSON Serializer.
+        /// </summary>
+        static TestSetUp() => CoreEx.Json.JsonSerializer.Default = new CoreEx.Newtonsoft.Json.JsonSerializer();
+        
         #region Setup
 
         /// <summary>
@@ -275,8 +280,8 @@ namespace Beef.Test.NUnit
             if (_refServiceType == null)
                 return;
 
-            service.AddSingleton(_refServiceType, _refProviderType)
-                   .AddSingleton(_refAgentServiceType, _refAgentType);
+            service.AddSingleton(_refServiceType, _refProviderType!)
+                   .AddSingleton(_refAgentServiceType!, _refAgentType!);
         }
 
         /// <summary>
@@ -344,7 +349,7 @@ namespace Beef.Test.NUnit
         {
             var services = new ServiceCollection();
             services.AddLogging(configure => configure.AddTestContext(includeLoggingScopesInOutput));
-            var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
+            var logger = services.BuildServiceProvider().GetRequiredService<ILogger<TestSetUp>>();
             return logger;
         }
 
@@ -362,7 +367,7 @@ namespace Beef.Test.NUnit
             services.AddBeefExecutionContext(createExecutionContext);
             serviceCollection?.Invoke(services);
             var sp = services.BuildServiceProvider();
-            var ec = sp.GetService<ExecutionContext>();
+            var ec = sp.GetRequiredService<ExecutionContext>();
             ec.ServiceProvider = sp;
             ExecutionContext.Reset();
             ExecutionContext.SetCurrent(ec);

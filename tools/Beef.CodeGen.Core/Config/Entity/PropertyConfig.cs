@@ -676,7 +676,7 @@ properties: [
                 if (Type == "ChangeLog")
                     return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Beef.Entities." + Type)})";
 
-                var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+                var ent = Root!.Entities?.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
                 {
                     if ((ent.EntityScope ?? Root.EntityScope) == "Common")

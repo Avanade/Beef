@@ -385,7 +385,7 @@ namespace Beef.Test.NUnit.Tests
 
             if (_isExpectedUniqueKey)
             {
-                if (!(result.Value is IUniqueKey uk2) || uk2.UniqueKey == null || uk2.UniqueKey.Args == null || uk2.UniqueKey.Args.Any(x => x == null))
+                if (!(result.Value is IUniqueKey uk2) || uk2.UniqueKey.Args == null || uk2.UniqueKey.Args.Any(x => x == null))
                     Assert.Fail("Expected IUniqueKey.Args array to have no null values.");
             }
 

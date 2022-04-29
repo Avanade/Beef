@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## 4.2.6
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.5
 - *Enhancement:* Upgraded the `Microsoft.Data.SqlClient` to the latest version. This may break existing tooling and testing; to correct add `;TrustServerCertificate=true` to the connection string.
 - *Fixed:* The `DatabaseRowVersionConverter` has been fixed to ensure that the `ETag` must be quoted to be compliant. See https://datatracker.ietf.org/doc/html/rfc7232#page-9 where specification states `entity-tag = [ weak ] opaque-tag`, and `opaque-tag = DQUOTE *etagc DQUOTE`; therefore, should be formatted as: `"value"`.

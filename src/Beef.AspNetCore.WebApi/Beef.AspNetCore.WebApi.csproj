@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <RootNamespace>Beef.AspNetCore.WebApi</RootNamespace>
-    <Version>4.2.5</Version>
+    <Version>4.2.6</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -39,12 +39,20 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.22" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
+    <PackageReference Include="Azure.Identity" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.24" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
   </ItemGroup>
 
   <ItemGroup>

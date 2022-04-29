@@ -102,7 +102,7 @@ queries:
                 ToTable = DefaultWhereNull(ToTable, () => Parent!.Parent!.Name);
                 ToColumn = DefaultWhereNull(ToColumn, () => Name);
 
-                c = Root!.DbTables.Where(x => x.Schema == ToSchema && x.Name == ToTable).SingleOrDefault()?.Columns.Where(x => x.Name == ToColumn).SingleOrDefault();
+                c = Root!.DbTables!.Where(x => x.Schema == ToSchema && x.Name == ToTable).SingleOrDefault()?.Columns.Where(x => x.Name == ToColumn).SingleOrDefault();
                 if (c == null)
                     throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in database.");
 

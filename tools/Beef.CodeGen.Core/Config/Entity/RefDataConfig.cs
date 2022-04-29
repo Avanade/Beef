@@ -15,22 +15,22 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether auto-implementing 'Database'.
         /// </summary>
-        public bool UsesDatabase => Parent!.RefDataEntities.Any(x => x.AutoImplement == "Database");
+        public bool UsesDatabase => Parent!.RefDataEntities?.Any(x => x.AutoImplement == "Database") ?? false;
 
         /// <summary>
         /// Indicates whether auto-implementing 'EntityFramework'.
         /// </summary>
-        public bool UsesEntityFramework => Parent!.RefDataEntities.Any(x => x.AutoImplement == "EntityFramework");
+        public bool UsesEntityFramework => Parent!.RefDataEntities?.Any(x => x.AutoImplement == "EntityFramework") ?? false;
 
         /// <summary>
         /// Indicates whether auto-implementing 'Cosmos'.
         /// </summary>
-        public bool UsesCosmos => Parent!.RefDataEntities.Any(x => x.AutoImplement == "Cosmos");
+        public bool UsesCosmos => Parent!.RefDataEntities?.Any(x => x.AutoImplement == "Cosmos") ?? false;
 
         /// <summary>
         /// Indicates whether auto-implementing 'OData'.
         /// </summary>
-        public bool UsesOData => Parent!.RefDataEntities.Any(x => x.AutoImplement == "OData");
+        public bool UsesOData => Parent!.RefDataEntities?.Any(x => x.AutoImplement == "OData") ?? false;
 
         /// <summary>
         /// Gets the Data constructor parameters.

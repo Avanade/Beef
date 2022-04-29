@@ -624,7 +624,7 @@ operations: [
         /// <summary>
         /// Indicates whether any parameters exist with WebApiFrom contain "FromEntityProperties".
         /// </summary>
-        public bool HasFromEntityPropertiesParameters => Parameters.Any(x => x.WebApiFrom == "FromEntityProperties");
+        public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
 
         /// <summary>
         /// The operation event properties.
@@ -705,7 +705,7 @@ operations: [
         /// <summary>
         /// Indicates whether there is a value operation.
         /// </summary>
-        public bool HasValue => Parameters.Any(x => x.IsValueArg);
+        public bool HasValue => Parameters!.Any(x => x.IsValueArg);
 
         /// <summary>
         /// Indicates whether the operation supports caching.
@@ -938,7 +938,7 @@ operations: [
             {
                 "Create" => "{_evtPub.FormatKey(__result)}",
                 "Update" => "{_evtPub.FormatKey(__result)}",
-                "Delete" => $"{{_evtPub.FormatKey({string.Join(", ", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{x.ArgumentName}"))})}}",
+                "Delete" => $"{{_evtPub.FormatKey({string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{x.ArgumentName}"))})}}",
                 _ => null
             };
 
@@ -973,7 +973,7 @@ operations: [
             {
                 "GetColl" => "",
                 "Custom" => "",
-                _ => string.Join(",", Parameters.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
+                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
 
             if (Type == "Patch" || Type == "Update")
@@ -1038,7 +1038,7 @@ operations: [
 
             if (UniqueKey.HasValue && UniqueKey.Value)
             {
-                foreach (var pc in Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value))
+                foreach (var pc in Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value))
                 {
                     Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
@@ -1209,7 +1209,7 @@ operations: [
                 if (WebApiLocation.StartsWith('^'))
                 {
                     var name = WebApiLocation.Length == 1 ? "Get" : WebApiLocation[1..];
-                    var op = Parent!.Operations.FirstOrDefault(x => x.Name == name);
+                    var op = Parent!.Operations!.FirstOrDefault(x => x.Name == name);
                     if (op == null)
                         throw new CodeGenException(this, nameof(WebApiLocation), $"Attempt to lookup Operation '{name}' which does not exist.");
 
@@ -1228,7 +1228,7 @@ operations: [
                                 throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' tokens are invalid.");
 
                             var arg = WebApiLocation.Substring(i, j - i + 1);
-                            var p = op.Parameters.FirstOrDefault(x => x.ArgumentName == arg[1..^1]);
+                            var p = op.Parameters!.FirstOrDefault(x => x.ArgumentName == arg[1..^1]);
                             if (p == null)
                                 throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' references Parameter token '{arg}' that does not exist.");
 
@@ -1242,7 +1242,7 @@ operations: [
                     WebApiLocation = Parent!.WebApiRoutePrefix + "/" + WebApiLocation;
             }
 
-            if (WebApiLocation.FirstOrDefault() != '/')
+            if (WebApiLocation?.FirstOrDefault() != '/')
                 WebApiLocation = "/" + WebApiLocation;
         }
 
@@ -1257,7 +1257,7 @@ operations: [
             if (HttpAgentRoute == null && !string.IsNullOrEmpty(WebApiRoute))
             {
                 if (Type == "Update")
-                    HttpAgentRoute = string.Join(",", Parameters.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}"));
+                    HttpAgentRoute = string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}"));
                 else
                     HttpAgentRoute = WebApiRoute;
             }

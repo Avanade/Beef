@@ -1,5 +1,5 @@
 ﻿cd ..
-dotnet run --GenerateEntityXmlMarkdown
-dotnet run --GenerateEntityMarkdown
-dotnet run --GenerateDatabaseXmlMarkdown
-dotnet run --GenerateDatabaseMarkdown
+dotnet run --framework net6.0 --GenerateEntityXmlMarkdown
+dotnet run --framework net6.0 --GenerateEntityMarkdown
+dotnet run --framework net6.0 --GenerateDatabaseXmlMarkdown
+dotnet run --framework net6.0 --GenerateDatabaseMarkdown

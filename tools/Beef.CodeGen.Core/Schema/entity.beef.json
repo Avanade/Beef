@@ -816,6 +816,16 @@
           "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
           "description": "This will automatically set the 'Operation.WebApiLocation' for an 'Operation' named 'Create' where there is a corresponding named 'Get'. This is defaulted from the 'CodeGen.WebApiAutoLocation'."
         },
+        "webApiConcurrency": {
+          "type": "boolean",
+          "title": "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
+          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the 'Operation.Type' is 'Update' or 'Patch', the request ETag will be matched against the response for a corresponding 'Get' operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the 'Get' must be the same as that returned from the corresponding 'Create', 'Update' and 'Patch' (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. This defaults the 'Operation.WebApiConcurrency'."
+        },
+        "webApiGetOperation": {
+          "type": "string",
+          "title": "The corresponding 'Get' method name (in the 'XxxManager') where the 'Operation.Type' is 'Update' and 'SimulateConcurrency' is 'true'.",
+          "description": "Defaults to 'Get'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."
+        },
         "dataModel": {
           "type": "boolean",
           "title": "Indicates whether a data 'model' version of the entity should also be generated (output to '.\\Business\\Data\\Model').",
@@ -1475,12 +1485,17 @@
           "title": "The HTTP Response Location Header route.",
           "description": "This uses similar formatting to the 'WebApiRoute'. The response value is accessed using 'r.' notation to access underlying properties; for example '{r.Id}' or 'person/{r.Id}'. The 'Entity.WebApiRoutePrefix' will be prepended automatically; however, to disable set the first character to '!', e.g. '!person/{r.Id}'. The URI can be inferred from another 'Operation' by using a lookup '^'; for example '^Get' indicates to infer from the named 'Get' operation (where only '^' is specified this is shorthand for '^Get' as this is the most common value). The Location URI will ensure the first character is a '/' so it acts a 'relative URL absolute path'."
         },
-        "patchGetOperation": {
+        "webApiConcurrency": {
+          "type": "boolean",
+          "title": "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
+          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the 'Operation.Type' is 'Update' or 'Patch', the request ETag will be matched against the response for a corresponding 'Get' operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the 'Get' must be the same as that returned from the corresponding 'Create', 'Update' and 'Patch' (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. Defaults to 'Entity.WebApiConcurrency'."
+        },
+        "webApiGetOperation": {
           "type": "string",
-          "title": "The corresponding 'Get' method name (in the 'XxxManager') where the 'Operation.Type' is 'Patch'.",
+          "title": "The corresponding 'Get' method name (in the 'XxxManager') where the 'Operation.Type' is 'Update' and 'SimulateConcurrency' is 'true'.",
           "description": "Defaults to 'Get'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."
         },
-        "patchUpdateOperation": {
+        "webApiUpdateOperation": {
           "type": "string",
           "title": "The corresponding 'Update' method name (in the 'XxxManager') where the 'Operation.Type' is 'Patch'.",
           "description": "Defaults to 'Update'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."

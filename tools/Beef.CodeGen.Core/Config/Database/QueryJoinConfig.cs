@@ -200,7 +200,7 @@ queries:
         /// <summary>
         /// Gets all the other joins excluding this.
         /// </summary>
-        public List<QueryJoinConfig> OtherJoins => Parent!.Joins.Where(x => x != this).ToList();
+        public List<QueryJoinConfig> OtherJoins => Parent!.Joins!.Where(x => x != this).ToList();
 
         /// <summary>
         /// Gets the selected column configurations.
@@ -297,7 +297,7 @@ queries:
                 Name = Name[1..];
 
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
-            DbTable = Root!.DbTables.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
+            DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 

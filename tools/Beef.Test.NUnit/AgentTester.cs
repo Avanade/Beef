@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Beef.Test.NUnit.Tests;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System;
@@ -68,11 +68,8 @@ namespace Beef.Test.NUnit
             var kvn = config["KeyVaultName"];
             if (!string.IsNullOrEmpty(kvn))
             {
-                var astp = new AzureServiceTokenProvider();
-#pragma warning disable CA2000 // Dispose objects before losing scope; this object MUST NOT be disposed or will result in further error - only a single instance so is OK.
-                var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
-                cb.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
-#pragma warning restore CA2000
+                var secretClient = new SecretClient(new Uri($"https://{kvn}.vault.azure.net/"), new DefaultAzureCredential());
+                cb.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
             }
 
             cb.AddCommandLine(args);

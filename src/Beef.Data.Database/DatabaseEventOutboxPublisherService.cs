@@ -47,14 +47,14 @@ namespace Beef.Data.Database
         /// <param name="logger"><inheritdoc/></param>
         /// <param name="overrideExecutionContext"><inheritdoc/></param>
         public DatabaseEventOutboxPublisherService(IServiceProvider serviceProvider, IDatabase? database = null, DatabaseEventOutboxBase? eventOutbox = null, IEventPublisher? eventPublisher = null, IConfiguration? config = null, ILogger? logger = null, Func<ExecutionContext>? overrideExecutionContext = null)
-            : base(serviceProvider, logger ?? Check.NotNull(serviceProvider, nameof(serviceProvider)).GetService<ILogger< DatabaseEventOutboxPublisherService>>(), config, overrideExecutionContext) 
+            : base(serviceProvider, logger ?? Check.NotNull(serviceProvider, nameof(serviceProvider)).GetRequiredService<ILogger< DatabaseEventOutboxPublisherService>>(), config, overrideExecutionContext) 
         {
             // Where null we will get value when 'executing' from the ExecutionContext.GetService.
             _database = database;
             _eventPublisher = eventPublisher;
 
             // This we can get here as it must be a singleton; also hook into enqueue event.
-            _eventOutbox = eventOutbox ?? serviceProvider.GetService<DatabaseEventOutboxBase>();
+            _eventOutbox = eventOutbox ?? serviceProvider.GetRequiredService<DatabaseEventOutboxBase>();
             _eventOutbox.OnEnqueue += EventOutbox_OnEnqueue;
 
             // Default from configuration.

@@ -18,6 +18,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.Grpc) && x.GrpcOperations!.Count > 0).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities!.Where(x => IsTrue(x.Grpc) && x.GrpcOperations!.Count > 0).AsEnumerable();
     }
 }

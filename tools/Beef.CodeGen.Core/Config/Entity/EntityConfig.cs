@@ -1027,17 +1027,17 @@ entities:
         /// <summary>
         /// Indicates where there are any <see cref="OperationConfig.ManagerExtensions"/>.
         /// </summary>
-        public bool HasManagerExtensions => Operations.Any(x => x.ManagerExtensions == true);
+        public bool HasManagerExtensions => Operations!.Any(x => x.ManagerExtensions == true);
 
         /// <summary>
         /// Indicates where there are any <see cref="OperationConfig.DataSvcExtensions"/>.
         /// </summary>
-        public bool HasDataSvcExtensions => Operations.Any(x => x.DataSvcExtensions == true);
+        public bool HasDataSvcExtensions => Operations!.Any(x => x.DataSvcExtensions == true);
 
         /// <summary>
         /// Indicates where there are any <see cref="OperationConfig.DataExtensions"/>.
         /// </summary>
-        public bool HasDataExtensions => Operations.Any(x => x.DataExtensions == true);
+        public bool HasDataExtensions => Operations!.Any(x => x.DataExtensions == true);
 
         /// <summary>
         /// Gets the Manager constructor parameters.
@@ -1149,7 +1149,7 @@ entities:
         /// <summary>
         /// Indicates whether any of the operations use validators.
         /// </summary>
-        public bool UsesValidators => Validator != null || Operations.Any(x => x.Validator != null || x.Parameters.Any(y => y.Validator != null));
+        public bool UsesValidators => Validator != null || Operations!.Any(x => x.Validator != null || x.Parameters!.Any(y => y.Validator != null));
 
         /// <summary>
         /// Indicates whether at least one operation needs a Manager.
@@ -1159,47 +1159,47 @@ entities:
         /// <summary>
         /// Indicates whether at least one operation needs a DataSvc.
         /// </summary>
-        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations.Any(x => CompareNullOrValue(x.ManagerCustom, false));
+        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations!.Any(x => CompareNullOrValue(x.ManagerCustom, false));
 
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 
         /// </summary>
-        public bool SupportsDataSvcEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "DataSvc");
+        public bool SupportsDataSvcEvents => Operations!.Any(x => x.Events.Count > 0 && x.EventPublish == "DataSvc");
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the Data-layer.
         /// </summary>
-        public bool SupportsDataEvents => Operations.Any(x => x.Events.Count > 0 && x.EventPublish == "Data");
+        public bool SupportsDataEvents => Operations!.Any(x => x.Events.Count > 0 && x.EventPublish == "Data");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Database'.
         /// </summary>
-        public bool UsesDatabase => AutoImplement == "Database" || Operations.Any(x => x.AutoImplement == "Database");
+        public bool UsesDatabase => AutoImplement == "Database" || Operations!.Any(x => x.AutoImplement == "Database");
 
         /// <summary>
         /// Indicates whether auto-implementing 'EntityFramework'.
         /// </summary>
-        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkModel != null || Operations.Any(x => x.AutoImplement == "EntityFramework");
+        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkModel != null || Operations!.Any(x => x.AutoImplement == "EntityFramework");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Cosmos'.
         /// </summary>
-        public bool UsesCosmos => AutoImplement == "Cosmos" || CosmosModel != null || Operations.Any(x => x.AutoImplement == "Cosmos");
+        public bool UsesCosmos => AutoImplement == "Cosmos" || CosmosModel != null || Operations!.Any(x => x.AutoImplement == "Cosmos");
 
         /// <summary>
         /// Indicates whether auto-implementing 'OData'.
         /// </summary>
-        public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
+        public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations!.Any(x => x.AutoImplement == "OData");
 
         /// <summary>
         /// Indicates whether auto-implementing 'HttpAgent'.
         /// </summary>
-        public bool UsesHttpAgent => AutoImplement == "HttpAgent" || HttpAgentModel != null || Operations.Any(x => x.AutoImplement == "HttpAgent");
+        public bool UsesHttpAgent => AutoImplement == "HttpAgent" || HttpAgentModel != null || Operations!.Any(x => x.AutoImplement == "HttpAgent");
 
         /// <summary>
         /// Indicates whether AutoMapper is being used.
@@ -1209,7 +1209,7 @@ entities:
         /// <summary>
         /// Indicates whether the data extensions section is required.
         /// </summary>
-        public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
+        public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations!.Any(x => x.Type == "GetColl");
 
         /// <summary>
         /// Gets the reference data qualified Entity name.
@@ -1224,12 +1224,12 @@ entities:
         /// <summary>
         /// Indicates whether the Manager needs a DataSvc using statement.
         /// </summary>
-        public bool ManagerNeedsUsingDataSvc => Operations.Any(x => x.ManagerCustom == null || x.ManagerCustom == false);
+        public bool ManagerNeedsUsingDataSvc => Operations!.Any(x => x.ManagerCustom == null || x.ManagerCustom == false);
 
         /// <summary>
         /// Indicates whether the DataSvc needs a DataSvc using statement.
         /// </summary>
-        public bool DataSvcNeedsUsingData => Operations.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
+        public bool DataSvcNeedsUsingData => Operations!.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
 
         /// <summary>
         /// <inheritdoc/>
@@ -1395,7 +1395,7 @@ entities:
         /// </summary>
         private void AddInheritedProperty(string name, ref int index, Func<PropertyConfig> func)
         {
-            if (Properties.Any(x => x.Name == name))
+            if (Properties!.Any(x => x.Name == name))
                 return;
 
             var p = func();
@@ -1477,7 +1477,7 @@ entities:
                     }
                 }
 
-                var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
+                var id = Properties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
                 if (id != null)
                 {
                     var iid = id.Type switch
@@ -1494,24 +1494,24 @@ entities:
                 }
             }
 
-            if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+            if (Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
                 implements.Insert(i++, "IUniqueKey");
                 modelImplements.Insert(m++, "IUniqueKey");
             }
 
-            if (Properties.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
+            if (Properties!.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
                 implements.Insert(i++, "IPartitionKey");
 
             if (CompareValue(ImplementsAutoInfer, true))
             {
-                if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+                if (Properties!.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
                 {
                     implements.Insert(i++, "IETag");
                     modelImplements.Insert(m++, "IETag");
                 }
 
-                if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
+                if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
                 {
                     implements.Insert(i++, "IChangeLog");
                     modelImplements.Insert(m++, "IChangeLog");
@@ -1559,7 +1559,7 @@ entities:
             if (SupportsDataSvcEvents)
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
-            if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
+            if (CompareValue(DataSvcCaching, true) && Operations!.Any(x => x.SupportsCaching))
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
             else 
                 DataSvcCaching = false;

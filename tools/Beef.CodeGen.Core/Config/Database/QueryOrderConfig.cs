@@ -77,7 +77,7 @@ namespace Beef.CodeGen.Config.Database
             Table = DefaultWhereNull(Table, () => Parent!.Name);
             Order = DefaultWhereNull(Order, () => "Ascending");
 
-            var c = Root!.DbTables.Where(x => x.Schema == Schema && x.Name == Table).SingleOrDefault()?.Columns.Where(x => x.Name == Name).SingleOrDefault();
+            var c = Root!.DbTables!.Where(x => x.Schema == Schema && x.Name == Table).SingleOrDefault()?.Columns.Where(x => x.Name == Name).SingleOrDefault();
             if (c == null)
                 throw new CodeGenException(this, nameof(Name), $"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in database.");
 

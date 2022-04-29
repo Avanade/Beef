@@ -29,7 +29,11 @@ namespace Beef.Test.NUnit.Tests
             ConfigureLocalServices(sc =>
             {
                 sc.AddTransient(_ => GetHttpClient());
-                sc.AddTransient(_ => GetBeforeRequest());
+
+                var br = GetBeforeRequest();
+                if (br != null)
+                    sc.AddTransient(_ => br);
+
                 sc.AddBeefAgentServices();
                 sc.AddBeefGrpcAgentServices();
             });

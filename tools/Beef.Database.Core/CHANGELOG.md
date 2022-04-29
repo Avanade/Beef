@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.15
+- *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
+
 ## v4.2.3
 - *Enhancement:* Database migration capabilities moved into new [DbEx](https://github.com/Avanade/DbEx) and referenced.
 - *Enhancement:* Updated to account for changes to `Beef.CodeGen.Core` and newly extracted base [OnRamp](https://github.com/Avanade/OnRamp) capabilities.
