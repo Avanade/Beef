@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.6
 - *Fixed:* `ETagGenerator.Generate` updated to support any value type, not just a class.
 

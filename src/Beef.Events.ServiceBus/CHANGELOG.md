@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.4
+- *Fixed:* Updated internal _Beef_ dependencies to latest.
+
 ## v4.2.3
 - *Enhancement:* Deprecate `Microsoft.Azure.ServiceBus` as per Microsoft [guidance](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md).
 - *Fixed:* Updated internal _Beef_ dependencies to latest.

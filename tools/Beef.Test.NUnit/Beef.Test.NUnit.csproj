@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>4.2.5</Version>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <Version>4.2.6</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -44,12 +44,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CoreEx.Newtonsoft" Version="1.0.2" />
+    <PackageReference Include="Moq" Version="4.17.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.17" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
+    <PackageReference Include="Azure.Identity" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.22" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.22" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.3" />
   </ItemGroup>
 
   <ItemGroup>

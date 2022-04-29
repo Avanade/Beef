@@ -297,7 +297,7 @@ namespace Beef.Test.NUnit
                 {
                     ExecutionContext.Reset();
                     var args = EventSubscriberHostArgs.Create(typeof(TSubscriber)).UseServiceProvider(scope.ServiceProvider);
-                    tesh = new EventSubscriberTestHost(args).UseLogger(scope.ServiceProvider.GetService<ILogger<EventSubscriberTester<TStartup>>>());
+                    tesh = new EventSubscriberTestHost(args).UseLogger(scope.ServiceProvider.GetRequiredService<ILogger<EventSubscriberTester<TStartup>>>());
                     sw = Stopwatch.StartNew();
                     await tesh.ReceiveAsync(@event).ConfigureAwait(false);
                     sw.Stop();

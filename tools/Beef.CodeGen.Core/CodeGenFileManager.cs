@@ -104,7 +104,7 @@ namespace Beef.CodeGen
                 return false;
             }
 
-            var yfi = new FileInfo(Path.Combine(xfi.DirectoryName, GetConfigFilenames(type).First()));
+            var yfi = new FileInfo(Path.Combine(xfi.DirectoryName!, GetConfigFilenames(type).First()));
             if (yfi.Exists)
             {
                 logger.LogError($"YAML file already exists: {yfi.Name}");

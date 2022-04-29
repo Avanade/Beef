@@ -13,11 +13,13 @@ namespace Beef.Test.NUnit
     /// Sets up the test by <see cref="ExecutionContext.Reset()">resetting</see> the <see cref="ExecutionContext"/> to ensure <c>null</c>; then orchestrates whether the 
     /// <see cref="TestSetUp.RegisterSetUp(Func{int, object?, bool})">registered setup</see> is required to be invoked for the test.
     /// </summary>
-    [System.Diagnostics.DebuggerStepThrough]
+    //[System.Diagnostics.DebuggerStepThrough]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
         private static readonly AsyncLocal<string> _username = new AsyncLocal<string>();
         private static readonly AsyncLocal<object?> _args = new AsyncLocal<object?>();
+        private readonly string _testUsername;
+        private readonly object? _testArgs;
         private readonly bool _needsSetup;
 
         /// <summary>
@@ -38,8 +40,10 @@ namespace Beef.Test.NUnit
         /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
         public TestSetUpAttribute(string? username = null, object? args = null, bool needsSetUp = true)
         {
-            _username.Value = username ?? TestSetUp.DefaultUsername;
-            _args.Value = args;
+            //_username.Value = username ?? TestSetUp.DefaultUsername;
+            //_args.Value = args;
+            _testUsername = username ?? TestSetUp.DefaultUsername;
+            _testArgs = args;
             _needsSetup = needsSetUp;
         }
 
@@ -59,7 +63,7 @@ namespace Beef.Test.NUnit
         public TestCommand Wrap(TestCommand command)
         {
             TestSetUp.ShouldContinueRunningTestsAssert();
-            return new ExecutionContextCommand(command, _needsSetup);
+            return new ExecutionContextCommand(command, _testUsername, _testArgs, _needsSetup);
         }
 
         /// <summary>
@@ -68,14 +72,23 @@ namespace Beef.Test.NUnit
         //[DebuggerStepThrough()]
         internal class ExecutionContextCommand : DelegatingTestCommand
         {
+            private readonly string _testUsername;
+            private readonly object? _testArgs;
             private readonly bool _needsSetUp;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ExecutionContextCommand"/> class.
             /// </summary>
             /// <param name="innerCommand">The inner <see cref="TestCommand"/>.</param>
+            /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUsername"/>).</param>
+            /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/>.</param>
             /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked.</param>
-            public ExecutionContextCommand(TestCommand innerCommand, bool needsSetUp = true) : base(innerCommand) => _needsSetUp = needsSetUp;
+            public ExecutionContextCommand(TestCommand innerCommand, string? username, object? args, bool needsSetUp = true) : base(innerCommand)
+            {
+                _testUsername = username ?? TestSetUp.DefaultUsername;
+                _testArgs = args;
+                _needsSetUp = needsSetUp;
+            }
 
             /// <summary>
             /// Executes the test, saving a <see cref="TestResult"/> in the supplied <see cref="TestExecutionContext"/>.
@@ -88,6 +101,9 @@ namespace Beef.Test.NUnit
                 {
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
+
+                    _username.Value = _testUsername;
+                    _args.Value = _testArgs;
 
                     if (context.CurrentTest?.Parent?.Fixture is ITestSetupPrepareExecutionContext uats)
                         uats.AgentTester.PrepareExecutionContext();

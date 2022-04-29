@@ -195,7 +195,7 @@ namespace Beef.Events
                 return await CheckResultAsync(data, CreateInvalidEventDataResult(null, "EventData is invalid; Subject is required."), null).ConfigureAwait(false);
 
             // Manages a Dependency Injection (DI) scope for each event execution.
-            using (Args.ServiceProvider.CreateScope())
+            using (Args.ServiceProvider!.CreateScope())
             {
                 // Match a subscriber to the subject + template supplied.
                 var subscriber = Args.CreateEventSubscriber(Args.SubjectTemplateWildcard, Args.SubjectPathSeparator, data.Metadata.Subject, data.Metadata.Action);
@@ -225,7 +225,7 @@ namespace Beef.Events
                 {
                     // Create and set the execution context for the event.
                     ExecutionContext.Reset();
-                    var ec = Args.ServiceProvider.GetService<ExecutionContext>();
+                    var ec = Args.ServiceProvider!.GetRequiredService<ExecutionContext>();
                     if (Args.UpdateExecutionContext == null)
                         UpdateExecutionContext(ec, subscriber, @event);
                     else

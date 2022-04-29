@@ -42,7 +42,7 @@ namespace Beef.Hosting
         {
             ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Config = config ?? ServiceProvider.GetService<IConfiguration>();
+            Config = config ?? ServiceProvider.GetRequiredService<IConfiguration>();
             _overrideExecutionContext = overrideExecutionContext;
         }
 
@@ -170,7 +170,7 @@ namespace Beef.Hosting
 
             // Set up the "scoped" execution context.
             ExecutionContext.Reset();
-            var ec = _overrideExecutionContext?.Invoke() ?? scope.ServiceProvider.GetService<ExecutionContext>();
+            var ec = _overrideExecutionContext?.Invoke() ?? scope.ServiceProvider.GetRequiredService<ExecutionContext>();
             ec.ServiceProvider = scope.ServiceProvider;
             ExecutionContext.SetCurrent(ec);
 

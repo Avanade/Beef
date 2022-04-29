@@ -231,7 +231,7 @@ namespace Beef.Data.Database
                 if (_connection != null)
                     return _connection;
 
-                Logger.LogDebug("Creating and opening the database connection. DatabaseId: {0}", DatabaseId);
+                Logger.LogDebug("Creating and opening the database connection. DatabaseId: {DatabaseId}", DatabaseId);
                 DbConnection conn = Provider.CreateConnection();
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
@@ -452,7 +452,7 @@ namespace Beef.Data.Database
                 {
                     if (_connection != null)
                     {
-                        Logger.LogDebug("Closing and disposing the database connection. DatabaseId: {0}", DatabaseId);
+                        Logger.LogDebug("Closing and disposing the database connection. DatabaseId: {DatabaseId}", DatabaseId);
                         _connection.Close();
                         _connection.Dispose();
                     }

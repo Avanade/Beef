@@ -173,7 +173,7 @@ namespace Beef
             if (CharactersNotAllowed != null && CharactersNotAllowed.Count > 0 && text.IndexOfAny(CharactersNotAllowed.ToArray()) >= 0)
                 wr.Selection |= WildcardSelection.InvalidCharacter;
 
-            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter, StringComparison.InvariantCulture) >= 0;
+            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.Contains(MultiWildcardCharacter, StringComparison.InvariantCulture);
             var hasTxt = false;
 
             for (int i = 0; i < text.Length; i++)

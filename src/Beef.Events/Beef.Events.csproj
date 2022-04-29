@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>4.2.4</Version>
+    <Version>4.2.5</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) Events framework.</Description>
@@ -31,12 +31,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
+    <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="CloudNative.CloudEvents.NewtonsoftJson" Version="2.1.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.22" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.22" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.4" />
     <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
 

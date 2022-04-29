@@ -18,6 +18,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<StoredProcedureConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Tables.SelectMany(x => x.StoredProcedures).Where(x => x.Type == "Update");
+            => Check.NotNull(config, nameof(config)).Tables!.SelectMany(x => x.StoredProcedures!).Where(x => x.Type == "Update");
     }
 }

@@ -274,7 +274,7 @@ parameters: [
         /// </summary>
         protected override Task PrepareAsync()
         {
-            var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Property);
+            var pc = Property == null ? null : Parent!.Parent!.Properties?.FirstOrDefault(x => x.Name == Property);
             if (Property != null && pc == null)
                 throw new CodeGenException(this, nameof(Property), $"Specified Property '{Property}' not found in Entity.");
 
@@ -285,7 +285,7 @@ parameters: [
                 Nullable = true;
             }
 
-            RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+            RelatedEntity = Root!.Entities!.FirstOrDefault(x => x.Name == Type);
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))

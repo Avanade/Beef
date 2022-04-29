@@ -88,7 +88,7 @@ namespace Beef.AspNetCore.WebApi
                         {
                             // Model 'errors' only added where there is a 'property' specified.
                             if (msg.Type == MessageType.Error && msg.Property != null)
-                                msd.AddModelError(msg.Property, msg.Text);
+                                msd.AddModelError(msg.Property, msg.Text ?? "Error");
                             else
                                 messages.Add(msg);
                         }
@@ -366,7 +366,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
-        [DebuggerStepThrough()]
+        //[DebuggerStepThrough()]
         internal async Task ExecuteResultInternalAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
             try
@@ -1178,7 +1178,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         private async Task<(WebApiPatchOption option, JsonPatchDocument<T>? patch)> PatchValidationAsync(ActionContext context)
         {
-            if (context.HttpContext.Request.ContentType.Equals("application/json-patch+json", StringComparison.InvariantCultureIgnoreCase))
+            if (context.HttpContext.Request!.ContentType!.Equals("application/json-patch+json", StringComparison.InvariantCultureIgnoreCase))
             {
                 JsonPatchDocument<T> patch;
                 try

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -18,7 +18,7 @@ namespace Beef.AspNetCore.WebApi
     public static class WebApiStartup
     {
         /// <summary>
-        /// Creates the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the standardized <see cref="ConfigurationBuilder"/>.
+        /// Creates the <see cref="IWebHost"/> using the <c>WebHost.CreateDefaultBuilder(string[])</c> utilizing the standardized <see cref="ConfigurationBuilder"/>.
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="args">The command line args.</param>
@@ -30,7 +30,7 @@ namespace Beef.AspNetCore.WebApi
                    .UseStartup<TStartup>();
 
         /// <summary>
-        /// Creates and builds the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the <see cref="ConfigurationBuilder"/>.
+        /// Creates and builds the <see cref="IWebHost"/> using the <c>WebHost.CreateDefaultBuilder(string[])</c> utilizing the <see cref="ConfigurationBuilder"/>.
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="args">The command line args.</param>
@@ -76,11 +76,8 @@ namespace Beef.AspNetCore.WebApi
             var kvn = config["KeyVaultName"];
             if (!string.IsNullOrEmpty(kvn))
             {
-                var astp = new AzureServiceTokenProvider();
-#pragma warning disable CA2000 // Dispose objects before losing scope; this object MUST NOT be disposed or will result in further error - only a single instance so is OK.
-                var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
-                configurationBuilder.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
-#pragma warning restore CA2000
+                var secretClient = new SecretClient(new Uri($"https://{kvn}.vault.azure.net/"), new DefaultAzureCredential());
+                configurationBuilder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
             }
 
             configurationBuilder.AddCommandLine(args);
