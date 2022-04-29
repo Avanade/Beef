@@ -366,7 +366,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
-        //[DebuggerStepThrough()]
+        [DebuggerStepThrough()]
         internal async Task ExecuteResultInternalAsync<TResult>(ActionContext context, Func<Task<TResult>> func, Func<TResult, Uri>? locationUri)
         {
             try

@@ -21,7 +21,7 @@ namespace Beef.Test.NUnit.Tests
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="WebApiAgentResult{TValue}.Value"/> <see cref="Type"/>.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public class AgentTest<TStartup, TAgent, TValue> : AgentTestBase<TStartup> where TStartup : class where TAgent : WebApiAgentBase
     {
         private readonly ComparisonConfig _comparisonConfig = TestSetUp.GetDefaultComparisonConfig();

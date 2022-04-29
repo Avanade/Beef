@@ -69,7 +69,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// The test command for the <see cref="TestSetUpAttribute"/>.
         /// </summary>
-        //[DebuggerStepThrough()]
+        [DebuggerStepThrough()]
         internal class ExecutionContextCommand : DelegatingTestCommand
         {
             private readonly string _testUsername;
