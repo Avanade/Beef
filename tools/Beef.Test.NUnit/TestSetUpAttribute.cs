@@ -5,6 +5,7 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Beef.Test.NUnit
@@ -13,7 +14,7 @@ namespace Beef.Test.NUnit
     /// Sets up the test by <see cref="ExecutionContext.Reset()">resetting</see> the <see cref="ExecutionContext"/> to ensure <c>null</c>; then orchestrates whether the 
     /// <see cref="TestSetUp.RegisterSetUp(Func{int, object?, bool})">registered setup</see> is required to be invoked for the test.
     /// </summary>
-    //[System.Diagnostics.DebuggerStepThrough]
+    [DebuggerStepThrough]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
         private static readonly AsyncLocal<string> _username = new AsyncLocal<string>();
