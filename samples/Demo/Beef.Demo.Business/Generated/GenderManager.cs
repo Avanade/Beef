@@ -40,25 +40,25 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public async Task<Gender?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public async Task<Gender> CreateAsync(Gender value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -66,14 +66,14 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public async Task<Gender> UpdateAsync(Gender value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             value.Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
     }
 }
 
