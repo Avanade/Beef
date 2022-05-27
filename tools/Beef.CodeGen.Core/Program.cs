@@ -54,16 +54,16 @@ namespace Beef.CodeGen
         private static int SpecialActivitiesCenter(string title, string filename, Action<string> action)
         {
             // Method name inspired by: https://en.wikipedia.org/wiki/Special_Activities_Center
-            Logger.Default.LogInformation("Business Entity Execution Framework (Beef) Code Generator - ** Special Activities Center **");
-            Logger.Default.LogInformation($" Action: {title}");
-            Logger.Default.LogInformation($" Filename: {filename}");
+            Logger.Default?.LogInformation("Business Entity Execution Framework (Beef) Code Generator - ** Special Activities Center **");
+            Logger.Default?.LogInformation(" Action: {Title}", title);
+            Logger.Default?.LogInformation(" Filename: {Filename}", filename);
 
             var sw = Stopwatch.StartNew();
             action(filename);
             sw.Stop();
-            Logger.Default.LogInformation(string.Empty);
-            Logger.Default.LogInformation($"CodeGen complete [{sw.ElapsedMilliseconds}ms].");
-            Logger.Default.LogInformation(string.Empty);
+            Logger.Default?.LogInformation("");
+            Logger.Default?.LogInformation("CodeGen complete [{Elapsed}ms].", sw.ElapsedMilliseconds);
+            Logger.Default?.LogInformation("");
             return 0;
         }
 
@@ -84,6 +84,6 @@ namespace Beef.CodeGen
                     var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(configType, ce, pd.Name).Attribute;
                     if (xpsa != null)
                         pd.Psa = xpsa;
-                }, fileCreation: fn => Logger.Default.LogWarning($" > {fn}"));
+                }, fileCreation: fn => Logger.Default?.LogWarning(" > {Filename}", fn));
     }
 }

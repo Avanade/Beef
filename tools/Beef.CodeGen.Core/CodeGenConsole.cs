@@ -312,7 +312,7 @@ namespace Beef.CodeGen
         {
             CodeGenStatistics stats;
             var cg = await CodeGenerator.CreateAsync(args).ConfigureAwait(false);
-            var fi = new FileInfo(args.ConfigFileName);
+            var fi = new FileInfo(args.ConfigFileName ?? throw new CodeGenException("Configuration file not specified."));
             switch (fi.Extension.ToUpperInvariant())
             {
                 // XML not natively supported so must be converted to YAML.

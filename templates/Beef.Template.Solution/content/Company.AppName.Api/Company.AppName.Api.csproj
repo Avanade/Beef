@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -10,12 +10,12 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.5" />
-    <PackageReference Include="Beef.Events" Version="4.2.4" />
-    <PackageReference Include="Beef.Events.EventHubs" Version="4.2.3" />
-    <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.4" />
+    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.6" />
+    <PackageReference Include="Beef.Events" Version="4.2.5" />
+    <PackageReference Include="Beef.Events.EventHubs" Version="4.2.4" />
+    <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
   </ItemGroup>
   <ItemGroup>

@@ -65,7 +65,7 @@ namespace Beef.AspNetCore.WebApi
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var ec = context.RequestServices.GetService<ExecutionContext>();
+            var ec = context.RequestServices.GetRequiredService<ExecutionContext>();
             ec.ServiceProvider = context.RequestServices;
             if (context.Request.Headers.TryGetValue(WebApiConsts.CorrelationIdHeaderName, out var val))
                 ec.CorrelationId = val.FirstOrDefault();

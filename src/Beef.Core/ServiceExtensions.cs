@@ -94,7 +94,7 @@ namespace Beef
             });
 
             if (!useCachePolicyManagerTimer)
-                services.AddHostedService(sp => new CachePolicyManagerServiceHost(cpm, sp, sp.GetService<ILogger<CachePolicyManager>>()) { FirstInterval = firstInterval, Interval = interval.Value });
+                services.AddHostedService(sp => new CachePolicyManagerServiceHost(cpm, sp, sp.GetRequiredService<ILogger<CachePolicyManager>>()) { FirstInterval = firstInterval, Interval = interval.Value });
 
             return services;
         }

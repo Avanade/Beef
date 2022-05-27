@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
+
 ## v4.2.5
 - *Enhancement*: Added support within `WebApiActionBase` et al for automatic concurrency (ETag) checking/generation when the underlying data source does not support.
 

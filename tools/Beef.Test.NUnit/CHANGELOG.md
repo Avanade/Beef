@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
+
 ## v4.2.5
 - *Enhancement:* Upgraded [`UnitTestEx`](https://github.com/Avanade/unittestex) to latest.
 

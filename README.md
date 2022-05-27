@@ -219,6 +219,7 @@ The following are references to additional documentation (these are all accessib
 
 ### Major/significant versions
 
+- [.NET 6](./docs/Upgrade-dotnet-v6-0.md)
 - [v4.1](./docs/Dependency-injection-v4-1.md)
 - [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
 

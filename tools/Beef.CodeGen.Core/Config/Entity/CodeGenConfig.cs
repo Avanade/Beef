@@ -489,27 +489,27 @@ entities:
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
         /// </summary>
-        public List<EntityConfig>? IManagerEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IManagerEntities => Entities!.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataSvcEntities => Entities!.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
  
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataEntities => Entities!.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for Reference Data.  
         /// </summary>
-        public List<EntityConfig>? RefDataEntities => Entities.Where(x => !string.IsNullOrEmpty(x.RefDataType) && CompareNullOrValue(x.Abstract, false)).ToList();
+        public List<EntityConfig>? RefDataEntities => Entities!.Where(x => !string.IsNullOrEmpty(x.RefDataType) && CompareNullOrValue(x.Abstract, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for Grpc.  
         /// </summary>
-        public List<EntityConfig>? GrpcEntities => Entities.Where(x => CompareValue(x.Grpc, true) && CompareNullOrValue(x.Abstract, false)).ToList();
+        public List<EntityConfig>? GrpcEntities => Entities!.Where(x => CompareValue(x.Grpc, true) && CompareNullOrValue(x.Abstract, false)).ToList();
 
         /// <summary>
         /// Gets the company name from the <see cref="IRootConfig.RuntimeParameters"/>.

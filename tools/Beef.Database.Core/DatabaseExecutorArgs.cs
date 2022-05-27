@@ -21,7 +21,7 @@ namespace Beef.Database.Core
         {
             Command = command;
             ConnectionString = Check.NotNull(connectionString, nameof(connectionString));
-            Assemblies.AddRange(assemblies);
+            AddAssembly(assemblies);
         }
 
         /// <summary>

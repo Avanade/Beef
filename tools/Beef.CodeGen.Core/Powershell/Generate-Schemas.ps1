@@ -1,5 +1,5 @@
 ﻿cd ..
-dotnet run --GenerateEntityXmlSchema
-dotnet run --GenerateEntityJsonSchema
-dotnet run --GenerateDatabaseXmlSchema
-dotnet run --GenerateDatabaseJsonSchema
+dotnet run --framework net6.0 --GenerateEntityXmlSchema
+dotnet run --framework net6.0 --GenerateEntityJsonSchema
+dotnet run --framework net6.0 --GenerateDatabaseXmlSchema
+dotnet run --framework net6.0 --GenerateDatabaseJsonSchema

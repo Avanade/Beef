@@ -39,7 +39,7 @@ namespace My.Hr.Test.Apis
                 {
                     Id = 2.ToGuid(),
                     EmployeeId = 1.ToGuid(),
-                    Date = new DateTime(2016, 11, 12),
+                    Date = new DateTime(2016, 11, 12, 0, 0, 0, DateTimeKind.Utc),
                     Outcome = "EE",
                     Reviewer = "r.Browne@org.com",
                     Notes = "They are awesome!"
@@ -106,7 +106,7 @@ namespace My.Hr.Test.Apis
 
             var v = new PerformanceReview
             {
-                Date = new DateTime(2020, 06, 15),
+                Date = new DateTime(2020, 06, 15, 0, 0, 0, DateTimeKind.Utc),
                 Outcome = "ME",
                 Notes = "Solid performance :-)",
                 Reviewer = "the.boss@org.com",

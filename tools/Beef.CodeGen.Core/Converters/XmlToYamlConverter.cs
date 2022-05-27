@@ -84,7 +84,7 @@ namespace Beef.CodeGen.Converters
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
 
-            if (xml.Root.Name.LocalName != "CodeGeneration")
+            if (xml.Root?.Name?.LocalName != "CodeGeneration")
                 throw new ArgumentException("Root element must be named 'CodeGeneration'.", nameof(xml));
 
             var sb = new StringBuilder();
@@ -155,7 +155,7 @@ namespace Beef.CodeGen.Converters
                         args.Writer.WriteLine();
                     }
 
-                    if (args.Indent == 0 && !child.Equals(xml.Document.Root.Elements().First()))
+                    if (args.Indent == 0 && !child.Equals(xml.Document!.Root!.Elements().First()))
                         args.Writer.WriteLine();
 
                     args.Level++;
