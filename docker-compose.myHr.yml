@@ -1,0 +1,16 @@
+# To run: docker-compose -f docker-compose.myHr.yml -f docker-compose.myHr.override.yml up
+version: '3.4'
+
+services:
+
+  sqldata:
+    build:
+      context: .
+      dockerfile: samples/My.Hr/My.Hr.Database/Dockerfile
+
+  myhr-api:
+    build:
+      context: .
+      dockerfile: samples/My.Hr/My.Hr.Api/Dockerfile
+    depends_on:
+      - sqldata
