@@ -14,9 +14,6 @@ using System.Net.Http;
 {{/if}}
 using System.Text;
 using System.Threading.Tasks;
-{{#if UsesCosmos}}
-using Microsoft.Azure.Cosmos;
-{{/if}}
 using Beef;
 using Beef.Business;
 {{#if UsesCosmos}}
@@ -61,6 +58,9 @@ using {{Root.NamespaceCommon}}.Entities;
 {{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
+{{#if UsesCosmos}}
+using Mac = Microsoft.Azure.Cosmos;
+{{/if}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
