@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.16
+- *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `EntityManager_cs.hbs`.
+- *Fixed:* Updated the `EntityData_cs.hbs` to use `using Mac = Microsoft.Azure.Cosmos` to avoid class name clashing.
+
 ## v4.2.15
 - *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
 

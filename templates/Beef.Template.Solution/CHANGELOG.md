@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.11
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v4.2.10
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 - *Enhancement:* All generated projects (where applicable) now created targeting `net6.0`.

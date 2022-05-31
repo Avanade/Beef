@@ -155,7 +155,7 @@ namespace My.Hr.Test.Apis
             // Query again with etag and ensure not modified.
             agentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1, 2), new WebApiRequestOptions { ETag = r.Response.Headers.ETag.Tag }));
+                .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1, 2), new WebApiRequestOptions { ETag = r.Response!.Headers!.ETag!.Tag }));
         }
 
         [Test, TestSetUp]
