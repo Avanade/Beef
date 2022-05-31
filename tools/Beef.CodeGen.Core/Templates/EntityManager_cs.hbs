@@ -96,7 +96,7 @@ namespace {{Root.NamespaceBusiness}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public async {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}}) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}}) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
   {{#ifeq Type 'Create' 'Update'}}
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
@@ -164,9 +164,9 @@ namespace {{Root.NamespaceBusiness}}
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }).ConfigureAwait(false);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} });
   {{else}}
-        }, BusinessInvokerArgs.{{ManagerOperationType}}).ConfigureAwait(false);
+        }, BusinessInvokerArgs.{{ManagerOperationType}});
   {{/if}}
 {{/each}}
     }

@@ -42,7 +42,7 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public async Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(country, state, city);
             await MultiValidator.Create()
@@ -52,7 +52,7 @@ namespace Beef.Demo.Business
                 .RunAsync(throwOnError: true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetPostCodesAsync(country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public async Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -74,7 +74,7 @@ namespace Beef.Demo.Business
                 .RunAsync(throwOnError: true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.CreatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -84,7 +84,7 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public async Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -96,7 +96,7 @@ namespace Beef.Demo.Business
                 .RunAsync(throwOnError: true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
     }
 }
 

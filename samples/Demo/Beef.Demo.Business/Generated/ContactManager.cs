@@ -39,35 +39,35 @@ namespace Beef.Demo.Business
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public async Task<ContactCollectionResult> GetAllAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public async Task<Contact?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        public async Task<Contact> CreateAsync(Contact value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
@@ -75,35 +75,35 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        public async Task<Contact> UpdateAsync(Contact value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             value.Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public async Task DeleteAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete);
 
         /// <summary>
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public async Task RaiseEventAsync(bool throwError) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(throwError);
             await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
     }
 }
 
