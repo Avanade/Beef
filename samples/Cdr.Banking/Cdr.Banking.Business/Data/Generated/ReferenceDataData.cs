@@ -44,7 +44,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.OpenStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.OpenStatus, Model.OpenStatus>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.OpenStatus, Model.OpenStatus>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -55,7 +55,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
         {
             var __coll = new RefDataNamespace.ProductCategoryCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.ProductCategory, Model.ProductCategory>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.ProductCategory, Model.ProductCategory>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -66,7 +66,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.AccountUTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.AccountUType, Model.AccountUType>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.AccountUType, Model.AccountUType>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -77,7 +77,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
         {
             var __coll = new RefDataNamespace.MaturityInstructionsCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -88,7 +88,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionType, Model.TransactionType>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionType, Model.TransactionType>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -99,7 +99,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionStatus, Model.TransactionStatus>(CosmosDbArgs.Create(_mapper, "RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionStatus, Model.TransactionStatus>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 

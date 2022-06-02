@@ -103,7 +103,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
             await DataInvoker.Current.InvokeAsync(this, async () => await {{Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)).ConfigureAwait(false);
