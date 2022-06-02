@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.5
+- *Fixed:* Updated the `CosmosDbArgs` overloads to provide `null` defaults where missing.
+
 ## v4.2.4
 - *Fixed:* Updated project type type to be `netstandard2.1` versus `netcoreapp3.1` to enable multiple version support.
 - *Fixed:* Updated internal _Beef_ dependencies to latest.

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.17
+- *Fixed:* Cosmos reference data queries were only returning the first 25 rows which has been corrected. 
+
 ## v4.2.16
 - *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `EntityManager_cs.hbs`.
 - *Fixed:* Updated the `EntityData_cs.hbs` to use `using Mac = Microsoft.Azure.Cosmos` to avoid class name clashing.
