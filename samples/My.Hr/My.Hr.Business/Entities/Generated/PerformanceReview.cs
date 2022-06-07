@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
+using CoreEx.Entities;
+using CoreEx.Entities.Extended;
+using CoreEx.RefData;
 using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -20,11 +21,8 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PerformanceReview : EntityBase, IGuidIdentifier, IUniqueKey, IETag, IChangeLog, IEquatable<PerformanceReview>
+    public partial class PerformanceReview : EntityBase<PerformanceReview>, IIdentifier<Guid>, IPrimaryKey, IETag, IChangeLog
     {
-        #region Privates
-
         private Guid _id;
         private Guid _employeeId;
         private DateTime _date;
@@ -35,336 +33,88 @@ namespace My.Hr.Business.Entities
         private string? _etag;
         private ChangeLog? _changeLog;
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
-        [Display(Name="Identifier")]
-        public Guid Id
-        {
-            get => _id;
-            set => SetValue(ref _id, value, false, false, nameof(Id));
-        }
+        public Guid Id { get => _id; set => SetValue(ref _id, value); }
 
         /// <summary>
         /// Gets or sets the <see cref="Employee.Id"/> (value is immutable).
         /// </summary>
-        [JsonProperty("employeeId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Employee")]
-        public Guid EmployeeId
-        {
-            get => _employeeId;
-            set => SetValue(ref _employeeId, value, false, false, nameof(EmployeeId));
-        }
+        public Guid EmployeeId { get => _employeeId; set => SetValue(ref _employeeId, value); }
 
         /// <summary>
         /// Gets or sets the Date.
         /// </summary>
-        [JsonProperty("date", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Date")]
-        public DateTime Date
-        {
-            get => _date;
-            set => SetValue(ref _date, value, false, DateTimeTransform.UseDefault, nameof(Date));
-        }
+        public DateTime Date { get => _date; set => SetValue(ref _date, value); }
 
         /// <summary>
         /// Gets or sets the <see cref="Outcome"/> using the underlying Serialization Identifier (SID).
         /// </summary>
-        [JsonProperty("outcome", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Outcome")]
-        public string? OutcomeSid
-        {
-            get => _outcomeSid;
-            set => SetValue(ref _outcomeSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Outcome));
-        }
+        public string? OutcomeSid { get => _outcomeSid; set => SetValue(ref _outcomeSid, value); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
-        [JsonProperty("outcomeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? OutcomeText { get => _outcomeText ?? GetRefDataText(() => Outcome); set => _outcomeText = value; }
+        public string? OutcomeText => RefDataNamespace.PerformanceOutcome.GetRefDataText(_outcomeSid);
 
         /// <summary>
         /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Outcome")]
-        public RefDataNamespace.PerformanceOutcome? Outcome
-        {
-            get => _outcomeSid;
-            set => SetValue(ref _outcomeSid, value, false, false, nameof(Outcome)); 
-        }
+        public RefDataNamespace.PerformanceOutcome? Outcome { get => _outcomeSid; set => SetValue(ref _outcomeSid, value); }
 
         /// <summary>
         /// Gets or sets the Reviewer.
         /// </summary>
-        [JsonProperty("reviewer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Reviewer")]
-        public string? Reviewer
-        {
-            get => _reviewer;
-            set => SetValue(ref _reviewer, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Reviewer));
-        }
+        public string? Reviewer { get => _reviewer; set => SetValue(ref _reviewer, value); }
 
         /// <summary>
         /// Gets or sets the Notes.
         /// </summary>
-        [JsonProperty("notes", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Notes")]
-        public string? Notes
-        {
-            get => _notes;
-            set => SetValue(ref _notes, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Notes));
-        }
+        public string? Notes { get => _notes; set => SetValue(ref _notes, value); }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="ETag")]
-        public string? ETag
-        {
-            get => _etag;
-            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
-        }
+        [JsonProperty("etag")]
+        public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
 
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Change Log")]
-        public ChangeLog? ChangeLog
-        {
-            get => _changeLog;
-            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
-        }
-
-        #endregion
-
-        #region IChangeTracking
+        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 
         /// <summary>
-        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
-        public override void AcceptChanges()
-        {
-            ChangeLog?.AcceptChanges();
-            base.AcceptChanges();
-        }
-
-        /// <summary>
-        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        public override void TrackChanges()
-        {
-            ChangeLog?.TrackChanges();
-            base.TrackChanges();
-        }
-
-        #endregion
-
-        #region IUniqueKey
-        
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
-
-        /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The <see cref="CompositeKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(Guid id) => new UniqueKey(id);
+        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Id);
+        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
 
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is PerformanceReview val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="PerformanceReview"/> is equal to the current <see cref="PerformanceReview"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="PerformanceReview"/> to compare with the current <see cref="PerformanceReview"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="PerformanceReview"/> is equal to the current <see cref="PerformanceReview"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(PerformanceReview? value)
+        /// <inheritdoc/>
+        protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(EmployeeId, value.EmployeeId)
-                && Equals(Date, value.Date)
-                && Equals(OutcomeSid, value.OutcomeSid)
-                && Equals(Reviewer, value.Reviewer)
-                && Equals(Notes, value.Notes)
-                && Equals(ETag, value.ETag)
-                && Equals(ChangeLog, value.ChangeLog);
+            yield return CreateProperty(Id, v => Id = v);
+            yield return CreateProperty(EmployeeId, v => EmployeeId = v);
+            yield return CreateProperty(Date, v => Date = v);
+            yield return CreateProperty(OutcomeSid, v => OutcomeSid = v);
+            yield return CreateProperty(Reviewer, v => Reviewer = v);
+            yield return CreateProperty(Notes, v => Notes = v);
+            yield return CreateProperty(ETag, v => ETag = v);
+            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
         }
-
-        /// <summary>
-        /// Compares two <see cref="PerformanceReview"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="PerformanceReview"/> A.</param>
-        /// <param name="b"><see cref="PerformanceReview"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (PerformanceReview? a, PerformanceReview? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="PerformanceReview"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="PerformanceReview"/> A.</param>
-        /// <param name="b"><see cref="PerformanceReview"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (PerformanceReview? a, PerformanceReview? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="PerformanceReview"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Id);
-            hash.Add(EmployeeId);
-            hash.Add(Date);
-            hash.Add(OutcomeSid);
-            hash.Add(Reviewer);
-            hash.Add(Notes);
-            hash.Add(ETag);
-            hash.Add(ChangeLog);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="PerformanceReview"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="PerformanceReview"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<PerformanceReview>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="PerformanceReview"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="PerformanceReview"/> to copy from.</param>
-        public void CopyFrom(PerformanceReview from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            Id = from.Id;
-            EmployeeId = from.EmployeeId;
-            Date = from.Date;
-            OutcomeSid = from.OutcomeSid;
-            Reviewer = from.Reviewer;
-            Notes = from.Notes;
-            ETag = from.ETag;
-            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="PerformanceReview"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new PerformanceReview();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="PerformanceReview"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Id = Cleaner.Clean(Id);
-            EmployeeId = Cleaner.Clean(EmployeeId);
-            Date = Cleaner.Clean(Date, DateTimeTransform.UseDefault);
-            OutcomeSid = Cleaner.Clean(OutcomeSid);
-            Reviewer = Cleaner.Clean(Reviewer, StringTrim.UseDefault, StringTransform.UseDefault);
-            Notes = Cleaner.Clean(Notes, StringTrim.UseDefault, StringTransform.UseDefault);
-            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
-            ChangeLog = Cleaner.Clean(ChangeLog);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(Id)
-                    && Cleaner.IsInitial(EmployeeId)
-                    && Cleaner.IsInitial(Date)
-                    && Cleaner.IsInitial(OutcomeSid)
-                    && Cleaner.IsInitial(Reviewer)
-                    && Cleaner.IsInitial(Notes)
-                    && Cleaner.IsInitial(ETag)
-                    && Cleaner.IsInitial(ChangeLog);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(PerformanceReview from);
-
-        #endregion
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="PerformanceReview"/> collection.
     /// </summary>
-    public partial class PerformanceReviewCollection : EntityBaseCollection<PerformanceReview>
+    public partial class PerformanceReviewCollection : EntityBaseCollection<PerformanceReview, PerformanceReviewCollection>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewCollection"/> class.
@@ -372,42 +122,16 @@ namespace My.Hr.Business.Entities
         public PerformanceReviewCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceReviewCollection"/> class with an entities range.
+        /// Initializes a new instance of the <see cref="PerformanceReviewCollection"/> class with a <paramref name="collection"/> of items to add.
         /// </summary>
-        /// <param name="entities">The <see cref="PerformanceReview"/> entities.</param>
-        public PerformanceReviewCollection(IEnumerable<PerformanceReview> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="PerformanceReviewCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="PerformanceReviewCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new PerformanceReviewCollection();
-            foreach (var item in this)
-            {
-                clone.Add((PerformanceReview)item.Clone());
-            }
-                
-            return clone;
-        }
-
-        /// <summary>
-        /// An implicit cast from the <see cref="PerformanceReviewCollectionResult"/> to a corresponding <see cref="PerformanceReviewCollection"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="PerformanceReviewCollectionResult"/>.</param>
-        /// <returns>The corresponding <see cref="PerformanceReviewCollection"/>.</returns>
-        public static implicit operator PerformanceReviewCollection(PerformanceReviewCollectionResult result) => result?.Result!;
+        /// <param name="collection">A collection containing items to add.</param>
+        public PerformanceReviewCollection(IEnumerable<PerformanceReview> collection) => AddRange(collection);
     }
-
-    #endregion  
-
-    #region CollectionResult
 
     /// <summary>
     /// Represents the <see cref="PerformanceReview"/> collection result.
     /// </summary>
-    public class PerformanceReviewCollectionResult : EntityCollectionResult<PerformanceReviewCollection, PerformanceReview>
+    public class PerformanceReviewCollectionResult : EntityCollectionResult<PerformanceReviewCollection, PerformanceReview, PerformanceReviewCollectionResult>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class.
@@ -424,22 +148,9 @@ namespace My.Hr.Business.Entities
         /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="PerformanceReviewCollectionResult"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new PerformanceReviewCollectionResult();
-            clone.CopyFrom(this);
-            return clone;
-        }
+        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
-
-    #endregion
 }
 
 #pragma warning restore

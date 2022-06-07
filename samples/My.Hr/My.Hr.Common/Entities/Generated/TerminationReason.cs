@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData.Model;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -17,8 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Termination Reason entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class TerminationReason : ReferenceDataBaseGuid
+    public partial class TerminationReason : ReferenceDataBase<Guid>
     {
     }
 

@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -16,43 +16,37 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> search arguments entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class EmployeeArgs
     {
         /// <summary>
         /// Gets or sets the First Name.
         /// </summary>
-        [JsonProperty("firstName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? FirstName { get; set; }
 
         /// <summary>
         /// Gets or sets the Last Name.
         /// </summary>
-        [JsonProperty("lastName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? LastName { get; set; }
 
         /// <summary>
         /// Gets or sets the Genders.
         /// </summary>
-        [JsonProperty("genders", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<string>? Genders { get; set; }
+        public List<string?>? Genders { get; set; }
 
         /// <summary>
         /// Gets or sets the Start From.
         /// </summary>
-        [JsonProperty("startFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? StartFrom { get; set; }
 
         /// <summary>
         /// Gets or sets the Start To.
         /// </summary>
-        [JsonProperty("startTo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? StartTo { get; set; }
 
         /// <summary>
         /// Indicates whether Is Include Terminated.
         /// </summary>
-        [JsonProperty("includeTerminated", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("includeTerminated")]
         public bool? IsIncludeTerminated { get; set; }
     }
 }

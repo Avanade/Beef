@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData.Model;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -17,8 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Performance Outcome entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PerformanceOutcome : ReferenceDataBaseGuid
+    public partial class PerformanceOutcome : ReferenceDataBase<Guid>
     {
     }
 

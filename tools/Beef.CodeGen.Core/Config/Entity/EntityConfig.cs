@@ -178,7 +178,7 @@ entities:
         /// </summary>
         [JsonProperty("inherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Entity", Title = "The base class that the entity inherits from.",
-            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. " +
+            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBase<xxx>` depending on the corresponding `RefDataType` value. " +
                           "See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.")]
         public string? Inherits { get; set; }
 
@@ -1117,6 +1117,11 @@ entities:
         public string? EntityNameSeeComments => IsTrue(ExcludeEntity) ? $"<b>{Name}</b>" : StringConverter.ToSeeComments(Name);
 
         /// <summary>
+        /// Indicates whether the extended inherits logic is required.
+        /// </summary>
+        public bool ExtendedInherits { get; set; }
+
+        /// <summary>
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityInherits { get; set; }
@@ -1329,36 +1334,37 @@ entities:
         /// </summary>
         private void InferInherits()
         {
+            ExtendedInherits = Inherits != null;
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt32",
-                "long" => "ReferenceDataBaseInt64",
-                "Guid" => "ReferenceDataBaseGuid",
-                "string" => "ReferenceDataBaseString",
-                _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
+                "int" => $"ReferenceDataBase<int, {Name}>",
+                "long" => $"ReferenceDataBase<long, {Name}>",
+                "Guid" => $"ReferenceDataBase<Guid, {Name}>",
+                "string" => $"ReferenceDataBase<string?, {Name}>",
+                _ => CompareNullOrValue(OmitEntityBase, false) ? $"EntityBase<{Name}>" : null
             });
 
             ModelInherits = RefDataType switch
             {
-                "int" => "ReferenceDataBaseInt32",
-                "long" => "ReferenceDataBaseInt64",
-                "Guid" => "ReferenceDataBaseGuid",
-                "string" => "ReferenceDataBaseString",
-                _ => EntityInherits == "EntityBase" ? null : EntityInherits
+                "int" => "ReferenceDataBase<int>",
+                "long" => "ReferenceDataBase<long>",
+                "Guid" => "ReferenceDataBase<Guid>",
+                "string" => "ReferenceDataBase<string?>",
+                _ => EntityInherits != null && EntityInherits.StartsWith("EntityBase<") ? null : EntityInherits
             };
 
             EntityCollectionInherits = CollectionInherits;
             EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
             {
                 if (RefDataType == null)
-                    return CompareValue(CollectionKeyed, true) ? $"EntityBaseKeyedCollection<UniqueKey, {EntityName}>" : $"EntityBaseCollection<{EntityName}>";
+                    return CompareValue(CollectionKeyed, true) ? $"EntityBaseKeyedCollection<UniqueKey, {EntityName}>" : $"EntityBaseCollection<{EntityName}, {EntityCollectionName}>";
                 else
-                    return $"ReferenceDataCollectionBase<{EntityName}>";
+                    return $"ReferenceDataCollectionBase<{RefDataType}{(RefDataType == "string" ? "?" : "")}, {EntityName}, {EntityCollectionName}>";
             });
 
             EntityCollectionResultInherits = CollectionResultInherits;
-            EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
+            EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}, {EntityCollectionResultName}>");
 
             CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
             CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"CollectionResult<{EntityCollectionName}, {EntityName}>");
@@ -1482,11 +1488,11 @@ entities:
                 {
                     var iid = id.Type switch
                     {
-                        "Guid" => "IGuidIdentifier",
-                        "int" => "IInt32Identifier",
-                        "long" => "IInt64Identifier",
-                        "string" => "IStringIdentifier",
-                        _ => "IIdentifier",
+                        "Guid" => "IIdentifier<Guid>",
+                        "int" => "IIdentifier<int>",
+                        "long" => "IIdentifier<long>",
+                        "string" => "IIdentifier<string>",
+                        _ => "IIdentifier<???>",
                     };
 
                     implements.Insert(i++, iid);
@@ -1496,8 +1502,8 @@ entities:
 
             if (Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
-                implements.Insert(i++, "IUniqueKey");
-                modelImplements.Insert(m++, "IUniqueKey");
+                implements.Insert(i++, "IPrimaryKey");
+                modelImplements.Insert(m++, "IPrimaryKey");
             }
 
             if (Properties!.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
@@ -1518,7 +1524,7 @@ entities:
                 }
             }
 
-            if (RefDataType == null)
+            if (RefDataType == null && ExtendedInherits)
                 implements.Insert(i++, $"IEquatable<{EntityName}>");
 
             EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());

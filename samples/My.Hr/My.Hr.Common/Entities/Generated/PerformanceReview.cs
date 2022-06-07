@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -16,79 +16,66 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PerformanceReview : IGuidIdentifier, IUniqueKey, IETag, IChangeLog
+    public partial class PerformanceReview : IIdentifier<Guid>, IPrimaryKey, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
         public Guid Id { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Employee.Id"/> (value is immutable).
         /// </summary>
-        [JsonProperty("employeeId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Guid EmployeeId { get; set; }
 
         /// <summary>
         /// Gets or sets the Date.
         /// </summary>
-        [JsonProperty("date", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime Date { get; set; }
 
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
-        [JsonProperty("outcomeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? OutcomeText { get; set ; }
 
         /// <summary>
         /// Gets or sets the Outcome.
         /// </summary>
-        [JsonProperty("outcome", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Outcome { get; set; }
 
         /// <summary>
         /// Gets or sets the Reviewer.
         /// </summary>
-        [JsonProperty("reviewer", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Reviewer { get; set; }
 
         /// <summary>
         /// Gets or sets the Notes.
         /// </summary>
-        [JsonProperty("notes", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Notes { get; set; }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("etag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log.
         /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
-
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
         
         /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(Guid id) => new UniqueKey(id);
+        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Id);
+        [JsonIgnore]
+        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
     }
 
     /// <summary>
@@ -117,7 +104,7 @@ namespace My.Hr.Common.Entities
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
+        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
 }
 

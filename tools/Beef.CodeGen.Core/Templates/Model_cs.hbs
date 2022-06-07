@@ -10,9 +10,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
+{{#ifeq JsonSerializer 'SystemText'}}
+using System.Text.Json;
+{{/ifeq}}
+using CoreEx.Entities;
 {{#ifval RefDataType}}
-using Beef.RefData.Model;
+using CoreEx.RefData.Models;
 {{/ifval}}
 {{#ifeq JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
@@ -40,9 +43,6 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// <summary>
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
     /// </summary>
-{{#ifeq JsonSerializer 'Newtonsoft'}}
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-{{/ifeq}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}
     {
 {{! ===== Properties ===== }}
@@ -58,9 +58,13 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
-            {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            {{/ifeq}}
+            {{#ifval JsonName}}
+              {{#ifeq Root.JsonSerializer 'SystemText'}}
+        [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
+              {{else}}
+        [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
+              {{/ifeq}}
+            {{/ifval}}
         public string? {{Name}}Text { get; set ; }
 
           {{/if}}
@@ -71,11 +75,29 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// <summary>
         /// {{{ModelSummaryText}}}
         /// </summary>
-    {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
-        [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+        {{#ifeq Root.JsonSerializer 'SystemText'}}
+          {{#if Root.IsDataModel}}
+            {{#ifval JsonDataModelName}}
+        [JsonPropertyName("{{JsonDataModelName}}")]
+            {{/ifval}}
+          {{else}}
+            {{#ifval JsonName}}
+        [JsonPropertyName("{{JsonName}}")]
+            {{/ifval}}
+          {{/if}}
+        {{else}}
+          {{#if Root.IsDataModel}}
+            {{#ifval JsonDataModelName}}
+        [JsonProperty("{{JsonDataModelName}}")]
+            {{/ifval}}
+          {{else}}
+            {{#ifval JsonName}}
+        [JsonProperty("{{JsonName}}")]
+            {{/ifval}}
+          {{/if}}        
+         {{/ifeq}}
       {{/unless}}
-    {{/ifeq}}
     {{#unless Root.IsDataModel}}
       {{#ifval Annotation1}}
         {{Annotation1}}
@@ -91,25 +113,21 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
 {{/each}}
 {{#unless RefDataType}}
   {{#ifne UniqueKeyProperties.Count 0}}
-
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
         
         /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
   {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+        [JsonIgnore]
+        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
   {{/ifne}}
 {{/unless}}
     }
@@ -145,7 +163,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
   {{/unless}}
 {{/if}}

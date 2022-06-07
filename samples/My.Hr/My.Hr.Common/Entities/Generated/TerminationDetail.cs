@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -16,25 +16,21 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Termination Detail entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class TerminationDetail
     {
         /// <summary>
         /// Gets or sets the Date.
         /// </summary>
-        [JsonProperty("date", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime Date { get; set; }
 
         /// <summary>
         /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
         /// </summary>
-        [JsonProperty("reasonText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? ReasonText { get; set ; }
 
         /// <summary>
         /// Gets or sets the Reason.
         /// </summary>
-        [JsonProperty("reason", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Reason { get; set; }
     }
 }

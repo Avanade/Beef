@@ -107,7 +107,7 @@ namespace My.Hr.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(EmployeeBaseCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, DateTime? startFrom = default, DateTime? startTo = default, [FromQuery(Name = "includeTerminated")] bool? isIncludeTerminated = default)
+        public IActionResult GetByArgs([FromQuery(Name = "")] string? firstName = default, [FromQuery(Name = "")] string? lastName = default, [FromQuery(Name = "")] List<string>? genders = default, [FromQuery(Name = "")] DateTime? startFrom = default, [FromQuery(Name = "")] DateTime? startTo = default, [FromQuery(Name = "includeTerminated")] bool? isIncludeTerminated = default)
         {
             var args = new EmployeeArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, StartFrom = startFrom, StartTo = startTo, IsIncludeTerminated = isIncludeTerminated };
             return new WebApiGet<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),

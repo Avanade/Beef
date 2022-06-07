@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -16,31 +16,27 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Employee entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Employee : EmployeeBase, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the Address.
         /// </summary>
-        [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Address? Address { get; set; }
 
         /// <summary>
         /// Gets or sets the Emergency Contacts.
         /// </summary>
-        [JsonProperty("emergencyContacts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public EmergencyContactCollection? EmergencyContacts { get; set; }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("etag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log.
         /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
     }
 }

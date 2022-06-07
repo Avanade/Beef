@@ -538,7 +538,7 @@ properties: [
         /// </summary>
         public string PropertyType => string.IsNullOrEmpty(RefDataType) 
             ? PrivateType 
-            : (CompareValue(RefDataList, true) ? $"ReferenceDataSidList<{Type}, {RefDataType}>?" : CompareValue(Nullable, true) ? Type + "?" : Type!);
+            : (CompareValue(RefDataList, true) ? $"ReferenceDataCodeList<{Type}{(RefDataType == "string" ? "?" : "")}, {RefDataType}>?" : CompareValue(Nullable, true) ? Type + "?" : Type!);
 
         /// <summary>
         /// Gets the computed declared private type.
@@ -550,7 +550,7 @@ properties: [
                 if (string.IsNullOrEmpty(RefDataType))
                     return CompareValue(Nullable, true) ? Type + "?" : Type!;
 
-                var rt = CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!;
+                var rt = CompareValue(RefDataList, true) ? $"List<{RefDataType}{(RefDataType == "string" ? "?" : "")}>" : RefDataType!;
                 return CompareValue(Nullable, true) ? rt + "?" : rt!;
             }
         }
@@ -609,7 +609,7 @@ properties: [
                 if (string.IsNullOrEmpty(n))
                     return null;
                 else
-                    return DataConverter!.Contains(".") ? n : $"{n}.Default";
+                    return DataConverter!.Contains('.') ? n : $"{n}.Default";
             }
         }
 
@@ -694,9 +694,8 @@ properties: [
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
-            DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !DotNet.IgnoreNullableTypes.Contains(Type!));
-            JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : ArgumentName);
+            JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : null);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
@@ -741,24 +740,6 @@ properties: [
             };
 
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Generates the display name (checks for Id and handles specifically).
-        /// </summary>
-        private string GenerateDisplayName()
-        {
-            var dn = StringConverter.ToSentenceCase(Name)!;
-            var parts = dn.Split(' ');
-            if (parts.Length == 1)
-                return (parts[0] == "Id") ? "Identifier" : dn;
-
-            if (parts.Last() != "Id")
-                return dn;
-
-            var parts2 = new string[parts.Length - 1];
-            Array.Copy(parts, parts2, parts.Length - 1);
-            return string.Join(" ", parts2);
         }
 
         /// <summary>

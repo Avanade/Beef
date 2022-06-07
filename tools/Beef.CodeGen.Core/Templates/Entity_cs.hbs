@@ -12,8 +12,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
+{{#ifeq JsonSerializer 'SystemText'}}
+using System.Text;
+{{/ifeq}}
+using CoreEx.Entities;
+using CoreEx.Entities.Extended;
+using CoreEx.RefData;
 {{#ifeq JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
 {{/ifeq}}
@@ -44,36 +48,20 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     /// <summary>
     /// Represents the {{{Text}}} entity.
     /// </summary>
-{{#ifeq JsonSerializer 'Newtonsoft'}}
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-{{/ifeq}}
-{{#ifval RefDataType}}
-    [ReferenceDataInterface(typeof(IReferenceData))]
-{{/ifval}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}, {{{EntityImplements}}}{{/ifval}}
     {
 {{! ===== Constants ===== }}
 {{#each Consts}}
-  {{#if @first}}
-        #region Constants
-
-  {{/if}}
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
         public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
   {{#if @last}}
 
-        #endregion
-
   {{/if}}
 {{/each}}
 {{! ===== Privates ===== }}
 {{#each PrivateProperties}}
-  {{#if @first}}
-        #region Privates
-
-  {{/if}}
         private {{{PrivateType}}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
   {{#ifval RefDataType}}
     {{#unless RefDataList}}
@@ -82,35 +70,29 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
       {{/if}}
     {{/unless}}
   {{/ifval}}
-  {{#if @last}}
-
-        #endregion
-
-  {{/if}}
 {{/each}}
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}
-  {{#if @first}}
-        #region Properties
-  {{/if}}
   {{#ifval RefDataType}}
 
         /// <summary>
         /// {{{SummaryRefDataSid}}}
         /// </summary>
-    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-      {{#unless SerializationIgnore}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-      {{/unless}}
-    {{/ifeq}}
+    {{#if SerializationIgnore}}
+        [JsonIgnore]
+    {{else}}
+      {{#ifval JsonName}}
+        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{JsonName}}")]
+        {{else}}
+        [JsonPropertyName("{{JsonName}}")]
+        {{/ifeq}}
+      {{/ifval}}
+    {{/if}}
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
     {{/ifval}}
-        public {{{PrivateType}}} {{PropertyName}}
-        {
-            get => {{PropertyPrivateName}};
-            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
-        }
+        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}); }
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
         {{#if RefDataText}}
@@ -118,10 +100,14 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
+        {{#ifval JsonName}}
           {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("{{JsonName}}Text")]
+          {{else}}
+        [JsonPropertyName("{{JsonName}}Text")]
           {{/ifeq}}
-        public string? {{Name}}Text { get => {{PrivateName}}Text ?? GetRefDataText(() => {{Name}}); set => {{PrivateName}}Text = value; }
+        {{/ifval}}
+        public string? {{Name}}Text => {{{Type}}}.GetRefDataText({{PropertyPrivateName}});
         {{/if}}
       {{/unless}}
     {{/unless}}
@@ -143,28 +129,26 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         {{Annotation3}}
     {{/ifval}}
     {{#if RefDataList}}
-        public ReferenceDataSidList<{{{Type}}}, {{RefDataType}}>? {{Name}}
-        {
-            get => new ReferenceDataSidList<{{{Type}}}, {{RefDataType}}>(ref {{PropertyPrivateName}});
-            set => SetValue(ref {{PropertyPrivateName}}, value?.ToSidList(), {{lower Immutable}}, false, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});
-        }
+        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}); }
     {{else}}
-        public {{{PropertyType}}} {{Name}}
-        {
-            get => {{PropertyPrivateName}};
-            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, false, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}}); 
-        }
+        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable = true{{/if}}); }
     {{/if}}
   {{else}}
 
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-      {{#unless SerializationIgnore}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-      {{/unless}}
-    {{/ifeq}}
+    {{#if SerializationIgnore}}
+        [JsonIgnore]
+    {{else}}
+      {{#ifval JsonName}}
+        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{JsonName}}")]
+        {{else}}
+        [JsonPropertyName("{{JsonName}}")]
+        {{/ifeq}}
+      {{/ifval}}
+    {{/if}}
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
     {{/ifval}}
@@ -180,86 +164,40 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     {{#ifval Annotation3}}
         {{Annotation3}}
     {{/ifval}}
+    {{#if RefDataMapping}}
         public {{{PropertyType}}} {{Name}}
         {
-  {{#if RefDataMapping}}
-            get => GetMapping<string>(nameof({{Name}}));
-            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
-  {{else}}
-            get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}};
-            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#ifeq Type 'string'}}StringTrim.{{StringTrim}}, StringTransform.{{StringTransform}}{{else}}{{#ifeq Type 'DateTime'}}DateTimeTransform.{{DateTimeTransform}}{{else}}{{lower BubblePropertyChanged}}{{/ifeq}}{{/ifeq}}, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});
-  {{/if}}
+            get => GetMapping<{{{PropertyType}}}>(nameof({{Name}}));
+            set { var _{{PropertyPrivateName}} = {{Name}}; SetValue(ref _{{PropertyPrivateName}}, value); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
         }
+    {{else}}
+        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true}}{{/if}}{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}); }
+    {{/if}}
   {{/ifval}}
-  {{#if @last}}
-
-        #endregion
-
-  {{/if}}
 {{/each}}
-{{! ===== IChangeTracking ===== }}
-{{#ifne EntityProperties.Count 0}}
-        #region IChangeTracking
-
-        /// <summary>
-        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
-        public override void AcceptChanges()
-        {
-{{#each EntityProperties}}
-            {{Name}}?.AcceptChanges();
-{{/each}}
-            base.AcceptChanges();
-        }
-
-        /// <summary>
-        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        public override void TrackChanges()
-        {
-{{#each EntityProperties}}
-            {{Name}}?.TrackChanges();
-{{/each}}
-            base.TrackChanges();
-        }
-
-        #endregion
-
-{{/ifne}}
-{{! ===== UniqueKey ===== }}
+{{! ===== PrimaryKey ===== }}
 {{#unless RefDataType}}
   {{#ifne UniqueKeyProperties.Count 0}}
-        #region IUniqueKey
-        
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
 
         /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The <see cref="CompositeKey"/>.</returns>
   {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
-
-        #endregion
-
+        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
   {{/ifne}}
 {{/unless}}
 {{! ===== PartitionKey ===== }}
 {{#unless RefDataType}}
   {{#ifne PartitionKeyProperties.Count 0}}
-        #region IPartitionKey
-        
+
         /// <summary>
         /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
         /// </summary>
@@ -273,229 +211,78 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
         public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
-
-        #endregion
-
   {{/ifne}}
 {{/unless}}
+{{! ===== GetPropertyValues ===== }}
+{{#ifne CoreProperties.Count 0}}
+
+        /// <inheritdoc/>
+        protected override IEnumerable<IPropertyValue> GetPropertyValues()
+        {
+  {{#if ExtendedInherits}}
+            foreach (var pv in base.GetPropertyValues())
+                yield return pv;
+
+  {{/if}}
+  {{#each CoreProperties}}
+            yield return CreateProperty({{PropertyName}}, v => {{PropertyName}} = v);
+  {{/each}}
+        }
+{{/ifne}}
 {{! ===== Operator ===== }}
 {{#ifval RefDataType}}
   {{#unless Abstract}}
-        #region Operator
 
-    {{#ifne RefDataType 'string'}}
         /// <summary>
-        /// An implicit cast from an <b>Id</b> to a {{{EntityNameSeeComments}}}.
-        /// </summary>
-        /// <param name="id">The <b>Id</b>.</param>
-        /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        public static implicit operator {{{EntityName}}}({{RefDataType}} id) => ConvertFromId<{{{EntityName}}}>(id);
-
-    {{/ifne}}
-        /// <summary>
-        /// An implicit cast from a <b>Code</b> to a {{{EntityNameSeeComments}}}.
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to a {{{EntityNameSeeComments}}}.
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        public static implicit operator {{{EntityName}}}(string? code) => ConvertFromCode<{{{EntityName}}}>(code);
-
-        #endregion
-    
+        public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
   {{/unless}}
 {{/ifval}}
-{{! ===== IEquatable (although the code generated looks a little funky this is required to function correctly.) ===== }}
-{{#unless RefDataType}}
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is {{{EntityName}}} val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified {{{EntityNameSeeComments}}} is equal to the current {{{EntityNameSeeComments}}} by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The {{{EntityNameSeeComments}}} to compare with the current {{{EntityNameSeeComments}}}.</param>
-        /// <returns><c>true</c> if the specified {{{EntityNameSeeComments}}} is equal to the current {{{EntityNameSeeComments}}}; otherwise, <c>false</c>.</returns>
-        public bool Equals({{EntityName}}? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value){{#ifeq CoreProperties.Count 0}};{{/ifeq}}
-  {{#each CoreProperties}}
-                && Equals({{PropertyName}}, value.{{PropertyName}}){{#if @last}};{{/if}}
-  {{/each}}
-        }
-
-        /// <summary>
-        /// Compares two {{{EntityNameSeeComments}}} types for equality.
-        /// </summary>
-        /// <param name="a">{{{EntityNameSeeComments}}} A.</param>
-        /// <param name="b">{{{EntityNameSeeComments}}} B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == ({{{EntityName}}}? a, {{{EntityName}}}? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two {{{EntityNameSeeComments}}} types for non-equality.
-        /// </summary>
-        /// <param name="a">{{{EntityNameSeeComments}}} A.</param>
-        /// <param name="b">{{{EntityNameSeeComments}}} B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != ({{{EntityName}}}? a, {{{EntityName}}}? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the {{{EntityNameSeeComments}}}.
-        /// </summary>
-        /// <returns>The hash code for the {{{EntityNameSeeComments}}}.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-  {{#each CoreProperties}}
-            hash.Add({{PropertyName}});
-  {{/each}}
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-{{/unless}}
-{{! ===== ICopyFrom ===== }}
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another {{{EntityNameSeeComments}}} updating this instance.
-        /// </summary>
-        /// <param name="from">The {{{EntityNameSeeComments}}} to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<{{{EntityName}}}>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another {{{EntityNameSeeComments}}} updating this instance.
-        /// </summary>
-        /// <param name="from">The {{{EntityNameSeeComments}}} to copy from.</param>
-        public void CopyFrom({{{EntityName}}} from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom(({{EntityInherits}})from);
-  {{#each CoreProperties}}
-    {{#if IsEntity}}
-            {{PropertyName}} = CopyOrClone(from.{{PropertyName}}, {{PropertyName}});
-    {{else}}
-            {{PropertyName}} = from.{{PropertyName}};
-    {{/if}}
-  {{/each}}
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-{{! ===== ICloneable ===== }}
-{{#unless Abstract}}
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the {{{EntityNameSeeComments}}}.
-        /// </summary>
-        /// <returns>A deep copy of the {{{EntityNameSeeComments}}}.</returns>
-        public override object Clone()
-        {
-            var clone = new {{{EntityName}}}();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-{{/unless}}
-{{! ===== ICleanUp ===== }}
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the {{{EntityNameSeeComments}}} resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-{{#each CoreProperties}}
-  {{#unless ExcludeCleanUp}}
-    {{#unless Immutable}}
-            {{PropertyName}} = Cleaner.Clean({{PropertyName}}{{#ifeq Type 'DateTime'}}, DateTimeTransform.{{DateTimeTransform}}{{/ifeq}}{{#ifeq Type 'string'}}, StringTrim.{{StringTrim}}, StringTransform.{{StringTransform}}{{/ifeq}});
-    {{/unless}}
-  {{/unless}}
-{{/each}}
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-{{#ifnull IsInitialOverride}}
-            get
-            {
-  {{#ifne EntityInherits 'EntityBase'}}
-                if (!base.IsInitial)
-                    return false;
-
-  {{/ifne}}
-  {{#each CoreProperties}}
-    {{#unless ExcludeCleanUp}}
-                {{#if @first}}return{{else}}    &&{{/if}} Cleaner.IsInitial({{PropertyName}}){{#if @last}};{{/if}}
-    {{/unless}}
-  {{/each}}
-  {{#ifeq CoreProperties.Count 0}}
-                return true;
-  {{/ifeq}}
-            }
-{{else}}
-            get => {{lower IsInitialOverride}};
-{{/ifnull}}
-        }
-
-        #endregion
-
 {{! ===== RefData ===== }}
 {{#ifval RefDataType}}
   {{#ifval RefDataStringFormat}}
-        #region RefData
 
         /// <summary>
         /// Overrides the default <see cref="ReferenceDataBase.StringFormat"/>.
         /// </summary>
         /// <remarks>The format value is '{{{RefDataStringFormat}}}'.</remarks>
         public override string StringFormat => "{{RefDataStringFormat}}";
-
-        #endregion
-
   {{/ifval}}
 {{/ifval}}
-{{! ===== PartialMethods ===== }}
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
+{{! ===== ExtendedInherits ===== }}
+{{#if ExtendedInherits}}
 
-        partial void OnAfterCopyFrom({{{EntityName}}} from);
+        /// <inheritdoc/>
+        public bool Equals({{Name}}? other) => base.Equals(other);
 
-        #endregion
+        /// <summary>
+        /// Compares two values for equality.
+        /// </summary>
+        /// <param name="a"><see cref="{{Name}}"/> A.</param>
+        /// <param name="b"><see cref="{{Name}}"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator ==({{Name}}? a, {{Name}}? b) => Equals(a, b);
+    
+        /// <summary>
+        /// Compares two values for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="{{Name}}"/> A.</param>
+        /// <param name="b"><see cref="{{Name}}"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator !=({{Name}}? a, {{Name}}? b) => !Equals(a, b);
+ 
+        /// <inheritdoc/>
+        public override int GetHashCode() => base.GetHashCode();
+
+        /// <inheritdoc/>
+        public override object Clone() => CreateClone<{{Name}}>(this);
+{{/if}}
     }
 {{! ===== Collection ===== }}
 {{#if Collection}}
-
-    #region Collection
 
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection.
@@ -508,51 +295,14 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
 
         /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with an entities range.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with a <paramref name="collection"/> of items to add.
         /// </summary>
-        /// <param name="entities">The {{{EntityNameSeeComments}}} entities.</param>
-        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> entities){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(entities);
-  {{#if CollectionKeyed}}
-
-        /// <summary>
-        /// Gets the key ({{{EntityNameSeeComments}}} <see cref="IUniqueKey.UniqueKey"/>) for the item.
-        /// </summary>
-        protected override UniqueKey GetKeyForItem({{{EntityName}}} entity) => entity.UniqueKey;
-  {{/if}}
-  {{#ifnull RefDataType}}
-
-        /// <summary>
-        /// Creates a deep copy of the {{{see-comments EntityCollectionName}}}.
-        /// </summary>
-        /// <returns>A deep copy of the {{{see-comments EntityCollectionName}}}.</returns>
-        public override object Clone()
-        {
-            var clone = new {{{EntityCollectionName}}}();
-            foreach (var item in this)
-            {
-                clone.Add(({{EntityName}})item.Clone());
-            }
-                
-            return clone;
-        }
-  {{/ifnull}}
-  {{#if CollectionResult}}
-
-        /// <summary>
-        /// An implicit cast from the {{{see-comments EntityCollectionResultName}}} to a corresponding {{{see-comments EntityCollectionName}}}.
-        /// </summary>
-        /// <param name="result">The {{{see-comments EntityCollectionResultName}}}.</param>
-        /// <returns>The corresponding {{{see-comments EntityCollectionName}}}.</returns>
-        public static implicit operator {{{EntityCollectionName}}}({{{EntityCollectionResultName}}} result) => result?.Result!;
-  {{/if}}
+        /// <param name="collection">A collection containing items to add.</param>
+        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> collection){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(collection);
     }
-
-    #endregion  
 {{/if}}
 {{! ===== CollectionResult ===== }}
 {{#if CollectionResult}}
-
-    #region CollectionResult
 
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection result.
@@ -574,22 +324,9 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
-        
-        /// <summary>
-        /// Creates a deep copy of the {{{see-comments EntityCollectionResultName}}}.
-        /// </summary>
-        /// <returns>A deep copy of the {{{see-comments EntityCollectionResultName}}}.</returns>
-        public override object Clone()
-        {
-            var clone = new {{{EntityCollectionResultName}}}();
-            clone.CopyFrom(this);
-            return clone;
-        }
+        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
-
-    #endregion
 {{/if}}
 }
 

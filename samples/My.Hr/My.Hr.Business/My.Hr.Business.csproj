@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx\CoreEx.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Data.EntityFrameworkCore\Beef.Data.EntityFrameworkCore.csproj" />
   </ItemGroup>

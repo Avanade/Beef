@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
+using CoreEx.Entities;
+using CoreEx.Entities.Extended;
+using CoreEx.RefData;
 using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -20,11 +21,8 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class EmployeeBase : EntityBase, IGuidIdentifier, IUniqueKey, IEquatable<EmployeeBase>
+    public partial class EmployeeBase : EntityBase<EmployeeBase>, IIdentifier<Guid>, IPrimaryKey
     {
-        #region Privates
-
         private Guid _id;
         private string? _email;
         private string? _firstName;
@@ -36,352 +34,93 @@ namespace My.Hr.Business.Entities
         private TerminationDetail? _termination;
         private string? _phoneNo;
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
-        [Display(Name="Identifier")]
-        public Guid Id
-        {
-            get => _id;
-            set => SetValue(ref _id, value, false, false, nameof(Id));
-        }
+        public Guid Id { get => _id; set => SetValue(ref _id, value); }
 
         /// <summary>
         /// Gets or sets the Unique <see cref="Employee"/> Email.
         /// </summary>
-        [JsonProperty("email", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Email")]
-        public string? Email
-        {
-            get => _email;
-            set => SetValue(ref _email, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Email));
-        }
+        public string? Email { get => _email; set => SetValue(ref _email, value); }
 
         /// <summary>
         /// Gets or sets the First Name.
         /// </summary>
-        [JsonProperty("firstName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="First Name")]
-        public string? FirstName
-        {
-            get => _firstName;
-            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName));
-        }
+        public string? FirstName { get => _firstName; set => SetValue(ref _firstName, value); }
 
         /// <summary>
         /// Gets or sets the Last Name.
         /// </summary>
-        [JsonProperty("lastName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Last Name")]
-        public string? LastName
-        {
-            get => _lastName;
-            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName));
-        }
+        public string? LastName { get => _lastName; set => SetValue(ref _lastName, value); }
 
         /// <summary>
         /// Gets or sets the <see cref="Gender"/> using the underlying Serialization Identifier (SID).
         /// </summary>
-        [JsonProperty("gender", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Gender")]
-        public string? GenderSid
-        {
-            get => _genderSid;
-            set => SetValue(ref _genderSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Gender));
-        }
+        public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        [JsonProperty("genderText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? GenderText { get => _genderText ?? GetRefDataText(() => Gender); set => _genderText = value; }
+        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid);
 
         /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Gender")]
-        public RefDataNamespace.Gender? Gender
-        {
-            get => _genderSid;
-            set => SetValue(ref _genderSid, value, false, false, nameof(Gender)); 
-        }
+        public RefDataNamespace.Gender? Gender { get => _genderSid; set => SetValue(ref _genderSid, value); }
 
         /// <summary>
         /// Gets or sets the Birthday.
         /// </summary>
-        [JsonProperty("birthday", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Birthday")]
-        public DateTime Birthday
-        {
-            get => _birthday;
-            set => SetValue(ref _birthday, value, false, DateTimeTransform.DateOnly, nameof(Birthday));
-        }
+        public DateTime Birthday { get => _birthday; set => SetValue(ref _birthday, value, transform: DateTimeTransform.DateOnly); }
 
         /// <summary>
         /// Gets or sets the Start Date.
         /// </summary>
-        [JsonProperty("startDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Start Date")]
-        public DateTime StartDate
-        {
-            get => _startDate;
-            set => SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, nameof(StartDate));
-        }
+        public DateTime StartDate { get => _startDate; set => SetValue(ref _startDate, value, transform: DateTimeTransform.DateOnly); }
 
         /// <summary>
         /// Gets or sets the Termination (see <see cref="Business.Entities.TerminationDetail"/>).
         /// </summary>
-        [JsonProperty("termination", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Termination")]
-        public TerminationDetail? Termination
-        {
-            get => _termination;
-            set => SetValue(ref _termination, value, false, true, nameof(Termination));
-        }
+        public TerminationDetail? Termination { get => _termination; set => SetValue(ref _termination, value); }
 
         /// <summary>
         /// Gets or sets the Phone No.
         /// </summary>
-        [JsonProperty("phoneNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Phone No")]
-        public string? PhoneNo
-        {
-            get => _phoneNo;
-            set => SetValue(ref _phoneNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PhoneNo));
-        }
-
-        #endregion
-
-        #region IChangeTracking
+        public string? PhoneNo { get => _phoneNo; set => SetValue(ref _phoneNo, value); }
 
         /// <summary>
-        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
-        public override void AcceptChanges()
-        {
-            Termination?.AcceptChanges();
-            base.AcceptChanges();
-        }
-
-        /// <summary>
-        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        public override void TrackChanges()
-        {
-            Termination?.TrackChanges();
-            base.TrackChanges();
-        }
-
-        #endregion
-
-        #region IUniqueKey
-        
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
-
-        /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The <see cref="CompositeKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(Guid id) => new UniqueKey(id);
+        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Id);
+        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
 
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is EmployeeBase val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="EmployeeBase"/> is equal to the current <see cref="EmployeeBase"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="EmployeeBase"/> to compare with the current <see cref="EmployeeBase"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="EmployeeBase"/> is equal to the current <see cref="EmployeeBase"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(EmployeeBase? value)
+        /// <inheritdoc/>
+        protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(Email, value.Email)
-                && Equals(FirstName, value.FirstName)
-                && Equals(LastName, value.LastName)
-                && Equals(GenderSid, value.GenderSid)
-                && Equals(Birthday, value.Birthday)
-                && Equals(StartDate, value.StartDate)
-                && Equals(Termination, value.Termination)
-                && Equals(PhoneNo, value.PhoneNo);
+            yield return CreateProperty(Id, v => Id = v);
+            yield return CreateProperty(Email, v => Email = v);
+            yield return CreateProperty(FirstName, v => FirstName = v);
+            yield return CreateProperty(LastName, v => LastName = v);
+            yield return CreateProperty(GenderSid, v => GenderSid = v);
+            yield return CreateProperty(Birthday, v => Birthday = v);
+            yield return CreateProperty(StartDate, v => StartDate = v);
+            yield return CreateProperty(Termination, v => Termination = v);
+            yield return CreateProperty(PhoneNo, v => PhoneNo = v);
         }
-
-        /// <summary>
-        /// Compares two <see cref="EmployeeBase"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="EmployeeBase"/> A.</param>
-        /// <param name="b"><see cref="EmployeeBase"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (EmployeeBase? a, EmployeeBase? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="EmployeeBase"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="EmployeeBase"/> A.</param>
-        /// <param name="b"><see cref="EmployeeBase"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (EmployeeBase? a, EmployeeBase? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="EmployeeBase"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="EmployeeBase"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Id);
-            hash.Add(Email);
-            hash.Add(FirstName);
-            hash.Add(LastName);
-            hash.Add(GenderSid);
-            hash.Add(Birthday);
-            hash.Add(StartDate);
-            hash.Add(Termination);
-            hash.Add(PhoneNo);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="EmployeeBase"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="EmployeeBase"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<EmployeeBase>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="EmployeeBase"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="EmployeeBase"/> to copy from.</param>
-        public void CopyFrom(EmployeeBase from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            Id = from.Id;
-            Email = from.Email;
-            FirstName = from.FirstName;
-            LastName = from.LastName;
-            GenderSid = from.GenderSid;
-            Birthday = from.Birthday;
-            StartDate = from.StartDate;
-            Termination = CopyOrClone(from.Termination, Termination);
-            PhoneNo = from.PhoneNo;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="EmployeeBase"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="EmployeeBase"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new EmployeeBase();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="EmployeeBase"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Id = Cleaner.Clean(Id);
-            Email = Cleaner.Clean(Email, StringTrim.UseDefault, StringTransform.UseDefault);
-            FirstName = Cleaner.Clean(FirstName, StringTrim.UseDefault, StringTransform.UseDefault);
-            LastName = Cleaner.Clean(LastName, StringTrim.UseDefault, StringTransform.UseDefault);
-            GenderSid = Cleaner.Clean(GenderSid);
-            Birthday = Cleaner.Clean(Birthday, DateTimeTransform.DateOnly);
-            StartDate = Cleaner.Clean(StartDate, DateTimeTransform.DateOnly);
-            Termination = Cleaner.Clean(Termination);
-            PhoneNo = Cleaner.Clean(PhoneNo, StringTrim.UseDefault, StringTransform.UseDefault);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(Id)
-                    && Cleaner.IsInitial(Email)
-                    && Cleaner.IsInitial(FirstName)
-                    && Cleaner.IsInitial(LastName)
-                    && Cleaner.IsInitial(GenderSid)
-                    && Cleaner.IsInitial(Birthday)
-                    && Cleaner.IsInitial(StartDate)
-                    && Cleaner.IsInitial(Termination)
-                    && Cleaner.IsInitial(PhoneNo);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(EmployeeBase from);
-
-        #endregion
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="EmployeeBase"/> collection.
     /// </summary>
-    public partial class EmployeeBaseCollection : EntityBaseCollection<EmployeeBase>
+    public partial class EmployeeBaseCollection : EntityBaseCollection<EmployeeBase, EmployeeBaseCollection>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeBaseCollection"/> class.
@@ -389,42 +128,16 @@ namespace My.Hr.Business.Entities
         public EmployeeBaseCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmployeeBaseCollection"/> class with an entities range.
+        /// Initializes a new instance of the <see cref="EmployeeBaseCollection"/> class with a <paramref name="collection"/> of items to add.
         /// </summary>
-        /// <param name="entities">The <see cref="EmployeeBase"/> entities.</param>
-        public EmployeeBaseCollection(IEnumerable<EmployeeBase> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="EmployeeBaseCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="EmployeeBaseCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new EmployeeBaseCollection();
-            foreach (var item in this)
-            {
-                clone.Add((EmployeeBase)item.Clone());
-            }
-                
-            return clone;
-        }
-
-        /// <summary>
-        /// An implicit cast from the <see cref="EmployeeBaseCollectionResult"/> to a corresponding <see cref="EmployeeBaseCollection"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="EmployeeBaseCollectionResult"/>.</param>
-        /// <returns>The corresponding <see cref="EmployeeBaseCollection"/>.</returns>
-        public static implicit operator EmployeeBaseCollection(EmployeeBaseCollectionResult result) => result?.Result!;
+        /// <param name="collection">A collection containing items to add.</param>
+        public EmployeeBaseCollection(IEnumerable<EmployeeBase> collection) => AddRange(collection);
     }
-
-    #endregion  
-
-    #region CollectionResult
 
     /// <summary>
     /// Represents the <see cref="EmployeeBase"/> collection result.
     /// </summary>
-    public class EmployeeBaseCollectionResult : EntityCollectionResult<EmployeeBaseCollection, EmployeeBase>
+    public class EmployeeBaseCollectionResult : EntityCollectionResult<EmployeeBaseCollection, EmployeeBase, EmployeeBaseCollectionResult>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeBaseCollectionResult"/> class.
@@ -441,22 +154,9 @@ namespace My.Hr.Business.Entities
         /// Initializes a new instance of the <see cref="EmployeeBaseCollectionResult"/> class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public EmployeeBaseCollectionResult(IEnumerable<EmployeeBase> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="EmployeeBaseCollectionResult"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new EmployeeBaseCollectionResult();
-            clone.CopyFrom(this);
-            return clone;
-        }
+        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+        public EmployeeBaseCollectionResult(IEnumerable<EmployeeBase> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
-
-    #endregion
 }
 
 #pragma warning restore

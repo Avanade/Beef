@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData.Model;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
@@ -17,8 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the US State entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class USState : ReferenceDataBaseGuid
+    public partial class USState : ReferenceDataBase<Guid>
     {
     }
 

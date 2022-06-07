@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
+using CoreEx.Entities;
+using CoreEx.Entities.Extended;
+using CoreEx.RefData;
 using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -20,241 +21,70 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Employee entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Employee : EmployeeBase, IETag, IChangeLog, IEquatable<Employee>
     {
-        #region Privates
-
         private Address? _address;
         private EmergencyContactCollection? _emergencyContacts;
         private string? _etag;
         private ChangeLog? _changeLog;
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the Address (see <see cref="Business.Entities.Address"/>).
         /// </summary>
-        [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Address")]
-        public Address? Address
-        {
-            get => _address;
-            set => SetValue(ref _address, value, false, true, nameof(Address));
-        }
+        public Address? Address { get => _address; set => SetValue(ref _address, value); }
 
         /// <summary>
         /// Gets or sets the Emergency Contacts.
         /// </summary>
-        [JsonProperty("emergencyContacts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Emergency Contacts")]
-        public EmergencyContactCollection? EmergencyContacts
-        {
-            get => _emergencyContacts;
-            set => SetValue(ref _emergencyContacts, value, false, false, nameof(EmergencyContacts));
-        }
+        public EmergencyContactCollection? EmergencyContacts { get => _emergencyContacts; set => SetValue(ref _emergencyContacts, value); }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="ETag")]
-        public string? ETag
-        {
-            get => _etag;
-            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
-        }
+        [JsonProperty("etag")]
+        public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
 
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Change Log")]
-        public ChangeLog? ChangeLog
+        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+
+        /// <inheritdoc/>
+        protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            get => _changeLog;
-            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
+            foreach (var pv in base.GetPropertyValues())
+                yield return pv;
+
+            yield return CreateProperty(Address, v => Address = v);
+            yield return CreateProperty(EmergencyContacts, v => EmergencyContacts = v);
+            yield return CreateProperty(ETag, v => ETag = v);
+            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
         }
 
-        #endregion
-
-        #region IChangeTracking
-
-        /// <summary>
-        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
-        public override void AcceptChanges()
-        {
-            Address?.AcceptChanges();
-            ChangeLog?.AcceptChanges();
-            base.AcceptChanges();
-        }
+        /// <inheritdoc/>
+        public bool Equals(Employee? other) => base.Equals(other);
 
         /// <summary>
-        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        public override void TrackChanges()
-        {
-            Address?.TrackChanges();
-            ChangeLog?.TrackChanges();
-            base.TrackChanges();
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is Employee val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="Employee"/> is equal to the current <see cref="Employee"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="Employee"/> to compare with the current <see cref="Employee"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="Employee"/> is equal to the current <see cref="Employee"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(Employee? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Address, value.Address)
-                && Equals(EmergencyContacts, value.EmergencyContacts)
-                && Equals(ETag, value.ETag)
-                && Equals(ChangeLog, value.ChangeLog);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="Employee"/> types for equality.
+        /// Compares two values for equality.
         /// </summary>
         /// <param name="a"><see cref="Employee"/> A.</param>
         /// <param name="b"><see cref="Employee"/> B.</param>
         /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (Employee? a, Employee? b) => Equals(a, b);
-
+        public static bool operator ==(Employee? a, Employee? b) => Equals(a, b);
+    
         /// <summary>
-        /// Compares two <see cref="Employee"/> types for non-equality.
+        /// Compares two values for non-equality.
         /// </summary>
         /// <param name="a"><see cref="Employee"/> A.</param>
         /// <param name="b"><see cref="Employee"/> B.</param>
         /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (Employee? a, Employee? b) => !Equals(a, b);
+        public static bool operator !=(Employee? a, Employee? b) => !Equals(a, b);
+ 
+        /// <inheritdoc/>
+        public override int GetHashCode() => base.GetHashCode();
 
-        /// <summary>
-        /// Returns the hash code for the <see cref="Employee"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="Employee"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Address);
-            hash.Add(EmergencyContacts);
-            hash.Add(ETag);
-            hash.Add(ChangeLog);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="Employee"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Employee"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<Employee>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="Employee"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Employee"/> to copy from.</param>
-        public void CopyFrom(Employee from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EmployeeBase)from);
-            Address = CopyOrClone(from.Address, Address);
-            EmergencyContacts = from.EmergencyContacts;
-            ETag = from.ETag;
-            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="Employee"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="Employee"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new Employee();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="Employee"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Address = Cleaner.Clean(Address);
-            EmergencyContacts = Cleaner.Clean(EmergencyContacts);
-            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
-            ChangeLog = Cleaner.Clean(ChangeLog);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                if (!base.IsInitial)
-                    return false;
-
-                return Cleaner.IsInitial(Address)
-                    && Cleaner.IsInitial(EmergencyContacts)
-                    && Cleaner.IsInitial(ETag)
-                    && Cleaner.IsInitial(ChangeLog);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(Employee from);
-
-        #endregion
+        /// <inheritdoc/>
+        public override object Clone() => CreateClone<Employee>(this);
     }
 }
 
