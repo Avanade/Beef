@@ -414,8 +414,8 @@ operations: [
         /// Gets or sets the alternate HTTP Status Code that will be returned for the operation where there is a null return value. 
         /// </summary>
         [JsonProperty("webApiAlternateStatus", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound", "ThrowException" },
-            Description = "The value defaults as follows: `NotFound` for `Operation.Type` value `Get`, `NoContent` for `Operation.Type` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.")]
+        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound" },
+            Description = "The value defaults as follows: `NotFound` for `Operation.Type` value `Get` and `NoContent` for `Operation.Type` value `GetColl`; otherwise, `null`.")]
         public string? WebApiAlternateStatus { get; set; }
 
         /// <summary>
@@ -673,14 +673,24 @@ operations: [
         public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
 
         /// <summary>
+        /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
+        /// </summary>
+        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<HttpResult<{OperationReturnType}>>" : "Task<HttpResult>";
+
+        /// <summary>
+        /// Gets the controller operation method call/invoke statement.
+        /// </summary>
+        public string ControllerOperationWebApiMethod => CreateControllerOperationWebApiMethod();
+
+        /// <summary>
+        /// Gets the agent operation HTTP method call/invoke statement.
+        /// </summary>
+        public string AgentOperationHttpMethod => CreateAgentOperationHttpMethod();
+
+        /// <summary>
         /// Gets the gRPC return type.
         /// </summary>
         public string GrpcReturnType => PropertyConfig.InferGrpcType(BaseReturnType!) + (Type == "GetColl" ? "CollectionResult" : "");
-
-        /// <summary>
-        /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
-        /// </summary>
-        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<WebApiAgentResult<{OperationReturnType}>>" : "Task<WebApiAgentResult>";
 
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for a gRPC agent.
@@ -912,11 +922,11 @@ operations: [
             {
                 "Get" => "NotFound",
                 "GetColl" => "NoContent",
-                "Create" => "ThrowException",
-                "Update" => "ThrowException",
-                "Patch" => "ThrowException",
-                "Delete" => "ThrowException",
-                _ => HasReturnValue ? "NoContent" : "ThrowException"
+                "Create" => "null",
+                "Update" => "null",
+                "Patch" => "null",
+                "Delete" => "null",
+                _ => HasReturnValue ? "NoContent" : "null"
             });
 
             ManagerOperationType = DefaultWhereNull(ManagerOperationType, () => Type switch
@@ -1305,6 +1315,70 @@ operations: [
                 "HttpDelete" => "Delete",
                 _ => "Get"
             };
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ControllerOperationWebApiMethod"/> string.
+        /// </summary>
+        private string CreateControllerOperationWebApiMethod()
+        {
+            var sb = new StringBuilder(WebApiMethod![4..]);
+            sb.Append("Async");
+
+            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                sb.Append('<');
+
+            if (ValueType != null && WebApiMethod != "HttpPatch")
+            {
+                sb.Append(ValueType);
+                if (HasReturnValue)
+                    sb.Append(", ");
+            }
+
+            if (HasReturnValue)
+                sb.Append(OperationReturnType);
+
+            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                sb.Append('>');
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Creates the <see cref="AgentOperationHttpMethod"/> string.
+        /// </summary>
+        private string CreateAgentOperationHttpMethod()
+        {
+            var sb = new StringBuilder(WebApiMethod![4..]);
+            if (Type == "GetColl")
+                sb.Append("CollectionResult");
+
+            sb.Append("Async");
+
+            if (Type == "GetColl")
+            {
+                sb.Append($"<{BaseReturnType}CollectionResult, {BaseReturnType}Collection, {BaseReturnType}>");
+            }
+            else
+            {
+                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                    sb.Append('<');
+
+                if (ValueType != null && WebApiMethod != "HttpPatch")
+                {
+                    sb.Append(ValueType);
+                    if (HasReturnValue)
+                        sb.Append(", ");
+                }
+
+                if (HasReturnValue)
+                    sb.Append(OperationReturnType);
+
+                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                    sb.Append('>');
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

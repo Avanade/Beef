@@ -8,12 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
 using My.Hr.Business;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
@@ -24,16 +24,19 @@ namespace My.Hr.Api.Controllers
     /// Provides the <see cref="Employee"/> Web API functionality.
     /// </summary>
     [Route("api/employees")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class EmployeeController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IEmployeeManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IEmployeeManager"/>.</param>
-        public EmployeeController(IEmployeeManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); EmployeeControllerCtor(); }
+        public EmployeeController(WebApi webApi, IEmployeeManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); EmployeeControllerCtor(); }
 
         partial void EmployeeControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,44 +48,40 @@ namespace My.Hr.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<Employee?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<Employee?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
         [HttpPost("")]
+        [AcceptsBody(typeof(Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Employee value) =>
-            new WebApiPost<Employee>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
+        public Task<IActionResult> Create() =>
+            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), locationUri: r => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPut("{id}")]
+        [AcceptsBody(typeof(Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Employee value, Guid id) =>
-            new WebApiPut<Employee>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="Employee"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="Employee"/>.</returns>
         [HttpPatch("{id}")]
+        [AcceptsBody(typeof(Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Patch([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<Employee>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Patch(Guid id) =>
+            _webApi.PatchAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -90,9 +89,8 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The Id.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> Delete(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -107,24 +105,22 @@ namespace My.Hr.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(EmployeeBaseCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs([FromQuery(Name = "")] string? firstName = default, [FromQuery(Name = "")] string? lastName = default, [FromQuery(Name = "")] List<string>? genders = default, [FromQuery(Name = "")] DateTime? startFrom = default, [FromQuery(Name = "")] DateTime? startTo = default, [FromQuery(Name = "includeTerminated")] bool? isIncludeTerminated = default)
+        public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, DateTime? startFrom = default, DateTime? startTo = default, [FromQuery(Name="includeTerminated")] bool? isIncludeTerminated = default)
         {
             var args = new EmployeeArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, StartFrom = startFrom, StartTo = startTo, IsIncludeTerminated = isIncludeTerminated };
-            return new WebApiGet<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<EmployeeBaseCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPost("{id}/terminate")]
+        [AcceptsBody(typeof(TerminationDetail))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
-        public IActionResult Terminate([FromBody] TerminationDetail value, Guid id) =>
-            new WebApiPost<Employee>(this, () => _manager.TerminateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Terminate(Guid id) =>
+            _webApi.PostAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), statusCode: HttpStatusCode.OK, operationType: OperationType.Update);
     }
 }
 

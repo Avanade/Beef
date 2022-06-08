@@ -226,7 +226,7 @@ parameters: [
         /// Gets the formatted summary text.
         /// </summary>
         public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
-            ? StringConverter.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {Text}.")
             : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
@@ -237,12 +237,12 @@ parameters: [
         /// <summary>
         /// Gets the WebApi parameter type.
         /// </summary>
-        public string WebApiParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : string.IsNullOrEmpty(RefDataType) ? ParameterType! : (CompareValue(Nullable, true) ? $"{RefDataType}?" : RefDataType!);
+        public string WebApiParameterType => IsValueArg && Parent!.Type == "Patch" ? "string" : string.IsNullOrEmpty(RefDataType) ? ParameterType! : (CompareValue(Nullable, true) ? $"{RefDataType}?" : RefDataType!);
 
         /// <summary>
         /// Gets the WebApi Agent parameter type.
         /// </summary>
-        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : WebApiParameterType!;
+        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "string" : WebApiParameterType!;
 
         /// <summary>
         /// Gets the <see cref="WebApiFrom"/> for use in an Agent.

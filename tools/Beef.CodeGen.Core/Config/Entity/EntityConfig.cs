@@ -1611,6 +1611,7 @@ entities:
             if (RequiresManager)
                 WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
 
+            WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "WebApi", Type = $"WebApi", Text = $"{{{{WebApi}}}}" });
             AddConfiguredParameters(WebApiCtorParams, WebApiCtorParameters);
             foreach (var ctor in WebApiCtorParameters)
             {

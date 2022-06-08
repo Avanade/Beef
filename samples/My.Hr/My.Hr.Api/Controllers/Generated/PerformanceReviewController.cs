@@ -8,12 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
 using My.Hr.Business;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
@@ -24,16 +24,19 @@ namespace My.Hr.Api.Controllers
     /// Provides the <see cref="PerformanceReview"/> Web API functionality.
     /// </summary>
     [Route("api")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class PerformanceReviewController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IPerformanceReviewManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IPerformanceReviewManager"/>.</param>
-        public PerformanceReviewController(IPerformanceReviewManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); PerformanceReviewControllerCtor(); }
+        public PerformanceReviewController(WebApi webApi, IPerformanceReviewManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); PerformanceReviewControllerCtor(); }
 
         partial void PerformanceReviewControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,9 +48,8 @@ namespace My.Hr.Api.Controllers
         [HttpGet("reviews/{id}")]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<PerformanceReview?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<PerformanceReview?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -57,45 +59,41 @@ namespace My.Hr.Api.Controllers
         [HttpGet("employees/{employeeId}/reviews")]
         [ProducesResponseType(typeof(PerformanceReviewCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByEmployeeId(Guid employeeId) =>
-            new WebApiGet<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview>(this, () => _manager.GetByEmployeeIdAsync(employeeId, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> GetByEmployeeId(Guid employeeId) =>
+            _webApi.GetAsync<PerformanceReviewCollectionResult>(Request, p => _manager.GetByEmployeeIdAsync(employeeId, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         [HttpPost("employees/{employeeId}/reviews")]
+        [AcceptsBody(typeof(PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] PerformanceReview value, Guid employeeId) =>
-            new WebApiPost<PerformanceReview>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value), employeeId),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/reviews/{r.Id}", UriKind.Relative));
+        public Task<IActionResult> Create(Guid employeeId) =>
+            _webApi.PostAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), locationUri: r => new Uri($"/api/reviews/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         [HttpPut("reviews/{id}")]
+        [AcceptsBody(typeof(PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] PerformanceReview value, Guid id) =>
-            new WebApiPut<PerformanceReview>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="PerformanceReview"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
         [HttpPatch("reviews/{id}")]
+        [AcceptsBody(typeof(PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
-        public IActionResult Patch([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<PerformanceReview>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Patch(Guid id) =>
+            _webApi.PatchAsync<PerformanceReview>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
@@ -103,9 +101,8 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         [HttpDelete("reviews/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> Delete(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
     }
 }
 
