@@ -16,7 +16,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
-    public partial class EmployeeBase : IIdentifier<Guid>, IPrimaryKey
+    public partial class EmployeeBase : IIdentifier<Guid>
     {
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.

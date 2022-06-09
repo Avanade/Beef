@@ -194,7 +194,7 @@ entities:
         /// </summary>
         [JsonProperty("implementsAutoInfer", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Entity", Title = "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-            Description = "Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
+            Description = "Will attempt to infer the following: `IIdentifier<Guid>`, `IIdentifier<int>`, `IIdentifier<long>`, `IIdentifier<string>`, `IETag` and `IChangeLog`. Defaults to `true`.")]
         public bool? ImplementsAutoInfer { get; set; }
 
         /// <summary>
@@ -699,7 +699,7 @@ entities:
         /// </summary>
         [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
+            Description = "Defaults to `IValidatorEx<Xxx>` (where `Xxx` is the entity `Name`) where `Validator` is not `null`. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? IValidator { get; set; }
 
         #endregion
@@ -1142,6 +1142,11 @@ entities:
         public string? EntityCollectionResultInherits { get; set; }
 
         /// <summary>
+        /// Indicates whether the entity has an inferred identifier column.
+        /// </summary>
+        public bool HasIdentifier { get; set; }
+
+        /// <summary>
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityImplements { get; set; }
@@ -1483,24 +1488,31 @@ entities:
                     }
                 }
 
-                var id = Properties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
-                if (id != null)
+                if (UniqueKeyProperties.Count == 1)
                 {
-                    var iid = id.Type switch
+                    var id = Properties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
+                    if (id != null)
                     {
-                        "Guid" => "IIdentifier<Guid>",
-                        "int" => "IIdentifier<int>",
-                        "long" => "IIdentifier<long>",
-                        "string" => "IIdentifier<string>",
-                        _ => "IIdentifier<???>",
-                    };
+                        var iid = id.Type switch
+                        {
+                            "Guid" => "IIdentifier<Guid>",
+                            "int" => "IIdentifier<int>",
+                            "long" => "IIdentifier<long>",
+                            "string" => "IIdentifier<string>",
+                            _ => "???",
+                        };
 
-                    implements.Insert(i++, iid);
-                    modelImplements.Insert(m++, iid);
+                        if (iid != "???")
+                        {
+                            implements.Insert(i++, iid);
+                            modelImplements.Insert(m++, iid);
+                            HasIdentifier = true;
+                        }
+                    }
                 }
             }
 
-            if (Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+            if (!HasIdentifier && Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
                 implements.Insert(i++, "IPrimaryKey");
                 modelImplements.Insert(m++, "IPrimaryKey");
@@ -1543,6 +1555,9 @@ entities:
             // Manager constructors.
             if (RequiresDataSvc)
                 ManagerCtorParameters.Add(new ParameterConfig { Name = "DataService", Type = $"I{Name}DataSvc", Text = $"{{{{I{Name}DataSvc}}}}" });
+
+            if (AuthRole != null || Operations!.Any(x => x.AuthRole != null || x.AuthPermission != null))
+                ManagerCtorParameters.Add(new ParameterConfig { Name = "ExecutionContext", Type = "CoreEx.ExecutionContext", Text = "{{CoreEx.ExecutionContext}}" });
 
             AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
 

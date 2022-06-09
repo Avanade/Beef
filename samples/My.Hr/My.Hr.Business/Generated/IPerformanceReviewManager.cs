@@ -7,10 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Entities;
+using CoreEx.Entities;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -25,38 +24,43 @@ namespace My.Hr.Business
         /// Gets the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        Task<PerformanceReview?> GetAsync(Guid id);
+        Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging);
+        Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId);
+        Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id);
+        Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        Task DeleteAsync(Guid id);
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }
 

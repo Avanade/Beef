@@ -53,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\CoreEx\src\CoreEx\CoreEx.csproj" />
     <ProjectReference Include="..\Beef.Abstractions\Beef.Abstractions.csproj" />
   </ItemGroup>
  

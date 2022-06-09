@@ -9,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Business;
+using CoreEx;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
-using Beef.Entities;
-using Beef.Events;
+using CoreEx.Entities;
+using CoreEx.Events;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using My.Hr.Business.Entities;
@@ -44,10 +45,10 @@ namespace My.Hr.Business.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         public EmployeeData(IDatabase db, IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
         {
-            _db = Check.NotNull(db, nameof(db));
-            _ef = Check.NotNull(ef, nameof(ef));
-            _mapper = Check.NotNull(mapper, nameof(mapper));
-            _evtPub = Check.NotNull(evtPub, nameof(evtPub));
+            _db = db ?? throw new ArgumentNullException(nameof(db));
+            _ef = ef ?? throw new ArgumentNullException(nameof(ef));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub));
             EmployeeDataCtor();
         }
 
@@ -57,70 +58,76 @@ namespace My.Hr.Business.Data
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, () => GetOnImplementationAsync(id));
+        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, __ct => GetOnImplementationAsync(id, __ct), cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
-            var __result = await CreateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "created");
+            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Create"));
             return __result;
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
-            var __result = await UpdateOnImplementationAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "updated");
+            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Update"));
             return __result;
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
             var __dataArgs = DbMapper.Default.CreateArgs("[Hr].[spEmployeeDelete]");
             await _db.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.Publish(new Uri($"my/hr/employee/{_evtPub.FormatKey(id)}", UriKind.Relative), $"my.hr.employee", "deleted", id);
-        });
+            _evtPub.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Delete"));
+        }, cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
         {
             EmployeeBaseCollectionResult __result = new EmployeeBaseCollectionResult(paging);
             var __dataArgs = EfDbArgs.Create(_mapper, __result.Paging!);
-            __result.Result = _ef.Query<EmployeeBase, EfModel.Employee>(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<EmployeeBaseCollection>();
+            __result.Collection = _ef.Query<EmployeeBase, EfModel.Employee>(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<EmployeeBaseCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => _db.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
-            var __result = await TerminateOnImplementationAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/employee/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.employee", "terminated", id);
+            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
             return __result;
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Provides the <see cref="Employee"/> property and database column mapping.

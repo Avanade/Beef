@@ -136,7 +136,7 @@ namespace Beef.Data.Database
                         return;
 
                     // Use the DataInvoke to dequeue and publish/send the events within a transaction; i.e. a failure to send must rollback the dequeue. 
-                    if (!await DataInvoker.Current.InvokeAsync(this, async () =>
+                    if (!await DataInvoker.Current.InvokeAsync(this, async _ =>
                     {
                         // Get the next tranch of events from the outbox.
                         var events = new List<EventData>();

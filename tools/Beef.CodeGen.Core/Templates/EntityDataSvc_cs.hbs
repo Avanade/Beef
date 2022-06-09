@@ -9,15 +9,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Business;
+using CoreEx;
 {{#if DataSvcCaching}}
-using Beef.Caching;
+using CoreEx.Caching;
 {{/if}}
-using Beef.Entities;
+using CoreEx.Entities;
 {{#if SupportsDataSvcEvents}}
-using Beef.Events;
+using CoreEx.Events;
 {{/if}}
 {{#if RequiresData}}
 {{#if DataSvcNeedsUsingData}}
@@ -55,7 +56,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 
   {{#each DataSvcAutoOperations}}
     {{#if DataSvcExtensions}}
-        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
+        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}CancellationToken, Task>? {{PrivateName}}OnAfterAsync;
     {{/if}}
   {{/each}}
 
@@ -70,11 +71,11 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 {{/each}}
         {{lower DataSvcCtor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
 {{#ifle DataSvcCtorParameters.Count 3}}
-            { {{#each DataSvcCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+            { {{#each DataSvcCtorParameters}}{{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
 {{else}}
         {
   {{#each DataSvcCtorParameters}}
-            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+            {{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}}));
   {{/each}}
             {{Name}}DataSvcCtor();
         }
@@ -89,21 +90,21 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#each DataParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}}) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});{{else}}DataSvcInvoker.Current.InvokeAsync(this, async () =>{{/if}}
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, __ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{ArgumentName}}, {{/each}}__ct){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}, cancellationToken);{{else}}DataSvcInvoker.Current.InvokeAsync(this, async __ct =>{{/if}}
   {{#unless DataSvcCustom}}
         {
     {{#if SupportsCaching}}
       {{#ifeq Type 'Get'}}
-            var __key = new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
-            if (_cache.TryGetValue(__key, out {{OperationReturnType}} __val))
+            if (_cache.TryGetValue(new CompositeKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), out {{OperationReturnType}} __val))
                 return __val;
 
       {{/ifeq}}
     {{/if}}         
-            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)), {{else}}{{ArgumentName}}, {{/if}}{{/each}}__ct).ConfigureAwait(false);
     {{#if DataSvcExtensions}}
             await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
     {{/if}}
@@ -128,16 +129,16 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     {{/ifeq}}
     {{#if SupportsCaching}}
       {{#ifeq Type 'Delete'}}
-            _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
+            _cache.Remove<{{Parent.Name}}>(new CompositeKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
       {{else}}
-            return _cache.SetAndReturnValue({{#ifeq Type 'Get'}}__key, {{/ifeq}}__result);
+            return _cache.SetAndReturnValue(__result);
       {{/ifeq}}
     {{else}}   
       {{#if HasReturnValue}}
             return __result;
       {{/if}}
     {{/if}}
-        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}, cancellationToken);
   {{/unless}}
 {{/each}}
     }

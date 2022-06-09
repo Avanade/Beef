@@ -7,12 +7,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
+using CoreEx;
+using CoreEx.Entities;
+using CoreEx.Validation;
 using My.Hr.Business.Entities;
 using My.Hr.Business.DataSvc;
 using My.Hr.Business.Validation;
@@ -32,7 +32,7 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IEmployeeDataSvc"/>.</param>
         public EmployeeManager(IEmployeeDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); EmployeeManagerCtor(); }
+            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); EmployeeManagerCtor(); }
 
         partial void EmployeeManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -40,82 +40,82 @@ namespace My.Hr.Business
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
             Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+            (await id.Validate(nameof(id)).Mandatory().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.GetAsync(id, __ct).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read, cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidator<Employee>>().RunAsync(throwOnError: true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+            Cleaner.CleanUp(value.EnsureValue());
+            (await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.CreateAsync(value, __ct).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Create, cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> UpdateAsync(Employee value, Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            value.Id = id;
+            value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidator<Employee>>().RunAsync(throwOnError: true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+            (await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.UpdateAsync(value, __ct).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Update, cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
             Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).RunAsync(throwOnError: true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete);
+            (await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            await _dataService.DeleteAsync(id, __ct).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete, cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
             Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<IValidator<EmployeeArgs>>().RunAsync(throwOnError: true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+            (await args.Validate(nameof(args)).Entity().With<IValidatorEx<EmployeeArgs>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging, __ct).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Read, cancellationToken);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            Cleaner.CleanUp(value, id);
-            await value.Validate().Entity().With<IValidator<TerminationDetail>>().RunAsync(throwOnError: true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.TerminateAsync(value, id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+            Cleaner.CleanUp(value.EnsureValue(), id);
+            (await value.Validate().Entity().With<IValidatorEx<TerminationDetail>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.TerminateAsync(value, id, __ct).ConfigureAwait(false));
+        }, BusinessInvokerArgs.Update, cancellationToken);
     }
 }
 

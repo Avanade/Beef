@@ -21,7 +21,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
-    public partial class EmployeeBase : EntityBase<EmployeeBase>, IIdentifier<Guid>, IPrimaryKey
+    public partial class EmployeeBase : EntityBase<EmployeeBase>, IIdentifier<Guid>
     {
         private Guid _id;
         private string? _email;
@@ -89,18 +89,6 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the Phone No.
         /// </summary>
         public string? PhoneNo { get => _phoneNo; set => SetValue(ref _phoneNo, value); }
-
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="CompositeKey"/>.</returns>
-        /// <param name="id">The <see cref="Id"/>.</param>
-        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
-
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
-        /// </summary>
-        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

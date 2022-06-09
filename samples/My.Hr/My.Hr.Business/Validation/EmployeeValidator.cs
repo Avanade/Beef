@@ -1,10 +1,11 @@
-﻿using Beef;
-using Beef.Validation;
-using Beef.Validation.Rules;
+﻿using CoreEx;
+using CoreEx.Validation;
+using CoreEx.Validation.Rules;
 using My.Hr.Business.DataSvc;
 using My.Hr.Business.Entities;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace My.Hr.Business.Validation
@@ -36,26 +37,26 @@ namespace My.Hr.Business.Validation
         /// </summary>
         public EmployeeValidator(IEmployeeDataSvc employeeDataSvc)
         {
-            _employeeDataSvc = Check.NotNull(employeeDataSvc, nameof(employeeDataSvc));
+            _employeeDataSvc = employeeDataSvc ?? throw new ArgumentNullException(nameof(employeeDataSvc));
 
             Property(x => x.Email).Mandatory().Email();
             Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.Gender).Mandatory().IsValid();
-            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, ExecutionContext.Current.Timestamp.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
+            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, CoreEx.ExecutionContext.Current.Timestamp.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
             Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
             Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
             Property(x => x.Address).Entity(_addressValidator);
-            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: CollectionRuleItem.Create(_emergencyContactValidator).UniqueKeyDuplicateCheck(ignoreWhereUniqueKeyIsInitial: true));
+            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: CollectionRuleItem.Create(_emergencyContactValidator).PrimaryKeyDuplicateCheck(ignoreWherePrimaryKeyIsInitial: true));
         }
 
         /// <summary>
         /// Add further validation logic non-property bound.
         /// </summary>
-        protected override async Task OnValidateAsync(ValidationContext<Employee> context)
+        protected override async Task OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
         {
             // Ensure that the termination data is always null on an update; unless already terminated then it can no longer be updated.
-            switch (ExecutionContext.Current.OperationType)
+            switch (ExecutionContext.OperationType)
             {
                 case OperationType.Create:
                     context.Value.Termination = null;
@@ -77,14 +78,14 @@ namespace My.Hr.Business.Validation
         /// <summary>
         /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
         /// </summary>
-        public static CommonValidator<Guid> CanDelete = CommonValidator.Create<Guid>(cv => cv.Custom(async context => 
+        public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, ct) =>
         {
             // Unable to use inheritance DI for a Common Validator so the context.GetService will get/create the instance in the same manner.
-            var existing = await context.GetService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
+            var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value, ct).ConfigureAwait(false);
             if (existing == null)
                 throw new NotFoundException();
 
-            if (existing.StartDate <= ExecutionContext.Current.Timestamp)
+            if (existing.StartDate <= CoreEx.ExecutionContext.Current.Timestamp)
                 throw new ValidationException("An employee cannot be deleted after they have started their employment.");
         }));
     }

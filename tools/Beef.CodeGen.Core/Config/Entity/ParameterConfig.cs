@@ -141,7 +141,7 @@ parameters: [
         /// </summary>
         [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Defaults to `IValidator<{Type}>` where the `{Type}` is `Type`.")]
+            Description = "Defaults to `IValidatorEx<{Type}>` where the `{Type}` is `Type`.")]
         public string? IValidator { get; set; }
 
         /// <summary>
@@ -302,7 +302,7 @@ parameters: [
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !DotNet.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
-            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidator<{Type}>" : null);
+            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidatorEx<{Type}>" : null);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");

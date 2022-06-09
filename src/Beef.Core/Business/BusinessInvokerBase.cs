@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -12,23 +12,11 @@ namespace Beef.Business
     /// a <see cref="BusinessInvokerArgs"/> to configure the <see cref="TransactionScope"/> and <see cref="BusinessInvokerArgs.ExceptionHandler">exception handling</see>. 
     /// </summary>
     [System.Diagnostics.DebuggerStepThrough]
-    public abstract class BusinessInvokerBase : InvokerBase<BusinessInvokerArgs>
+    public abstract class BusinessInvokerBase : CoreEx.Abstractions.InvokerBase<object, BusinessInvokerArgs>
     {
-        #region NoResult
-
-        /// <summary>
-        /// Invokes an <paramref name="action"/> synchronously.
-        /// </summary>
-        /// <param name="caller">The calling (invoking) object.</param>
-        /// <param name="action">The function to invoke.</param>
-        /// <param name="param">The optional parameter passed to the invoke.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override void WrapInvoke(object caller, Action action, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        /// <inheritdoc/>
+        protected async override Task<TResult> OnInvokeAsync<TResult>(object owner, Func<CancellationToken, Task<TResult>> func, BusinessInvokerArgs? param, CancellationToken cancellationToken)
         {
-            Check.NotNull(action, nameof(action));
-
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -40,91 +28,7 @@ namespace Beef.Business
                 if (bia.IncludeTransactionScope)
                     txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
-                action();
-                txn?.Complete();
-            }
-            catch (Exception ex)
-            {
-                bia.ExceptionHandler?.Invoke(ex);
-                throw;
-            }
-            finally
-            {
-                txn?.Dispose();
-                ExecutionContext.Current.OperationType = ot;
-            }
-        }
-
-        /// <summary>
-        /// Invokes a <paramref name="func"/> asynchronously.
-        /// </summary>
-        /// <param name="caller">The calling (invoking) object.</param>
-        /// <param name="func">The function to invoke.</param>
-        /// <param name="param">The optional parameter passed to the invoke.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Check.NotNull(func, nameof(func));
-
-            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
-            TransactionScope? txn = null;
-            OperationType ot = ExecutionContext.Current.OperationType;
-            if (bia.OperationType.HasValue)
-                ExecutionContext.Current.OperationType = bia.OperationType.Value;
-
-            try
-            {
-                if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
-
-                await func().ConfigureAwait(false);
-                txn?.Complete();
-            }
-            catch (Exception ex)
-            {
-                bia.ExceptionHandler?.Invoke(ex);
-                throw;
-            }
-            finally
-            {
-                txn?.Dispose();
-                ExecutionContext.Current.OperationType = ot;
-            }
-        }
-
-        #endregion
-
-        #region WithResult
-
-        /// <summary>
-        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
-        /// </summary>
-        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
-        /// <param name="caller">The calling (invoking) object.</param>
-        /// <param name="func">The function to invoke.</param>
-        /// <param name="param">The optional parameter passed to the invoke.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        /// <returns>The result.</returns>
-        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Check.NotNull(func, nameof(func));
-
-            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
-            TransactionScope? txn = null;
-            OperationType ot = ExecutionContext.Current.OperationType;
-            if (bia.OperationType.HasValue)
-                ExecutionContext.Current.OperationType = bia.OperationType.Value;
-
-            try
-            {
-                if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
-
-                var result = func();
+                var result = await func(cancellationToken).ConfigureAwait(false);
                 txn?.Complete();
                 return result;
             }
@@ -139,50 +43,6 @@ namespace Beef.Business
                 ExecutionContext.Current.OperationType = ot;
             }
         }
-
-        /// <summary>
-        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
-        /// </summary>
-        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
-        /// <param name="caller">The calling (invoking) object.</param>
-        /// <param name="func">The function to invoke.</param>
-        /// <param name="param">The optional parameter passed to the invoke.</param>
-        /// <param name="memberName">The method or property name of the caller to the method.</param>
-        /// <param name="filePath">The full path of the source file that contains the caller.</param>
-        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        /// <returns>The result.</returns>
-        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Check.NotNull(func, nameof(func));
-
-            BusinessInvokerArgs bia = Check.NotNull(param ?? BusinessInvokerArgs.Default, nameof(param));
-            TransactionScope? txn = null;
-            OperationType ot = ExecutionContext.Current.OperationType;
-            if (bia.OperationType.HasValue)
-                ExecutionContext.Current.OperationType = bia.OperationType.Value;
-
-            try
-            {
-                if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
-
-                var result = await func().ConfigureAwait(false);
-                txn?.Complete();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                bia.ExceptionHandler?.Invoke(ex);
-                throw;
-            }
-            finally
-            {
-                txn?.Dispose();
-                ExecutionContext.Current.OperationType = ot;
-            }
-        }
-
-        #endregion
     }
 
     /// <summary>

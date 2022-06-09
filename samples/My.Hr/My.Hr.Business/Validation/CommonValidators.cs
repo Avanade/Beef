@@ -1,5 +1,4 @@
-﻿using Beef.Validation;
-using System.ComponentModel.DataAnnotations;
+﻿using CoreEx.Validation;
 
 namespace My.Hr.Business.Validation
 {
@@ -11,16 +10,16 @@ namespace My.Hr.Business.Validation
         /// <summary>
         /// Provides a common person's name validator, ensure max length is 100.
         /// </summary>
-        public static CommonValidator<string?> PersonName = CommonValidator.Create<string?>(cv => cv.String(100));
+        public static CommonValidator<string?> PersonName { get; } = CommonValidator.Create<string?>(cv => cv.String(100));
 
         /// <summary>
         /// Provides a common address's street validator, ensure max length is 100.
         /// </summary>
-        public static CommonValidator<string?> Street = CommonValidator.Create<string?>(cv => cv.String(100));
+        public static CommonValidator<string?> Street { get; } = CommonValidator.Create<string?>(cv => cv.String(100));
 
         /// <summary>
         /// Provides a common phone number validator, just length, but could be regex or other.
         /// </summary>
-        public static CommonValidator<string?> PhoneNo = CommonValidator.Create<string?>(cv => cv.String(50));
+        public static CommonValidator<string?> PhoneNo { get; } = CommonValidator.Create<string?>(cv => cv.String(50));
     }
 }

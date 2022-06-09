@@ -75,7 +75,7 @@ entities:
       { name: Create, type: Create, autoImplement: None },
       { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
       { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
-      { name: Delete, type: Delete, webApiRoute: '{id}',
+      { name: Delete, type: Delete, uniqueKey: true, webApiRoute: '{id}',
         parameters: [
           { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
         ]

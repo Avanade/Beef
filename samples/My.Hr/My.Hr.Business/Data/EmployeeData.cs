@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using My.Hr.Business.Entities;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace My.Hr.Business.Data
@@ -31,7 +32,7 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Executes the 'Get' stored procedure passing the identifier and returns the result.
         /// </summary>
-        private Task<Employee?> GetOnImplementationAsync(Guid id) =>
+        private Task<Employee?> GetOnImplementationAsync(Guid id, CancellationToken ct) =>
             ExecuteStatement(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default.GetParamName(nameof(Employee.Id)), id));
 
         /// <summary>

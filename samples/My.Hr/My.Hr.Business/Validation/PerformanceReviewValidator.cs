@@ -1,6 +1,8 @@
-﻿using Beef;
-using Beef.Validation;
+﻿using CoreEx;
+using CoreEx.Validation;
 using My.Hr.Business.Entities;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace My.Hr.Business.Validation
@@ -18,11 +20,11 @@ namespace My.Hr.Business.Validation
         /// </summary>
         public PerformanceReviewValidator(IPerformanceReviewManager performanceReviewManager, IEmployeeManager employeeManager)
         {
-            _performanceReviewManager = Check.NotNull(performanceReviewManager, nameof(performanceReviewManager));
-            _employeeManager = Check.NotNull(employeeManager, nameof(employeeManager));
+            _performanceReviewManager = performanceReviewManager ?? throw new ArgumentNullException(nameof(performanceReviewManager));
+            _employeeManager = employeeManager ?? throw new ArgumentNullException(nameof(employeeManager));
 
             Property(x => x.EmployeeId).Mandatory();
-            Property(x => x.Date).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => ExecutionContext.Current.Timestamp, _ => "today");
+            Property(x => x.Date).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => CoreEx.ExecutionContext.Current.Timestamp, _ => "today");
             Property(x => x.Notes).String(4000);
             Property(x => x.Reviewer).Mandatory().String(256);
             Property(x => x.Outcome).Mandatory().IsValid();
@@ -31,14 +33,14 @@ namespace My.Hr.Business.Validation
         /// <summary>
         /// Add further validation logic.
         /// </summary>
-        protected override async Task OnValidateAsync(ValidationContext<PerformanceReview> context)
+        protected override async Task OnValidateAsync(ValidationContext<PerformanceReview> context, CancellationToken cancellationToken)
         {
             if (!context.HasError(x => x.EmployeeId))
             {
                 // Ensure that the EmployeeId has not be changed as it is immutable.
-                if (ExecutionContext.Current.OperationType == OperationType.Update)
+                if (ExecutionContext.OperationType == OperationType.Update)
                 {
-                    var prv = await _performanceReviewManager.GetAsync(context.Value.Id).ConfigureAwait(false);
+                    var prv = await _performanceReviewManager.GetAsync(context.Value.Id, cancellationToken).ConfigureAwait(false);
                     if (prv == null)
                         throw new NotFoundException();
 
@@ -50,7 +52,7 @@ namespace My.Hr.Business.Validation
                 }
 
                 // Check that the referenced Employee exists, and the review data is within the bounds of their employment.
-                var ev = await _employeeManager.GetAsync(context.Value.EmployeeId).ConfigureAwait(false);
+                var ev = await _employeeManager.GetAsync(context.Value.EmployeeId, cancellationToken).ConfigureAwait(false);
                 if (ev == null)
                     context.AddError(x => x.EmployeeId, ValidatorStrings.ExistsFormat);
                 else

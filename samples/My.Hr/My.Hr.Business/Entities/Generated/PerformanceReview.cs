@@ -21,7 +21,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    public partial class PerformanceReview : EntityBase<PerformanceReview>, IIdentifier<Guid>, IPrimaryKey, IETag, IChangeLog
+    public partial class PerformanceReview : EntityBase<PerformanceReview>, IIdentifier<Guid>, IETag, IChangeLog
     {
         private Guid _id;
         private Guid _employeeId;
@@ -84,18 +84,6 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
-
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="CompositeKey"/>.</returns>
-        /// <param name="id">The <see cref="Id"/>.</param>
-        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
-
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
-        /// </summary>
-        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

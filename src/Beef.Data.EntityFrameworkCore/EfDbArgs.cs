@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using AutoMapper;
-using Beef.Entities;
+using CoreEx.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 

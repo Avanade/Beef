@@ -57,6 +57,8 @@ operations: [
     [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class OperationConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
+        private int _ensureValueCount;
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -298,7 +300,7 @@ operations: [
         /// </summary>
         [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.")]
+            Description = "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidatorEx<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.")]
         public string? IValidator { get; set; }
 
         /// <summary>
@@ -808,6 +810,11 @@ operations: [
         public string? HttpAgentSendStatement { get; set; }
 
         /// <summary>
+        /// Provides an ensure value counter (automatically updates by 1 on each access).
+        /// </summary>
+        public int EnsureValueCount => _ensureValueCount++;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -888,7 +895,7 @@ operations: [
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
-            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? Parent!.IValidator ?? $"IValidator<{ValueType}>" : null);
+            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? Parent!.IValidator ?? $"IValidatorEx<{ValueType}>" : null);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             if (Type == "Custom")
                 AutoImplement = "None";
@@ -946,17 +953,17 @@ operations: [
 
             EventFormatKey = Type switch
             {
-                "Create" => "{_evtPub.FormatKey(__result)}",
-                "Update" => "{_evtPub.FormatKey(__result)}",
-                "Delete" => $"{{_evtPub.FormatKey({string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{x.ArgumentName}"))})}}",
+                "Create" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
+                "Update" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
+                "Delete" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}",
                 _ => null
             };
 
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
-                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
-                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}{(EventFormatKey == null || Parent!.EventSubjectFormat == "NameOnly" ? "" : $"{Root!.EventSubjectSeparator}" + EventFormatKey)}:{ConvertEventAction(ManagerOperationType!)}",
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
                 _ => null
             });
 
@@ -1025,15 +1032,6 @@ operations: [
         }
 
         /// <summary>
-        /// Converts the event action.
-        /// </summary>
-        private string ConvertEventAction(string action) => Root!.EventActionFormat switch
-        {
-            "PastTense" => StringConverter.ToPastTense(action)!,
-            _ => action
-        };
-
-        /// <summary>
         /// Prepares the parameters.
         /// </summary>
         private async Task PrepareParametersAsync()
@@ -1050,6 +1048,10 @@ operations: [
             {
                 foreach (var pc in Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value))
                 {
+                    // Do not add where same parameter (name) has been configured manually, assume overridden on purpose.
+                    if (Parameters.Any(x => x.Name == pc.Name))
+                        continue;
+
                     Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
             }
@@ -1081,23 +1083,13 @@ operations: [
                 if (parts.Length > 1)
                     ed.Action = parts[1];
                 else
-                    ed.Action = ConvertEventAction(ManagerOperationType!);
+                    ed.Action = ManagerOperationType!;
 
                 if (Root!.EventSubjectRoot != null)
-                    ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
+                    ed.Subject = Root!.EventSubjectRoot + Root!.EventSubjectSeparator + ed.Subject;
 
-                switch (Parent!.EventCasing)
-                {
-                    case "Lower":
-                        ed.Action = ed.Action?.ToLowerInvariant();
-                        ed.Subject = ed.Subject?.ToLowerInvariant();
-                        break;
-
-                    case "Upper":
-                        ed.Action = ed.Action?.ToUpperInvariant();
-                        ed.Subject = ed.Subject?.ToUpperInvariant();
-                        break;
-                }
+                if (ed.Subject != null)
+                    ed.Subject = ed.Subject.Replace("{$key}", EventFormatKey);
 
                 if (Root!.EventSourceKind != "None")
                     ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);

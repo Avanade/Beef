@@ -16,7 +16,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    public partial class PerformanceReview : IIdentifier<Guid>, IPrimaryKey, IETag, IChangeLog
+    public partial class PerformanceReview : IIdentifier<Guid>, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.

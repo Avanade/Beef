@@ -8,9 +8,11 @@ namespace Beef.Business
     [System.Diagnostics.DebuggerStepThrough]
     public class ManagerInvoker : BusinessInvokerBase
     {
+        private static ManagerInvoker? _default;
+
         /// <summary>
         /// Gets the current configured instance (see <see cref="ExecutionContext.ServiceProvider"/>).
         /// </summary>
-        public static ManagerInvoker Current => GetCurrentInstance<ManagerInvoker>(false) ?? new ManagerInvoker();
+        public static ManagerInvoker Current => ExecutionContext.GetService<ManagerInvoker>() ?? (_default ??= new ManagerInvoker());
     }
 }

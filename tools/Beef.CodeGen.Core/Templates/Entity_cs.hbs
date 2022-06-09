@@ -176,23 +176,25 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{/ifval}}
 {{/each}}
 {{! ===== PrimaryKey ===== }}
-{{#unless RefDataType}}
-  {{#ifne UniqueKeyProperties.Count 0}}
+{{#unless HasIdentifier}}
+  {{#unless RefDataType}}
+    {{#ifne UniqueKeyProperties.Count 0}}
 
         /// <summary>
         /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
         /// <returns>The <see cref="CompositeKey"/>.</returns>
-  {{#each UniqueKeyProperties}}
+    {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
-  {{/each}}
+    {{/each}}
         public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
         /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
         public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
-  {{/ifne}}
+    {{/ifne}}
+  {{/unless}}
 {{/unless}}
 {{! ===== PartitionKey ===== }}
 {{#unless RefDataType}}

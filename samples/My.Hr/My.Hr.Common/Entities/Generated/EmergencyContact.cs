@@ -16,7 +16,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Emergency Contact entity.
     /// </summary>
-    public partial class EmergencyContact : IIdentifier<Guid>, IPrimaryKey
+    public partial class EmergencyContact : IIdentifier<Guid>
     {
         /// <summary>
         /// Gets or sets the Id.

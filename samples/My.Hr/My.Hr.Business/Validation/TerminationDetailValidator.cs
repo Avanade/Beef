@@ -1,4 +1,4 @@
-﻿using Beef.Validation;
+﻿using CoreEx.Validation;
 using My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Validation

@@ -8,9 +8,11 @@ namespace Beef.Business
     [System.Diagnostics.DebuggerStepThrough]
     public class DataInvoker : BusinessInvokerBase
     {
+        private static DataInvoker? _default;
+
         /// <summary>
         /// Gets the current configured instance (see <see cref="ExecutionContext.ServiceProvider"/>).
         /// </summary>
-        public static DataInvoker Current => GetCurrentInstance<DataInvoker>(false) ?? new DataInvoker();
+        public static DataInvoker Current => ExecutionContext.GetService<DataInvoker>() ?? (_default ??= new DataInvoker());
     }
 }

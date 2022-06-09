@@ -21,7 +21,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Emergency Contact entity.
     /// </summary>
-    public partial class EmergencyContact : EntityBase<EmergencyContact>, IIdentifier<Guid>, IPrimaryKey
+    public partial class EmergencyContact : EntityBase<EmergencyContact>, IIdentifier<Guid>
     {
         private Guid _id;
         private string? _firstName;
@@ -65,18 +65,6 @@ namespace My.Hr.Business.Entities
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public RefDataNamespace.RelationshipType? Relationship { get => _relationshipSid; set => SetValue(ref _relationshipSid, value); }
-
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="CompositeKey"/>.</returns>
-        /// <param name="id">The <see cref="Id"/>.</param>
-        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
-
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
-        /// </summary>
-        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

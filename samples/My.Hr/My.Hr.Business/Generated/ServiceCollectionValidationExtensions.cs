@@ -24,10 +24,10 @@ namespace My.Hr.Business
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedValidationServices(this IServiceCollection services)
         {
-            return services.AddScoped<IValidator<Employee>, EmployeeValidator>()
-                           .AddScoped<IValidator<EmployeeArgs>, EmployeeArgsValidator>()
-                           .AddScoped<IValidator<TerminationDetail>, TerminationDetailValidator>()
-                           .AddScoped<IValidator<PerformanceReview>, PerformanceReviewValidator>();
+            return services.AddScoped<IValidatorEx<Employee>, EmployeeValidator>()
+                           .AddScoped<IValidatorEx<EmployeeArgs>, EmployeeArgsValidator>()
+                           .AddScoped<IValidatorEx<TerminationDetail>, TerminationDetailValidator>()
+                           .AddScoped<IValidatorEx<PerformanceReview>, PerformanceReviewValidator>();
         }
     }
 }

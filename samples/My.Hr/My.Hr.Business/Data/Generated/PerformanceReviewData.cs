@@ -9,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Business;
+using CoreEx;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
-using Beef.Entities;
-using Beef.Events;
+using CoreEx.Entities;
+using CoreEx.Events;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using My.Hr.Business.Entities;
@@ -41,7 +42,7 @@ namespace My.Hr.Business.Data
         /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         public PerformanceReviewData(IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
-            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); PerformanceReviewDataCtor(); }
+            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -49,63 +50,68 @@ namespace My.Hr.Business.Data
         /// Gets the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             return await _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
         {
             PerformanceReviewCollectionResult __result = new PerformanceReviewCollectionResult(paging);
             var __dataArgs = EfDbArgs.Create(_mapper, __result.Paging!);
-            __result.Result = _ef.Query<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, __dataArgs) ?? q).SelectQuery<PerformanceReviewCollection>();
+            __result.Collection = _ef.Query<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, __dataArgs) ?? q).SelectQuery<PerformanceReviewCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "created");
+            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Create"));
             return __result;
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"my.hr.performancereview", "updated");
+            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Update"));
             return __result;
-        });
+        }, cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
         {
             var __dataArgs = EfDbArgs.Create(_mapper);
             await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.PublishValue(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{_evtPub.FormatKey(id)}", UriKind.Relative), $"my.hr.performancereview", "deleted", id);
-        });
+            _evtPub.Publish(EventData.Create(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Delete"));
+        }, cancellationToken);
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> <i>AutoMapper</i> mapping.
