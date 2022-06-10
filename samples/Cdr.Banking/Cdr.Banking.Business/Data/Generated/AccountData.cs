@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
 using Beef.Data.Cosmos;
@@ -18,6 +17,7 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Cdr.Banking.Common.Entities;
+using Mac = Microsoft.Azure.Cosmos;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business.Data
@@ -52,7 +52,7 @@ namespace Cdr.Banking.Business.Data
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             AccountCollectionResult __result = new AccountCollectionResult(paging);
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", __result.Paging!, Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             __result.Result = _cosmos.Container<Account, Model.Account>(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });
@@ -64,7 +64,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             return await _cosmos.Container<AccountDetail, Model.Account>(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
         });
 

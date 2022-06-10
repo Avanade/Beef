@@ -161,7 +161,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The command-line arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
-        public async Task<int> RunAsync(string? args = null) => await RunAsync(OnRamp.Console.CodeGenConsole.SplitArgumentsIntoArray(args)).ConfigureAwait(false);
+        public Task<int> RunAsync(string? args = null) => RunAsync(OnRamp.Console.CodeGenConsole.SplitArgumentsIntoArray(args));
 
         /// <summary>
         /// Runs the code generation using the passed <paramref name="args"/> array.

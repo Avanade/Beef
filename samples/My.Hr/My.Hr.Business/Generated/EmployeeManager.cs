@@ -41,26 +41,26 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public async Task<Employee?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public async Task<Employee> CreateAsync(Employee value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             Cleaner.CleanUp(value);
             await value.Validate().Entity().With<IValidator<Employee>>().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -68,7 +68,7 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public async Task<Employee> UpdateAsync(Employee value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -76,18 +76,18 @@ namespace My.Hr.Business
             Cleaner.CleanUp(value);
             await value.Validate().Entity().With<IValidator<Employee>>().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public async Task DeleteAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).RunAsync(throwOnError: true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -95,12 +95,12 @@ namespace My.Hr.Business
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public async Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await args.Validate(nameof(args)).Entity().With<IValidator<EmployeeArgs>>().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
@@ -108,14 +108,14 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public async Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
             Cleaner.CleanUp(value, id);
             await value.Validate().Entity().With<IValidator<TerminationDetail>>().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.TerminateAsync(value, id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
     }
 }
 

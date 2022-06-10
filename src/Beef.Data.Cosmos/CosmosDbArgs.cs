@@ -40,7 +40,7 @@ namespace Beef.Data.Cosmos
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         /// <param name="onCreate">Optional action to perform additional processing.</param>
         /// <returns>The <see cref="CosmosDbArgs"/>.</returns>
-        public static CosmosDbArgs Create(IMapper mapper, string containerId, PagingArgs paging, PartitionKey? partitionKey, QueryRequestOptions? requestOptions = null, Action<CosmosDbArgs>? onCreate = null)
+        public static CosmosDbArgs Create(IMapper mapper, string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<CosmosDbArgs>? onCreate = null)
         {
             var dbArgs = new CosmosDbArgs(mapper, containerId, paging, partitionKey, requestOptions);
             onCreate?.Invoke(dbArgs);
@@ -57,7 +57,7 @@ namespace Beef.Data.Cosmos
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         /// <param name="onCreate">Optional action to perform additional processing.</param>
         /// <returns>The <see cref="CosmosDbArgs"/>.</returns>
-        public static CosmosDbArgs Create(IMapper mapper, string containerId, PagingResult paging, PartitionKey? partitionKey, QueryRequestOptions? requestOptions = null, Action<CosmosDbArgs>? onCreate = null)
+        public static CosmosDbArgs Create(IMapper mapper, string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<CosmosDbArgs>? onCreate = null)
         {
             var dbArgs = new CosmosDbArgs(mapper, containerId, paging, partitionKey, requestOptions);
             onCreate?.Invoke(dbArgs);

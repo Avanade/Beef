@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
 using Beef.Data.Cosmos;
@@ -18,6 +17,7 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Beef.Demo.Common.Entities;
+using Mac = Microsoft.Azure.Cosmos;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.Data
@@ -50,7 +50,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
         public Task<Robot?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).GetAsync(id).ConfigureAwait(false);
         });
 
@@ -61,7 +61,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
@@ -72,7 +72,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             return await _cosmos.Container<Robot, Model.Robot>(__dataArgs).UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
         });
 
@@ -82,7 +82,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             await _cosmos.Container<Robot, Model.Robot>(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
         });
 
@@ -95,7 +95,7 @@ namespace Beef.Demo.Business.Data
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             RobotCollectionResult __result = new RobotCollectionResult(paging);
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Items", __result.Paging!, Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
             __result.Result = _cosmos.Container<Robot, Model.Robot>(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });

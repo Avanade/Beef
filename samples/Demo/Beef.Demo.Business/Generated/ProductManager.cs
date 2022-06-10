@@ -41,12 +41,12 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> where found.</returns>
-        public async Task<Product?> GetAsync(int id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Product?> GetAsync(int id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
@@ -54,12 +54,12 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
-        public async Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await args.Validate(nameof(args)).Entity().With<IValidator<ProductArgs>>().RunAsync(throwOnError: true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
     }
 }
 

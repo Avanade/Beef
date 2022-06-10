@@ -2,7 +2,10 @@
 
 Represents the **NuGet** versions.
 
-## v4.2.15
+## v4.2.5
+- *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `DatabaseConsole`.
+
+## v4.2.4
 - *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
 
 ## v4.2.3
