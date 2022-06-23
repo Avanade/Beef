@@ -590,7 +590,7 @@ entities:
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             HttpAgentName = DefaultWhereNull(HttpAgentName, () => "IHttpAgent");
-            JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
+            JsonSerializer = DefaultWhereNull(JsonSerializer, () => "SystemText");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter<T>");
 

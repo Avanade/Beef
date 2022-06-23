@@ -9,7 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Beef.Data.Database;
+using CoreEx.Database;
+using CoreEx.Database.SqlServer;
 using {{#ifeq EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities;
 
 namespace {{Root.NamespaceBusiness}}.Data
@@ -21,9 +22,10 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// <summary>
             /// Creates a <see cref="TableValuedParameter"/> for the <paramref name="list"/>.
             /// </summary>
+            /// <param name="database">The <see cref="IDatabase"/>.</param>
             /// <param name="list">The entity list.</param>
             /// <returns>The Table-Valued Parameter.</returns>
-            public TableValuedParameter CreateTableValuedParameter(IEnumerable<{{Tvp}}> list)
+            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<{{Tvp}}> list)
             {        
                 var dt = new DataTable();
 {{#each UdtColumns}}
@@ -31,7 +33,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 {{/each}}
 
                 var tvp = new TableValuedParameter("[{{Schema}}].[udt{{Name}}List]", dt);
-                AddToTableValuedParameter(tvp, list);
+                tvp.AddRows(database, this, list);
                 return tvp;
             }
         }

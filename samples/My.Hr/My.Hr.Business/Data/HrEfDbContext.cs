@@ -1,8 +1,8 @@
-﻿using Beef;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
+﻿using CoreEx.Database;
+using CoreEx.EntityFrameworkCore;
 using My.Hr.Business.Data.EfModel;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace My.Hr.Business.Data
 {
@@ -15,8 +15,8 @@ namespace My.Hr.Business.Data
         /// Initializes a new instance of the <see cref="HrEfDbContext"/> class.
         /// </summary>
         /// <param name="options">The <see cref="DbContextOptions{HrEfDbContext}"/>.</param>
-        /// <param name="db">The base <see cref="IDatabase"/>.</param>
-        public HrEfDbContext(DbContextOptions<HrEfDbContext> options, IDatabase db) : base(options) => BaseDatabase = Check.NotNull(db, nameof(db));
+        /// <param name="db">The base <see cref="HrDb"/>.</param>
+        public HrEfDbContext(DbContextOptions<HrEfDbContext> options, IDatabase db) : base(options) => BaseDatabase = db ?? throw new ArgumentNullException(nameof(db));
 
         /// <summary>
         /// Gets the base <see cref="IDatabase"/>.

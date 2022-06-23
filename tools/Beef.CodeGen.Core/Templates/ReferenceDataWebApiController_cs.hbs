@@ -12,10 +12,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.RefData;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
+using CoreEx.RefData;
 using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -34,6 +34,15 @@ namespace {{Root.NamespaceApi}}.Controllers
 {{/ifval}}
     public partial class ReferenceDataController : ControllerBase
     {
+        private readonly ReferenceDataContentWebApi _webApi;
+        private readonly ReferenceDataOrchestrator _orchestrator;
+
+        public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
+        {
+            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
+            _orchestrator = orchestrator ?? throw new ArgumentNullException(nameof(orchestrator));
+        }
+
 {{#each RefDataEntities}}
         /// <summary> 
         /// Gets all of the {{see-comments RefDataQualifiedEntityName}} reference data items that match the specified criteria.
@@ -49,10 +58,8 @@ namespace {{Root.NamespaceApi}}.Controllers
         [Route("{{WebApiRoutePrefix}}")]
   {{/ifval}}
         [ProducesResponseType(typeof(IEnumerable<{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult {{Name}}GetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<{{RefDataQualifiedEntityName}}>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> {{Name}}GetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<{{RefDataQualifiedEntityName}}>(codes, text, p.RequestOptions.IncludeInactive));
 
 {{/each}}
         /// <summary>
@@ -65,31 +72,7 @@ namespace {{Root.NamespaceApi}}.Controllers
         [HttpGet()]
         [Route("{{RefDataWebApiRoute}}")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetNamed()
-        {
-            return new WebApiGet<ReferenceDataMultiCollection>(this, async () =>
-            {
-                var coll = new ReferenceDataMultiCollection();
-                var inactive = this.IncludeInactive();
-                var refSelection = this.ReferenceDataSelection();
-
-                var names = refSelection.Select(x => x.Key).ToArray();
-                await {{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.PrefetchAsync(names).ConfigureAwait(false);
-
-                foreach (var q in refSelection)
-                {
-                    switch (q.Key)
-                    {
-{{#each RefDataEntities}}
-                        case var s when string.Compare(s, nameof({{RefDataQualifiedEntityName}}), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof({{RefDataQualifiedEntityName}}), await ReferenceDataFilterer.ApplyFilterAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>({{#ifval Root.RefDataNamespace}}RefDataNamespace.{{else}}RefDataBusNamespace.{{/ifval}}ReferenceData.Current.{{Name}}, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-{{/each}}
-                    }
-                }
-                
-                return coll;
-            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
+        public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }
 

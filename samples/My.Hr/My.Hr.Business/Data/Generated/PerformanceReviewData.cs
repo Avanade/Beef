@@ -11,14 +11,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Business;
 using CoreEx;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
+using CoreEx.Business;
+using CoreEx.Database;
+using CoreEx.Database.Mapping;
+using CoreEx.EntityFrameworkCore;
 using CoreEx.Entities;
 using CoreEx.Events;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -30,7 +31,6 @@ namespace My.Hr.Business.Data
     public partial class PerformanceReviewData : IPerformanceReviewData
     {
         private readonly IEfDb _ef;
-        private readonly AutoMapper.IMapper _mapper;
         private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.PerformanceReview>, Guid, EfDbArgs, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
@@ -39,10 +39,9 @@ namespace My.Hr.Business.Data
         /// Initializes a new instance of the <see cref="PerformanceReviewData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public PerformanceReviewData(IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); PerformanceReviewDataCtor(); }
+        public PerformanceReviewData(IEfDb ef, IEventPublisher evtPub)
+            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -52,10 +51,9 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            return await _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
+            return _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id), ct);
         }, cancellationToken);
 
         /// <summary>
@@ -65,12 +63,9 @@ namespace My.Hr.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct =>
         {
-            PerformanceReviewCollectionResult __result = new PerformanceReviewCollectionResult(paging);
-            var __dataArgs = EfDbArgs.Create(_mapper, __result.Paging!);
-            __result.Collection = _ef.Query<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, __dataArgs) ?? q).SelectQuery<PerformanceReviewCollection>();
-            return await Task.FromResult(__result).ConfigureAwait(false);
+            return _ef.SelectResultQueryAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview, EfModel.PerformanceReview>(paging, (q, da) => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, da) ?? q, ct);
         }, cancellationToken);
 
         /// <summary>
@@ -79,13 +74,12 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Create"));
             return __result;
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
@@ -93,25 +87,23 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Update"));
             return __result;
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => _ef.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(__dataArgs, id).ConfigureAwait(false);
+            await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id), ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Delete"));
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> <i>AutoMapper</i> mapping.
@@ -130,7 +122,7 @@ namespace My.Hr.Business.Data
                 s2d.ForMember(d => d.PerformanceOutcomeCode, o => o.MapFrom(s => s.OutcomeSid));
                 s2d.ForMember(d => d.Reviewer, o => o.MapFrom(s => s.Reviewer));
                 s2d.ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToDest, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToDestination, s => s.ETag));
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
                 s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
                 s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
@@ -143,7 +135,7 @@ namespace My.Hr.Business.Data
                 d2s.ForMember(s => s.OutcomeSid, o => o.MapFrom(d => d.PerformanceOutcomeCode));
                 d2s.ForMember(s => s.Reviewer, o => o.MapFrom(d => d.Reviewer));
                 d2s.ForMember(s => s.Notes, o => o.MapFrom(d => d.Notes));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
                 d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
                 d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedDate));
                 d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedBy));

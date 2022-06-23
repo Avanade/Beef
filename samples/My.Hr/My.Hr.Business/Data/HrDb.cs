@@ -1,24 +1,25 @@
-﻿using Beef.Data.Database;
+﻿using CoreEx.Database.SqlServer;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace My.Hr.Business.Data
 {
     /// <summary>
     /// Represents the <b>My.Hr</b> database.
     /// </summary>
-    public class HrDb : DatabaseBase
+    public class HrDb : SqlServerDatabase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HrDb"/> class.
         /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        /// <param name="provider">The optional data provider.</param>
-        public HrDb(string connectionString, DbProviderFactory? provider = null) : base(connectionString, provider, new SqlRetryDatabaseInvoker()) { }
+        public HrDb(Func<SqlConnection> create, ILogger<HrDb>? logger = null) : base(create, logger) { }
 
-        /// <summary>
-        /// Set the SQL Session Context when the connection is opened.
-        /// </summary>
-        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        public override void OnConnectionOpen(DbConnection dbConnection) => SetSqlSessionContext(dbConnection);
+        /// <inheritdoc/>
+        protected override Task OnConnectionOpenAsync(DbConnection connection, CancellationToken cancellationToken)
+            => SetSqlSessionContextAsync(cancellationToken: cancellationToken);
     }
 }

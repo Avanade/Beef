@@ -4,10 +4,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.AutoMapper\CoreEx.AutoMapper.csproj" />
+    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.Database\CoreEx.Database.csproj" />
+    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.EntityFrameworkCore\CoreEx.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.Validation\CoreEx.Validation.csproj" />
     <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx\CoreEx.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.EntityFrameworkCore\Beef.Data.EntityFrameworkCore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataSvc\" />

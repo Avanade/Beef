@@ -8,13 +8,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using CoreEx.Business;
+using CoreEx.Database;
+using CoreEx.EntityFrameworkCore;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using CoreEx;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
@@ -22,75 +23,38 @@ namespace My.Hr.Business.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    public partial class ReferenceDataData : IReferenceDataData
+    internal partial class ReferenceDataData : IReferenceDataData
     {
         private readonly IEfDb _ef;
-        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        public ReferenceDataData(IEfDb ef, AutoMapper.IMapper mapper)
-            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
+        public ReferenceDataData(IEfDb ef)
+            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); ReferenceDataDataCtor(); }
 
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
-        public async Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.GenderCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.Gender, EfModel.Gender>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.GenderCollection> GenderGetAllAsync(CancellationToken cancellationToken = default)
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.Gender, EfModel.Gender>().SelectQueryAsync<RefDataNamespace.GenderCollection>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TerminationReason"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.TerminationReasonCollection"/>.</returns>
-        public async Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.TerminationReasonCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync(CancellationToken cancellationToken = default)
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>().SelectQueryAsync<RefDataNamespace.TerminationReasonCollection>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.RelationshipType"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.RelationshipTypeCollection"/>.</returns>
-        public async Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.RelationshipTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync(CancellationToken cancellationToken = default)
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>().SelectQueryAsync<RefDataNamespace.RelationshipTypeCollection>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.USState"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
-        public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.USStateCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.USState, EfModel.USState>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.USStateCollection> USStateGetAllAsync(CancellationToken cancellationToken = default)
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.USState, EfModel.USState>().SelectQueryAsync<RefDataNamespace.USStateCollection>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.PerformanceOutcome"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
-        public async Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.PerformanceOutcomeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync(CancellationToken cancellationToken = default)
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>().SelectQueryAsync<RefDataNamespace.PerformanceOutcomeCollection>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.Gender"/> and Entity Framework <see cref="EfModel.Gender"/> <i>AutoMapper</i> mapping.
@@ -104,11 +68,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.Gender, RefDataNamespace.Gender>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.GenderId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 GenderMapperProfileCtor(d2s);
             }
@@ -128,11 +88,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.TerminationReason, RefDataNamespace.TerminationReason>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.TerminationReasonId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 TerminationReasonMapperProfileCtor(d2s);
             }
@@ -152,11 +108,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.RelationshipType, RefDataNamespace.RelationshipType>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.RelationshipTypeId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 RelationshipTypeMapperProfileCtor(d2s);
             }
@@ -176,11 +128,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.USState, RefDataNamespace.USState>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.USStateId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 USStateMapperProfileCtor(d2s);
             }
@@ -200,11 +148,7 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceOutcomeId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 PerformanceOutcomeMapperProfileCtor(d2s);
             }

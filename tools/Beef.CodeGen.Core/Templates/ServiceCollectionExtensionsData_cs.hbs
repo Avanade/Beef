@@ -22,7 +22,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         public static IServiceCollection AddGenerated{{#if IsRefData}}ReferenceData{{/if}}DataServices(this IServiceCollection services)
         {
 {{#if IsRefData}}
-            return services.AddTransient<IReferenceDataData, ReferenceDataData>(){{#ifeq IDataEntities.Count 0}};{{/ifeq}}
+            return services.AddScoped<IReferenceDataData, ReferenceDataData>(){{#ifeq IDataEntities.Count 0}};{{/ifeq}}
 {{/if}}
 {{#each IDataEntities}}
             {{#if @first}}{{#if Root.IsRefData}}               {{else}}return services{{/if}}{{else}}               {{/if}}.AddScoped<I{{Name}}Data{{#if GenericWithT}}<T>{{/if}}, {{Name}}Data{{#if GenericWithT}}<T>{{/if}}>(){{#if @last}};{{/if}}

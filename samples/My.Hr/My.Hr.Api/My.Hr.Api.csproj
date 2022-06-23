@@ -10,14 +10,11 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
     <ProjectReference Include="..\My.Hr.Business\My.Hr.Business.csproj" />
     <ProjectReference Include="..\My.Hr.Common\My.Hr.Common.csproj" />
   </ItemGroup>

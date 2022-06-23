@@ -648,13 +648,13 @@ entities:
         public string? EventCasing { get; set; }
 
         /// <summary>
-        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated whereever generating event publishing logic.
         /// </summary>
         [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+        [CodeGenProperty("Events", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated whereever generating event publishing logic.", IsImportant = true,
             Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
                 "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
-                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.")]
+                "Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where a transactionally-aware data source is being used.")]
         public bool? EventTransaction { get; set; }
 
         #endregion
@@ -1212,11 +1212,6 @@ entities:
         public bool UsesHttpAgent => AutoImplement == "HttpAgent" || HttpAgentModel != null || Operations!.Any(x => x.AutoImplement == "HttpAgent");
 
         /// <summary>
-        /// Indicates whether AutoMapper is being used.
-        /// </summary>
-        public bool UsesAutoMapper { get; set; }
-
-        /// <summary>
         /// Indicates whether the data extensions section is required.
         /// </summary>
         public bool DataExtensionsRequired => HasDataExtensions || UsesCosmos || DataOperations!.Any(x => x.Type == "GetColl");
@@ -1606,12 +1601,6 @@ entities:
 
             if (UsesHttpAgent)
                 DataCtorParameters.Add(new ParameterConfig { Name = "HttpAgent", Type = HttpAgentName, Text = $"{{{{{HttpAgentName}}}}}" });
-
-            if (UsesEntityFramework || UsesCosmos || UsesOData || UsesHttpAgent)
-            { 
-                DataCtorParameters.Add(new ParameterConfig { Name = "Mapper", Type = "AutoMapper.IMapper", Text = $"{{{{AutoMapper.IMapper}}}}" });
-                UsesAutoMapper = true;
-            }
 
             if (SupportsDataEvents)
                 DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });

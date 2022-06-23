@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
 using CoreEx.RefData;
-using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Entities
@@ -48,6 +48,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the <see cref="State"/> using the underlying Serialization Identifier (SID).
         /// </summary>
+        [JsonPropertyName("state")]
         public string? StateSid { get => _stateSid; set => SetValue(ref _stateSid, value); }
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public RefDataNamespace.USState? State { get => _stateSid; set => SetValue(ref _stateSid, value); }
 
         /// <summary>

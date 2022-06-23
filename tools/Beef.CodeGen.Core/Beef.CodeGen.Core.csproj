@@ -80,12 +80,10 @@
     <None Remove="Templates\ReferenceDataData_cs.hbs" />
     <None Remove="Templates\ReferenceDataIDataSvc_cs.hbs" />
     <None Remove="Templates\ReferenceDataIData_cs.hbs" />
-    <None Remove="Templates\ReferenceDataI_cs.hbs" />
     <None Remove="Templates\ReferenceDataProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgent_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiController_cs.hbs" />
-    <None Remove="Templates\ReferenceData_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsData_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
@@ -147,9 +145,7 @@
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiController_cs.hbs" />
-    <EmbeddedResource Include="Templates\ReferenceDataI_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />
-    <EmbeddedResource Include="Templates\ReferenceData_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityWebApiAgentArgs_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsValidation_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.hbs" />

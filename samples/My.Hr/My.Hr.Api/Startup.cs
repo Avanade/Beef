@@ -1,15 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Azure.Messaging.EventHubs.Producer;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Caching.Policy;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
-using Beef.Entities;
-using Beef.Events.EventHubs;
-using Beef.Validation;
+//using Azure.Messaging.EventHubs.Producer;
+//using Beef;
+//using Beef.Data.Database;
+//using Beef.Data.EntityFrameworkCore;
+//using Beef.Events.EventHubs;
+//using Beef.AspNetCore.WebApi;
+using CoreEx.Entities;
+using CoreEx.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +17,9 @@ using Microsoft.OpenApi.Models;
 using My.Hr.Business;
 using My.Hr.Business.Data;
 using My.Hr.Business.DataSvc;
+using CoreEx.RefData;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Data.SqlClient;
 
 namespace My.Hr.Api
 {
@@ -34,7 +36,7 @@ namespace My.Hr.Api
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         public Startup(IConfiguration config)
         {
-            _config = Check.NotNull(config, nameof(config));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
 
             // Use JSON property names in validation and default the page size.
             ValidationArgs.DefaultUseJsonNames = true;
@@ -51,19 +53,27 @@ namespace My.Hr.Api
                 throw new ArgumentNullException(nameof(services));
 
             // Add the core beef services.
-            services.AddBeefExecutionContext()
-                    .AddBeefTextProviderAsSingleton()
-                    .AddBeefSystemTime()
-                    .AddBeefRequestCache()
-                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
-                    .AddBeefWebApiServices()
-                    .AddBeefBusinessServices();
+            services.AddSettings<HrSettings>()
+                    .AddExecutionContext()
+                    .AddJsonSerializer()
+                    .AddReferenceDataOrchestrator(sp => new ReferenceDataOrchestrator(sp, new MemoryCache(new MemoryCacheOptions())).Register<IReferenceDataProvider>())
+                    //.AddBeefTextProviderAsSingleton()
+                    //.AddBeefSystemTime()
+                    //.AddBeefRequestCache()
+                    //.AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                    //.AddBeefWebApiServices()
+                    //.AddBeefBusinessServices()
+                    .AddWebApi()
+                    .AddReferenceDataContentWebApi()
+                    .AddRequestCache();
 
             // Add the beef database services (scoped per request/connection).
-            services.AddBeefDatabaseServices(() => new HrDb(WebApiStartup.GetConnectionString(_config, "Database")));
+            //services.AddBeefDatabaseServices(() => new HrDb(Beef.AspNetCore.WebApi.WebApiStartup.GetConnectionString(_config, "Database")));
+            services.AddDatabase(sp => new HrDb(() => new SqlConnection(sp.GetRequiredService<HrSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<HrDb>>()));
 
             // Add the beef entity framework services (scoped per request/connection).
-            services.AddBeefEntityFrameworkServices<HrEfDbContext, HrEfDb>();
+            services.AddDbContext<HrEfDbContext>();
+            services.AddEfDb<HrEfDb>();
 
             // Add the generated reference data services.
             services.AddGeneratedReferenceDataManagerServices()
@@ -77,21 +87,23 @@ namespace My.Hr.Api
                     .AddGeneratedDataServices();
 
             // Add event publishing services.
-            var ehcs = _config.GetValue<string>("EventHubConnectionString");
-            if (!string.IsNullOrEmpty(ehcs))
-                services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
-            else
-                services.AddBeefNullEventPublisher();
+            //var ehcs = _config.GetValue<string>("EventHubConnectionString");
+            //if (!string.IsNullOrEmpty(ehcs))
+            //    services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
+            //else
+            //    services.AddBeefNullEventPublisher();
+            services.AddNullEventPublisher();
 
             // Add transactional event outbox services.
-            services.AddGeneratedDatabaseEventOutbox();
-            services.AddBeefDatabaseEventOutboxPublisherService();
+            //services.AddGeneratedDatabaseEventOutbox();
+            //services.AddBeefDatabaseEventOutboxPublisherService();
 
             // Add AutoMapper services via Assembly-based probing for Profiles.
-            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(EmployeeData).Assembly);
+            services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(EmployeeData).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
+            services.AddAutoMapperWrapper();
 
             // Add additional services; note Beef requires NewtonsoftJson.
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers(); //.AddNewtonsoftJson();
             services.AddHealthChecks();
             services.AddHttpClient();
 
@@ -113,17 +125,19 @@ namespace My.Hr.Api
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
-        public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
+        //public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
+        public void Configure(IApplicationBuilder app)
         {
             // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
+            //app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My.Hr"));
 
             // Add execution context set up to the pipeline.
-            app.UseExecutionContext();
+            // TODO: add this back a bit later on.
+            // app.UseExecutionContext();
 
             // Add health checks.
             app.UseHealthChecks("/health");

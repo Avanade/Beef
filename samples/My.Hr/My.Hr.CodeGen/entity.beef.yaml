@@ -18,7 +18,8 @@ eventActionFormat: PastTense
 eventCasing: Lower
 eventSourceRoot: My/Hr
 eventSourceKind: Relative
-eventOutbox: Database
+eventTransaction: true
+eventPublish: Data
 appBasedAgentArgs: true
 webApiAutoLocation: true
 webApiRoutePrefix: api

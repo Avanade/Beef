@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
 using CoreEx.RefData;
-using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Entities
@@ -57,6 +57,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the <see cref="Gender"/> using the underlying Serialization Identifier (SID).
         /// </summary>
+        [JsonPropertyName("gender")]
         public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value); }
 
         /// <summary>
@@ -68,6 +69,7 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public RefDataNamespace.Gender? Gender { get => _genderSid; set => SetValue(ref _genderSid, value); }
 
         /// <summary>

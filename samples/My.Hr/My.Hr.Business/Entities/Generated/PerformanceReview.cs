@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
 using CoreEx.RefData;
-using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Entities
@@ -51,6 +51,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the <see cref="Outcome"/> using the underlying Serialization Identifier (SID).
         /// </summary>
+        [JsonPropertyName("outcome")]
         public string? OutcomeSid { get => _outcomeSid; set => SetValue(ref _outcomeSid, value); }
 
         /// <summary>
@@ -62,6 +63,7 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public RefDataNamespace.PerformanceOutcome? Outcome { get => _outcomeSid; set => SetValue(ref _outcomeSid, value); }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag")]
+        [JsonPropertyName("etag")]
         public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
 
         /// <summary>

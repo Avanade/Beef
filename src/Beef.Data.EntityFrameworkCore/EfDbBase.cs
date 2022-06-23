@@ -2,7 +2,7 @@
 
 using Beef.Data.Database;
 using Beef.Mapper;
-using CoreEx.Entities;
+using Beef.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;

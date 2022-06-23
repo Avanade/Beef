@@ -13,7 +13,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 {{#ifeq JsonSerializer 'SystemText'}}
-using System.Text;
+using System.Text.Json.Serialization;
 {{/ifeq}}
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
@@ -87,6 +87,12 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
+      {{else}}
+        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{ArgumentName}}")]
+        {{else}}
+        [JsonPropertyName("{{ArgumentName}}")]
+        {{/ifeq}}
       {{/ifval}}
     {{/if}}
     {{#ifval DisplayName}}
@@ -116,6 +122,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// {{{SummaryText}}}
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
     {{/ifval}}

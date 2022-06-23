@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -22,7 +23,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    public partial interface IReferenceDataData
+    internal partial interface IReferenceDataData
     {
 {{#each RefDataEntities}}
   {{#unless @first}}
@@ -31,8 +32,9 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <summary>
         /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
         /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
-        Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync();
+        Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync(CancellationToken cancellationToken = default);
 {{/each}}
     }
 }

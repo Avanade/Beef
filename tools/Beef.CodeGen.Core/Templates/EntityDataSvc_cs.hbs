@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Business;
 using CoreEx;
+using CoreEx.Business;
 {{#if DataSvcCaching}}
 using CoreEx.Caching;
 {{/if}}
@@ -94,7 +94,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, __ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{ArgumentName}}, {{/each}}__ct){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}, cancellationToken);{{else}}DataSvcInvoker.Current.InvokeAsync(this, async __ct =>{{/if}}
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, __ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{ArgumentName}}, {{/each}}__ct){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}, cancellationToken);{{else}}DataSvcInvoker.Current.InvokeAsync(this, async __ct =>{{/if}}
   {{#unless DataSvcCustom}}
         {
     {{#if SupportsCaching}}
@@ -111,15 +111,14 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     {{#ifeq EventPublish 'DataSvc'}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
-            await _evtPub.Publish{{#ifval Value}}Value{{/ifval}}({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{#ifval RefDataType}}.Code{{/ifval}}{{/each}}).SendAsync().ConfigureAwait(false);
+            _evtPub.Publish{{#ifval Value}}Value{{/ifval}}({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{#ifval RefDataType}}.Code{{/ifval}}{{/each}});
         {{/each}}
       {{else}}
         {{#ifeq Events.Count 0}}
-            await _evtPub.SendAsync().ConfigureAwait(false);
         {{else}}
-            await _evtPub.Publish(
+            _evtPub.Publish(
           {{#each Events}}
-                _evtPub.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{#ifval RefDataType}}.Code{{/ifval}}{{/each}}){{#if @last}}).SendAsync().ConfigureAwait(false);{{else}},{{/if}}
+                _evtPub.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{#ifval RefDataType}}.Code{{/ifval}}{{/each}}){{#if @last}});{{else}},{{/if}}
             {{#if @last}}
 
             {{/if}}
@@ -138,7 +137,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
             return __result;
       {{/if}}
     {{/if}}
-        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}, cancellationToken);
+        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}, cancellationToken);
   {{/unless}}
 {{/each}}
     }

@@ -624,6 +624,11 @@ operations: [
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
 
         /// <summary>
+        /// Gets the parameter that is <see cref="ParameterConfig.IsPagingArgs"/>.
+        /// </summary>
+        public ParameterConfig? PagingParameter => Parameters!.Where(x => x.IsPagingArgs).FirstOrDefault();
+
+        /// <summary>
         /// Indicates whether any parameters exist with WebApiFrom contain "FromEntityProperties".
         /// </summary>
         public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
@@ -783,21 +788,6 @@ operations: [
         /// Indicates whether any of the operations will raise an event within the Data-layer.
         /// </summary>
         public bool HasDataEvents => EventPublish == "Data";
-
-        /// <summary>
-        /// Gets or sets the DataInvoker code.
-        /// </summary>
-        public string DataInvoker { get; set; } = "DataInvoker.Current";
-
-        /// <summary>
-        /// Gets or sets the DataInvokerArgs code.
-        /// </summary>
-        public string DataInvokerArgs { get; set; } = "BusinessInvokerArgs";
-
-        /// <summary>
-        /// Indicates whether a send as well as a publish should occur.
-        /// </summary>
-        public bool DataEventSend { get; set; } = true;
 
         /// <summary>
         /// Indicates whether the HTTP Agent operation requires a mapper.
@@ -967,6 +957,7 @@ operations: [
                 _ => null
             });
 
+            DataTransaction = DefaultWhereNull(DataTransaction, () => CompareValue(EventPublish, "Data") && CompareValue(Parent!.EventTransaction, true));
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeAll = DefaultWhereNull(ExcludeAll, () => false);
@@ -1128,64 +1119,33 @@ operations: [
                 case "Database":
                     DataArgs.Name = "_db";
                     DataArgs.Type = "IDatabaseArgs";
-
-                    if (EventOutbox != "None" && EventOutbox != "Database")
-                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Database' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
-
                     break;
 
                 case "EntityFramework":
                     DataArgs.Name = "_ef";
                     DataArgs.Type = "EfDbArgs";
-
-                    if (EventOutbox != "None" && EventOutbox != "Database")
-                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'EntityFramework' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
-
                     break;
 
                 case "Cosmos":
                     DataArgs.Name = "_cosmos";
                     DataArgs.Type = "CosmosDbArgs";
-
-                    if (EventOutbox != "None")
-                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'Cosmos' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
-
                     break;
 
                 case "OData":
                     DataArgs.Name = "_odata";
                     DataArgs.Type = "ODataArgs";
-
-                    if (EventOutbox != "None")
-                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'OData' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
-
                     break;
 
                 case "HttpAgent":
                     DataArgs.Name = "_httpAgent";
                     DataArgs.Type = null;
-
-                    if (EventOutbox != "None")
-                        throw new CodeGenException(this, nameof(EventOutbox), $"An Operation.AutoImplement (or Entity.AutoImplement) of 'HttpAgent' is at odds with the EventOutbox persistence of '{EventOutbox}'.");
-
                     break;
 
                 default:
-                    if (EventPublish == "Data")
-                        throw new CodeGenException(this, nameof(EventPublish), "Unable to determine the EventOutbox 'Data' repository as both the Operation.AutoImplement and Entity.AutoImplement are set to 'None'; at least one of these must be set.");
-
                     break;
             }
 
             await DataArgs.PrepareAsync(Root!, this).ConfigureAwait(false);
-
-            if (EventOutbox != "None")
-            {
-                DataInvoker = $"{(DataArgs.Name == "<internal>" ? "_db" : DataArgs.Name)}.EventOutboxInvoker";
-                DataInvokerArgs = "DatabaseEventOutboxInvokerArgs";
-                DataTransaction = false;
-                DataEventSend = false;
-            }
         }
 
         /// <summary>

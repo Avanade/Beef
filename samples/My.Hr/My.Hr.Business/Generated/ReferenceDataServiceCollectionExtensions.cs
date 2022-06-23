@@ -5,6 +5,7 @@
 #nullable enable
 #pragma warning disable
 
+using CoreEx.RefData;
 using Microsoft.Extensions.DependencyInjection;
 using My.Hr.Business.Entities;
 
@@ -21,9 +22,7 @@ namespace My.Hr.Business
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
-        {
-            return services.AddSingleton<IReferenceData, ReferenceDataProvider>();
-        }
+            => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>();
     }
 }
 

@@ -5,7 +5,7 @@
 #nullable enable
 #pragma warning disable
 
-using Beef.Validation;
+using CoreEx.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using My.Hr.Business.Entities;
 using My.Hr.Business.Validation;

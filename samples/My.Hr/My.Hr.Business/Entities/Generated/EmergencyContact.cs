@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
 using CoreEx.RefData;
-using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Entities
@@ -53,6 +53,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the <see cref="Relationship"/> using the underlying Serialization Identifier (SID).
         /// </summary>
+        [JsonPropertyName("relationship")]
         public string? RelationshipSid { get => _relationshipSid; set => SetValue(ref _relationshipSid, value); }
 
         /// <summary>
@@ -64,6 +65,7 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the Relationship (see <see cref="RefDataNamespace.RelationshipType"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public RefDataNamespace.RelationshipType? Relationship { get => _relationshipSid; set => SetValue(ref _relationshipSid, value); }
 
         /// <inheritdoc/>

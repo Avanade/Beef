@@ -8,12 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 {{#if RefData.UsesCosmos}}
 using Microsoft.Azure.Cosmos;
 {{/if}}
-using Beef;
-using Beef.Business;
+using CoreEx.Business;
 {{#if RefData.UsesCosmos}}
 using Beef.Data.Cosmos;
   {{#ifval Root.CosmosUsingNamespace}}
@@ -21,16 +21,16 @@ using {{Root.CosmosUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if RefData.UsesDatabase}}
-using Beef.Data.Database;
+using CoreEx.Data.Database;
   {{#ifval Root.DatabaseUsingNamespace}}
 using {{Root.DatabaseUsingNamespace}};
   {{/ifval}}
 {{/if}}
 {{#if RefData.UsesEntityFramework}}
   {{#unless RefData.UsesDatabase}}
-using Beef.Data.Database;
+using CoreEx.Database;
   {{/unless}}
-using Beef.Data.EntityFrameworkCore;
+using CoreEx.EntityFrameworkCore;
   {{#ifval Root.EntityFrameworkUsingNamespace}}
 using {{Root.EntityFrameworkUsingNamespace}};
   {{/ifval}}
@@ -41,8 +41,9 @@ using Beef.Data.OData;
 using {{Root.ODataUsingNamespace}};
   {{/ifval}}
 {{/if}}
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using CoreEx;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
@@ -55,7 +56,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    public partial class ReferenceDataData : IReferenceDataData
+    internal partial class ReferenceDataData : IReferenceDataData
     {
 {{#each RefData.DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
@@ -70,7 +71,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}ReferenceDataDataCtor(); }
+            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}})); {{/each}}ReferenceDataDataCtor(); }
 
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -78,15 +79,12 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#unless @first}}
 
   {{/unless}}
-        /// <summary>
-        /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
-        /// </summary>
-        /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
-        public async Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync()
+        /// <inheritdoc/>
+        public {{#ifeq AutoImplement 'Database'}}async {{/ifeq}}Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync(CancellationToken cancellationToken = default)
+  {{#ifeq AutoImplement 'Database'}}
         {
             var __coll = new {{RefDataQualifiedEntityCollectionName}}();
-  {{#ifeq AutoImplement 'Database'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => 
+            await DataInvoker.Current.InvokeAsync(this, async __ct => 
             {
                 await _db.GetRefDataAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>(__coll, "[{{DatabaseSchema}}].[sp{{Name}}GetAll]", "{{Name}}Id"{{#ifeq CoreProperties.Count 0}});{{else}}, additionalProperties: (dr, item, fields) =>{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
@@ -96,20 +94,20 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/each}}
                 });
     {{/ifne}}
-            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            }, BusinessInvokerArgs.TransactionSuppress, cancellationToken).ConfigureAwait(false);
 
-  {{/ifeq}}
-  {{#ifeq AutoImplement 'EntityFramework'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>(EfDbArgs.Create(_mapper)).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
-  {{/ifeq}}
-  {{#ifeq AutoImplement 'Cosmos'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-  {{/ifeq}}
-  {{#ifeq AutoImplement 'None'}}
-            await DataInvoker.Current.InvokeAsync(this, async () => await {{Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)).ConfigureAwait(false);
-  {{/ifeq}}
             return __coll;
         }
+  {{/ifeq}}
+  {{#ifeq AutoImplement 'EntityFramework'}}
+            => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>(ct), BusinessInvokerArgs.TransactionSuppress, cancellationToken);
+  {{/ifeq}}
+  {{#ifeq AutoImplement 'Cosmos'}}
+            await DataInvoker.Current.InvokeAsync(this, async _ => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, cancellationToken).ConfigureAwait(false);
+  {{/ifeq}}
+  {{#ifeq AutoImplement 'None'}}
+            await DataInvoker.Current.InvokeAsync(this, async ct => await {{Name}}GetAll_OnImplementationAsync(__coll, ct).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+  {{/ifeq}}
 {{/each}}
 {{#each RefDataEntities}}
   {{#ifeq AutoImplement 'EntityFramework'}}
@@ -130,11 +128,7 @@ namespace {{Root.NamespaceBusiness}}.Data
           {{#each CoreProperties}}
                 d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
           {{/each}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(DatabaseRowVersionConverter.Default.ToSrce, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
+                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 {{Name}}MapperProfileCtor(d2s);
             }

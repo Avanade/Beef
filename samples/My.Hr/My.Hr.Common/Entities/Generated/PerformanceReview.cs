@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
-using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
 {
@@ -56,7 +56,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("etag")]
+        [JsonPropertyName("etag")]
         public string? ETag { get; set; }
 
         /// <summary>

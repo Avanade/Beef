@@ -11,14 +11,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Business;
 using CoreEx;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
+using CoreEx.Business;
+using CoreEx.Database;
+using CoreEx.Database.Extended;
+using CoreEx.Database.Mapping;
+using CoreEx.EntityFrameworkCore;
 using CoreEx.Entities;
 using CoreEx.Events;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -31,7 +33,6 @@ namespace My.Hr.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
-        private readonly AutoMapper.IMapper _mapper;
         private readonly IEventPublisher _evtPub;
 
         private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, EfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
@@ -41,16 +42,9 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public EmployeeData(IDatabase db, IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
-        {
-            _db = db ?? throw new ArgumentNullException(nameof(db));
-            _ef = ef ?? throw new ArgumentNullException(nameof(ef));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub));
-            EmployeeDataCtor();
-        }
+        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher evtPub)
+            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); EmployeeDataCtor(); }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -60,7 +54,7 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, __ct => GetOnImplementationAsync(id, __ct), cancellationToken);
+        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct => GetOnImplementationAsync(id, ct), cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -68,12 +62,12 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Create"));
             return __result;
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -81,24 +75,23 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Update"));
             return __result;
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __dataArgs = DbMapper.Default.CreateArgs("[Hr].[spEmployeeDelete]");
-            await _db.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id), cancellationToken).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Delete"));
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -107,12 +100,9 @@ namespace My.Hr.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct =>
         {
-            EmployeeBaseCollectionResult __result = new EmployeeBaseCollectionResult(paging);
-            var __dataArgs = EfDbArgs.Create(_mapper, __result.Paging!);
-            __result.Collection = _ef.Query<EmployeeBase, EfModel.Employee>(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<EmployeeBaseCollection>();
-            return await Task.FromResult(__result).ConfigureAwait(false);
+            return _ef.SelectResultQueryAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase, EfModel.Employee>(paging, (q, da) => _getByArgsOnQuery?.Invoke(q, args, da) ?? q, ct);
         }, cancellationToken);
 
         /// <summary>
@@ -122,12 +112,12 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => _db.EventOutboxInvoker.InvokeAsync(this, async __ct =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
+            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id, ct).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
             return __result;
-        }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
 
         /// <summary>
         /// Provides the <see cref="Employee"/> property and database column mapping.
@@ -140,8 +130,9 @@ namespace My.Hr.Business.Data
             public DbMapper()
             {
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
-                Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
-                AddStandardProperties();
+                Property(s => s.Address, "AddressJson").SetConverter(new ObjectToJsonConverter<Address>());
+                Property(s => s.ETag, "RowVersion").SetConverter(new StringToBase64Converter());
+                Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
                 DbMapperCtor();
             }
             

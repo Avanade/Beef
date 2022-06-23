@@ -30,7 +30,7 @@ namespace My.Hr.Database
             IConfiguration config = builder.Build();
 
             // first try to get connection 
-            var connectionString = config.GetConnectionString("sqlserver:MyHr");
+            var connectionString = config.GetConnectionString("sqlserver:MyHr") ?? "Data Source =.; Initial Catalog = My.Hr; Integrated Security = True; TrustServerCertificate = true";
             System.Console.WriteLine(connectionString);
 
             return DatabaseConsole.Create(connectionString, "My", "Hr", useBeefDbo: true).RunAsync(args);

@@ -5,6 +5,9 @@
 #nullable enable
 #pragma warning disable
 
+{{#if IsRefData}}
+using CoreEx.RefData;
+{{/if}}
 using Microsoft.Extensions.DependencyInjection;
 {{#if IsRefData}}
   {{#ifeq EntityUsing 'Business' 'All'}}
@@ -28,14 +31,15 @@ namespace {{Root.NamespaceBusiness}}
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGenerated{{#if IsRefData}}ReferenceData{{/if}}ManagerServices(this IServiceCollection services)
-        {
 {{#if IsRefData}}
-            return services.AddSingleton<IReferenceData, ReferenceDataProvider>(){{#ifeq IManagerEntities.Count 0}};{{/ifeq}}
-{{/if}}
-{{#each IManagerEntities}}
+            => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>(){{#ifeq IManagerEntities.Count 0}};{{/ifeq}}
+{{else}}        
+        {
+  {{#each IManagerEntities}}
             {{#if @first}}{{#if Root.IsRefData}}               {{else}}return services{{/if}}{{else}}               {{/if}}.AddScoped<I{{Name}}Manager{{#if GenericWithT}}<T>{{/if}}, {{Name}}Manager{{#if GenericWithT}}<T>{{/if}}>(){{#if @last}};{{/if}}
-{{/each}}
+  {{/each}}
         }
+{{/if}}
     }
 }
 

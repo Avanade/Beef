@@ -601,17 +601,7 @@ properties: [
         /// Gets or sets the data converter name.
         /// </summary>
         /// <remarks>Where the name contains a '.' assume it is referencing a static and '.Default' is not required; otherwise, add.</remarks>
-        public string? DataConverterName
-        {
-            get
-            {
-                var n = string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}";
-                if (string.IsNullOrEmpty(n))
-                    return null;
-                else
-                    return DataConverter!.Contains('.') ? n : $"{n}.Default";
-            }
-        }
+        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"new {DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}()";
 
         /// <summary>
         /// Gets the data converter C# code.

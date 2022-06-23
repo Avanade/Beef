@@ -22,7 +22,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         public static IServiceCollection AddGenerated{{#if IsRefData}}ReferenceData{{/if}}DataSvcServices(this IServiceCollection services)
         {
 {{#if IsRefData}}
-            return services.AddSingleton<IReferenceDataDataSvc, ReferenceDataDataSvc>(){{#ifeq IDataSvcEntities.Count 0}};{{/ifeq}}
+            return services.AddScoped<IReferenceDataDataSvc, ReferenceDataDataSvc>(){{#ifeq IDataSvcEntities.Count 0}};{{/ifeq}}
 {{/if}}
 {{#each IDataSvcEntities}}
             {{#if @first}}{{#if Root.IsRefData}}               {{else}}return services{{/if}}{{else}}               {{/if}}.AddScoped<I{{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}}, {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}}>(){{#if @last}};{{/if}}

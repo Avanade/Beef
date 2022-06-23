@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.Entities.Extended;
 using CoreEx.RefData;
-using Newtonsoft.Json;
 using RefDataNamespace = My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Entities
@@ -43,12 +43,14 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the <see cref="Genders"/> list using the underlying Serialization Identifier (SID).
         /// </summary>
+        [JsonPropertyName("genders")]
         public List<string?>? GendersSids { get => _gendersSids; set => SetValue(ref _gendersSids, value); }
 
         /// <summary>
         /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [JsonIgnore]
         public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList()); }
 
         /// <summary>
@@ -64,7 +66,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Indicates whether Is Include Terminated.
         /// </summary>
-        [JsonProperty("includeTerminated")]
+        [JsonPropertyName("includeTerminated")]
         public bool? IsIncludeTerminated { get => _isIncludeTerminated; set => SetValue(ref _isIncludeTerminated, value); }
 
         /// <inheritdoc/>

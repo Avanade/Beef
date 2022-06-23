@@ -8,13 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Beef;
-using Beef.Business;
-using Beef.RefData;
-using Beef.RefData.Caching;
+using CoreEx;
+using CoreEx.RefData;
 using My.Hr.Business.Data;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -23,45 +20,28 @@ namespace My.Hr.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
+    internal partial class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
-        private readonly IServiceProvider _provider;
-        private readonly Dictionary<Type, IReferenceDataCache> _cacheDict = new Dictionary<Type, IReferenceDataCache>();
+        private readonly IReferenceDataData _data;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
         /// </summary>
-        /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
-        public ReferenceDataDataSvc(IServiceProvider provider)
-        {
-            _provider = Check.NotNull(provider, nameof(provider));
-            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.GenderGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.TerminationReason), new ReferenceDataCache<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TerminationReasonGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.RelationshipType), new ReferenceDataCache<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.RelationshipTypeGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.USStateGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.PerformanceOutcome), new ReferenceDataCache<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.PerformanceOutcomeGetAllAsync()))));
-            ReferenceDataDataSvcCtor();
-        }
+        /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
+        public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
 
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
-        /// <summary>
-        /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
-        /// </summary>
-        private async Task<T> GetDataAsync<T>(Func<IReferenceDataData, Task<T>> func)
+        /// <inheritdoc/>
+        public async Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => type switch
         {
-            using var scope = _provider.CreateScope();
-            return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
-        /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public IReferenceDataCollection GetCollection(Type type) =>
-            _cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc) ? rdc.GetCollection() :
-                throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
+            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.TerminationReason) => await _data.TerminationReasonGetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.RelationshipType) => await _data.RelationshipTypeGetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => await _data.PerformanceOutcomeGetAllAsync(cancellationToken).ConfigureAwait(false),
+            _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
+        };
     }
 }
 

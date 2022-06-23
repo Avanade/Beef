@@ -11,13 +11,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Business;
 using CoreEx;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
+using CoreEx.Business;
+using CoreEx.Database;
+using CoreEx.Database.Extended;
+using CoreEx.Database.Mapping;
+using CoreEx.EntityFrameworkCore;
 using CoreEx.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
 using My.Hr.Business.Entities;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -39,7 +41,7 @@ namespace My.Hr.Business.Data
             /// </summary>
             public DbMapper()
             {
-                Property(s => s.Id, "EmployeeId").SetUniqueKey(true);
+                Property(s => s.Id, "EmployeeId").SetPrimaryKey(true);
                 Property(s => s.Email);
                 Property(s => s.FirstName);
                 Property(s => s.LastName);
