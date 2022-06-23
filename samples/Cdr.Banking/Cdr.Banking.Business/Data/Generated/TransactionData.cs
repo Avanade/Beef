@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
 using Beef.Data.Cosmos;
@@ -18,6 +17,7 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Cdr.Banking.Common.Entities;
+using Mac = Microsoft.Azure.Cosmos;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business.Data
@@ -53,7 +53,7 @@ namespace Cdr.Banking.Business.Data
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
         {
             TransactionCollectionResult __result = new TransactionCollectionResult(paging);
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Transaction", __result.Paging!, new PartitionKey(accountId), onCreate: _onDataArgsCreate);
+            var __dataArgs = CosmosDbArgs.Create(_mapper, "Transaction", __result.Paging!, new Mac.PartitionKey(accountId), onCreate: _onDataArgsCreate);
             __result.Result = _cosmos.Container<Transaction, Model.Transaction>(__dataArgs).Query(q => _getTransactionsOnQuery?.Invoke(q, accountId, args, __dataArgs) ?? q).SelectQuery<TransactionCollection>();
             return await Task.FromResult(__result).ConfigureAwait(false);
         });

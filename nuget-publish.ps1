@@ -35,7 +35,7 @@
     Used to test locally changes, Create
 
     .Example
-    C:\PS> .\nuget-publish.ps1 -NugetServer 'https://api.nuget.org/v3/index.json' -ApiKey 'key' -ProjectsToPublish @('Beef.CodeGen.Core', 'Beef.Database.Core')
+    C:\PS> .\nuget-publish.ps1 -NugetServer 'https://api.nuget.org/v3/index.json' -ApiKey 'key' -IncludeSymbols -IncludeSource -ProjectsToPublish @('Beef.CodeGen.Core', 'Beef.Database.Core')
     Build selected pacakges and push to remote server.
 #>
 param(

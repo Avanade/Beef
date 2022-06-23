@@ -172,7 +172,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        public async Task<Person> CreateAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -189,13 +189,13 @@ namespace Beef.Demo.Business
             var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
             await (_createOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public async Task DeleteAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await (_deleteOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -208,14 +208,14 @@ namespace Beef.Demo.Business
             await (_deleteOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
             await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await MultiValidator.Create()
@@ -223,7 +223,7 @@ namespace Beef.Demo.Business
                 .RunAsync(throwOnError: true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -231,7 +231,7 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -248,7 +248,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
             await (_updateOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -256,7 +256,7 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -273,14 +273,14 @@ namespace Beef.Demo.Business
             var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
             await (_updateWithRollbackOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_getAllOnPreValidateAsync?.Invoke(paging) ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -292,13 +292,13 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
             await (_getAllOnAfterAsync?.Invoke(__result, paging) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetAll2Async() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_getAll2OnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -310,7 +310,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
             await (_getAll2OnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -318,7 +318,7 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await (_getByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -332,7 +332,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
             await (_getByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
@@ -340,7 +340,7 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
-        public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await (_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -354,7 +354,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
             await (_getDetailByArgsOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Merge first <see cref="Person"/> into second.
@@ -362,7 +362,7 @@ namespace Beef.Demo.Business
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public async Task<Person> MergeAsync(Guid fromId, Guid toId) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> MergeAsync(Guid fromId, Guid toId) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(fromId, toId);
             await (_mergeOnPreValidateAsync?.Invoke(fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -377,12 +377,12 @@ namespace Beef.Demo.Business
             var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
             await (_mergeOnAfterAsync?.Invoke(__result, fromId, toId) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        public async Task MarkAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_markOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -393,14 +393,14 @@ namespace Beef.Demo.Business
             await (_markOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
             await _dataService.MarkAsync().ConfigureAwait(false);
             await (_markOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        public async Task<MapCoordinates> MapAsync(MapArgs? args) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<MapCoordinates> MapAsync(MapArgs? args) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await (_mapOnPreValidateAsync?.Invoke(args) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -413,13 +413,13 @@ namespace Beef.Demo.Business
             var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
             await (_mapOnAfterAsync?.Invoke(__result, args) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Get no arguments.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetNoArgsAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_getNoArgsOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -431,14 +431,14 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
             await (_getNoArgsOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-        public async Task<PersonDetail?> GetDetailAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonDetail?> GetDetailAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await (_getDetailOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -452,7 +452,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
             await (_getDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Updates an existing <see cref="PersonDetail"/>.
@@ -460,7 +460,7 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        public async Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -477,22 +477,22 @@ namespace Beef.Demo.Business
             var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
             await (_updateDetailOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
         /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-        public async Task AddAsync(Person person) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await AddOnImplementationAsync(person).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
 
         /// <summary>
         /// Validate a DataSvc Custom generation.
         /// </summary>
         /// <returns>A resultant <see cref="int"/>.</returns>
-        public async Task<int> DataSvcCustomAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_dataSvcCustomOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -504,16 +504,16 @@ namespace Beef.Demo.Business
             var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
             await (_dataSvcCustomOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
 
         /// <summary>
         /// Validate a Manager Custom generation.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> ManagerCustomAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person?> ManagerCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Get Null.
@@ -521,7 +521,7 @@ namespace Beef.Demo.Business
         /// <param name="name">The Name.</param>
         /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public async Task<Person?> GetNullAsync(string? name, List<string>? names) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(name, names);
             await (_getNullOnPreValidateAsync?.Invoke(name, names) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -534,14 +534,14 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
             await (_getNullOnAfterAsync?.Invoke(__result, name, names) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
 
         /// <summary>
         /// Validate when an Event is published but not sent.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> EventPublishNoSendAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -557,7 +557,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
             await (_eventPublishNoSendOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -565,7 +565,7 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(args);
             await (_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -579,12 +579,12 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
             await (_getByArgsWithEfOnAfterAsync?.Invoke(__result, args, paging) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Throw Error.
         /// </summary>
-        public async Task ThrowErrorAsync() => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await (_throwErrorOnPreValidateAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
 
@@ -595,14 +595,14 @@ namespace Beef.Demo.Business
             await (_throwErrorOnBeforeAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
             await _dataService.ThrowErrorAsync().ConfigureAwait(false);
             await (_throwErrorOnAfterAsync?.Invoke() ?? Task.CompletedTask).ConfigureAwait(false);
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified }).ConfigureAwait(false);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified });
 
         /// <summary>
         /// Invoke Api Via Agent.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public async Task<string?> InvokeApiViaAgentAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await (_invokeApiViaAgentOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -615,13 +615,13 @@ namespace Beef.Demo.Business
             var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
             await (_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
 
         /// <summary>
         /// Param Coll.
         /// </summary>
         /// <param name="addresses">The Addresses.</param>
-        public async Task ParamCollAsync(AddressCollection? addresses) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task ParamCollAsync(AddressCollection? addresses) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(addresses);
             await (_paramCollOnPreValidateAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -634,14 +634,14 @@ namespace Beef.Demo.Business
             await (_paramCollOnBeforeAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
             await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
             await (_paramCollOnAfterAsync?.Invoke(addresses) ?? Task.CompletedTask).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Unspecified);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public async Task<Person?> GetWithEfAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person?> GetWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await (_getWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -655,14 +655,14 @@ namespace Beef.Demo.Business
             var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
             await (_getWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Read).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        public async Task<Person> CreateWithEfAsync(Person value) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -679,7 +679,7 @@ namespace Beef.Demo.Business
             var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
             await (_createWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Create).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -687,7 +687,7 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public async Task<Person> UpdateWithEfAsync(Person value, Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
 
@@ -704,13 +704,13 @@ namespace Beef.Demo.Business
             var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
             await (_updateWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return Cleaner.Clean(__result);
-        }, BusinessInvokerArgs.Update).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public async Task DeleteWithEfAsync(Guid id) => await ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
         {
             Cleaner.CleanUp(id);
             await (_deleteWithEfOnPreValidateAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
@@ -723,7 +723,7 @@ namespace Beef.Demo.Business
             await (_deleteWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
             await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
             await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
+        }, BusinessInvokerArgs.Delete);
     }
 }
 

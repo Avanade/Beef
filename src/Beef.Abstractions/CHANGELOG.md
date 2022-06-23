@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `InvokerBase`.
+
 ## v4.2.5
 - *Fixed:* Updated internal _Beef_ dependencies to latest.
 
