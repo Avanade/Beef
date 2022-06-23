@@ -184,7 +184,7 @@ public class CosmosDb : CosmosDbBase
     public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput)
     {
         // Apply an authorization filter to all operations to ensure only the valid data is available based on the users context - only allow access to Accounts within list defined on ExecutionContext.
-        SetAuthorizeFilter<Model.Account>("Account", (q) => ((IQueryable<Model.Account>)q).Where(am => ExcutionContext.Current.Accounts.Contains(am.Id!)));
+        SetAuthorizeFilter<Model.Account>("Account", (q) => ((IQueryable<Model.Account>)q).Where(am => ExecutionContext.Current.Accounts.Contains(am.Id!)));
     }
 }
 ```
