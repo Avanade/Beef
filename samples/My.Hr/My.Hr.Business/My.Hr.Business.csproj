@@ -4,13 +4,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.AutoMapper\CoreEx.AutoMapper.csproj" />
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.Database\CoreEx.Database.csproj" />
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.EntityFrameworkCore\CoreEx.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx.Validation\CoreEx.Validation.csproj" />
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx\CoreEx.csproj" />
+    <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataSvc\" />
+    <PackageReference Include="CoreEx" Version="1.0.8" />
+    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.8" />
+    <PackageReference Include="CoreEx.Database" Version="1.0.8" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="1.0.8" />
+    <PackageReference Include="CoreEx.Validation" Version="1.0.8" />
   </ItemGroup>
 </Project>

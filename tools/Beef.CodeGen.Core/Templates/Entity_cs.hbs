@@ -250,17 +250,6 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
   {{/unless}}
 {{/ifval}}
-{{! ===== RefData ===== }}
-{{#ifval RefDataType}}
-  {{#ifval RefDataStringFormat}}
-
-        /// <summary>
-        /// Overrides the default <see cref="ReferenceDataBase.StringFormat"/>.
-        /// </summary>
-        /// <remarks>The format value is '{{{RefDataStringFormat}}}'.</remarks>
-        public override string StringFormat => "{{RefDataStringFormat}}";
-  {{/ifval}}
-{{/ifval}}
 {{! ===== ExtendedInherits ===== }}
 {{#if ExtendedInherits}}
 

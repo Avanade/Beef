@@ -51,9 +51,9 @@ namespace Beef.Database.Core
         /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <returns>The <see cref="DatabaseConsole"/> instance.</returns>
         public static DatabaseConsole Create(string connectionString, string company, string appName, bool useBeefDbo = true)
-            => Create(new DatabaseConsoleArgs { ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString)), UseBeefDbo = useBeefDbo }
-                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, Check.NotEmpty(company, nameof(company)))
-                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, Check.NotEmpty(appName, nameof(appName)))
+            => Create(new DatabaseConsoleArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)), UseBeefDbo = useBeefDbo }
+                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company ?? throw new ArgumentNullException(nameof(company)))
+                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName)))
                 .AddAssembly(Assembly.GetEntryAssembly()!));
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Beef.Database.Core
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public DatabaseConsole OutputDirectory(string path)
         {
-            Args.OutputDirectory = new DirectoryInfo(Check.NotEmpty(path, nameof(path)));
+            Args.OutputDirectory = new DirectoryInfo(path ?? throw new ArgumentNullException(nameof(path)));
             return this;
         }
 
@@ -130,7 +130,7 @@ namespace Beef.Database.Core
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public DatabaseConsole DatabaseScript(string script)
         {
-            Args.ScriptFileName = Check.NotEmpty(script, nameof(script));
+            Args.ScriptFileName = script ?? throw new ArgumentNullException(nameof(script));
             return this;
         }
 
@@ -172,7 +172,6 @@ namespace Beef.Database.Core
         {
             // Final set up of console arguments.
             Args.Logger ??= new ConsoleLogger(PhysicalConsole.Singleton);
-            Diagnostics.Logger.Default ??= Args.Logger;
 
             // Set up the app.
             using var app = new CommandLineApplication(PhysicalConsole.Singleton) { Name = AppName, Description = AppTitle };
@@ -340,31 +339,31 @@ namespace Beef.Database.Core
             {
                 // Write the masthead and headser.
                 if (MastheadText != null)
-                    Args.Logger?.LogInformation(MastheadText);
+                    Args.Logger?.LogInformation("{Content}", MastheadText);
 
                 // Write the header.
-                Args.Logger?.LogInformation(AppTitle);
-                Args.Logger?.LogInformation(string.Empty);
+                Args.Logger?.LogInformation("{Content}", AppTitle);
+                Args.Logger?.LogInformation("{Content}", string.Empty);
 
                 if (GetCommandOption(XmlToYamlOptionName).HasValue())
                 {
-                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName())).ConfigureAwait(false);
+                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName()), Args.Logger).ConfigureAwait(false);
                     return success ? 0 : 4;
                 }
 
                 // Write the options.
-                Args.Logger?.LogInformation($"Command = {_cmdArg!.ParsedValue}");
-                Args.Logger?.LogInformation($"SchemaOrder = {string.Join(", ", Args.SchemaOrder.ToArray())}");
-                Args.Logger?.LogInformation($"Parameters{(Args.Parameters.Count == 0 ? " = none" : ":")}");
+                Args.Logger?.LogInformation("{Content}", $"Command = {_cmdArg!.ParsedValue}");
+                Args.Logger?.LogInformation("{Content}", $"SchemaOrder = {string.Join(", ", Args.SchemaOrder.ToArray())}");
+                Args.Logger?.LogInformation("{Content}", $"Parameters{(Args.Parameters.Count == 0 ? " = none" : ":")}");
                 foreach (var p in Args.Parameters)
                 {
-                    Args.Logger?.LogInformation($"  {p.Key} = {p.Value}");
+                    Args.Logger?.LogInformation("{Content}", $"  {p.Key} = {p.Value}");
                 }
 
-                Args.Logger?.LogInformation($"Assemblies{(Args.Assemblies.Count == 0 ? " = none" : ":")}");
+                Args.Logger?.LogInformation("{Content}", $"Assemblies{(Args.Assemblies.Count == 0 ? " = none" : ":")}");
                 foreach (var a in Args.Assemblies)
                 {
-                    Args.Logger?.LogInformation($"  {a.FullName}");
+                    Args.Logger?.LogInformation("{Content}", $"  {a.FullName}");
                 }
 
                 // Run the database executor.
@@ -374,11 +373,11 @@ namespace Beef.Database.Core
 
                 // Write the footer.
                 sw.Stop();
-                Args.Logger?.LogInformation(string.Empty);
-                Args.Logger?.LogInformation(new string('-', 80));
-                Args.Logger?.LogInformation(string.Empty);
-                Args.Logger?.LogInformation($"{AppName} Complete. [{sw.ElapsedMilliseconds}ms]");
-                Args.Logger?.LogInformation(string.Empty);
+                Args.Logger?.LogInformation("{Content}", string.Empty);
+                Args.Logger?.LogInformation("{Content}", new string('-', 80));
+                Args.Logger?.LogInformation("{Content}", string.Empty);
+                Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms]");
+                Args.Logger?.LogInformation("{Content}", string.Empty);
 
                 return 0;
             }
@@ -386,16 +385,16 @@ namespace Beef.Database.Core
             {
                 if (gcex.Message != null)
                 {
-                    Args.Logger?.LogError(gcex.Message);
-                    Args.Logger?.LogError(string.Empty);
+                    Args.Logger?.LogError("{Content}", gcex.Message);
+                    Args.Logger?.LogError("{Content}", string.Empty);
                 }
 
                 return 2;
             }
             catch (CodeGenChangesFoundException cgcfex)
             {
-                Args.Logger?.LogError(cgcfex.Message);
-                Args.Logger?.LogError(string.Empty);
+                Args.Logger?.LogError("{Content}", cgcfex.Message);
+                Args.Logger?.LogError("{Content}", string.Empty);
                 return 3;
             }
         }

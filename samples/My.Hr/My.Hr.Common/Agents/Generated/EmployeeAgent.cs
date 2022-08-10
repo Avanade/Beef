@@ -172,7 +172,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => GetCollectionResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase>("api/employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+            => GetAsync<EmployeeBaseCollectionResult>("api/employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.

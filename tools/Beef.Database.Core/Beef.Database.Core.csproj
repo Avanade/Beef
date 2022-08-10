@@ -42,12 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbEx" Version="1.0.5" />
+    <PackageReference Include="DbEx" Version="1.0.12" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
-    <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
     <ProjectReference Include="..\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
   </ItemGroup>
 

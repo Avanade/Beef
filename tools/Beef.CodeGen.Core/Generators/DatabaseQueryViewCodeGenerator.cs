@@ -18,6 +18,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<QueryConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Queries!.Where(x => x.View.HasValue && x.View.Value);
+            => (config ?? throw new System.ArgumentNullException(nameof(config))).Queries!.Where(x => x.View.HasValue && x.View.Value);
     }
 }

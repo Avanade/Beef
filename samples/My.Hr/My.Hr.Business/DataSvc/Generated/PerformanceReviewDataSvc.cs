@@ -44,12 +44,12 @@ namespace My.Hr.Business.DataSvc
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
         {
             if (_cache.TryGetValue(new CompositeKey(id), out PerformanceReview? __val))
                 return __val;
 
-            var __result = await _data.GetAsync(id, __ct).ConfigureAwait(false);
+            var __result = await _data.GetAsync(id, ct).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
         }, cancellationToken);
 
@@ -60,9 +60,9 @@ namespace My.Hr.Business.DataSvc
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await _data.GetByEmployeeIdAsync(employeeId, paging, __ct).ConfigureAwait(false);
+            var __result = await _data.GetByEmployeeIdAsync(employeeId, paging, ct).ConfigureAwait(false);
             return __result;
         }, cancellationToken);
 
@@ -72,9 +72,9 @@ namespace My.Hr.Business.DataSvc
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value)), __ct).ConfigureAwait(false);
+            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
         }, cancellationToken);
 
@@ -84,9 +84,9 @@ namespace My.Hr.Business.DataSvc
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value)), __ct).ConfigureAwait(false);
+            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
         }, cancellationToken);
 
@@ -95,9 +95,9 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
         {
-            await _data.DeleteAsync(id, __ct).ConfigureAwait(false);
+            await _data.DeleteAsync(id, ct).ConfigureAwait(false);
             _cache.Remove<PerformanceReview>(new CompositeKey(id));
         }, cancellationToken);
     }

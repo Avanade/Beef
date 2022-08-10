@@ -302,7 +302,7 @@ properties: [
         #region Manager
 
         /// <summary>
-        /// Gets or sets the Identifier Generator Type to generate the identifier on create via Dependency Injection (<see cref="Entities.IIdentifierGenerator"/>).
+        /// Gets or sets the Identifier Generator Type to generate the identifier on create via Dependency Injection (<see cref="CoreEx.Entities.IIdentifierGenerator{T}"/>).
         /// </summary>
         [JsonProperty("identifierGenerator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",

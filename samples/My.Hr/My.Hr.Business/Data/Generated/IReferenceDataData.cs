@@ -18,7 +18,7 @@ namespace My.Hr.Business.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    internal partial interface IReferenceDataData
+    public partial interface IReferenceDataData
     {
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.

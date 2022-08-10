@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config;
-using Beef.Reflection;
 using Newtonsoft.Json;
 using OnRamp.Config;
 using OnRamp.Utility;
@@ -75,7 +74,7 @@ namespace Beef.CodeGen.Generators
                 if (pi.PropertyType == typeof(List<string>))
                     continue;
 
-                WriteObject(ct, ComplexTypeReflector.GetItemType(pi.PropertyType), ns, xs, false);
+                WriteObject(ct, CoreEx.Abstractions.Reflection.TypeReflector.GetCollectionItemType(pi.PropertyType).ItemType ?? pi.PropertyType, ns, xs, false);
                 hasSeq = true;
             }
 

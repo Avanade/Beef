@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<TableConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).EFModels;
+            => (config ?? throw new System.ArgumentNullException(nameof(config))).EFModels;
     }
 }

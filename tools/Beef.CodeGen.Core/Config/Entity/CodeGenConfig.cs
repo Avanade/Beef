@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Entities;
+using CoreEx.Entities.Extended;
 using Newtonsoft.Json;
 using OnRamp.Config;
 using System.Collections.Generic;
@@ -169,11 +169,11 @@ entities:
         public string? WebApiAuthorize { get; set; }
 
         /// <summary>
-        /// Indicates whether to create and use an application-based (domain) <see cref="WebApi.WebApiAgentArgs"/> to simplify dependency injection usage.
+        /// Indicates whether to create and use an application-based (domain) API Args to simplify dependency injection usage.
         /// </summary>
         [JsonProperty("appBasedAgentArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.")]
-        public bool? AppBasedAgentArgs { get; set; }
+        [CodeGenProperty("WebApi", Title = "Indicates whether to create and use a domain-specific API Args to simplify dependency injection usage.")]
+        public bool? AppBasedAgentArgs { get; set; } // TODO: determine if still used?
 
         /// <summary>
         /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.

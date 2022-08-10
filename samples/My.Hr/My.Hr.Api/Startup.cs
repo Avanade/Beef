@@ -64,8 +64,11 @@ namespace My.Hr.Api
                     //.AddBeefWebApiServices()
                     //.AddBeefBusinessServices()
                     .AddWebApi()
+                    .AddJsonMergePatch()
                     .AddReferenceDataContentWebApi()
-                    .AddRequestCache();
+                    .AddRequestCache()
+                    .AddValidationTextProvider()
+                    .AddValidators<EmployeeManager>();
 
             // Add the beef database services (scoped per request/connection).
             //services.AddBeefDatabaseServices(() => new HrDb(Beef.AspNetCore.WebApi.WebApiStartup.GetConnectionString(_config, "Database")));
@@ -82,7 +85,6 @@ namespace My.Hr.Api
 
             // Add the generated entity services.
             services.AddGeneratedManagerServices()
-                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 
@@ -136,8 +138,7 @@ namespace My.Hr.Api
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My.Hr"));
 
             // Add execution context set up to the pipeline.
-            // TODO: add this back a bit later on.
-            // app.UseExecutionContext();
+            app.UseExecutionContext();
 
             // Add health checks.
             app.UseHealthChecks("/health");

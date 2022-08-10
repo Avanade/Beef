@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using OnRamp;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -20,7 +21,7 @@ namespace Beef.Database.Core
         public DatabaseExecutorArgs(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies) : base()
         {
             Command = command;
-            ConnectionString = Check.NotNull(connectionString, nameof(connectionString));
+            ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             AddAssembly(assemblies);
         }
 

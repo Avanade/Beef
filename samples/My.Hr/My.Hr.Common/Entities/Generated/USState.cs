@@ -8,9 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using CoreEx.Entities;
 using CoreEx.RefData.Models;
-using Newtonsoft.Json;
 
 namespace My.Hr.Common.Entities
 {

@@ -23,7 +23,7 @@ namespace My.Hr.Business.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    internal partial class ReferenceDataData : IReferenceDataData
+    public partial class ReferenceDataData : IReferenceDataData
     {
         private readonly IEfDb _ef;
 

@@ -47,7 +47,7 @@ namespace My.Hr.Business.Validation
             Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
             Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
             Property(x => x.Address).Entity(_addressValidator);
-            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: CollectionRuleItem.Create(_emergencyContactValidator).PrimaryKeyDuplicateCheck(ignoreWherePrimaryKeyIsInitial: true));
+            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: CollectionRuleItem.Create(_emergencyContactValidator).IdentifierDuplicateCheck(ignoreWhereIdIsDefault: true));
         }
 
         /// <summary>

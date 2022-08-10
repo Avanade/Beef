@@ -2,7 +2,6 @@
 
 using Beef.CodeGen.Config;
 using Beef.CodeGen.Generators;
-using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using OnRamp.Config;
 using OnRamp.Console;
@@ -19,6 +18,8 @@ namespace Beef.CodeGen
     /// </summary>
     public static class Program
     {
+        private static readonly ILogger _logger = new ConsoleLogger(null);
+
         /// <summary>
         /// The main entry point.
         /// </summary>
@@ -26,8 +27,6 @@ namespace Beef.CodeGen
         /// <returns><b>Zero</b> indicates success; otherwise, unsuccessful.</returns>
         public static async Task<int> Main(string[] args)
         {
-            Logger.Default = new ConsoleLogger(null);
-
             // Check for special case / internal use arguments.
             if (args.Length == 1)
             {
@@ -54,16 +53,16 @@ namespace Beef.CodeGen
         private static int SpecialActivitiesCenter(string title, string filename, Action<string> action)
         {
             // Method name inspired by: https://en.wikipedia.org/wiki/Special_Activities_Center
-            Logger.Default?.LogInformation("Business Entity Execution Framework (Beef) Code Generator - ** Special Activities Center **");
-            Logger.Default?.LogInformation(" Action: {Title}", title);
-            Logger.Default?.LogInformation(" Filename: {Filename}", filename);
+            _logger.LogInformation("{Content}", "Business Entity Execution Framework (Beef) Code Generator - ** Special Activities Center **");
+            _logger.LogInformation("{Content}", $" Action: {title}");
+            _logger.LogInformation("{Content}", $" Filename: {filename}");
 
             var sw = Stopwatch.StartNew();
             action(filename);
             sw.Stop();
-            Logger.Default?.LogInformation("");
-            Logger.Default?.LogInformation("CodeGen complete [{Elapsed}ms].", sw.ElapsedMilliseconds);
-            Logger.Default?.LogInformation("");
+            _logger.LogInformation("{Content}", "");
+            _logger.LogInformation("{Content}", $"CodeGen complete [{sw.Elapsed.TotalMilliseconds}ms].");
+            _logger.LogInformation("{Content}", "");
             return 0;
         }
 
@@ -84,6 +83,6 @@ namespace Beef.CodeGen
                     var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(configType, ce, pd.Name).Attribute;
                     if (xpsa != null)
                         pd.Psa = xpsa;
-                }, fileCreation: fn => Logger.Default?.LogWarning(" > {Filename}", fn));
+                }, fileCreation: fn => _logger.LogWarning("{Content}", $" > {fn}"));
     }
 }

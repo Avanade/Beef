@@ -56,7 +56,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     /// <summary>
     /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
-    internal partial class ReferenceDataData : IReferenceDataData
+    public partial class ReferenceDataData : IReferenceDataData
     {
 {{#each RefData.DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};

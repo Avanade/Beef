@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Converters;
-using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using OnRamp.Console;
@@ -82,33 +81,33 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="type">The <see cref="CommandType"/>.</param>
         /// <param name="filename">The XML filename.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
         /// <returns><c>true</c> indicates success; otherwise, <c>false</c>.</returns>
-        public static async Task<bool> ConvertXmlToYamlAsync(CommandType type, string filename)
+        public static async Task<bool> ConvertXmlToYamlAsync(CommandType type, string filename, ILogger? logger)
         {
-            var logger = (Logger.Default ??= new ConsoleLogger());
-            logger.LogInformation($"Convert XML to YAML file configuration: {filename}");
-            logger.LogInformation(string.Empty);
+            logger?.LogInformation("{Content}", $"Convert XML to YAML file configuration: {filename}");
+            logger?.LogInformation("{Content}", string.Empty);
 
             var xfi = new FileInfo(filename);
             if (!xfi.Exists)
             {
-                logger.LogError("File does not exist.");
-                logger.LogInformation(string.Empty);
+                logger?.LogError("{Content}", "File does not exist.");
+                logger?.LogInformation("{Content}", string.Empty);
                 return false;
             }
 
             if (string.Compare(xfi.Extension, ".XML", StringComparison.OrdinalIgnoreCase) != 0)
             {
-                logger.LogError("File extension must be XML.");
-                logger.LogInformation(string.Empty);
+                logger?.LogError("{Content}", "File extension must be XML.");
+                logger?.LogInformation("{Content}", string.Empty);
                 return false;
             }
 
             var yfi = new FileInfo(Path.Combine(xfi.DirectoryName!, GetConfigFilenames(type).First()));
             if (yfi.Exists)
             {
-                logger.LogError($"YAML file already exists: {yfi.Name}");
-                logger.LogInformation(string.Empty);
+                logger?.LogError("{Content}", $"YAML file already exists: {yfi.Name}");
+                logger?.LogInformation("{Content}", string.Empty);
                 return false;
             }
 
@@ -120,29 +119,29 @@ namespace Beef.CodeGen
                 using var ysw = yfi.CreateText();
                 await ysw.WriteAsync(result.Yaml).ConfigureAwait(false);
 
-                logger.LogWarning($"YAML file created: {yfi.Name}");
-                logger.LogInformation(string.Empty);
-                logger.LogInformation("Please check the contents of the YAML conversion and when ready to proceed please delete the existing XML file.");
-                logger.LogInformation(string.Empty);
-                logger.LogInformation("Note: the existing XML formatting and comments may not have been converted correctly; these will need to be refactored manually.");
-                logger.LogInformation("Note: the YAML file will now be used as the configuration source even where the existing XML file exists; if this is not the desired state then the YAML file should be deleted.");
+                logger?.LogWarning("{Content}", $"YAML file created: {yfi.Name}");
+                logger?.LogInformation("{Content}", string.Empty);
+                logger?.LogInformation("{Content}", "Please check the contents of the YAML conversion and when ready to proceed please delete the existing XML file.");
+                logger?.LogInformation("{Content}", string.Empty);
+                logger?.LogInformation("{Content}", "Note: the existing XML formatting and comments may not have been converted correctly; these will need to be refactored manually.");
+                logger?.LogInformation("{Content}", "Note: the YAML file will now be used as the configuration source even where the existing XML file exists; if this is not the desired state then the YAML file should be deleted.");
 
                 if (result.UnknownAttributes.Count > 0)
                 {
-                    logger.LogInformation(string.Empty);
-                    logger.LogWarning("The following element.attributes combinations are not considered core Beef; please delete if no longer required:");
+                    logger?.LogInformation("{Content}", string.Empty);
+                    logger?.LogWarning("{Content}", "The following element.attributes combinations are not considered core Beef; please delete if no longer required:");
                     foreach (var ua in result.UnknownAttributes)
                     {
-                        logger.LogInformation($" > {ua}");
+                        logger?.LogInformation("{Content}", $" > {ua}");
                     }
                 }
 
-                logger.LogInformation(string.Empty);
+                logger?.LogInformation("{Content}", string.Empty);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
-                logger.LogInformation(string.Empty);
+                logger?.LogError("{Content}", ex.Message);
+                logger?.LogInformation("{Content}", string.Empty);
                 return false;
             }
 

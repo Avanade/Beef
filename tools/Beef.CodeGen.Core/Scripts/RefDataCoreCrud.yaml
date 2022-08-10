@@ -10,4 +10,3 @@ generators:
 
 - { type: 'Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiController_cs', file: '{{Name}}Controller.cs', directory: '{{Root.PathApi}}/Controllers/Generated', EntityScope: 'Common', text: 'EntityWebApiControllerCodeGenerator: Api/Controllers' }
 - { type: 'Beef.CodeGen.Generators.EntityWebApiAgentCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiAgent_cs', file: '{{Name}}Agent.cs', directory: '{{Root.PathCommon}}/Agents/Generated', EntityScope: 'Common', text: 'EntityWebApiAgentCodeGenerator: Common/Agents' }
-- { type: 'Beef.CodeGen.Generators.EntityWebApiAgentArgsCodeGenerator, Beef.CodeGen.Core', template: 'EntityWebApiAgentArgs_cs', file: '{{Root.AppName}}WebApiAgentArgs.cs', directory: '{{Root.PathCommon}}/Agents/Generated', EntityScope: 'Common', text: 'EntityIWebApiAgentArgsCodeGenerator: Common/Agents' }

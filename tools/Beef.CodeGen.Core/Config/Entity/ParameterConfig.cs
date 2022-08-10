@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Entities;
+using CoreEx;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;

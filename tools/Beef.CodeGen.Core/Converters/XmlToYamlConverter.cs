@@ -22,7 +22,7 @@ namespace Beef.CodeGen.Converters
         /// Initializes a new instance of the <see cref="YamlFormatArgs"/>.
         /// </summary>
         /// <param name="writer">The <see cref="StringWriter"/>.</param>
-        public YamlFormatArgs(StringWriter writer) => Writer = Check.NotNull(writer, nameof(writer));
+        public YamlFormatArgs(StringWriter writer) => Writer = writer ?? throw new ArgumentNullException(nameof(writer));
 
         /// <summary>
         /// Gets the <see cref="StringWriter"/>.

@@ -122,7 +122,7 @@ namespace My.Hr.Business.Data
                 s2d.ForMember(d => d.PerformanceOutcomeCode, o => o.MapFrom(s => s.OutcomeSid));
                 s2d.ForMember(d => d.Reviewer, o => o.MapFrom(s => s.Reviewer));
                 s2d.ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
-                s2d.ForMember(d => d.RowVersion, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToDestination, s => s.ETag));
+                s2d.ForMember(d => d.RowVersion, o => o.OperationTypes(OperationTypes.AnyExceptCreate).ConvertUsing(AutoMapperStringToBase64Converter.Default.ToDestination, s => s.ETag));
                 s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
                 s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
                 s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
@@ -136,10 +136,10 @@ namespace My.Hr.Business.Data
                 d2s.ForMember(s => s.Reviewer, o => o.MapFrom(d => d.Reviewer));
                 d2s.ForMember(s => s.Notes, o => o.MapFrom(d => d.Notes));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(d => d.UpdatedDate));
+                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
+                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
+                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
+                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
 
                 EfMapperProfileCtor(s2d, d2s);
             }

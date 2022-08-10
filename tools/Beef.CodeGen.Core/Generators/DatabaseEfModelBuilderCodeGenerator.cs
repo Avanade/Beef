@@ -19,7 +19,7 @@ namespace Beef.CodeGen.Generators
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
         {
-            return Check.NotNull(config, nameof(config)).EFModels.Count > 0 ? base.SelectGenConfig(config) : Array.Empty<CodeGenConfig>();
+            return (config ?? throw new ArgumentNullException(nameof(config))).EFModels.Count > 0 ? base.SelectGenConfig(config) : Array.Empty<CodeGenConfig>();
         }
     }
 }

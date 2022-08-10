@@ -1302,33 +1302,23 @@ operations: [
         private string CreateAgentOperationHttpMethod()
         {
             var sb = new StringBuilder(WebApiMethod![4..]);
-            if (Type == "GetColl")
-                sb.Append("CollectionResult");
-
             sb.Append("Async");
 
-            if (Type == "GetColl")
-            {
-                sb.Append($"<{BaseReturnType}CollectionResult, {BaseReturnType}Collection, {BaseReturnType}>");
-            }
-            else
-            {
-                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
-                    sb.Append('<');
+            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                sb.Append('<');
 
-                if (ValueType != null && WebApiMethod != "HttpPatch")
-                {
-                    sb.Append(ValueType);
-                    if (HasReturnValue)
-                        sb.Append(", ");
-                }
-
+            if (ValueType != null && WebApiMethod != "HttpPatch")
+            {
+                sb.Append(ValueType);
                 if (HasReturnValue)
-                    sb.Append(OperationReturnType);
-
-                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
-                    sb.Append('>');
+                    sb.Append(", ");
             }
+
+            if (HasReturnValue)
+                sb.Append(OperationReturnType);
+
+            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                sb.Append('>');
 
             return sb.ToString();
         }

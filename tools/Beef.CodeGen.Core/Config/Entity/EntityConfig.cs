@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Caching;
-using Beef.Entities;
+using CoreEx.Caching;
+using CoreEx.Entities;
 using Newtonsoft.Json;
 using OnRamp.Config;
 using OnRamp.Utility;
@@ -126,10 +126,10 @@ entities:
         public string? ConstType { get; set; }
 
         /// <summary>
-        /// Indicates whether to override the <see cref="ICleanUp.IsInitial"/> property.
+        /// Indicates whether to override the <see cref="IInitial.IsInitial"/> property.
         /// </summary>
         [JsonProperty("isInitialOverride", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "Indicates whether to override the `ICleanup.IsInitial` property.",
+        [CodeGenProperty("Key", Title = "Indicates whether to override the `IInitial.IsInitial` property.",
             Description = "Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.")]
         public bool? IsInitialOverride { get; set; }
 
@@ -160,14 +160,6 @@ entities:
         [CodeGenProperty("RefData", Title = "The Reference Data sort order option.", Options = new string[] { "SortOrder", "Id", "Code", "Text" },
             Description = "Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.")]
         public string? RefDataSortOrder { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Reference Data <c>ToString</c> composite <see cref="Beef.RefData.ReferenceDataBase.StringFormat"/>.
-        /// </summary>
-        [JsonProperty("refDataStringFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("RefData", Title = "The Reference Data `ToString` composite format.",
-            Description = "The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.")]
-        public string? RefDataStringFormat { get; set; }
 
         #endregion
 

@@ -131,7 +131,7 @@ namespace My.Hr.Business.Data
             {
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
                 Property(s => s.Address, "AddressJson").SetConverter(new ObjectToJsonConverter<Address>());
-                Property(s => s.ETag, "RowVersion").SetConverter(new StringToBase64Converter());
+                Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(new StringToBase64Converter());
                 Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
                 DbMapperCtor();
             }

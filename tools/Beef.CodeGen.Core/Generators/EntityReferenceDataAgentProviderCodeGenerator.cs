@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).EntityScope == "Common" ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+            => (config ?? throw new System.ArgumentNullException(nameof(config))).EntityScope == "Common" ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
     }
 }

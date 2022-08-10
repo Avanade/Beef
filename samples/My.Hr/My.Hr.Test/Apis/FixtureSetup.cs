@@ -1,9 +1,9 @@
 using Beef.Database.Core;
-using Beef.Test.NUnit;
+using My.Hr.Api;
 using NUnit.Framework;
 using System.Reflection;
-using My.Hr.Api;
-using My.Hr.Common.Agents;
+using UnitTestEx;
+using UnitTestEx.NUnit;
 
 namespace My.Hr.Test.Apis
 {
@@ -13,16 +13,16 @@ namespace My.Hr.Test.Apis
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.DefaultEnvironmentVariablePrefix = "Hr";
-            TestSetUp.AddWebApiAgentArgsType<IHrWebApiAgentArgs, HrWebApiAgentArgs>();
-            TestSetUp.DefaultExpectNoEvents = true;
-            var config = AgentTester.BuildConfiguration<Startup>();
+            TestSetUp.Default.ExpectedEventsEnabled = true;
+            TestSetUp.Default.ExpectNoEvents = true;
 
-            TestSetUp.RegisterSetUp(async (count, _) =>
+            TestSetUp.Default.RegisterSetUp(async (count, _, __) =>
             {
+                using var test = ApiTester.Create<Startup>();
+
                 return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:Database"],
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true } ).ConfigureAwait(false) == 0;
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, test.Configuration["ConnectionStrings:Database"],
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true }).ConfigureAwait(false) == 0;
             });
         }
     }

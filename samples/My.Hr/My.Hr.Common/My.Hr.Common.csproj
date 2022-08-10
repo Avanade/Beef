@@ -8,7 +8,6 @@
     <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\CoreEx\src\CoreEx\CoreEx.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Abstractions\Beef.Abstractions.csproj" />
+    <PackageReference Include="CoreEx" Version="1.0.8" />
   </ItemGroup>
 </Project>

@@ -97,7 +97,7 @@ namespace {{Root.NamespaceBusiness}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
   {{#ifval AuthRole}}
             _executionContext.IsInRole("{{AuthRole}}", true);
@@ -121,20 +121,20 @@ namespace {{Root.NamespaceBusiness}}
     {{/ifeq}}
   {{/each}}
   {{#if ManagerCustom}}
-            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}__ct).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}ct).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
             Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}});
     {{/ifne}}
     {{#if ManagerExtensions}}
       {{#unless SingleValdiateParameters}}
-            await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}__ct) ?? Task.CompletedTask).ConfigureAwait(false);
+            await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-            (await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+            (await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
       {{/each}}
     {{else}}
             (await MultiValidator.Create()
@@ -146,18 +146,18 @@ namespace {{Root.NamespaceBusiness}}
                 .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                .ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
+                .ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
 
     {{/if}}
     {{#if ManagerExtensions}}
-            await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}, {{/each}}__ct) ?? Task.CompletedTask).ConfigureAwait(false);
-            {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}, {{/each}}__ct).ConfigureAwait(false);
-            await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result, {{/if}}{{#each ValueLessParameters}}{{{ArgumentName}}}, {{/each}}__ct) ?? Task.CompletedTask).ConfigureAwait(false);
+            await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}, {{/each}}ct).ConfigureAwait(false);
+            await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result, {{/if}}{{#each ValueLessParameters}}{{{ArgumentName}}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
       {{#if HasReturnValue}}
             return Cleaner.Clean(__result);
       {{/if}}
     {{else}}
-            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}, {{/each}}__ct).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}, {{/each}}ct).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}

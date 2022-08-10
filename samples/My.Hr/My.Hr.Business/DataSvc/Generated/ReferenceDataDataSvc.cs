@@ -20,7 +20,7 @@ namespace My.Hr.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    internal partial class ReferenceDataDataSvc : IReferenceDataDataSvc
+    public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
         private readonly IReferenceDataData _data;
 

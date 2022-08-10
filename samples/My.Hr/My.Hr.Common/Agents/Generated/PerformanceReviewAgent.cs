@@ -120,7 +120,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => GetCollectionResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview>("api/employees/{employeeId}/reviews", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<Guid>("employeeId", employeeId)), cancellationToken: cancellationToken);
+            => GetAsync<PerformanceReviewCollectionResult>("api/employees/{employeeId}/reviews", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<Guid>("employeeId", employeeId)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.

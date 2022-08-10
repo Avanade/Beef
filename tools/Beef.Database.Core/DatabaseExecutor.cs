@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.Diagnostics;
 using DbEx.Migration;
 using DbEx.Migration.SqlServer;
 using Microsoft.Extensions.Logging;
@@ -55,8 +54,8 @@ namespace Beef.Database.Core
                     return await ExecuteSqlStatementsAsync(_args.ExecuteStatements?.ToArray() ?? Array.Empty<string>()).ConfigureAwait(false);
                 else
                 {
-                    Logger?.LogInformation(string.Empty);
-                    Logger?.LogError("Execute command is not supported.");
+                    Logger?.LogInformation("{Content}", string.Empty);
+                    Logger?.LogError("{Content}", "Execute command is not supported.");
                     return false;
                 }
             }
@@ -67,8 +66,8 @@ namespace Beef.Database.Core
                     return await CreateScriptAsync(_args.ScriptName, _args.ScriptArguments).ConfigureAwait(false);
                 else
                 {
-                    Logger?.LogInformation(string.Empty);
-                    Logger?.LogError("Script command is not supported.");
+                    Logger?.LogInformation("{Content}", string.Empty);
+                    Logger?.LogError("{Content}", "Script command is not supported.");
                     return false;
                 }
             }
@@ -92,7 +91,7 @@ namespace Beef.Database.Core
                 cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
                 cga.ValidateCompanyAndAppName();
 
-                _args.Logger?.LogInformation(string.Empty);
+                _args.Logger?.LogInformation("{Content}", string.Empty);
                 OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);
 
                 try
@@ -102,14 +101,14 @@ namespace Beef.Database.Core
                 }
                 catch (CodeGenException cgex)
                 {
-                    _args.Logger?.LogError(cgex.Message);
-                    _args.Logger?.LogError(string.Empty);
+                    _args.Logger?.LogError("{Content}", cgex.Message);
+                    _args.Logger?.LogError("{Content}", string.Empty);
                     return false;
                 }
                 catch (CodeGenChangesFoundException cgcfex) 
                 {
-                    _args.Logger?.LogError(cgcfex.Message);
-                    _args.Logger?.LogError(string.Empty);
+                    _args.Logger?.LogError("{Content}", cgcfex.Message);
+                    _args.Logger?.LogError("{Content}", string.Empty);
                     return false;
                 }
             }, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}").ConfigureAwait(false);

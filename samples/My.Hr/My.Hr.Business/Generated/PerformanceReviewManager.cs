@@ -42,11 +42,11 @@ namespace My.Hr.Business
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
             Cleaner.CleanUp(id);
-            (await id.Validate(nameof(id)).Mandatory().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
-            return Cleaner.Clean(await _dataService.GetAsync(id, __ct).ConfigureAwait(false));
+            (await id.Validate(nameof(id)).Mandatory().ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.GetAsync(id, ct).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read, cancellationToken);
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace My.Hr.Business
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
             Cleaner.CleanUp(employeeId);
-            return Cleaner.Clean(await _dataService.GetByEmployeeIdAsync(employeeId, paging, __ct).ConfigureAwait(false));
+            return Cleaner.Clean(await _dataService.GetByEmployeeIdAsync(employeeId, paging, ct).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read, cancellationToken);
 
         /// <summary>
@@ -69,12 +69,12 @@ namespace My.Hr.Business
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
             value.EnsureValue().EmployeeId = employeeId;
             Cleaner.CleanUp(value);
-            (await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
-            return Cleaner.Clean(await _dataService.CreateAsync(value, __ct).ConfigureAwait(false));
+            (await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.CreateAsync(value, ct).ConfigureAwait(false));
         }, BusinessInvokerArgs.Create, cancellationToken);
 
         /// <summary>
@@ -84,12 +84,12 @@ namespace My.Hr.Business
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            (await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
-            return Cleaner.Clean(await _dataService.UpdateAsync(value, __ct).ConfigureAwait(false));
+            (await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
+            return Cleaner.Clean(await _dataService.UpdateAsync(value, ct).ConfigureAwait(false));
         }, BusinessInvokerArgs.Update, cancellationToken);
 
         /// <summary>
@@ -97,11 +97,11 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async __ct =>
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
         {
             Cleaner.CleanUp(id);
-            (await id.Validate(nameof(id)).Mandatory().ValidateAsync(__ct).ConfigureAwait(false)).ThrowOnError();
-            await _dataService.DeleteAsync(id, __ct).ConfigureAwait(false);
+            (await id.Validate(nameof(id)).Mandatory().ValidateAsync(ct).ConfigureAwait(false)).ThrowOnError();
+            await _dataService.DeleteAsync(id, ct).ConfigureAwait(false);
         }, BusinessInvokerArgs.Delete, cancellationToken);
     }
 }

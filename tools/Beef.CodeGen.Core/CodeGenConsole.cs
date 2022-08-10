@@ -76,9 +76,9 @@ namespace Beef.CodeGen
             var args = new CodeGeneratorArgs { OutputDirectory = string.IsNullOrEmpty(outputDirectory) ? new DirectoryInfo(GetBaseExeDirectory()).Parent : new DirectoryInfo(outputDirectory) };
             args.AddAssembly(typeof(CodeGenConsole).Assembly);
             args.AddAssembly(assemblies);
-            args.AddParameter(CompanyParamName, Check.NotEmpty(company, nameof(company)));
-            args.AddParameter(AppNameParamName, Check.NotEmpty(appName, nameof(appName)));
-            args.AddParameter(ApiNameParamName, Check.NotEmpty(apiName, nameof(apiName)));
+            args.AddParameter(CompanyParamName, company ?? throw new ArgumentNullException(nameof(company)));
+            args.AddParameter(AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName)));
+            args.AddParameter(ApiNameParamName, apiName ?? throw new ArgumentNullException(nameof(apiName)));
             return new CodeGenConsole(args) { BypassOnWrites = true };
         }
 
@@ -135,7 +135,7 @@ namespace Beef.CodeGen
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public CodeGenConsole EntityScript(string script)
         {
-            _entityScript = Check.NotEmpty(script, nameof(script));
+            _entityScript = script ?? throw new ArgumentNullException(nameof(script));
             return this;
         }
 
@@ -146,7 +146,7 @@ namespace Beef.CodeGen
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public CodeGenConsole DataModelScript(string script)
         {
-            _dataModelScript = Check.NotEmpty(script, nameof(script));
+            _dataModelScript = script ?? throw new ArgumentNullException(nameof(script));
             return this;
         }
 
@@ -157,7 +157,7 @@ namespace Beef.CodeGen
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public CodeGenConsole RefDataScript(string script)
         {
-            _refDataScript = Check.NotEmpty(script, nameof(script));
+            _refDataScript = script ?? throw new ArgumentNullException(nameof(script));
             return this;
         }
 
@@ -168,7 +168,7 @@ namespace Beef.CodeGen
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
         public CodeGenConsole DatabaseScript(string script)
         {
-            _databaseScript = Check.NotEmpty(script, nameof(script));
+            _databaseScript = script ?? throw new ArgumentNullException(nameof(script));
             return this;
         }
 
@@ -180,7 +180,7 @@ namespace Beef.CodeGen
         /// <remarks>Acts as the default; the command line option '<c>-cs|--connectionString</c>' and environment variable take precedence.</remarks>
         public CodeGenConsole DatabaseConnectionString(string connectionString)
         {
-            Args.ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
+            Args.ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             return this;
         }
 
@@ -194,8 +194,6 @@ namespace Beef.CodeGen
         /// <inheritdoc/>
         protected override ValidationResult? OnValidation(ValidationContext context)
         {
-            Diagnostics.Logger.Default ??= Args.Logger;
-
             var cmd = _cmdArg!.ParsedValue;
             if (cmd == CommandType.All)
             {
@@ -245,7 +243,7 @@ namespace Beef.CodeGen
             // Where XML to YAML requested do so, then exit.
             if (_x2yOpt!.HasValue())
             {
-                if (await CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName)).ConfigureAwait(false))
+                if (await CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName), Args.Logger).ConfigureAwait(false))
                     return new CodeGenStatistics();
                 else
                     throw new CodeGenException("An error occured whilst converting XML to YAML.");
@@ -267,10 +265,10 @@ namespace Beef.CodeGen
 
             if (count > 1)
             {
-                Args.Logger?.LogInformation(new string('-', 80));
-                Args.Logger?.LogInformation("");
-                Args.Logger?.LogInformation($"{AppName} OVERALL. {stats.ToSummaryString()}");
-                Args.Logger?.LogInformation("");
+                Args.Logger?.LogInformation("{Content}", new string('-', 80));
+                Args.Logger?.LogInformation("{Content}", "");
+                Args.Logger?.LogInformation("{Content}", $"{AppName} OVERALL. {stats.ToSummaryString()}");
+                Args.Logger?.LogInformation("{Content}", "");
             }
 
             return stats;
@@ -289,8 +287,8 @@ namespace Beef.CodeGen
 
             if (count > 0)
             {
-                args.Logger?.LogInformation(new string('-', 80));
-                args.Logger?.LogInformation("");
+                args.Logger?.LogInformation("{Content}", new string('-', 80));
+                args.Logger?.LogInformation("{Content}", "");
             }
 
             OnWriteArgs(args);
