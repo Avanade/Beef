@@ -6,7 +6,9 @@
 #pragma warning disable
 
 using System;
+{{#if Root.CancellationToken}}
 using System.Threading;
+{{/if}}
 using System.Threading.Tasks;
 using CoreEx.RefData;
 
@@ -21,9 +23,11 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="IReferenceData"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
+{{#if Root.CancellationToken}}
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+{{/if}}
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default);
+        Task<IReferenceDataCollection> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}});
     }
 }
 

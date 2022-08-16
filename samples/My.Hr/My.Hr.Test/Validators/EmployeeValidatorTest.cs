@@ -25,9 +25,9 @@ namespace My.Hr.Test.Validators
         public void OneTimeSetUp()
         {
             var rd = new Mock<IReferenceDataData>();
-            rd.Setup(x => x.GenderGetAllAsync(CancellationToken.None)).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
-            rd.Setup(x => x.USStateGetAllAsync(CancellationToken.None)).ReturnsAsync(new USStateCollection { new USState { Id = Guid.NewGuid(), Code = "WA" } });
-            rd.Setup(x => x.RelationshipTypeGetAllAsync(CancellationToken.None)).ReturnsAsync(new RelationshipTypeCollection { new RelationshipType { Id = Guid.NewGuid(), Code = "FR" } });
+            rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+            rd.Setup(x => x.USStateGetAllAsync()).ReturnsAsync(new USStateCollection { new USState { Id = Guid.NewGuid(), Code = "WA" } });
+            rd.Setup(x => x.RelationshipTypeGetAllAsync()).ReturnsAsync(new RelationshipTypeCollection { new RelationshipType { Id = Guid.NewGuid(), Code = "FR" } });
 
             var eds = new Mock<IEmployeeDataSvc>();
 
@@ -223,7 +223,7 @@ namespace My.Hr.Test.Validators
             e.Id = 1.ToGuid();
 
             var eds = new Mock<IEmployeeDataSvc>();
-            eds.Setup(x => x.GetAsync(1.ToGuid(), It.IsAny<CancellationToken>())).ReturnsAsync(new Employee { Termination = new TerminationDetail { Date = DateTime.UtcNow } });
+            eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { Termination = new TerminationDetail { Date = DateTime.UtcNow } });
 
             using var test = ValidationTester.Create();
 
@@ -238,7 +238,7 @@ namespace My.Hr.Test.Validators
         public void B110_CanDelete_NotFound()
         {
             var eds = new Mock<IEmployeeDataSvc>();
-            eds.Setup(x => x.GetAsync(1.ToGuid(), CancellationToken.None)).ReturnsAsync((Employee)null!);
+            eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
 
             using var test = ValidationTester.Create();
 
@@ -252,7 +252,7 @@ namespace My.Hr.Test.Validators
         public void B110_CanDelete_Invalid()
         {
             var eds = new Mock<IEmployeeDataSvc>();
-            eds.Setup(x => x.GetAsync(1.ToGuid(), CancellationToken.None)).ReturnsAsync(new Employee { StartDate = DateTime.UtcNow.AddDays(-1) });
+            eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { StartDate = DateTime.UtcNow.AddDays(-1) });
 
             using var test = ValidationTester.Create();
 

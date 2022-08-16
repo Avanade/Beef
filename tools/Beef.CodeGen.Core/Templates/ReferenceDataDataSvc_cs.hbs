@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+{{#if Root.CancellationToken}}
 using System.Threading;
+{{/if}}
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.RefData;
@@ -38,10 +40,10 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => type switch
+        public async Task<IReferenceDataCollection> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => type switch
         {
 {{#each RefDataEntities}}
-            Type _ when type == typeof({{RefDataQualifiedEntityName}}) => await _data.{{Name}}GetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof({{RefDataQualifiedEntityName}}) => await _data.{{Name}}GetAllAsync({{#if Root.CancellationToken}}cancellationToken{{/if}}).ConfigureAwait(false),
 {{/each}}
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };

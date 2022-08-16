@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using My.Hr.Business.Entities;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace My.Hr.Business.Data
@@ -33,39 +32,39 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Executes the 'Get' stored procedure passing the identifier and returns the result.
         /// </summary>
-        private Task<Employee?> GetOnImplementationAsync(Guid id, CancellationToken ct) =>
-            ExecuteStatementAsync(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default[x => x.Id], id), ct);
+        private Task<Employee?> GetOnImplementationAsync(Guid id) =>
+            ExecuteStatementAsync(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default[x => x.Id], id));
 
         /// <summary>
         /// Executes the 'Create' stored procedure and returns the result.
         /// </summary>
-        private Task<Employee> CreateOnImplementationAsync(Employee value, CancellationToken ct) =>
-            ExecuteStatementAsync("[Hr].[spEmployeeCreate]", value, CoreEx.Mapping.OperationTypes.Create, ct);
+        private Task<Employee> CreateOnImplementationAsync(Employee value) =>
+            ExecuteStatementAsync("[Hr].[spEmployeeCreate]", value, CoreEx.Mapping.OperationTypes.Create);
 
         /// <summary>
         /// Executes the 'Update' stored procedure and returns the result.
         /// </summary>
-        private Task<Employee> UpdateOnImplementationAsync(Employee value, CancellationToken ct) =>
-            ExecuteStatementAsync("[Hr].[spEmployeeUpdate]", value, CoreEx.Mapping.OperationTypes.Update, ct);
+        private Task<Employee> UpdateOnImplementationAsync(Employee value) =>
+            ExecuteStatementAsync("[Hr].[spEmployeeUpdate]", value, CoreEx.Mapping.OperationTypes.Update);
 
         /// <summary>
         /// Executes the stored procedure, passing Employee parameters, and the EmergencyContacts as a table-valued parameter (TVP), the operation type to aid mapping, 
         /// and requests for the result to be reselected.
         /// </summary>
-        private Task<Employee> ExecuteStatementAsync(string storedProcedureName, Employee value, CoreEx.Mapping.OperationTypes operationType, CancellationToken ct)
+        private Task<Employee> ExecuteStatementAsync(string storedProcedureName, Employee value, CoreEx.Mapping.OperationTypes operationType)
         {
             var sp = _db.StoredProcedure(storedProcedureName)
                         .Params(p => DbMapper.Default.MapToDb(value, p, operationType))
                         .TableValuedParam("@EmergencyContactList", EmergencyContactData.DbMapper.Default.CreateTableValuedParameter(_db, value.EmergencyContacts!))
                         .ReselectRecordParam();
 
-            return ExecuteStatementAsync(sp, ct)!;
+            return ExecuteStatementAsync(sp)!;
         }
 
         /// <summary>
         /// Executes the underlying stored procedure and processes the result (used by Get, Create and Update).
         /// </summary>
-        private static async Task<Employee?> ExecuteStatementAsync(DatabaseCommand db, CancellationToken ct)
+        private static async Task<Employee?> ExecuteStatementAsync(DatabaseCommand db)
         {
             Employee? employee = null;
 
@@ -74,7 +73,7 @@ namespace My.Hr.Business.Data
             // 2. Zero or more EmergencyContact rows. Use EmergencyContactData.DbMapper to map between columns and .NET Type. Update the Employee with result.
             await db.SelectMultiSetAsync(MultiSetArgs.Create(
                 new MultiSetSingleArgs<Employee>(DbMapper.Default, r => employee = r, isMandatory: false, stopOnNull: true),
-                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r)), ct).ConfigureAwait(false);
+                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r))).ConfigureAwait(false);
 
             return employee;
         }
@@ -82,10 +81,10 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Terminates an existing employee by updating their termination columns.
         /// </summary>
-        private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken)
+        private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
         {
             // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-            var curr = await GetOnImplementationAsync(id, cancellationToken).ConfigureAwait(false);
+            var curr = await GetOnImplementationAsync(id).ConfigureAwait(false);
             if (curr == null)
                 throw new NotFoundException();
 
@@ -96,7 +95,7 @@ namespace My.Hr.Business.Data
                 throw new ValidationException("An Employee can not be terminated prior to their start date.");
 
             curr.Termination = value;
-            return await UpdateOnImplementationAsync(curr, cancellationToken).ConfigureAwait(false);
+            return await UpdateOnImplementationAsync(curr).ConfigureAwait(false);
         }
     }
 }

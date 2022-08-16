@@ -46,7 +46,7 @@ namespace {{Root.NamespaceBusiness}}
         };
 
         /// <inheritdoc/>
-        public Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type, cancellationToken);
+        public Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type{{#if Root.CancellationToken}}, cancellationToken{{/if}});
     }
 }
 

@@ -34,8 +34,9 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null);
+        Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
 {{/each}}
         /// <summary>
@@ -43,9 +44,10 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null);
+        Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -70,9 +72,10 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
-        public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null) =>
-            GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)));      
+        public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
+            GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
 {{/each}}
         /// <summary>
@@ -80,15 +83,16 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null)
+        public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
         {
             var ro = requestOptions ?? new HttpRequestOptions();
             if (names != null)
                 ro.UrlQueryString += string.Join("&", names);
                 
-            return GetAsync("{{Root.RefDataWebApiRoute}}", ro, null);
+            return GetAsync("{{Root.RefDataWebApiRoute}}", ro, null, cancellationToken);
         }
     }
 }

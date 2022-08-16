@@ -6,7 +6,6 @@
 #pragma warning disable
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx.RefData;
 
@@ -21,9 +20,8 @@ namespace My.Hr.Business.DataSvc
         /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="IReferenceData"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default);
+        Task<IReferenceDataCollection> GetAsync(Type type);
     }
 }
 

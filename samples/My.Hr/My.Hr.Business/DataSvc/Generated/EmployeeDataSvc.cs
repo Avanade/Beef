@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Business;
@@ -42,77 +41,71 @@ namespace My.Hr.Business.DataSvc
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             if (_cache.TryGetValue(new CompositeKey(id), out Employee? __val))
                 return __val;
 
-            var __result = await _data.GetAsync(id, ct).ConfigureAwait(false);
+            var __result = await _data.GetAsync(id).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
-        }, cancellationToken);
+        });
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> CreateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
+            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
-        }, cancellationToken);
+        });
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> UpdateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
+            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
-        }, cancellationToken);
+        });
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await _data.DeleteAsync(id, ct).ConfigureAwait(false);
+            await _data.DeleteAsync(id).ConfigureAwait(false);
             _cache.Remove<Employee>(new CompositeKey(id));
-        }, cancellationToken);
+        });
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.GetByArgsAsync(args, paging, ct).ConfigureAwait(false);
+            var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
             return __result;
-        }, cancellationToken);
+        });
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => DataSvcInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id, ct).ConfigureAwait(false);
+            var __result = await _data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
             return _cache.SetAndReturnValue(__result);
-        }, cancellationToken);
+        });
     }
 }
 

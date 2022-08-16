@@ -951,9 +951,9 @@ operations: [
 
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
-                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
-                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
-                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{ManagerOperationType!}",
+                "Create" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{(Root!.EventActionFormat == "PastTense" ? "Created" : ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{(Root!.EventActionFormat == "PastTense" ? "Updated" : ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}{Root!.EventSubjectSeparator}{Parent!.Name}:{(Root!.EventActionFormat == "PastTense" ? "Deleted" : ManagerOperationType!)}",
                 _ => null
             });
 

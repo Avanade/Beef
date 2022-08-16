@@ -78,10 +78,10 @@ namespace My.Hr.Business.Validation
         /// <summary>
         /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
         /// </summary>
-        public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, ct) =>
+        public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, _) =>
         {
             // Unable to use inheritance DI for a Common Validator so the context.GetService will get/create the instance in the same manner.
-            var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value, ct).ConfigureAwait(false);
+            var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
             if (existing == null)
                 throw new NotFoundException();
 

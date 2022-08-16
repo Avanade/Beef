@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.RefData;
@@ -33,13 +32,13 @@ namespace My.Hr.Business.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => type switch
+        public async Task<IReferenceDataCollection> GetAsync(Type type) => type switch
         {
-            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync(cancellationToken).ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.TerminationReason) => await _data.TerminationReasonGetAllAsync(cancellationToken).ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.RelationshipType) => await _data.RelationshipTypeGetAllAsync(cancellationToken).ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync(cancellationToken).ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => await _data.PerformanceOutcomeGetAllAsync(cancellationToken).ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.TerminationReason) => await _data.TerminationReasonGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.RelationshipType) => await _data.RelationshipTypeGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => await _data.PerformanceOutcomeGetAllAsync().ConfigureAwait(false),
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };
     }

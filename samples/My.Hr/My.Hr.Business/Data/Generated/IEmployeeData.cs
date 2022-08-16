@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Entities;
@@ -26,50 +25,44 @@ namespace My.Hr.Business.Data
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Employee?> GetAsync(Guid id);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default);
+        Task<Employee> CreateAsync(Employee value);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default);
+        Task<Employee> UpdateAsync(Employee value);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default);
+        Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default);
+        Task<Employee> TerminateAsync(TerminationDetail value, Guid id);
     }
 }
 

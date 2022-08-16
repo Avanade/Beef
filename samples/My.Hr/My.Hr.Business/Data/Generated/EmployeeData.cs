@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Business;
@@ -52,72 +51,66 @@ namespace My.Hr.Business.Data
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct => GetOnImplementationAsync(id, ct), cancellationToken);
+        public Task<Employee?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => GetOnImplementationAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Create"));
+            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), ct).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Update"));
+            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
+        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id), cancellationToken).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Delete"));
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
+            await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id)).ConfigureAwait(false);
+            _evtPub.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, ct =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this,  _ =>
         {
-            return _ef.SelectResultQueryAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase, EfModel.Employee>(paging, (q, da) => _getByArgsOnQuery?.Invoke(q, args, da) ?? q, ct);
-        }, cancellationToken);
+            return _ef.SelectResultQueryAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase, EfModel.Employee>(paging, (q, da) => _getByArgsOnQuery?.Invoke(q, args, da) ?? q);
+        });
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id, CancellationToken cancellationToken = default) => DataInvoker.Current.InvokeAsync(this, async ct =>
+        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id, ct).ConfigureAwait(false);
+            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
             _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub }, cancellationToken);
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
 
         /// <summary>
         /// Provides the <see cref="Employee"/> property and database column mapping.

@@ -9,7 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+{{#if Root.CancellationToken}}
 using System.Threading;
+{{/if}}
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Business;
@@ -90,11 +92,13 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#each DataParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
+  {{#if Root.CancellationToken}}
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+  {{/if}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{ArgumentName}}, {{/each}}ct){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}, cancellationToken);{{else}}DataSvcInvoker.Current.InvokeAsync(this, async ct =>{{/if}}
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => {{#if DataSvcCustom}}DataSvcInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct => {{else}}_ => {{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{ArgumentName}}, {{/each}}ct){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{else}}DataSvcInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct =>{{else}}_ =>{{/if}}{{/if}}
   {{#unless DataSvcCustom}}
         {
     {{#if SupportsCaching}}
@@ -104,7 +108,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 
       {{/ifeq}}
     {{/if}}         
-            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)), {{else}}{{ArgumentName}}, {{/if}}{{/each}}ct).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
     {{#if DataSvcExtensions}}
             await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}) ?? Task.CompletedTask).ConfigureAwait(false);
     {{/if}}
@@ -137,7 +141,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
             return __result;
       {{/if}}
     {{/if}}
-        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}, cancellationToken);
+        }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/unless}}
 {{/each}}
     }

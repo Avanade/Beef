@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Entities;
@@ -26,41 +25,36 @@ namespace My.Hr.Business.Data
         /// Gets the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        Task<PerformanceReview?> GetAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<PerformanceReview?> GetAsync(Guid id);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging, CancellationToken cancellationToken = default);
+        Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        Task<PerformanceReview> CreateAsync(PerformanceReview value, CancellationToken cancellationToken = default);
+        Task<PerformanceReview> CreateAsync(PerformanceReview value);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        Task<PerformanceReview> UpdateAsync(PerformanceReview value, CancellationToken cancellationToken = default);
+        Task<PerformanceReview> UpdateAsync(PerformanceReview value);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id);
     }
 }
 

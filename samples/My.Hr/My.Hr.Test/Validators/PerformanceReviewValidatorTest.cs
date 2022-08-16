@@ -24,15 +24,15 @@ namespace My.Hr.Test.Validators
         public void OneTimeSetUp()
         {
             var rd = new Mock<IReferenceDataData>();
-            rd.Setup(x => x.PerformanceOutcomeGetAllAsync(CancellationToken.None)).ReturnsAsync(new PerformanceOutcomeCollection { new PerformanceOutcome { Id = Guid.NewGuid(), Code = "ME" } });
+            rd.Setup(x => x.PerformanceOutcomeGetAllAsync()).ReturnsAsync(new PerformanceOutcomeCollection { new PerformanceOutcome { Id = Guid.NewGuid(), Code = "ME" } });
 
             var em = new Mock<IEmployeeManager>();
-            em.Setup(x => x.GetAsync(404.ToGuid(), CancellationToken.None)).ReturnsAsync((Employee)null!);
-            em.Setup(x => x.GetAsync(1.ToGuid(), CancellationToken.None)).ReturnsAsync(new Employee { Id = 1.ToGuid(), StartDate = DateTime.Now.AddYears(-1) });
-            em.Setup(x => x.GetAsync(2.ToGuid(), CancellationToken.None)).ReturnsAsync(new Employee { Id = 2.ToGuid(), StartDate = DateTime.Now.AddYears(-1), Termination = new TerminationDetail { Date = DateTime.Now.AddMonths(-1) } });
+            em.Setup(x => x.GetAsync(404.ToGuid())).ReturnsAsync((Employee)null!);
+            em.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { Id = 1.ToGuid(), StartDate = DateTime.Now.AddYears(-1) });
+            em.Setup(x => x.GetAsync(2.ToGuid())).ReturnsAsync(new Employee { Id = 2.ToGuid(), StartDate = DateTime.Now.AddYears(-1), Termination = new TerminationDetail { Date = DateTime.Now.AddMonths(-1) } });
 
             var prm = new Mock<IPerformanceReviewManager>();
-            prm.Setup(x => x.GetAsync(1.ToGuid(), CancellationToken.None)).ReturnsAsync(new PerformanceReview { Id = 1.ToGuid(), EmployeeId = 2.ToGuid() });
+            prm.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new PerformanceReview { Id = 1.ToGuid(), EmployeeId = 2.ToGuid() });
 
             _testSetup = sc => sc
                 .AddValidationTextProvider()

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using RefDataNamespace = My.Hr.Business.Entities;
 
@@ -23,37 +22,32 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
-        Task<RefDataNamespace.GenderCollection> GenderGetAllAsync(CancellationToken cancellationToken = default);
+        Task<RefDataNamespace.GenderCollection> GenderGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.TerminationReason"/> items.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="RefDataNamespace.TerminationReasonCollection"/>.</returns>
-        Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync(CancellationToken cancellationToken = default);
+        Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.RelationshipType"/> items.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="RefDataNamespace.RelationshipTypeCollection"/>.</returns>
-        Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync(CancellationToken cancellationToken = default);
+        Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.USState"/> items.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
-        Task<RefDataNamespace.USStateCollection> USStateGetAllAsync(CancellationToken cancellationToken = default);
+        Task<RefDataNamespace.USStateCollection> USStateGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.PerformanceOutcome"/> items.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
-        Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync(CancellationToken cancellationToken = default);
+        Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync();
     }
 }
 

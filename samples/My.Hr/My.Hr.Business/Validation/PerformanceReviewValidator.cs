@@ -40,7 +40,7 @@ namespace My.Hr.Business.Validation
                 // Ensure that the EmployeeId has not be changed as it is immutable.
                 if (ExecutionContext.OperationType == OperationType.Update)
                 {
-                    var prv = await _performanceReviewManager.GetAsync(context.Value.Id, cancellationToken).ConfigureAwait(false);
+                    var prv = await _performanceReviewManager.GetAsync(context.Value.Id).ConfigureAwait(false);
                     if (prv == null)
                         throw new NotFoundException();
 
@@ -52,7 +52,7 @@ namespace My.Hr.Business.Validation
                 }
 
                 // Check that the referenced Employee exists, and the review data is within the bounds of their employment.
-                var ev = await _employeeManager.GetAsync(context.Value.EmployeeId, cancellationToken).ConfigureAwait(false);
+                var ev = await _employeeManager.GetAsync(context.Value.EmployeeId).ConfigureAwait(false);
                 if (ev == null)
                     context.AddError(x => x.EmployeeId, ValidatorStrings.ExistsFormat);
                 else

@@ -9,7 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+{{#if Root.CancellationToken}}
 using System.Threading;
+{{/if}}
 using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Entities;
@@ -43,11 +45,13 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#each DataParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
+  {{#if Root.CancellationToken}}
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+  {{/if}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}, {{/each}}CancellationToken cancellationToken = default);
+        {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}});
 {{/each}}
     }
 }
