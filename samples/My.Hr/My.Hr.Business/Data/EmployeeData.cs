@@ -71,9 +71,9 @@ namespace My.Hr.Business.Data
             // Execute the generated stored procedure, selecting (querying) two sets of data:
             // 1. The selected Employee (single row), the row is not mandatory, and stop (do not goto second set) where null. Use the underlying DbMapper to map between columns and .NET Type.
             // 2. Zero or more EmergencyContact rows. Use EmergencyContactData.DbMapper to map between columns and .NET Type. Update the Employee with result.
-            await db.SelectMultiSetAsync(MultiSetArgs.Create(
+            await db.SelectMultiSetAsync(
                 new MultiSetSingleArgs<Employee>(DbMapper.Default, r => employee = r, isMandatory: false, stopOnNull: true),
-                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r))).ConfigureAwait(false);
+                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r)).ConfigureAwait(false);
 
             return employee;
         }
