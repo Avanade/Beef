@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.Abstractions" Version="4.2.6" />
+    <PackageReference Include="Beef.Abstractions" Version="4.2.7" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Agents\" />

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Issue [184](https://github.com/Avanade/Beef/issues/184).* Support loading the `GetBeforeRequest` after the constructor.
+
 ## v4.2.6
 - *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
 

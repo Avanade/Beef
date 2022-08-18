@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Fixed:* Removed redundant package dependencies.
+
 ## v4.2.6
 - *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `InvokerBase`.
 
