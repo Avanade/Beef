@@ -16,7 +16,7 @@ namespace Beef.Test.NUnit.Tests
     [DebuggerStepThrough()]
     public abstract class AgentTesterBase : TesterBase
     {
-        private Action<HttpRequestMessage>? _beforeRequest;
+        private Action<HttpRequestMessage> _beforeRequest = new Action<HttpRequestMessage>(x => { });
         private bool _beforeRequestOverridden;
 
         /// <summary>
@@ -24,15 +24,12 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        protected AgentTesterBase(bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) : base(configureLocalRefData, true, includeLoggingScopesInOutput: includeLoggingScopesInOutput) 
+        protected AgentTesterBase(bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) : base(configureLocalRefData, true, includeLoggingScopesInOutput: includeLoggingScopesInOutput)
         {
             ConfigureLocalServices(sc =>
             {
                 sc.AddTransient(_ => GetHttpClient());
-
-                var br = GetBeforeRequest();
-                if (br != null)
-                    sc.AddTransient(_ => br);
+                sc.AddTransient(_ => GetBeforeRequest());
 
                 sc.AddBeefAgentServices();
                 sc.AddBeefGrpcAgentServices();
@@ -72,7 +69,7 @@ namespace Beef.Test.NUnit.Tests
         /// <summary>
         /// Gets the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending.
         /// </summary>
-        public Action<HttpRequestMessage>? GetBeforeRequest() => _beforeRequestOverridden ? _beforeRequest : AgentTester.GetBeforeRequest();
+        public Action<HttpRequestMessage> GetBeforeRequest() => _beforeRequestOverridden ? _beforeRequest : AgentTester.GetBeforeRequest();
 
         /// <summary>
         /// Gets an <see cref="HttpClient"/> instance.

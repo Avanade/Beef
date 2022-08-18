@@ -21,7 +21,7 @@ namespace Beef.Test.NUnit
     /// </summary>
     public static class AgentTester
     {
-        private static Action<HttpRequestMessage>? _beforeRequest;
+        private static Action<HttpRequestMessage> _beforeRequest = new Action<HttpRequestMessage>(x => { });
 
         /// <summary>
         /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending.
@@ -32,7 +32,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets or sets the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending.
         /// </summary>
-        public static Action<HttpRequestMessage>? GetBeforeRequest() => _beforeRequest;
+        public static Action<HttpRequestMessage> GetBeforeRequest() => _beforeRequest;
 
         /// <summary>
         /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration) where 'KeyVaultName' config key has value,
@@ -99,7 +99,7 @@ namespace Beef.Test.NUnit
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class 
+        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class
             => new AgentTesterWaf<TStartup>(configuration, null, null, configureLocalRefData, includeLoggingScopesInOutput);
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Beef.Test.NUnit
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
         /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IServiceCollection>? services, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class 
+        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IServiceCollection>? services, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class
             => new AgentTesterWaf<TStartup>(null, null, services, configureLocalRefData, includeLoggingScopesInOutput);
 
         /// <summary>
