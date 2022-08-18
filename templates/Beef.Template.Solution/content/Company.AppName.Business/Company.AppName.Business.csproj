@@ -4,9 +4,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.Core" Version="4.2.8" />
+    <PackageReference Include="Beef.Core" Version="4.2.9" />
     <!--#if (implement_database || implement_entityframework) -->
-    <PackageReference Include="Beef.Data.Database" Version="4.2.6" />
+    <PackageReference Include="Beef.Data.Database" Version="4.2.7" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
     <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.2.5" />
