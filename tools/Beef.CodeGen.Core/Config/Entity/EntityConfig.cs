@@ -1565,7 +1565,7 @@ entities:
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
 
             if (SupportsDataSvcEvents)
-                DataSvcCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
+                DataSvcCtorParameters.Add(new ParameterConfig { Name = "Events", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             if (CompareValue(DataSvcCaching, true) && Operations!.Any(x => x.SupportsCaching))
                 DataSvcCtorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
@@ -1595,7 +1595,7 @@ entities:
                 DataCtorParameters.Add(new ParameterConfig { Name = "HttpAgent", Type = HttpAgentName, Text = $"{{{{{HttpAgentName}}}}}" });
 
             if (SupportsDataEvents)
-                DataCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Events", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)

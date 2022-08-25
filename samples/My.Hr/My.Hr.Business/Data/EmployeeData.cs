@@ -14,7 +14,7 @@ namespace My.Hr.Business.Data
         partial void EmployeeDataCtor()
         {
             // Implement the GetByArgs OnQuery search/filtering logic.
-            _getByArgsOnQuery = (q, args, _) =>
+            _getByArgsOnQuery = (q, args) =>
             {
                 _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
                 _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));

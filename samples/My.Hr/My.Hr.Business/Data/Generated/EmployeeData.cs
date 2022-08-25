@@ -32,18 +32,18 @@ namespace My.Hr.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
-        private readonly IEventPublisher _evtPub;
+        private readonly IEventPublisher _events;
 
-        private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, EfDbArgs, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
+        private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher evtPub)
-            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); EmployeeDataCtor(); }
+        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher events)
+            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); EmployeeDataCtor(); }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -62,9 +62,9 @@ namespace My.Hr.Business.Data
         public Task<Employee> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
+            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -74,9 +74,9 @@ namespace My.Hr.Business.Data
         public Task<Employee> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
+            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -85,8 +85,8 @@ namespace My.Hr.Business.Data
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id)).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+            _events.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -94,9 +94,9 @@ namespace My.Hr.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this,  _ =>
+        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            return _ef.SelectResultQueryAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection, EmployeeBase, EfModel.Employee>(paging, (q, da) => _getByArgsOnQuery?.Invoke(q, args, da) ?? q);
+            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
         });
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace My.Hr.Business.Data
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
+            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Provides the <see cref="Employee"/> property and database column mapping.

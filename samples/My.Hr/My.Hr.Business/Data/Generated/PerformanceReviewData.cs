@@ -30,17 +30,17 @@ namespace My.Hr.Business.Data
     public partial class PerformanceReviewData : IPerformanceReviewData
     {
         private readonly IEfDb _ef;
-        private readonly IEventPublisher _evtPub;
+        private readonly IEventPublisher _events;
 
-        private Func<IQueryable<EfModel.PerformanceReview>, Guid, EfDbArgs, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
+        private Func<IQueryable<EfModel.PerformanceReview>, Guid, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public PerformanceReviewData(IEfDb ef, IEventPublisher evtPub)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _evtPub = evtPub ?? throw new ArgumentNullException(nameof(evtPub)); PerformanceReviewDataCtor(); }
+        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+        public PerformanceReviewData(IEfDb ef, IEventPublisher events)
+            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -49,7 +49,7 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this,  _ =>
+        public Task<PerformanceReview?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
             return _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id));
         });
@@ -60,9 +60,9 @@ namespace My.Hr.Business.Data
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this,  _ =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            return _ef.SelectResultQueryAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection, PerformanceReview, EfModel.PerformanceReview>(paging, (q, da) => _getByEmployeeIdOnQuery?.Invoke(q, employeeId, da) ?? q);
+            return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
         });
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace My.Hr.Business.Data
         public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created"));
+            _events.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
@@ -85,9 +85,9 @@ namespace My.Hr.Business.Data
         public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated"));
+            _events.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated"));
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
@@ -96,8 +96,8 @@ namespace My.Hr.Business.Data
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id)).ConfigureAwait(false);
-            _evtPub.Publish(EventData.Create(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted"));
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _evtPub });
+            _events.Publish(EventData.Create(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted"));
+        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> <i>AutoMapper</i> mapping.

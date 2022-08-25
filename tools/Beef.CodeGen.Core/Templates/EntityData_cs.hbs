@@ -102,20 +102,20 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#each DataOperations}}
       {{#ifeq Type 'GetColl'}}
         {{#ifeq AutoImplement 'Database'}}
-        private Action<DatabaseParameters, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}>? {{PrivateName}}OnQuery;
+        private Action<DatabaseParameters{{#each CoreDataParameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnQuery;
         {{/ifeq}}
         {{#ifeq AutoImplement 'EntityFramework'}}
-        private Func<IQueryable<{{Parent.EntityFrameworkModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.EntityFrameworkModel}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{Parent.EntityFrameworkModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{Parent.EntityFrameworkModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}}   
         {{#ifeq AutoImplement 'Cosmos'}}
           {{#ifval Parent.CosmosValueContainer}}
-        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<CosmosDbValue{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<CosmosDbValue{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
           {{else}}
-        private Func<IQueryable<{{Parent.CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.CosmosModel}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{Parent.CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{Parent.CosmosModel}}>>? {{PrivateName}}OnQuery;
           {{/ifval}}
         {{/ifeq}}  
         {{#ifeq AutoImplement 'OData'}}
-        private Func<Soc.IBoundClient<{{Parent.ODataModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, Soc.IBoundClient<{{Parent.ODataModel}}>>? {{PrivateName}}OnQuery;
+        private Func<Soc.IBoundClient<{{Parent.ODataModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}Soc.IBoundClient<{{Parent.ODataModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}} 
       {{/ifeq}}
       {{#if DataExtensions}}
@@ -165,7 +165,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
     {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => {{#if IsManualShorthand}}{{#if DataExtensions}}DataInvoker.Current.InvokeAsync(this, ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}, {{/each}}ct), new BusinessInvokerArgs { ExceptionHandler = {{PrivateName}}OnException{{#if DataTransaction}}, IncludeTransactionScope = true{{/if}}{{#ifeq EventPublish 'Data'}}, EventPublisher = _evtPub{{/ifeq}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{else}}DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct => {{else}}_ => {{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}){{#if DataTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'Data'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'Data'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/if}}{{/if}}{{#unless IsManualShorthand}}DataInvoker.Current.InvokeAsync(this, {{#ifne Type 'GetColl' 'Get'}}async{{/ifne}}{{#if Root.CancellationToken}} ct =>{{else}} _ =>{{/if}}{{/unless}}
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => {{#if IsManualShorthand}}{{#if DataExtensions}}DataInvoker.Current.InvokeAsync(this, ct => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}, {{/each}}ct), new BusinessInvokerArgs { ExceptionHandler = {{PrivateName}}OnException{{#if DataTransaction}}, IncludeTransactionScope = true{{/if}}{{#ifeq EventPublish 'Data'}}, EventPublisher = _events{{/ifeq}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{else}}DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct => {{else}}_ => {{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}){{#if DataTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'Data'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'Data'}}, new BusinessInvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/if}}{{/if}}{{#unless IsManualShorthand}}DataInvoker.Current.InvokeAsync(this, {{#ifne Type 'GetColl' 'Get'}}async {{/ifne}}{{#if Root.CancellationToken}}ct =>{{else}}_ =>{{/if}}{{/unless}}
     {{#unless IsManualShorthand}}
         {
       {{#ifne Type 'GetColl'}}
@@ -199,7 +199,7 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'EntityFramework'}}
         {{#ifeq Type 'GetColl'}}
-            return {{DataArgs.Name}}.SelectResultQueryAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection, {{BaseReturnType}}, {{Parent.EntityFrameworkModel}}>({{#if Paging}}{{PagingParameter.ArgumentName}}{{/if}}, (q, da) => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}da) ?? q{{#if Root.CancellationToken}}, ct{{/if}});
+            return {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{Parent.EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}ct{{/if}});
         {{else}}
             {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}{{#ifne Type 'Get'}}await {{/ifne}}{{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.EntityFrameworkModel}}>({{#if HasValue}}value?? throw new ArgumentNullException(nameof(value)){{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}CompositeKey.Create({{/if}}{{ParameterConverted}}{{#if @last}}){{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}){{#ifne Type 'Get'}}.ConfigureAwait(false){{/ifne}};
         {{/ifeq}}
@@ -227,12 +227,12 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq EventPublish 'Data'}}
         {{#ifeq Events.Count 1}}
           {{#each Events}}
-            _evtPub.Publish(EventData.Create({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"));
+            _events.Publish(EventData.Create({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"));
           {{/each}}
         {{else}}
           {{#ifeq Events.Count 0}}
           {{else}}
-            _evtPub.Publish(
+            _events.Publish(
             {{#each Events}}
                 EventData.Create({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}")){{#if @last}});{{else}},{{/if}}
               {{#if @last}}
@@ -255,7 +255,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             {{/if}}
           {{/ifne}}
         {{/if}}
-        }{{#if DataTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'Data'}}, EventPublisher = _evtPub{{/ifeq}} }{{else}}{{#ifeq EventPublish 'Data'}}, new BusinessInvokerArgs { EventPublisher = _evtPub }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        }{{#if DataTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'Data'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'Data'}}, new BusinessInvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
       {{/if}}
     {{/unless}}
   {{/each}}

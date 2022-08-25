@@ -6,7 +6,7 @@ namespace My.Hr.Business.Data
     {
         partial void PerformanceReviewDataCtor()
         {
-            _getByEmployeeIdOnQuery = (q_, employeeId, _) => q_.Where(x => x.EmployeeId == employeeId).OrderByDescending(x => x.Date);
+            _getByEmployeeIdOnQuery = (q, id) => q.Where(x => x.EmployeeId == id).OrderByDescending(x => x.Date);
         }
     }
 }
