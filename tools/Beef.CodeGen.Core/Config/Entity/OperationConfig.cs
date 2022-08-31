@@ -742,7 +742,7 @@ operations: [
         /// <summary>
         /// Gets the Cosmos PartitionKey as C# code.
         /// </summary>
-        public string CosmosPartitionKeyCode => CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? $"Mac.{CosmosPartitionKey}" : $"new Mac.PartitionKey({CosmosPartitionKey})";
+        public string? CosmosPartitionKeyCode => CosmosPartitionKey == null ? null : (CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? $"Mac.{CosmosPartitionKey}" : $"new Mac.PartitionKey({CosmosPartitionKey})");
 
         /// <summary>
         /// Indicates whether the operation is a 'Patch'.

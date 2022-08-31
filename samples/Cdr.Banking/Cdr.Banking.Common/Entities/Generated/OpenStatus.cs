@@ -7,151 +7,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
     /// Represents the Open Status entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ReferenceDataInterface(typeof(IReferenceData))]
-    public partial class OpenStatus : ReferenceDataBaseGuid
-    {
-        #region Constants
-
-        /// <summary>
-        /// Represents a All (both Open and Closed) constant value.
-        /// </summary>
-        public const string All = "ALL";
-
-        #endregion
-
-        #region Operator
-
-        /// <summary>
-        /// An implicit cast from an <b>Id</b> to a <see cref="OpenStatus"/>.
-        /// </summary>
-        /// <param name="id">The <b>Id</b>.</param>
-        /// <returns>The corresponding <see cref="OpenStatus"/>.</returns>
-        public static implicit operator OpenStatus(Guid id) => ConvertFromId<OpenStatus>(id);
-
-        /// <summary>
-        /// An implicit cast from a <b>Code</b> to a <see cref="OpenStatus"/>.
-        /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
-        /// <returns>The corresponding <see cref="OpenStatus"/>.</returns>
-        public static implicit operator OpenStatus(string? code) => ConvertFromCode<OpenStatus>(code);
-
-        #endregion
-    
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="OpenStatus"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="OpenStatus"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<OpenStatus>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="OpenStatus"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="OpenStatus"/> to copy from.</param>
-        public void CopyFrom(OpenStatus from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((ReferenceDataBaseGuid)from);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="OpenStatus"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="OpenStatus"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new OpenStatus();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="OpenStatus"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                if (!base.IsInitial)
-                    return false;
-
-                return true;
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(OpenStatus from);
-
-        #endregion
-    }
-
-    #region Collection
+    public partial class OpenStatus : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="OpenStatus"/> collection.
     /// </summary>
-    public partial class OpenStatusCollection : ReferenceDataCollectionBase<OpenStatus>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStatusCollection"/> class.
-        /// </summary>
-        public OpenStatusCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStatusCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="OpenStatus"/> entities.</param>
-        public OpenStatusCollection(IEnumerable<OpenStatus> entities) => AddRange(entities);
-    }
-
-    #endregion  
+    public partial class OpenStatusCollection : List<OpenStatus> { }
 }
 
 #pragma warning restore

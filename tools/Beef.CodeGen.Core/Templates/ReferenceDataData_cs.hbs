@@ -17,7 +17,7 @@ using Microsoft.Azure.Cosmos;
 {{/if}}
 using CoreEx.Business;
 {{#if RefData.UsesCosmos}}
-using Beef.Data.Cosmos;
+using CoreEx.Cosmos;
   {{#ifval Root.CosmosUsingNamespace}}
 using {{Root.CosmosUsingNamespace}};
   {{/ifval}}
@@ -88,7 +88,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             var __coll = new {{RefDataQualifiedEntityCollectionName}}();
             await DataInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => 
             {
-                await _db.GetRefDataAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>(__coll, "[{{DatabaseSchema}}].[sp{{Name}}GetAll]", "{{Name}}Id"{{#ifeq CoreProperties.Count 0}});{{else}}, additionalProperties: (dr, item, fields) =>{{/ifeq}}
+                await {{DatabaseDataParameter.PrivateName}}.GetRefDataAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>(__coll, "[{{DatabaseSchema}}].[sp{{Name}}GetAll]", "{{Name}}Id"{{#ifeq CoreProperties.Count 0}});{{else}}, additionalProperties: (dr, item, fields) =>{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
                 {
       {{#each CoreProperties}}
@@ -102,10 +102,10 @@ namespace {{Root.NamespaceBusiness}}.Data
         }
   {{/ifeq}}
   {{#ifeq AutoImplement 'EntityFramework'}}
-            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => _ef.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}), BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} =>{{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}), BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
-            await DataInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => { _cosmos.ValueQuery<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>(CosmosDbArgs.Create(_mapper, "{{CosmosContainerId}}", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }{{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
+            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
             await DataInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => await {{Name}}GetAll_OnImplementationAsync(__coll{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
@@ -155,8 +155,10 @@ namespace {{Root.NamespaceBusiness}}.Data
                 var d2s = CreateMap<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>();
           {{#each CoreProperties}}
                 d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
-          {{/each}}
+            {{#if @last}}
 
+            {{/if}}
+          {{/each}}
                 {{Name}}MapperProfileCtor(d2s);
             }
 

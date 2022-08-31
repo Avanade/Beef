@@ -18,7 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Cosmos\Transaction.yaml" />
+    <Compile Remove="Cosmos\TransactionArgsTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Cosmos\Data.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="TransactionArgsTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,10 +35,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.26" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
     <ProjectReference Include="..\Cdr.Banking.Api\Cdr.Banking.Api.csproj" />
   </ItemGroup>
   

@@ -26,9 +26,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A110_Get_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
@@ -36,9 +36,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A120_Get_Found_NoAddress()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -59,9 +59,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A130_Get_Found_WithAddress()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -84,15 +84,15 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A140_Get_Modified_NotModified()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag })).Value!;
 
             Assert.NotNull(v);
 
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { ETag = v.ETag }));
         }
@@ -100,9 +100,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A150_Get_IncludeRefDataText()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { IncludeText = true})).Value!;
 
@@ -113,9 +113,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A160_Get_IncludeFields()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent>()
+            apiTester.Agent<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions().Include(new string[] { "firstName", "lastName" })))
                 .AssertJson("{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}");
@@ -128,9 +128,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A210_GetByArgs_All()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(null)).Value;
 
@@ -143,9 +143,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A220_GetByArgs_All_Paging()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var r = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var r = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1,2)));
 
@@ -156,7 +156,7 @@ namespace My.Hr.Test.Apis
             Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Collection.Select(x => x.LastName).ToArray());
 
             // Query again with etag and ensure not modified.
-            agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1, 2), new HttpRequestOptions { ETag = r.Response!.Headers!.ETag!.Tag }));
         }
@@ -164,9 +164,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A230_GetByArgs_FirstName()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { FirstName = "*a*" })).Value;
 
@@ -179,9 +179,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A240_GetByArgs_LastName()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*" })).Value;
 
@@ -194,9 +194,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A250_GetByArgs_LastName_IncludeTerminated()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", IsIncludeTerminated = true })).Value;
 
@@ -209,9 +209,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A260_GetByArgs_Gender()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } })).Value;
 
@@ -224,9 +224,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A270_GetByArgs_Empty()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var v = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", Genders = new List<string?> { "F" } })).Value;
 
@@ -238,9 +238,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A280_GetByArgs_FieldSelection()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var r = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var r = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions().Include("firstname", "lastname")))
                 .AssertJson("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]");
@@ -249,9 +249,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A290_GetByArgs_RefDataText()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var r = agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            var r = apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }));
 
@@ -265,9 +265,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A300_GetByArgs_ArgsError()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrors("Genders contains one or more invalid items.")
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "Q" } }));
@@ -280,7 +280,7 @@ namespace My.Hr.Test.Apis
         [Test]
         public void B110_Create()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             var v = new Employee
             {
@@ -296,7 +296,7 @@ namespace My.Hr.Test.Apis
             };
 
             // Create value.
-            v = agentTester.Agent<EmployeeAgent, Employee>()
+            v = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
@@ -306,7 +306,7 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(v.Id));
@@ -315,7 +315,7 @@ namespace My.Hr.Test.Apis
         [Test]
         public void B120_Create_Duplicate()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             var v = new Employee
             {
@@ -329,7 +329,7 @@ namespace My.Hr.Test.Apis
             };
 
             // Create value.
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .Run(a => a.CreateAsync(v));
         }
@@ -341,15 +341,15 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C110_Update_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(4.ToGuid())).Value!;
 
             // Try updating with an invalid identifier.
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
@@ -357,22 +357,22 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C120_Update_Concurrency()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 4.ToGuid();
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
             // Try updating the value with an invalid eTag (if-match).
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id, new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag }));
 
             // Try updating the value with an invalid eTag.
             v.ETag = TestSetUp.Default.ConcurrencyErrorETag;
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id));
         }
@@ -380,11 +380,11 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C130_Update()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 4.ToGuid();
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -396,7 +396,7 @@ namespace My.Hr.Test.Apis
             v.EmergencyContacts.Add(new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" });
 
             // Update the value.
-            v = agentTester.Agent<EmployeeAgent, Employee>()
+            v = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -406,7 +406,7 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(id));
@@ -415,11 +415,11 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C140_Update_AlreadyTerminated()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 2.ToGuid();
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -428,7 +428,7 @@ namespace My.Hr.Test.Apis
             v.LastName += "Y";
 
             // Update the value.
-            var r = agentTester.Agent<EmployeeAgent, Employee>()
+            var r = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError, "Once an Employee has been Terminated the data can no longer be updated.")
                 .Run(a => a.UpdateAsync(v, id));
@@ -441,15 +441,15 @@ namespace My.Hr.Test.Apis
         [Test]
         public void D110_Patch_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(4.ToGuid())).Value!;
 
             // Try patching with an invalid identifier.
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404.ToGuid()));
         }
@@ -457,22 +457,22 @@ namespace My.Hr.Test.Apis
         [Test]
         public void D120_Patch_Concurrency()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 4.ToGuid();
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
             // Try updating the value with an invalid eTag (if-match).
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", id, new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag }));
 
             // Try updating the value with an eTag header (json payload eTag is ignored).
             v.ETag = TestSetUp.Default.ConcurrencyErrorETag;
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, $"{{ \"lastName\": \"Smithers\", \"etag\": \"{TestSetUp.Default.ConcurrencyErrorETag}\" }}", id));
         }
@@ -480,11 +480,11 @@ namespace My.Hr.Test.Apis
         [Test]
         public void D130_Patch()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 4.ToGuid();
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -493,7 +493,7 @@ namespace My.Hr.Test.Apis
             v.EmergencyContacts = null;
 
             // Update the value.
-            v = agentTester.Agent<EmployeeAgent, Employee>()
+            v = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -503,7 +503,7 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\", \"emergencyContacts\": null }}", id, new HttpRequestOptions { ETag = v.ETag })).Value;
 
             // Check the value was updated properly.
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(id));
@@ -516,7 +516,7 @@ namespace My.Hr.Test.Apis
         [Test]
         public void E110_Delete()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             var v = new Employee
             {
@@ -532,24 +532,24 @@ namespace My.Hr.Test.Apis
             };
 
             // Create an employee in the future.
-            v = agentTester.Agent<EmployeeAgent, Employee>()
+            v = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Delete value.
-            agentTester.Agent<EmployeeAgent>()
+            apiTester.Agent<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .ExpectEvent($"my.hr.employee", "deleted")
                 .Run(a => a.DeleteAsync(v.Id));
 
             // Check value no longer exists.
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(v.Id));
 
             // Delete again (should still be successful as a Delete is idempotent); note there should be no corresponding event as nothing actually happened.
-            agentTester.Agent<EmployeeAgent>()
+            apiTester.Agent<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(v.Id));
         }
@@ -561,9 +561,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void F110_Terminate_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<EmployeeAgent, Employee>()
+            apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, Reason = "RD" }, 404.ToGuid()));
         }
@@ -571,9 +571,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void F120_Terminate_MoreThanOnce()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var r = agentTester.Agent<EmployeeAgent, Employee>()
+            var r = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated more than once.")
                 .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, Reason = "RD" }, 2.ToGuid()));
@@ -582,9 +582,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void F130_Terminate_BeforeStart()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var r = agentTester.Agent<EmployeeAgent, Employee>()
+            var r = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated prior to their start date.")
                 .Run(a => a.TerminateAsync(new TerminationDetail { Date = new DateTime(1999, 12, 31), Reason = "RD" }, 1.ToGuid()));
@@ -593,15 +593,15 @@ namespace My.Hr.Test.Apis
         [Test]
         public void F140_Terminate()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<EmployeeAgent, Employee?>()
+            var v = apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value!;
 
             v.Termination = new TerminationDetail { Date = Cleaner.Clean(DateTime.Now, DateTimeTransform.DateOnly), Reason = "RD" };
 
-            v = agentTester.Agent<EmployeeAgent, Employee>()
+            v = apiTester.Agent<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -610,7 +610,7 @@ namespace My.Hr.Test.Apis
                 .ExpectEvent($"my.hr.employee", "terminated")
                 .Run(a => a.TerminateAsync(v.Termination, 1.ToGuid())).Value!;
 
-            agentTester.Agent<EmployeeAgent, Employee?>()
+            apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(1.ToGuid()));

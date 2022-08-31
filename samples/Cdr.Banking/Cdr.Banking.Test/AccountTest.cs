@@ -1,173 +1,185 @@
-﻿using Beef.Entities;
-using Beef.Test.NUnit;
-using Cdr.Banking.Api;
+﻿using Cdr.Banking.Api;
 using Cdr.Banking.Common.Agents;
 using Cdr.Banking.Common.Entities;
+using CoreEx.Entities;
 using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Net;
+using UnitTestEx;
+using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Cdr.Banking.Test
 {
     [TestFixture, NonParallelizable]
-    public class AccountTest : UsingAgentTesterServer<Startup>
+    public class AccountTest : UsingApiTester<Startup>
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            ApiTester.UserUser("jessica");
+            TestSetUp.Default.SetUp();
+        }
+
         #region GetAccounts
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B110_GetAccounts_User1()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(3, v.Result.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890", "45678901" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(3, v.Collection.Count);
+            Assert.AreEqual(new string[] { "12345678", "34567890", "45678901" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void B120_GetAccounts_User2()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(1, v.Result.Count);
-            Assert.AreEqual(new string[] { "23456789" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(1, v.Collection.Count);
+            Assert.AreEqual(new string[] { "23456789" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jason")]
+        [Test]
         public void B130_GetAccounts_User3_None()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
+                .WithUser("jason")
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(0, v.Result.Count);
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(0, v.Collection.Count);
         }
 
-        [Test, TestSetUp("john")]
+        [Test]
         public void B140_GetAccounts_User4_Auth()
         {
-            AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            ApiTester.Agent<AccountAgent, AccountCollectionResult>()
+                .WithUser("john")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetAccountsAsync(null));
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B210_GetAccounts_OpenStatus()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { OpenStatus = "OPEN" })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B220_GetAccounts_ProductCategory()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { ProductCategory = "CRED_AND_CHRG_CARDS" })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(1, v.Result.Count);
-            Assert.AreEqual(new string[] { "34567890" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(1, v.Collection.Count);
+            Assert.AreEqual(new string[] { "34567890" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B230_GetAccounts_IsOwned()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = true })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B240_GetAccounts_NotIsOwned()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = false })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(1, v.Result.Count);
-            Assert.AreEqual(new string[] { "45678901" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(1, v.Collection.Count);
+            Assert.AreEqual(new string[] { "45678901" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B310_GetAccounts_Page1()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(1, 2))).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B320_GetAccounts_Page2()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(2, 2))).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(1, v.Result.Count);
-            Assert.AreEqual(new string[] { "45678901" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(1, v.Collection.Count);
+            Assert.AreEqual(new string[] { "45678901" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B330_GetAccounts_Page3()
         {
-            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(3, 2))).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(0, v.Result.Count);
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(0, v.Collection.Count);
         }
 
         #endregion
 
         #region GetDetail
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void C110_GetDetail_NotFound()
         {
-            AgentTester.Test<AccountAgent, AccountDetail?>()
+            ApiTester.Agent<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetDetailAsync("00000000"));
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void C120_GetDetail_Found()
         {
-            AgentTester.Test<AccountAgent, AccountDetail?>()
+            ApiTester.Agent<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new AccountDetail
                 {
@@ -186,18 +198,20 @@ namespace Cdr.Banking.Test
                 .Run(a => a.GetDetailAsync("12345678"));
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void C130_GetDetail_Found_NoAuth()
         {
-            AgentTester.Test<AccountAgent, AccountDetail?>()
+            ApiTester.Agent<AccountAgent, AccountDetail?>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
 
-        [Test, TestSetUp("john")]
+        [Test]
         public void C140_GetDetail_NoAuth()
         {
-            AgentTester.Test<AccountAgent, AccountDetail?>()
+            ApiTester.Agent<AccountAgent, AccountDetail?>()
+                .WithUser("john")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
@@ -206,37 +220,40 @@ namespace Cdr.Banking.Test
 
         #region GetBalance
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void D110_GetBalance_Found()
         {
-            var v = AgentTester.Test<AccountAgent, Balance?>()
+            var v = ApiTester.Agent<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetBalanceAsync("12345678")).Value;
 
             Assert.IsNotNull(v);
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void D120_GetBalance_NotFound()
         {
-            AgentTester.Test<AccountAgent, Balance?>()
+            ApiTester.Agent<AccountAgent, Balance?>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void D130_GetBalance_NotFound_Auth()
         {
             // Try with a known id that is valid for another user.
-            AgentTester.Test<AccountAgent, Balance?>()
+            ApiTester.Agent<AccountAgent, Balance?>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("12345678"));
         }
 
-        [Test, TestSetUp("john")]
+        [Test]
         public void D140_GetBalance_NoAuth()
         {
-            AgentTester.Test<AccountAgent, Balance?>()
+            ApiTester.Agent<AccountAgent, Balance?>()
+                .WithUser("john")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }

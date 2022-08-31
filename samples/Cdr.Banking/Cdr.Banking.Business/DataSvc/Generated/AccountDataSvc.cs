@@ -9,13 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Caching;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Caching;
+using CoreEx.Entities;
 using Cdr.Banking.Business.Data;
-using Cdr.Banking.Common.Entities;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using Cdr.Banking.Business.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.DataSvc
 {
@@ -33,7 +33,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="data">The <see cref="IAccountData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public AccountDataSvc(IAccountData data, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); AccountDataSvcCtor(); }
+            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); AccountDataSvcCtor(); }
 
         partial void AccountDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -43,7 +43,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
             return __result;
@@ -54,14 +54,13 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __key = new UniqueKey(accountId);
-            if (_cache.TryGetValue(__key, out AccountDetail? __val))
+            if (_cache.TryGetValue(new CompositeKey(accountId), out AccountDetail? __val))
                 return __val;
 
             var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__key, __result);
+            return _cache.SetAndReturnValue(__result);
         });
 
         /// <summary>
@@ -69,14 +68,13 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Balance?> GetBalanceAsync(string? accountId) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __key = new UniqueKey(accountId);
-            if (_cache.TryGetValue(__key, out Balance? __val))
+            if (_cache.TryGetValue(new CompositeKey(accountId), out Balance? __val))
                 return __val;
 
             var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__key, __result);
+            return _cache.SetAndReturnValue(__result);
         });
     }
 }

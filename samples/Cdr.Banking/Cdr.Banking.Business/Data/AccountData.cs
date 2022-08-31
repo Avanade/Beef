@@ -1,6 +1,4 @@
-﻿using Beef;
-using Beef.Data.Cosmos;
-using Cdr.Banking.Common.Entities;
+﻿using Cdr.Banking.Business.Entities;
 using Microsoft.Azure.Cosmos.Linq;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,13 +18,14 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Perform the query filering for the GetAccounts.
         /// </summary>
-        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, CosmosDbArgs dbArgs)
+        private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args)
         {
+            var q = query.OrderBy(x => x.Id).AsQueryable();
             if (args == null || args.IsInitial)
-                return query;
+                return q;
 
             // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
-            var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
+            q = q.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
             q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
 
             // With checking IsOwned a simple false check cannot be performed with Cosmos; assume "not IsDefined" is equivalent to false also. 
@@ -45,16 +44,15 @@ namespace Cdr.Banking.Business.Data
         private Task<Balance?> GetBalanceOnImplementationAsync(string? accountId)
         {
             // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
-            var args = CosmosDbArgs.Create(_mapper, "Account");
-            var val = (from a in _cosmos.Container<Model.Account, Model.Account>(args).AsQueryable()
+            var val = (from a in _cosmos.Accounts.Query().AsQueryable()
                        where a.Id == accountId
-                       select new { a.Id, a.Balance }).SelectSingleOrDefault();
+                       select new { a.Id, a.Balance }).AsEnumerable().SingleOrDefault();
 
             if (val == null)
                 return Task.FromResult<Balance?>(null);
 
             // Map the Model.Balance to Balance and return.
-            var bal = _mapper.Map<Model.Balance, Balance>(val.Balance)!;
+            var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(val.Balance)!;
             bal.Id = val.Id;
             return Task.FromResult<Balance?>(bal);
         }

@@ -8,15 +8,15 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
 using Cdr.Banking.Business;
-using Cdr.Banking.Common.Entities;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using Cdr.Banking.Business.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Api.Controllers
 {
@@ -24,16 +24,19 @@ namespace Cdr.Banking.Api.Controllers
     /// Provides the <see cref="Account"/> Web API functionality.
     /// </summary>
     [Route("api/v1/banking/accounts")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class AccountController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IAccountManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IAccountManager"/>.</param>
-        public AccountController(IAccountManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); AccountControllerCtor(); }
+        public AccountController(WebApi webApi, IAccountManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); AccountControllerCtor(); }
 
         partial void AccountControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -47,11 +50,10 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(AccountCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetAccounts([FromQuery(Name = "product-category")] string? productCategory = default, [FromQuery(Name = "open-status")] string? openStatus = default, [FromQuery(Name = "is-owned")] bool? isOwned = default)
+        public Task<IActionResult> GetAccounts([FromQuery(Name="product-category")] string? productCategory = default, [FromQuery(Name="open-status")] string? openStatus = default, [FromQuery(Name="is-owned")] bool? isOwned = default)
         {
             var args = new AccountArgs { ProductCategorySid = productCategory, OpenStatusSid = openStatus, IsOwned = isOwned };
-            return new WebApiGet<AccountCollectionResult, AccountCollection, Account>(this, () => _manager.GetAccountsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<AccountCollectionResult>(Request, p => _manager.GetAccountsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -62,9 +64,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("{accountId}")]
         [ProducesResponseType(typeof(AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetDetail(string? accountId) =>
-            new WebApiGet<AccountDetail?>(this, () => _manager.GetDetailAsync(accountId),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetDetail(string? accountId) =>
+            _webApi.GetAsync<AccountDetail?>(Request, p => _manager.GetDetailAsync(accountId));
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
@@ -74,9 +75,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("{accountId}/balance")]
         [ProducesResponseType(typeof(Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetBalance(string? accountId) =>
-            new WebApiGet<Balance?>(this, () => _manager.GetBalanceAsync(accountId),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetBalance(string? accountId) =>
+            _webApi.GetAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));
     }
 }
 

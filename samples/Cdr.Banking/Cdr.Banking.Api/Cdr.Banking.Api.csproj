@@ -10,12 +10,11 @@
     <EmbeddedResource Include="webapisettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.4" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
     <ProjectReference Include="..\Cdr.Banking.Business\Cdr.Banking.Business.csproj" />
     <ProjectReference Include="..\Cdr.Banking.Common\Cdr.Banking.Common.csproj" />
   </ItemGroup>

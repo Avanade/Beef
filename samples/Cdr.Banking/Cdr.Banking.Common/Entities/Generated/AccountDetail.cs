@@ -7,299 +7,46 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
     /// Represents the <see cref="Account"/> Detail entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class AccountDetail : Account, IEquatable<AccountDetail>
+    public partial class AccountDetail : Account
     {
-        #region Privates
-
-        private string? _bsb;
-        private string? _accountNumber;
-        private string? _bundleName;
-        private string? _specificAccountUTypeSid;
-        private TermDepositAccount? _termDeposit;
-        private CreditCardAccount? _creditCard;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the Bsb.
         /// </summary>
-        [JsonProperty("bsb", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Bsb")]
-        public string? Bsb
-        {
-            get => _bsb;
-            set => SetValue(ref _bsb, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Bsb));
-        }
+        public string? Bsb { get; set; }
 
         /// <summary>
         /// Gets or sets the Account Number.
         /// </summary>
-        [JsonProperty("accountNumber", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Account Number")]
-        public string? AccountNumber
-        {
-            get => _accountNumber;
-            set => SetValue(ref _accountNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountNumber));
-        }
+        public string? AccountNumber { get; set; }
 
         /// <summary>
         /// Gets or sets the Bundle Name.
         /// </summary>
-        [JsonProperty("bundleName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Bundle Name")]
-        public string? BundleName
-        {
-            get => _bundleName;
-            set => SetValue(ref _bundleName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BundleName));
-        }
+        public string? BundleName { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="SpecificAccountUType"/> using the underlying Serialization Identifier (SID).
+        /// Gets or sets the Specific Account U Type.
         /// </summary>
-        [JsonProperty("specificAccountUType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Specific Account U Type")]
-        public string? SpecificAccountUTypeSid
-        {
-            get => _specificAccountUTypeSid;
-            set => SetValue(ref _specificAccountUTypeSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SpecificAccountUType));
-        }
+        public string? SpecificAccountUType { get; set; }
 
         /// <summary>
-        /// Gets or sets the Specific Account U Type (see <see cref="RefDataNamespace.AccountUType"/>).
+        /// Gets or sets the Term Deposit.
         /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Specific Account U Type")]
-        public RefDataNamespace.AccountUType? SpecificAccountUType
-        {
-            get => _specificAccountUTypeSid;
-            set => SetValue(ref _specificAccountUTypeSid, value, false, false, nameof(SpecificAccountUType)); 
-        }
+        public TermDepositAccount? TermDeposit { get; set; }
 
         /// <summary>
-        /// Gets or sets the Term Deposit (see <see cref="Common.Entities.TermDepositAccount"/>).
+        /// Gets or sets the Credit Card.
         /// </summary>
-        [JsonProperty("termDeposit", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Term Deposit")]
-        public TermDepositAccount? TermDeposit
-        {
-            get => _termDeposit;
-            set => SetValue(ref _termDeposit, value, false, true, nameof(TermDeposit));
-        }
-
-        /// <summary>
-        /// Gets or sets the Credit Card (see <see cref="Common.Entities.CreditCardAccount"/>).
-        /// </summary>
-        [JsonProperty("creditCard", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Credit Card")]
-        public CreditCardAccount? CreditCard
-        {
-            get => _creditCard;
-            set => SetValue(ref _creditCard, value, false, true, nameof(CreditCard));
-        }
-
-        #endregion
-
-        #region IChangeTracking
-
-        /// <summary>
-        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
-        public override void AcceptChanges()
-        {
-            TermDeposit?.AcceptChanges();
-            CreditCard?.AcceptChanges();
-            base.AcceptChanges();
-        }
-
-        /// <summary>
-        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
-        /// </summary>
-        public override void TrackChanges()
-        {
-            TermDeposit?.TrackChanges();
-            CreditCard?.TrackChanges();
-            base.TrackChanges();
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is AccountDetail val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="AccountDetail"/> to compare with the current <see cref="AccountDetail"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(AccountDetail? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Bsb, value.Bsb)
-                && Equals(AccountNumber, value.AccountNumber)
-                && Equals(BundleName, value.BundleName)
-                && Equals(SpecificAccountUTypeSid, value.SpecificAccountUTypeSid)
-                && Equals(TermDeposit, value.TermDeposit)
-                && Equals(CreditCard, value.CreditCard);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="AccountDetail"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="AccountDetail"/> A.</param>
-        /// <param name="b"><see cref="AccountDetail"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (AccountDetail? a, AccountDetail? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="AccountDetail"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="AccountDetail"/> A.</param>
-        /// <param name="b"><see cref="AccountDetail"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (AccountDetail? a, AccountDetail? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="AccountDetail"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Bsb);
-            hash.Add(AccountNumber);
-            hash.Add(BundleName);
-            hash.Add(SpecificAccountUTypeSid);
-            hash.Add(TermDeposit);
-            hash.Add(CreditCard);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="AccountDetail"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="AccountDetail"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<AccountDetail>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="AccountDetail"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="AccountDetail"/> to copy from.</param>
-        public void CopyFrom(AccountDetail from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((Account)from);
-            Bsb = from.Bsb;
-            AccountNumber = from.AccountNumber;
-            BundleName = from.BundleName;
-            SpecificAccountUTypeSid = from.SpecificAccountUTypeSid;
-            TermDeposit = CopyOrClone(from.TermDeposit, TermDeposit);
-            CreditCard = CopyOrClone(from.CreditCard, CreditCard);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="AccountDetail"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new AccountDetail();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="AccountDetail"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Bsb = Cleaner.Clean(Bsb, StringTrim.UseDefault, StringTransform.UseDefault);
-            AccountNumber = Cleaner.Clean(AccountNumber, StringTrim.UseDefault, StringTransform.UseDefault);
-            BundleName = Cleaner.Clean(BundleName, StringTrim.UseDefault, StringTransform.UseDefault);
-            SpecificAccountUTypeSid = Cleaner.Clean(SpecificAccountUTypeSid);
-            TermDeposit = Cleaner.Clean(TermDeposit);
-            CreditCard = Cleaner.Clean(CreditCard);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                if (!base.IsInitial)
-                    return false;
-
-                return Cleaner.IsInitial(Bsb)
-                    && Cleaner.IsInitial(AccountNumber)
-                    && Cleaner.IsInitial(BundleName)
-                    && Cleaner.IsInitial(SpecificAccountUTypeSid)
-                    && Cleaner.IsInitial(TermDeposit)
-                    && Cleaner.IsInitial(CreditCard);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(AccountDetail from);
-
-        #endregion
+        public CreditCardAccount? CreditCard { get; set; }
     }
 }
 

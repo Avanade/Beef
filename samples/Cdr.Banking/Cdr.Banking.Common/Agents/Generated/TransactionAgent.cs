@@ -10,16 +10,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Entities;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
+using CoreEx.Configuration;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.Json;
+using Microsoft.Extensions.Logging;
 using Cdr.Banking.Common.Entities;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Transaction"/> Web API agent.
+    /// Defines the <see cref="Transaction"/> HTTP agent.
     /// </summary>
     public partial interface ITransactionAgent
     {
@@ -29,21 +31,27 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="accountId">The Account Id.</param>
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides the <see cref="Transaction"/> Web API agent.
+    /// Provides the <see cref="Transaction"/> HTTP agent.
     /// </summary>
-    public partial class TransactionAgent : WebApiAgentBase, ITransactionAgent
+    public partial class TransactionAgent : TypedHttpClientBase<TransactionAgent>, ITransactionAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public TransactionAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
+        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public TransactionAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<TransactionAgent> logger) 
+            : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <summary>
         /// Get transaction for account.
@@ -51,11 +59,11 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="accountId">The Account Id.</param>
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null) =>
-            GetCollectionResultAsync<TransactionCollectionResult, TransactionCollection, Transaction>("api/v1/banking/accounts/{accountId}/transactions", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("accountId", accountId), new WebApiArg<TransactionArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<TransactionCollectionResult>("api/v1/banking/accounts/{accountId}/transactions", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId), new HttpArg<TransactionArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
     }
 }
 

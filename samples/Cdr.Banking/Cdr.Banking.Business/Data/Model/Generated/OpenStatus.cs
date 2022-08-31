@@ -8,19 +8,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData.Model;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
     /// Represents the Open Status model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class OpenStatus : ReferenceDataBaseGuid
-    {
-    }
+    public partial class OpenStatus : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="OpenStatus"/> collection.

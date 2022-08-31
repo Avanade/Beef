@@ -1,12 +1,12 @@
-﻿using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Caching.Policy;
-using Beef.Entities;
-using Beef.Validation;
-using Cdr.Banking.Business;
-using Cdr.Banking.Business.Data;
-using Cdr.Banking.Business.DataSvc;
+﻿using Cdr.Banking.Business;
+using CoreEx;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.RefData;
+using CoreEx.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,7 +15,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Api
 {
@@ -24,23 +23,19 @@ namespace Cdr.Banking.Api
     /// </summary>
     public class Startup
     {
-        private readonly IConfiguration _config;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         public Startup(IConfiguration config)
         {
-            _config = config;
-
             // Use JSON property names in validation; and determine whether unhandled exception details are to be included in the response.
             ValidationArgs.DefaultUseJsonNames = true;
 
             // Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification; and default the page size to 25 from config.
-            WebApiQueryString.PagingArgsPageQueryStringNames.Add("page");
-            WebApiQueryString.PagingArgsTakeQueryStringNames.Add("page-size");
-            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+            HttpConsts.PagingArgsPageQueryStringNames.Add("page");
+            HttpConsts.PagingArgsTakeQueryStringNames.Add("page-size");
+            PagingArgs.DefaultTake = new BankingSettings(config).GetValue<int>("DefaultPageSize");
         }
 
         /// <summary>
@@ -52,52 +47,53 @@ namespace Cdr.Banking.Api
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            // Add the core beef services (including the customized ExecutionContext).
-            services.AddBeefExecutionContext(_ => new Business.ExecutionContext())
-                    .AddBeefTextProviderAsSingleton()
-                    .AddBeefSystemTime()
-                    .AddBeefRequestCache()
-                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
-                    .AddBeefWebApiServices()
-                    .AddBeefBusinessServices();
+            // Add the core services (including the customized ExecutionContext).
+            services.AddSettings<BankingSettings>()
+                    .AddExecutionContext(_ => new Business.ExecutionContext())
+                    .AddJsonSerializer()
+                    .AddReferenceDataOrchestrator(sp => new ReferenceDataOrchestrator(sp, new MemoryCache(new MemoryCacheOptions())).Register<IReferenceDataProvider>())
+                    .AddWebApi()
+                    .AddReferenceDataContentWebApi()
+                    .AddRequestCache()
+                    .AddValidationTextProvider()
+                    .AddValidators<AccountManager>();
 
-            // Add the data sources as singletons for dependency injection requirements.
-            var ccs = _config.GetSection("CosmosDb");
-            services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")));
+            // Add the cosmos database.
+            services.AddSingleton<Business.Data.ICosmos>(sp =>
+            {
+                var settings = sp.GetRequiredService<BankingSettings>();
+                var cco = new CosmosClientOptions { SerializerOptions = new CosmosSerializationOptions { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
+                return new Business.Data.CosmosDb(new CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+            });
 
-            // Add beef cache policy management.
-            services.AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-
-            // Add the generated reference data services for dependency injection requirements.
+            // Add the generated reference data services.
             services.AddGeneratedReferenceDataManagerServices()
                     .AddGeneratedReferenceDataDataSvcServices()
                     .AddGeneratedReferenceDataDataServices();
 
-            // Add the generated services for dependency injection requirements.
+            // Add the generated services.
             services.AddGeneratedManagerServices()
-                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 
             // Add AutoMapper services via Assembly-based probing for Profiles.
-            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(AccountData).Assembly);
+            services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(AccountManager).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
+            services.AddAutoMapperWrapper();
 
-            // Add services; note Beef requires NewtonsoftJson.
-            services.AddControllers().AddNewtonsoftJson();
+            // Add additional services.
+            services.AddControllers();
             services.AddHealthChecks();
             services.AddHttpClient();
 
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cdr.Banking API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Cdr.Banking API", Version = "v1" });
 
                 var xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
                 if (File.Exists(xmlFile))
-                    c.IncludeXmlComments(xmlFile);
+                    options.IncludeXmlComments(xmlFile);
             });
-
-            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         /// <summary>
@@ -107,25 +103,22 @@ namespace Cdr.Banking.Api
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
-            // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
+            // Handle any unhandled exceptions.
+            app.UseWebApiExceptionHandler();
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cdr.Banking"));
-
-            // Add health checks page to the pipeline.
-            app.UseHealthChecks("/health");
 
             // Add execution context set up to the pipeline.
             app.UseExecutionContext((hc, ec) =>
             {
                 // TODO: This would be replaced with appropriate OAuth integration, etc... - this is purely for illustrative purposes only.
                 if (!hc.Request.Headers.TryGetValue("cdr-user", out var username) || username.Count != 1)
-                    throw new Beef.AuthorizationException();
+                    throw new AuthorizationException();
 
                 var bec = (Business.ExecutionContext)ec;
-                bec.Timestamp = SystemTime.Get(hc.RequestServices).UtcNow;
+                bec.Timestamp = SystemTime.Get().UtcNow;
 
                 switch (username[0])
                 {
@@ -141,11 +134,14 @@ namespace Cdr.Banking.Api
                         break;
 
                     default:
-                        throw new Beef.AuthorizationException();
+                        throw new AuthorizationException();
                 }
 
                 return Task.CompletedTask;
             });
+
+            // Add health checks page to the pipeline.
+            app.UseHealthChecks("/health");
 
             // Use controllers.
             app.UseRouting();

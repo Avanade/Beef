@@ -3,7 +3,7 @@ entities:
   # Account model definitions.
 - { name: Account, text: Account model for data persistence,
     properties: [
-      { name: Id },
+      { name: Id, uniqueKey: true },
       { name: CreationDate, type: DateTime },
       { name: DisplayName },
       { name: Nickname },
@@ -62,7 +62,7 @@ entities:
   # Transaction model definitions
 - { name: Transaction, text: Transaction model for data persistence,
     properties: [
-      { name: Id },
+      { name: Id, uniqueKey: true },
       { name: AccountId },
       { name: IsDetailAvailable, type: bool },
       { name: Type },

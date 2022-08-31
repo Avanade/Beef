@@ -7,142 +7,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
     /// Represents the Transaction Status entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ReferenceDataInterface(typeof(IReferenceData))]
-    public partial class TransactionStatus : ReferenceDataBaseGuid
-    {
-        #region Operator
-
-        /// <summary>
-        /// An implicit cast from an <b>Id</b> to a <see cref="TransactionStatus"/>.
-        /// </summary>
-        /// <param name="id">The <b>Id</b>.</param>
-        /// <returns>The corresponding <see cref="TransactionStatus"/>.</returns>
-        public static implicit operator TransactionStatus(Guid id) => ConvertFromId<TransactionStatus>(id);
-
-        /// <summary>
-        /// An implicit cast from a <b>Code</b> to a <see cref="TransactionStatus"/>.
-        /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
-        /// <returns>The corresponding <see cref="TransactionStatus"/>.</returns>
-        public static implicit operator TransactionStatus(string? code) => ConvertFromCode<TransactionStatus>(code);
-
-        #endregion
-    
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="TransactionStatus"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="TransactionStatus"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<TransactionStatus>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="TransactionStatus"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="TransactionStatus"/> to copy from.</param>
-        public void CopyFrom(TransactionStatus from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((ReferenceDataBaseGuid)from);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="TransactionStatus"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="TransactionStatus"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new TransactionStatus();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="TransactionStatus"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                if (!base.IsInitial)
-                    return false;
-
-                return true;
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(TransactionStatus from);
-
-        #endregion
-    }
-
-    #region Collection
+    public partial class TransactionStatus : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="TransactionStatus"/> collection.
     /// </summary>
-    public partial class TransactionStatusCollection : ReferenceDataCollectionBase<TransactionStatus>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionStatusCollection"/> class.
-        /// </summary>
-        public TransactionStatusCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionStatusCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="TransactionStatus"/> entities.</param>
-        public TransactionStatusCollection(IEnumerable<TransactionStatus> entities) => AddRange(entities);
-    }
-
-    #endregion  
+    public partial class TransactionStatusCollection : List<TransactionStatus> { }
 }
 
 #pragma warning restore

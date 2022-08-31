@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading.Tasks;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.Data
 {

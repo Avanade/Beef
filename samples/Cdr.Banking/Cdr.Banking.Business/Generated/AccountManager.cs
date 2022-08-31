@@ -7,16 +7,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
-using Cdr.Banking.Common.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Entities;
+using CoreEx.Validation;
+using Cdr.Banking.Business.Entities;
 using Cdr.Banking.Business.DataSvc;
 using Cdr.Banking.Business.Validation;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business
 {
@@ -32,7 +31,7 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IAccountDataSvc"/>.</param>
         public AccountManager(IAccountDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); AccountManagerCtor(); }
+            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); AccountManagerCtor(); }
 
         partial void AccountManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -42,10 +41,10 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<IValidator<AccountArgs>>().RunAsync(throwOnError: true).ConfigureAwait(false);
+            (await args.Validate(nameof(args)).Entity().With<IValidatorEx<AccountArgs>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
             return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
 
@@ -54,10 +53,10 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountDetail?> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId);
-            await accountId.Validate(nameof(accountId)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            (await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
             return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
 
@@ -66,10 +65,10 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Balance?> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId);
-            await accountId.Validate(nameof(accountId)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            (await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
             return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
     }

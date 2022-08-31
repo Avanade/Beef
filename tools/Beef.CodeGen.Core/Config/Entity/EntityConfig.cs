@@ -454,7 +454,7 @@ entities:
         /// </summary>
         [JsonProperty("cosmosPartitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Cosmos", Title = "The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.",
-            Description = "Defaults to `PartitionKey.None`.")]
+            Description = "The value `PartitionKey.None` can be specified. Literals will need to be quoted.")]
         public string? CosmosPartitionKey { get; set; }
 
         /// <summary>
@@ -1062,6 +1062,21 @@ entities:
         public List<ParameterConfig> DataCtorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
+        /// Gets the <see cref="DatabaseName"/> as a <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? DatabaseDataParameter { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="EntityFrameworkName"/> as a <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? EntityFrameworkDataParameter { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="CosmosName"/> as a <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? CosmosDataParameter { get; set; }
+
+        /// <summary>
         /// Gets the EntityController <see cref="OperationConfig"/> collection.
         /// </summary>
         public List<OperationConfig>? WebApiOperations => Operations!.Where(x => IsFalse(x.ExcludeWebApi)).ToList();
@@ -1229,6 +1244,11 @@ entities:
         public bool DataSvcNeedsUsingData => Operations!.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
 
         /// <summary>
+        /// Gets the Cosmos PartitionKey as C# code.
+        /// </summary>
+        public string? CosmosPartitionKeyCode => CosmosPartitionKey == null ? null : (CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? $"Mac.{CosmosPartitionKey}" : $"new Mac.PartitionKey({CosmosPartitionKey})");
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -1250,7 +1270,6 @@ entities:
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
             CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
-            CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             HttpAgentName = InterfaceiseName(DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
@@ -1580,13 +1599,13 @@ entities:
 
             // Data constructors.
             if (UsesDatabase)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
+                DataCtorParameters.Add(DatabaseDataParameter = new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
 
             if (UsesEntityFramework)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
+                DataCtorParameters.Add(EntityFrameworkDataParameter = new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
 
             if (UsesCosmos)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
+                DataCtorParameters.Add(CosmosDataParameter = new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
 
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });

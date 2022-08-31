@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using CoreEx;
 using CoreEx.Business;
 {{#if UsesCosmos}}
-using Beef.Data.Cosmos;
+using CoreEx.Cosmos;
   {{#ifval Root.CosmosUsingNamespace}}
 using {{Root.CosmosUsingNamespace}};
   {{/ifval}}
@@ -87,17 +87,12 @@ namespace {{Root.NamespaceBusiness}}.Data
 {{#ifne Operations.Count 0}}
   {{#each DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
-    {{#if @last}}
-
-    {{/if}}
   {{/each}}
   {{#if DataExtensionsRequired}}
     {{#if HasDataExtensions}}
+
         #region Extensions
 
-    {{/if}}
-    {{#if UsesCosmos}}
-        private Action<CosmosDbArgs>? _onDataArgsCreate;
     {{/if}}
     {{#each DataOperations}}
       {{#ifeq Type 'GetColl'}}
@@ -125,13 +120,16 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{/ifne}}
         private Action<Exception>? {{PrivateName}}OnException;
       {{/if}}
-    {{/each}}
-
     {{#if HasDataExtensions}}
-        #endregion
 
     {{/if}}
+    {{/each}}
+    {{#if HasDataExtensions}}
+
+        #endregion
+    {{/if}}
   {{/if}}
+
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Data"/> class.
         /// </summary>
@@ -175,9 +173,6 @@ namespace {{Root.NamespaceBusiness}}.Data
           {{/if}}
         {{/if}}
       {{/ifne}}
-      {{#ifeq AutoImplement 'Cosmos'}}
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "{{Parent.CosmosContainerId}}"{{#if Paging}}, __result.Paging!{{/if}}, {{CosmosPartitionKeyCode}}, onCreate: _onDataArgsCreate);
-      {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}
             var __dataArgs = ODataArgs.Create(_mapper{{#if Paging}}, __result.Paging!{{/if}}{{#ifval ODataCollectionName}}, "{{ODataCollectionName}}"{{/ifval}});
       {{/ifeq}}
@@ -206,9 +201,9 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
-            __result.Collection = {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{BaseReturnType}}, {{Parent.CosmosModel}}>(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
+            return {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}ct{{/if}});
         {{else}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.CosmosModel}}>(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}{{#ifne Type 'Get'}}await {{/ifne}}{{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}Async({{#if HasValue}}value?? throw new ArgumentNullException(nameof(value)){{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}){{#ifne Type 'Get'}}.ConfigureAwait(false){{/ifne}};
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}

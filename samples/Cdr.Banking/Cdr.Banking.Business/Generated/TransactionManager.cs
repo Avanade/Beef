@@ -7,16 +7,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
-using Cdr.Banking.Common.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Entities;
+using CoreEx.Validation;
+using Cdr.Banking.Business.Entities;
 using Cdr.Banking.Business.DataSvc;
 using Cdr.Banking.Business.Validation;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business
 {
@@ -32,7 +31,7 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>
         public TransactionManager(ITransactionDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); TransactionManagerCtor(); }
+            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TransactionManagerCtor(); }
 
         partial void TransactionManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -43,13 +42,13 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId, args);
-            await MultiValidator.Create()
+            (await MultiValidator.Create()
                 .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
-                .Add(args.Validate(nameof(args)).Entity().With<IValidator<TransactionArgs>>())
-                .RunAsync(throwOnError: true).ConfigureAwait(false);
+                .Add(args.Validate(nameof(args)).Entity().With<IValidatorEx<TransactionArgs>>())
+                .ValidateAsync().ConfigureAwait(false)).ThrowOnError();
 
             return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);

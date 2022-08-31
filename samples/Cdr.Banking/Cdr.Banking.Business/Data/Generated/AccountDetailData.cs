@@ -10,15 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Cosmos;
-using Beef.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Cdr.Banking.Common.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Cosmos;
+using CoreEx.Entities;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using Cdr.Banking.Business.Entities;
 using Mac = Microsoft.Azure.Cosmos;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.Data
 {

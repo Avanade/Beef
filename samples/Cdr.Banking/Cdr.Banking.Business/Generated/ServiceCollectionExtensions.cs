@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using Cdr.Banking.Business;
 
-namespace Cdr.Banking.Business
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static partial class ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.

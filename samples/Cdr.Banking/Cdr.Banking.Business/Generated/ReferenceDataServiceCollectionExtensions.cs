@@ -5,15 +5,16 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
-using Cdr.Banking.Common.Entities;
+using CoreEx.RefData;
+using Cdr.Banking.Business;
+using Cdr.Banking.Business.Entities;
 
-namespace Cdr.Banking.Business
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ReferenceDataServiceCollectionsExtension
+    public static partial class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.
@@ -21,9 +22,7 @@ namespace Cdr.Banking.Business
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
-        {
-            return services.AddSingleton<IReferenceData, ReferenceDataProvider>();
-        }
+            => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>();
     }
 }
 

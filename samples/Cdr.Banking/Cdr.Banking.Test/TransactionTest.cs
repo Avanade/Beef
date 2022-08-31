@@ -1,176 +1,108 @@
-﻿using Beef.Test.NUnit;
-using Cdr.Banking.Api;
-using Cdr.Banking.Business.Validation;
+﻿using Cdr.Banking.Api;
 using Cdr.Banking.Common.Agents;
 using Cdr.Banking.Common.Entities;
 using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using UnitTestEx;
+using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Cdr.Banking.Test
 {
-    public class TransactionTest : UsingAgentTesterServer<Startup>
+    [TestFixture]
+    public class TransactionTest : UsingApiTester<Startup>
     {
-        #region ArgsValidator
-
-        [Test, TestSetUp]
-        public async Task A110_ArgsValidator_Empty()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var ta = new TransactionArgs();
-            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
-
-            Assert.IsFalse(r!.HasErrors);
-            Assert.AreEqual(DateTime.UtcNow.Date.AddDays(-90), ta.FromDate!.Value.Date);
-            Assert.IsNull(ta.ToDate);
-            Assert.IsNull(ta.MinAmount);
-            Assert.IsNull(ta.MaxAmount);
-            Assert.IsNull(ta.Text);
+            ApiTester.UserUser("jessica");
+            TestSetUp.Default.SetUp();
         }
 
-        [Test, TestSetUp]
-        public async Task A120_ArgsValidator_ToDateOnly()
-        {
-            var ta = new TransactionArgs { ToDate = new DateTime(2020, 03, 01) };
-            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
-
-            Assert.IsFalse(r!.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01).AddDays(-90), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
-            Assert.IsNull(ta.MinAmount);
-            Assert.IsNull(ta.MaxAmount);
-            Assert.IsNull(ta.Text);
-        }
-
-        [Test, TestSetUp]
-        public async Task A130_ArgsValidator_ValidSame()
-        {
-            var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 03, 01), MinAmount = 100m, MaxAmount = 100m, Text = "Best Buy" };
-            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
-
-            Assert.IsFalse(r!.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
-            Assert.AreEqual(100m, ta.MinAmount);
-            Assert.AreEqual(100m, ta.MaxAmount);
-            Assert.AreEqual("Best Buy", ta.Text);
-        }
-
-        [Test, TestSetUp]
-        public async Task A140_ArgsValidator_ValidDiff()
-        {
-            var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 04, 01), MinAmount = 100m, MaxAmount = 120m, Text = "Best Buy" };
-            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
-
-            Assert.IsFalse(r!.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 04, 01), ta.ToDate);
-            Assert.AreEqual(100m, ta.MinAmount);
-            Assert.AreEqual(120m, ta.MaxAmount);
-            Assert.AreEqual("Best Buy", ta.Text);
-        }
-
-        [Test, TestSetUp]
-        public async Task A150_ArgsValidator_Invalid()
-        {
-            await ValidationTester.Test()
-                .ExpectMessages(
-                    "Oldest time must be less than or equal to Newest time.",
-                    "Min Amount must be less than or equal to Max Amount.",
-                    "Text contains invalid or non-supported wildcard selection.")
-                .RunAsync(async () =>
-                {
-                    var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 02, 01), MinAmount = 100m, MaxAmount = 80m, Text = "Best*Buy" };
-                    (await new TransactionArgsValidator().ValidateAsync(ta).ConfigureAwait(false)).ThrowOnError();
-                });
-        }
-
-        #endregion
-
-        #region GetTransactions
-
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B110_GetTransactions_FromDate()
         {
-            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(3, v.Result.Count);
-            Assert.AreEqual(new string[] { "X0007", "X0003", "X0001" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(3, v.Collection.Count);
+            Assert.AreEqual(new string[] { "X0007", "X0003", "X0001" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B120_GetTransactions_DateRange()
         {
-            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), ToDate = new DateTime(2019, 07, 01) })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "X0003", "X0001" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "X0003", "X0001" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B130_GetTransactions_MinAmount()
         {
-            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MinAmount = 0 })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(1, v.Result.Count);
-            Assert.AreEqual(new string[] { "X0003" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(1, v.Collection.Count);
+            Assert.AreEqual(new string[] { "X0003" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jessica")]
+        [Test]
         public void B140_GetTransactions_MaxAmount()
         {
-            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MaxAmount = 0 })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "X0007", "X0001" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "X0007", "X0001" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void B150_GetTransactions_Text()
         {
-            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("23456789", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), Text = "usb" })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Result);
-            Assert.AreEqual(2, v.Result.Count);
-            Assert.AreEqual(new string[] { "X0006", "X0002" }, v.Result.Select(x => x.Id).ToArray());
+            Assert.IsNotNull(v!.Collection);
+            Assert.AreEqual(2, v.Collection.Count);
+            Assert.AreEqual(new string[] { "X0006", "X0002" }, v.Collection.Select(x => x.Id).ToArray());
         }
 
-        [Test, TestSetUp("jenny")]
+        [Test]
         public void B160_GetTransactions_AccountAuth()
         {
-            AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
+                .WithUser("jenny")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }
 
-        [Test, TestSetUp("john")]
+        [Test]
         public void B170_GetTransactions_Auth()
         {
-           AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            ApiTester.Agent<TransactionAgent, TransactionCollectionResult>()
+                .WithUser("john")
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }
-
-        #endregion
     }
 }

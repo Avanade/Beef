@@ -4,10 +4,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.Data.Cosmos\Beef.Data.Cosmos.csproj" />
     <ProjectReference Include="..\Cdr.Banking.Common\Cdr.Banking.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataSvc\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.9" />
+    <PackageReference Include="CoreEx.Cosmos" Version="1.0.9" />
+    <PackageReference Include="CoreEx.Validation" Version="1.0.9" />
   </ItemGroup>
 </Project>

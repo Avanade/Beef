@@ -6,8 +6,8 @@
 #pragma warning disable
 
 using System;
-using Beef.RefData;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using System.Threading.Tasks;
+using CoreEx.RefData;
 
 namespace Cdr.Banking.Business.DataSvc
 {
@@ -17,11 +17,11 @@ namespace Cdr.Banking.Business.DataSvc
     public partial interface IReferenceDataDataSvc
     {
         /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
+        /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="IReferenceData"/> <see cref="Type"/>.
         /// </summary>
-        /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
-        /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        IReferenceDataCollection GetCollection(Type type);
+        /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
+        /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
+        Task<IReferenceDataCollection> GetAsync(Type type);
     }
 }
 

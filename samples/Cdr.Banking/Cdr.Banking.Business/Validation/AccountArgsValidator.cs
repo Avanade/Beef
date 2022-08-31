@@ -1,5 +1,5 @@
-﻿using Beef.Validation;
-using Cdr.Banking.Common.Entities;
+﻿using Cdr.Banking.Business.Entities;
+using CoreEx.Validation;
 
 namespace Cdr.Banking.Business.Validation
 {

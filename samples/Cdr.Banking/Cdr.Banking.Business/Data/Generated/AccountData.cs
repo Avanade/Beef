@@ -10,15 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Cosmos;
-using Beef.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Cdr.Banking.Common.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Cosmos;
+using CoreEx.Entities;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using Cdr.Banking.Business.Entities;
 using Mac = Microsoft.Azure.Cosmos;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.Data
 {
@@ -27,19 +27,15 @@ namespace Cdr.Banking.Business.Data
     /// </summary>
     public partial class AccountData : IAccountData
     {
-        private readonly ICosmosDb _cosmos;
-        private readonly AutoMapper.IMapper _mapper;
-
-        private Action<CosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Account>, AccountArgs?, CosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
+        private readonly ICosmos _cosmos;
+        private Func<IQueryable<Model.Account>, AccountArgs?, IQueryable<Model.Account>>? _getAccountsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class.
         /// </summary>
-        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        public AccountData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); AccountDataCtor(); }
+        /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
+        public AccountData(ICosmos cosmos)
+            { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); AccountDataCtor(); }
 
         partial void AccountDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -49,12 +45,9 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            AccountCollectionResult __result = new AccountCollectionResult(paging);
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", __result.Paging!, Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
-            __result.Result = _cosmos.Container<Account, Model.Account>(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
-            return await Task.FromResult(__result).ConfigureAwait(false);
+            return _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<AccountCollectionResult, AccountCollection>();
         });
 
         /// <summary>
@@ -62,10 +55,9 @@ namespace Cdr.Banking.Business.Data
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Account", Mac.PartitionKey.None, onCreate: _onDataArgsCreate);
-            return await _cosmos.Container<AccountDetail, Model.Account>(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
+            return _cosmos.AccountDetails.GetAsync(accountId);
         });
 
         /// <summary>
@@ -73,7 +65,7 @@ namespace Cdr.Banking.Business.Data
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
+        public Task<Balance?> GetBalanceAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, _ => GetBalanceOnImplementationAsync(accountId));
 
         /// <summary>
         /// Provides the <see cref="Account"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.

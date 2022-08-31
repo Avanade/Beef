@@ -1,7 +1,4 @@
-﻿using Beef;
-using Beef.Data.Cosmos;
-using Cdr.Banking.Common.Entities;
-using System.Collections.Generic;
+﻿using Cdr.Banking.Business.Entities;
 using System.Linq;
 
 namespace Cdr.Banking.Business.Data
@@ -19,7 +16,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Perform the query filering for the GetTransactions.
         /// </summary>
-        private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, CosmosDbArgs? __)
+        private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args)
         {
             if (args == null || args.IsInitial)
                 return query.OrderByDescending(x => x.TransactionDateTime);

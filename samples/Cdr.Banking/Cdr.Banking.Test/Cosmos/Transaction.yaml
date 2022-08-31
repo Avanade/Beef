@@ -1,9 +1,0 @@
-﻿Banking:
-  - Transaction:
-    - { id: X0001, accountId: 12345678, type: PAYMENT, status: Posted, postingDateTime: 2019-04-14T00:10:30, transactionDateTime: 2019-04-14T00:10:30, amount: -150.00, merchantName: Amazon, description: Computer mouse }
-    - { id: X0002, accountId: 23456789, type: PAYMENT, status: Posted, postingDateTime: 2019-05-14T00:10:30, transactionDateTime: 2019-05-14T00:10:30, amount: -380.00, merchantName: Apple, description: USB cable }
-    - { id: X0003, accountId: 12345678, type: DIRECT_DEBIT, status: Posted, postingDateTime: 2019-06-14T00:10:30, transactionDateTime: 2019-06-14T00:10:30, amount: 150.00, merchantName: Microsoft, description: Salary }
-    - { id: X0004, accountId: 23456789, type: PAYMENT, status: Posted, postingDateTime: 2019-07-14T00:10:30, transactionDateTime: 2019-07-14T00:10:30, amount: -9.99, merchantName: Best Buy, description: Cable ties }
-    - { id: X0005, accountId: 34567890, type: DIRECT_DEBIT, status: Posted, postingDateTime: 2019-08-14T00:10:30, transactionDateTime: 2019-08-14T00:10:30, amount: 420.00, merchantName: Amazon, description: Salary }
-    - { id: X0006, accountId: 23456789, type: PAYMENT, status: Posted, postingDateTime: 2019-09-14T00:10:30, transactionDateTime: 2019-09-14T00:10:30, amount: -150.00, merchantName: Amazon, description: Monitor stand, reference: XUSB36 }
-    - { id: X0007, accountId: 12345678, type: PAYMENT, status: Posted, postingDateTime: 2019-10-14T00:10:30, transactionDateTime: 2019-10-14T00:10:30, amount: -1088.00, merchantName: Apple, description: iPhone  }

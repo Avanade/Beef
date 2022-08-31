@@ -9,12 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Entities;
 using Cdr.Banking.Business.Data;
-using Cdr.Banking.Common.Entities;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using Cdr.Banking.Business.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.DataSvc
 {
@@ -30,7 +30,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="data">The <see cref="ITransactionData"/>.</param>
         public TransactionDataSvc(ITransactionData data)
-            { _data = Check.NotNull(data, nameof(data)); TransactionDataSvcCtor(); }
+            { _data = data ?? throw new ArgumentNullException(nameof(data)); TransactionDataSvcCtor(); }
 
         partial void TransactionDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -41,7 +41,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
             return __result;

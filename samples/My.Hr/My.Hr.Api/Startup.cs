@@ -40,7 +40,7 @@ namespace My.Hr.Api
 
             // Use JSON property names in validation and default the page size.
             ValidationArgs.DefaultUseJsonNames = true;
-            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+            PagingArgs.DefaultTake = config.GetValue<int>("DefaultPageSize");
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace My.Hr.Api
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            // Add the core beef services.
+            // Add the core services.
             services.AddSettings<HrSettings>()
                     .AddExecutionContext()
                     .AddJsonSerializer()
@@ -104,19 +104,21 @@ namespace My.Hr.Api
             services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(EmployeeData).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
             services.AddAutoMapperWrapper();
 
-            // Add additional services; note Beef requires NewtonsoftJson.
-            services.AddControllers(); //.AddNewtonsoftJson();
+            // Add additional services.
+            services.AddControllers();
             services.AddHealthChecks();
             services.AddHttpClient();
 
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My.Hr API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "My.Hr API", Version = "v1" });
 
                 var xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
                 if (File.Exists(xmlFile))
-                    c.IncludeXmlComments(xmlFile);
+                    options.IncludeXmlComments(xmlFile);
+
+                options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
             });
 
             services.AddSwaggerGenNewtonsoftSupport();

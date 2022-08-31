@@ -8,7 +8,7 @@
 {{#if IsRefData}}
 using CoreEx.RefData;
 {{/if}}
-using Microsoft.Extensions.DependencyInjection;
+using {{Root.NamespaceBusiness}};
 {{#if IsRefData}}
   {{#ifeq EntityUsing 'Business' 'All'}}
 using {{Root.NamespaceBusiness}}.Entities;
@@ -18,12 +18,12 @@ using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
 {{/if}}
 
-namespace {{Root.NamespaceBusiness}}
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
+    public static partial class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.

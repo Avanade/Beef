@@ -10,12 +10,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
-using Beef;
-using Beef.Business;
-using Beef.Data.Cosmos;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using CoreEx.Business;
+using CoreEx.Cosmos;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using CoreEx;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.Data
 {
@@ -24,84 +24,40 @@ namespace Cdr.Banking.Business.Data
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
-        private readonly ICosmosDb _cosmos;
-        private readonly AutoMapper.IMapper _mapper;
+        private readonly ICosmos _cosmos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
-        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        public ReferenceDataData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); ReferenceDataDataCtor(); }
+        /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
+        public ReferenceDataData(ICosmos cosmos)
+            { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ReferenceDataDataCtor(); }
 
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
-        public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.OpenStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.OpenStatus, Model.OpenStatus>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.OpenStatus, Model.OpenStatus>("RefData").Query().SelectQueryAsync<RefDataNamespace.OpenStatusCollection>());
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
-        public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.ProductCategoryCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.ProductCategory, Model.ProductCategory>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.ProductCategory, Model.ProductCategory>("RefData").Query().SelectQueryAsync<RefDataNamespace.ProductCategoryCollection>());
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.AccountUType"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
-        public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.AccountUTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.AccountUType, Model.AccountUType>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.AccountUType, Model.AccountUType>("RefData").Query().SelectQueryAsync<RefDataNamespace.AccountUTypeCollection>());
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
-        public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.MaturityInstructionsCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>("RefData").Query().SelectQueryAsync<RefDataNamespace.MaturityInstructionsCollection>());
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionType"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
-        public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.TransactionTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionType, Model.TransactionType>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionType, Model.TransactionType>("RefData").Query().SelectQueryAsync<RefDataNamespace.TransactionTypeCollection>());
 
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> items.
-        /// </summary>
-        /// <returns>The <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
-        public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
-        {
-            var __coll = new RefDataNamespace.TransactionStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery<RefDataNamespace.TransactionStatus, Model.TransactionStatus>(CosmosDbArgs.Create(_mapper, "RefData", new Beef.Entities.PagingArgs().OverrideTake(100000))).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
-            return __coll;
-        }
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionStatus, Model.TransactionStatus>("RefData").Query().SelectQueryAsync<RefDataNamespace.TransactionStatusCollection>());
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.OpenStatus"/> and Entity Framework <see cref="Model.OpenStatus"/> <i>AutoMapper</i> mapping.
@@ -114,7 +70,6 @@ namespace Cdr.Banking.Business.Data
             public OpenStatusMapperProfile()
             {
                 var d2s = CreateMap<Model.OpenStatus, RefDataNamespace.OpenStatus>();
-
                 OpenStatusMapperProfileCtor(d2s);
             }
 
@@ -132,7 +87,6 @@ namespace Cdr.Banking.Business.Data
             public ProductCategoryMapperProfile()
             {
                 var d2s = CreateMap<Model.ProductCategory, RefDataNamespace.ProductCategory>();
-
                 ProductCategoryMapperProfileCtor(d2s);
             }
 
@@ -150,7 +104,6 @@ namespace Cdr.Banking.Business.Data
             public AccountUTypeMapperProfile()
             {
                 var d2s = CreateMap<Model.AccountUType, RefDataNamespace.AccountUType>();
-
                 AccountUTypeMapperProfileCtor(d2s);
             }
 
@@ -168,7 +121,6 @@ namespace Cdr.Banking.Business.Data
             public MaturityInstructionsMapperProfile()
             {
                 var d2s = CreateMap<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions>();
-
                 MaturityInstructionsMapperProfileCtor(d2s);
             }
 
@@ -186,7 +138,6 @@ namespace Cdr.Banking.Business.Data
             public TransactionTypeMapperProfile()
             {
                 var d2s = CreateMap<Model.TransactionType, RefDataNamespace.TransactionType>();
-
                 TransactionTypeMapperProfileCtor(d2s);
             }
 
@@ -204,7 +155,6 @@ namespace Cdr.Banking.Business.Data
             public TransactionStatusMapperProfile()
             {
                 var d2s = CreateMap<Model.TransactionStatus, RefDataNamespace.TransactionStatus>();
-
                 TransactionStatusMapperProfileCtor(d2s);
             }
 

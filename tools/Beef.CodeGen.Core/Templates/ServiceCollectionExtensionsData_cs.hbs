@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using {{Root.NamespaceBusiness}}.Data;
 
-namespace {{Root.NamespaceBusiness}}.Data
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Data</b>-layer services.
     /// </summary>
-    public static class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
+    public static partial class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Data</b>-layer services.

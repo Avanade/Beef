@@ -1,5 +1,5 @@
-﻿using Beef.Validation;
-using Cdr.Banking.Common.Entities;
+﻿using Cdr.Banking.Business.Entities;
+using CoreEx.Validation;
 using System;
 
 namespace Cdr.Banking.Business.Validation
@@ -23,7 +23,7 @@ namespace Cdr.Banking.Business.Validation
             Property(x => x.MinAmount).CompareProperty(CompareOperator.LessThanEqual, y => y.MaxAmount).DependsOn(y => y.MaxAmount);
 
             // Make sure the Text does not include the '*' wildcard character.
-            Property(x => x.Text).Wildcard(Beef.Wildcard.None);
+            Property(x => x.Text).Wildcard(CoreEx.Wildcards.Wildcard.None);
         }
     }
 }

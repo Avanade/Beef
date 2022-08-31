@@ -8,51 +8,44 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
     /// Represents the Balance model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Balance
     {
         /// <summary>
         /// Gets or sets the Current Balance.
         /// </summary>
-        [JsonProperty("currentBalance", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public decimal CurrentBalance { get; set; }
 
         /// <summary>
         /// Gets or sets the Available Balance.
         /// </summary>
-        [JsonProperty("availableBalance", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public decimal AvailableBalance { get; set; }
 
         /// <summary>
         /// Gets or sets the Credit Limit.
         /// </summary>
-        [JsonProperty("creditLimit", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public decimal CreditLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the Amortised Limit.
         /// </summary>
-        [JsonProperty("amortisedLimit", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public decimal AmortisedLimit { get; set; }
 
         /// <summary>
         /// Gets or sets the Currency.
         /// </summary>
-        [JsonProperty("currency", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Currency { get; set; }
 
         /// <summary>
         /// Gets or sets the Purses.
         /// </summary>
-        [JsonProperty("purses", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public BalancePurseCollection? Purses { get; set; }
     }
 }

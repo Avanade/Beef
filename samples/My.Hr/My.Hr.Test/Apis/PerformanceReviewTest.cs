@@ -24,9 +24,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A110_Get_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
@@ -34,9 +34,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A110_Get()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -59,9 +59,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A210_GetByEmployeeId_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByEmployeeIdAsync(4.ToGuid())).Value!;
 
@@ -73,9 +73,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A220_GetByEmployeeId()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByEmployeeIdAsync(2.ToGuid())).Value!;
 
@@ -88,9 +88,9 @@ namespace My.Hr.Test.Apis
         [Test]
         public void A220_GetByEmployeeId_Last()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReviewCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByEmployeeIdAsync(2.ToGuid(), PagingArgs.CreateSkipAndTake(0, 1))).Value!;
 
@@ -107,7 +107,7 @@ namespace My.Hr.Test.Apis
         [Test]
         public void B110_Create()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             var v = new PerformanceReview
             {
@@ -118,7 +118,7 @@ namespace My.Hr.Test.Apis
             };
 
             // Create value.
-            v = agentTester.Agent<PerformanceReviewAgent, PerformanceReview>()
+            v = apiTester.Agent<PerformanceReviewAgent, PerformanceReview>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
@@ -130,7 +130,7 @@ namespace My.Hr.Test.Apis
             Assert.AreEqual(3.ToGuid(), v.EmployeeId);
 
             // Check the value was created properly.
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(v.Id));
@@ -143,15 +143,15 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C110_Update_NotFound()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value!;
 
             // Try updating with an invalid identifier.
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
@@ -159,22 +159,22 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C120_Update_Concurrency()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 3.ToGuid();
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
             // Try updating the value with an invalid eTag (if-match).
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id, new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag }));
 
             // Try updating the value with an invalid eTag.
             v.ETag = TestSetUp.Default.ConcurrencyErrorETag;
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .Run(a => a.UpdateAsync(v, id));
         }
@@ -182,11 +182,11 @@ namespace My.Hr.Test.Apis
         [Test]
         public void C130_Update()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             // Get an existing value.
             var id = 3.ToGuid();
-            var v = agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            var v = apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id)).Value!;
 
@@ -194,7 +194,7 @@ namespace My.Hr.Test.Apis
             v.Notes += "X";
 
             // Update the value.
-            v = agentTester.Agent<PerformanceReviewAgent, PerformanceReview>()
+            v = apiTester.Agent<PerformanceReviewAgent, PerformanceReview>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
@@ -204,7 +204,7 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.UpdateAsync(v, id)).Value!;
 
             // Check the value was updated properly.
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(id));
@@ -217,28 +217,28 @@ namespace My.Hr.Test.Apis
         [Test]
         public void E110_Delete()
         {
-            using var agentTester = ApiTester.Create<Startup>();
+            using var apiTester = ApiTester.Create<Startup>();
 
             var id = 3.ToGuid();
 
             // Get an existing value.
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(id));
 
             // Delete value.
-            agentTester.Agent<PerformanceReviewAgent>()
+            apiTester.Agent<PerformanceReviewAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .ExpectEvent($"my.hr.performancereview", "deleted")
                 .Run(a => a.DeleteAsync(id));
 
             // Check value no longer exists.
-            agentTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
+            apiTester.Agent<PerformanceReviewAgent, PerformanceReview?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(id));
 
             // Delete again (should still be successful as a Delete is idempotent); note there should be no corresponding event as nothing actually happened.
-            agentTester.Agent<PerformanceReviewAgent>()
+            apiTester.Agent<PerformanceReviewAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(id));
         }

@@ -8,15 +8,15 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
 using Cdr.Banking.Business;
-using Cdr.Banking.Common.Entities;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using Cdr.Banking.Business.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Api.Controllers
 {
@@ -24,16 +24,19 @@ namespace Cdr.Banking.Api.Controllers
     /// Provides the <see cref="Transaction"/> Web API functionality.
     /// </summary>
     [Route("api/v1/banking/accounts")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class TransactionController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly ITransactionManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="ITransactionManager"/>.</param>
-        public TransactionController(ITransactionManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); TransactionControllerCtor(); }
+        public TransactionController(WebApi webApi, ITransactionManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); TransactionControllerCtor(); }
 
         partial void TransactionControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -50,11 +53,10 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("{accountId}/transactions")]
         [ProducesResponseType(typeof(TransactionCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetTransactions([FromRoute] string? accountId, [FromQuery(Name = "oldest-time")] DateTime? fromDate = default, [FromQuery(Name = "newest-time")] DateTime? toDate = default, [FromQuery(Name = "min-amount")] decimal? minAmount = default, [FromQuery(Name = "max-amount")] decimal? maxAmount = default, string? text = default)
+        public Task<IActionResult> GetTransactions([FromRoute] string? accountId, [FromQuery(Name="oldest-time")] DateTime? fromDate = default, [FromQuery(Name="newest-time")] DateTime? toDate = default, [FromQuery(Name="min-amount")] decimal? minAmount = default, [FromQuery(Name="max-amount")] decimal? maxAmount = default, [FromQuery(Name="text")] string? text = default)
         {
             var args = new TransactionArgs { FromDate = fromDate, ToDate = toDate, MinAmount = minAmount, MaxAmount = maxAmount, Text = text };
-            return new WebApiGet<TransactionCollectionResult, TransactionCollection, Transaction>(this, () => _manager.GetTransactionsAsync(accountId, args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<TransactionCollectionResult>(Request, p => _manager.GetTransactionsAsync(accountId, args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
     }
 }

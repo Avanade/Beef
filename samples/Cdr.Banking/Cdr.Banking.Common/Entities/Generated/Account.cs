@@ -7,405 +7,73 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
     /// Represents the Account entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Account : EntityBase, IStringIdentifier, IUniqueKey, IEquatable<Account>
+    public partial class Account : IIdentifier<string>
     {
-        #region Privates
-
-        private string? _id;
-        private DateTime _creationDate;
-        private string? _displayName;
-        private string? _nickname;
-        private string? _openStatusSid;
-        private bool _isOwned;
-        private string? _maskedNumber;
-        private string? _productCategorySid;
-        private string? _productName;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the <see cref="Account"/> identifier.
         /// </summary>
-        [JsonProperty("accountId", DefaultValueHandling = DefaultValueHandling.Include)]
-        [Display(Name="Identifier")]
-        public string? Id
-        {
-            get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id));
-        }
+        [JsonPropertyName("accountId")]
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the Creation Date.
         /// </summary>
-        [JsonProperty("creationDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Creation Date")]
-        public DateTime CreationDate
-        {
-            get => _creationDate;
-            set => SetValue(ref _creationDate, value, false, DateTimeTransform.DateOnly, nameof(CreationDate));
-        }
+        public DateTime CreationDate { get; set; }
 
         /// <summary>
         /// Gets or sets the Display Name.
         /// </summary>
-        [JsonProperty("displayName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Display Name")]
-        public string? DisplayName
-        {
-            get => _displayName;
-            set => SetValue(ref _displayName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(DisplayName));
-        }
+        public string? DisplayName { get; set; }
 
         /// <summary>
         /// Gets or sets the Nickname.
         /// </summary>
-        [JsonProperty("nickname", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Nickname")]
-        public string? Nickname
-        {
-            get => _nickname;
-            set => SetValue(ref _nickname, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Nickname));
-        }
+        public string? Nickname { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="OpenStatus"/> using the underlying Serialization Identifier (SID).
+        /// Gets or sets the Open Status.
         /// </summary>
-        [JsonProperty("openStatus", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Open Status")]
-        public string? OpenStatusSid
-        {
-            get => _openStatusSid;
-            set => SetValue(ref _openStatusSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(OpenStatus));
-        }
-
-        /// <summary>
-        /// Gets or sets the Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Open Status")]
-        public RefDataNamespace.OpenStatus? OpenStatus
-        {
-            get => _openStatusSid;
-            set => SetValue(ref _openStatusSid, value, false, false, nameof(OpenStatus)); 
-        }
+        public string? OpenStatus { get; set; }
 
         /// <summary>
         /// Indicates whether Is Owned.
         /// </summary>
-        [JsonProperty("isOwned", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Is Owned")]
-        public bool IsOwned
-        {
-            get => _isOwned;
-            set => SetValue(ref _isOwned, value, false, false, nameof(IsOwned));
-        }
+        public bool IsOwned { get; set; }
 
         /// <summary>
         /// Gets or sets the Masked Number.
         /// </summary>
-        [JsonProperty("maskedNumber", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Masked Number")]
-        public string? MaskedNumber
-        {
-            get => _maskedNumber;
-            set => SetValue(ref _maskedNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaskedNumber));
-        }
+        public string? MaskedNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ProductCategory"/> using the underlying Serialization Identifier (SID).
+        /// Gets or sets the Product Category.
         /// </summary>
-        [JsonProperty("productCategory", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Product Category")]
-        public string? ProductCategorySid
-        {
-            get => _productCategorySid;
-            set => SetValue(ref _productCategorySid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductCategory));
-        }
-
-        /// <summary>
-        /// Gets or sets the Product Category (see <see cref="RefDataNamespace.ProductCategory"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Product Category")]
-        public RefDataNamespace.ProductCategory? ProductCategory
-        {
-            get => _productCategorySid;
-            set => SetValue(ref _productCategorySid, value, false, false, nameof(ProductCategory)); 
-        }
+        public string? ProductCategory { get; set; }
 
         /// <summary>
         /// Gets or sets the Product Name.
         /// </summary>
-        [JsonProperty("productName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Product Name")]
-        public string? ProductName
-        {
-            get => _productName;
-            set => SetValue(ref _productName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductName));
-        }
-
-        #endregion
-
-        #region IUniqueKey
-        
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
-
-        /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
-        /// <param name="accountId">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(string? accountId) => new UniqueKey(accountId);
-
-        /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
-        /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Id);
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is Account val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="Account"/> is equal to the current <see cref="Account"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="Account"/> to compare with the current <see cref="Account"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="Account"/> is equal to the current <see cref="Account"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(Account? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(CreationDate, value.CreationDate)
-                && Equals(DisplayName, value.DisplayName)
-                && Equals(Nickname, value.Nickname)
-                && Equals(OpenStatusSid, value.OpenStatusSid)
-                && Equals(IsOwned, value.IsOwned)
-                && Equals(MaskedNumber, value.MaskedNumber)
-                && Equals(ProductCategorySid, value.ProductCategorySid)
-                && Equals(ProductName, value.ProductName);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="Account"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="Account"/> A.</param>
-        /// <param name="b"><see cref="Account"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (Account? a, Account? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="Account"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="Account"/> A.</param>
-        /// <param name="b"><see cref="Account"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (Account? a, Account? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="Account"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="Account"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Id);
-            hash.Add(CreationDate);
-            hash.Add(DisplayName);
-            hash.Add(Nickname);
-            hash.Add(OpenStatusSid);
-            hash.Add(IsOwned);
-            hash.Add(MaskedNumber);
-            hash.Add(ProductCategorySid);
-            hash.Add(ProductName);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="Account"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Account"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<Account>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="Account"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Account"/> to copy from.</param>
-        public void CopyFrom(Account from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            Id = from.Id;
-            CreationDate = from.CreationDate;
-            DisplayName = from.DisplayName;
-            Nickname = from.Nickname;
-            OpenStatusSid = from.OpenStatusSid;
-            IsOwned = from.IsOwned;
-            MaskedNumber = from.MaskedNumber;
-            ProductCategorySid = from.ProductCategorySid;
-            ProductName = from.ProductName;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="Account"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="Account"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new Account();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="Account"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Id = Cleaner.Clean(Id, StringTrim.UseDefault, StringTransform.UseDefault);
-            CreationDate = Cleaner.Clean(CreationDate, DateTimeTransform.DateOnly);
-            DisplayName = Cleaner.Clean(DisplayName, StringTrim.UseDefault, StringTransform.UseDefault);
-            Nickname = Cleaner.Clean(Nickname, StringTrim.UseDefault, StringTransform.UseDefault);
-            OpenStatusSid = Cleaner.Clean(OpenStatusSid);
-            IsOwned = Cleaner.Clean(IsOwned);
-            MaskedNumber = Cleaner.Clean(MaskedNumber, StringTrim.UseDefault, StringTransform.UseDefault);
-            ProductCategorySid = Cleaner.Clean(ProductCategorySid);
-            ProductName = Cleaner.Clean(ProductName, StringTrim.UseDefault, StringTransform.UseDefault);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(Id)
-                    && Cleaner.IsInitial(CreationDate)
-                    && Cleaner.IsInitial(DisplayName)
-                    && Cleaner.IsInitial(Nickname)
-                    && Cleaner.IsInitial(OpenStatusSid)
-                    && Cleaner.IsInitial(IsOwned)
-                    && Cleaner.IsInitial(MaskedNumber)
-                    && Cleaner.IsInitial(ProductCategorySid)
-                    && Cleaner.IsInitial(ProductName);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(Account from);
-
-        #endregion
+        public string? ProductName { get; set; }
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="Account"/> collection.
     /// </summary>
-    public partial class AccountCollection : EntityBaseCollection<Account>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollection"/> class.
-        /// </summary>
-        public AccountCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="Account"/> entities.</param>
-        public AccountCollection(IEnumerable<Account> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="AccountCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="AccountCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new AccountCollection();
-            foreach (var item in this)
-            {
-                clone.Add((Account)item.Clone());
-            }
-                
-            return clone;
-        }
-
-        /// <summary>
-        /// An implicit cast from the <see cref="AccountCollectionResult"/> to a corresponding <see cref="AccountCollection"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="AccountCollectionResult"/>.</param>
-        /// <returns>The corresponding <see cref="AccountCollection"/>.</returns>
-        public static implicit operator AccountCollection(AccountCollectionResult result) => result?.Result!;
-    }
-
-    #endregion  
-
-    #region CollectionResult
+    public partial class AccountCollection : List<Account> { }
 
     /// <summary>
     /// Represents the <see cref="Account"/> collection result.
     /// </summary>
-    public class AccountCollectionResult : EntityCollectionResult<AccountCollection, Account>
+    public class AccountCollectionResult : CollectionResult<AccountCollection, Account>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountCollectionResult"/> class.
@@ -423,21 +91,8 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public AccountCollectionResult(IEnumerable<Account> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="AccountCollectionResult"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="AccountCollectionResult"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new AccountCollectionResult();
-            clone.CopyFrom(this);
-            return clone;
-        }
+        public AccountCollectionResult(IEnumerable<Account> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
-
-    #endregion
 }
 
 #pragma warning restore

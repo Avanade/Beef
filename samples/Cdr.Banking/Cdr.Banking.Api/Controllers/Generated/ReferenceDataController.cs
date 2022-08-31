@@ -12,12 +12,12 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.RefData;
+using CoreEx;
+using CoreEx.WebApis;
+using CoreEx.Entities;
+using CoreEx.RefData;
 using Cdr.Banking.Common.Entities;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Api.Controllers
 {
@@ -26,6 +26,15 @@ namespace Cdr.Banking.Api.Controllers
     /// </summary>
     public partial class ReferenceDataController : ControllerBase
     {
+        private readonly ReferenceDataContentWebApi _webApi;
+        private readonly ReferenceDataOrchestrator _orchestrator;
+
+        public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
+        {
+            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
+            _orchestrator = orchestrator ?? throw new ArgumentNullException(nameof(orchestrator));
+        }
+
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.OpenStatus"/> reference data items that match the specified criteria.
         /// </summary>
@@ -35,10 +44,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/openStatuses")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult OpenStatusGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.OpenStatus>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> OpenStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.OpenStatus>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.ProductCategory"/> reference data items that match the specified criteria.
@@ -49,10 +56,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/productCategories")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult ProductCategoryGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.ProductCategory>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> ProductCategoryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.ProductCategory>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.AccountUType"/> reference data items that match the specified criteria.
@@ -63,10 +68,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/accountUTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult AccountUTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.AccountUType>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> AccountUTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.AccountUType>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.MaturityInstructions"/> reference data items that match the specified criteria.
@@ -77,10 +80,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/maturityInstructions")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult MaturityInstructionsGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.MaturityInstructions>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> MaturityInstructionsGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.MaturityInstructions>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.TransactionType"/> reference data items that match the specified criteria.
@@ -91,10 +92,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/transactionTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult TransactionTypeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TransactionType>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> TransactionTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionType>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.TransactionStatus"/> reference data items that match the specified criteria.
@@ -105,10 +104,8 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref/transactionStatuses")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult TransactionStatusGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.TransactionStatus>>(this, 
-            async () => await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, codes, text, includeInactive: this.IncludeInactive()).ConfigureAwait(false),
-            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> TransactionStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionStatus>(codes, text, p.RequestOptions.IncludeInactive));
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
@@ -117,34 +114,7 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet()]
         [Route("api/v1/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetNamed()
-        {
-            return new WebApiGet<ReferenceDataMultiCollection>(this, async () =>
-            {
-                var coll = new ReferenceDataMultiCollection();
-                var inactive = this.IncludeInactive();
-                var refSelection = this.ReferenceDataSelection();
-
-                var names = refSelection.Select(x => x.Key).ToArray();
-                await RefDataNamespace.ReferenceData.Current.PrefetchAsync(names).ConfigureAwait(false);
-
-                foreach (var q in refSelection)
-                {
-                    switch (q.Key)
-                    {
-                        case var s when string.Compare(s, nameof(RefDataNamespace.OpenStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.OpenStatus), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(RefDataNamespace.ReferenceData.Current.OpenStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.ProductCategory), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.ProductCategory), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(RefDataNamespace.ReferenceData.Current.ProductCategory, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.AccountUType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.AccountUType), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(RefDataNamespace.ReferenceData.Current.AccountUType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.MaturityInstructions), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.MaturityInstructions), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(RefDataNamespace.ReferenceData.Current.MaturityInstructions, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionType), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(RefDataNamespace.ReferenceData.Current.TransactionType, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                        case var s when string.Compare(s, nameof(RefDataNamespace.TransactionStatus), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TransactionStatus), await ReferenceDataFilterer.ApplyFilterAsync<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(RefDataNamespace.ReferenceData.Current.TransactionStatus, q.Value, includeInactive: inactive).ConfigureAwait(false))); break;
-                    }
-                }
-                
-                return coll;
-            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
+        public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }
 

@@ -43,8 +43,14 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// <summary>
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
     /// </summary>
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+{{#ifnull RefDataType}}
     {
+{{else}}
+  {{#ifne CoreProperties.Count 0}}
+    {
+  {{/ifne}}
+{{/ifnull}}
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}
   {{#unless @first}}
@@ -111,16 +117,17 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{/unless}}
         public {{{PrivateType}}} {{Name}} { get; set; }
 {{/each}}
-{{#unless RefDataType}}
-  {{#ifne UniqueKeyProperties.Count 0}}
+{{#unless HasIdentifier}}
+  {{#unless RefDataType}}
+    {{#ifne UniqueKeyProperties.Count 0}}
         
         /// <summary>
         /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
         /// <returns>The primary <see cref="CompositeKey"/>.</returns>
-  {{#each UniqueKeyProperties}}
+    {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
-  {{/each}}
+    {{/each}}
         public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
@@ -128,9 +135,16 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// </summary>
         [JsonIgnore]
         public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
-  {{/ifne}}
+    {{/ifne}}
+  {{/unless}}
 {{/unless}}
+{{#ifnull RefDataType}}
     }
+{{else}}
+  {{#ifne CoreProperties.Count 0}}
+    }
+  {{/ifne}}
+{{/ifnull}}
 {{! ===== Collection ===== }}
 {{#if Collection}}
 

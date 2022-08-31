@@ -10,15 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Cosmos;
-using Beef.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Cdr.Banking.Common.Entities;
+using CoreEx;
+using CoreEx.Business;
+using CoreEx.Cosmos;
+using CoreEx.Entities;
+using CoreEx.Mapping;
+using CoreEx.Mapping.Converters;
+using Cdr.Banking.Business.Entities;
 using Mac = Microsoft.Azure.Cosmos;
-using RefDataNamespace = Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Business.Entities;
 
 namespace Cdr.Banking.Business.Data
 {
@@ -27,19 +27,15 @@ namespace Cdr.Banking.Business.Data
     /// </summary>
     public partial class TransactionData : ITransactionData
     {
-        private readonly ICosmosDb _cosmos;
-        private readonly AutoMapper.IMapper _mapper;
-
-        private Action<CosmosDbArgs>? _onDataArgsCreate;
-        private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, CosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
+        private readonly ICosmos _cosmos;
+        private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionData"/> class.
         /// </summary>
-        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        public TransactionData(ICosmosDb cosmos, AutoMapper.IMapper mapper)
-            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); _mapper = Check.NotNull(mapper, nameof(mapper)); TransactionDataCtor(); }
+        /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
+        public TransactionData(ICosmos cosmos)
+            { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); TransactionDataCtor(); }
 
         partial void TransactionDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -50,12 +46,9 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            TransactionCollectionResult __result = new TransactionCollectionResult(paging);
-            var __dataArgs = CosmosDbArgs.Create(_mapper, "Transaction", __result.Paging!, new Mac.PartitionKey(accountId), onCreate: _onDataArgsCreate);
-            __result.Result = _cosmos.Container<Transaction, Model.Transaction>(__dataArgs).Query(q => _getTransactionsOnQuery?.Invoke(q, accountId, args, __dataArgs) ?? q).SelectQuery<TransactionCollection>();
-            return await Task.FromResult(__result).ConfigureAwait(false);
+            return _cosmos.Transactions.Query(new Mac.PartitionKey(accountId), q => _getTransactionsOnQuery?.Invoke(q, accountId, args) ?? q).WithPaging(paging).SelectResultAsync<TransactionCollectionResult, TransactionCollection>();
         });
 
         /// <summary>
