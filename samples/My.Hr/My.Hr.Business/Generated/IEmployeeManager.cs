@@ -5,13 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CoreEx.Entities;
-using My.Hr.Business.Entities;
-using RefDataNamespace = My.Hr.Business.Entities;
-
 namespace My.Hr.Business
 {
     /// <summary>

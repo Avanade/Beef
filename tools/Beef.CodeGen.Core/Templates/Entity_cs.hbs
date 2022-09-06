@@ -5,43 +5,31 @@
 
 #nullable enable
 #pragma warning disable
-
+{{set 'HasUsingStatement' false}}
 {{! ===== Using ===== }}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-{{#ifeq JsonSerializer 'SystemText'}}
-using System.Text.Json.Serialization;
-{{/ifeq}}
-using CoreEx.Entities;
-using CoreEx.Entities.Extended;
-using CoreEx.RefData;
 {{#ifeq JsonSerializer 'Newtonsoft'}}
-using Newtonsoft.Json;
+using Newtonsoft.Json;{{set 'HasUsingStatement' true}}
 {{/ifeq}}
 {{#if Root.UsingNamespace1}}
-using {{Root.UsingNamespace1}};
+using {{Root.UsingNamespace1}};{{set 'HasUsingStatement' true}}
 {{/if}}
 {{#if Root.UsingNamespace2}}
-using {{Root.UsingNamespace2}};
+using {{Root.UsingNamespace2}};{{set 'HasUsingStatement' true}}
 {{/if}}
 {{#if Root.UsingNamespace3}}
-using {{Root.UsingNamespace3}};
+using {{Root.UsingNamespace3}};{{set 'HasUsingStatement' true}}
 {{/if}}
 {{#ifeq EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
-using {{Root.NamespaceCommon}}.Entities;
+using {{Root.NamespaceCommon}}.Entities;{{set 'HasUsingStatement' true}}
   {{/ifeq}}
 {{/ifeq}}
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
-{{/ifval}}
 {{#ifval Root.RefDataBusNamespace}}
-using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
+using RefDataBusNamespace = {{Root.RefDataBusNamespace}};{{set 'HasUsingStatement' true}}
 {{/ifval}}
+{{#if HasUsingStatement}}
 
+{{/if}}
 {{! ===== Class ===== }}
 namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
@@ -96,7 +84,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
       {{/ifval}}
     {{/if}}
     {{#ifval DisplayName}}
-        [Display(Name="{{DisplayName}}")]
+        [System.ComponentModel.DataAnnotations.Display(Name="{{DisplayName}}")]
     {{/ifval}}
         public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}); }
     {{#unless SerializationIgnore}}

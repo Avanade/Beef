@@ -5,17 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.Entities.Extended;
-using CoreEx.RefData;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Business.Entities
 {
     /// <summary>

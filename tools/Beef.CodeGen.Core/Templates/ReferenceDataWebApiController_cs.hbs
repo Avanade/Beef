@@ -5,25 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using CoreEx;
-using CoreEx.WebApis;
-using CoreEx.Entities;
-using CoreEx.RefData;
-using {{Root.NamespaceCommon}}.Entities;
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
-{{/ifval}}
-{{#ifval Root.RefDataBusNamespace}}
-using RefDataNamespace = {{Root.RefDataBusNamespace}};
-{{/ifval}}
-
 namespace {{Root.NamespaceApi}}.Controllers
 {
     /// <summary>

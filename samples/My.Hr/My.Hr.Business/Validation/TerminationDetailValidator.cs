@@ -1,7 +1,4 @@
-﻿using CoreEx.Validation;
-using My.Hr.Business.Entities;
-
-namespace My.Hr.Business.Validation
+﻿namespace My.Hr.Business.Validation
 {
     /// <summary>
     /// Represents a <see cref="TerminationDetail"/> validator.

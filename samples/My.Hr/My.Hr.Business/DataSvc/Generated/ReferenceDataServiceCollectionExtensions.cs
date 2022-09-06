@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using My.Hr.Business.DataSvc;
 
-namespace My.Hr.Business.DataSvc
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static class ReferenceDataServiceCollectionsExtension
+    public static partial class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>DataSvc</b>-layer services.

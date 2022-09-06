@@ -6,35 +6,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-{{#if Root.CancellationToken}}
-using System.Threading;
-{{/if}}
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Business;
-using CoreEx.Entities;
-using CoreEx.Validation;
-{{#ifeq EntityUsing 'Common' 'All'}}
-using {{Root.NamespaceCommon}}.Entities;
-{{/ifeq}}
-{{#ifeq EntityUsing 'Business' 'All'}}
-using {{Root.NamespaceBusiness}}.Entities;
-{{/ifeq}}
-{{#if ManagerNeedsUsingDataSvc}}
-using {{Root.NamespaceBusiness}}.DataSvc;
-{{/if}}
-{{#if UsesValidators}}
-using {{#ifeq Root.ValidatorLayer 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Validation;
-{{/if}}
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
-{{/ifval}}
-{{#ifval Root.RefDataBusNamespace}}
-using RefDataNamespace = {{Root.RefDataBusNamespace}};
-{{/ifval}}
-
 namespace {{Root.NamespaceBusiness}}
 {
     /// <summary>

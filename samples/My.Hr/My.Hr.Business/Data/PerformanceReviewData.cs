@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace My.Hr.Business.Data
+﻿namespace My.Hr.Business.Data
 {
     public partial class PerformanceReviewData
     {

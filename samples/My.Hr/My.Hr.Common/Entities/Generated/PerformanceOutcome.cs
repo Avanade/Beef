@@ -17,9 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Performance Outcome entity.
     /// </summary>
-    public partial class PerformanceOutcome : ReferenceDataBase<Guid>
-    {
-    }
+    public partial class PerformanceOutcome : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="PerformanceOutcome"/> collection.

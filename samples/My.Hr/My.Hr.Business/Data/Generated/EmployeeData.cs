@@ -5,24 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Business;
-using CoreEx.Database;
-using CoreEx.Database.Extended;
-using CoreEx.Database.Mapping;
-using CoreEx.EntityFrameworkCore;
-using CoreEx.Entities;
-using CoreEx.Events;
-using CoreEx.Mapping;
-using CoreEx.Mapping.Converters;
-using My.Hr.Business.Entities;
-using RefDataNamespace = My.Hr.Business.Entities;
-
 namespace My.Hr.Business.Data
 {
     /// <summary>
@@ -33,7 +15,6 @@ namespace My.Hr.Business.Data
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
         private readonly IEventPublisher _events;
-
         private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
 
         /// <summary>

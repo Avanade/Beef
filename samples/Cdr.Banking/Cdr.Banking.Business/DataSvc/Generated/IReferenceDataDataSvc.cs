@@ -5,10 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Threading.Tasks;
-using CoreEx.RefData;
-
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>

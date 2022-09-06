@@ -6,28 +6,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-{{#if Root.CancellationToken}}
-using System.Threading;
-{{/if}}
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Entities;
-{{#ifeq EntityUsing 'Common' 'All'}}
-using {{Root.NamespaceCommon}}.Entities;
-{{/ifeq}}
-{{#ifeq EntityUsing 'Business' 'All'}}
-using {{Root.NamespaceBusiness}}.Entities;
-{{/ifeq}}
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
-{{/ifval}}
-{{#ifval Root.RefDataBusNamespace}}
-using RefDataNamespace = {{Root.RefDataBusNamespace}};
-{{/ifval}}
-
 namespace {{Root.NamespaceBusiness}}.Data
 {
     /// <summary>

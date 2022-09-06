@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Business;
-using CoreEx.Entities;
-using CoreEx.Validation;
-using Cdr.Banking.Business.Entities;
-using Cdr.Banking.Business.DataSvc;
-using Cdr.Banking.Business.Validation;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Business
 {
     /// <summary>

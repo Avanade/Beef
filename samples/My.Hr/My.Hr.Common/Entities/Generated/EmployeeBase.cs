@@ -67,19 +67,6 @@ namespace My.Hr.Common.Entities
         /// Gets or sets the Phone No.
         /// </summary>
         public string? PhoneNo { get; set; }
-        
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
-        /// <param name="id">The <see cref="Id"/>.</param>
-        public static CompositeKey CreatePrimaryKey(Guid id) => new CompositeKey(id);
-
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
-        /// </summary>
-        [JsonIgnore]
-        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
     }
 
     /// <summary>

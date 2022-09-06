@@ -1,14 +1,4 @@
-﻿using CoreEx;
-using CoreEx.Validation;
-using CoreEx.Validation.Rules;
-using My.Hr.Business.DataSvc;
-using My.Hr.Business.Entities;
-using System;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace My.Hr.Business.Validation
+﻿namespace My.Hr.Business.Validation
 {
     /// <summary>
     /// Represents a <see cref="Employee"/> validator.

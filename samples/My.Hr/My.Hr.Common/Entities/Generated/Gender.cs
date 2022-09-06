@@ -17,9 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Gender entity.
     /// </summary>
-    public partial class Gender : ReferenceDataBase<Guid>
-    {
-    }
+    public partial class Gender : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="Gender"/> collection.

@@ -1,8 +1,4 @@
-﻿using CoreEx.Database;
-using CoreEx.EntityFrameworkCore;
-using My.Hr.Business.Data.EfModel;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using My.Hr.Business.Data.EfModel;
 
 namespace My.Hr.Business.Data
 {

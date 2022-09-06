@@ -5,12 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>

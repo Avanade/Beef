@@ -17,9 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Termination Reason entity.
     /// </summary>
-    public partial class TerminationReason : ReferenceDataBase<Guid>
-    {
-    }
+    public partial class TerminationReason : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="TerminationReason"/> collection.

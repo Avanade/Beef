@@ -1,7 +1,4 @@
-﻿using CoreEx.Configuration;
-using Microsoft.Extensions.Configuration;
-
-namespace My.Hr.Business
+﻿namespace My.Hr.Business
 {
     /// <summary>
     /// Provides the <see cref="IConfiguration"/> settings.

@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
-using CoreEx.Business;
-using CoreEx.Cosmos;
-using CoreEx.Mapping;
-using CoreEx.Mapping.Converters;
-using CoreEx;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>

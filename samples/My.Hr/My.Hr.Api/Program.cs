@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-
-namespace My.Hr.Api
+﻿namespace My.Hr.Api
 {
     /// <summary>
     /// The <b>Web API</b> host/program.

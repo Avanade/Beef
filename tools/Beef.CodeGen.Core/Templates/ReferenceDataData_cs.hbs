@@ -5,54 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-{{#if Root.CancellationToken}}
-using System.Threading;
-{{/if}}
-using System.Threading.Tasks;
-{{#if RefData.UsesCosmos}}
-using Microsoft.Azure.Cosmos;
-{{/if}}
-using CoreEx.Business;
-{{#if RefData.UsesCosmos}}
-using CoreEx.Cosmos;
-  {{#ifval Root.CosmosUsingNamespace}}
-using {{Root.CosmosUsingNamespace}};
-  {{/ifval}}
-{{/if}}
-{{#if RefData.UsesDatabase}}
-using CoreEx.Data.Database;
-  {{#ifval Root.DatabaseUsingNamespace}}
-using {{Root.DatabaseUsingNamespace}};
-  {{/ifval}}
-{{/if}}
-{{#if RefData.UsesEntityFramework}}
-  {{#unless RefData.UsesDatabase}}
-using CoreEx.Database;
-  {{/unless}}
-using CoreEx.EntityFrameworkCore;
-  {{#ifval Root.EntityFrameworkUsingNamespace}}
-using {{Root.EntityFrameworkUsingNamespace}};
-  {{/ifval}}
-{{/if}}
-{{#if RefData.UsesOData}}
-using Beef.Data.OData;
-  {{#ifval Root.ODataUsingNamespace}}
-using {{Root.ODataUsingNamespace}};
-  {{/ifval}}
-{{/if}}
-using CoreEx.Mapping;
-using CoreEx.Mapping.Converters;
-using CoreEx;
-{{#ifval Root.RefDataNamespace}}
-using RefDataNamespace = {{Root.RefDataNamespace}};
-{{/ifval}}
-{{#ifval Root.RefDataBusNamespace}}
-using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
-{{/ifval}}
-
 namespace {{Root.NamespaceBusiness}}.Data
 {
     /// <summary>

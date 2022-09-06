@@ -17,9 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the Relationship Type entity.
     /// </summary>
-    public partial class RelationshipType : ReferenceDataBase<Guid>
-    {
-    }
+    public partial class RelationshipType : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="RelationshipType"/> collection.

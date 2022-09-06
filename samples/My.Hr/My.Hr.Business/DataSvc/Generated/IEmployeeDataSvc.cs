@@ -5,15 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Entities;
-using My.Hr.Business.Entities;
-using RefDataNamespace = My.Hr.Business.Entities;
-
 namespace My.Hr.Business.DataSvc
 {
     /// <summary>

@@ -17,9 +17,7 @@ namespace My.Hr.Common.Entities
     /// <summary>
     /// Represents the US State entity.
     /// </summary>
-    public partial class USState : ReferenceDataBase<Guid>
-    {
-    }
+    public partial class USState : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="USState"/> collection.

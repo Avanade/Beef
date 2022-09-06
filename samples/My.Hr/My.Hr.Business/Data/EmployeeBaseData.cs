@@ -1,6 +1,4 @@
-﻿using My.Hr.Business.Entities;
-
-namespace My.Hr.Business.Data
+﻿namespace My.Hr.Business.Data
 {
     public partial class EmployeeBaseData
     {

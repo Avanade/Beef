@@ -1,13 +1,4 @@
-﻿using CoreEx;
-using CoreEx.Database;
-using CoreEx.Database.SqlServer;
-using Microsoft.EntityFrameworkCore;
-using My.Hr.Business.Entities;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace My.Hr.Business.Data
+﻿namespace My.Hr.Business.Data
 {
     public partial class EmployeeData
     {

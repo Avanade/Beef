@@ -5,21 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.Business;
-using CoreEx.Cosmos;
-using CoreEx.Entities;
-using CoreEx.Mapping;
-using CoreEx.Mapping.Converters;
-using Cdr.Banking.Business.Entities;
-using Mac = Microsoft.Azure.Cosmos;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>

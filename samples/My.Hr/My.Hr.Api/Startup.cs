@@ -1,27 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-//using Azure.Messaging.EventHubs.Producer;
-//using Beef;
-//using Beef.Data.Database;
-//using Beef.Data.EntityFrameworkCore;
-//using Beef.Events.EventHubs;
-//using Beef.AspNetCore.WebApi;
-using CoreEx.Entities;
-using CoreEx.Validation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using My.Hr.Business;
-using My.Hr.Business.Data;
-using My.Hr.Business.DataSvc;
-using CoreEx.RefData;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Data.SqlClient;
-
-namespace My.Hr.Api
+﻿namespace My.Hr.Api
 {
     /// <summary>
     /// Represents the <b>startup</b> class.

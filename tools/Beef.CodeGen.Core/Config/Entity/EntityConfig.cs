@@ -1249,6 +1249,11 @@ entities:
         public string? CosmosPartitionKeyCode => CosmosPartitionKey == null ? null : (CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? $"Mac.{CosmosPartitionKey}" : $"new Mac.PartitionKey({CosmosPartitionKey})");
 
         /// <summary>
+        /// Indicates whether a using statement has been generated (set by codegen template).
+        /// </summary>
+        public bool HasUsingStatement { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()

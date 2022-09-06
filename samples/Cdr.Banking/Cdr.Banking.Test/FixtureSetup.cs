@@ -1,10 +1,8 @@
 using Cdr.Banking.Api;
-using Cdr.Banking.Business;
 using Cdr.Banking.Business.Data;
 using CoreEx.Cosmos;
 using CoreEx.Cosmos.Batch;
 using CoreEx.Json.Data;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Threading.Tasks;
@@ -51,11 +49,12 @@ namespace Cdr.Banking.Test
                         UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                     }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-                    await _cosmosDb.Accounts.ImportYamlBatchAsync<FixtureSetUp, Business.Data.Model.Account>("Data.yaml", cancellationToken: ct).ConfigureAwait(false);
-                    await _cosmosDb.Transactions.ImportYamlBatchAsync<FixtureSetUp, Business.Data.Model.Transaction>("Data.yaml", cancellationToken: ct).ConfigureAwait(false);
+                    var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
+                    await _cosmosDb.Accounts.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
+                    await _cosmosDb.Transactions.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
-                    var dra = new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-                    await _cosmosDb.ImportYamlValueBatchAsync<FixtureSetUp>("RefData", test.Services.GetRequiredService<CoreEx.RefData.IReferenceDataProvider>().Types, "RefData.yaml", dataReaderArgs: dra, cancellationToken: ct).ConfigureAwait(false);
+                    jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
+                    await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.IReferenceDataProvider>().Types, cancellationToken: ct).ConfigureAwait(false);
                 }
 
                 return true;

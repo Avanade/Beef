@@ -1,6 +1,4 @@
-﻿using CoreEx.Validation;
-
-namespace My.Hr.Business.Validation
+﻿namespace My.Hr.Business.Validation
 {
     /// <summary>
     /// Provides common validator capabilities.

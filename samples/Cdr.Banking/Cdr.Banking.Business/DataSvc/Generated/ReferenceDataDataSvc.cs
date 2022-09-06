@@ -5,15 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
-using CoreEx;
-using CoreEx.RefData;
-using Cdr.Banking.Business.Data;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>

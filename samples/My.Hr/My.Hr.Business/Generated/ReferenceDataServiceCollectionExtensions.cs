@@ -6,15 +6,15 @@
 #pragma warning disable
 
 using CoreEx.RefData;
-using Microsoft.Extensions.DependencyInjection;
+using My.Hr.Business;
 using My.Hr.Business.Entities;
 
-namespace My.Hr.Business
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ReferenceDataServiceCollectionsExtension
+    public static partial class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.
