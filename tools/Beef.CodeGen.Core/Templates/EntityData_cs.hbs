@@ -205,9 +205,9 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
-            __result.Result = {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{BaseReturnType}}, {{Parent.CosmosModel}}>(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
+            __result.Result = {{DataArgs.Name}}.{{#if Parent.CosmosValueContainer}}Value{{/if}}Container<{{BaseReturnType}}, {{Parent.CosmosModel}}>(__dataArgs).Query(q => {{PrivateName}}OnQuery?.Invoke(q, {{#each CoreDataParameters}}{{{ArgumentName}}}, {{/each}}__dataArgs) ?? q).SelectQuery<{{BaseReturnType}}Collection>();
         {{else}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{#if CosmosValueContainer}}Value{{/if}}Container<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.CosmosModel}}>(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/ifor}}await {{DataArgs.Name}}.{{#if Parent.CosmosValueContainer}}Value{{/if}}Container<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.CosmosModel}}>(__dataArgs).{{Type}}Async({{#each PagingLessDataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ParameterConverted}}{{/if}}{{/each}}).ConfigureAwait(false);
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}
