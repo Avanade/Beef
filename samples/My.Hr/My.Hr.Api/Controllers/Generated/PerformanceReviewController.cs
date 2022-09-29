@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using CoreEx;
-using CoreEx.WebApis;
-using CoreEx.Entities;
-using My.Hr.Business;
-using My.Hr.Business.Entities;
-using RefDataNamespace = My.Hr.Business.Entities;
-
 namespace My.Hr.Api.Controllers
 {
     /// <summary>
