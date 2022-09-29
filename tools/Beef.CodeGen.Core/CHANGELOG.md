@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.18
+- *Fixed:* Code generation where using `CosmosValueContainer` has been corrected.
+
 ## v4.2.17
 - *Fixed:* Cosmos reference data queries were only returning the first 25 rows which has been corrected. 
 

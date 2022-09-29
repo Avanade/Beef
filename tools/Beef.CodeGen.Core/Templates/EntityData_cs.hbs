@@ -103,7 +103,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{/ifeq}}   
         {{#ifeq AutoImplement 'Cosmos'}}
           {{#ifval Parent.CosmosValueContainer}}
-        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<CosmosDbValue{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
           {{else}}
         private Func<IQueryable<{{Parent.CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.CosmosModel}}>>? {{PrivateName}}OnQuery;
           {{/ifval}}

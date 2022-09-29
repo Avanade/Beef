@@ -69,7 +69,7 @@ entities:
 
   # As per the AccountDetail schema it inherits from Account and extends the properties (also inherits the data mapper).
   # 
-- { name: AccountDetail, text: '{{Account}} Detail', inherits: Account, excludeAll: true, excludeData: RequiresMapper, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account, cosmosValueContainer: true, cosmosMapperInheritsFrom: AccountData.CosmosMapper,
+- { name: AccountDetail, text: '{{Account}} Detail', inherits: Account, excludeAll: true, excludeData: RequiresMapper, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account, cosmosMapperInheritsFrom: AccountData.CosmosMapper,
     properties: [
       { name: Bsb },
       { name: AccountNumber },
