@@ -5,11 +5,7 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
 using System.Data;
-using Beef.Data.Database;
-using Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.Data
 {
@@ -20,9 +16,10 @@ namespace Beef.Demo.Business.Data
             /// <summary>
             /// Creates a <see cref="TableValuedParameter"/> for the <paramref name="list"/>.
             /// </summary>
+            /// <param name="database">The <see cref="IDatabase"/>.</param>
             /// <param name="list">The entity list.</param>
             /// <returns>The Table-Valued Parameter.</returns>
-            public TableValuedParameter CreateTableValuedParameter(IEnumerable<WorkHistory> list)
+            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<WorkHistory>? list)
             {        
                 var dt = new DataTable();
                 dt.Columns.Add("WorkHistoryId", typeof(Guid));
@@ -31,7 +28,7 @@ namespace Beef.Demo.Business.Data
                 dt.Columns.Add("EndDate", typeof(DateTime));
 
                 var tvp = new TableValuedParameter("[Demo].[udtWorkHistoryList]", dt);
-                AddToTableValuedParameter(tvp, list);
+                tvp.AddRows(database, this, list);
                 return tvp;
             }
         }

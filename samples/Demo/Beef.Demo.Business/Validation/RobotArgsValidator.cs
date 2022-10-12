@@ -1,5 +1,4 @@
-﻿using Beef.Demo.Common.Entities;
-using Beef.Validation;
+﻿using CoreEx.Wildcards;
 
 namespace Beef.Demo.Business.Validation
 {

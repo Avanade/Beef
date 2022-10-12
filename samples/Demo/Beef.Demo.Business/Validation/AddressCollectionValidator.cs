@@ -1,8 +1,4 @@
-﻿using Beef.Demo.Common.Entities;
-using Beef.Validation;
-using Beef.Validation.Rules;
-
-namespace Beef.Demo.Business.Validation
+﻿namespace Beef.Demo.Business.Validation
 {
     public class AddressCollectionValidator : CollectionValidator<AddressCollection, Address>
     {

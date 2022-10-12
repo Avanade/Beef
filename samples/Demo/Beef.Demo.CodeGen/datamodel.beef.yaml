@@ -1,8 +1,8 @@
 entities:
   # CosmosDb model
-- { name: Robot, text: Robot, collection: true, omitEntityBase: true,
+- { name: Robot, text: Robot, collection: true,
     properties: [
-      { name: Id, type: Guid },
+      { name: Id, type: string, uniqueKey: true },
       { name: ModelNo },
       { name: SerialNo },
       { name: EyeColor },
@@ -13,7 +13,7 @@ entities:
   }
 
   # OData models
-- { name: Product, omitEntityBase: true,
+- { name: Product,
     properties: [
       { name: ID, type: int },
       { name: Name },

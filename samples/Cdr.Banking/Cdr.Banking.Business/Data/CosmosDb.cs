@@ -1,8 +1,4 @@
-﻿using Cdr.Banking.Business.Entities;
-using CoreEx.Cosmos;
-using CoreEx.Mapping;
-using Microsoft.Azure.Cosmos;
-using System.Linq;
+﻿using Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Business.Data
 {

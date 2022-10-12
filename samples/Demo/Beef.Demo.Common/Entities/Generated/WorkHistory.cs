@@ -7,282 +7,55 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
     /// Represents the Work History entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class WorkHistory : EntityBase, IUniqueKey, IEquatable<WorkHistory>
+    public partial class WorkHistory : IPrimaryKey
     {
-        #region Privates
-
-        private Guid _personId;
-        private string? _name;
-        private DateTime _startDate;
-        private DateTime? _endDate;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier (not serialized/read-only for internal data merging).
         /// </summary>
-        [Display(Name="Person")]
-        public Guid PersonId
-        {
-            get => _personId;
-            set => SetValue(ref _personId, value, true, false, nameof(PersonId));
-        }
+        public Guid PersonId { get; set; }
 
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Include)]
-        [Display(Name="Name")]
-        public string? Name
-        {
-            get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name));
-        }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Start Date.
         /// </summary>
-        [JsonProperty("startDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Start Date")]
-        public DateTime StartDate
-        {
-            get => _startDate;
-            set => SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, nameof(StartDate));
-        }
+        public DateTime StartDate { get; set; }
 
         /// <summary>
         /// Gets or sets the End Date.
         /// </summary>
-        [JsonProperty("endDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="End Date")]
-        public DateTime? EndDate
-        {
-            get => _endDate;
-            set => SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, nameof(EndDate));
-        }
-
-        #endregion
-
-        #region IUniqueKey
+        public DateTime? EndDate { get; set; }
         
         /// <summary>
-        /// Gets the list of property names that represent the unique key.
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Name) };
-
-        /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
         /// <param name="name">The <see cref="Name"/>.</param>
-        public static UniqueKey CreateUniqueKey(string? name) => new UniqueKey(name);
+        public static CompositeKey CreatePrimaryKey(string? name) => new CompositeKey(name);
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Name"/>).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Name"/>).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Name);
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is WorkHistory val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="WorkHistory"/> to compare with the current <see cref="WorkHistory"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(WorkHistory? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(PersonId, value.PersonId)
-                && Equals(Name, value.Name)
-                && Equals(StartDate, value.StartDate)
-                && Equals(EndDate, value.EndDate);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="WorkHistory"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="WorkHistory"/> A.</param>
-        /// <param name="b"><see cref="WorkHistory"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (WorkHistory? a, WorkHistory? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="WorkHistory"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="WorkHistory"/> A.</param>
-        /// <param name="b"><see cref="WorkHistory"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (WorkHistory? a, WorkHistory? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="WorkHistory"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="WorkHistory"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(PersonId);
-            hash.Add(Name);
-            hash.Add(StartDate);
-            hash.Add(EndDate);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="WorkHistory"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="WorkHistory"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<WorkHistory>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="WorkHistory"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="WorkHistory"/> to copy from.</param>
-        public void CopyFrom(WorkHistory from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            PersonId = from.PersonId;
-            Name = from.Name;
-            StartDate = from.StartDate;
-            EndDate = from.EndDate;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="WorkHistory"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="WorkHistory"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new WorkHistory();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="WorkHistory"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Name = Cleaner.Clean(Name, StringTrim.UseDefault, StringTransform.UseDefault);
-            StartDate = Cleaner.Clean(StartDate, DateTimeTransform.DateOnly);
-            EndDate = Cleaner.Clean(EndDate, DateTimeTransform.DateOnly);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(PersonId)
-                    && Cleaner.IsInitial(Name)
-                    && Cleaner.IsInitial(StartDate)
-                    && Cleaner.IsInitial(EndDate);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(WorkHistory from);
-
-        #endregion
+        [JsonIgnore]
+        public CompositeKey PrimaryKey => CreatePrimaryKey(Name);
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="WorkHistory"/> collection.
     /// </summary>
-    public partial class WorkHistoryCollection : EntityBaseCollection<WorkHistory>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class.
-        /// </summary>
-        public WorkHistoryCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="WorkHistory"/> entities.</param>
-        public WorkHistoryCollection(IEnumerable<WorkHistory> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="WorkHistoryCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="WorkHistoryCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new WorkHistoryCollection();
-            foreach (var item in this)
-            {
-                clone.Add((WorkHistory)item.Clone());
-            }
-                
-            return clone;
-        }
-    }
-
-    #endregion  
+    public partial class WorkHistoryCollection : List<WorkHistory> { }
 }
 
 #pragma warning restore

@@ -7,229 +7,32 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
     /// Represents the Address entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Address : EntityBase, IEquatable<Address>
+    public partial class Address
     {
-        #region Privates
-
-        private string? _street;
-        private string? _city;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the Street.
         /// </summary>
-        [JsonProperty("street", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Street")]
-        public string? Street
-        {
-            get => _street;
-            set => SetValue(ref _street, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Street));
-        }
+        public string? Street { get; set; }
 
         /// <summary>
         /// Gets or sets the City.
         /// </summary>
-        [JsonProperty("city", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="City")]
-        public string? City
-        {
-            get => _city;
-            set => SetValue(ref _city, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(City));
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is Address val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="Address"/> is equal to the current <see cref="Address"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="Address"/> to compare with the current <see cref="Address"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="Address"/> is equal to the current <see cref="Address"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(Address? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Street, value.Street)
-                && Equals(City, value.City);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="Address"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="Address"/> A.</param>
-        /// <param name="b"><see cref="Address"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (Address? a, Address? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="Address"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="Address"/> A.</param>
-        /// <param name="b"><see cref="Address"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (Address? a, Address? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="Address"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="Address"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Street);
-            hash.Add(City);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="Address"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Address"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<Address>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="Address"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Address"/> to copy from.</param>
-        public void CopyFrom(Address from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            Street = from.Street;
-            City = from.City;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="Address"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="Address"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new Address();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="Address"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Street = Cleaner.Clean(Street, StringTrim.UseDefault, StringTransform.UseDefault);
-            City = Cleaner.Clean(City, StringTrim.UseDefault, StringTransform.UseDefault);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(Street)
-                    && Cleaner.IsInitial(City);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(Address from);
-
-        #endregion
+        public string? City { get; set; }
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="Address"/> collection.
     /// </summary>
-    public partial class AddressCollection : EntityBaseCollection<Address>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AddressCollection"/> class.
-        /// </summary>
-        public AddressCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AddressCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="Address"/> entities.</param>
-        public AddressCollection(IEnumerable<Address> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="AddressCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="AddressCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new AddressCollection();
-            foreach (var item in this)
-            {
-                clone.Add((Address)item.Clone());
-            }
-                
-            return clone;
-        }
-    }
-
-    #endregion  
+    public partial class AddressCollection : List<Address> { }
 }
 
 #pragma warning restore

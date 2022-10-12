@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
-using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.DataSvc;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business
 {
     /// <summary>
@@ -31,7 +19,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
         public GenderManager(IGenderDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); GenderManagerCtor(); }
+            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); GenderManagerCtor(); }
 
         partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -40,10 +28,10 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
 
@@ -52,11 +40,9 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            Cleaner.CleanUp(value);
+            Cleaner.CleanUp(value.EnsureValue());
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, BusinessInvokerArgs.Create);
 
@@ -66,11 +52,9 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            value.Id = id;
+            value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, BusinessInvokerArgs.Update);

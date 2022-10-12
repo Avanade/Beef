@@ -10,16 +10,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Entities;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
+using CoreEx.Configuration;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.Json;
+using Microsoft.Extensions.Logging;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Robot"/> Web API agent.
+    /// Defines the <see cref="Robot"/> HTTP agent.
     /// </summary>
     public partial interface IRobotAgent
     {
@@ -27,149 +29,161 @@ namespace Beef.Demo.Common.Agents
         /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Robot?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<Robot?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Robot>> CreateAsync(Robot value, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<Robot>> CreateAsync(Robot value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Robot>> UpdateAsync(Robot value, Guid id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<Robot>> UpdateAsync(Robot value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Patches an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Robot"/>.</param>
+        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
+        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Robot>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<Robot>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides the <see cref="Robot"/> Web API agent.
+    /// Provides the <see cref="Robot"/> HTTP agent.
     /// </summary>
-    public partial class RobotAgent : WebApiAgentBase, IRobotAgent
+    public partial class RobotAgent : TypedHttpClientBase<RobotAgent>, IRobotAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
-        public RobotAgent(IDemoWebApiAgentArgs args) : base(args) { }
+        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
+        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public RobotAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<RobotAgent> logger) 
+            : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <summary>
         /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Robot?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Robot?>("api/v1/robots/{id}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<Robot?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<Robot?>("api/v1/robots/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Robot>> CreateAsync(Robot value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Robot>("api/v1/robots", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: Array.Empty<WebApiArg>());
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<Robot>> CreateAsync(Robot value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<Robot, Robot>("api/v1/robots", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Robot>> UpdateAsync(Robot value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Robot>("api/v1/robots/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<Robot>> UpdateAsync(Robot value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PutAsync<Robot, Robot>("api/v1/robots/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Patches an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Robot"/>.</param>
+        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
+        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Robot>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<Robot>("api/v1/robots/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<Robot>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PatchAsync<Robot>("api/v1/robots/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            DeleteAsync("api/v1/robots/{id}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => DeleteAsync("api/v1/robots/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null) =>
-            GetCollectionResultAsync<RobotCollectionResult, RobotCollection, Robot>("api/v1/robots", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<RobotArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RobotCollectionResult>("api/v1/robots", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<RobotArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync("api/v1/robots/{id}/powerSource/{powerSource}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Guid>("id", id), new WebApiArg<string?>("powerSource", powerSource) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync("api/v1/robots/{id}/powerSource/{powerSource}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id), new HttpArg<string?>("powerSource", powerSource)), cancellationToken: cancellationToken);
     }
 }
 

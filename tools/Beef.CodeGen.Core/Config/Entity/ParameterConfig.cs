@@ -178,15 +178,8 @@ parameters: [
         /// </summary>
         [JsonProperty("dataConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Data", Title = "The data `Converter` class name where specific data conversion is required.",
-            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where the standard data type conversion is not applicable.")]
+            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Type`.")]
         public string? DataConverter { get; set; }
-
-        /// <summary>
-        /// Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.
-        /// </summary>
-        [JsonProperty("dataConverterIsGeneric", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Data", Title = "Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.")]
-        public bool? DataConverterIsGeneric { get; set; }
 
         #endregion
 
@@ -253,7 +246,7 @@ parameters: [
         /// <summary>
         /// Gets the parameter argument using the specified converter.
         /// </summary>
-        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{ParameterType}>" : "")}.Default.ConvertToDest({ArgumentName})";
+        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}.Default.ToDestination.Convert({ArgumentName})";
 
         /// <summary>
         /// Gets or sets the related entity.
@@ -305,7 +298,7 @@ parameters: [
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
             IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidatorEx<{Type}>" : null);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
-            DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
+            DataConverter = PropertyConfig.ReformatDataConverter(DataConverter, Type, RefDataType, null).DataConverter;
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);

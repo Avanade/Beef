@@ -261,6 +261,14 @@ operations: [
             Description = "Defaults to `Operation.HttpAgentModel` where the `Operation.ReturnType` is equal to `Entity.Name` (same type). This can be overridden within the `Operation`(s).")]
         public string? HttpAgentReturnModel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("HttpAgent", Title = "The fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.",
+            Description = "Appended to `Entity.HttpAgentCode` where specified to extend.")]
+        public string? HttpAgentCode { get; set; }
+
         #endregion 
 
         #region Manager
@@ -805,6 +813,11 @@ operations: [
         public int EnsureValueCount => _ensureValueCount++;
 
         /// <summary>
+        /// Indicates whether the DataSvc operation invocation can occur on a single line.
+        /// </summary>
+        public bool DataSvcSingleLine => Type == "GetColl" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false);
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -1228,26 +1241,43 @@ operations: [
             HttpAgentRoute = DefaultWhereNull(HttpAgentRoute, () => WebApiRoute);
 
             HttpAgentMethod = DefaultWhereNull(HttpAgentMethod, () => WebApiMethod);
+            HttpAgentMethod = HttpAgentMethod switch
+            {
+                "HttpGet" => "Get",
+                "HttpPost" => "Post",
+                "HttpPut" => "Put",
+                "HttpPatch" => "Patch",
+                "HttpDelete" => "Delete",
+                _ => HttpAgentMethod
+            };
+
             HttpAgentModel = DefaultWhereNull(HttpAgentModel, () => ValueType == null ? null : Parent!.HttpAgentModel);
             HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => BaseReturnType == "void" || BaseReturnType != Parent!.Name ? null : Parent!.HttpAgentReturnModel ?? Parent!.HttpAgentModel);
 
             if (string.IsNullOrEmpty(HttpAgentModel) && new string[] { "Create", "Update", "Patch" }.Contains(Type))
                 throw new CodeGenException(this, nameof(HttpAgentModel), $"Type '{Type}' requires a {nameof(HttpAgentModel)} to be specified.");
 
-            var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}.Send");
+            var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}");
+            if (!string.IsNullOrEmpty(Parent.HttpAgentCode))
+                sb.Append($".{Parent.HttpAgentCode}");
+
+            if (!string.IsNullOrEmpty(HttpAgentCode))
+                sb.Append($".{HttpAgentCode}");
+
+            sb.Append($".{HttpAgentMethod}MappedAsync");
             if (HttpAgentModel != null && HttpAgentReturnModel != null)
-                sb.Append($"MappedRequestResponseAsync<{ValueType}, {HttpAgentModel}, {BaseReturnType}, {HttpAgentReturnModel}>(");
+                sb.Append($"<{ValueType}, {HttpAgentModel}, {BaseReturnType}, {HttpAgentReturnModel}>(");
             else if (HttpAgentModel != null)
-                sb.Append($"MappedRequestAsync<{BaseReturnType}, {HttpAgentReturnModel}>(");
+                sb.Append($"<{BaseReturnType}{(HttpAgentMethod == "Get" ? "?" : "")}, {HttpAgentReturnModel}{(HttpAgentMethod == "Get" ? "?" : "")}>(");
             else if (HttpAgentReturnModel != null)
-                sb.Append($"MappedResponseAsync<{ReturnType}, {HttpAgentReturnModel}>(");
+                sb.Append($"<{ReturnType}{(HttpAgentMethod == "Get" ? "?" : "")}, {HttpAgentReturnModel}{(HttpAgentMethod == "Get" ? "?" : "")}>(");
             else
             {
-                sb.Append("Async(");
+                sb.Append("(");
                 HttpAgentRequiresMapper = false;
             }
 
-            sb.Append($"__dataArgs");
+            sb.Append($"{(HttpAgentRoute != null && HttpAgentRoute.Contains("{") ? "$" : "")}\"{HttpAgentRoute}\"");
             if (ValueType != null)
                 sb.Append(", value");
 
@@ -1258,15 +1288,6 @@ operations: [
                 sb.Append(").Value;");
 
             HttpAgentSendStatement = sb.ToString();
-
-            HttpAgentMethod = HttpAgentMethod switch
-            {
-                "HttpPost" => "Post",
-                "HttpPut" => "Put",
-                "HttpPatch" => "Patch",
-                "HttpDelete" => "Delete",
-                _ => "Get"
-            };
         }
 
         /// <summary>

@@ -6,12 +6,7 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
 using System.Data;
-using CoreEx.Database;
-using CoreEx.Database.SqlServer;
-using {{#ifeq EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities;
 
 namespace {{Root.NamespaceBusiness}}.Data
 {
@@ -25,7 +20,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// <param name="database">The <see cref="IDatabase"/>.</param>
             /// <param name="list">The entity list.</param>
             /// <returns>The Table-Valued Parameter.</returns>
-            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<{{Tvp}}> list)
+            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<{{Tvp}}>? list)
             {        
                 var dt = new DataTable();
 {{#each UdtColumns}}

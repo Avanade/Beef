@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cdr.Banking.Common\Cdr.Banking.Common.csproj" />
@@ -10,8 +11,8 @@
     <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.9" />
-    <PackageReference Include="CoreEx.Cosmos" Version="1.0.9" />
-    <PackageReference Include="CoreEx.Validation" Version="1.0.9" />
+    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.10" />
+    <PackageReference Include="CoreEx.Cosmos" Version="1.0.10" />
+    <PackageReference Include="CoreEx.Validation" Version="1.0.10" />
   </ItemGroup>
 </Project>

@@ -84,7 +84,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{/if}}
   {{#each Parameters}}
     {{#ifeq WebApiFrom 'FromEntityProperties'}}
-            var {{ArgumentName}} = new {{Type}} { {{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{PropertyName}} = {{#ifval WebApiQueryStringConverter}}new {{WebApiQueryStringConverter}}().ConvertToSrce({{ArgumentName}}){{else}}{{ArgumentName}}{{/ifval}}{{/each}} };
+            var {{ArgumentName}} = new {{Type}} { {{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{PropertyName}} = {{ArgumentName}}{{/each}} };
     {{/ifeq}}
   {{/each}}
   {{#ifeq WebApiMethod 'HttpGet'}}

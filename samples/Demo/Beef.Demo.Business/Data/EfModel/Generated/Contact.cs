@@ -14,7 +14,7 @@ namespace Beef.Demo.Business.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Demo.Contact'.
     /// </summary>
-    public partial class Contact : Beef.Entities.ILogicallyDeleted
+    public partial class Contact : ILogicallyDeleted
     {
         /// <summary>
         /// Gets or sets the 'ContactId' column value.

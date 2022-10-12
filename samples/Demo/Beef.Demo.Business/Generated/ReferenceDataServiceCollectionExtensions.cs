@@ -5,15 +5,16 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
-using Beef.Demo.Common.Entities;
+using CoreEx.RefData;
+using Beef.Demo.Business;
+using Beef.Demo.Business.Entities;
 
-namespace Beef.Demo.Business
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ReferenceDataServiceCollectionsExtension
+    public static partial class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.
@@ -21,10 +22,8 @@ namespace Beef.Demo.Business
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
-        {
-            return services.AddSingleton<IReferenceData, ReferenceDataProvider>()
-                           .AddScoped<IGenderManager, GenderManager>();
-        }
+            => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>()
+                       .AddScoped<IGenderManager, GenderManager>();
     }
 }
 

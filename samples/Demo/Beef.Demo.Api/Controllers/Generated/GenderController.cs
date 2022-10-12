@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
@@ -25,16 +12,19 @@ namespace Beef.Demo.Api.Controllers
     /// </summary>
     [AllowAnonymous]
     [Route("api/v1/demo/ref/genders")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class GenderController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IGenderManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>
-        public GenderController(IGenderManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); GenderControllerCtor(); }
+        public GenderController(WebApi webApi, IGenderManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); GenderControllerCtor(); }
 
         partial void GenderControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -46,32 +36,29 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<Gender?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<Gender?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
         [HttpPost("")]
+        [AcceptsBody(typeof(Gender))]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Gender value) =>
-            new WebApiPost<Gender>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
+        public Task<IActionResult> Create() =>
+            _webApi.PostAsync<Gender, Gender>(Request, p => _manager.CreateAsync(p.Value!));
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
         [HttpPut("{id}")]
+        [AcceptsBody(typeof(Gender))]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Gender value, Guid id) =>
-            new WebApiPut<Gender>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<Gender, Gender>(Request, p => _manager.UpdateAsync(p.Value!, id));
     }
 }
 

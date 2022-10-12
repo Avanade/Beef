@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Beef;
-using Beef.Business;
-using Beef.RefData;
-using Beef.RefData.Caching;
-using Beef.Demo.Business.Data;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
@@ -25,45 +12,28 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
-        private readonly IServiceProvider _provider;
-        private readonly Dictionary<Type, IReferenceDataCache> _cacheDict = new Dictionary<Type, IReferenceDataCache>();
+        private readonly IReferenceDataData _data;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
         /// </summary>
-        /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
-        public ReferenceDataDataSvc(IServiceProvider provider)
-        {
-            _provider = Check.NotNull(provider, nameof(provider));
-            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.CountryGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.USStateGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.GenderGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.EyeColorGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.PowerSourceGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.CompanyGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.Status), new ReferenceDataCache<RefDataNamespace.StatusCollection, RefDataNamespace.Status>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.StatusGetAllAsync()))));
-            ReferenceDataDataSvcCtor();
-        }
+        /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
+        public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
 
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
-        /// <summary>
-        /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
-        /// </summary>
-        private async Task<T> GetDataAsync<T>(Func<IReferenceDataData, Task<T>> func)
+        /// <inheritdoc/>
+        public async Task<IReferenceDataCollection> GetAsync(Type type) => type switch
         {
-            using var scope = _provider.CreateScope();
-            return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
-        /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public IReferenceDataCollection GetCollection(Type type) =>
-            _cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc) ? rdc.GetCollection() :
-                throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
+            Type _ when type == typeof(RefDataNamespace.Country) => await _data.CountryGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.EyeColor) => await _data.EyeColorGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.PowerSource) => await _data.PowerSourceGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Company) => await _data.CompanyGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Status) => await _data.StatusGetAllAsync().ConfigureAwait(false),
+            _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
+        };
     }
 }
 

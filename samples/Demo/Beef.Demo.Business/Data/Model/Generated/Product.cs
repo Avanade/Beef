@@ -5,36 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Newtonsoft.Json;
-
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
     /// Represents the Product model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Product
     {
         /// <summary>
         /// Gets or sets the ID.
         /// </summary>
-        [JsonProperty("iD", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int ID { get; set; }
 
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Description.
         /// </summary>
-        [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Description { get; set; }
     }
 }

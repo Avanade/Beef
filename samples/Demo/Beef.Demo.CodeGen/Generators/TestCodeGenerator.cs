@@ -9,6 +9,6 @@ namespace Beef.Demo.CodeGen.Generators
     public class TestCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => x.GetExtraProperty<JValue>("TestCodeGen")?.ToObject<bool>() ?? false).AsEnumerable();
+            => config.Entities.Where(x => x.GetExtraProperty<JValue>("TestCodeGen")?.ToObject<bool>() ?? false).AsEnumerable();
     }
 }

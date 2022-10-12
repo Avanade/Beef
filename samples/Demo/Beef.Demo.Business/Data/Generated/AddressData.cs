@@ -5,20 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Database;
-using Beef.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.Data
 {
     /// <summary>

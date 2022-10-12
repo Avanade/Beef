@@ -262,13 +262,16 @@ entities:
         [CodeGenProperty("Data", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", 
             Options = new string[] { 
                 "ReferenceDataCodeConverter", "ReferenceDataCodeConverter{T}", "ReferenceDataCodeConverter<T>",
+                "ReferenceDataIdConverter{T, int}", "ReferenceDataIdConverter<T, int>", "ReferenceDataIdConverter{T, int?}", "ReferenceDataIdConverter<T, int?>",
+                "ReferenceDataIdConverter{T, long}", "ReferenceDataIdConverter<T, long>", "ReferenceDataIdConverter{T, long?}", "ReferenceDataIdConverter<T, long?>",
+                "ReferenceDataIdConverter{T, Guid}", "ReferenceDataIdConverter<T, Guid>", "ReferenceDataIdConverter{T, Guid?}", "ReferenceDataIdConverter<T, Guid?>",
                 "ReferenceDataInt32IdConverter", "ReferenceDataInt32IdConverter{T}", "ReferenceDataInt32IdConverter<T>",
                 "ReferenceDataNullableInt32IdConverter", "ReferenceDataNullableInt32IdConverter{T}", "ReferenceDataNullableInt32IdConverter<T>",
                 "ReferenceDataInt64IdConverter", "ReferenceDataInt64IdConverter{T}", "ReferenceDataInt64IdConverter<T>",
                 "ReferenceDataNullableInt64IdConverter", "ReferenceDataNullableInt64IdConverter{T}", "ReferenceDataNullableInt64IdConverter<T>",
                 "ReferenceDataGuidIdConverter", "ReferenceDataGuidIdConverter{T}", "ReferenceDataGuidIdConverter<T>",
                 "ReferenceDataNullableGuidIdConverter", "ReferenceDataNullableGuidIdConverter{T}", "ReferenceDataNullableGuidIdConverter<T>" },
-            Description = "Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Property.DataConverterIsGeneric` to `true`.")]
+            Description = "Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically be set to the `Type`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
 
         /// <summary>

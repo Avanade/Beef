@@ -31,13 +31,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="1.0.9" />
+    <PackageReference Include="CoreEx" Version="1.0.10" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
-    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.25" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.26" />
   </ItemGroup>
 
   <ItemGroup>

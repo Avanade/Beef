@@ -5,21 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Beef.WebApi;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
@@ -27,16 +12,14 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public partial class PostalInfoData : IPostalInfoData
     {
-        private readonly IZippoAgent _httpAgent;
-        private readonly AutoMapper.IMapper _mapper;
+        private readonly ZippoAgent _httpAgent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostalInfoData"/> class.
         /// </summary>
-        /// <param name="httpAgent">The <see cref="IZippoAgent"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        public PostalInfoData(IZippoAgent httpAgent, AutoMapper.IMapper mapper)
-            { _httpAgent = Check.NotNull(httpAgent, nameof(httpAgent)); _mapper = Check.NotNull(mapper, nameof(mapper)); PostalInfoDataCtor(); }
+        /// <param name="httpAgent">The <see cref="ZippoAgent"/>.</param>
+        public PostalInfoData(ZippoAgent httpAgent)
+            { _httpAgent = httpAgent ?? throw new ArgumentNullException(nameof(httpAgent)); PostalInfoDataCtor(); }
 
         partial void PostalInfoDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -47,10 +30,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Get, $"{country.Code}/{state}/{city}", true);
-            return (await _httpAgent.SendMappedResponseAsync<PostalInfo, Model.PostalInfo>(__dataArgs).ConfigureAwait(false)).Value;
+            return (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).Value;
         });
 
         /// <summary>
@@ -61,10 +43,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Post, $"{country.Code}/{state}/{city}");
-            return (await _httpAgent.SendMappedRequestResponseAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>(__dataArgs, value).ConfigureAwait(false)).Value;
+            return (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
         });
 
         /// <summary>
@@ -75,10 +56,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = HttpSendArgs.Create(_mapper, HttpMethod.Put, $"{country.Code}/{state}/{city}");
-            return (await _httpAgent.SendMappedRequestResponseAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>(__dataArgs, value).ConfigureAwait(false)).Value;
+            return (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
         });
 
         /// <summary>

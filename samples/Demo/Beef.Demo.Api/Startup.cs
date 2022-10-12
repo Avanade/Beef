@@ -37,7 +37,7 @@ namespace Beef.Demo.Api
             ValidationArgs.DefaultUseJsonNames = true;
 
             // Default the page size.
-            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+            // PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

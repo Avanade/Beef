@@ -1,7 +1,4 @@
-﻿using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
-using Beef.Demo.Business.Data.EfModel;
-using Microsoft.EntityFrameworkCore;
+﻿using Beef.Demo.Business.Data.EfModel;
 
 namespace Beef.Demo.Business.Data
 {
@@ -15,7 +12,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="options">The <see cref="DbContextOptions{EfDbContext}"/>.</param>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
-        public EfDbContext(DbContextOptions<EfDbContext> options, IDatabase db) : base(options) => BaseDatabase = Check.NotNull(db, nameof(db));
+        public EfDbContext(DbContextOptions<EfDbContext> options, IDatabase db) : base(options) => BaseDatabase = db ?? throw new ArgumentNullException(nameof(db));
 
         /// <summary>
         /// Gets the base <see cref="IDatabase"/>.

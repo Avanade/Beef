@@ -1,16 +1,4 @@
-﻿using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
-using Beef.Demo.Common.Entities;
-using Beef.Entities;
-using Beef.Mapper;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-
-namespace Beef.Demo.Business.Data
+﻿namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
@@ -21,24 +9,24 @@ namespace Beef.Demo.Business.Data
             _markOnException = MarkOnException;
         }
 
-        private void GetByArgsOnQuery(DatabaseParameters p, PersonArgs args, IDatabaseArgs dbArgs)
+        private void GetByArgsOnQuery(DatabaseParameterCollection p, PersonArgs? args)
         {
             p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
              .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
-             .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
+             .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
         }
 
-        private IQueryable<EfModel.Person> GetByArgsWithEfOnQuery(IQueryable<EfModel.Person> q, PersonArgs args, EfDbArgs efArgs)
+        private IQueryable<EfModel.Person> GetByArgsWithEfOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args)
         {
-            _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-            _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-            _ef.With(args?.Genders, () => q = q.Where(x => args.Genders.ToGuidIdList().Contains(x.GenderId.Value)));
+            _ef.WithWildcard(args?.FirstName, w => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
+            _ef.WithWildcard(args?.LastName, w => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
+            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToIdList<Guid>().Contains(x.GenderId!.Value)));
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 
         private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
-            return await Task.FromResult((Person)null).ConfigureAwait(false);
+            return await Task.FromResult((Person)null!).ConfigureAwait(false);
         }
 
         private Task MarkOnImplementationAsync()
@@ -50,7 +38,7 @@ namespace Beef.Demo.Business.Data
 
         private Task<MapCoordinates> MapOnImplementationAsync(MapArgs args)
         {
-            return Task.FromResult(args.Coordinates);
+            return Task.FromResult(args.Coordinates!);
         }
 
         private void MarkOnException(Exception ex)
@@ -73,7 +61,7 @@ namespace Beef.Demo.Business.Data
         private async Task<string> InvokeApiViaAgentOnImplementationAsync(Guid id)
         {
             var result = await _personAgent.GetAsync(id).ConfigureAwait(false);
-            return result.Value.LastName;
+            return result.Value!.LastName!;
         }
 
         private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)
@@ -85,22 +73,22 @@ namespace Beef.Demo.Business.Data
                 {
                     p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
                      .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
-                     .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
+                     .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
                 })
-                .SelectQueryMultiSetAsync(pdcr.Paging,
-                    new MultiSetCollArgs<PersonCollection, Person>(PersonData.DbMapper.Default, (r) => r.ForEach((p) => { var pd = new PersonDetail(); pd.CopyFrom(p); pdcr.Result.Add(pd); })),
+                .SelectMultiSetAsync(pdcr.Paging,
+                    new MultiSetCollArgs<PersonCollection, Person>(PersonData.DbMapper.Default, (r) => r.ForEach((p) => { var pd = new PersonDetail(); pd.CopyFrom(p); pdcr.Collection.Add(pd); })),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) =>
                     {
-                        PersonDetail pd = null;
+                        PersonDetail? pd = null;
                         foreach (var wh in r)
                         {
                             if (pd == null || wh.PersonId != pd.Id)
                             {
-                                pd = pdcr.Result.Where(x => x.Id == wh.PersonId).Single();
+                                pd = pdcr.Collection.Where(x => x.Id == wh.PersonId).Single();
                                 pd.History = new WorkHistoryCollection();
                             }
                             
-                            pd.History.Add(wh);
+                            pd.History!.Add(wh);
                         }
                     }));
 
@@ -109,37 +97,37 @@ namespace Beef.Demo.Business.Data
 
         private async Task<PersonDetail> GetDetailOnImplementationAsync(Guid id)
         {
-            PersonDetail pd = null;
+            PersonDetail? pd = null;
 
             System.Diagnostics.Debug.WriteLine($"One, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
             await GetAsync(id);
 
             System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
             await _db.StoredProcedure("[Demo].[spPersonGetDetail]")
-                .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
-                .SelectQueryMultiSetAsync(
+                .Param(DbMapper.Default.GetParameterName(nameof(PersonDetail.Id)), id)
+                .SelectMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
-                    new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));
+                    new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd!.History = r));
 
-            return pd;
+            return pd!;
         }
 
         private async Task<PersonDetail> UpdateDetailOnImplementationAsync(PersonDetail value)
         {
-            PersonDetail pd = null;
+            PersonDetail? pd = null;
 
             await _db.StoredProcedure("[Demo].[spPersonUpdateDetail]")
-                .Params((p) => PersonData.DbMapper.Default.MapToDb(value, p, Mapper.OperationTypes.Update))
-                .TableValuedParam("@WorkHistoryList", WorkHistoryData.DbMapper.Default.CreateTableValuedParameter(value.History))
+                .Params((p) => PersonData.DbMapper.Default.MapToDb(value, p, OperationTypes.Update))
+                .TableValuedParam("@WorkHistoryList", WorkHistoryData.DbMapper.Default.CreateTableValuedParameter(_db, value.History))
                 .ReselectRecordParam()
-                .SelectQueryMultiSetAsync(
+                .SelectMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, false, true),
-                    new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));
+                    new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd!.History = r));
 
-            return pd;
+            return pd!;
         }
 
-        private Task<Person> GetNullOnImplementationAsync(string _, List<string> __) => Task.FromResult<Person>(null);
+        private Task<Person> GetNullOnImplementationAsync(string _, List<string> __) => Task.FromResult<Person>(null!);
 
         public partial class EfMapperProfile
         {

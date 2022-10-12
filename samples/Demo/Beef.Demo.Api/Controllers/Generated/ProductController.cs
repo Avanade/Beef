@@ -5,35 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
     /// Provides the <see cref="Product"/> Web API functionality.
     /// </summary>
     [Route("api/v1/products")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class ProductController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IProductManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IProductManager"/>.</param>
-        public ProductController(IProductManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); ProductControllerCtor(); }
+        public ProductController(WebApi webApi, IProductManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); ProductControllerCtor(); }
 
         partial void ProductControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,9 +35,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(int id) =>
-            new WebApiGet<Product?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(int id) =>
+            _webApi.GetAsync<Product?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
@@ -58,11 +47,10 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(ProductCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs(string? name = default, string? description = default)
+        public Task<IActionResult> GetByArgs(string? name = default, string? description = default)
         {
             var args = new ProductArgs { Name = name, Description = description };
-            return new WebApiGet<ProductCollectionResult, ProductCollection, Product>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<ProductCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
     }
 }

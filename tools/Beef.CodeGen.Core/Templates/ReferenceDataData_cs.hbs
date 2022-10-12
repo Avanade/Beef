@@ -34,24 +34,19 @@ namespace {{Root.NamespaceBusiness}}.Data
 
   {{/unless}}
         /// <inheritdoc/>
-        public {{#ifeq AutoImplement 'Database'}}async {{/ifeq}}Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync({{#if Root.CancellatioToken}}CancellationToken cancellationToken = default{{/if}})
+        public Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync({{#if Root.CancellatioToken}}CancellationToken cancellationToken = default{{/if}})
   {{#ifeq AutoImplement 'Database'}}
-        {
-            var __coll = new {{RefDataQualifiedEntityCollectionName}}();
-            await DataInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => 
-            {
-                await {{DatabaseDataParameter.PrivateName}}.GetRefDataAsync<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}>(__coll, "[{{DatabaseSchema}}].[sp{{Name}}GetAll]", "{{Name}}Id"{{#ifeq CoreProperties.Count 0}});{{else}}, additionalProperties: (dr, item, fields) =>{{/ifeq}}
+            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("[{{DatabaseSchema}}].[sp{{Name}}GetAll]").LoadAsync("{{Name}}Id"), BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
+            {
+                return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("[{{DatabaseSchema}}].[sp{{Name}}GetAll]").LoadAsync("{{Name}}Id", additionalProperties: (dr, item) =>
                 {
       {{#each CoreProperties}}
-                    item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{DataReaderType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
+                    item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{RefDataGetValueType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
       {{/each}}
                 }{{#if Root.CancellationToken}}, ct{{/if}});
+            }, BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
     {{/ifne}}
-            }, BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
-
-            return __coll;
-        }
   {{/ifeq}}
   {{#ifeq AutoImplement 'EntityFramework'}}
             => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} =>{{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}), BusinessInvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
@@ -60,7 +55,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
-            await DataInvoker.Current.InvokeAsync(this, async {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => await {{Name}}GetAll_OnImplementationAsync(__coll{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
+            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{Name}}GetAll_OnImplementationAsync({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
 {{/each}}
 {{#each RefDataEntities}}

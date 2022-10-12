@@ -5,35 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
     /// Provides the <b>Config</b> Web API functionality.
     /// </summary>
     [Route("api/v1/envvars")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class ConfigController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IConfigManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IConfigManager"/>.</param>
-        public ConfigController(IConfigManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); ConfigControllerCtor(); }
+        public ConfigController(WebApi webApi, IConfigManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); ConfigControllerCtor(); }
 
         partial void ConfigControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -44,9 +34,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpPost("")]
         [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetEnvVars() =>
-            new WebApiPost<System.Collections.IDictionary>(this, () => _manager.GetEnvVarsAsync(),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> GetEnvVars() =>
+            _webApi.PostAsync<System.Collections.IDictionary>(Request, p => _manager.GetEnvVarsAsync(), statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
     }
 }
 

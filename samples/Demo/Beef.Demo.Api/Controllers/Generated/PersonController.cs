@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
@@ -25,31 +12,38 @@ namespace Beef.Demo.Api.Controllers
     /// </summary>
     [AllowAnonymous]
     [Route("api/v1/persons")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class PersonController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IPersonManager _manager;
         private readonly IPersonManager _personManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IPersonManager"/>.</param>
         /// <param name="personManager">The <see cref="IPersonManager"/>.</param>
-        public PersonController(IPersonManager manager, IPersonManager personManager)
-            { _manager = Check.NotNull(manager, nameof(manager)); _personManager = Check.NotNull(personManager, nameof(personManager)); PersonControllerCtor(); }
+        public PersonController(WebApi webApi, IPersonManager manager, IPersonManager personManager)
+        {
+            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
+            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            _personManager = personManager ?? throw new ArgumentNullException(nameof(personManager));
+            PersonControllerCtor();
+        }
 
         partial void PersonControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
         [HttpPost("")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Person value) =>
-            new WebApiPost<Person>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/persons/{r.Id}", UriKind.Relative));
+        public Task<IActionResult> Create() =>
+            _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateAsync(p.Value!), locationUri: r => new Uri($"/api/v1/persons/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
@@ -57,9 +51,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> Delete(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -69,45 +62,52 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<Person?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<Person?>(Request, p => _manager.GetAsync(id));
+
+        /// <summary>
+        /// Gets the specified <see cref="Person"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
+        [HttpGet("ex/{id}")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public Task<IActionResult> GetEx(Guid id) =>
+            _webApi.GetAsync<Person?>(Request, p => _manager.GetExAsync(id));
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("{id}")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Person value, Guid id) =>
-            new WebApiPut<Person>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("withRollback/{id}")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult UpdateWithRollback([FromBody] Person value, Guid id) =>
-            new WebApiPut<Person>(this, () => _manager.UpdateWithRollbackAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> UpdateWithRollback(Guid id) =>
+            _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("{id}")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult Patch([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<Person>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Patch(Guid id) =>
+            _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -116,9 +116,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("all")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetAll() =>
-            new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetAllAsync(WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> GetAll() =>
+            _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAllAsync(p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -127,9 +126,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("allnopaging")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetAll2() =>
-            new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetAll2Async(),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> GetAll2() =>
+            _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAll2Async(), alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -141,11 +139,10 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -158,11 +155,10 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("argsdetail")]
         [ProducesResponseType(typeof(PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonDetailCollectionResult, PersonDetailCollection, PersonDetail>(this, () => _manager.GetDetailByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<PersonDetailCollectionResult>(Request, p => _manager.GetDetailByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -173,32 +169,30 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>A resultant <see cref="Person"/>.</returns>
         [HttpPost("merge")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult Merge(Guid fromId, Guid toId) =>
-            new WebApiPost<Person>(this, () => _manager.MergeAsync(fromId, toId),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public Task<IActionResult> Merge(Guid fromId, Guid toId) =>
+            _webApi.PostAsync<Person>(Request, p => _manager.MergeAsync(fromId, toId), statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Update);
 
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
         [HttpPost("mark")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
-        public IActionResult Mark() =>
-            new WebApiPost(this, () => _manager.MarkAsync(),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.Accepted);
+        public Task<IActionResult> Mark() =>
+            _webApi.PostAsync(Request, p => _manager.MarkAsync(), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Update);
 
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="coordinates">The Coordinates (see <see cref="Common.Entities.MapCoordinates"/>).</param>
+        /// <param name="coordinates">The Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         [HttpPost("map")]
         [ProducesResponseType(typeof(MapCoordinates), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Map(string? coordinates = default)
+        public Task<IActionResult> Map(MapCoordinates? coordinates = default)
         {
-            var args = new MapArgs { Coordinates = new MapCoordinatesToStringConverter().ConvertToSrce(coordinates) };
-            return new WebApiPost<MapCoordinates>(this, () => _manager.MapAsync(args),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            var args = new MapArgs { Coordinates = coordinates };
+            return _webApi.PostAsync<MapCoordinates>(Request, p => _manager.MapAsync(args), statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Read);
         }
 
         /// <summary>
@@ -208,9 +202,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("noargsforme")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetNoArgs() =>
-            new WebApiGet<Person?>(this, () => _manager.GetNoArgsAsync(),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetNoArgs() =>
+            _webApi.GetAsync<Person?>(Request, p => _manager.GetNoArgsAsync());
 
         /// <summary>
         /// Gets the specified <see cref="PersonDetail"/>.
@@ -220,33 +213,30 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetDetail(Guid id) =>
-            new WebApiGet<PersonDetail?>(this, () => _manager.GetDetailAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetDetail(Guid id) =>
+            _webApi.GetAsync<PersonDetail?>(Request, p => _manager.GetDetailAsync(id));
 
         /// <summary>
         /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         [HttpPut("{id}/detail")]
+        [AcceptsBody(typeof(PersonDetail))]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
-        public IActionResult UpdateDetail([FromBody] PersonDetail value, Guid id) =>
-            new WebApiPut<PersonDetail>(this, () => _manager.UpdateDetailAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> UpdateDetail(Guid id) =>
+            _webApi.PutAsync<PersonDetail, PersonDetail>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="PersonDetail"/>.</returns>
         [HttpPatch("{id}/detail")]
+        [AcceptsBody(typeof(PersonDetail))]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
-        public IActionResult PatchDetail([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<PersonDetail>(this, value, () => _manager.GetDetailAsync(id), (__value) => _personManager.UpdateDetailAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> PatchDetail(Guid id) =>
+            _webApi.PatchAsync<PersonDetail>(Request, get: _ => _manager.GetDetailAsync(id), put: p => _personManager.UpdateDetailAsync(p.Value!, id));
 
         /// <summary>
         /// Actually validating the FromBody parameter generation.
@@ -254,9 +244,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
         [HttpPost("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public IActionResult Add([FromBody] Person person) =>
-            new WebApiPost(this, () => _manager.AddAsync(person),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Created);
+        public Task<IActionResult> Add([FromBody] Person person) =>
+            _webApi.PostAsync(Request, p => _manager.AddAsync(person), operationType: CoreEx.OperationType.Unspecified);
 
         /// <summary>
         /// Get Null.
@@ -267,20 +256,18 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("null")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetNull(string? name, List<string>? names = default) =>
-            new WebApiGet<Person?>(this, () => _manager.GetNullAsync(name, names),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetNull(string? name, List<string>? names = default) =>
+            _webApi.GetAsync<Person?>(Request, p => _manager.GetNullAsync(name, names), operationType: CoreEx.OperationType.Unspecified);
 
         /// <summary>
         /// Validate when an Event is published but not sent.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("publishnosend")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult EventPublishNoSend([FromBody] Person value) =>
-            new WebApiPut<Person>(this, () => _manager.EventPublishNoSendAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> EventPublishNoSend() =>
+            _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!));
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -292,11 +279,10 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("args")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetByArgsWithEfAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetByArgsWithEfAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -304,9 +290,8 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         [HttpPost("error")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult ThrowError() =>
-            new WebApiPost(this, () => _manager.ThrowErrorAsync(),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> ThrowError() =>
+            _webApi.PostAsync(Request, p => _manager.ThrowErrorAsync(), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 
         /// <summary>
         /// Invoke Api Via Agent.
@@ -316,9 +301,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpPost("invokeApi")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult InvokeApiViaAgent(Guid id) =>
-            new WebApiPost<string?>(this, () => _manager.InvokeApiViaAgentAsync(id),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> InvokeApiViaAgent(Guid id) =>
+            _webApi.PostAsync<string?>(Request, p => _manager.InvokeApiViaAgentAsync(id), statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 
         /// <summary>
         /// Param Coll.
@@ -326,9 +310,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="addresses">The Addresses.</param>
         [HttpPost("paramcoll")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult ParamColl([FromBody] AddressCollection? addresses) =>
-            new WebApiPost(this, () => _manager.ParamCollAsync(addresses),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> ParamColl([FromBody] AddressCollection? addresses) =>
+            _webApi.PostAsync(Request, p => _manager.ParamCollAsync(addresses), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -338,32 +321,29 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetWithEf(Guid id) =>
-            new WebApiGet<Person?>(this, () => _manager.GetWithEfAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> GetWithEf(Guid id) =>
+            _webApi.GetAsync<Person?>(Request, p => _manager.GetWithEfAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
         [HttpPost("ef")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
-        public IActionResult CreateWithEf([FromBody] Person value) =>
-            new WebApiPost<Person>(this, () => _manager.CreateWithEfAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/persons/ef/{r.Id}", UriKind.Relative));
+        public Task<IActionResult> CreateWithEf() =>
+            _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateWithEfAsync(p.Value!), locationUri: r => new Uri($"/api/v1/persons/ef/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("ef/{id}")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult UpdateWithEf([FromBody] Person value, Guid id) =>
-            new WebApiPut<Person>(this, () => _manager.UpdateWithEfAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> UpdateWithEf(Guid id) =>
+            _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
@@ -371,21 +351,19 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         [HttpDelete("ef/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult DeleteWithEf(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteWithEfAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> DeleteWithEf(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteWithEfAsync(id));
 
         /// <summary>
         /// Patches an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("ef/{id}")]
+        [AcceptsBody(typeof(Person))]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
-        public IActionResult PatchWithEf([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<Person>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> PatchWithEf(Guid id) =>
+            _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
     }
 }
 

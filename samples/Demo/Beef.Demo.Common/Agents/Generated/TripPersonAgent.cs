@@ -10,16 +10,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Entities;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
+using CoreEx.Configuration;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.Json;
+using Microsoft.Extensions.Logging;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="TripPerson"/> Web API agent.
+    /// Defines the <see cref="TripPerson"/> HTTP agent.
     /// </summary>
     public partial interface ITripPersonAgent
     {
@@ -27,87 +29,96 @@ namespace Beef.Demo.Common.Agents
         /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<TripPerson?>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<TripPerson?>> GetAsync(string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<TripPerson>> CreateAsync(TripPerson value, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<TripPerson>> CreateAsync(TripPerson value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<TripPerson>> UpdateAsync(TripPerson value, string? id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<TripPerson>> UpdateAsync(TripPerson value, string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult> DeleteAsync(string? id, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> DeleteAsync(string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides the <see cref="TripPerson"/> Web API agent.
+    /// Provides the <see cref="TripPerson"/> HTTP agent.
     /// </summary>
-    public partial class TripPersonAgent : WebApiAgentBase, ITripPersonAgent
+    public partial class TripPersonAgent : TypedHttpClientBase<TripPersonAgent>, ITripPersonAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
-        public TripPersonAgent(IDemoWebApiAgentArgs args) : base(args) { }
+        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
+        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public TripPersonAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<TripPersonAgent> logger) 
+            : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <summary>
         /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TripPerson?>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<TripPerson?>("api/v1/tripPeople/{id}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<TripPerson?>> GetAsync(string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<TripPerson?>("api/v1/tripPeople/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TripPerson>> CreateAsync(TripPerson value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<TripPerson>("api/v1/tripPeople", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: Array.Empty<WebApiArg>());
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<TripPerson>> CreateAsync(TripPerson value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<TripPerson, TripPerson>("api/v1/tripPeople", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TripPerson>> UpdateAsync(TripPerson value, string? id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<TripPerson>("api/v1/tripPeople/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<TripPerson>> UpdateAsync(TripPerson value, string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PutAsync<TripPerson, TripPerson>("api/v1/tripPeople/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult> DeleteAsync(string? id, WebApiRequestOptions? requestOptions = null) =>
-            DeleteAsync("api/v1/tripPeople/{id}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("id", id) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult> DeleteAsync(string? id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => DeleteAsync("api/v1/tripPeople/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("id", id)), cancellationToken: cancellationToken);
     }
 }
 

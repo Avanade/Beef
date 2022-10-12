@@ -10,46 +10,54 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Entities;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
+using CoreEx.Configuration;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.Json;
+using Microsoft.Extensions.Logging;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <b>Config</b> Web API agent.
+    /// Defines the <b>Config</b> HTTP agent.
     /// </summary>
     public partial interface IConfigAgent
     {
         /// <summary>
         /// Get Env Vars.
         /// </summary>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<System.Collections.IDictionary>> GetEnvVarsAsync(WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides the <b>Config</b> Web API agent.
+    /// Provides the <b>Config</b> HTTP agent.
     /// </summary>
-    public partial class ConfigAgent : WebApiAgentBase, IConfigAgent
+    public partial class ConfigAgent : TypedHttpClientBase<ConfigAgent>, IConfigAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
-        public ConfigAgent(IDemoWebApiAgentArgs args) : base(args) { }
+        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
+        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public ConfigAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ConfigAgent> logger) 
+            : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <summary>
         /// Get Env Vars.
         /// </summary>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<System.Collections.IDictionary>> GetEnvVarsAsync(WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions,
-                args: Array.Empty<WebApiArg>());
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions, cancellationToken: cancellationToken);
     }
 }
 

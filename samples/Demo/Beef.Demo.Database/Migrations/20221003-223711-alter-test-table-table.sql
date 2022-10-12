@@ -1,0 +1,7 @@
+-- Alter table: [test].[table]
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Test].[Table] ALTER COLUMN [TenantId] NVARCHAR(50) NULL
+
+COMMIT TRANSACTION

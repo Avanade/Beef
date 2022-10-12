@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Caching;
-using Beef.Entities;
-using Beef.Demo.Business.Data;
-using Beef.Demo.Business.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
@@ -33,7 +21,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="data">The <see cref="IContactData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public ContactDataSvc(IContactData data, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ContactDataSvcCtor(); }
+            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); ContactDataSvcCtor(); }
 
         partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -41,25 +29,20 @@ namespace Beef.Demo.Business.DataSvc
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public Task<ContactCollectionResult> GetAllAsync() => DataSvcInvoker.Current.InvokeAsync(this, async () =>
-        {
-            var __result = await _data.GetAllAsync().ConfigureAwait(false);
-            return __result;
-        });
+        public Task<ContactCollectionResult> GetAllAsync() => DataSvcInvoker.Current.InvokeAsync(this, _ => _data.GetAllAsync());
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public Task<Contact?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __key = new UniqueKey(id);
-            if (_cache.TryGetValue(__key, out Contact? __val))
+            if (_cache.TryGetValue(id, out Contact? __val))
                 return __val;
 
             var __result = await _data.GetAsync(id).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__key, __result);
+            return _cache.SetValue(__result);
         });
 
         /// <summary>
@@ -67,10 +50,10 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        public Task<Contact> CreateAsync(Contact value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> CreateAsync(Contact value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
+            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(__result);
         });
 
         /// <summary>
@@ -78,27 +61,27 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        public Task<Contact> UpdateAsync(Contact value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> UpdateAsync(Contact value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
+            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(__result);
         });
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _data.DeleteAsync(id).ConfigureAwait(false);
-            _cache.Remove<Contact>(new UniqueKey(id));
+            _cache.Remove<Contact>(id);
         });
 
         /// <summary>
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task RaiseEventAsync(bool throwError) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _data.RaiseEventAsync(throwError).ConfigureAwait(false);
         });

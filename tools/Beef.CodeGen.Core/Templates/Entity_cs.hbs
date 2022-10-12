@@ -5,27 +5,66 @@
 
 #nullable enable
 #pragma warning disable
-{{set 'HasUsingStatement' false}}
+{{set-value 'HasUsingStatement' false}}
 {{! ===== Using ===== }}
+{{#ifeq Root.RuntimeEntityScope 'Common'}}
+using System;{{set-value 'HasUsingStatement' true}}
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+{{#ifne JsonSerializer 'Newtonsoft'}}
+using System.Text.Json.Serialization;
+{{/ifne}}
+using CoreEx.Entities;
+using CoreEx.Entities.Extended;
+using CoreEx.RefData;
+{{/ifeq}}
 {{#ifeq JsonSerializer 'Newtonsoft'}}
-using Newtonsoft.Json;{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using Newtonsoft.Json;{{set-value 'HasUsingStatement' true}}
 {{/ifeq}}
 {{#if Root.UsingNamespace1}}
-using {{Root.UsingNamespace1}};{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using {{Root.UsingNamespace1}};{{set-value 'HasUsingStatement' true}}
 {{/if}}
 {{#if Root.UsingNamespace2}}
-using {{Root.UsingNamespace2}};{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using {{Root.UsingNamespace2}};{{set-value 'HasUsingStatement' true}}
 {{/if}}
 {{#if Root.UsingNamespace3}}
-using {{Root.UsingNamespace3}};{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 {{/if}}
 {{#ifeq EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
-using {{Root.NamespaceCommon}}.Entities;{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using {{Root.NamespaceCommon}}.Entities;{{set-value 'HasUsingStatement' true}}
   {{/ifeq}}
 {{/ifeq}}
+{{#ifeq Root.RuntimeEntityScope 'Common'}}
+  {{#ifval Root.RefDataNamespace}}
+    {{#unless HasUsingStatement}}
+
+    {{/unless}}
+using RefDataNamespace = {{Root.RefDataNamespace}};{{set-value 'HasUsingStatement' true}}
+  {{/ifval}}
+{{/ifeq}}
 {{#ifval Root.RefDataBusNamespace}}
-using RefDataBusNamespace = {{Root.RefDataBusNamespace}};{{set 'HasUsingStatement' true}}
+  {{#unless HasUsingStatement}}
+
+  {{/unless}}
+using RefDataBusNamespace = {{Root.RefDataBusNamespace}};{{set-value 'HasUsingStatement' true}}
 {{/ifval}}
 {{#if HasUsingStatement}}
 
@@ -36,7 +75,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     /// <summary>
     /// Represents the {{{Text}}} entity.
     /// </summary>
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}, {{{EntityImplements}}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
     {
 {{! ===== Constants ===== }}
 {{#each Consts}}
@@ -44,9 +83,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// {{{SummaryText}}}
         /// </summary>
         public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
-  {{#if @last}}
 
-  {{/if}}
 {{/each}}
 {{! ===== Privates ===== }}
 {{#each PrivateProperties}}
@@ -86,7 +123,11 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     {{#ifval DisplayName}}
         [System.ComponentModel.DataAnnotations.Display(Name="{{DisplayName}}")]
     {{/ifval}}
+    {{#if Parent.OmitEntityBase}}
+        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+    {{else}}
         public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}); }
+    {{/if}}
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
         {{#if RefDataText}}
@@ -124,9 +165,17 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         {{Annotation3}}
     {{/ifval}}
     {{#if RefDataList}}
+      {{#if Parent.OmitEntityBase}}
+        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
+      {{else}}
         public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}); }
+      {{/if}}   
     {{else}}
+      {{#if Parent.OmitEntityBase}}
+        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+      {{else}}
         public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable = true{{/if}}); }
+      {{/if}}
     {{/if}}
   {{else}}
 
@@ -147,9 +196,6 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
     {{/ifval}}
-    {{#ifval WebApiQueryStringConverter}}
-        [Beef.WebApi.WebApiArgFormatter(typeof({{WebApiQueryStringConverter}}))]
-    {{/ifval}}
     {{#ifval Annotation1}}
         {{Annotation1}}
     {{/ifval}}
@@ -166,7 +212,11 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
             set { var _{{PropertyPrivateName}} = {{Name}}; SetValue(ref _{{PropertyPrivateName}}, value); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
         }
     {{else}}
-        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true}}{{/if}}{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}); }
+      {{#if Parent.OmitEntityBase}}
+        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+      {{else}}
+        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}); }
+      {{/if}}
     {{/if}}
   {{/ifval}}
 {{/each}}
@@ -202,7 +252,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{#each PartitionKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => PartitionKeyGenerator.Generate({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
 
         /// <summary>
         /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
@@ -211,21 +261,23 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
   {{/ifne}}
 {{/unless}}
 {{! ===== GetPropertyValues ===== }}
-{{#ifne CoreProperties.Count 0}}
+{{#unless OmitEntityBase}}
+  {{#ifne CoreProperties.Count 0}}
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-  {{#if ExtendedInherits}}
+    {{#if ExtendedInherits}}
             foreach (var pv in base.GetPropertyValues())
                 yield return pv;
 
-  {{/if}}
-  {{#each CoreProperties}}
+    {{/if}}
+    {{#each CoreProperties}}
             yield return CreateProperty({{PropertyName}}, v => {{PropertyName}} = v);
-  {{/each}}
+    {{/each}}
         }
-{{/ifne}}
+  {{/ifne}}
+{{/unless}}
 {{! ===== Operator ===== }}
 {{#ifval RefDataType}}
   {{#unless Abstract}}

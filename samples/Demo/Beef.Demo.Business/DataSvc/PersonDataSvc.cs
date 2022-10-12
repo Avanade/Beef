@@ -1,9 +1,4 @@
-﻿using Beef.Demo.Common.Entities;
-using Beef.Events;
-using System;
-using System.Threading.Tasks;
-
-namespace Beef.Demo.Business.DataSvc
+﻿namespace Beef.Demo.Business.DataSvc
 {
     public partial class PersonDataSvc
     {
@@ -15,7 +10,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private Task MarkOnAfterAsync()
         {
-            _evtPub.PublishValue("Wahlberg", "Demo.Mark", "Marked");
+            _events.CreateValueEventAndPublish("Wahlberg", "Demo.Mark", "Marked");
             return Task.CompletedTask;
         }
 
@@ -26,7 +21,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private Task<Person> EventPublishNoSendOnImplementationAsync(Person value)
         {
-            _evtPub.PublishValue(value, $"Beef.Demo.NoSend.{value.Id}");
+            _events.CreateValueEventAndPublish(value, $"Beef.Demo.NoSend.{value.Id}");
             return Task.FromResult(value);
         }
 

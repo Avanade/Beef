@@ -5,60 +5,47 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Newtonsoft.Json;
-
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
     /// Represents the Robot model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Robot : IGuidIdentifier, IETag, IChangeLog
+    public partial class Robot : IIdentifier<string>, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the Id.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the Model No.
         /// </summary>
-        [JsonProperty("modelNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? ModelNo { get; set; }
 
         /// <summary>
         /// Gets or sets the Serial No.
         /// </summary>
-        [JsonProperty("serialNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? SerialNo { get; set; }
 
         /// <summary>
         /// Gets or sets the Eye Color.
         /// </summary>
-        [JsonProperty("eyeColor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? EyeColor { get; set; }
 
         /// <summary>
         /// Gets or sets the Power Source.
         /// </summary>
-        [JsonProperty("powerSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? PowerSource { get; set; }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("_etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("_etag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log.
         /// </summary>
-        [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
     }
 

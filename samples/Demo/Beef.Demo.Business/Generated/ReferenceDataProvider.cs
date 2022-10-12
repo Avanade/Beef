@@ -5,21 +5,12 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Beef;
-using Beef.RefData;
-using Beef.Demo.Business.DataSvc;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business
 {
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
     /// </summary>
-    public partial class ReferenceDataProvider : RefDataNamespace.ReferenceData
+    public partial class ReferenceDataProvider : IReferenceDataProvider
     {
         private readonly IReferenceDataDataSvc _dataService;
         
@@ -27,87 +18,24 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
-        public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ReferenceDataProviderCtor(); }
+        public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ReferenceDataProviderCtor(); }
 
         partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
-        
-        #region Collections
 
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.CountryCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.CountryCollection Country => (RefDataNamespace.CountryCollection)this[typeof(RefDataNamespace.Country)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.GenderCollection Gender => (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.EyeColorCollection EyeColor => (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.PowerSourceCollection PowerSource => (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
-
-        /// <summary> 
-        /// Gets the <see cref="RefDataNamespace.StatusCollection"/>.
-        /// </summary>
-        public override RefDataNamespace.StatusCollection Status => (RefDataNamespace.StatusCollection)this[typeof(RefDataNamespace.Status)];
-
-        #endregion
-
-        /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
-        /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public override IReferenceDataCollection this[Type type] => _dataService.GetCollection(type);
-        
-        /// <summary>
-        /// Prefetches all, or the list of <see cref="ReferenceDataBase"/> objects, where not already cached or expired.
-        /// </summary>
-        /// <param name="names">The list of <see cref="ReferenceDataBase"/> names; otherwise, <c>null</c> for all.</param>
-        public override Task PrefetchAsync(params string[] names)
+        /// <inheritdoc/>
+        public Type[] Types => new Type[] 
         {
-            var types = new List<Type>();
-            if (names == null)
-            {
-                types.AddRange(GetAllTypes());
-            }
-            else
-            {
-                foreach (string name in names.Distinct())
-                {
-                    switch (name)
-                    {
-                        case var n when string.Compare(n, nameof(RefDataNamespace.Country), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Country)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.USState)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Gender)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.EyeColor)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.PowerSource)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.Company), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Company)); break;
-                        case var n when string.Compare(n, nameof(RefDataNamespace.Status), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Status)); break;
-                    }
-                }
-            }
+            typeof(RefDataNamespace.Country),
+            typeof(RefDataNamespace.USState),
+            typeof(RefDataNamespace.Gender),
+            typeof(RefDataNamespace.EyeColor),
+            typeof(RefDataNamespace.PowerSource),
+            typeof(RefDataNamespace.Company),
+            typeof(RefDataNamespace.Status)
+        };
 
-            Parallel.ForEach(types, (type, _) => { var __ = this[type]; });
-            return Task.CompletedTask;
-        }
+        /// <inheritdoc/>
+        public Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);
     }
 }
 

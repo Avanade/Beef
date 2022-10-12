@@ -67,7 +67,7 @@ namespace Beef.Demo.Api.Grpc
                 var __req = request ?? new proto.RobotCreateRequest();
                 var __result = await _manager.CreateAsync(_mapper.Map<proto.Robot, Robot>(__req.Value)!);
                 return _mapper.Map<Robot, proto.Robot>(__result!)!;
-            }, operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null).ExecuteAsync();
+            }, operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: HttpStatusCode.null).ExecuteAsync();
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Beef.Demo.Api.Grpc
                 var __req = request ?? new proto.RobotUpdateRequest();
                 var __result = await _manager.UpdateAsync(_mapper.Map<proto.Robot, Robot>(__req.Value)!, Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
                 return _mapper.Map<Robot, proto.Robot>(__result!)!;
-            }, operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null).ExecuteAsync();
+            }, operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.null).ExecuteAsync();
         }
 
         /// <summary>

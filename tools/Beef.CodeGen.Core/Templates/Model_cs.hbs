@@ -5,10 +5,10 @@
 
 #nullable enable
 #pragma warning disable
-{{set 'HasUsingStatement' false}}
+{{set-value 'HasUsingStatement' false}}
 {{! ===== Using ===== }}
 {{#unless Root.IsDataModel}}
-using System;{{set 'HasUsingStatement' true}}
+using System;{{set-value 'HasUsingStatement' true}}
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
   {{#ifeq JsonSerializer 'SystemText'}}
@@ -20,21 +20,21 @@ using CoreEx.RefData.Models;
   {{/ifval}}
 {{/unless}}
 {{#ifeq JsonSerializer 'Newtonsoft'}}
-using Newtonsoft.Json;{{set 'HasUsingStatement' true}}
+using Newtonsoft.Json;{{set-value 'HasUsingStatement' true}}
 {{/ifeq}}
 {{#unless Root.IsDataModel}}
   {{#if Root.UsingNamespace1}}
-using {{Root.UsingNamespace1}};{{set 'HasUsingStatement' true}}
+using {{Root.UsingNamespace1}};{{set-value 'HasUsingStatement' true}}
   {{/if}}
   {{#if Root.UsingNamespace2}}
-using {{Root.UsingNamespace2}};{{set 'HasUsingStatement' true}}
+using {{Root.UsingNamespace2}};{{set-value 'HasUsingStatement' true}}
   {{/if}}
   {{#if Root.UsingNamespace3}}
-using {{Root.UsingNamespace3}};{{set 'HasUsingStatement' true}}
+using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
   {{/if}}
   {{#ifeq EntityUsing 'Common' 'All'}}
     {{#ifeq EntityScope 'Business'}}
-using {{Root.NamespaceCommon}}.Entities;{{set 'HasUsingStatement' true}}
+using {{Root.NamespaceCommon}}.Entities;{{set-value 'HasUsingStatement' true}}
     {{/ifeq}}
   {{/ifeq}}
 {{/unless}}

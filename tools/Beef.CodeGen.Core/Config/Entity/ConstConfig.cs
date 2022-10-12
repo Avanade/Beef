@@ -67,7 +67,7 @@ consts: [
         /// </summary>
         protected override Task PrepareAsync()
         {
-            DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name));
+            Text = DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name));
             return Task.CompletedTask;
         }
     }

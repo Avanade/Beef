@@ -7,142 +7,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
+using CoreEx.RefData.Models;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
     /// Represents the Country entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ReferenceDataInterface(typeof(IReferenceData))]
-    public partial class Country : ReferenceDataBaseGuid
-    {
-        #region Operator
-
-        /// <summary>
-        /// An implicit cast from an <b>Id</b> to a <see cref="Country"/>.
-        /// </summary>
-        /// <param name="id">The <b>Id</b>.</param>
-        /// <returns>The corresponding <see cref="Country"/>.</returns>
-        public static implicit operator Country(Guid id) => ConvertFromId<Country>(id);
-
-        /// <summary>
-        /// An implicit cast from a <b>Code</b> to a <see cref="Country"/>.
-        /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
-        /// <returns>The corresponding <see cref="Country"/>.</returns>
-        public static implicit operator Country(string? code) => ConvertFromCode<Country>(code);
-
-        #endregion
-    
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="Country"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Country"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<Country>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="Country"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Country"/> to copy from.</param>
-        public void CopyFrom(Country from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((ReferenceDataBaseGuid)from);
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="Country"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="Country"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new Country();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="Country"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                if (!base.IsInitial)
-                    return false;
-
-                return true;
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(Country from);
-
-        #endregion
-    }
-
-    #region Collection
+    public partial class Country : ReferenceDataBase<Guid> { }
 
     /// <summary>
     /// Represents the <see cref="Country"/> collection.
     /// </summary>
-    public partial class CountryCollection : ReferenceDataCollectionBase<Country>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CountryCollection"/> class.
-        /// </summary>
-        public CountryCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CountryCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="Country"/> entities.</param>
-        public CountryCollection(IEnumerable<Country> entities) => AddRange(entities);
-    }
-
-    #endregion  
+    public partial class CountryCollection : List<Country> { }
 }
 
 #pragma warning restore

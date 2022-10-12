@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using Beef.Demo.Business.DataSvc;
 
-namespace Beef.Demo.Business.DataSvc
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static partial class ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>DataSvc</b>-layer services.
@@ -22,9 +22,7 @@ namespace Beef.Demo.Business.DataSvc
         public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
         {
             return services.AddScoped<IPersonDataSvc, PersonDataSvc>()
-                           .AddScoped<IProductDataSvc, ProductDataSvc>()
                            .AddScoped<IRobotDataSvc, RobotDataSvc>()
-                           .AddScoped<ITripPersonDataSvc, TripPersonDataSvc>()
                            .AddScoped<IContactDataSvc, ContactDataSvc>()
                            .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>();
         }

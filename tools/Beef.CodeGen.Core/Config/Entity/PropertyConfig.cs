@@ -5,6 +5,7 @@ using OnRamp.Config;
 using OnRamp.Utility;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -38,7 +39,6 @@ properties: [
     [CodeGenCategory("OData", Title = "Provides the specific _OData_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `OData`.")]
     [CodeGenCategory("HttpAgent", Title = "Provides the specific _HTTP Agent_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `HttpAgent`.")]
     [CodeGenCategory("Annotation", Title = "Provides additional property _Annotation_ configuration.")]
-    [CodeGenCategory("WebApi", Title = "Provides the data _Web API_ configuration.")]
     [CodeGenCategory("gRPC", Title = "Provides the _gRPC_ configuration.")]
     public class PropertyConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
@@ -328,15 +328,8 @@ properties: [
         /// </summary>
         [JsonProperty("dataConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Data", Title = "The data `Converter` class name where `Entity.AutoImplement` is selected.", IsImportant = true,
-            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `DataConverterIsGeneric` to `true`.")]
+            Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Type`.")]
         public string? DataConverter { get; set; }
-
-        /// <summary>
-        /// Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.
-        /// </summary>
-        [JsonProperty("dataConverterIsGeneric", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Data", Title = "Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.")]
-        public bool? DataConverterIsGeneric { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Data / DataMapper generated output. 
@@ -472,17 +465,6 @@ properties: [
 
         #endregion
 
-        #region WebApi
-
-        /// <summary>
-        /// Gets or sets the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.
-        /// </summary>
-        [JsonProperty("webApiQueryStringConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "The `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
-        public string? WebApiQueryStringConverter { get; set; }
-
-        #endregion
-
         #region Grpc
 
         /// <summary>
@@ -561,21 +543,9 @@ properties: [
         public string? DeclaredType { get; set; }
 
         /// <summary>
-        /// Gets the data reader type (used for ReferenceDataData layer only).
+        /// Gets the reference data database get value type.
         /// </summary>
-        public string? DataReaderType => string.IsNullOrEmpty(RefDataType)
-            ? DeclaredType
-            : DataConverter switch
-                {
-                    "ReferenceDataGuidIdConverter" => "Guid",
-                    "ReferenceDataNullableGuidIdConverter" => "Guid?",
-                    "ReferenceDataInt32IdConverter" => "int",
-                    "ReferenceDataNullableInt32IdConverter" => "int?",
-                    "ReferenceDataInt64IdConverter" => "long",
-                    "ReferenceDataNullableInt64IdConverter" => "long?",
-                    "ReferenceDataStringIdConverter" => "string?",
-                    _ => DeclaredType
-                };
+        public string? RefDataGetValueType { get; set; }
 
         /// <summary>
         /// Gets the computed property name.
@@ -600,8 +570,7 @@ properties: [
         /// <summary>
         /// Gets or sets the data converter name.
         /// </summary>
-        /// <remarks>Where the name contains a '.' assume it is referencing a static and '.Default' is not required; otherwise, add.</remarks>
-        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"new {DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}()";
+        public string? DataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}.Default";
 
         /// <summary>
         /// Gets the data converter C# code.
@@ -609,14 +578,24 @@ properties: [
         public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverterName})";
 
         /// <summary>
+        /// Gets or sets the data converter name.
+        /// </summary>
+        public string? MapperDataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"AutoMapper{DataConverter}.Default";
+
+        /// <summary>
+        /// Gets the data converter C# code.
+        /// </summary>
+        public string? MapperDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({MapperDataConverterName})";
+
+        /// <summary>
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
-        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ConvertToSrce(";
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ToSource.Convert(";
 
         /// <summary>
         /// Gets the WebAPI parameter type.
         /// </summary>
-        public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? (string.IsNullOrEmpty(WebApiQueryStringConverter) ? Type! : "string") : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
+        public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? Type! : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
 
         /// <summary>
         /// Gets the name of the IdentifierGenerator as passed in as a parameter via DI.
@@ -655,7 +634,7 @@ properties: [
             }
 
             DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
-
+            RefDataGetValueType = DeclaredType;
             ModelText = StringConverter.ToComments(DefaultWhereNull(ModelText, () => Text ?? StringConverter.ToSentenceCase(Name)));
 
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
@@ -664,7 +643,7 @@ properties: [
                     return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
 
                 if (Type == "ChangeLog")
-                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Beef.Entities." + Type)})";
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("CoreEx.Entities." + Type)})";
 
                 var ent = Root!.Entities?.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
@@ -695,14 +674,10 @@ properties: [
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
 
             DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
-            if (!string.IsNullOrEmpty(DataConverter) && (DataConverter.EndsWith("{T}", StringComparison.InvariantCulture) || DataConverter.EndsWith("<T>", StringComparison.InvariantCulture)))
-            {
-                DataConverterIsGeneric = true;
-                DataConverter = DataConverter![0..^3];
-            }
 
-            if (CompareValue(RefDataType, "string") && CompareValue(DataConverter, "ReferenceDataCodeConverter"))
-                DataConverter = null;
+            var rdc = ReformatDataConverter(DataConverter, Type, RefDataType, RefDataGetValueType);
+            DataConverter = rdc.DataConverter;
+            RefDataGetValueType = rdc.RefDataGetValueType;
 
             if (!string.IsNullOrEmpty(IdentifierGenerator))
             {
@@ -730,6 +705,79 @@ properties: [
             };
 
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Reformat the DataConverter and replace the Type placeholders.
+        /// </summary>
+        internal static (string? DataConverter, string? RefDataGetValueType) ReformatDataConverter(string? dataConverter, string type, string? refDataType, string? refDataGetValueType)
+        {
+            if (string.IsNullOrEmpty(dataConverter))
+                return (dataConverter, refDataGetValueType);
+
+            // Handle any legacy formatted values.
+            dataConverter = dataConverter switch
+            {
+                "ReferenceDataCodeConverter" => "ReferenceDataCodeConverter<T>",
+                "ReferenceDataCodeConverter{T}" => "ReferenceDataCodeConverter<T>",
+                "ReferenceDataGuidIdConverter" => "ReferenceDataIdConverter<T, Guid>",
+                "ReferenceDataInt32IdConverter" => "ReferenceDataIdConverter<T, int>",
+                "ReferenceDataInt64IdConverter" => "ReferenceDataIdConverter<T, long>",
+                "ReferenceDataStringIdConverter" => "ReferenceDataIdConverter<T, string?>",
+                "ReferenceDataGuidIdConverter{T}" => "ReferenceDataIdConverter<T, Guid>",
+                "ReferenceDataInt32IdConverter{T}" => "ReferenceDataIdConverter<T, int>",
+                "ReferenceDataInt64IdConverter{T}" => "ReferenceDataIdConverter<T, long>",
+                "ReferenceDataStringIdConverter{T}" => "ReferenceDataIdConverter<T, string?>",
+                "ReferenceDataGuidIdConverter<T>" => "ReferenceDataIdConverter<T, Guid>",
+                "ReferenceDataInt32IdConverter<T>" => "ReferenceDataIdConverter<T, int>",
+                "ReferenceDataInt64IdConverter<T>" => "ReferenceDataIdConverter<T, long>",
+                "ReferenceDataStringIdConverter<T>" => "ReferenceDataIdConverter<T, string?>",
+                "ReferenceDataNullableGuidIdConverter" => "ReferenceDataIdConverter<T, Guid?>",
+                "ReferenceDataNullableInt32IdConverter" => "ReferenceDataIdConverter<T, int?>",
+                "ReferenceDataNullableInt64IdConverter" => "ReferenceDataIdConverter<T, long?>",
+                "ReferenceDataNullableGuidIdConverter{T}" => "ReferenceDataIdConverter<T, Guid?>",
+                "ReferenceDataNullableInt32IdConverter{T}" => "ReferenceDataIdConverter<T, int?>",
+                "ReferenceDataNullableInt64IdConverter{T}" => "ReferenceDataIdConverter<T, long?>",
+                "ReferenceDataNullableGuidIdConverter<T>" => "ReferenceDataIdConverter<T, Guid?>",
+                "ReferenceDataNullableInt32IdConverter<T>" => "ReferenceDataIdConverter<T, int?>",
+                "ReferenceDataNullableInt64IdConverter<T>" => "ReferenceDataIdConverter<T, long?>",
+                _ => dataConverter
+            };
+
+            if (CompareValue(refDataType, "string") && CompareValue(dataConverter, "ReferenceDataCodeConverter<T>"))
+                return (null, refDataGetValueType);
+
+            var s = dataConverter.IndexOfAny(new char[] { '<', '{' });
+            if (s < 1)
+                return (dataConverter, refDataGetValueType);
+
+            var e = dataConverter.IndexOfAny(new char[] { '>', '}' });
+            if (e < 0 || e < s)
+                return (dataConverter, refDataGetValueType);
+
+            var parts = dataConverter.Substring(s + 1, e - s - 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var sb = new StringBuilder();
+            foreach (var part in parts)
+            {
+                var p = part.Trim();
+                if (p.Length == 0)
+                    continue;
+
+                if (sb.Length > 0)
+                    sb.Append(", ");
+
+                switch (p)
+                {
+                    case "T": sb.Append(type); break;
+                    case "T?": sb.Append($"{type}?"); break;
+                    case "T2": sb.Append(refDataType); break;
+                    case "T2?": sb.Append($"{refDataType}?"); break;
+                    default: sb.Append(p); break;
+                }
+
+            }
+
+            return ($"{dataConverter[..s]}<{sb}>", parts.Length > 1 ? parts[1].Trim() : refDataGetValueType);
         }
 
         /// <summary>

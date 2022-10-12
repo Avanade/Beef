@@ -18,7 +18,7 @@ namespace Cdr.Banking.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            ApiTester.UserUser("jessica");
+            ApiTester.UseUser("jessica");
             TestSetUp.Default.SetUp();
         }
 
@@ -69,7 +69,7 @@ namespace Cdr.Banking.Test
         {
             ApiTester.Agent<AccountAgent, AccountCollectionResult>()
                 .WithUser("john")
-                .ExpectStatusCode(HttpStatusCode.Forbidden)
+                .ExpectStatusCode(HttpStatusCode.Unauthorized)
                 .Run(a => a.GetAccountsAsync(null));
         }
 

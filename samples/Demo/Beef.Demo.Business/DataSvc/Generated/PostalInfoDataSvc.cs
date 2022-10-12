@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Events;
-using Beef.Demo.Business.Data;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
@@ -25,15 +13,15 @@ namespace Beef.Demo.Business.DataSvc
     public partial class PostalInfoDataSvc : IPostalInfoDataSvc
     {
         private readonly IPostalInfoData _data;
-        private readonly IEventPublisher _evtPub;
+        private readonly IEventPublisher _events;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostalInfoDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IPostalInfoData"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher evtPub)
-            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); PostalInfoDataSvcCtor(); }
+        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+        public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher events)
+            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); PostalInfoDataSvcCtor(); }
 
         partial void PostalInfoDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -44,7 +32,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _data.GetPostCodesAsync(country, state, city).ConfigureAwait(false);
             return __result;
@@ -58,12 +46,12 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreatePostCodesAsync(Check.NotNull(value, nameof(value)), country, state, city).ConfigureAwait(false);
-            await _evtPub.PublishValue(__result, new Uri($"/postalinfo/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.PostalInfo.{_evtPub.FormatKey(__result)}", "Create", country.Code, state, city).SendAsync().ConfigureAwait(false);
+            var __result = await _data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create");
             return __result;
-        });
+        }, new BusinessInvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -73,12 +61,12 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdatePostCodesAsync(Check.NotNull(value, nameof(value)), country, state, city).ConfigureAwait(false);
-            await _evtPub.PublishValue(__result, new Uri($"/postalinfo/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.PostalInfo.{_evtPub.FormatKey(__result)}", "Update", country.Code, state, city).SendAsync().ConfigureAwait(false);
+            var __result = await _data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
             return __result;
-        });
+        }, new BusinessInvokerArgs { EventPublisher = _events });
     }
 }
 

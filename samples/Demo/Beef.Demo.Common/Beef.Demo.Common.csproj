@@ -1,43 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup Label="Globals">
-    <SccProjectName></SccProjectName>
-    <SccProvider></SccProvider>
-    <SccAuxPath></SccAuxPath>
-    <SccLocalPath></SccLocalPath>
-  </PropertyGroup>
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Beef.Demo.Common.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <Folder Include="Agents\" />
-    <Folder Include="Agents\Generated" />
     <Folder Include="Entities\" />
-    <Folder Include="Entities\Generated\" />
-    <Folder Include="Grpc\" />
-    <Folder Include="Grpc\Generated" />
   </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="CoreEx" Version="1.0.10" />
     <PackageReference Include="Grpc.Tools" Version="2.45.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include=".\Grpc\Generated\beef.demo.common.grpc.proto" GrpcServices="Client,Server" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.Abstractions\Beef.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Grpc\Beef.Grpc.csproj" />
-  </ItemGroup>
-
 </Project>

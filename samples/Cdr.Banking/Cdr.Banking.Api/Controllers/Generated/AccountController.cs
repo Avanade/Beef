@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using CoreEx;
-using CoreEx.WebApis;
-using CoreEx.Entities;
-using Cdr.Banking.Business;
-using Cdr.Banking.Business.Entities;
-using RefDataNamespace = Cdr.Banking.Business.Entities;
-
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>

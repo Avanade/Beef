@@ -83,7 +83,7 @@ namespace {{Root.NamespaceBusiness}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#ifval IdentifierGeneratorName}}
-            value{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
+            value{{#ifeq ../../EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
       {{/ifval}}
     {{/each}}
   {{/ifeq}}
@@ -102,17 +102,17 @@ namespace {{Root.NamespaceBusiness}}
             Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}});
     {{/ifne}}
     {{#if ManagerExtensions}}
-      {{#unless SingleValdiateParameters}}
+      {{#unless SingleValidateParameters}}
             await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-            (await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false)).ThrowOnError();
+            await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
       {{/each}}
     {{else}}
-            (await MultiValidator.Create()
+            await MultiValidator.Create()
       {{#each ValidateParameters}}
                 .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{IValidator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
@@ -121,7 +121,7 @@ namespace {{Root.NamespaceBusiness}}
                 .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                .ValidateAsync({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false)).ThrowOnError();
+                .ValidateAsync(true, {{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
 
     {{/if}}
     {{#if ManagerExtensions}}

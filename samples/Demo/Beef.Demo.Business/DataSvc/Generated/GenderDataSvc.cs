@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Caching;
-using Beef.Entities;
-using Beef.Events;
-using Beef.Demo.Business.Data;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
@@ -26,17 +13,17 @@ namespace Beef.Demo.Business.DataSvc
     public partial class GenderDataSvc : IGenderDataSvc
     {
         private readonly IGenderData _data;
-        private readonly IEventPublisher _evtPub;
+        private readonly IEventPublisher _events;
         private readonly IRequestCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IGenderData"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public GenderDataSvc(IGenderData data, IEventPublisher evtPub, IRequestCache cache)
-            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); GenderDataSvcCtor(); }
+        public GenderDataSvc(IGenderData data, IEventPublisher events, IRequestCache cache)
+            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); GenderDataSvcCtor(); }
 
         partial void GenderDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,14 +32,13 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __key = new UniqueKey(id);
-            if (_cache.TryGetValue(__key, out Gender? __val))
+            if (_cache.TryGetValue(id, out Gender? __val))
                 return __val;
 
             var __result = await _data.GetAsync(id).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__key, __result);
+            return _cache.SetValue(__result);
         });
 
         /// <summary>
@@ -60,24 +46,24 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Create").SendAsync().ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
-        });
+            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, $"Demo.Gender", "Create");
+            return _cache.SetValue(__result);
+        }, new BusinessInvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Gender> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            await _evtPub.PublishValue(__result, $"Demo.Gender.{_evtPub.FormatKey(__result)}", "Update").SendAsync().ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
-        });
+            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, $"Demo.Gender", "Update");
+            return _cache.SetValue(__result);
+        }, new BusinessInvokerArgs { EventPublisher = _events });
     }
 }
 

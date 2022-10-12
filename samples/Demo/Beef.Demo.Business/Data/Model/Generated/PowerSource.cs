@@ -5,25 +5,16 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData.Model;
-using Newtonsoft.Json;
-
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
     /// Represents the Power Source model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PowerSource : ReferenceDataBaseGuid
+    public partial class PowerSource : ReferenceDataBase<Guid>
     {
         /// <summary>
         /// Gets or sets the Additional Info.
         /// </summary>
-        [JsonProperty("additionalInfo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? AdditionalInfo { get; set; }
     }
 

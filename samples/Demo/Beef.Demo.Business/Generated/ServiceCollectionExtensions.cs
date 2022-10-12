@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using Beef.Demo.Business;
 
-namespace Beef.Demo.Business
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static partial class ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Manager</b>-layer services.
@@ -22,9 +22,7 @@ namespace Beef.Demo.Business
         public static IServiceCollection AddGeneratedManagerServices(this IServiceCollection services)
         {
             return services.AddScoped<IPersonManager, PersonManager>()
-                           .AddScoped<IProductManager, ProductManager>()
                            .AddScoped<IRobotManager, RobotManager>()
-                           .AddScoped<ITripPersonManager, TripPersonManager>()
                            .AddScoped<IContactManager, ContactManager>()
                            .AddScoped<IConfigManager, ConfigManager>()
                            .AddScoped<IPostalInfoManager, PostalInfoManager>();

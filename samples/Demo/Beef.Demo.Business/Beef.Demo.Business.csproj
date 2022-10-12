@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,11 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.Core\Beef.Core.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.Cosmos\Beef.Data.Cosmos.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.EntityFrameworkCore\Beef.Data.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Data.OData\Beef.Data.OData.csproj" />
+    <PackageReference Include="CoreEx" Version="1.0.10" />
+    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.10" />
+    <PackageReference Include="CoreEx.Cosmos" Version="1.0.10" />
+    <PackageReference Include="CoreEx.Database" Version="1.0.10" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="1.0.10" />
+    <PackageReference Include="CoreEx.Validation" Version="1.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
   </ItemGroup>
 

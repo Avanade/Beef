@@ -1,10 +1,4 @@
-﻿using Beef.Demo.Business.Entities;
-using Beef.Events;
-using Beef.Mapper;
-using System;
-using System.Threading.Tasks;
-
-namespace Beef.Demo.Business.Data
+﻿namespace Beef.Demo.Business.Data
 {
     public partial class ContactData
     {

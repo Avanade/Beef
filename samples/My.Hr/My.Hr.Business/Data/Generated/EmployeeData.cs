@@ -43,7 +43,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
+            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created");
             return __result;
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -55,7 +55,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
+            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated");
             return __result;
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -66,7 +66,7 @@ namespace My.Hr.Business.Data
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id)).ConfigureAwait(false);
-            _events.Publish(EventData.Create(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
+            _events.CreateValueEventAndPublish(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted");
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace My.Hr.Business.Data
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
-            _events.Publish(EventData.Create(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
+            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated");
             return __result;
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -104,8 +104,8 @@ namespace My.Hr.Business.Data
             public DbMapper()
             {
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
-                Property(s => s.Address, "AddressJson").SetConverter(new ObjectToJsonConverter<Address>());
-                Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(new StringToBase64Converter());
+                Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
+                Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
                 Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
                 DbMapperCtor();
             }

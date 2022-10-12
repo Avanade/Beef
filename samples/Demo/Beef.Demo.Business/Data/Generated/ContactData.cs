@@ -5,22 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Data.Database;
-using Beef.Data.EntityFrameworkCore;
-using Beef.Entities;
-using Beef.Events;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
-using Beef.Demo.Business.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
@@ -29,19 +13,16 @@ namespace Beef.Demo.Business.Data
     public partial class ContactData : IContactData
     {
         private readonly IEfDb _ef;
-        private readonly AutoMapper.IMapper _mapper;
-        private readonly IEventPublisher _evtPub;
-
-        private Func<IQueryable<EfModel.Contact>, EfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
+        private readonly IEventPublisher _events;
+        private Func<IQueryable<EfModel.Contact>, IQueryable<EfModel.Contact>>? _getAllOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="mapper">The <see cref="AutoMapper.IMapper"/>.</param>
-        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
-        public ContactData(IEfDb ef, AutoMapper.IMapper mapper, IEventPublisher evtPub)
-            { _ef = Check.NotNull(ef, nameof(ef)); _mapper = Check.NotNull(mapper, nameof(mapper)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); ContactDataCtor(); }
+        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+        public ContactData(IEfDb ef, IEventPublisher events)
+            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); ContactDataCtor(); }
 
         partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -49,12 +30,9 @@ namespace Beef.Demo.Business.Data
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public Task<ContactCollectionResult> GetAllAsync() => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<ContactCollectionResult> GetAllAsync() => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            ContactCollectionResult __result = new ContactCollectionResult();
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            __result.Result = _ef.Query<Contact, EfModel.Contact>(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
-            return await Task.FromResult(__result).ConfigureAwait(false);
+            return _ef.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
         });
 
         /// <summary>
@@ -62,10 +40,9 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public Task<Contact?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            return await _ef.GetAsync<Contact, EfModel.Contact>(__dataArgs, id).ConfigureAwait(false);
+            return _ef.GetAsync<Contact, EfModel.Contact>(id);
         });
 
         /// <summary>
@@ -73,43 +50,40 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        public Task<Contact> CreateAsync(Contact value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Create");
+            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Create");
             return __result;
-        });
+        }, new BusinessInvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        public Task<Contact> UpdateAsync(Contact value) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-            _evtPub.PublishValue(__result, new Uri($"/contact/{_evtPub.FormatKey(__result)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(__result)}", "Update");
+            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Update");
             return __result;
-        });
+        }, new BusinessInvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => _ef.EventOutboxInvoker.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __dataArgs = EfDbArgs.Create(_mapper);
-            await _ef.DeleteAsync<Contact, EfModel.Contact>(__dataArgs, id).ConfigureAwait(false);
-            _evtPub.PublishValue(new Contact { Id = id }, new Uri($"/contact/{_evtPub.FormatKey(id)}", UriKind.Relative), $"Demo.Contact.{_evtPub.FormatKey(id)}", "Delete", id);
-        });
+            await _ef.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
+            _events.PublishValueEvent(new Contact { Id = id }, new Uri($"/contact/{id}", UriKind.Relative), $"Demo.Contact", "Delete");
+        }, new BusinessInvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => _ef.EventOutboxInvoker.InvokeAsync(this, () => RaiseEventOnImplementationAsync(throwError));
+        public Task RaiseEventAsync(bool throwError) => DataInvoker.Current.InvokeAsync(this, _ => RaiseEventOnImplementationAsync(throwError));
 
         /// <summary>
         /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> <i>AutoMapper</i> mapping.

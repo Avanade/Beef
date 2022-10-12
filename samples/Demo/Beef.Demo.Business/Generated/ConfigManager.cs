@@ -5,17 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business
 {
     /// <summary>
@@ -35,9 +24,9 @@ namespace Beef.Demo.Business
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
+            return Cleaner.Clean(await GetEnvVarsOnImplementationAsync(ct).ConfigureAwait(false));
         }, BusinessInvokerArgs.Unspecified);
     }
 }

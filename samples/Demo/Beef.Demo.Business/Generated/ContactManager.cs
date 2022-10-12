@@ -5,18 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Business;
-using Beef.Entities;
-using Beef.Validation;
-using Beef.Demo.Business.Entities;
-using Beef.Demo.Business.DataSvc;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business
 {
     /// <summary>
@@ -31,7 +19,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
         public ContactManager(IContactDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
+            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ContactManagerCtor(); }
 
         partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -39,7 +27,7 @@ namespace Beef.Demo.Business
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
@@ -49,10 +37,10 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
         }, BusinessInvokerArgs.Read);
 
@@ -61,11 +49,9 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            Cleaner.CleanUp(value);
+            Cleaner.CleanUp(value.EnsureValue());
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, BusinessInvokerArgs.Create);
 
@@ -75,11 +61,9 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await value.Validate().Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
-
-            value.Id = id;
+            value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, BusinessInvokerArgs.Update);
@@ -88,10 +72,10 @@ namespace Beef.Demo.Business
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().RunAsync(throwOnError: true).ConfigureAwait(false);
+            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
         }, BusinessInvokerArgs.Delete);
 
@@ -99,7 +83,7 @@ namespace Beef.Demo.Business
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async () =>
+        public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(throwError);
             await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);

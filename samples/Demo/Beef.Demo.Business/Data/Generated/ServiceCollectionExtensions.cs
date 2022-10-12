@@ -5,14 +5,14 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.Extensions.DependencyInjection;
+using Beef.Demo.Business.Data;
 
-namespace Beef.Demo.Business.Data
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides the generated <b>Data</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static partial class ServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>Data</b>-layer services.
@@ -22,9 +22,7 @@ namespace Beef.Demo.Business.Data
         public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
         {
             return services.AddScoped<IPersonData, PersonData>()
-                           .AddScoped<IProductData, ProductData>()
                            .AddScoped<IRobotData, RobotData>()
-                           .AddScoped<ITripPersonData, TripPersonData>()
                            .AddScoped<IContactData, ContactData>()
                            .AddScoped<IPostalInfoData, PostalInfoData>();
         }

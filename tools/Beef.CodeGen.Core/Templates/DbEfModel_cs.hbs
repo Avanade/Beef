@@ -15,7 +15,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : Beef.Entities.ILogicallyDeleted{{#ifval ColumnTenantId}}, Beef.Entities.IMultiTenant{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : Beef.Entities.IMultiTenant{{/ifval}}{{/ifval}}
+    public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{#ifval ColumnTenantId}}, ITenantId{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : ITenantId{{/ifval}}{{/ifval}}
     {
 {{#each CoreColumns}}
         /// <summary>
@@ -60,7 +60,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {{/ifval}}
 {{#ifval ColumnTenantId}}
                 entity.Property(p => p.TenantId).HasColumnType("{{ColumnTenantId.EfSqlType}}");
-                entity.HasQueryFilter(v => v.TenantId == ExecutionContext.Current.TenantId);
+                entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
 {{/ifval}}
                 AddToModel(entity);
             });

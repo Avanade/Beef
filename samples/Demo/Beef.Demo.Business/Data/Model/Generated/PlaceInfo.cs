@@ -5,30 +5,23 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Newtonsoft.Json;
-
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
     /// Represents the Place Info model.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class PlaceInfo
     {
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
-        [JsonProperty("place name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("place name")]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Post Code.
         /// </summary>
-        [JsonProperty("post code", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("post code")]
         public string? PostCode { get; set; }
     }
 

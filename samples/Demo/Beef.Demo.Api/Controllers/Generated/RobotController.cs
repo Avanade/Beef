@@ -5,35 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
     /// Provides the <see cref="Robot"/> Web API functionality.
     /// </summary>
     [Route("api/v1/robots")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class RobotController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IRobotManager _manager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
-        public RobotController(IRobotManager manager)
-            { _manager = Check.NotNull(manager, nameof(manager)); RobotControllerCtor(); }
+        public RobotController(WebApi webApi, IRobotManager manager)
+            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); RobotControllerCtor(); }
 
         partial void RobotControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,44 +35,40 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<Robot?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<Robot?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
         [HttpPost("")]
+        [AcceptsBody(typeof(Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Robot value) =>
-            new WebApiPost<Robot>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null, locationUri: (r) => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
+        public Task<IActionResult> Create() =>
+            _webApi.PostAsync<Robot, Robot>(Request, p => _manager.CreateAsync(p.Value!), locationUri: r => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
         [HttpPut("{id}")]
+        [AcceptsBody(typeof(Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Robot value, Guid id) =>
-            new WebApiPut<Robot>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<Robot, Robot>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The patched <see cref="Robot"/>.</returns>
         [HttpPatch("{id}")]
+        [AcceptsBody(typeof(Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
-        public IActionResult Patch([FromBody] JToken value, Guid id) =>
-            new WebApiPatch<Robot>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Patch(Guid id) =>
+            _webApi.PatchAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
@@ -90,9 +76,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> Delete(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -104,11 +89,10 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs([FromQuery(Name = "model-no")] string? modelNo = default, [FromQuery(Name = "serial-no")] string? serialNo = default, [FromQuery(Name = "power-sources")] List<string>? powerSources = default)
+        public Task<IActionResult> GetByArgs([FromQuery(Name="model-no")] string? modelNo = default, [FromQuery(Name="serial-no")] string? serialNo = default, [FromQuery(Name="power-sources")] List<string>? powerSources = default)
         {
             var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo, PowerSourcesSids = powerSources };
-            return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetAsync<RobotCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -118,9 +102,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="powerSource">The Power Source.</param>
         [HttpPost("{id}/powerSource/{powerSource}")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
-        public IActionResult RaisePowerSourceChange(Guid id, string? powerSource) =>
-            new WebApiPost(this, () => _manager.RaisePowerSourceChangeAsync(id, powerSource),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Accepted);
+        public Task<IActionResult> RaisePowerSourceChange(Guid id, string? powerSource) =>
+            _webApi.PostAsync(Request, p => _manager.RaisePowerSourceChangeAsync(id, powerSource), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Unspecified);
     }
 }
 

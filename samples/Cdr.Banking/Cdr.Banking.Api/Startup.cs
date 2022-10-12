@@ -1,20 +1,4 @@
-﻿using Cdr.Banking.Business;
-using CoreEx;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.RefData;
-using CoreEx.Validation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Api
 {
@@ -115,7 +99,7 @@ namespace Cdr.Banking.Api
             {
                 // TODO: This would be replaced with appropriate OAuth integration, etc... - this is purely for illustrative purposes only.
                 if (!hc.Request.Headers.TryGetValue("cdr-user", out var username) || username.Count != 1)
-                    throw new AuthorizationException();
+                    throw new AuthenticationException();
 
                 var bec = (Business.ExecutionContext)ec;
                 bec.Timestamp = SystemTime.Get().UtcNow;
@@ -134,7 +118,7 @@ namespace Cdr.Banking.Api
                         break;
 
                     default:
-                        throw new AuthorizationException();
+                        throw new AuthenticationException();
                 }
 
                 return Task.CompletedTask;

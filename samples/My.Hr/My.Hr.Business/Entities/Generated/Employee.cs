@@ -34,7 +34,7 @@ namespace My.Hr.Business.Entities
         public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
+        /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
         /// </summary>
         public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 

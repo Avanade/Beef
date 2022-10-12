@@ -55,7 +55,7 @@ namespace My.Hr.Business.Data
         public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created"));
+            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
             return __result;
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -67,7 +67,7 @@ namespace My.Hr.Business.Data
         public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.Publish(EventData.Create(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated"));
+            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
             return __result;
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data
         public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id)).ConfigureAwait(false);
-            _events.Publish(EventData.Create(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted"));
+            _events.CreateValueEventAndPublish(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted");
         }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>

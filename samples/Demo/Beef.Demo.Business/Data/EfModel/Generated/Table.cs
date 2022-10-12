@@ -14,7 +14,7 @@ namespace Beef.Demo.Business.Data.EfModel
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Test.Table'.
     /// </summary>
-    public partial class Table : Beef.Entities.ILogicallyDeleted, Beef.Entities.IMultiTenant
+    public partial class Table : ILogicallyDeleted, ITenantId
     {
         /// <summary>
         /// Gets or sets the 'TableId' column value.
@@ -84,7 +84,7 @@ namespace Beef.Demo.Business.Data.EfModel
         /// <summary>
         /// Gets or sets the 'TenantId' column value.
         /// </summary>
-        public Guid? TenantId { get; set; }
+        public string? TenantId { get; set; }
 
         /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
@@ -113,8 +113,8 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
                 entity.Property(p => p.IsDeleted).HasColumnType("BIT");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
-                entity.Property(p => p.TenantId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.HasQueryFilter(v => v.TenantId == ExecutionContext.Current.TenantId);
+                entity.Property(p => p.TenantId).HasColumnType("NVARCHAR(50)");
+                entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
                 AddToModel(entity);
             });
         }

@@ -5,15 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Beef;
-using Beef.Entities;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
@@ -40,6 +31,13 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         Task<Person?> GetAsync(Guid id);
+
+        /// <summary>
+        /// Gets the specified <see cref="Person"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
+        Task<Person?> GetExAsync(Guid id);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.

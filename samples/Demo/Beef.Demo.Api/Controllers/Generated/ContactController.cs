@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Entities;
-using Beef.Demo.Business;
-using Beef.Demo.Business.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
-
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
@@ -25,18 +12,26 @@ namespace Beef.Demo.Api.Controllers
     /// </summary>
     [AllowAnonymous]
     [Route("api/v1/contacts")]
+    [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class ContactController : ControllerBase
     {
+        private readonly WebApi _webApi;
         private readonly IContactManager _manager;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _config;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactController"/> class.
         /// </summary>
+        /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IContactManager"/>.</param>
         /// <param name="config">The <see cref="Microsoft.Extensions.Configuration.IConfiguration"/>.</param>
-        public ContactController(IContactManager manager, Microsoft.Extensions.Configuration.IConfiguration config)
-            { _manager = Check.NotNull(manager, nameof(manager)); _config = Check.NotNull(config, nameof(config)); ContactControllerCtor(); }
+        public ContactController(WebApi webApi, IContactManager manager, Microsoft.Extensions.Configuration.IConfiguration config)
+        {
+            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
+            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            ContactControllerCtor();
+        }
 
         partial void ContactControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -47,9 +42,8 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(ContactCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetAll() =>
-            new WebApiGet<ContactCollectionResult, ContactCollection, Contact>(this, () => _manager.GetAllAsync(),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> GetAll() =>
+            _webApi.GetAsync<ContactCollectionResult>(Request, p => _manager.GetAllAsync(), alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
@@ -59,32 +53,29 @@ namespace Beef.Demo.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(Guid id) =>
-            new WebApiGet<Contact?>(this, () => _manager.GetAsync(id),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        public Task<IActionResult> Get(Guid id) =>
+            _webApi.GetAsync<Contact?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
         [HttpPost("")]
+        [AcceptsBody(typeof(Contact))]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
-        public IActionResult Create([FromBody] Contact value) =>
-            new WebApiPost<Contact>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
-                operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
+        public Task<IActionResult> Create() =>
+            _webApi.PostAsync<Contact, Contact>(Request, p => _manager.CreateAsync(p.Value!));
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
         [HttpPut("{id}")]
+        [AcceptsBody(typeof(Contact))]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-        public IActionResult Update([FromBody] Contact value, Guid id) =>
-            new WebApiPut<Contact>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
-                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        public Task<IActionResult> Update(Guid id) =>
+            _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
@@ -92,9 +83,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult Delete(Guid id) =>
-            new WebApiDelete(this, () => _manager.DeleteAsync(id),
-                operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> Delete(Guid id) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Raise Event.
@@ -102,9 +92,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
         [HttpPost("raise")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult RaiseEvent(bool throwError) =>
-            new WebApiPost(this, () => _manager.RaiseEventAsync(throwError),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        public Task<IActionResult> RaiseEvent(bool throwError) =>
+            _webApi.PostAsync(Request, p => _manager.RaiseEventAsync(throwError), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
     }
 }
 

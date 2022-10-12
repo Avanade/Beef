@@ -10,16 +10,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Beef.Entities;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
+using CoreEx.Configuration;
+using CoreEx.Entities;
+using CoreEx.Http;
+using CoreEx.Json;
+using Microsoft.Extensions.Logging;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="PostalInfo"/> Web API agent.
+    /// Defines the <see cref="PostalInfo"/> HTTP agent.
     /// </summary>
     public partial interface IPostalInfoAgent
     {
@@ -29,9 +31,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -40,9 +43,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -51,33 +55,40 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Patches an existing <see cref="PostalInfo"/>.
         /// </summary>
-        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
+        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
+        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<PostalInfo>> PatchPostCodesAsync(WebApiPatchOption patchOption, JToken value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null);
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides the <see cref="PostalInfo"/> Web API agent.
+    /// Provides the <see cref="PostalInfo"/> HTTP agent.
     /// </summary>
-    public partial class PostalInfoAgent : WebApiAgentBase, IPostalInfoAgent
+    public partial class PostalInfoAgent : TypedHttpClientBase<PostalInfoAgent>, IPostalInfoAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PostalInfoAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
-        public PostalInfoAgent(IDemoWebApiAgentArgs args) : base(args) { }
+        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
+        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public PostalInfoAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<PostalInfoAgent> logger) 
+            : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <summary>
         /// Gets the specified <see cref="PostalInfo"/>.
@@ -85,11 +96,11 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -98,11 +109,11 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -111,25 +122,25 @@ namespace Beef.Demo.Common.Agents
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PutAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Patches an existing <see cref="PostalInfo"/>.
         /// </summary>
-        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
-        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
+        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
+        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PostalInfo>> PatchPostCodesAsync(WebApiPatchOption patchOption, JToken value, string? country, string? state, string? city, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("country", country), new WebApiArg<string?>("state", state), new WebApiArg<string?>("city", city) });
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
     }
 }
 

@@ -1,6 +1,4 @@
-﻿using Beef.Validation;
-
-namespace Beef.Demo.Business.Validation
+﻿namespace Beef.Demo.Business.Validation
 {
     /// <summary>
     /// Defines the common/shared validators.

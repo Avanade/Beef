@@ -1,8 +1,5 @@
 ﻿#nullable enable
 
-using Beef.Demo.Common.Entities;
-using Beef.Validation;
-
 namespace Beef.Demo.Business.Validation
 {
     /// <summary>

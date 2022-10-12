@@ -3,6 +3,7 @@
 using CoreEx.Caching;
 using CoreEx.Entities;
 using Newtonsoft.Json;
+using OnRamp;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
@@ -556,6 +557,14 @@ entities:
         [CodeGenProperty("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).",
             Description = "This can be overridden within the `Operation`(s).")]
         public string? HttpAgentReturnModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.
+        /// </summary>
+        [JsonProperty("httpAgentCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("HttpAgent", Title = "The fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.",
+            Description = "Prepended to `Operation.HttpAgentCode` where specified to enable standardized functionality.")]
+        public string? HttpAgentCode { get; set; }
 
         #endregion 
 
@@ -1258,6 +1267,9 @@ entities:
         /// </summary>
         protected override async Task PrepareAsync()
         {
+            if (!string.IsNullOrEmpty(RefDataType) && CompareValue(OmitEntityBase, true))
+                throw new CodeGenException(this, nameof(OmitEntityBase), $"An {nameof(OmitEntityBase)} is not allowed where a {nameof(RefDataType)} has been specified.");
+
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
@@ -1276,7 +1288,7 @@ entities:
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
             CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
-            HttpAgentName = InterfaceiseName(DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName));
+            HttpAgentName = DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName);
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
@@ -1350,7 +1362,7 @@ entities:
         /// </summary>
         private void InferInherits()
         {
-            ExtendedInherits = Inherits != null;
+            ExtendedInherits = Inherits != null && CompareNullOrValue(OmitEntityBase, false);
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
@@ -1370,7 +1382,7 @@ entities:
                 _ => EntityInherits != null && EntityInherits.StartsWith("EntityBase<") ? null : EntityInherits
             };
 
-            EntityCollectionInherits = CollectionInherits;
+            EntityCollectionInherits = CompareValue(OmitEntityBase, true) ? $"List<{EntityName}>" : CollectionInherits;
             EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
             {
                 if (RefDataType == null)
@@ -1379,7 +1391,7 @@ entities:
                     return $"ReferenceDataCollectionBase<{RefDataType}{(RefDataType == "string" ? "?" : "")}, {EntityName}, {EntityCollectionName}>";
             });
 
-            EntityCollectionResultInherits = CollectionResultInherits;
+            EntityCollectionResultInherits = CompareValue(OmitEntityBase, true) ? $"CollectionResult<{EntityCollectionName}, {EntityName}>" : CollectionResultInherits;
             EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}, {EntityCollectionResultName}>");
 
             CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");

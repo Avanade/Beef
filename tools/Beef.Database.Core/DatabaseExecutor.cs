@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using OnRamp;
 using OnRamp.Console;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Beef.Database.Core
@@ -46,12 +47,12 @@ namespace Beef.Database.Core
         }
 
         /// <inheritdoc/>
-        public override async Task<bool> MigrateAsync()
+        public override async Task<bool> MigrateAsync(CancellationToken cancellationToken = default)
         {
             if (_args.Command.HasFlag(DatabaseExecutorCommand.Execute))
             {
                 if (_args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Execute))
-                    return await ExecuteSqlStatementsAsync(_args.ExecuteStatements?.ToArray() ?? Array.Empty<string>()).ConfigureAwait(false);
+                    return await ExecuteSqlStatementsAsync(_args.ExecuteStatements?.ToArray() ?? Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
                 else
                 {
                     Logger?.LogInformation("{Content}", string.Empty);
@@ -63,7 +64,7 @@ namespace Beef.Database.Core
             if (_args.Command.HasFlag(DatabaseExecutorCommand.Script))
             {
                 if (_args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Script))
-                    return await CreateScriptAsync(_args.ScriptName, _args.ScriptArguments).ConfigureAwait(false);
+                    return await CreateScriptAsync(_args.ScriptName, _args.ScriptArguments, cancellationToken: cancellationToken).ConfigureAwait(false);
                 else
                 {
                     Logger?.LogInformation("{Content}", string.Empty);
@@ -72,7 +73,7 @@ namespace Beef.Database.Core
                 }
             }
 
-            return await base.MigrateAsync().ConfigureAwait(false);
+            return await base.MigrateAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -83,7 +84,7 @@ namespace Beef.Database.Core
 
             CodeGenStatistics stats = null!;
 
-            return await CommandExecuteAsync("DATABASE CODEGEN: Code-gen database objects...", async () =>
+            return await CommandExecuteAsync("DATABASE CODEGEN: Code-gen database objects...", async _ =>
             {
                 var cga = new OnRamp.CodeGeneratorArgs();
                 cga.CopyFrom(_args);
@@ -111,7 +112,7 @@ namespace Beef.Database.Core
                     _args.Logger?.LogError("{Content}", string.Empty);
                     return false;
                 }
-            }, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}").ConfigureAwait(false);
+            }, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}", default).ConfigureAwait(false);
         }
 
         /// <summary>

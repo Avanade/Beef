@@ -7,280 +7,55 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
     /// Represents the Product entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Product : EntityBase, IUniqueKey, IEquatable<Product>
+    public partial class Product : IPrimaryKey
     {
-        #region Privates
-
-        private int _id;
-        private string? _name;
-        private string? _description;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the <see cref="Product"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
-        [Display(Name="Identifier")]
-        public int Id
-        {
-            get => _id;
-            set => SetValue(ref _id, value, true, false, nameof(Id));
-        }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Name")]
-        public string? Name
-        {
-            get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name));
-        }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the Description.
         /// </summary>
-        [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Description")]
-        public string? Description
-        {
-            get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description));
-        }
-
-        #endregion
-
-        #region IUniqueKey
+        public string? Description { get; set; }
         
         /// <summary>
-        /// Gets the list of property names that represent the unique key.
+        /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
-        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
-
-        /// <summary>
-        /// Creates the <see cref="UniqueKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
+        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(int id) => new UniqueKey(id);
+        public static CompositeKey CreatePrimaryKey(int id) => new CompositeKey(id);
 
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public UniqueKey UniqueKey => CreateUniqueKey(Id);
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is Product val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="Product"/> is equal to the current <see cref="Product"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="Product"/> to compare with the current <see cref="Product"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="Product"/> is equal to the current <see cref="Product"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(Product? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(Name, value.Name)
-                && Equals(Description, value.Description);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="Product"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="Product"/> A.</param>
-        /// <param name="b"><see cref="Product"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (Product? a, Product? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="Product"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="Product"/> A.</param>
-        /// <param name="b"><see cref="Product"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (Product? a, Product? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="Product"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="Product"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Id);
-            hash.Add(Name);
-            hash.Add(Description);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="Product"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Product"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<Product>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="Product"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="Product"/> to copy from.</param>
-        public void CopyFrom(Product from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            Id = from.Id;
-            Name = from.Name;
-            Description = from.Description;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="Product"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="Product"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new Product();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="Product"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            Name = Cleaner.Clean(Name, StringTrim.UseDefault, StringTransform.UseDefault);
-            Description = Cleaner.Clean(Description, StringTrim.UseDefault, StringTransform.UseDefault);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(Id)
-                    && Cleaner.IsInitial(Name)
-                    && Cleaner.IsInitial(Description);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(Product from);
-
-        #endregion
+        [JsonIgnore]
+        public CompositeKey PrimaryKey => CreatePrimaryKey(Id);
     }
-
-    #region Collection
 
     /// <summary>
     /// Represents the <see cref="Product"/> collection.
     /// </summary>
-    public partial class ProductCollection : EntityBaseCollection<Product>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProductCollection"/> class.
-        /// </summary>
-        public ProductCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProductCollection"/> class with an entities range.
-        /// </summary>
-        /// <param name="entities">The <see cref="Product"/> entities.</param>
-        public ProductCollection(IEnumerable<Product> entities) => AddRange(entities);
-
-        /// <summary>
-        /// Creates a deep copy of the <see cref="ProductCollection"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="ProductCollection"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new ProductCollection();
-            foreach (var item in this)
-            {
-                clone.Add((Product)item.Clone());
-            }
-                
-            return clone;
-        }
-
-        /// <summary>
-        /// An implicit cast from the <see cref="ProductCollectionResult"/> to a corresponding <see cref="ProductCollection"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="ProductCollectionResult"/>.</param>
-        /// <returns>The corresponding <see cref="ProductCollection"/>.</returns>
-        public static implicit operator ProductCollection(ProductCollectionResult result) => result?.Result!;
-    }
-
-    #endregion  
-
-    #region CollectionResult
+    public partial class ProductCollection : List<Product> { }
 
     /// <summary>
     /// Represents the <see cref="Product"/> collection result.
     /// </summary>
-    public class ProductCollectionResult : EntityCollectionResult<ProductCollection, Product>
+    public class ProductCollectionResult : CollectionResult<ProductCollection, Product>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductCollectionResult"/> class.
@@ -298,21 +73,8 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public ProductCollectionResult(IEnumerable<Product> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="ProductCollectionResult"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="ProductCollectionResult"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new ProductCollectionResult();
-            clone.CopyFrom(this);
-            return clone;
-        }
+        public ProductCollectionResult(IEnumerable<Product> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
     }
-
-    #endregion
 }
 
 #pragma warning restore

@@ -7,220 +7,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Beef.Entities;
-using Beef.RefData;
-using Newtonsoft.Json;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+using System.Text.Json.Serialization;
+using CoreEx.Entities;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
     /// Represents the <see cref="Robot"/> arguments entity.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class RobotArgs : EntityBase, IEquatable<RobotArgs>
+    public partial class RobotArgs
     {
-        #region Privates
-
-        private string? _modelNo;
-        private string? _serialNo;
-        private List<string>? _powerSourcesSids;
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets or sets the Model number.
         /// </summary>
-        [JsonProperty("model-no", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Model No")]
-        public string? ModelNo
-        {
-            get => _modelNo;
-            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo));
-        }
+        [JsonPropertyName("model-no")]
+        public string? ModelNo { get; set; }
 
         /// <summary>
         /// Gets or sets the Unique serial number.
         /// </summary>
-        [JsonProperty("serial-no", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Serial No")]
-        public string? SerialNo
-        {
-            get => _serialNo;
-            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo));
-        }
+        [JsonPropertyName("serial-no")]
+        public string? SerialNo { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="PowerSources"/> list using the underlying Serialization Identifier (SID).
+        /// Gets or sets the Power Sources.
         /// </summary>
-        [JsonProperty("power-sources", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Power Sources")]
-        public List<string>? PowerSourcesSids
-        {
-            get => _powerSourcesSids;
-            set => SetValue(ref _powerSourcesSids, value, false, false, nameof(PowerSources));
-        }
-
-        /// <summary>
-        /// Gets or sets the Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Display(Name="Power Sources")]
-        public ReferenceDataSidList<RefDataNamespace.PowerSource, string>? PowerSources
-        {
-            get => new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref _powerSourcesSids);
-            set => SetValue(ref _powerSourcesSids, value?.ToSidList(), false, false, nameof(PowerSources));
-        }
-
-        #endregion
-
-        #region IEquatable
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => obj is RobotArgs val && Equals(val);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="RobotArgs"/> is equal to the current <see cref="RobotArgs"/> by comparing the values of all the properties.
-        /// </summary>
-        /// <param name="value">The <see cref="RobotArgs"/> to compare with the current <see cref="RobotArgs"/>.</param>
-        /// <returns><c>true</c> if the specified <see cref="RobotArgs"/> is equal to the current <see cref="RobotArgs"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(RobotArgs? value)
-        {
-            if (value == null)
-                return false;
-            else if (ReferenceEquals(value, this))
-                return true;
-
-            return base.Equals((object)value)
-                && Equals(ModelNo, value.ModelNo)
-                && Equals(SerialNo, value.SerialNo)
-                && Equals(PowerSourcesSids, value.PowerSourcesSids);
-        }
-
-        /// <summary>
-        /// Compares two <see cref="RobotArgs"/> types for equality.
-        /// </summary>
-        /// <param name="a"><see cref="RobotArgs"/> A.</param>
-        /// <param name="b"><see cref="RobotArgs"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator == (RobotArgs? a, RobotArgs? b) => Equals(a, b);
-
-        /// <summary>
-        /// Compares two <see cref="RobotArgs"/> types for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="RobotArgs"/> A.</param>
-        /// <param name="b"><see cref="RobotArgs"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator != (RobotArgs? a, RobotArgs? b) => !Equals(a, b);
-
-        /// <summary>
-        /// Returns the hash code for the <see cref="RobotArgs"/>.
-        /// </summary>
-        /// <returns>The hash code for the <see cref="RobotArgs"/>.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(ModelNo);
-            hash.Add(SerialNo);
-            hash.Add(PowerSourcesSids);
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-    
-        #endregion
-
-        #region ICopyFrom
-    
-        /// <summary>
-        /// Performs a copy from another <see cref="RobotArgs"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="RobotArgs"/> to copy from.</param>
-        public override void CopyFrom(object from)
-        {
-            var fval = ValidateCopyFromType<RobotArgs>(from);
-            CopyFrom(fval);
-        }
-        
-        /// <summary>
-        /// Performs a copy from another <see cref="RobotArgs"/> updating this instance.
-        /// </summary>
-        /// <param name="from">The <see cref="RobotArgs"/> to copy from.</param>
-        public void CopyFrom(RobotArgs from)
-        {
-            if (from == null)
-                throw new ArgumentNullException(nameof(from));
-
-            CopyFrom((EntityBase)from);
-            ModelNo = from.ModelNo;
-            SerialNo = from.SerialNo;
-            PowerSourcesSids = from.PowerSourcesSids;
-
-            OnAfterCopyFrom(from);
-        }
-
-        #endregion
-
-        #region ICloneable
-        
-        /// <summary>
-        /// Creates a deep copy of the <see cref="RobotArgs"/>.
-        /// </summary>
-        /// <returns>A deep copy of the <see cref="RobotArgs"/>.</returns>
-        public override object Clone()
-        {
-            var clone = new RobotArgs();
-            clone.CopyFrom(this);
-            return clone;
-        }
-        
-        #endregion
-        
-        #region ICleanUp
-
-        /// <summary>
-        /// Performs a clean-up of the <see cref="RobotArgs"/> resetting property values as appropriate to ensure a basic level of data consistency.
-        /// </summary>
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            ModelNo = Cleaner.Clean(ModelNo, StringTrim.UseDefault, StringTransform.UseDefault);
-            SerialNo = Cleaner.Clean(SerialNo, StringTrim.UseDefault, StringTransform.UseDefault);
-            PowerSourcesSids = Cleaner.Clean(PowerSourcesSids);
-
-            OnAfterCleanUp();
-        }
-
-        /// <summary>
-        /// Indicates whether considered initial; i.e. all properties have their initial value.
-        /// </summary>
-        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
-        public override bool IsInitial
-        {
-            get
-            {
-                return Cleaner.IsInitial(ModelNo)
-                    && Cleaner.IsInitial(SerialNo)
-                    && Cleaner.IsInitial(PowerSourcesSids);
-            }
-        }
-
-        #endregion
-
-        #region PartialMethods
-      
-        partial void OnAfterCleanUp();
-
-        partial void OnAfterCopyFrom(RobotArgs from);
-
-        #endregion
+        [JsonPropertyName("power-sources")]
+        public List<string?>? PowerSources { get; set; }
     }
 }
 
