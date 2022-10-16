@@ -31,7 +31,6 @@ properties: [
     [CodeGenCategory("Property", Title = "Provides additional _Property_ configuration.")]
     [CodeGenCategory("RefData", Title = "Provides the _Reference Data_ configuration.")]
     [CodeGenCategory("Serialization", Title = "Provides the _Serialization_ configuration.")]
-    [CodeGenCategory("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CodeGenCategory("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CodeGenCategory("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Database`.")]
     [CodeGenCategory("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.")]
@@ -296,20 +295,6 @@ properties: [
         [CodeGenProperty("Serialization", Title = "The override JSON property name where outputting as a data model.",
             Description = "Defaults to `JsonName` where not specified.")]
         public string? DataModelJsonName { get; set; }
-
-        #endregion
-
-        #region Manager
-
-        /// <summary>
-        /// Gets or sets the Identifier Generator Type to generate the identifier on create via Dependency Injection (<see cref="CoreEx.Entities.IIdentifierGenerator{T}"/>).
-        /// </summary>
-        [JsonProperty("identifierGenerator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
-            Description = "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. " +
-                "Where the `Type` matches an already inferred value it will be ignored. " +
-                "See `Beef.Entities.IInt32IdentifierGenerator`, `Beef.Entities.IInt64IdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
-        public string? IdentifierGenerator { get; set; }
 
         #endregion
 
@@ -598,9 +583,9 @@ properties: [
         public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? Type! : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
 
         /// <summary>
-        /// Gets the name of the IdentifierGenerator as passed in as a parameter via DI.
+        /// Indicates whether the property is to be set using the identifier generator on create.
         /// </summary>
-        public string? IdentifierGeneratorName { get; set; }
+        public bool IdentifierGenerator => CompareValue(Parent!.IdentifierGenerator, true) && Parent.HasIdentifier && CompareValue(UniqueKey, true) && Name == "Id";
 
         /// <summary>
         /// Gets or sets the gRPC converter.
@@ -674,20 +659,9 @@ properties: [
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
 
             DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
-
             var rdc = ReformatDataConverter(DataConverter, Type, RefDataType, RefDataGetValueType);
             DataConverter = rdc.DataConverter;
             RefDataGetValueType = rdc.RefDataGetValueType;
-
-            if (!string.IsNullOrEmpty(IdentifierGenerator))
-            {
-                var pc = EntityConfig.CreateParameterConfigFromInterface(IdentifierGenerator);
-                if (pc != null)
-                {
-                    IdentifierGenerator = pc.Type;
-                    IdentifierGeneratorName = pc.Name;
-                }
-            }
 
             EntityFrameworkMapper = DefaultWhereNull(EntityFrameworkMapper, () => "Map");
             CosmosMapper = DefaultWhereNull(CosmosMapper, () => "Map");

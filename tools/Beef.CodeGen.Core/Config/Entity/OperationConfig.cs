@@ -174,6 +174,14 @@ operations: [
         public bool? DataExtensions { get; set; }
 
         /// <summary>
+        /// Indicates whether a `DataInvoker` should orchestrate the `Data`-layer.
+        /// </summary>
+        [JsonProperty("dataInvoker", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Data", Title = "Indicates whether a `DataInvoker` should orchestrate the `Data`-layer.",
+            Description = "Where `Dataransaction` or `EventPublish` is `Data` then orchestration will default to `true`.")]
+        public bool? DataInvoker { get; set; }
+
+        /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer.
         /// </summary>
         [JsonProperty("dataTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -336,6 +344,14 @@ operations: [
         [JsonProperty("dataSvcTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.")]
         public bool? DataSvcTransaction { get; set; }
+
+        /// <summary>
+        /// Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.
+        /// </summary>
+        [JsonProperty("dataSvcInvoker", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("DataSvc", Title = "Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.",
+            Description = "Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then orchestration will default to `true`.")]
+        public bool? DataSvcInvoker { get; set; }
 
         /// <summary>
         /// Indicates whether the `DataSvc` extensions logic should be generated.
@@ -815,7 +831,17 @@ operations: [
         /// <summary>
         /// Indicates whether the DataSvc operation invocation can occur on a single line.
         /// </summary>
-        public bool DataSvcSingleLine => Type == "GetColl" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false);
+        public bool DataSvcSingleLine => (Type == "GetColl" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"))
+            || (Type == "Get" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"))
+            || (Type == "Custom" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"));
+
+        /// <summary>
+        /// Indicates whether the Data operation invocation can occur on a single line.
+        /// </summary>
+        public bool DataSingleLine => (Type == "GetColl" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
+            || (Type == "Get" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
+            || (Type == "Custom" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
+            || (AutoImplement == "None" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"));
 
         /// <summary>
         /// <inheritdoc/>
@@ -971,7 +997,15 @@ operations: [
             });
 
             DataTransaction = DefaultWhereNull(DataTransaction, () => CompareValue(EventPublish, "Data") && CompareValue(Parent!.EventTransaction, true));
+            DataInvoker = DefaultWhereNull(DataInvoker, () => false);
+            if (DataTransaction!.Value || CompareValue(EventPublish, "Data"))
+                DataInvoker = true;
+
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
+            DataSvcInvoker = DefaultWhereNull(DataSvcInvoker, () => false);
+            if (DataSvcTransaction!.Value || CompareValue(EventPublish, "DataSvc"))
+                DataSvcInvoker = true;
+
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
             ExcludeAll = DefaultWhereNull(ExcludeAll, () => false);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
@@ -1040,8 +1074,7 @@ operations: [
         /// </summary>
         private async Task PrepareParametersAsync()
         {
-            if (Parameters == null)
-                Parameters = new List<ParameterConfig>();
+            Parameters ??= new List<ParameterConfig>();
 
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
@@ -1273,11 +1306,11 @@ operations: [
                 sb.Append($"<{ReturnType}{(HttpAgentMethod == "Get" ? "?" : "")}, {HttpAgentReturnModel}{(HttpAgentMethod == "Get" ? "?" : "")}>(");
             else
             {
-                sb.Append("(");
+                sb.Append('(');
                 HttpAgentRequiresMapper = false;
             }
 
-            sb.Append($"{(HttpAgentRoute != null && HttpAgentRoute.Contains("{") ? "$" : "")}\"{HttpAgentRoute}\"");
+            sb.Append($"{(HttpAgentRoute != null && HttpAgentRoute.Contains('{') ? "$" : "")}\"{HttpAgentRoute}\"");
             if (ValueType != null)
                 sb.Append(", value");
 

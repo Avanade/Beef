@@ -26,8 +26,8 @@ namespace Beef.Demo.Business
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
         public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            return Cleaner.Clean(await GetEnvVarsOnImplementationAsync(ct).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Unspecified);
+            return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
+        }, InvokerArgs.Unspecified);
     }
 }
 

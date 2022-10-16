@@ -101,7 +101,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonCreate]").CreateAsync(DbMapper.Default, value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             await (_createOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+        }, new InvokerArgs { ExceptionHandler = _createOnException });
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
@@ -112,7 +112,7 @@ namespace Beef.Demo.Business.Data
             await (_deleteOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
             await _db.StoredProcedure("[Demo].[spPersonDelete]").DeleteAsync(DbMapper.Default, CompositeKey.Create(id)).ConfigureAwait(false);
             await (_deleteOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-        }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
+        }, new InvokerArgs { ExceptionHandler = _deleteOnException });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -135,7 +135,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonGetEx]").GetAsync(DbMapper.Default, CompositeKey.Create(id));
             await (_getExOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getExOnException });
+        }, new InvokerArgs { ExceptionHandler = _getExOnException });
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -158,7 +158,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             await (_updateWithRollbackOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
+        }, new InvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -171,7 +171,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAllOnQuery?.Invoke(p)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
             await (_getAllOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getAllOnException });
+        }, new InvokerArgs { ExceptionHandler = _getAllOnException });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -183,7 +183,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAll2OnQuery?.Invoke(p)).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
             await (_getAll2OnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getAll2OnException });
+        }, new InvokerArgs { ExceptionHandler = _getAll2OnException });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -197,7 +197,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _db.StoredProcedure("[Demo].[spPersonGetByArgs]").Query(DbMapper.Default, p => _getByArgsOnQuery?.Invoke(p, args)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
             await (_getByArgsOnAfterAsync?.Invoke(__result, args) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
+        }, new InvokerArgs { ExceptionHandler = _getByArgsOnException });
 
         /// <summary>
         /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
@@ -205,7 +205,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
-        public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ => GetDetailByArgsOnImplementationAsync(args, paging), new BusinessInvokerArgs { ExceptionHandler = _getDetailByArgsOnException });
+        public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ => GetDetailByArgsOnImplementationAsync(args, paging), new InvokerArgs { ExceptionHandler = _getDetailByArgsOnException });
 
         /// <summary>
         /// Merge first <see cref="Person"/> into second.
@@ -213,39 +213,39 @@ namespace Beef.Demo.Business.Data
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person> MergeAsync(Guid fromId, Guid toId) => DataInvoker.Current.InvokeAsync(this, _ => MergeOnImplementationAsync(fromId, toId), new BusinessInvokerArgs { ExceptionHandler = _mergeOnException });
+        public Task<Person> MergeAsync(Guid fromId, Guid toId) => DataInvoker.Current.InvokeAsync(this, _ => MergeOnImplementationAsync(fromId, toId), new InvokerArgs { ExceptionHandler = _mergeOnException });
 
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        public Task MarkAsync() => DataInvoker.Current.InvokeAsync(this, _ => MarkOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _markOnException });
+        public Task MarkAsync() => DataInvoker.Current.InvokeAsync(this, _ => MarkOnImplementationAsync(), new InvokerArgs { ExceptionHandler = _markOnException });
 
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        public Task<MapCoordinates> MapAsync(MapArgs? args) => DataInvoker.Current.InvokeAsync(this, _ => MapOnImplementationAsync(args), new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
+        public Task<MapCoordinates> MapAsync(MapArgs? args) => DataInvoker.Current.InvokeAsync(this, _ => MapOnImplementationAsync(args), new InvokerArgs { ExceptionHandler = _mapOnException });
 
         /// <summary>
         /// Get no arguments.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> GetNoArgsAsync() => DataInvoker.Current.InvokeAsync(this, _ => GetNoArgsOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _getNoArgsOnException });
+        public Task<Person?> GetNoArgsAsync() => DataInvoker.Current.InvokeAsync(this, _ => GetNoArgsOnImplementationAsync(), new InvokerArgs { ExceptionHandler = _getNoArgsOnException });
 
         /// <summary>
         /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-        public Task<PersonDetail?> GetDetailAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => GetDetailOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
+        public Task<PersonDetail?> GetDetailAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => GetDetailOnImplementationAsync(id), new InvokerArgs { ExceptionHandler = _getDetailOnException });
 
         /// <summary>
         /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataInvoker.Current.InvokeAsync(this, _ => UpdateDetailOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))), new BusinessInvokerArgs { ExceptionHandler = _updateDetailOnException });
+        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataInvoker.Current.InvokeAsync(this, _ => UpdateDetailOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value))), new InvokerArgs { ExceptionHandler = _updateDetailOnException });
 
         /// <summary>
         /// Get Null.
@@ -253,7 +253,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="name">The Name.</param>
         /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person?> GetNullAsync(string? name, List<string>? names) => DataInvoker.Current.InvokeAsync(this, _ => GetNullOnImplementationAsync(name, names), new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
+        public Task<Person?> GetNullAsync(string? name, List<string>? names) => DataInvoker.Current.InvokeAsync(this, _ => GetNullOnImplementationAsync(name, names), new InvokerArgs { ExceptionHandler = _getNullOnException });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -267,19 +267,19 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.Query<Person, EfModel.Person>(q => _getByArgsWithEfOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
             await (_getByArgsWithEfOnAfterAsync?.Invoke(__result, args) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsWithEfOnException });
+        }, new InvokerArgs { ExceptionHandler = _getByArgsWithEfOnException });
 
         /// <summary>
         /// Throw Error.
         /// </summary>
-        public Task ThrowErrorAsync() => DataInvoker.Current.InvokeAsync(this, _ => ThrowErrorOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _throwErrorOnException });
+        public Task ThrowErrorAsync() => DataInvoker.Current.InvokeAsync(this, _ => ThrowErrorOnImplementationAsync(), new InvokerArgs { ExceptionHandler = _throwErrorOnException });
 
         /// <summary>
         /// Invoke Api Via Agent.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string?> InvokeApiViaAgentAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => InvokeApiViaAgentOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _invokeApiViaAgentOnException });
+        public Task<string?> InvokeApiViaAgentAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => InvokeApiViaAgentOnImplementationAsync(id), new InvokerArgs { ExceptionHandler = _invokeApiViaAgentOnException });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -292,7 +292,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.GetAsync<Person, EfModel.Person>(id);
             await (_getWithEfOnAfterAsync?.Invoke(__result, id) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _getWithEfOnException });
+        }, new InvokerArgs { ExceptionHandler = _getWithEfOnException });
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
@@ -305,7 +305,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.CreateAsync<Person, EfModel.Person>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             await (_createWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _createWithEfOnException });
+        }, new InvokerArgs { ExceptionHandler = _createWithEfOnException });
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -318,7 +318,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.UpdateAsync<Person, EfModel.Person>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             await (_updateWithEfOnAfterAsync?.Invoke(__result) ?? Task.CompletedTask).ConfigureAwait(false);
             return __result;
-        }, new BusinessInvokerArgs { ExceptionHandler = _updateWithEfOnException });
+        }, new InvokerArgs { ExceptionHandler = _updateWithEfOnException });
 
         /// <summary>
         /// Deletes the specified <see cref="Person"/>.
@@ -329,7 +329,7 @@ namespace Beef.Demo.Business.Data
             await (_deleteWithEfOnBeforeAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
             await _ef.DeleteAsync<Person, EfModel.Person>(id).ConfigureAwait(false);
             await (_deleteWithEfOnAfterAsync?.Invoke(id) ?? Task.CompletedTask).ConfigureAwait(false);
-        }, new BusinessInvokerArgs { ExceptionHandler = _deleteWithEfOnException });
+        }, new InvokerArgs { ExceptionHandler = _deleteWithEfOnException });
 
         /// <summary>
         /// Provides the <see cref="Person"/> property and database column mapping.

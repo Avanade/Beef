@@ -37,10 +37,10 @@ namespace Beef.Demo.Business
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
                 .Add(city.Validate(nameof(city)).Mandatory())
-                .ValidateAsync(true, ).ConfigureAwait(false);
+                .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetPostCodesAsync(country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -57,10 +57,10 @@ namespace Beef.Demo.Business
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
                 .Add(city.Validate(nameof(city)).Mandatory())
-                .ValidateAsync(true, ).ConfigureAwait(false);
+                .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.CreatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+        }, InvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -77,10 +77,10 @@ namespace Beef.Demo.Business
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
                 .Add(city.Validate(nameof(city)).Mandatory())
-                .ValidateAsync(true, ).ConfigureAwait(false);
+                .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
     }
 }
 

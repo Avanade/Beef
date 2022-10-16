@@ -32,14 +32,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            if (_cache.TryGetValue(id, out Gender? __val))
-                return __val;
-
-            var __result = await _data.GetAsync(id).ConfigureAwait(false);
-            return _cache.SetValue(__result);
-        });
+        public Task<Gender?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
@@ -51,7 +44,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, $"Demo.Gender", "Create");
             return _cache.SetValue(__result);
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -63,7 +56,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, $"Demo.Gender", "Update");
             return _cache.SetValue(__result);
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
     }
 }
 

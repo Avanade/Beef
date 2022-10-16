@@ -10,7 +10,7 @@
 
         private Task MarkOnAfterAsync()
         {
-            _events.CreateValueEventAndPublish("Wahlberg", "Demo.Mark", "Marked");
+            _events.PublishValueEvent("Wahlberg", "Demo.Mark", "Marked");
             return Task.CompletedTask;
         }
 
@@ -21,11 +21,11 @@
 
         private Task<Person> EventPublishNoSendOnImplementationAsync(Person value)
         {
-            _events.CreateValueEventAndPublish(value, $"Beef.Demo.NoSend.{value.Id}");
+            _events.PublishValueEvent(value, $"Beef.Demo.NoSend.{value.Id}");
             return Task.FromResult(value);
         }
 
-        private Task ParamCollOnImplementationAsync(AddressCollection addresses)
+        private static Task ParamCollOnImplementationAsync(AddressCollection addresses)
         {
             return Task.CompletedTask;
         }

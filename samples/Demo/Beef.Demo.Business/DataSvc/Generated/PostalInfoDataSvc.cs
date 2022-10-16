@@ -32,11 +32,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            var __result = await _data.GetPostCodesAsync(country, state, city).ConfigureAwait(false);
-            return __result;
-        });
+        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -51,7 +47,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create");
             return __result;
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -66,7 +62,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
             return __result;
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
     }
 }
 

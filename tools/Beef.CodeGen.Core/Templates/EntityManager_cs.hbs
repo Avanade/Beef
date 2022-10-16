@@ -25,11 +25,11 @@ namespace {{Root.NamespaceBusiness}}
   {{#each ManagerAutoOperations}}
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
-        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}CancellationToken, Task>? {{PrivateName}}OnPreValidateAsync;
+        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task>? {{PrivateName}}OnPreValidateAsync;
         private Action<MultiValidator{{#each Parameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnValidate;
       {{/unless}}
-        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}CancellationToken, Task>? {{PrivateName}}OnBeforeAsync;
-        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}CancellationToken, Task>? {{PrivateName}}OnAfterAsync;
+        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task>? {{PrivateName}}OnBeforeAsync;
+        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task>? {{PrivateName}}OnAfterAsync;
 
     {{/if}}
   {{/each}}
@@ -82,9 +82,9 @@ namespace {{Root.NamespaceBusiness}}
   {{/ifval}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
-      {{#ifval IdentifierGeneratorName}}
-            value{{#ifeq ../../EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
-      {{/ifval}}
+      {{#if IdentifierGenerator}}
+            value{{#ifeq ../../EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
+      {{/if}}
     {{/each}}
   {{/ifeq}}
   {{#each Parameters}}
@@ -96,14 +96,14 @@ namespace {{Root.NamespaceBusiness}}
     {{/ifeq}}
   {{/each}}
   {{#if ManagerCustom}}
-            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}ct).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
             Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}});
     {{/ifne}}
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
-            await ({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
+            await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}
@@ -121,13 +121,13 @@ namespace {{Root.NamespaceBusiness}}
                 .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                .ValidateAsync(true, {{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+                .ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
 
     {{/if}}
     {{#if ManagerExtensions}}
-            await ({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{{ArgumentName}}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
-            {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}, {{/each}}ct).ConfigureAwait(false);
-            await ({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result, {{/if}}{{#each ValueLessParameters}}{{{ArgumentName}}}, {{/each}}ct) ?? Task.CompletedTask).ConfigureAwait(false);
+            await Invoker.InvokeAsync({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
+            {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false);
+            await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}})).ConfigureAwait(false);
       {{#if HasReturnValue}}
             return Cleaner.Clean(__result);
       {{/if}}
@@ -136,9 +136,9 @@ namespace {{Root.NamespaceBusiness}}
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{else}}
-        }, BusinessInvokerArgs.{{ManagerOperationType}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        }, InvokerArgs.{{ManagerOperationType}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/if}}
 {{/each}}
     }

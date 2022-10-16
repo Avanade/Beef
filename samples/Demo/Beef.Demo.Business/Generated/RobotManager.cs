@@ -14,19 +14,19 @@ namespace Beef.Demo.Business
     {
         private readonly IRobotDataSvc _dataService;
         private readonly IEventPublisher _eventPublisher;
-        private readonly IGuidIdentifierGenerator _guidIdentifierGenerator;
+        private readonly IIdentifierGenerator _identifierGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
         /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
-        /// <param name="guidIdentifierGenerator">The <see cref="IGuidIdentifierGenerator"/>.</param>
-        public RobotManager(IRobotDataSvc dataService, IEventPublisher eventPublisher, IGuidIdentifierGenerator guidIdentifierGenerator)
+        /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
+        public RobotManager(IRobotDataSvc dataService, IEventPublisher eventPublisher, IIdentifierGenerator identifierGenerator)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
-            _guidIdentifierGenerator = guidIdentifierGenerator ?? throw new ArgumentNullException(nameof(guidIdentifierGenerator));
+            _identifierGenerator = identifierGenerator ?? throw new ArgumentNullException(nameof(identifierGenerator));
             RobotManagerCtor();
         }
 
@@ -42,7 +42,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
@@ -51,11 +51,11 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = await _guidIdentifierGenerator.GenerateIdentifierAsync<Robot>().ConfigureAwait(false);
+            value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await value.Validate().Entity().With<IValidatorEx<Robot>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+        }, InvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
@@ -69,7 +69,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await value.Validate().Entity().With<IValidatorEx<Robot>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
@@ -80,7 +80,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete);
+        }, InvokerArgs.Delete);
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -93,7 +93,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(args);
             await args.Validate(nameof(args)).Entity().With<IValidatorEx<RobotArgs>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Raises a <see cref="Robot.PowerSource"/> change event.
@@ -102,8 +102,8 @@ namespace Beef.Demo.Business
         /// <param name="powerSource">The Power Source.</param>
         public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await RaisePowerSourceChangeOnImplementationAsync(id, powerSource, ct).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Unspecified);
+            await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);
+        }, InvokerArgs.Unspecified);
     }
 }
 

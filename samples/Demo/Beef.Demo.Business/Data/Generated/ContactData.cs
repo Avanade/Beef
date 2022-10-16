@@ -55,7 +55,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Create");
             return __result;
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
@@ -67,7 +67,7 @@ namespace Beef.Demo.Business.Data
             var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Update");
             return __result;
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
@@ -77,7 +77,7 @@ namespace Beef.Demo.Business.Data
         {
             await _ef.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
             _events.PublishValueEvent(new Contact { Id = id }, new Uri($"/contact/{id}", UriKind.Relative), $"Demo.Contact", "Delete");
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Raise Event.

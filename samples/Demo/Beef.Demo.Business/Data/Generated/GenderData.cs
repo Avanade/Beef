@@ -72,7 +72,6 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.TripCode);
                 Property(s => s.Country, "CountryId").SetConverter(ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default);
                 Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-                Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
                 DbMapperCtor();
             }
             

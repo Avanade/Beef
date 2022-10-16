@@ -1,10 +1,4 @@
-﻿using Beef.Demo.Common.Entities;
-using System;
-using System.Threading.Tasks;
-
-#nullable enable
-
-namespace Beef.Demo.Business
+﻿namespace Beef.Demo.Business
 {
     public partial class PersonManager
     {
@@ -13,13 +7,13 @@ namespace Beef.Demo.Business
             _updateOnPreValidateAsync = UpdateOnPreValidateAsync;
         }
 
-        private Task AddOnImplementationAsync(Person value)
+        private static Task AddOnImplementationAsync(Person value)
         {
-            Check.NotNull(value, nameof(value));
+            if (value == null) throw new ArgumentNullException(nameof(value));
             return Task.CompletedTask;
         }
 
-        private Task<Person?> ManagerCustomOnImplementationAsync()
+        private static Task<Person?> ManagerCustomOnImplementationAsync()
         {
             return Task.FromResult<Person?>(null);
         }
@@ -32,5 +26,3 @@ namespace Beef.Demo.Business
         }
     }
 }
-
-#nullable restore

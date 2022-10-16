@@ -33,7 +33,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
@@ -44,7 +44,7 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(value.EnsureValue());
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+        }, InvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -57,7 +57,7 @@ namespace Beef.Demo.Business
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
     }
 }
 

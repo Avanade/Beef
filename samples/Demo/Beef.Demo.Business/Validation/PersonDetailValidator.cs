@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Beef.Demo.Business.Validation
+﻿namespace Beef.Demo.Business.Validation
 {
     /// <summary>
     /// Represents a <see cref="PersonDetail"/> validator.
@@ -15,12 +13,10 @@ namespace Beef.Demo.Business.Validation
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonDetailValidator"/>.
         /// </summary>
-        public PersonDetailValidator(IValidator<Person> personValidator)
+        public PersonDetailValidator(IValidatorEx<Person> personValidator)
         {
             IncludeBase(personValidator);
-            Property(x => x.History).Collection(item: CollectionRuleItem.Create(_workHistoryValidator).UniqueKeyDuplicateCheck());
+            Property(x => x.History).Collection(item: CollectionRuleItem.Create(_workHistoryValidator).DuplicateCheck());
         }
     }
 }
-
-#nullable restore

@@ -32,14 +32,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            if (_cache.TryGetValue(id, out Robot? __val))
-                return __val;
-
-            var __result = await _data.GetAsync(id).ConfigureAwait(false);
-            return _cache.SetValue(__result);
-        });
+        public Task<Robot?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
@@ -51,7 +44,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/robots/{__result.Id}", UriKind.Relative), $"Demo.Robot", "Create");
             return _cache.SetValue(__result);
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
@@ -63,7 +56,7 @@ namespace Beef.Demo.Business.DataSvc
             var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/robots/{__result.Id}", UriKind.Relative), $"Demo.Robot", "Update");
             return _cache.SetValue(__result);
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
@@ -74,7 +67,7 @@ namespace Beef.Demo.Business.DataSvc
             await _data.DeleteAsync(id).ConfigureAwait(false);
             _events.PublishValueEvent(new Robot { Id = id }, new Uri($"/robots/{id}", UriKind.Relative), $"Demo.Robot", "Delete");
             _cache.Remove<Robot>(id);
-        }, new BusinessInvokerArgs { EventPublisher = _events });
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -82,7 +75,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, _ => _data.GetByArgsAsync(args, paging));
+        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => _data.GetByArgsAsync(args, paging);
     }
 }
 

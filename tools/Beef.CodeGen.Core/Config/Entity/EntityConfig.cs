@@ -703,6 +703,13 @@ entities:
             Description = "Defaults to `IValidatorEx<Xxx>` (where `Xxx` is the entity `Name`) where `Validator` is not `null`. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? IValidator { get; set; }
 
+        /// <summary>
+        /// Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property on `Create`.
+        /// </summary>
+        [JsonProperty("identifierGenerator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.")]
+        public bool? IdentifierGenerator { get; set; }
+
         #endregion
 
         #region WebApi
@@ -1415,7 +1422,6 @@ entities:
                 AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool" });
                 AddInheritedProperty("SortOrder", ref i, () => new PropertyConfig { Type = "int" });
                 AddInheritedProperty("ETag", ref i, () => new PropertyConfig { Type = "string" });
-                AddInheritedProperty("ChangeLog", ref i, () => new PropertyConfig { Type = "ChangeLog" });
             }
 
             foreach (var property in Properties)
@@ -1584,12 +1590,9 @@ entities:
 
             AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
 
-            // Get the identifier generator(s).
-            foreach (var p in Properties!.Where(x => !string.IsNullOrEmpty(x.IdentifierGenerator)))
-            {
-                if (!ManagerCtorParameters.Any(x => x.Name == p.IdentifierGeneratorName))
-                    ManagerCtorParameters.Add(new ParameterConfig { Name = p.IdentifierGeneratorName, Type = p.IdentifierGenerator, Text = $"{{{{{p.IdentifierGenerator}}}}}" });
-            }
+            // Include `IIdentifierGenerator` where has identifier property and there is at least one create operation.
+            if (CompareValue(IdentifierGenerator, true) && HasIdentifier && Operations!.Any(x => x.Type! == "Create"))
+                ManagerCtorParameters.Add(new ParameterConfig { Name = "identifierGenerator", Type = "IIdentifierGenerator", Text = $"{{{{IIdentifierGenerator}}}}" });
 
             foreach (var ctor in ManagerCtorParameters)
             {

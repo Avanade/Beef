@@ -30,7 +30,7 @@ namespace Beef.Demo.Business
         public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
@@ -42,7 +42,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
@@ -53,7 +53,7 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(value.EnsureValue());
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+        }, InvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
@@ -66,7 +66,7 @@ namespace Beef.Demo.Business
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
@@ -77,7 +77,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete);
+        }, InvokerArgs.Delete);
 
         /// <summary>
         /// Raise Event.
@@ -87,7 +87,7 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(throwError);
             await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Unspecified);
+        }, InvokerArgs.Unspecified);
     }
 }
 
