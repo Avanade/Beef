@@ -22,7 +22,10 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(AdditionalInfo, v => AdditionalInfo = v);
+            foreach (var pv in base.GetPropertyValues())
+                yield return pv;
+
+            yield return CreateProperty(nameof(AdditionalInfo), AdditionalInfo, v => AdditionalInfo = v);
         }
 
         /// <summary>
@@ -44,10 +47,10 @@ namespace Beef.Demo.Business.Entities
         public PowerSourceCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PowerSourceCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PowerSourceCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PowerSourceCollection(IEnumerable<PowerSource> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PowerSourceCollection(IEnumerable<PowerSource> items) => AddRange(items);
     }
 }
 

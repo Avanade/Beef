@@ -135,9 +135,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(null)).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(3, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones", "Smithers" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(3, v.Items.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
         }
 
         [Test]
@@ -151,9 +151,9 @@ namespace My.Hr.Test.Apis
 
             var v = r.Value;
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(2, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(2, v.Items.Count);
+            Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Items.Select(x => x.LastName).ToArray());
 
             // Query again with etag and ensure not modified.
             apiTester.Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
@@ -171,9 +171,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { FirstName = "*a*" })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(2, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Browne", "Smithers" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(2, v.Items.Count);
+            Assert.AreEqual(new string[] { "Browne", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
         }
 
         [Test]
@@ -186,9 +186,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*" })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(1, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Smithers" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(1, v.Items.Count);
+            Assert.AreEqual(new string[] { "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
         }
 
         [Test]
@@ -201,9 +201,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", IsIncludeTerminated = true })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(2, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Smith", "Smithers" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(2, v.Items.Count);
+            Assert.AreEqual(new string[] { "Smith", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
         }
 
         [Test]
@@ -216,9 +216,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(2, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones" }, v.Collection.Select(x => x.LastName).ToArray());
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(2, v.Items.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones" }, v.Items.Select(x => x.LastName).ToArray());
         }
 
         [Test]
@@ -231,8 +231,8 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", Genders = new List<string?> { "F" } })).Value;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Collection);
-            Assert.AreEqual(0, v.Collection.Count);
+            Assert.IsNotNull(v!.Items);
+            Assert.AreEqual(0, v.Items.Count);
         }
 
         [Test]
@@ -256,10 +256,10 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }));
 
             Assert.IsNotNull(r.Value);
-            Assert.IsNotNull(r.Value!.Collection);
-            Assert.AreEqual(2, r.Value.Collection.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones" }, r.Value.Collection.Select(x => x.LastName).ToArray());
-            Assert.AreEqual(new string[] { "Female", "Female" }, r.Value.Collection.Select(x => x.GenderText).ToArray());
+            Assert.IsNotNull(r.Value!.Items);
+            Assert.AreEqual(2, r.Value.Items.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones" }, r.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.AreEqual(new string[] { "Female", "Female" }, r.Value.Items.Select(x => x.GenderText).ToArray());
         }
 
         [Test]
@@ -537,6 +537,12 @@ namespace My.Hr.Test.Apis
                 .ExpectEvent("my.hr.employee", "created")
                 .Run(a => a.CreateAsync(v)).Value!;
 
+            // Confirm employee exists.
+            apiTester.Agent<EmployeeAgent, Employee?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
+                .Run(a => a.GetAsync(v.Id));
+
             // Delete value.
             apiTester.Agent<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
@@ -546,11 +552,13 @@ namespace My.Hr.Test.Apis
             // Check value no longer exists.
             apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
+                .ExpectNoEvents()
                 .Run(a => a.GetAsync(v.Id));
 
             // Delete again (should still be successful as a Delete is idempotent); note there should be no corresponding event as nothing actually happened.
             apiTester.Agent<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
+                .ExpectNoEvents()
                 .Run(a => a.DeleteAsync(v.Id));
         }
 
@@ -612,6 +620,7 @@ namespace My.Hr.Test.Apis
 
             apiTester.Agent<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
                 .ExpectValue(_ => v)
                 .Run(a => a.GetAsync(1.ToGuid()));
         }

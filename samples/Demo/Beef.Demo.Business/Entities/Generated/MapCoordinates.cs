@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Map Coordinates entity.
     /// </summary>
-    public partial class MapCoordinates : EntityBase<MapCoordinates>
+    public partial class MapCoordinates : EntityBase
     {
         private decimal _latitude;
         private decimal _longitude;
@@ -28,8 +28,8 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Latitude, v => Latitude = v);
-            yield return CreateProperty(Longitude, v => Longitude = v);
+            yield return CreateProperty(nameof(Latitude), Latitude, v => Latitude = v);
+            yield return CreateProperty(nameof(Longitude), Longitude, v => Longitude = v);
         }
     }
 }

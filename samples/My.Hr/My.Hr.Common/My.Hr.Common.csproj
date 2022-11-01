@@ -4,10 +4,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Agents\" />
-    <Folder Include="Entities\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="CoreEx" Version="1.0.10" />
   </ItemGroup>
 </Project>

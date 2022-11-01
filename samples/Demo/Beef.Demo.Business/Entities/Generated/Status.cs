@@ -12,7 +12,6 @@ namespace Beef.Demo.Business.Entities
     /// </summary>
     public partial class Status : ReferenceDataBase<string?, Status>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Status"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace Beef.Demo.Business.Entities
         public StatusCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StatusCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="StatusCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public StatusCollection(IEnumerable<Status> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public StatusCollection(IEnumerable<Status> items) => AddRange(items);
     }
 }
 

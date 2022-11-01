@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the <see cref="Robot"/> arguments entity.
     /// </summary>
-    public partial class RobotArgs : EntityBase<RobotArgs>
+    public partial class RobotArgs : EntityBase
     {
         private string? _modelNo;
         private string? _serialNo;
@@ -44,9 +44,9 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(ModelNo, v => ModelNo = v);
-            yield return CreateProperty(SerialNo, v => SerialNo = v);
-            yield return CreateProperty(PowerSourcesSids, v => PowerSourcesSids = v);
+            yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
+            yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
+            yield return CreateProperty(nameof(PowerSourcesSids), PowerSourcesSids, v => PowerSourcesSids = v);
         }
     }
 }

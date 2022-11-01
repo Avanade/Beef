@@ -5,6 +5,8 @@
 #nullable enable
 #pragma warning disable
 
+using CommonRefDataNamespace = My.Hr.Common.Entities;
+
 namespace My.Hr.Api.Controllers
 {
     /// <summary>
@@ -29,7 +31,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A RefDataNamespace.Gender collection.</returns>
         [HttpGet()]
         [Route("ref/genders")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -41,7 +43,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
         [HttpGet()]
         [Route("ref/terminationReasons")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> TerminationReasonGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TerminationReason>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -53,7 +55,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
         [HttpGet()]
         [Route("ref/relationshipTypes")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> RelationshipTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.RelationshipType>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -65,7 +67,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A RefDataNamespace.USState collection.</returns>
         [HttpGet()]
         [Route("ref/usStates")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -77,7 +79,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
         [HttpGet()]
         [Route("ref/performanceOutcomes")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PerformanceOutcomeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PerformanceOutcome>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -87,7 +89,7 @@ namespace My.Hr.Api.Controllers
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
         [Route("ref")]
-        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.Models.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

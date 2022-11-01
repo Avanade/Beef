@@ -12,7 +12,6 @@ namespace Cdr.Banking.Business.Entities
     /// </summary>
     public partial class MaturityInstructions : ReferenceDataBase<Guid, MaturityInstructions>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="MaturityInstructions"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace Cdr.Banking.Business.Entities
         public MaturityInstructionsCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MaturityInstructionsCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="MaturityInstructionsCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public MaturityInstructionsCollection(IEnumerable<MaturityInstructions> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public MaturityInstructionsCollection(IEnumerable<MaturityInstructions> items) => AddRange(items);
     }
 }
 

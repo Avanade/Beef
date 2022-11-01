@@ -1,78 +1,78 @@
-﻿using Beef.Demo.Business.Data;
+﻿using Beef.Demo.Api;
+using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
-using Beef.Entities;
-using Beef.Test.NUnit;
-using Cosmos = Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Configuration;
+using CoreEx;
+using CoreEx.Cosmos;
+using CoreEx.Cosmos.Batch;
+using CoreEx.Entities;
+using CoreEx.Json.Data;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Beef.Data.Cosmos;
-using Beef.Demo.Api;
+using UnitTestEx;
+using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
+using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Test
 {
     [TestFixture, NonParallelizable]
-    public class RobotTest : UsingAgentTesterServer<Startup>
+    public class RobotTest : UsingApiTester<Startup>
     {
-        private bool _removeAfterUse;
-        private CosmosDb _cosmosDb;
-
         [OneTimeSetUp]
-        public async Task OneTimeSetUp() => await CosmosOneTimeSetUp();
-
-        public async Task CosmosOneTimeSetUp()
+        public async Task OneTimeSetUp()
         {
-            var config = Beef.Test.NUnit.AgentTester.BuildConfiguration<Startup>().GetSection("CosmosDb");
-            _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
-            _cosmosDb = new CosmosDb(new Cosmos.CosmosClient(config.GetValue<string>("EndPoint"), config.GetValue<string>("AuthKey")),
-                config.GetValue<string>("Database"), createDatabaseIfNotExists: true);
+            ApiTester.UseExpectedEvents();
+            await CosmosOneTimeSetUp(ApiTester.Services.GetService<DemoCosmosDb>());
+        }
 
-            var rc = await _cosmosDb.ReplaceOrCreateContainerAsync(
+        public static async Task CosmosOneTimeSetUp(DemoCosmosDb cosmosDb)
+        {
+            await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id).ConfigureAwait(false);
+
+            var rc = await cosmosDb.Database.ReplaceOrCreateContainerAsync(
                 new Cosmos.ContainerProperties
                 {
                     Id = "Items",
                     PartitionKeyPath = "/_partitionKey",
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/serialNo" } } } }
-                }, 400);
+                }, 400).ConfigureAwait(false);
 
-            await rc.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "Robot");
+            var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
+            await cosmosDb.Items.ImportBatchAsync(jdr, "Robot").ConfigureAwait(false);
 
-            var rdc = await _cosmosDb.ReplaceOrCreateContainerAsync(
+            var rdc = await cosmosDb.Database.ReplaceOrCreateContainerAsync(
                 new Cosmos.ContainerProperties
                 {
                     Id = "RefData",
                     PartitionKeyPath = "/_partitionKey",
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                }, 400);
+                }, 400).ConfigureAwait(false);
 
-            await rdc.ImportValueRefDataBatchAsync<RobotTest, ReferenceData>("RefData.yaml");
-        }
-
-        [OneTimeTearDown]
-        public async Task OneTimeTearDown()
-        {
-            if (_removeAfterUse)
-                await _cosmosDb.Database.DeleteAsync();
+            jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
+            await cosmosDb.ImportValueBatchAsync<Business.Data.Model.PowerSource>("RefData", jdr).ConfigureAwait(false);
         }
 
         #region Get
 
-        [Test, TestSetUp]
+        [Test]
         public void B110_Get_NotFound()
         {
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void B120_Get_Found()
         {
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -80,123 +80,121 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void B120_Get_Found_WithText()
         {
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
                 .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456", PowerSource = "F", PowerSourceText = "Fusion" })
-                .Run(a => a.GetAsync(1.ToGuid(), new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "$text=true" }));
+                .Run(a => a.GetAsync(1.ToGuid(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "$text=true" }));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void B130_Get_NotModified()
         {
-            var v = AgentTester.Test<RobotAgent, Robot>()
+            var v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
             Assert.NotNull(v);
 
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run(a => a.GetAsync(3.ToGuid(), new WebApi.WebApiRequestOptions { ETag = v.ETag }));
+                .Run(a => a.GetAsync(3.ToGuid(), new CoreEx.Http.HttpRequestOptions { ETag = v.ETag }));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void B140_Get_NotModified_Modified()
         {
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetAsync(3.ToGuid(), new WebApi.WebApiRequestOptions { ETag = "ABCDEFG" }));
+                .Run(a => a.GetAsync(3.ToGuid(), new CoreEx.Http.HttpRequestOptions { ETag = "ABCDEFG" }));
         }
 
         #endregion
 
         #region GetByArgs
 
-        [Test, TestSetUp]
+        [Test]
         public void C110_GetByArgs_All_NoPaging()
         {
-            var rcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var rcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs()));
 
             // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, rcr?.Value?.Result?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456", "A45768", "B45768" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+            Assert.AreEqual(4, rcr?.Value?.Items?.Count);
+            Assert.AreEqual(new string[] { "123456", "223456", "A45768", "B45768" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void C120_GetByArgs_All_Paging()
         {
-            var pcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var pcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs(), PagingArgs.CreateSkipAndTake(1, 2)));
 
             // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, pcr?.Value?.Result?.Count);
-            Assert.AreEqual(new string[] { "223456", "A45768", }, pcr.Value.Result.Select(x => x.SerialNo).ToArray());
+            Assert.AreEqual(2, pcr?.Value?.Items?.Count);
+            Assert.AreEqual(new string[] { "223456", "A45768", }, pcr.Value.Items.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void C130_GetByArgs_Filtered_NoPaging()
         {
-            var rcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var rcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs { ModelNo = "T1000" }));
 
             // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Result?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
+            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void C130_GetByArgs_Wildcard_NoPaging()
         {
-            var rcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var rcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs { SerialNo = "*68" }));
 
             // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Result?.Count);
-            Assert.AreEqual(new string[] { "A45768", "B45768" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
+            Assert.AreEqual(new string[] { "A45768", "B45768" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void C140_GetByArgs_PowerSources_NoPaging()
         {
-            var rcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var rcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new RobotArgs { PowerSources = new RefData.ReferenceDataSidList<PowerSource, string> { "F", "N" } }));
+                .Run(a => a.GetByArgsAsync(new RobotArgs { PowerSources = new List<string> { "F", "N" } }));
 
             // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Result?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
+            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void C150_GetByArgs_All_NoResult()
         {
-            var rcr = AgentTester.Test<RobotAgent, RobotCollectionResult>()
+            var rcr = Agent<RobotAgent, RobotCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetByArgsAsync(new RobotArgs { ModelNo = "ABC", SerialNo = "K*", PowerSources = new RefData.ReferenceDataSidList<PowerSource, string> { "F", "N" } }));
+                .Run(a => a.GetByArgsAsync(new RobotArgs { ModelNo = "ABC", SerialNo = "K*", PowerSources = new List<string> { "F", "N" } }));
 
             // Check nothing is returned..
-            Assert.AreEqual(0, rcr?.Value?.Result?.Count);
+            Assert.AreEqual(0, rcr?.Value?.Items?.Count);
         }
 
         #endregion
 
         #region Create
 
-        [Test, TestSetUp]
+        [Test]
         public void E110_Create()
         {
-            AgentTester.PrepareExecutionContext();
-
             var r = new Robot
             {
                 ModelNo = "T500",
@@ -206,27 +204,25 @@ namespace Beef.Demo.Test
             };
 
             // Create a robot.
-            r = AgentTester.Test<RobotAgent, Robot>()
+            r = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
-                .ExpectUniqueKey()
-                .ExpectEventWithValue("Demo.Robot.*", "Create")
+                .ExpectIdentifier()
+                .ExpectEvent("Demo.Robot.*", "Create")
                 .ExpectValue((t) => r)
                 .Run(a => a.CreateAsync(r)).Value;
 
             // Check the robot was created properly.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => r)
                 .Run(a => a.GetAsync(r.Id));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void E120_Create_Duplicate()
         {
-            AgentTester.PrepareExecutionContext();
-
             var r = new Robot
             {
                 ModelNo = "T500",
@@ -236,9 +232,8 @@ namespace Beef.Demo.Test
             };
 
             // Try to create a robot which will result in a duplicate.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
-                .ExpectErrorType(ErrorType.DuplicateError)
                 .ExpectNoEvents()
                 .Run(a => a.CreateAsync(r));
         }
@@ -247,63 +242,60 @@ namespace Beef.Demo.Test
 
         #region Update
 
-        [Test, TestSetUp]
+        [Test]
         public void F110_Update_NotFound()
         {
             // Get an existing Robot.
-            var v = AgentTester.Test<RobotAgent, Robot>()
+            var v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Update with an invalid identifier.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(ErrorType.NotFoundError)
                 .ExpectNoEvents()
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void F120_Update_Concurrency()
         {
             // Get an existing Robot.
-            var v = AgentTester.Test<RobotAgent, Robot>()
+            var v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Try updating the Robot with an invalid eTag.
-            v.ETag = TestSetUp.ConcurrencyErrorETag;
+            v.ETag = TestSetUp.Default.ConcurrencyErrorETag;
 
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .ExpectErrorType(ErrorType.ConcurrencyError)
                 .ExpectNoEvents()
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void F130_Update_Duplicate()
         {
             // Get an existing Robot.
-            var v = AgentTester.Test<RobotAgent, Robot>()
+            var v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Try updating the Robot which will result in a duplicate.
             v.SerialNo = "A45768";
 
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
-                .ExpectErrorType(ErrorType.DuplicateError)
                 .ExpectNoEvents()
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void F140_Update()
         {
             // Get an existing Robot.
-            var v = AgentTester.Test<RobotAgent, Robot>()
+            var v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectNoEvents()
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
@@ -312,17 +304,17 @@ namespace Beef.Demo.Test
             v.ModelNo += "X";
             v.SerialNo += "Y";
 
-            v = AgentTester.Test<RobotAgent, Robot>()
+            v = Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectChangeLogUpdated(ExecutionContext.Current.Username)
+                .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
-                .ExpectUniqueKey()
-                .ExpectEventWithValue("Demo.Robot.*", "Update")
+                .ExpectIdentifier()
+                .ExpectEvent("Demo.Robot.*", "Update")
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, 1.ToGuid())).Value;
 
             // Check the Robot was updated properly.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectNoEvents()
                 .ExpectValue((t) => v)
@@ -333,34 +325,33 @@ namespace Beef.Demo.Test
 
         #region Delete
 
-        [Test, TestSetUp]
+        [Test]
         public void G110_Delete_NotFound()
         {
             // Deleting a Robot that does not exist only reports success.
-            AgentTester.Test<RobotAgent>()
+            Agent<RobotAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(404.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void G120_Delete()
         {
             // Check Robot exists.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectNoEvents()
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             // Delete a Robot.
-            AgentTester.Test<RobotAgent>()
+            Agent<RobotAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .ExpectEvent("Demo.Robot.*", "Delete")
                 .Run(a => a.DeleteAsync(1.ToGuid()));
 
             // Check Robot no longer exists.
-            AgentTester.Test<RobotAgent, Robot>()
+            Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .ExpectNoEvents()
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
@@ -369,10 +360,10 @@ namespace Beef.Demo.Test
 
         #region Other
 
-        [Test, TestSetUp]
+        [Test]
         public void Z100_RaisePowerSourceChange()
         {
-            AgentTester.Test<RobotAgent>()
+            Agent<RobotAgent>()
                 .ExpectStatusCode(HttpStatusCode.Accepted)
                 .ExpectEvent($"Demo.Robot.{3.ToGuid()}", "PowerSourceChange")
                 .Run(a => a.RaisePowerSourceChangeAsync(3.ToGuid(), "F"));

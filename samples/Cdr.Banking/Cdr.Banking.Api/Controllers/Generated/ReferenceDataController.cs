@@ -5,6 +5,8 @@
 #nullable enable
 #pragma warning disable
 
+using CommonRefDataNamespace = Cdr.Banking.Common.Entities;
+
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>
@@ -29,7 +31,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.OpenStatus collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/openStatuses")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> OpenStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.OpenStatus>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -41,7 +43,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.ProductCategory collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/productCategories")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> ProductCategoryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.ProductCategory>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -53,7 +55,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.AccountUType collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/accountUTypes")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> AccountUTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.AccountUType>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -65,7 +67,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.MaturityInstructions collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/maturityInstructions")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> MaturityInstructionsGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.MaturityInstructions>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -77,7 +79,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.TransactionType collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/transactionTypes")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> TransactionTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionType>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -89,7 +91,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A RefDataNamespace.TransactionStatus collection.</returns>
         [HttpGet()]
         [Route("api/v1/ref/transactionStatuses")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> TransactionStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionStatus>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -99,7 +101,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
         [Route("api/v1/ref")]
-        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.Models.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

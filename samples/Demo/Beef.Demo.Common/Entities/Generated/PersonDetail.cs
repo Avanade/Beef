@@ -46,11 +46,11 @@ namespace Beef.Demo.Common.Entities
         public PersonDetailCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PersonDetailCollectionResult(IEnumerable<PersonDetail> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public PersonDetailCollectionResult(IEnumerable<PersonDetail> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

@@ -30,10 +30,10 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
         {
             return (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).Value;
-        });
+        }
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -43,10 +43,10 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
         {
             return (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
-        });
+        }
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -56,10 +56,10 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
         {
             return (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
-        });
+        }
 
         /// <summary>
         /// Provides the <see cref="PostalInfo"/> and HttpAgent <see cref="Model.PostalInfo"/> <i>AutoMapper</i> mapping.
@@ -76,12 +76,14 @@ namespace Beef.Demo.Business.Data
                 s2d.ForMember(d => d.City, o => o.MapFrom(s => s.City));
                 s2d.ForMember(d => d.State, o => o.MapFrom(s => s.State));
                 s2d.ForMember(d => d.Places, o => o.MapFrom(s => s.Places));
+                s2d.ForMember(d => d.ETag, o => o.MapFrom(s => s.ETag));
 
                 var d2s = CreateMap<Model.PostalInfo, PostalInfo>();
                 d2s.ForMember(s => s.CountrySid, o => o.MapFrom(d => d.Country));
                 d2s.ForMember(s => s.City, o => o.MapFrom(d => d.City));
                 d2s.ForMember(s => s.State, o => o.MapFrom(d => d.State));
                 d2s.ForMember(s => s.Places, o => o.MapFrom(d => d.Places));
+                d2s.ForMember(s => s.ETag, o => o.MapFrom(d => d.ETag));
 
                 HttpAgentMapperProfileCtor(s2d, d2s);
             }

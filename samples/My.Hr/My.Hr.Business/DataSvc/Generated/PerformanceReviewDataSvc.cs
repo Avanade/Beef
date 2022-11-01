@@ -30,14 +30,7 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            if (_cache.TryGetValue(new CompositeKey(id), out PerformanceReview? __val))
-                return __val;
-
-            var __result = await _data.GetAsync(id).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
-        });
+        public Task<PerformanceReview?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -45,43 +38,39 @@ namespace My.Hr.Business.DataSvc
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            var __result = await _data.GetByEmployeeIdAsync(employeeId, paging).ConfigureAwait(false);
-            return __result;
-        });
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task<PerformanceReview> CreateAsync(PerformanceReview value)
         {
             var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
-        });
+            return _cache.SetValue(__result);
+        }
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task<PerformanceReview> UpdateAsync(PerformanceReview value)
         {
             var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetAndReturnValue(__result);
-        });
+            return _cache.SetValue(__result);
+        }
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public async Task DeleteAsync(Guid id)
         {
+            _cache.Remove<PerformanceReview>(id);
             await _data.DeleteAsync(id).ConfigureAwait(false);
-            _cache.Remove<PerformanceReview>(new CompositeKey(id));
-        });
+        }
     }
 }
 

@@ -47,7 +47,11 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// <summary>
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
     /// </summary>
+{{#if Root.IsDataModel}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+{{else}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval CommonImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{CommonImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+{{/if}}
 {{#ifnull RefDataType}}
     {
 {{else}}
@@ -69,7 +73,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// {{{SummaryRefDataText}}}
         /// </summary>
             {{#ifval JsonName}}
-              {{#ifeq Root.JsonSerializer 'SystemText'}}
+              {{#ifeq Parent.JsonSerializer 'SystemText'}}
         [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
               {{else}}
         [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
@@ -85,29 +89,31 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// <summary>
         /// {{{ModelSummaryText}}}
         /// </summary>
-      {{#unless SerializationIgnore}}
-        {{#ifeq Root.JsonSerializer 'SystemText'}}
-          {{#if Root.IsDataModel}}
-            {{#ifval JsonDataModelName}}
-        [JsonPropertyName("{{JsonDataModelName}}")]
-            {{/ifval}}
-          {{else}}
-            {{#ifval JsonName}}
-        [JsonPropertyName("{{JsonName}}")]
-            {{/ifval}}
-          {{/if}}
-        {{else}}
-          {{#if Root.IsDataModel}}
-            {{#ifval JsonDataModelName}}
+  {{#if Root.IsDataModel}}   
+    {{#if DataModelSerializationIgnore}}
+        [JsonIgnore]
+    {{else}}
+      {{#ifval JsonDataModelName}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonDataModelName}}")]
-            {{/ifval}}
-          {{else}}
-            {{#ifval JsonName}}
+        {{else}}
+        [JsonPropertyName("{{JsonDataModelName}}")]
+        {{/ifeq}}
+      {{/ifval}}
+    {{/if}}
+  {{else}}
+    {{#if SerializationIgnore}}
+        [JsonIgnore]
+    {{else}}
+      {{#ifval JsonName}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}")]
-            {{/ifval}}
-          {{/if}}        
-         {{/ifeq}}
-      {{/unless}}
+        {{else}}
+        [JsonPropertyName("{{JsonName}}")]
+        {{/ifeq}}
+      {{/ifval}}
+    {{/if}}
+  {{/if}}
     {{#unless Root.IsDataModel}}
       {{#ifval Annotation1}}
         {{Annotation1}}
@@ -119,7 +125,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         {{Annotation3}}
       {{/ifval}}
     {{/unless}}
-        public {{{PrivateType}}} {{Name}} { get; set; }
+        public {{{ModelType}}} {{Name}} { get; set; }
 {{/each}}
 {{#unless HasIdentifier}}
   {{#unless RefDataType}}
@@ -177,11 +183,11 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
   {{/unless}}
 {{/if}}

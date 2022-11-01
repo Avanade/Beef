@@ -5,12 +5,14 @@
 #nullable enable
 #pragma warning disable
 
+using Newtonsoft.Json;
+
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
     /// Represents the Robot model.
     /// </summary>
-    public partial class Robot : IIdentifier<string>, IETag, IChangeLog
+    public partial class Robot : IIdentifier<string>, IETag, CoreEx.Entities.Models.IChangeLog
     {
         /// <summary>
         /// Gets or sets the Id.
@@ -40,13 +42,13 @@ namespace Beef.Demo.Business.Data.Model
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonPropertyName("_etag")]
+        [JsonProperty("_etag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log.
         /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
+        public CoreEx.Entities.Models.ChangeLog ChangeLog { get; set; }
     }
 
     /// <summary>

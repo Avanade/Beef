@@ -120,8 +120,8 @@ entities:
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
-            Description = "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).")]
+        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
+            Description = "Defaults to `SystemText`. This can be overridden within the `Entity`(s).")]
         public string? JsonSerializer { get; set; }
 
         /// <summary>
@@ -532,7 +532,7 @@ entities:
         /// <summary>
         /// Gets the entity scope from the from the <see cref="IRootConfig.RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
-        public string RuntimeEntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
+        public string RuntimeEntityScope => GetRuntimeParameter<string?>("EntityScope") ?? "Business";
 
         /// <summary>
         /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="IRootConfig.RuntimeParameters"/>).

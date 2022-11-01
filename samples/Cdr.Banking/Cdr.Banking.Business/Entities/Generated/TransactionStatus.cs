@@ -12,7 +12,6 @@ namespace Cdr.Banking.Business.Entities
     /// </summary>
     public partial class TransactionStatus : ReferenceDataBase<Guid, TransactionStatus>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="TransactionStatus"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace Cdr.Banking.Business.Entities
         public TransactionStatusCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionStatusCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="TransactionStatusCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public TransactionStatusCollection(IEnumerable<TransactionStatus> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public TransactionStatusCollection(IEnumerable<TransactionStatus> items) => AddRange(items);
     }
 }
 

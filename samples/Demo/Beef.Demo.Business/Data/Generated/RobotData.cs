@@ -12,14 +12,14 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public partial class RobotData : IRobotData
     {
-        private readonly ICosmos _cosmos;
+        private readonly DemoCosmosDb _cosmos;
         private Func<IQueryable<Model.Robot>, RobotArgs?, IQueryable<Model.Robot>>? _getByArgsOnQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotData"/> class.
         /// </summary>
-        /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
-        public RobotData(ICosmos cosmos)
+        /// <param name="cosmos">The <see cref="DemoCosmosDb"/>.</param>
+        public RobotData(DemoCosmosDb cosmos)
             { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); RobotDataCtor(); }
 
         partial void RobotDataCtor(); // Enables additional functionality to be added to the constructor.
@@ -29,39 +29,39 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<Robot?> GetAsync(Guid id)
         {
             return _cosmos.Items.GetAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
-        });
+        }
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Robot> CreateAsync(Robot value)
         {
-            return await _cosmos.Items.CreateAsync(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-        });
+            return _cosmos.Items.CreateAsync(value ?? throw new ArgumentNullException(nameof(value)));
+        }
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Robot> UpdateAsync(Robot value)
         {
-            return await _cosmos.Items.UpdateAsync(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-        });
+            return _cosmos.Items.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value)));
+        }
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task DeleteAsync(Guid id)
         {
-            await _cosmos.Items.DeleteAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id)).ConfigureAwait(false);
-        });
+            return _cosmos.Items.DeleteAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
+        }
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -69,10 +69,10 @@ namespace Beef.Demo.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
             return _cosmos.Items.Query(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<RobotCollectionResult, RobotCollection>();
-        });
+        }
 
         /// <summary>
         /// Provides the <see cref="Robot"/> and Entity Framework <see cref="Model.Robot"/> <i>AutoMapper</i> mapping.

@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Emergency Contact entity.
     /// </summary>
-    public partial class EmergencyContact : EntityBase<EmergencyContact>, IIdentifier<Guid>
+    public partial class EmergencyContact : EntityBase, IIdentifier<Guid>
     {
         private Guid _id;
         private string? _firstName;
@@ -48,7 +48,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
         /// </summary>
-        public string? RelationshipText => RefDataNamespace.RelationshipType.GetRefDataText(_relationshipSid);
+        public string? RelationshipText => RefDataNamespace.RelationshipType.GetRefDataText(_relationshipSid); 
 
         /// <summary>
         /// Gets or sets the Relationship (see <see cref="RefDataNamespace.RelationshipType"/>).
@@ -60,11 +60,11 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(PhoneNo, v => PhoneNo = v);
-            yield return CreateProperty(RelationshipSid, v => RelationshipSid = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(PhoneNo), PhoneNo, v => PhoneNo = v);
+            yield return CreateProperty(nameof(RelationshipSid), RelationshipSid, v => RelationshipSid = v);
         }
     }
 
@@ -79,10 +79,10 @@ namespace My.Hr.Business.Entities
         public EmergencyContactCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmergencyContactCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="EmergencyContactCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public EmergencyContactCollection(IEnumerable<EmergencyContact> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public EmergencyContactCollection(IEnumerable<EmergencyContact> items) => AddRange(items);
     }
 }
 

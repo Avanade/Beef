@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Person entity.
     /// </summary>
-    public partial class Person : EntityBase<Person>, IIdentifier<Guid>, IPartitionKey, IETag, IChangeLog
+    public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETag, IChangeLog
     {
         private Guid _id;
         private string? _firstName;
@@ -56,7 +56,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid);
+        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid); 
 
         /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
@@ -74,7 +74,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
+        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid); 
 
         /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
@@ -119,22 +119,23 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the Partition Key (consists of the following property(s): <see cref="EyeColor"/>).
         /// </summary>
+        [JsonIgnore]
         public string PartitionKey => CreatePartitionKey(EyeColorSid);
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(UniqueCode, v => UniqueCode = v);
-            yield return CreateProperty(GenderSid, v => GenderSid = v);
-            yield return CreateProperty(EyeColorSid, v => EyeColorSid = v);
-            yield return CreateProperty(Birthday, v => Birthday = v);
-            yield return CreateProperty(Address, v => Address = v);
-            yield return CreateProperty(ETag, v => ETag = v);
-            yield return CreateProperty(Metadata, v => Metadata = v);
-            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(UniqueCode), UniqueCode, v => UniqueCode = v);
+            yield return CreateProperty(nameof(GenderSid), GenderSid, v => GenderSid = v);
+            yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
+            yield return CreateProperty(nameof(Birthday), Birthday, v => Birthday = v);
+            yield return CreateProperty(nameof(Address), Address, v => Address = v);
+            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
+            yield return CreateProperty(nameof(Metadata), Metadata, v => Metadata = v);
+            yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
         }
     }
 
@@ -149,10 +150,10 @@ namespace Beef.Demo.Business.Entities
         public PersonCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PersonCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PersonCollection(IEnumerable<Person> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PersonCollection(IEnumerable<Person> items) => AddRange(items);
     }
 
     /// <summary>
@@ -172,11 +173,11 @@ namespace Beef.Demo.Business.Entities
         public PersonCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public PersonCollectionResult(IEnumerable<Person> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public PersonCollectionResult(IEnumerable<Person> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

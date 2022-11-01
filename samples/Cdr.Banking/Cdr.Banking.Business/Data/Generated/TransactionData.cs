@@ -31,10 +31,10 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
             return _cosmos.Transactions.Query(new Mac.PartitionKey(accountId), q => _getTransactionsOnQuery?.Invoke(q, accountId, args) ?? q).WithPaging(paging).SelectResultAsync<TransactionCollectionResult, TransactionCollection>();
-        });
+        }
 
         /// <summary>
         /// Provides the <see cref="Transaction"/> and Entity Framework <see cref="Model.Transaction"/> <i>AutoMapper</i> mapping.

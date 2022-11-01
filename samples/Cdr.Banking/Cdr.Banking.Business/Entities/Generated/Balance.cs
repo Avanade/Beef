@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Balance entity.
     /// </summary>
-    public partial class Balance : EntityBase<Balance>, IIdentifier<string>
+    public partial class Balance : EntityBase, IIdentifier<string>
     {
         private string? _id;
         private decimal _currentBalance;
@@ -59,13 +59,13 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(CurrentBalance, v => CurrentBalance = v);
-            yield return CreateProperty(AvailableBalance, v => AvailableBalance = v);
-            yield return CreateProperty(CreditLimit, v => CreditLimit = v);
-            yield return CreateProperty(AmortisedLimit, v => AmortisedLimit = v);
-            yield return CreateProperty(Currency, v => Currency = v);
-            yield return CreateProperty(Purses, v => Purses = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(CurrentBalance), CurrentBalance, v => CurrentBalance = v);
+            yield return CreateProperty(nameof(AvailableBalance), AvailableBalance, v => AvailableBalance = v);
+            yield return CreateProperty(nameof(CreditLimit), CreditLimit, v => CreditLimit = v);
+            yield return CreateProperty(nameof(AmortisedLimit), AmortisedLimit, v => AmortisedLimit = v);
+            yield return CreateProperty(nameof(Currency), Currency, v => Currency = v);
+            yield return CreateProperty(nameof(Purses), Purses, v => Purses = v);
         }
     }
 }

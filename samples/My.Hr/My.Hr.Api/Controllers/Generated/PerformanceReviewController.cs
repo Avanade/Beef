@@ -55,10 +55,10 @@ namespace My.Hr.Api.Controllers
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         [HttpPost("employees/{employeeId}/reviews")]
-        [AcceptsBody(typeof(PerformanceReview))]
+        [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create(Guid employeeId) =>
-            _webApi.PostAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), locationUri: r => new Uri($"/api/reviews/{r.Id}", UriKind.Relative));
+            _webApi.PostAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/reviews/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
@@ -66,7 +66,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         [HttpPut("reviews/{id}")]
-        [AcceptsBody(typeof(PerformanceReview))]
+        [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.UpdateAsync(p.Value!, id));
@@ -77,7 +77,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
         [HttpPatch("reviews/{id}")]
-        [AcceptsBody(typeof(PerformanceReview))]
+        [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<PerformanceReview>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));

@@ -87,11 +87,11 @@ namespace Beef.Demo.Common.Entities
         public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(IEnumerable<Robot> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

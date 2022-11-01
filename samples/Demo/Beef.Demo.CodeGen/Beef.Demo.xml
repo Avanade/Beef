@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" EntityScope="Autonomous" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" EventSourceKind="Relative" CosmosName="ICosmos" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" EntityScope="Autonomous" Grpc="true" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" RefDataText="true" EventPublish="true" EventSourceKind="Relative" CosmosName="DemoCosmosDb" AppBasedAgentArgs="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <Entity Name="Person" Text="Person" Implements="IETag, IChangeLog" Collection="true" CollectionResult="true" Grpc="true" Validator="PersonValidator" IdentifierGenerator="true" WebApiAuthorize="false" WebApiRoutePrefix="api/v1/persons" WebApiAutoLocation="true" Create="true" Delete="true" AutoImplement="Database" DatabaseSchema="Demo" EntityFrameworkEntity="EfModel.Person" DataCtorParams="Microsoft.Extensions.Logging.ILogger&lt;PersonData&gt;^Logger, Common.Agents.IPersonAgent" ManagerExtensions="true" DataSvcExtensions="true" DataExtensions="true" EventTransaction="true" TestCodeGen="true" TestExtra="Unknown-Config">
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" GrpcFieldNo="1" UniqueKey="true" DataName="PersonId" Annotation1="[System.Xml.Serialization.XmlElement(&quot;Id&quot;)]" />
     <Property Name="FirstName" Type="string" GrpcFieldNo="2" />
@@ -8,7 +8,7 @@
     <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" GrpcFieldNo="5" DataName="GenderId" DataConverter="ReferenceDataNullableGuidIdConverter{T}" />
     <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" PartitionKey="true" GrpcFieldNo="6" DataName="EyeColorCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" GrpcFieldNo="7" DatabaseDbType="Date"/>
-    <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" EntityFrameworkMapper="Ignore" />
+    <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" EntityFrameworkMapper="Skip" />
     <Property Name="ETag" Type="string" GrpcFieldNo="500" />
     <Property Name="Metadata" Type="Dictionary&lt;string, string&gt;" DataConverter="ObjectToJsonConverter{T}" DataName="MetadataJson" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="501" />
@@ -55,7 +55,7 @@
       <Parameter Name="Names" Type="List&lt;string&gt;" Default="default" />
     </Operation>
 
-    <Operation Name="EventPublishNoSend" OperationType="Update" Text="Validate when an Event is published but not sent" WebApiRoute="publishnosend" DataSvcCustom="true" ExcludeData="true" ExcludeIData="true" />
+    <Operation Name="EventPublishNoSend" OperationType="Update" Text="Validate when an Event is published but not sent" WebApiRoute="publishnosend" EventPublish="None" DataSvcCustom="true" ExcludeData="true" ExcludeIData="true" />
 
     <!-- Entity Framework -->
     <Operation Name="GetByArgsWithEf" OperationType="GetColl" PagingArgs="true" WebApiRoute="args" AutoImplement="EntityFramework">
@@ -116,12 +116,12 @@
     <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
       <Parameter Name="Args" Type="ProductArgs" Validator="ProductArgsValidator" />
     </Operation>
-  </Entity>
+  </Entity>-->
 
   <Entity Name="ProductArgs" Text="{{Product}} arguments" ExcludeAll="true">
     <Property Name="Name" Type="string"/>
     <Property Name="Description" Type="string"/>
-  </Entity>-->
+  </Entity>
 
   <!-- CosmosDb -->
   <Entity Name="Robot" Grpc="true" Text="Robot" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" IdentifierGenerator="true" WebApiRoutePrefix="api/v1/robots" ManagerCtorParams="IEventPublisher" EventSource="/robots/{$key}" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
@@ -194,6 +194,7 @@
     <Property Name="City" JsonDataModelName="place name" />
     <Property Name="State" JsonDataModelName="state abbreviation" />
     <Property Name="Places" Type="PlaceInfoCollection" />
+    <Property Name="ETag" InternalOnly="true" DataModelSerializationIgnore="true" />
 
     <Operation Name="GetPostCodes" OperationType="Get" WebApiRoute="{country}/{state}/{city}" HttpAgentRoute="{country.Code}/{state}/{city}" HttpAgentCode="Reset()">
       <Parameter Name="Country" Type="^Country" IsMandatory="true" ValidatorFluent="IsValid()" />

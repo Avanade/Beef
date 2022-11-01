@@ -66,8 +66,8 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByEmployeeIdAsync(4.ToGuid())).Value!;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Collection);
-            Assert.AreEqual(0, v.Collection.Count);
+            Assert.IsNotNull(v.Items);
+            Assert.AreEqual(0, v.Items.Count);
         }
 
         [Test]
@@ -80,9 +80,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByEmployeeIdAsync(2.ToGuid())).Value!;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Collection);
-            Assert.AreEqual(2, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Work quality low.", "Work quality below standard." }, v.Collection.Select(x => x.Notes).ToArray());
+            Assert.IsNotNull(v.Items);
+            Assert.AreEqual(2, v.Items.Count);
+            Assert.AreEqual(new string[] { "Work quality low.", "Work quality below standard." }, v.Items.Select(x => x.Notes).ToArray());
         }
 
         [Test]
@@ -95,9 +95,9 @@ namespace My.Hr.Test.Apis
                 .Run(a => a.GetByEmployeeIdAsync(2.ToGuid(), PagingArgs.CreateSkipAndTake(0, 1))).Value!;
 
             Assert.IsNotNull(v);
-            Assert.IsNotNull(v.Collection);
-            Assert.AreEqual(1, v.Collection.Count);
-            Assert.AreEqual(new string[] { "Work quality low." }, v.Collection.Select(x => x.Notes).ToArray());
+            Assert.IsNotNull(v.Items);
+            Assert.AreEqual(1, v.Items.Count);
+            Assert.AreEqual(new string[] { "Work quality low." }, v.Items.Select(x => x.Notes).ToArray());
         }
 
         #endregion

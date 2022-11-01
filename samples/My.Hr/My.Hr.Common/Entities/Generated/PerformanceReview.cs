@@ -87,11 +87,11 @@ namespace My.Hr.Common.Entities
         public PerformanceReviewCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

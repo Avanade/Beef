@@ -6,7 +6,7 @@
     public class Database : SqlServerDatabase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HrDb"/> class.
+        /// Initializes a new instance of the <see cref="Database"/> class.
         /// </summary>
         public Database(Func<SqlConnection> create, ILogger<Database>? logger = null) : base(create, logger) { }
 

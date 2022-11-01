@@ -35,7 +35,7 @@ namespace Cdr.Banking.Api
             services.AddSettings<BankingSettings>()
                     .AddExecutionContext(_ => new Business.ExecutionContext())
                     .AddJsonSerializer()
-                    .AddReferenceDataOrchestrator(sp => new ReferenceDataOrchestrator(sp, new MemoryCache(new MemoryCacheOptions())).Register<IReferenceDataProvider>())
+                    .AddReferenceDataOrchestrator()
                     .AddWebApi()
                     .AddReferenceDataContentWebApi()
                     .AddRequestCache()

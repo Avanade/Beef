@@ -28,7 +28,7 @@ namespace Cdr.Banking.Test
                     using var test = ApiTester.Create<Startup>();
                     _cosmosDb = test.Services.GetRequiredService<ICosmos>();
 
-                    await _cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(_cosmosDb.Database.Id, cancellationToken: ct);
+                    await _cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(_cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
                     var ac = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
                     {
@@ -54,7 +54,7 @@ namespace Cdr.Banking.Test
                     await _cosmosDb.Transactions.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
                     jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
-                    await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.IReferenceDataProvider>().Types, cancellationToken: ct).ConfigureAwait(false);
+                    await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
                 }
 
                 return true;

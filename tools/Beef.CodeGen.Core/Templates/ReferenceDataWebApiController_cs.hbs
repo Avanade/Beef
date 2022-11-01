@@ -5,6 +5,8 @@
 #nullable enable
 #pragma warning disable
 
+using CommonRefDataNamespace = {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+
 namespace {{Root.NamespaceApi}}.Controllers
 {
     /// <summary>
@@ -38,7 +40,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{#ifval WebApiRoutePrefix}}
         [Route("{{WebApiRoutePrefix}}")]
   {{/ifval}}
-        [ProducesResponseType(typeof(IEnumerable<{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<Common{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> {{Name}}GetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<{{RefDataQualifiedEntityName}}>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -52,7 +54,7 @@ namespace {{Root.NamespaceApi}}.Controllers
 {{/ifval}}
         [HttpGet()]
         [Route("{{RefDataWebApiRoute}}")]
-        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.Models.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

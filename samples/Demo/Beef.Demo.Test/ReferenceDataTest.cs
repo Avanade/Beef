@@ -1,8 +1,9 @@
 ﻿using Beef.Demo.Api;
+using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
-using Beef.Test.NUnit;
-using Beef.WebApi;
+using CoreEx.RefData;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -10,80 +11,83 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
     [TestFixture, Parallelizable(ParallelScope.Children)]
-    public class ReferenceDataTest : UsingAgentTesterServer<Startup>
+    public class ReferenceDataTest : UsingApiTester<Startup>
     {
-        private static readonly RobotTest _robotTest = new RobotTest();
-
         [OneTimeSetUp]
-        public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();
-
-        [OneTimeTearDown]
-        public async Task OneTimeTearDown() => await _robotTest.OneTimeTearDown();
-
-        [Test, TestSetUp, Parallelizable]
-        public void A110_GetNamed_AllList()
+        public async Task OneTimeSetUp()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
-                .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(new string[] { nameof(ReferenceData.Country), nameof(ReferenceData.USState), nameof(ReferenceData.Gender), nameof(ReferenceData.EyeColor), nameof(ReferenceData.PowerSource), nameof(ReferenceData.Company), nameof(ReferenceData.Status) }));
-
-            Assert.NotNull(r.Content);
-            Assert.AreEqual(7, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
+            ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
+            await RobotTest.CosmosOneTimeSetUp(ApiTester.Services.GetService<DemoCosmosDb>()).ConfigureAwait(false);
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
+        public void A110_GetNamed_AllList()
+        {
+            var r = Agent<ReferenceDataAgent>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetNamedAsync(new string[] { nameof(Country), nameof(USState), nameof(Gender), nameof(EyeColor), nameof(PowerSource), nameof(Company), nameof(Status) }));
+
+            Assert.NotNull(r.GetContent());
+            Assert.AreEqual(7, JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count());
+        }
+
+        [Test, Parallelizable]
         public void A120_GetNamed_AllList_NotModified()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
+            var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
+                .Run(a => a.GetNamedAsync(new string[] { nameof(Gender), nameof(Company) }));
 
-            Assert.NotNull(r.Content);
+            Assert.NotNull(r.GetContent());
 
             Assert.IsTrue(r.Response.Headers.TryGetValues("ETag", out var etags));
             Assert.AreEqual(1, etags.Count());
 
-            r = AgentTester.Test<ReferenceDataAgent>()
+            r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
-                {
-                    x.Headers.Add("If-None-Match", etags.First());
-                })).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
+                .Run(a => a.GetNamedAsync(new string[] { nameof(Gender), nameof(Company) }, new CoreEx.Http.HttpRequestOptions { ETag = etags.First() }));
+                //.RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                //{
+                //    x.Headers.Add("If-None-Match", etags.First());
+                //})).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
         }
 
-        [Test, TestSetUp, Parallelizable]
-        public void A130_GetNamed_AllList_NotModified_Modified()
+        [Test, Parallelizable]
+        public void A130_GetNamed_AllList_Modified()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
+            var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
-                {
-                    x.Headers.Add("If-None-Match", new string[] { "\"ABC\"", "\"DEF\"" });
-                })).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
+                .Run(a => a.GetNamedAsync(new string[] { nameof(Gender), nameof(Company) }, new CoreEx.Http.HttpRequestOptions { ETag = "ABC" }));
+                //.RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                //{
+                //    x.Headers.Add("If-None-Match", new string[] { "\"ABC\"", "\"DEF\"" });
+                //})).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
 
-            Assert.NotNull(r.Content);
-            Assert.AreEqual(2, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
+            Assert.NotNull(r.GetContent());
+            Assert.AreEqual(2, JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count());
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A140_GetGender()
         {
-            var rd = AgentTester.Test<ReferenceDataAgent, GenderCollection>()
+            var rd = Agent<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GenderGetAllAsync()).Value;
 
             Assert.IsNotNull(rd);
-            Assert.Greater(rd.AllList.Count, 0);
+            Assert.Greater(rd.Count, 0);
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A150_GetGender_NotModified()
         {
-            var r = AgentTester.Test<ReferenceDataAgent, GenderCollection>()
+            var r = Agent<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GenderGetAllAsync());
 
@@ -91,78 +95,79 @@ namespace Beef.Demo.Test
             Assert.IsNotNull(vals);
             Assert.AreEqual(1, vals.Count());
 
-            AgentTester.Test<ReferenceDataAgent, GenderCollection>()
+            Agent<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
-                {
-                    x.Headers.Add("If-None-Match", vals.First());
-                })).GenderGetAllAsync());
+                .Run(a => a.GenderGetAllAsync(null, new CoreEx.Http.HttpRequestOptions { ETag = vals.First() }));
+                //.RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
+                //{
+                //    x.Headers.Add("If-None-Match", vals.First());
+                //})).GenderGetAllAsync());
 
-            AgentTester.Test<ReferenceDataAgent, GenderCollection>()
-                .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run(a => a.GenderGetAllAsync(null, new Beef.WebApi.WebApiRequestOptions { ETag = vals.First() }));
+            //Agent<ReferenceDataAgent, GenderCollection>()
+            //    .ExpectStatusCode(HttpStatusCode.NotModified)
+            //    .Run(a => a.GenderGetAllAsync(null, new Beef.WebApi.WebApiRequestOptions { ETag = vals.First() }));
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A160_GetPowerSource_FilterByCodes()
         {
-            var r = AgentTester.Test<ReferenceDataAgent, PowerSourceCollection>()
+            var r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "E", null, "n" } }));
+                .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "E", null, "n" } }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
-            Assert.AreEqual(2, r.Value.Count());
+            Assert.AreEqual(2, r.Value.Count);
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A170_GetPowerSource_FilterByText()
         {
-            var r = AgentTester.Test<ReferenceDataAgent, PowerSourceCollection>()
+            var r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Text = "el*" }));
+                .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Text = "el*" }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
-            Assert.AreEqual(1, r.Value.Count());
+            Assert.AreEqual(1, r.Value.Count);
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A175_GetPowerSource_FilterByCodes_Inactive()
         {
-            var r = AgentTester.Test<ReferenceDataAgent, PowerSourceCollection>()
+            var r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }));
+                .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "o" } }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
             Assert.AreEqual(0, r.Value.Count());
 
-            r = AgentTester.Test<ReferenceDataAgent, PowerSourceCollection>()
+            r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }, new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "$inactive=true" }));
+                .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "o" } }, new CoreEx.Http.HttpRequestOptions { IncludeInactive = true }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
-            Assert.AreEqual(1, r.Value.Count());
+            Assert.AreEqual(1, r.Value.Count);
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A180_GetByCodes()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
+            var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
+                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
 
             Assert.IsNotNull(r);
-            Assert.IsNotNull(r.Content);
-            Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.Content);
+            Assert.IsNotNull(r.GetContent());
+            Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.GetContent());
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void A190_Get_NoContent()
         {
-            var r = AgentTester.Test<ReferenceDataAgent>()
+            var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetNamedAsync(null));
         }

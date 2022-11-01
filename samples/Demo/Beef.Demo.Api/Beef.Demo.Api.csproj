@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Beef.Demo.WebApi</AssemblyName>
     <RootNamespace>Beef.Demo.WebApi</RootNamespace>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -11,18 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.45.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Events.EventHubs\Beef.Events.EventHubs.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Events.ServiceBus\Beef.Events.ServiceBus.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
-    <ProjectReference Include="..\..\..\src\Beef.Grpc\Beef.Grpc.csproj" />
     <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
   </ItemGroup>
@@ -31,6 +26,11 @@
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\Generated\" />
+    <Folder Include="Grpc\Generated\" />
   </ItemGroup>
 
 </Project>

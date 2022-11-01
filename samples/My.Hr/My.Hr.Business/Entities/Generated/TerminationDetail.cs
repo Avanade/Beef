@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Termination Detail entity.
     /// </summary>
-    public partial class TerminationDetail : EntityBase<TerminationDetail>
+    public partial class TerminationDetail : EntityBase
     {
         private DateTime _date;
         private string? _reasonSid;
@@ -30,7 +30,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
         /// </summary>
-        public string? ReasonText => RefDataNamespace.TerminationReason.GetRefDataText(_reasonSid);
+        public string? ReasonText => RefDataNamespace.TerminationReason.GetRefDataText(_reasonSid); 
 
         /// <summary>
         /// Gets or sets the Reason (see <see cref="RefDataNamespace.TerminationReason"/>).
@@ -42,8 +42,8 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Date, v => Date = v);
-            yield return CreateProperty(ReasonSid, v => ReasonSid = v);
+            yield return CreateProperty(nameof(Date), Date, v => Date = v);
+            yield return CreateProperty(nameof(ReasonSid), ReasonSid, v => ReasonSid = v);
         }
     }
 }

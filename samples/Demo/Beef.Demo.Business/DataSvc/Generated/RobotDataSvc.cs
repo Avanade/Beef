@@ -64,9 +64,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
+            _cache.Remove<Robot>(id);
             await _data.DeleteAsync(id).ConfigureAwait(false);
             _events.PublishValueEvent(new Robot { Id = id }, new Uri($"/robots/{id}", UriKind.Relative), $"Demo.Robot", "Delete");
-            _cache.Remove<Robot>(id);
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>

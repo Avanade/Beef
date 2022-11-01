@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Contact entity.
     /// </summary>
-    public partial class Contact : EntityBase<Contact>, IIdentifier<Guid>
+    public partial class Contact : EntityBase, IIdentifier<Guid>
     {
         private Guid _id;
         private string? _firstName;
@@ -43,7 +43,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
         /// </summary>
-        public string? StatusText => RefDataNamespace.Status.GetRefDataText(_statusSid);
+        public string? StatusText => RefDataNamespace.Status.GetRefDataText(_statusSid); 
 
         /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).
@@ -55,16 +55,17 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets or sets the Internal Code.
         /// </summary>
+        [JsonIgnore]
         public string? InternalCode { get => _internalCode; set => SetValue(ref _internalCode, value); }
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(StatusSid, v => StatusSid = v);
-            yield return CreateProperty(InternalCode, v => InternalCode = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(StatusSid), StatusSid, v => StatusSid = v);
+            yield return CreateProperty(nameof(InternalCode), InternalCode, v => InternalCode = v);
         }
     }
 
@@ -79,10 +80,10 @@ namespace Beef.Demo.Business.Entities
         public ContactCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContactCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="ContactCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public ContactCollection(IEnumerable<Contact> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public ContactCollection(IEnumerable<Contact> items) => AddRange(items);
     }
 
     /// <summary>
@@ -102,11 +103,11 @@ namespace Beef.Demo.Business.Entities
         public ContactCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public ContactCollectionResult(IEnumerable<Contact> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public ContactCollectionResult(IEnumerable<Contact> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

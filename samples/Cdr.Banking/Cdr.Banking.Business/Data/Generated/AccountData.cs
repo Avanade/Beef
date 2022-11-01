@@ -30,27 +30,27 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
             return _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<AccountCollectionResult, AccountCollection>();
-        });
+        }
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
             return _cosmos.AccountDetails.GetAsync(accountId);
-        });
+        }
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => DataInvoker.Current.InvokeAsync(this, _ => GetBalanceOnImplementationAsync(accountId));
+        public Task<Balance?> GetBalanceAsync(string? accountId) => GetBalanceOnImplementationAsync(accountId);
 
         /// <summary>
         /// Provides the <see cref="Account"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.

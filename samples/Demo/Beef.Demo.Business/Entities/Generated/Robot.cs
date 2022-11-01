@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Robot entity.
     /// </summary>
-    public partial class Robot : EntityBase<Robot>, IIdentifier<Guid>, IETag, IChangeLog
+    public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLog
     {
         private Guid _id;
         private string? _modelNo;
@@ -46,7 +46,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
+        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid); 
 
         /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
@@ -64,7 +64,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
         /// </summary>
-        public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid);
+        public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid); 
 
         /// <summary>
         /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).
@@ -87,13 +87,13 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(ModelNo, v => ModelNo = v);
-            yield return CreateProperty(SerialNo, v => SerialNo = v);
-            yield return CreateProperty(EyeColorSid, v => EyeColorSid = v);
-            yield return CreateProperty(PowerSourceSid, v => PowerSourceSid = v);
-            yield return CreateProperty(ETag, v => ETag = v);
-            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
+            yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
+            yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
+            yield return CreateProperty(nameof(PowerSourceSid), PowerSourceSid, v => PowerSourceSid = v);
+            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
+            yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
         }
     }
 
@@ -108,10 +108,10 @@ namespace Beef.Demo.Business.Entities
         public RobotCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="RobotCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public RobotCollection(IEnumerable<Robot> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public RobotCollection(IEnumerable<Robot> items) => AddRange(items);
     }
 
     /// <summary>
@@ -131,11 +131,11 @@ namespace Beef.Demo.Business.Entities
         public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(IEnumerable<Robot> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

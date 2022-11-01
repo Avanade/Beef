@@ -4,7 +4,7 @@
     {
         private Task RaisePowerSourceChangeOnImplementationAsync(Guid id, RefDataNamespace.PowerSource powerSource)
             => _eventPublisher
-                .PublishValueEvent(powerSource, $"Demo.Robot.{id}", "PowerSourceChange", id)
+                .PublishValueEvent(powerSource, $"Demo.Robot", "PowerSourceChange", id)
                 .SendAsync();
     }
 }

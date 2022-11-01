@@ -61,10 +61,10 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The created <see cref="Contact"/>.</returns>
         [HttpPost("")]
-        [AcceptsBody(typeof(Contact))]
+        [AcceptsBody(typeof(Common.Entities.Contact))]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Contact, Contact>(Request, p => _manager.CreateAsync(p.Value!));
+            _webApi.PostAsync<Contact, Contact>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
         /// <summary>
         /// Updates an existing <see cref="Contact"/>.
@@ -72,7 +72,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
         [HttpPut("{id}")]
-        [AcceptsBody(typeof(Contact))]
+        [AcceptsBody(typeof(Common.Entities.Contact))]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));

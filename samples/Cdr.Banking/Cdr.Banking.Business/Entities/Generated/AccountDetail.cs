@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the <see cref="Account"/> Detail entity.
     /// </summary>
-    public partial class AccountDetail : Account, IEquatable<AccountDetail>
+    public partial class AccountDetail : Account
     {
         private string? _bsb;
         private string? _accountNumber;
@@ -63,38 +63,13 @@ namespace Cdr.Banking.Business.Entities
             foreach (var pv in base.GetPropertyValues())
                 yield return pv;
 
-            yield return CreateProperty(Bsb, v => Bsb = v);
-            yield return CreateProperty(AccountNumber, v => AccountNumber = v);
-            yield return CreateProperty(BundleName, v => BundleName = v);
-            yield return CreateProperty(SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
-            yield return CreateProperty(TermDeposit, v => TermDeposit = v);
-            yield return CreateProperty(CreditCard, v => CreditCard = v);
+            yield return CreateProperty(nameof(Bsb), Bsb, v => Bsb = v);
+            yield return CreateProperty(nameof(AccountNumber), AccountNumber, v => AccountNumber = v);
+            yield return CreateProperty(nameof(BundleName), BundleName, v => BundleName = v);
+            yield return CreateProperty(nameof(SpecificAccountUTypeSid), SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
+            yield return CreateProperty(nameof(TermDeposit), TermDeposit, v => TermDeposit = v);
+            yield return CreateProperty(nameof(CreditCard), CreditCard, v => CreditCard = v);
         }
-
-        /// <inheritdoc/>
-        public bool Equals(AccountDetail? other) => base.Equals(other);
-
-        /// <summary>
-        /// Compares two values for equality.
-        /// </summary>
-        /// <param name="a"><see cref="AccountDetail"/> A.</param>
-        /// <param name="b"><see cref="AccountDetail"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator ==(AccountDetail? a, AccountDetail? b) => Equals(a, b);
-    
-        /// <summary>
-        /// Compares two values for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="AccountDetail"/> A.</param>
-        /// <param name="b"><see cref="AccountDetail"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator !=(AccountDetail? a, AccountDetail? b) => !Equals(a, b);
- 
-        /// <inheritdoc/>
-        public override int GetHashCode() => base.GetHashCode();
-
-        /// <inheritdoc/>
-        public override object Clone() => CreateClone<AccountDetail>(this);
     }
 }
 

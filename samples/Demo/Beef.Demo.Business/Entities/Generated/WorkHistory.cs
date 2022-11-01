@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Work History entity.
     /// </summary>
-    public partial class WorkHistory : EntityBase<WorkHistory>, IPrimaryKey
+    public partial class WorkHistory : EntityBase, IPrimaryKey
     {
         private Guid _personId;
         private string? _name;
@@ -48,15 +48,16 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Name"/>).
         /// </summary>
+        [JsonIgnore]
         public CompositeKey PrimaryKey => CreatePrimaryKey(Name);
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(PersonId, v => PersonId = v);
-            yield return CreateProperty(Name, v => Name = v);
-            yield return CreateProperty(StartDate, v => StartDate = v);
-            yield return CreateProperty(EndDate, v => EndDate = v);
+            yield return CreateProperty(nameof(PersonId), PersonId, v => PersonId = v);
+            yield return CreateProperty(nameof(Name), Name, v => Name = v);
+            yield return CreateProperty(nameof(StartDate), StartDate, v => StartDate = v);
+            yield return CreateProperty(nameof(EndDate), EndDate, v => EndDate = v);
         }
     }
 
@@ -71,10 +72,10 @@ namespace Beef.Demo.Business.Entities
         public WorkHistoryCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public WorkHistoryCollection(IEnumerable<WorkHistory> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public WorkHistoryCollection(IEnumerable<WorkHistory> items) => AddRange(items);
     }
 }
 

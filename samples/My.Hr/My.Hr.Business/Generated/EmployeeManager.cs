@@ -31,9 +31,9 @@ namespace My.Hr.Business
         public Task<Employee?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(id);
-            (await id.Validate(nameof(id)).Mandatory().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -43,9 +43,9 @@ namespace My.Hr.Business
         public Task<Employee> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(value.EnsureValue());
-            (await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Create);
+        }, InvokerArgs.Create);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -57,9 +57,9 @@ namespace My.Hr.Business
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            (await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -68,9 +68,9 @@ namespace My.Hr.Business
         public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(id);
-            (await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).ValidateAsync(true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, BusinessInvokerArgs.Delete);
+        }, InvokerArgs.Delete);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -81,9 +81,9 @@ namespace My.Hr.Business
         public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            (await args.Validate(nameof(args)).Entity().With<IValidatorEx<EmployeeArgs>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await args.Validate(nameof(args)).Entity().With<IValidatorEx<EmployeeArgs>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
@@ -94,9 +94,9 @@ namespace My.Hr.Business
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(value.EnsureValue(), id);
-            (await value.Validate().Entity().With<IValidatorEx<TerminationDetail>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await value.Validate().Entity().With<IValidatorEx<TerminationDetail>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.TerminateAsync(value, id).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Update);
+        }, InvokerArgs.Update);
     }
 }
 

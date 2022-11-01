@@ -32,9 +32,9 @@ namespace Cdr.Banking.Business
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            (await args.Validate(nameof(args)).Entity().With<IValidatorEx<AccountArgs>>().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await args.Validate(nameof(args)).Entity().With<IValidatorEx<AccountArgs>>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
@@ -44,9 +44,9 @@ namespace Cdr.Banking.Business
         public Task<AccountDetail?> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId);
-            (await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
@@ -56,9 +56,9 @@ namespace Cdr.Banking.Business
         public Task<Balance?> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId);
-            (await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+            await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
     }
 }
 

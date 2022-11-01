@@ -2,12 +2,9 @@
 using My.Hr.Api;
 using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.Linq;
-using System.Net;
 using UnitTestEx;
-using UnitTestEx.Expectations;
 using UnitTestEx.NUnit;
 
 namespace My.Hr.Test.Apis

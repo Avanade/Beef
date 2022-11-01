@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Address entity.
     /// </summary>
-    public partial class Address : EntityBase<Address>
+    public partial class Address : EntityBase
     {
         private string? _street;
         private string? _city;
@@ -28,8 +28,8 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Street, v => Street = v);
-            yield return CreateProperty(City, v => City = v);
+            yield return CreateProperty(nameof(Street), Street, v => Street = v);
+            yield return CreateProperty(nameof(City), City, v => City = v);
         }
     }
 
@@ -44,10 +44,10 @@ namespace Beef.Demo.Business.Entities
         public AddressCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddressCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="AddressCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public AddressCollection(IEnumerable<Address> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public AddressCollection(IEnumerable<Address> items) => AddRange(items);
     }
 }
 

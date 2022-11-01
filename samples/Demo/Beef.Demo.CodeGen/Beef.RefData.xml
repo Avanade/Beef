@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration EntityScope="Autonomous" RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/demo/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter" WebApiAuthorize="false" AppBasedAgentArgs="true" CosmosName="ICosmos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration EntityScope="Autonomous" RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/demo/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter" WebApiAuthorize="false" AppBasedAgentArgs="true" CosmosName="DemoCosmosDb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
   <Entity Name="Country" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/countries" AutoImplement="Database" DatabaseSchema="Ref" />
   <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/usStates" AutoImplement="Database" DatabaseSchema="Ref" />

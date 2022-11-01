@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Term Deposit Account entity.
     /// </summary>
-    public partial class TermDepositAccount : EntityBase<TermDepositAccount>
+    public partial class TermDepositAccount : EntityBase
     {
         private DateTime _lodgementDate;
         private DateTime _maturityDate;
@@ -54,11 +54,11 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(LodgementDate, v => LodgementDate = v);
-            yield return CreateProperty(MaturityDate, v => MaturityDate = v);
-            yield return CreateProperty(MaturityAmount, v => MaturityAmount = v);
-            yield return CreateProperty(MaturityCurrency, v => MaturityCurrency = v);
-            yield return CreateProperty(MaturityInstructionsSid, v => MaturityInstructionsSid = v);
+            yield return CreateProperty(nameof(LodgementDate), LodgementDate, v => LodgementDate = v);
+            yield return CreateProperty(nameof(MaturityDate), MaturityDate, v => MaturityDate = v);
+            yield return CreateProperty(nameof(MaturityAmount), MaturityAmount, v => MaturityAmount = v);
+            yield return CreateProperty(nameof(MaturityCurrency), MaturityCurrency, v => MaturityCurrency = v);
+            yield return CreateProperty(nameof(MaturityInstructionsSid), MaturityInstructionsSid, v => MaturityInstructionsSid = v);
         }
     }
 }

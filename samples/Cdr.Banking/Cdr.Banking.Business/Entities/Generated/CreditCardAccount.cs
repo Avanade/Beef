@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Credit Card Account entity.
     /// </summary>
-    public partial class CreditCardAccount : EntityBase<CreditCardAccount>
+    public partial class CreditCardAccount : EntityBase
     {
         private decimal _minPaymentAmount;
         private decimal _paymentDueAmount;
@@ -40,10 +40,10 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(MinPaymentAmount, v => MinPaymentAmount = v);
-            yield return CreateProperty(PaymentDueAmount, v => PaymentDueAmount = v);
-            yield return CreateProperty(PaymentCurrency, v => PaymentCurrency = v);
-            yield return CreateProperty(PaymentDueDate, v => PaymentDueDate = v);
+            yield return CreateProperty(nameof(MinPaymentAmount), MinPaymentAmount, v => MinPaymentAmount = v);
+            yield return CreateProperty(nameof(PaymentDueAmount), PaymentDueAmount, v => PaymentDueAmount = v);
+            yield return CreateProperty(nameof(PaymentCurrency), PaymentCurrency, v => PaymentCurrency = v);
+            yield return CreateProperty(nameof(PaymentDueDate), PaymentDueDate, v => PaymentDueDate = v);
         }
     }
 }

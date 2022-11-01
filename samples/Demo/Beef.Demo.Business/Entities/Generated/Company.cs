@@ -25,7 +25,10 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(ExternalCode, v => ExternalCode = v);
+            foreach (var pv in base.GetPropertyValues())
+                yield return pv;
+
+            yield return CreateProperty(nameof(ExternalCode), ExternalCode, v => ExternalCode = v);
         }
 
         /// <summary>
@@ -47,10 +50,10 @@ namespace Beef.Demo.Business.Entities
         public CompanyCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CompanyCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="CompanyCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public CompanyCollection(IEnumerable<Company> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public CompanyCollection(IEnumerable<Company> items) => AddRange(items);
     }
 }
 

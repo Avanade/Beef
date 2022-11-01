@@ -37,10 +37,10 @@ namespace Cdr.Banking.Business.Entities
         public OpenStatusCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStatusCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="OpenStatusCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public OpenStatusCollection(IEnumerable<OpenStatus> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public OpenStatusCollection(IEnumerable<OpenStatus> items) => AddRange(items);
     }
 }
 

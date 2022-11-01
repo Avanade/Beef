@@ -1,12 +1,12 @@
 ﻿using Beef.Demo.Api;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
-using Beef.Test.NUnit;
-using Beef.WebApi;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Net;
+using UnitTestEx;
+using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
@@ -14,35 +14,40 @@ namespace Beef.Demo.Test
     /// Fully parallelizable test; seeing how it performs (perf/stability) under load.
     /// </summary>
     [TestFixture, Parallelizable(ParallelScope.Children)]
-    public class XParallelPersonTest : UsingAgentTesterServer<Startup>
+    public class XParallelPersonTest : UsingApiTester<Startup>
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => AgentTester.Test<PersonAgent, Person>()
-                                        .ExpectStatusCode(HttpStatusCode.NotFound)
-                                        .Run(a => a.GetAsync(404.ToGuid()));
-
-        [Test, TestSetUp, Parallelizable]
-        public void B110_Get_NotFound()
+        public void OneTimeSetUp()
         {
-            AgentTester.Test<PersonAgent, Person>()
+            TestSetUp.Default.SetUp();
+
+            Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
+        public void B110_Get_NotFound()
+        {
+            Agent<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(404.ToGuid()));
+        }
+
+        [Test, Parallelizable]
         public void B120_Get_FoundAndUpdate()
         {
-            var pr = AgentTester.Test<PersonAgent, Person>()
+            var pr = Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             pr.FirstName += "X";
 
-            var r = AgentTester.Test<PersonAgent, Person>()
-                .Run(a => a.UpdateAsync(pr, 1.ToGuid()));
+            var r = Agent<PersonAgent, Person>()
+                .Run(a => a.UpdateAsync(pr, 1.ToGuid())).Response;
 
             Assert.NotNull(r);
-            if (r.IsSuccess) // i.e. HttpStatusCode.OK
+            if (r.IsSuccessStatusCode) // i.e. HttpStatusCode.OK
                 return;
 
             if (r.StatusCode == HttpStatusCode.PreconditionFailed)
@@ -51,125 +56,125 @@ namespace Beef.Demo.Test
                 Assert.Fail($"Unexpected status code: {r.StatusCode}");
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void B130_CreateAndUpdateAndDelete()
         {
             var p = new Person
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                GenderSid = "M",
-                EyeColorSid = "BROWN",
+                Gender = "M",
+                EyeColor = "BROWN",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = Guid.NewGuid().ToString()
             };
 
             // Create a person.
-            p = AgentTester.Test<PersonAgent, Person>()
+            p = Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .Run(a => a.CreateAsync(p)).Value;
 
             // Update a person.
             p.LastName += "X";
-            p.GenderSid = "F";
+            p.Gender = "F";
 
-            p = AgentTester.Test<PersonAgent, Person>()
+            p = Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.UpdateAsync(p, p.Id)).Value;
 
             // Get the person (not-modified).
-            AgentTester.Test<PersonAgent, Person>()
+            Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run(a => a.GetAsync(p.Id, new WebApiRequestOptions { ETag = p.ETag }));
+                .Run(a => a.GetAsync(p.Id, new CoreEx.Http.HttpRequestOptions { ETag = p.ETag }));
 
             p.FirstName += "X";
 
             // Patch the person.
-            AgentTester.Test<PersonAgent, Person>()
+            Agent<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
-                    JToken.Parse($"{{ \"firstName\": \"{p.FirstName}\", \"address\": {{ \"street\": \"Simpsons Road\", \"city\": \"Bardon\" }} }}"),
-                    p.Id, new WebApiRequestOptions { ETag = p.ETag }));
+                .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch,
+                    $"{{ \"firstName\": \"{p.FirstName}\", \"address\": {{ \"street\": \"Simpsons Road\", \"city\": \"Bardon\" }} }}",
+                    p.Id, new CoreEx.Http.HttpRequestOptions { ETag = p.ETag }));
 
             // Delete a person.
-            AgentTester.Test<PersonAgent>()
+            Agent<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(p.Id));
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void B140_GetByArgs()
         {
             var args = new PersonArgs { LastName = "sm*" };
-            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = Agent<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(args));
 
             var etag = pcr.Response.Headers.ETag.Tag;
 
-            AgentTester.Test<PersonAgent, PersonCollectionResult>()
+            Agent<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run(a => a.GetByArgsAsync(args, requestOptions: new WebApiRequestOptions { ETag = etag }));
+                .Run(a => a.GetByArgsAsync(args, requestOptions: new CoreEx.Http.HttpRequestOptions { ETag = etag }));
         }
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void C110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void C120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void C130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void C140_GetByArgs() => B140_GetByArgs();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void D110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void D120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void D130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void D140_GetByArgs() => B140_GetByArgs();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void E110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void E120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void E130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void E140_GetByArgs() => B140_GetByArgs();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void F110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void F120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void F130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void F140_GetByArgs() => B140_GetByArgs();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void G110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void G120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void G130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, TestSetUp, Parallelizable]
+        [Test, Parallelizable]
         public void G140_GetByArgs() => B140_GetByArgs();
     }
 }

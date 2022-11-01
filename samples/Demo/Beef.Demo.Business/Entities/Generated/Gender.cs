@@ -56,9 +56,12 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(AlternateName, v => AlternateName = v);
-            yield return CreateProperty(TripCode, v => TripCode = v);
-            yield return CreateProperty(CountrySid, v => CountrySid = v);
+            foreach (var pv in base.GetPropertyValues())
+                yield return pv;
+
+            yield return CreateProperty(nameof(AlternateName), AlternateName, v => AlternateName = v);
+            yield return CreateProperty(nameof(TripCode), TripCode, v => TripCode = v);
+            yield return CreateProperty(nameof(CountrySid), CountrySid, v => CountrySid = v);
         }
 
         /// <summary>
@@ -80,10 +83,10 @@ namespace Beef.Demo.Business.Entities
         public GenderCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GenderCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="GenderCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public GenderCollection(IEnumerable<Gender> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public GenderCollection(IEnumerable<Gender> items) => AddRange(items);
     }
 }
 

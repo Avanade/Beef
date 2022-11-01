@@ -10,6 +10,7 @@
     <Folder Include="DataSvc\Generated\" />
     <Folder Include="Data\EfModel\Generated\" />
     <Folder Include="Data\Generated\" />
+    <Folder Include="Entities\Generated\" />
     <Folder Include="Generated\" />
   </ItemGroup>
 

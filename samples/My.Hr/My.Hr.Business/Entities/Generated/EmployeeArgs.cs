@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> search arguments entity.
     /// </summary>
-    public partial class EmployeeArgs : EntityBase<EmployeeArgs>
+    public partial class EmployeeArgs : EntityBase
     {
         private string? _firstName;
         private string? _lastName;
@@ -61,12 +61,12 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(GendersSids, v => GendersSids = v);
-            yield return CreateProperty(StartFrom, v => StartFrom = v);
-            yield return CreateProperty(StartTo, v => StartTo = v);
-            yield return CreateProperty(IsIncludeTerminated, v => IsIncludeTerminated = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
+            yield return CreateProperty(nameof(StartFrom), StartFrom, v => StartFrom = v);
+            yield return CreateProperty(nameof(StartTo), StartTo, v => StartTo = v);
+            yield return CreateProperty(nameof(IsIncludeTerminated), IsIncludeTerminated, v => IsIncludeTerminated = v);
         }
     }
 }

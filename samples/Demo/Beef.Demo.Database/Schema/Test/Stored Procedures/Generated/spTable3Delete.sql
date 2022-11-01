@@ -18,6 +18,9 @@ BEGIN
       WHERE [t].[PartA] = @PartA
         AND [t].[PartB] = @PartB
 
+   -- Select the row count.
+   SELECT @@ROWCOUNT
+
     -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY

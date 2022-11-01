@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Mapping arguments entity.
     /// </summary>
-    public partial class MapArgs : EntityBase<MapArgs>
+    public partial class MapArgs : EntityBase
     {
         private MapCoordinates? _coordinates;
 
@@ -22,7 +22,7 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Coordinates, v => Coordinates = v);
+            yield return CreateProperty(nameof(Coordinates), Coordinates, v => Coordinates = v);
         }
     }
 }

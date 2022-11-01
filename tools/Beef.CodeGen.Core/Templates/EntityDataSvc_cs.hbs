@@ -74,6 +74,9 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
                 return __val;
 
       {{/ifeq}}
+      {{#ifeq Type 'Delete'}}
+            _cache.Remove<{{Parent.Name}}>({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}});
+      {{/ifeq}}
     {{/if}}
             {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
     {{#if DataSvcExtensions}}
@@ -98,11 +101,9 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{/ifeq}}
     {{/ifeq}}
     {{#if SupportsCaching}}
-      {{#ifeq Type 'Delete'}}
-            _cache.Remove<{{Parent.Name}}>({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}});
-      {{else}}
+      {{#ifne Type 'Delete'}}
             return _cache.SetValue(__result);
-      {{/ifeq}}
+      {{/ifne}}
     {{else}}   
       {{#if HasReturnValue}}
             return __result;

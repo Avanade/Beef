@@ -21,6 +21,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier (not serialized/read-only for internal data merging).
         /// </summary>
+        [JsonIgnore]
         public Guid PersonId { get; set; }
 
         /// <summary>

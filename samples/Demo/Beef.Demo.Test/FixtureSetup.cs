@@ -1,10 +1,11 @@
 ﻿using Beef.Database.Core;
 using Beef.Demo.Api;
-using Beef.Demo.Common.Agents;
-using Beef.Demo.Common.Entities;
-using Beef.Test.NUnit;
+using Beef.Demo.Business;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Reflection;
+using UnitTestEx;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
@@ -14,13 +15,13 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var config = AgentTester.BuildConfiguration<Startup>("Beef");
-            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
-            TestSetUp.AddWebApiAgentArgsType<IDemoWebApiAgentArgs, DemoWebApiAgentArgs>();
-            TestSetUp.RegisterSetUp(async (count, data) =>
+            TestSetUp.Default.RegisterSetUp(async (count, _, __) =>
             {
+                using var test = ApiTester.Create<Startup>();
+                var settings = test.Services.GetRequiredService<DemoSettings>();
+
                 var args = new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"],
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, settings.DatabaseConnectionString,
                     typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly)
                 { UseBeefDbo = true }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
 

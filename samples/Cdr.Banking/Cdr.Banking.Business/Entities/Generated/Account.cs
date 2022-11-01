@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Account entity.
     /// </summary>
-    public partial class Account : EntityBase<Account>, IIdentifier<string>
+    public partial class Account : EntityBase, IIdentifier<string>
     {
         private string? _id;
         private DateTime _creationDate;
@@ -87,15 +87,15 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(CreationDate, v => CreationDate = v);
-            yield return CreateProperty(DisplayName, v => DisplayName = v);
-            yield return CreateProperty(Nickname, v => Nickname = v);
-            yield return CreateProperty(OpenStatusSid, v => OpenStatusSid = v);
-            yield return CreateProperty(IsOwned, v => IsOwned = v);
-            yield return CreateProperty(MaskedNumber, v => MaskedNumber = v);
-            yield return CreateProperty(ProductCategorySid, v => ProductCategorySid = v);
-            yield return CreateProperty(ProductName, v => ProductName = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(CreationDate), CreationDate, v => CreationDate = v);
+            yield return CreateProperty(nameof(DisplayName), DisplayName, v => DisplayName = v);
+            yield return CreateProperty(nameof(Nickname), Nickname, v => Nickname = v);
+            yield return CreateProperty(nameof(OpenStatusSid), OpenStatusSid, v => OpenStatusSid = v);
+            yield return CreateProperty(nameof(IsOwned), IsOwned, v => IsOwned = v);
+            yield return CreateProperty(nameof(MaskedNumber), MaskedNumber, v => MaskedNumber = v);
+            yield return CreateProperty(nameof(ProductCategorySid), ProductCategorySid, v => ProductCategorySid = v);
+            yield return CreateProperty(nameof(ProductName), ProductName, v => ProductName = v);
         }
     }
 
@@ -110,10 +110,10 @@ namespace Cdr.Banking.Business.Entities
         public AccountCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="AccountCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public AccountCollection(IEnumerable<Account> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public AccountCollection(IEnumerable<Account> items) => AddRange(items);
     }
 
     /// <summary>
@@ -133,11 +133,11 @@ namespace Cdr.Banking.Business.Entities
         public AccountCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="AccountCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public AccountCollectionResult(IEnumerable<Account> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public AccountCollectionResult(IEnumerable<Account> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

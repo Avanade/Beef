@@ -16,6 +16,9 @@ BEGIN
     DELETE [e] FROM [Hr].[Employee] AS [e]
       WHERE [e].[EmployeeId] = @EmployeeId
 
+   -- Select the row count.
+   SELECT @@ROWCOUNT
+
     -- Execute additional statements.
     DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId
     DELETE FROM [Hr].[PerformanceReview] WHERE [EmployeeId] = @EmployeeId

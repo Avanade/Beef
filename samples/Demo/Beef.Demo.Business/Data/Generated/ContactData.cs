@@ -30,29 +30,29 @@ namespace Beef.Demo.Business.Data
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public Task<ContactCollectionResult> GetAllAsync() => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<ContactCollectionResult> GetAllAsync()
         {
             return _ef.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
-        });
+        }
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public Task<Contact?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<Contact?> GetAsync(Guid id)
         {
             return _ef.GetAsync<Contact, EfModel.Contact>(id);
-        });
+        }
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Create");
             return __result;
         }, new InvokerArgs { EventPublisher = _events });
@@ -62,9 +62,9 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
             _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Update");
             return __result;
         }, new InvokerArgs { EventPublisher = _events });
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business.Data
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await _ef.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
             _events.PublishValueEvent(new Contact { Id = id }, new Uri($"/contact/{id}", UriKind.Relative), $"Demo.Contact", "Delete");
@@ -83,7 +83,7 @@ namespace Beef.Demo.Business.Data
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => DataInvoker.Current.InvokeAsync(this, _ => RaiseEventOnImplementationAsync(throwError));
+        public Task RaiseEventAsync(bool throwError) => RaiseEventOnImplementationAsync(throwError);
 
         /// <summary>
         /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> <i>AutoMapper</i> mapping.

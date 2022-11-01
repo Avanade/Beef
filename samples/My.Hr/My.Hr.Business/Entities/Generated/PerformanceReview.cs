@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    public partial class PerformanceReview : EntityBase<PerformanceReview>, IIdentifier<Guid>, IETag, IChangeLog
+    public partial class PerformanceReview : EntityBase, IIdentifier<Guid>, IETag, IChangeLog
     {
         private Guid _id;
         private Guid _employeeId;
@@ -46,7 +46,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
-        public string? OutcomeText => RefDataNamespace.PerformanceOutcome.GetRefDataText(_outcomeSid);
+        public string? OutcomeText => RefDataNamespace.PerformanceOutcome.GetRefDataText(_outcomeSid); 
 
         /// <summary>
         /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).
@@ -79,14 +79,14 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(EmployeeId, v => EmployeeId = v);
-            yield return CreateProperty(Date, v => Date = v);
-            yield return CreateProperty(OutcomeSid, v => OutcomeSid = v);
-            yield return CreateProperty(Reviewer, v => Reviewer = v);
-            yield return CreateProperty(Notes, v => Notes = v);
-            yield return CreateProperty(ETag, v => ETag = v);
-            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(EmployeeId), EmployeeId, v => EmployeeId = v);
+            yield return CreateProperty(nameof(Date), Date, v => Date = v);
+            yield return CreateProperty(nameof(OutcomeSid), OutcomeSid, v => OutcomeSid = v);
+            yield return CreateProperty(nameof(Reviewer), Reviewer, v => Reviewer = v);
+            yield return CreateProperty(nameof(Notes), Notes, v => Notes = v);
+            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
+            yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
         }
     }
 
@@ -101,10 +101,10 @@ namespace My.Hr.Business.Entities
         public PerformanceReviewCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceReviewCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PerformanceReviewCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PerformanceReviewCollection(IEnumerable<PerformanceReview> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PerformanceReviewCollection(IEnumerable<PerformanceReview> items) => AddRange(items);
     }
 
     /// <summary>
@@ -124,11 +124,11 @@ namespace My.Hr.Business.Entities
         public PerformanceReviewCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PerformanceReviewCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public PerformanceReviewCollectionResult(IEnumerable<PerformanceReview> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

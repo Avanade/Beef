@@ -66,8 +66,8 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public async Task DeleteAsync(Guid id)
         {
-            await _data.DeleteAsync(id).ConfigureAwait(false);
             _cache.Remove<Contact>(id);
+            await _data.DeleteAsync(id).ConfigureAwait(false);
         }
 
         /// <summary>

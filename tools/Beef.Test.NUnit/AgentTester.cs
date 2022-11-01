@@ -1,130 +1,28 @@
-﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
-
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Beef.Test.NUnit.Tests;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.IO;
-using System.Net.Http;
+using UnitTestEx.NUnit;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Provides the default testing capabilities for the <see cref="AgentTesterWaf{TStartup}"/>, <see cref="AgentTest{TStartup, TAgent}"/> and <see cref="AgentTest{TStartup, TAgent, TValue}"/>.
+    /// Provides existing <c>Test</c> methods to support backwards compatibility.
     /// </summary>
+    /// <remarks>It is <b>recommended</b> that usage is upgraded to the new <see cref="ApiTester.Create{TEntryPoint}"/> as this will eventually be deprecated.</remarks>
     public static class AgentTester
     {
-        private static Action<HttpRequestMessage>? _beforeRequest;
-
         /// <summary>
-        /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending.
+        /// Creates an <see cref="AgentTester{TEntryPoint}"/> to support agent-initiated API testing.
         /// </summary>
-        /// <param name="request">The <see cref="Action{HttpRequestMessage}"/>.</param>
-        public static void RegisterBeforeRequest(Action<HttpRequestMessage> request) => _beforeRequest = request;
-
-        /// <summary>
-        /// Gets or sets the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending.
-        /// </summary>
-        public static Action<HttpRequestMessage>? GetBeforeRequest() => _beforeRequest;
-
-        /// <summary>
-        /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration) where 'KeyVaultName' config key has value,
-        /// 2) User Secrets where 'UseUserSecrets' config key has value (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (see <paramref name="environmentVariablePrefix"/>),
-        /// 4) appsettings.{environment}.json, 5) appsettings.json, 6) webapisettings.{environment}.json (embedded resource within <typeparamref name="TStartup"/> assembly), and 7) webapisettings.json (embedded resource within <typeparamref name="TStartup"/> assembly).
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied). Defaults to <see cref="TestSetUp.DefaultEnvironmentVariablePrefix"/></param>
-        /// <param name="environment">The environment to be used by the underlying web host. Defaults to <see cref="TestSetUp.DefaultEnvironment"/>.</param>
-        /// <returns>The <see cref="IConfiguration"/>.</returns>
-        public static IConfiguration BuildConfiguration<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment) where TStartup : class
+        /// <typeparam name="TEntryPoint">The API startup <see cref="Type"/>.</typeparam>
+        /// <returns>The <see cref="AgentTester{TEntryPoint}"/>.</returns>
+        /// <remarks>It is <b>recommended</b> that usage is upgraded to the new <see cref="ApiTester.Create{TEntryPoint}"/> as this will eventually be deprecated.</remarks>
+        public static AgentTester<TEntryPoint> CreateWaf<TEntryPoint>(Action<IServiceCollection>? configureServices) where TEntryPoint : class
         {
-            var cb = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
-                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{environment}.json", true, false)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{environment}.json", true, true);
+            var tester = ApiTester.Create<TEntryPoint>();
+            if (configureServices != null)
+                tester.ConfigureServices(configureServices);
 
-            var evp = string.IsNullOrEmpty(environmentVariablePrefix) ? TestSetUp.DefaultEnvironmentVariablePrefix : environmentVariablePrefix;
-            if (string.IsNullOrEmpty(evp))
-                cb.AddEnvironmentVariables();
-            else
-                cb.AddEnvironmentVariables(evp.EndsWith("_", StringComparison.InvariantCulture) ? evp : evp + "_");
-
-            var args = Environment.GetCommandLineArgs();
-            cb.AddCommandLine(args);
-
-            var config = cb.Build();
-            if (config.GetValue<bool>("UseUserSecrets"))
-                cb.AddUserSecrets<TStartup>();
-
-            var kvn = config["KeyVaultName"];
-            if (!string.IsNullOrEmpty(kvn))
-            {
-                var secretClient = new SecretClient(new Uri($"https://{kvn}.vault.azure.net/"), new DefaultAzureCredential());
-                cb.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
-            }
-
-            cb.AddCommandLine(args);
-
-            return cb.Build();
+            return new AgentTester<TEntryPoint>(tester);
         }
-
-        /// <summary>
-        /// Creates an <see cref="AgentTesterServer{TStartup}"/> to manage the orchestration of the <see cref="TestServer"/> to execute one or more integration tests against.
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
-        /// <param name="environment">The environment to be used by the underlying web host.</param>
-        /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
-        /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
-        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        /// <returns>An <see cref="AgentTesterServer{TStartup}"/> instance.</returns>
-        public static AgentTesterServer<TStartup> CreateServer<TStartup>(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
-            where TStartup : class => new AgentTesterServer<TStartup>(environmentVariablePrefix, environment, config, services, configureLocalRefData, includeLoggingScopesInOutput);
-
-        /// <summary>
-        /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="configuration">The <see cref="Action{IWebHostBuilder}"/>.</param>
-        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class 
-            => new AgentTesterWaf<TStartup>(configuration, null, null, configureLocalRefData, includeLoggingScopesInOutput);
-
-        /// <summary>
-        /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against enabling specific
-        /// <b>API</b> <paramref name="services"/> to be configured/replaced (dependency injection).
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
-        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IServiceCollection>? services, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class 
-            => new AgentTesterWaf<TStartup>(null, null, services, configureLocalRefData, includeLoggingScopesInOutput);
-
-        /// <summary>
-        /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
-        /// <param name="environment">The environment to be used by the underlying web host.</param>
-        /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
-        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
-            where TStartup : class => new AgentTesterWaf<TStartup>(environmentVariablePrefix, environment, services, configureLocalRefData, includeLoggingScopesInOutput);
     }
 }

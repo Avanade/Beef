@@ -12,7 +12,6 @@ namespace My.Hr.Business.Entities
     /// </summary>
     public partial class USState : ReferenceDataBase<Guid, USState>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="USState"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace My.Hr.Business.Entities
         public USStateCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="USStateCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="USStateCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public USStateCollection(IEnumerable<USState> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public USStateCollection(IEnumerable<USState> items) => AddRange(items);
     }
 }
 

@@ -5,6 +5,8 @@
 #nullable enable
 #pragma warning disable
 
+using CommonRefDataNamespace = Beef.Demo.Common.Entities;
+
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
@@ -31,7 +33,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/countries")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Country>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Country>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> CountryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Country>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -44,7 +46,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/usStates")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -57,7 +59,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/genders")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -70,7 +72,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/eyeColors")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> EyeColorGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.EyeColor>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -83,7 +85,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/powerSources")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PowerSourceGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PowerSource>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -96,7 +98,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/companies")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Company>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Company>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> CompanyGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Company>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -109,7 +111,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/statuses")]
-        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Status>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Status>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> StatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Status>(codes, text, p.RequestOptions.IncludeInactive));
 
@@ -120,7 +122,7 @@ namespace Beef.Demo.Api.Controllers
         [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref")]
-        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.Models.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

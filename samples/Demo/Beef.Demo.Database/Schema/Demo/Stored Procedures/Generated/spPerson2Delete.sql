@@ -27,6 +27,9 @@ BEGIN
       WHERE [p].[PersonId] = @PersonId
         AND ([p].[IsDeleted] IS NULL OR [p].[IsDeleted] = 0)
 
+   -- Select the row count.
+   SELECT @@ROWCOUNT
+
     -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY

@@ -4,9 +4,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="DataSvc\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="CoreEx" Version="1.0.10" />
     <PackageReference Include="CoreEx.AutoMapper" Version="1.0.10" />
     <PackageReference Include="CoreEx.Database" Version="1.0.10" />

@@ -16,6 +16,9 @@ BEGIN
     DELETE [p] FROM [Demo].[Person] AS [p]
       WHERE [p].[PersonId] = @PersonId
 
+   -- Select the row count.
+   SELECT @@ROWCOUNT
+
     -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY

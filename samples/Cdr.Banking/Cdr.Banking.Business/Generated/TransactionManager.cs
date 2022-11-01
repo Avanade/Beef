@@ -33,13 +33,13 @@ namespace Cdr.Banking.Business
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(accountId, args);
-            (await MultiValidator.Create()
+            await MultiValidator.Create()
                 .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
                 .Add(args.Validate(nameof(args)).Entity().With<IValidatorEx<TransactionArgs>>())
-                .ValidateAsync().ConfigureAwait(false)).ThrowOnError();
+                .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
-        }, BusinessInvokerArgs.Read);
+        }, InvokerArgs.Read);
     }
 }
 

@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Employee entity.
     /// </summary>
-    public partial class Employee : EmployeeBase, IETag, IChangeLog, IEquatable<Employee>
+    public partial class Employee : EmployeeBase, IETag, IChangeLog
     {
         private Address? _address;
         private EmergencyContactCollection? _emergencyContacts;
@@ -44,36 +44,11 @@ namespace My.Hr.Business.Entities
             foreach (var pv in base.GetPropertyValues())
                 yield return pv;
 
-            yield return CreateProperty(Address, v => Address = v);
-            yield return CreateProperty(EmergencyContacts, v => EmergencyContacts = v);
-            yield return CreateProperty(ETag, v => ETag = v);
-            yield return CreateProperty(ChangeLog, v => ChangeLog = v);
+            yield return CreateProperty(nameof(Address), Address, v => Address = v);
+            yield return CreateProperty(nameof(EmergencyContacts), EmergencyContacts, v => EmergencyContacts = v);
+            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
+            yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
         }
-
-        /// <inheritdoc/>
-        public bool Equals(Employee? other) => base.Equals(other);
-
-        /// <summary>
-        /// Compares two values for equality.
-        /// </summary>
-        /// <param name="a"><see cref="Employee"/> A.</param>
-        /// <param name="b"><see cref="Employee"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator ==(Employee? a, Employee? b) => Equals(a, b);
-    
-        /// <summary>
-        /// Compares two values for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="Employee"/> A.</param>
-        /// <param name="b"><see cref="Employee"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator !=(Employee? a, Employee? b) => !Equals(a, b);
- 
-        /// <inheritdoc/>
-        public override int GetHashCode() => base.GetHashCode();
-
-        /// <inheritdoc/>
-        public override object Clone() => CreateClone<Employee>(this);
     }
 }
 

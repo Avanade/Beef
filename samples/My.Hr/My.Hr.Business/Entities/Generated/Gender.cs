@@ -12,7 +12,6 @@ namespace My.Hr.Business.Entities
     /// </summary>
     public partial class Gender : ReferenceDataBase<Guid, Gender>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Gender"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace My.Hr.Business.Entities
         public GenderCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GenderCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="GenderCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public GenderCollection(IEnumerable<Gender> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public GenderCollection(IEnumerable<Gender> items) => AddRange(items);
     }
 }
 

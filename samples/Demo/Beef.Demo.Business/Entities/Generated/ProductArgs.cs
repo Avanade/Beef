@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the <see cref="Product"/> arguments entity.
     /// </summary>
-    public partial class ProductArgs : EntityBase<ProductArgs>
+    public partial class ProductArgs : EntityBase
     {
         private string? _name;
         private string? _description;
@@ -28,8 +28,8 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Name, v => Name = v);
-            yield return CreateProperty(Description, v => Description = v);
+            yield return CreateProperty(nameof(Name), Name, v => Name = v);
+            yield return CreateProperty(nameof(Description), Description, v => Description = v);
         }
     }
 }

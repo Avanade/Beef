@@ -2,10 +2,12 @@
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using CoreEx;
 using NUnit.Framework;
+using System;
 using System.Net;
+using UnitTestEx;
+using UnitTestEx.Expectations;
 
 namespace Beef.Demo.Test
 {

@@ -10,13 +10,14 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Postal Info entity.
     /// </summary>
-    public partial class PostalInfo : EntityBase<PostalInfo>
+    public partial class PostalInfo : EntityBase, IETag
     {
         private string? _countrySid;
         private string? _countryText;
         private string? _city;
         private string? _state;
         private PlaceInfoCollection? _places;
+        private string? _etag;
 
         /// <summary>
         /// Gets or sets the <see cref="Country"/> using the underlying Serialization Identifier (SID).
@@ -27,7 +28,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Country"/> text (read-only where selected).
         /// </summary>
-        public string? CountryText => RefDataNamespace.Country.GetRefDataText(_countrySid);
+        public string? CountryText => RefDataNamespace.Country.GetRefDataText(_countrySid); 
 
         /// <summary>
         /// Gets or sets the Country (see <see cref="RefDataNamespace.Country"/>).
@@ -51,13 +52,20 @@ namespace Beef.Demo.Business.Entities
         /// </summary>
         public PlaceInfoCollection? Places { get => _places; set => SetValue(ref _places, value); }
 
+        /// <summary>
+        /// Gets or sets the ETag.
+        /// </summary>
+        [JsonIgnore]
+        public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
+
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(CountrySid, v => CountrySid = v);
-            yield return CreateProperty(City, v => City = v);
-            yield return CreateProperty(State, v => State = v);
-            yield return CreateProperty(Places, v => Places = v);
+            yield return CreateProperty(nameof(CountrySid), CountrySid, v => CountrySid = v);
+            yield return CreateProperty(nameof(City), City, v => City = v);
+            yield return CreateProperty(nameof(State), State, v => State = v);
+            yield return CreateProperty(nameof(Places), Places, v => Places = v);
+            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
         }
     }
 }

@@ -73,6 +73,9 @@ BEGIN
       {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
   {{/each}}
 {{/ifval}}
+
+   -- Select the row count.
+   SELECT @@ROWCOUNT
 {{#each ExecuteAfter}}
   {{#if @first}}
 

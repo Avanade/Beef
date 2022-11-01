@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -214,7 +215,7 @@ properties: [
         /// </summary>
         [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
-            Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration.")]
+            Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration and JSON serialization.")]
         public bool? InternalOnly { get; set; }
 
         #endregion
@@ -289,17 +290,25 @@ properties: [
         public bool? SerializationEmitDefault { get; set; }
 
         /// <summary>
-        /// Gets or sets the override JSON property name where outputting as a data model.
+        /// Indicates whether the property is not to be serialized.
         /// </summary>
-        [JsonProperty("dataModelJsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Serialization", Title = "The override JSON property name where outputting as a data model.",
-            Description = "Defaults to `JsonName` where not specified.")]
-        public string? DataModelJsonName { get; set; }
+        [JsonProperty("dataModelIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Serialization", Title = "Indicates whether the property is to be included within the data model.",
+            Description = "All properties are included in the data model by default.")]
+        public bool? DataModelIgnore { get; set; }
+
+        /// <summary>
+        /// Indicates whether the property is not to be serialized where outputting as a data model.
+        /// </summary>
+        [JsonProperty("dataModelSerializationIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Serialization", Title = "Indicates whether the property is not to be serialized where outputting as a data model.",
+            Description = "All properties are included in the data model by default.")]
+        public bool? DataModelSerializationIgnore { get; set; }
 
         #endregion
 
         #region Data
-    
+
         /// <summary>
         /// Gets or sets the data name where `Entity.AutoImplement` is selected.
         /// </summary>
@@ -523,6 +532,11 @@ properties: [
         }
 
         /// <summary>
+        /// Gets the computed declared private type for a model.
+        /// </summary>
+        public string ModelType => Root!.IsDataModel && Name == "ChangeLog" && Type == "ChangeLog" ? "CoreEx.Entities.Models.ChangeLog" : PrivateType;
+
+        /// <summary>
         /// Gets or sets the declared type including nullability.
         /// </summary>
         public string? DeclaredType { get; set; }
@@ -652,11 +666,13 @@ properties: [
             JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : null);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
-            DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
             IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => RefDataMapping.HasValue && RefDataMapping.Value == true);
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
+
+            if (CompareValue(InternalOnly, true))
+                SerializationIgnore = true;
 
             DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
             var rdc = ReformatDataConverter(DataConverter, Type, RefDataType, RefDataGetValueType);

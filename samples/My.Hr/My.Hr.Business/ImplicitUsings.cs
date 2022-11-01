@@ -1,5 +1,4 @@
 ﻿global using CoreEx;
-global using CoreEx.Business;
 global using CoreEx.Caching;
 global using CoreEx.Configuration;
 global using CoreEx.Database;
@@ -11,6 +10,7 @@ global using CoreEx.Entities.Extended;
 global using CoreEx.EntityFrameworkCore;
 global using CoreEx.Events;
 global using CoreEx.Http;
+global using CoreEx.Invokers;
 global using CoreEx.Json;
 global using CoreEx.Mapping;
 global using CoreEx.Mapping.Converters;

@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Transaction entity.
     /// </summary>
-    public partial class Transaction : EntityBase<Transaction>, IIdentifier<string>
+    public partial class Transaction : EntityBase, IIdentifier<string>
     {
         private string? _id;
         private string? _accountId;
@@ -129,22 +129,22 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(AccountId, v => AccountId = v);
-            yield return CreateProperty(IsDetailAvailable, v => IsDetailAvailable = v);
-            yield return CreateProperty(TypeSid, v => TypeSid = v);
-            yield return CreateProperty(StatusSid, v => StatusSid = v);
-            yield return CreateProperty(Description, v => Description = v);
-            yield return CreateProperty(PostingDateTime, v => PostingDateTime = v);
-            yield return CreateProperty(ExecutionDateTime, v => ExecutionDateTime = v);
-            yield return CreateProperty(Amount, v => Amount = v);
-            yield return CreateProperty(Currency, v => Currency = v);
-            yield return CreateProperty(Reference, v => Reference = v);
-            yield return CreateProperty(MerchantName, v => MerchantName = v);
-            yield return CreateProperty(MerchantCategoryCode, v => MerchantCategoryCode = v);
-            yield return CreateProperty(BillerCode, v => BillerCode = v);
-            yield return CreateProperty(BillerName, v => BillerName = v);
-            yield return CreateProperty(ApcaNumber, v => ApcaNumber = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(AccountId), AccountId, v => AccountId = v);
+            yield return CreateProperty(nameof(IsDetailAvailable), IsDetailAvailable, v => IsDetailAvailable = v);
+            yield return CreateProperty(nameof(TypeSid), TypeSid, v => TypeSid = v);
+            yield return CreateProperty(nameof(StatusSid), StatusSid, v => StatusSid = v);
+            yield return CreateProperty(nameof(Description), Description, v => Description = v);
+            yield return CreateProperty(nameof(PostingDateTime), PostingDateTime, v => PostingDateTime = v);
+            yield return CreateProperty(nameof(ExecutionDateTime), ExecutionDateTime, v => ExecutionDateTime = v);
+            yield return CreateProperty(nameof(Amount), Amount, v => Amount = v);
+            yield return CreateProperty(nameof(Currency), Currency, v => Currency = v);
+            yield return CreateProperty(nameof(Reference), Reference, v => Reference = v);
+            yield return CreateProperty(nameof(MerchantName), MerchantName, v => MerchantName = v);
+            yield return CreateProperty(nameof(MerchantCategoryCode), MerchantCategoryCode, v => MerchantCategoryCode = v);
+            yield return CreateProperty(nameof(BillerCode), BillerCode, v => BillerCode = v);
+            yield return CreateProperty(nameof(BillerName), BillerName, v => BillerName = v);
+            yield return CreateProperty(nameof(ApcaNumber), ApcaNumber, v => ApcaNumber = v);
         }
     }
 
@@ -159,10 +159,10 @@ namespace Cdr.Banking.Business.Entities
         public TransactionCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="TransactionCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public TransactionCollection(IEnumerable<Transaction> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public TransactionCollection(IEnumerable<Transaction> items) => AddRange(items);
     }
 
     /// <summary>
@@ -182,11 +182,11 @@ namespace Cdr.Banking.Business.Entities
         public TransactionCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public TransactionCollectionResult(IEnumerable<Transaction> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public TransactionCollectionResult(IEnumerable<Transaction> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

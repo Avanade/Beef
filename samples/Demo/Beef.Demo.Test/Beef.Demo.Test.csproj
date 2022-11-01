@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
@@ -16,6 +16,17 @@
     <EmbeddedResource Include="Schema\**\*" />
     <EmbeddedResource Include="Scripts\**\*" />
     <EmbeddedResource Include="Data\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ContactTest.cs" />
+    <Compile Remove="DeadLockRetryTest.cs" />
+    <Compile Remove="EntityTest.cs" />
+    <Compile Remove="EventOutboxTest.cs" />
+    <Compile Remove="ProductTest.cs" />
+    <Compile Remove="RobotGrpcTest.cs" />
+    <Compile Remove="SubscribersTest.cs" />
+    <Compile Remove="TripPersonTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,11 +54,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.1.0">
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.27" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,13 +67,6 @@
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
-    <ProjectReference Include="..\Beef.Demo.Functions\Beef.Demo.Functions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

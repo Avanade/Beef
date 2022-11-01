@@ -12,7 +12,6 @@ namespace Cdr.Banking.Business.Entities
     /// </summary>
     public partial class AccountUType : ReferenceDataBase<Guid, AccountUType>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="AccountUType"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace Cdr.Banking.Business.Entities
         public AccountUTypeCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountUTypeCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="AccountUTypeCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public AccountUTypeCollection(IEnumerable<AccountUType> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public AccountUTypeCollection(IEnumerable<AccountUType> items) => AddRange(items);
     }
 }
 

@@ -14,26 +14,26 @@ namespace Beef.Demo.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
-        private readonly ICosmos _cosmos;
+        private readonly DemoCosmosDb _cosmos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
-        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmos cosmos)
+        /// <param name="cosmos">The <see cref="DemoCosmosDb"/>.</param>
+        public ReferenceDataData(IDatabase db, IEfDb ef, DemoCosmosDb cosmos)
             { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ReferenceDataDataCtor(); }
 
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.CountryCollection> CountryGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadAsync("CountryId"), BusinessInvokerArgs.TransactionSuppress);
+            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadAsync("CountryId"), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadAsync("USStateId"), BusinessInvokerArgs.TransactionSuppress);
+            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadAsync("USStateId"), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
@@ -45,11 +45,11 @@ namespace Beef.Demo.Business.Data
                     item.TripCode = dr.GetValue<string>("TripCode");
                     item.Country = ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ToSource.Convert(dr.GetValue<Guid?>("CountryId"));
                 });
-            }, BusinessInvokerArgs.TransactionSuppress);
+            }, InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryAsync<RefDataNamespace.EyeColorCollection>(), BusinessInvokerArgs.TransactionSuppress);
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryAsync<RefDataNamespace.EyeColorCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
@@ -61,7 +61,7 @@ namespace Beef.Demo.Business.Data
 
         /// <inheritdoc/>
         public Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryAsync<RefDataNamespace.StatusCollection>(), BusinessInvokerArgs.TransactionSuppress);
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> <i>AutoMapper</i> mapping.

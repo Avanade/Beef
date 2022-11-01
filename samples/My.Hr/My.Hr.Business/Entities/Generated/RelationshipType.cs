@@ -12,7 +12,6 @@ namespace My.Hr.Business.Entities
     /// </summary>
     public partial class RelationshipType : ReferenceDataBase<Guid, RelationshipType>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="RelationshipType"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace My.Hr.Business.Entities
         public RelationshipTypeCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationshipTypeCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="RelationshipTypeCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public RelationshipTypeCollection(IEnumerable<RelationshipType> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public RelationshipTypeCollection(IEnumerable<RelationshipType> items) => AddRange(items);
     }
 }
 

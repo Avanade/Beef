@@ -45,6 +45,9 @@ BEGIN
         AND [t].[TenantId] = @TenantId
         AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
 
+   -- Select the row count.
+   SELECT @@ROWCOUNT
+
     -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY

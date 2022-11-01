@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the <see cref="Employee"/> base entity.
     /// </summary>
-    public partial class EmployeeBase : EntityBase<EmployeeBase>, IIdentifier<Guid>
+    public partial class EmployeeBase : EntityBase, IIdentifier<Guid>
     {
         private Guid _id;
         private string? _email;
@@ -52,7 +52,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid);
+        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid); 
 
         /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
@@ -84,15 +84,15 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Id, v => Id = v);
-            yield return CreateProperty(Email, v => Email = v);
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(GenderSid, v => GenderSid = v);
-            yield return CreateProperty(Birthday, v => Birthday = v);
-            yield return CreateProperty(StartDate, v => StartDate = v);
-            yield return CreateProperty(Termination, v => Termination = v);
-            yield return CreateProperty(PhoneNo, v => PhoneNo = v);
+            yield return CreateProperty(nameof(Id), Id, v => Id = v);
+            yield return CreateProperty(nameof(Email), Email, v => Email = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(GenderSid), GenderSid, v => GenderSid = v);
+            yield return CreateProperty(nameof(Birthday), Birthday, v => Birthday = v);
+            yield return CreateProperty(nameof(StartDate), StartDate, v => StartDate = v);
+            yield return CreateProperty(nameof(Termination), Termination, v => Termination = v);
+            yield return CreateProperty(nameof(PhoneNo), PhoneNo, v => PhoneNo = v);
         }
     }
 
@@ -107,10 +107,10 @@ namespace My.Hr.Business.Entities
         public EmployeeBaseCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmployeeBaseCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="EmployeeBaseCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public EmployeeBaseCollection(IEnumerable<EmployeeBase> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public EmployeeBaseCollection(IEnumerable<EmployeeBase> items) => AddRange(items);
     }
 
     /// <summary>
@@ -130,11 +130,11 @@ namespace My.Hr.Business.Entities
         public EmployeeBaseCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmployeeBaseCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="EmployeeBaseCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public EmployeeBaseCollectionResult(IEnumerable<EmployeeBase> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public EmployeeBaseCollectionResult(IEnumerable<EmployeeBase> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

@@ -12,7 +12,6 @@ namespace My.Hr.Business.Entities
     /// </summary>
     public partial class PerformanceOutcome : ReferenceDataBase<Guid, PerformanceOutcome>
     {
-
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="PerformanceOutcome"/>.
         /// </summary>
@@ -32,10 +31,10 @@ namespace My.Hr.Business.Entities
         public PerformanceOutcomeCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PerformanceOutcomeCollection(IEnumerable<PerformanceOutcome> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PerformanceOutcomeCollection(IEnumerable<PerformanceOutcome> items) => AddRange(items);
     }
 }
 

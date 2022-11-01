@@ -33,7 +33,7 @@
             services.AddSettings<HrSettings>()
                     .AddExecutionContext()
                     .AddJsonSerializer()
-                    .AddReferenceDataOrchestrator(sp => new ReferenceDataOrchestrator(sp, new MemoryCache(new MemoryCacheOptions())).Register<IReferenceDataProvider>())
+                    .AddReferenceDataOrchestrator<IReferenceDataProvider>()
                     //.AddBeefTextProviderAsSingleton()
                     //.AddBeefSystemTime()
                     //.AddBeefRequestCache()

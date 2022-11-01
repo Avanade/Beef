@@ -31,10 +31,10 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<PerformanceReview?> GetAsync(Guid id)
         {
-            return _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id));
-        });
+            return _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(id);
+        }
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -42,44 +42,44 @@ namespace My.Hr.Business.Data
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, _ =>
+        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
         {
             return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
-        });
+        }
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.CreateValueEventAndPublish(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
             return __result;
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ =>
+        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(CompositeKey.Create(id)).ConfigureAwait(false);
-            _events.CreateValueEventAndPublish(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted");
-        }, new BusinessInvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+            await _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(id).ConfigureAwait(false);
+            _events.PublishValueEvent(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted");
+        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> <i>AutoMapper</i> mapping.

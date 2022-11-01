@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the <see cref="Account"/> arguments entity.
     /// </summary>
-    public partial class TransactionArgs : EntityBase<TransactionArgs>
+    public partial class TransactionArgs : EntityBase
     {
         private DateTime? _fromDate;
         private DateTime? _toDate;
@@ -53,11 +53,11 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(FromDate, v => FromDate = v);
-            yield return CreateProperty(ToDate, v => ToDate = v);
-            yield return CreateProperty(MinAmount, v => MinAmount = v);
-            yield return CreateProperty(MaxAmount, v => MaxAmount = v);
-            yield return CreateProperty(Text, v => Text = v);
+            yield return CreateProperty(nameof(FromDate), FromDate, v => FromDate = v);
+            yield return CreateProperty(nameof(ToDate), ToDate, v => ToDate = v);
+            yield return CreateProperty(nameof(MinAmount), MinAmount, v => MinAmount = v);
+            yield return CreateProperty(nameof(MaxAmount), MaxAmount, v => MaxAmount = v);
+            yield return CreateProperty(nameof(Text), Text, v => Text = v);
         }
     }
 }

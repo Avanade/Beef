@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Balance Purse entity.
     /// </summary>
-    public partial class BalancePurse : EntityBase<BalancePurse>
+    public partial class BalancePurse : EntityBase
     {
         private decimal _amount;
         private string? _currency;
@@ -28,8 +28,8 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Amount, v => Amount = v);
-            yield return CreateProperty(Currency, v => Currency = v);
+            yield return CreateProperty(nameof(Amount), Amount, v => Amount = v);
+            yield return CreateProperty(nameof(Currency), Currency, v => Currency = v);
         }
     }
 
@@ -44,10 +44,10 @@ namespace Cdr.Banking.Business.Entities
         public BalancePurseCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BalancePurseCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="BalancePurseCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public BalancePurseCollection(IEnumerable<BalancePurse> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public BalancePurseCollection(IEnumerable<BalancePurse> items) => AddRange(items);
     }
 }
 

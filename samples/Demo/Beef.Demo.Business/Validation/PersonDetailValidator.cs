@@ -16,7 +16,7 @@
         public PersonDetailValidator(IValidatorEx<Person> personValidator)
         {
             IncludeBase(personValidator);
-            Property(x => x.History).Collection(item: CollectionRuleItem.Create(_workHistoryValidator).DuplicateCheck());
+            Property(x => x.History).Collection(item: CollectionRuleItem.Create(_workHistoryValidator).DuplicateCheck(nameof(WorkHistory.Name)));
         }
     }
 }

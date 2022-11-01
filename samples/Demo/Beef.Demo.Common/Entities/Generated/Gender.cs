@@ -27,6 +27,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the Trip OData Code.
         /// </summary>
+        [JsonIgnore]
         public string? TripCode { get; set; }
 
         /// <summary>

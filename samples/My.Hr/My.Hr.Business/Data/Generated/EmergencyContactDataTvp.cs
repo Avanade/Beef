@@ -5,12 +5,7 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
 using System.Data;
-using CoreEx.Database;
-using CoreEx.Database.SqlServer;
-using My.Hr.Business.Entities;
 
 namespace My.Hr.Business.Data
 {
@@ -24,7 +19,7 @@ namespace My.Hr.Business.Data
             /// <param name="database">The <see cref="IDatabase"/>.</param>
             /// <param name="list">The entity list.</param>
             /// <returns>The Table-Valued Parameter.</returns>
-            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<EmergencyContact> list)
+            public TableValuedParameter CreateTableValuedParameter(IDatabase database, IEnumerable<EmergencyContact>? list)
             {        
                 var dt = new DataTable();
                 dt.Columns.Add("EmergencyContactId", typeof(Guid));

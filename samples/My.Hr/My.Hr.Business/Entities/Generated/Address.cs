@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Address entity.
     /// </summary>
-    public partial class Address : EntityBase<Address>
+    public partial class Address : EntityBase
     {
         private string? _street1;
         private string? _street2;
@@ -43,7 +43,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="State"/> text (read-only where selected).
         /// </summary>
-        public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid);
+        public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid); 
 
         /// <summary>
         /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
@@ -60,11 +60,11 @@ namespace My.Hr.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Street1, v => Street1 = v);
-            yield return CreateProperty(Street2, v => Street2 = v);
-            yield return CreateProperty(City, v => City = v);
-            yield return CreateProperty(StateSid, v => StateSid = v);
-            yield return CreateProperty(PostCode, v => PostCode = v);
+            yield return CreateProperty(nameof(Street1), Street1, v => Street1 = v);
+            yield return CreateProperty(nameof(Street2), Street2, v => Street2 = v);
+            yield return CreateProperty(nameof(City), City, v => City = v);
+            yield return CreateProperty(nameof(StateSid), StateSid, v => StateSid = v);
+            yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
         }
     }
 }

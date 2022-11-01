@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Place Info entity.
     /// </summary>
-    public partial class PlaceInfo : EntityBase<PlaceInfo>
+    public partial class PlaceInfo : EntityBase
     {
         private string? _name;
         private string? _postCode;
@@ -28,8 +28,8 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(Name, v => Name = v);
-            yield return CreateProperty(PostCode, v => PostCode = v);
+            yield return CreateProperty(nameof(Name), Name, v => Name = v);
+            yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
         }
     }
 
@@ -44,10 +44,10 @@ namespace Beef.Demo.Business.Entities
         public PlaceInfoCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PlaceInfoCollection(IEnumerable<PlaceInfo> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PlaceInfoCollection(IEnumerable<PlaceInfo> items) => AddRange(items);
     }
 }
 

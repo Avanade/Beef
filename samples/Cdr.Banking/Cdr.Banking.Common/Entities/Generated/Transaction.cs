@@ -122,11 +122,11 @@ namespace Cdr.Banking.Common.Entities
         public TransactionCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public TransactionCollectionResult(IEnumerable<Transaction> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public TransactionCollectionResult(IEnumerable<Transaction> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 

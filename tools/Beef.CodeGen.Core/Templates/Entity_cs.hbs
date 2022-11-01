@@ -75,7 +75,11 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
     /// <summary>
     /// Represents the {{{Text}}} entity.
     /// </summary>
+{{#ifeq Root.RuntimeEntityScope 'Business'}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
+{{else}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval CommonImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{CommonImplements}}}{{/ifval}}
+{{/ifeq}}
     {
 {{! ===== Constants ===== }}
 {{#each Consts}}
@@ -107,13 +111,13 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
-        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}")]
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{else}}
-        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{ArgumentName}}")]
         {{else}}
         [JsonPropertyName("{{ArgumentName}}")]
@@ -136,13 +140,13 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// {{{SummaryRefDataText}}}
         /// </summary>
         {{#ifval JsonName}}
-          {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+          {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}Text")]
           {{else}}
         [JsonPropertyName("{{JsonName}}Text")]
           {{/ifeq}}
         {{/ifval}}
-        public string? {{Name}}Text => {{{Type}}}.GetRefDataText({{PropertyPrivateName}});
+        public string? {{Name}}Text => {{{Type}}}.GetRefDataText({{PropertyPrivateName}}); 
         {{/if}}
       {{/unless}}
     {{/unless}}
@@ -186,7 +190,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
-        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}")]
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
@@ -237,6 +241,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <summary>
         /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
+        [JsonIgnore]
         public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
     {{/ifne}}
   {{/unless}}
@@ -257,13 +262,24 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         /// <summary>
         /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
+        [JsonIgnore]
         public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
   {{/ifne}}
 {{/unless}}
 {{! ===== GetPropertyValues ===== }}
 {{#unless OmitEntityBase}}
   {{#ifne CoreProperties.Count 0}}
+    {{#ifval RefDataType}}
+      {{#ifne CoreProperties.Count 0}}
 
+      {{else}}
+        {{#ifne Consts.Count 0}}
+
+        {{/ifne}}
+      {{/ifne}}
+    {{else}}
+
+    {{/ifval}}
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
@@ -273,7 +289,7 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
 
     {{/if}}
     {{#each CoreProperties}}
-            yield return CreateProperty({{PropertyName}}, v => {{PropertyName}} = v);
+            yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v);
     {{/each}}
         }
   {{/ifne}}
@@ -281,7 +297,13 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
 {{! ===== Operator ===== }}
 {{#ifval RefDataType}}
   {{#unless Abstract}}
+      {{#ifne CoreProperties.Count 0}}
 
+      {{else}}
+        {{#ifne Consts.Count 0}}
+
+        {{/ifne}}
+      {{/ifne}}
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a {{{EntityNameSeeComments}}}.
         /// </summary>
@@ -290,34 +312,6 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
   {{/unless}}
 {{/ifval}}
-{{! ===== ExtendedInherits ===== }}
-{{#if ExtendedInherits}}
-
-        /// <inheritdoc/>
-        public bool Equals({{Name}}? other) => base.Equals(other);
-
-        /// <summary>
-        /// Compares two values for equality.
-        /// </summary>
-        /// <param name="a"><see cref="{{Name}}"/> A.</param>
-        /// <param name="b"><see cref="{{Name}}"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator ==({{Name}}? a, {{Name}}? b) => Equals(a, b);
-    
-        /// <summary>
-        /// Compares two values for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="{{Name}}"/> A.</param>
-        /// <param name="b"><see cref="{{Name}}"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator !=({{Name}}? a, {{Name}}? b) => !Equals(a, b);
- 
-        /// <inheritdoc/>
-        public override int GetHashCode() => base.GetHashCode();
-
-        /// <inheritdoc/>
-        public override object Clone() => CreateClone<{{Name}}>(this);
-{{/if}}
     }
 {{! ===== Collection ===== }}
 {{#if Collection}}
@@ -333,10 +327,10 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
 
         /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> collection){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
     }
 {{/if}}
 {{! ===== CollectionResult ===== }}
@@ -359,11 +353,11 @@ namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{el
         public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 {{/if}}
 }

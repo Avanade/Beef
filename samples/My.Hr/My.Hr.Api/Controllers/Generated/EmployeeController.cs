@@ -43,10 +43,10 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <returns>The created <see cref="Employee"/>.</returns>
         [HttpPost("")]
-        [AcceptsBody(typeof(Employee))]
+        [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), locationUri: r => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
+            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -54,7 +54,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPut("{id}")]
-        [AcceptsBody(typeof(Employee))]
+        [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
@@ -65,7 +65,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="Employee"/>.</returns>
         [HttpPatch("{id}")]
-        [AcceptsBody(typeof(Employee))]
+        [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
@@ -104,10 +104,10 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [HttpPost("{id}/terminate")]
-        [AcceptsBody(typeof(TerminationDetail))]
+        [AcceptsBody(typeof(Common.Entities.TerminationDetail))]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Terminate(Guid id) =>
-            _webApi.PostAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), statusCode: HttpStatusCode.OK, operationType: CoreEx.OperationType.Update);
+            _webApi.PostAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), operationType: CoreEx.OperationType.Update);
     }
 }
 

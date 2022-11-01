@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the <see cref="Account"/> arguments entity.
     /// </summary>
-    public partial class AccountArgs : EntityBase<AccountArgs>
+    public partial class AccountArgs : EntityBase
     {
         private string? _productCategorySid;
         private string? _openStatusSid;
@@ -51,9 +51,9 @@ namespace Cdr.Banking.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(ProductCategorySid, v => ProductCategorySid = v);
-            yield return CreateProperty(OpenStatusSid, v => OpenStatusSid = v);
-            yield return CreateProperty(IsOwned, v => IsOwned = v);
+            yield return CreateProperty(nameof(ProductCategorySid), ProductCategorySid, v => ProductCategorySid = v);
+            yield return CreateProperty(nameof(OpenStatusSid), OpenStatusSid, v => OpenStatusSid = v);
+            yield return CreateProperty(nameof(IsOwned), IsOwned, v => IsOwned = v);
         }
     }
 }

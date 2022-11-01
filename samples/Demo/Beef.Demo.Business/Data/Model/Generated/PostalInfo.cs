@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Data.Model
     /// <summary>
     /// Represents the Postal Info model.
     /// </summary>
-    public partial class PostalInfo
+    public partial class PostalInfo : IETag
     {
         /// <summary>
         /// Gets or sets the Country.
@@ -34,6 +34,12 @@ namespace Beef.Demo.Business.Data.Model
         /// Gets or sets the Places.
         /// </summary>
         public PlaceInfoCollection? Places { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ETag.
+        /// </summary>
+        [JsonIgnore]
+        public string? ETag { get; set; }
     }
 }
 

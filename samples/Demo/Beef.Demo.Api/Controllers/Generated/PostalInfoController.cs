@@ -48,10 +48,10 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
         [HttpPost("{country}/{state}/{city}")]
-        [AcceptsBody(typeof(PostalInfo))]
+        [AcceptsBody(typeof(Common.Entities.PostalInfo))]
         [ProducesResponseType(typeof(PostalInfo), (int)HttpStatusCode.Created)]
         public Task<IActionResult> CreatePostCodes(string? country, string? state, string? city) =>
-            _webApi.PostAsync<PostalInfo, PostalInfo>(Request, p => _manager.CreatePostCodesAsync(p.Value!, country, state, city));
+            _webApi.PostAsync<PostalInfo, PostalInfo>(Request, p => _manager.CreatePostCodesAsync(p.Value!, country, state, city), statusCode: HttpStatusCode.Created);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -61,10 +61,10 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
         [HttpPut("{country}/{state}/{city}")]
-        [AcceptsBody(typeof(PostalInfo))]
+        [AcceptsBody(typeof(Common.Entities.PostalInfo))]
         [ProducesResponseType(typeof(PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> UpdatePostCodes(string? country, string? state, string? city) =>
-            _webApi.PutAsync<PostalInfo, PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdateAsync(p.Value!, country, state, city), simulatedConcurrency: true);
+            _webApi.PutAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
         /// <summary>
         /// Patches an existing <see cref="PostalInfo"/>.
@@ -74,7 +74,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="city">The City.</param>
         /// <returns>The patched <see cref="PostalInfo"/>.</returns>
         [HttpPatch("{country}/{state}/{city}")]
-        [AcceptsBody(typeof(PostalInfo))]
+        [AcceptsBody(typeof(Common.Entities.PostalInfo))]
         [ProducesResponseType(typeof(PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchPostCodes(string? country, string? state, string? city) =>
             _webApi.PatchAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);

@@ -73,10 +73,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
+            _cache.Remove<Person>(id);
             await _data.DeleteAsync(id).ConfigureAwait(false);
             await Invoker.InvokeAsync(_deleteOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
             _events.PublishValueEvent(new Person { Id = id }, new Uri($"/person/{id}", UriKind.Relative), $"Demo.Person", "Delete");
-            _cache.Remove<Person>(id);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        public Task<Person> EventPublishNoSendAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this,  _ => EventPublishNoSendOnImplementationAsync(value), new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+        public Task<Person> EventPublishNoSendAsync(Person value) => EventPublishNoSendOnImplementationAsync(value);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -367,10 +367,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteWithEfAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
+            _cache.Remove<Person>(id);
             await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
             await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
             _events.PublishValueEvent(new Person { Id = id }, new Uri($"/person/{id}", UriKind.Relative), $"Demo.Person.{id}", "Delete");
-            _cache.Remove<Person>(id);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
     }
 }

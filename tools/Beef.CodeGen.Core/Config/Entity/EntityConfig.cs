@@ -9,6 +9,7 @@ using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -224,8 +225,8 @@ entities:
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
-            Description = "Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `Newtonsoft`.")]
+        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
+            Description = "Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `SystemText`.")]
         public string? JsonSerializer { get; set; }
 
         #endregion
@@ -913,7 +914,7 @@ entities:
         /// <summary>
         /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
-        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && !(x.InternalOnly == true && Root!.RuntimeEntityScope == "Common" && Root.IsDataModel == false)).ToList();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && !(x.InternalOnly == true && Root!.RuntimeEntityScope == "Common" && Root.IsDataModel == false) && (!Root!.IsDataModel || (Root.IsDataModel && x.DataModelIgnore != true))).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key; excluding inherited.
@@ -1170,12 +1171,17 @@ entities:
         public bool HasIdentifier { get; set; }
 
         /// <summary>
-        /// Gets or sets the computed entity inherits.
+        /// Gets or sets the computed entity implements.
         /// </summary>
         public string? EntityImplements { get; set; }
 
         /// <summary>
-        /// Gets or sets the computed model inherits.
+        /// Gets or sets the computed common implements.
+        /// </summary>
+        public string? CommonImplements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed model implements.
         /// </summary>
         public string? ModelImplements { get; set; }
 
@@ -1290,11 +1296,11 @@ entities:
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
-            DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
+            DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
-            EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
-            CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
-            ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
+            EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName);
+            CosmosName = DefaultWhereNull(CosmosName, () => Parent!.CosmosName);
+            ODataName = DefaultWhereNull(ODataName, () => Parent!.ODataName);
             HttpAgentName = DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName);
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
@@ -1309,7 +1315,6 @@ entities:
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
             WebApiConcurrency = DefaultWhereNull(WebApiConcurrency, () => false);
-            WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => "Get");
 
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
@@ -1360,16 +1365,14 @@ entities:
         }
 
         /// <summary>
-        /// Interface-ise the name; i.e. prefix with an 'I'.
-        /// </summary>
-        private static string? InterfaceiseName(string? name) => string.IsNullOrEmpty(name) || (name.StartsWith("I", StringComparison.Ordinal) && name.Length >= 2 && char.IsUpper(name[1])) ? name : "I" + name;
-
-        /// <summary>
         /// Infers the <see cref="Inherits"/>, <see cref="CollectionInherits"/> and <see cref="CollectionResultInherits"/> values.
         /// </summary>
         private void InferInherits()
         {
             ExtendedInherits = Inherits != null && CompareNullOrValue(OmitEntityBase, false);
+            if (RefDataType != null && Properties != null && Properties.Count > 0)
+                ExtendedInherits = true;
+
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
@@ -1377,7 +1380,7 @@ entities:
                 "long" => $"ReferenceDataBase<long, {Name}>",
                 "Guid" => $"ReferenceDataBase<Guid, {Name}>",
                 "string" => $"ReferenceDataBase<string?, {Name}>",
-                _ => CompareNullOrValue(OmitEntityBase, false) ? $"EntityBase<{Name}>" : null
+                _ => CompareNullOrValue(OmitEntityBase, false) ? $"EntityBase" : null
             });
 
             ModelInherits = RefDataType switch
@@ -1386,7 +1389,7 @@ entities:
                 "long" => "ReferenceDataBase<long>",
                 "Guid" => "ReferenceDataBase<Guid>",
                 "string" => "ReferenceDataBase<string?>",
-                _ => EntityInherits != null && EntityInherits.StartsWith("EntityBase<") ? null : EntityInherits
+                _ => EntityInherits == "EntityBase" ? null : EntityInherits
             };
 
             EntityCollectionInherits = CompareValue(OmitEntityBase, true) ? $"List<{EntityName}>" : CollectionInherits;
@@ -1501,8 +1504,10 @@ entities:
         private void InferImplements()
         {
             var implements = new List<string>();
+            var commonImplements = new List<string>();
             var modelImplements = new List<string>();
             var i = 0;
+            var c = 0;
             var m = 0;
 
             if (CompareValue(ImplementsAutoInfer, true))
@@ -1513,7 +1518,10 @@ entities:
                     {
                         var txt = str?.Trim();
                         if (!string.IsNullOrEmpty(txt))
+                        {
                             implements.Add(txt!);
+                            commonImplements.Add(txt!);
+                        }
                     }
                 }
 
@@ -1534,6 +1542,7 @@ entities:
                         if (iid != "???")
                         {
                             implements.Insert(i++, iid);
+                            commonImplements.Insert(c++, iid);
                             modelImplements.Insert(m++, iid);
                             HasIdentifier = true;
                         }
@@ -1544,31 +1553,41 @@ entities:
             if (!HasIdentifier && Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
                 implements.Insert(i++, "IPrimaryKey");
+                commonImplements.Insert(c++, "IPrimaryKey");
                 modelImplements.Insert(m++, "IPrimaryKey");
             }
 
             if (Properties!.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
+            {
                 implements.Insert(i++, "IPartitionKey");
+                modelImplements.Insert(m++, "IPartitionKey");
+            }
 
             if (CompareValue(ImplementsAutoInfer, true))
             {
                 if (Properties!.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
                 {
                     implements.Insert(i++, "IETag");
-                    modelImplements.Insert(m++, "IETag");
+                    if (Properties!.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.DataModelIgnore, false)))
+                        modelImplements.Insert(m++, "IETag");
+
+                    if (Properties!.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.InternalOnly, false)))
+                        commonImplements.Insert(c++, "IETag");
                 }
 
                 if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
                 {
                     implements.Insert(i++, "IChangeLog");
-                    modelImplements.Insert(m++, "IChangeLog");
+                    if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.DataModelIgnore, false)))
+                        modelImplements.Insert(m++, "CoreEx.Entities.Models.IChangeLog");
+
+                    if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.InternalOnly, false)))
+                        commonImplements.Insert(c++, "IChangeLog");
                 }
             }
 
-            if (RefDataType == null && ExtendedInherits)
-                implements.Insert(i++, $"IEquatable<{EntityName}>");
-
             EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());
+            CommonImplements = commonImplements.Count == 0 ? null : string.Join(", ", commonImplements.GroupBy(x => x).Select(y => y.First()).ToArray());
             ModelImplements = modelImplements.Count == 0 ? null : string.Join(", ", modelImplements.GroupBy(x => x).Select(y => y.First()).ToArray());
         }
 

@@ -6,7 +6,6 @@
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
             _getByArgsWithEfOnQuery = GetByArgsWithEfOnQuery;
-            _markOnException = MarkOnException;
         }
 
         private void GetByArgsOnQuery(DatabaseParameterCollection p, PersonArgs? args)
@@ -41,12 +40,6 @@
             return Task.FromResult(args.Coordinates!);
         }
 
-        private void MarkOnException(Exception ex)
-        {
-            if (ex is NotImplementedException)
-                throw new NotSupportedException();
-        }
-
         private Task<Person> GetNoArgsOnImplementationAsync()
         {
             return Task.FromResult(new Person { FirstName = "No", LastName = "Args" });
@@ -76,7 +69,7 @@
                      .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
                 })
                 .SelectMultiSetAsync(pdcr.Paging,
-                    new MultiSetCollArgs<PersonCollection, Person>(PersonData.DbMapper.Default, (r) => r.ForEach((p) => { var pd = new PersonDetail(); pd.CopyFrom(p); pdcr.Collection.Add(pd); })),
+                    new MultiSetCollArgs<PersonCollection, Person>(PersonData.DbMapper.Default, (r) => r.ForEach((p) => { var pd = new PersonDetail(); pd.CopyFrom(p); pdcr.Items.Add(pd); })),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) =>
                     {
                         PersonDetail? pd = null;
@@ -84,7 +77,7 @@
                         {
                             if (pd == null || wh.PersonId != pd.Id)
                             {
-                                pd = pdcr.Collection.Where(x => x.Id == wh.PersonId).Single();
+                                pd = pdcr.Items.Where(x => x.Id == wh.PersonId).Single();
                                 pd.History = new WorkHistoryCollection();
                             }
                             
@@ -134,6 +127,16 @@
             partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Person, EfModel.Person> s2d, AutoMapper.IMappingExpression<EfModel.Person, Person> d2s)
             {
                 // Flatten and unflatten the address.
+                //CreateMap<Address, EfModel.Person>()
+                //    .ForMember(d => d.Street, o => o.MapFrom(s => s.Street))
+                //    .ForMember(d => d.City, o => o.MapFrom(s => s.City));
+
+                //CreateMap<EfModel.Person, Address>()
+                //    .ForMember(s => s.Street, o => o.MapFrom(d => d.Street))
+                //    .ForMember(s => s.City, o => o.MapFrom(d => d.City));
+
+                //s2d.IncludeMembers(s => s.Address);
+                //d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
                 CreateMap<Address, EfModel.Person>().ReverseMap();
                 s2d.IncludeMembers(s => s.Address);
                 d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));

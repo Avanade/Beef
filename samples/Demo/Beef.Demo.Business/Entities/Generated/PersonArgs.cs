@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the <see cref="Person"/> arguments entity.
     /// </summary>
-    public partial class PersonArgs : EntityBase<PersonArgs>
+    public partial class PersonArgs : EntityBase
     {
         private string? _firstName;
         private string? _lastName;
@@ -42,9 +42,9 @@ namespace Beef.Demo.Business.Entities
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
-            yield return CreateProperty(FirstName, v => FirstName = v);
-            yield return CreateProperty(LastName, v => LastName = v);
-            yield return CreateProperty(GendersSids, v => GendersSids = v);
+            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+            yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
         }
     }
 }

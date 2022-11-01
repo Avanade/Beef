@@ -43,10 +43,10 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The created <see cref="Robot"/>.</returns>
         [HttpPost("")]
-        [AcceptsBody(typeof(Robot))]
+        [AcceptsBody(typeof(Common.Entities.Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Robot, Robot>(Request, p => _manager.CreateAsync(p.Value!), locationUri: r => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
+            _webApi.PostAsync<Robot, Robot>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
@@ -54,7 +54,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
         [HttpPut("{id}")]
-        [AcceptsBody(typeof(Robot))]
+        [AcceptsBody(typeof(Common.Entities.Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Robot, Robot>(Request, p => _manager.UpdateAsync(p.Value!, id));
@@ -65,7 +65,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The patched <see cref="Robot"/>.</returns>
         [HttpPatch("{id}")]
-        [AcceptsBody(typeof(Robot))]
+        [AcceptsBody(typeof(Common.Entities.Robot))]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));

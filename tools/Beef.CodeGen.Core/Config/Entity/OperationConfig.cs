@@ -838,10 +838,12 @@ operations: [
         /// <summary>
         /// Indicates whether the Data operation invocation can occur on a single line.
         /// </summary>
-        public bool DataSingleLine => (Type == "GetColl" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
-            || (Type == "Get" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
-            || (Type == "Custom" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"))
-            || (AutoImplement == "None" && CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data"));
+        public bool DataSingleLine => CompareNullOrValue(DataExtensions, false) && CompareNullOrValue(DataTransaction, false) && !CompareValue(EventPublish, "Data");
+
+        /// <summary>
+        /// Indicates whether the Data operation where auto implement is none then invocation can occur on a single line.
+        /// </summary>
+        public bool DataNoneSingleLine => AutoImplement == "None" && CompareNullOrValue(DataExtensions, false) && !CompareValue(EventPublish, "Data");
 
         /// <summary>
         /// <inheritdoc/>
@@ -931,6 +933,9 @@ operations: [
 
             ManagerExtensions = DefaultWhereNull(ManagerExtensions, () => Parent!.ManagerExtensions);
             DataExtensions = DefaultWhereNull(DataExtensions, () => Parent!.DataExtensions);
+            if (AutoImplement == "None")
+                DataExtensions = false;
+
             DataEntityMapperCreate = string.IsNullOrEmpty(DataEntityMapper);
             DataEntityMapper = DefaultWhereNull(DataEntityMapper, () => AutoImplement switch
             {
@@ -998,7 +1003,7 @@ operations: [
 
             DataTransaction = DefaultWhereNull(DataTransaction, () => CompareValue(EventPublish, "Data") && CompareValue(Parent!.EventTransaction, true));
             DataInvoker = DefaultWhereNull(DataInvoker, () => false);
-            if (DataTransaction!.Value || CompareValue(EventPublish, "Data"))
+            if (DataTransaction!.Value || CompareValue(EventPublish, "Data") || CompareValue(DataExtensions, true))
                 DataInvoker = true;
 
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
@@ -1033,7 +1038,7 @@ operations: [
 
             if (Type == "Patch" || Type == "Update")
             {
-                WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => Parent!.WebApiGetOperation);
+                WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => Parent!.WebApiGetOperation ?? Parent!.Operations!.Where(x => x.Type == "Get").FirstOrDefault()?.Name ?? "Get");
                 var parts = string.IsNullOrEmpty(WebApiGetOperation) ? Array.Empty<string>() : WebApiGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
                 WebApiGetVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
@@ -1043,7 +1048,7 @@ operations: [
                         Parent!.WebApiCtorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
 
-                WebApiUpdateOperation = DefaultWhereNull(WebApiUpdateOperation, () => "Update");
+                WebApiUpdateOperation = DefaultWhereNull(WebApiUpdateOperation, () => Parent!.Operations!.Where(x => x.Type == "Update").FirstOrDefault()?.Name ?? "Update");
                 parts = string.IsNullOrEmpty(WebApiUpdateOperation) ? Array.Empty<string>() : WebApiUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
                 WebApiUpdateVariable = parts.Length <= 1 ? "_manager" : StringConverter.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
@@ -1334,7 +1339,7 @@ operations: [
             if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
                 sb.Append('<');
 
-            if (ValueType != null && WebApiMethod != "HttpPatch")
+            if (ValueType != null && WebApiMethod != "HttpPatch" && !(WebApiMethod == "HttpPut" && CompareValue(WebApiConcurrency, true)))
             {
                 sb.Append(ValueType);
                 if (HasReturnValue)

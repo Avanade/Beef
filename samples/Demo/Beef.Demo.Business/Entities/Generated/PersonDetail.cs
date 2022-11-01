@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the <see cref="Person"/> detail entity.
     /// </summary>
-    public partial class PersonDetail : Person, IEquatable<PersonDetail>
+    public partial class PersonDetail : Person
     {
         private WorkHistoryCollection? _history;
 
@@ -25,33 +25,8 @@ namespace Beef.Demo.Business.Entities
             foreach (var pv in base.GetPropertyValues())
                 yield return pv;
 
-            yield return CreateProperty(History, v => History = v);
+            yield return CreateProperty(nameof(History), History, v => History = v);
         }
-
-        /// <inheritdoc/>
-        public bool Equals(PersonDetail? other) => base.Equals(other);
-
-        /// <summary>
-        /// Compares two values for equality.
-        /// </summary>
-        /// <param name="a"><see cref="PersonDetail"/> A.</param>
-        /// <param name="b"><see cref="PersonDetail"/> B.</param>
-        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator ==(PersonDetail? a, PersonDetail? b) => Equals(a, b);
-    
-        /// <summary>
-        /// Compares two values for non-equality.
-        /// </summary>
-        /// <param name="a"><see cref="PersonDetail"/> A.</param>
-        /// <param name="b"><see cref="PersonDetail"/> B.</param>
-        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
-        public static bool operator !=(PersonDetail? a, PersonDetail? b) => !Equals(a, b);
- 
-        /// <inheritdoc/>
-        public override int GetHashCode() => base.GetHashCode();
-
-        /// <inheritdoc/>
-        public override object Clone() => CreateClone<PersonDetail>(this);
     }
 
     /// <summary>
@@ -65,10 +40,10 @@ namespace Beef.Demo.Business.Entities
         public PersonDetailCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
-        public PersonDetailCollection(IEnumerable<PersonDetail> collection) => AddRange(collection);
+        /// <param name="items">The items to add.</param>
+        public PersonDetailCollection(IEnumerable<PersonDetail> items) => AddRange(items);
     }
 
     /// <summary>
@@ -88,11 +63,11 @@ namespace Beef.Demo.Business.Entities
         public PersonDetailCollectionResult(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="items"/> to add.
         /// </summary>
-        /// <param name="collection">A collection containing items to add.</param>
+        /// <param name="items">The items to add.</param>
         /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public PersonDetailCollectionResult(IEnumerable<PersonDetail> collection, PagingArgs? paging = null) : base(paging) => Collection.AddRange(collection);
+        public PersonDetailCollectionResult(IEnumerable<PersonDetail> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
     }
 }
 
