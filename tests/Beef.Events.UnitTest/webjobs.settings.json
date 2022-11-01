@@ -1,7 +1,0 @@
-{
-  "AzureTableStorage": "UseDevelopmentStorage=true",
-  "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-  "EventHubConnectionString": "Endpoint=sb://unittest.servicebus.windows.net/;SharedAccessKeyName=All;SharedAccessKey=yeahnahitstopsecretbro=;EntityPath=testhub",
-  "EventHubPoisonMessagesTable": "UnitTestEventHubPoisonMessages",
-  "EventHubAuditMessagesTable": "UnitTestEventHubAuditMessages"
-}
