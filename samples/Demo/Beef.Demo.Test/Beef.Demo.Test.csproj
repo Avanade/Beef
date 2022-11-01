@@ -19,10 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ContactTest.cs" />
     <Compile Remove="DeadLockRetryTest.cs" />
     <Compile Remove="EntityTest.cs" />
-    <Compile Remove="EventOutboxTest.cs" />
     <Compile Remove="ProductTest.cs" />
     <Compile Remove="RobotGrpcTest.cs" />
     <Compile Remove="SubscribersTest.cs" />

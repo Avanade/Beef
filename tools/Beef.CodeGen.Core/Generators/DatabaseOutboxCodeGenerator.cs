@@ -7,12 +7,11 @@ using System.Collections.Generic;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the Database Event Outbox generator.
+    /// Represents a <see cref="CodeGenConfig.Outbox"/>-driven code generator.
     /// </summary>
     public class DatabaseOutboxCodeGenerator : CodeGeneratorBase<CodeGenConfig, CodeGenConfig>
     {
         /// <inheritdoc/>
-        protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => (config ?? throw new System.ArgumentNullException(nameof(config))).Outbox == true ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+        protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config) => IsTrue(config.Outbox) ? config.SelectGenResult : null!;
     }
 }

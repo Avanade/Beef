@@ -83,7 +83,10 @@ namespace Beef.Demo.Business.Data
         /// Raise Event.
         /// </summary>
         /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => RaiseEventOnImplementationAsync(throwError);
+        public Task RaiseEventAsync(bool throwError) => DataInvoker.Current.InvokeAsync(this, async _ => 
+        {
+            await RaiseEventOnImplementationAsync(throwError);
+        }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> <i>AutoMapper</i> mapping.

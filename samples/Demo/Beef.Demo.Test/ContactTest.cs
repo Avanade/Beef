@@ -1,13 +1,14 @@
 ﻿using Beef.Demo.Api;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
-using Beef.Test.NUnit;
-using CoreEx;
+using CoreEx.Database;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Net;
 using UnitTestEx;
 using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
@@ -15,14 +16,14 @@ namespace Beef.Demo.Test
     public class ContactTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Reset();
+        public void OneTimeSetUp() => TestSetUp.Default.SetUp();
 
-        [Test, TestSetUp]
+        [Test]
         public void A110_Get()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent, Contact>()
+            var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -30,7 +31,7 @@ namespace Beef.Demo.Test
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = agentTester.Test<ContactAgent, Contact>()
+            r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -39,32 +40,32 @@ namespace Beef.Demo.Test
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
         }
 
-        [Test, TestSetUp]
-        public void A120_Get_Deleted()
+        [Test]
+        public void A120_Get_LogicallyDeleted()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent, Contact>()
+            var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(2.ToGuid()));
         }
 
-        [Test, TestSetUp]
-        public void A130_Update_Deleted()
+        [Test]
+        public void A130_Update_LogicallyDeleted()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent, Contact>()
+            var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.UpdateAsync(new Contact { Id = 2.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" }, 2.ToGuid()));
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A140_UpdateAndCheckEventOutboxDequeue()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent, Contact>()
+            var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P" })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -72,66 +73,69 @@ namespace Beef.Demo.Test
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            var db = new Beef.Demo.Business.Data.Database(agentTester.WebApplicationFactory.Services.GetService<IConfiguration>()["ConnectionStrings:BeefDemo"]);
-            db.SqlStatement("DELETE FROM [Demo].[EventOutbox]").NonQueryAsync().GetAwaiter().GetResult();
+            using var scope = test.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
+            db.SqlStatement("DELETE FROM [Outbox].[EventOutbox]").NonQueryAsync().GetAwaiter().GetResult();
+            db.SqlStatement("DELETE FROM [Outbox].[EventOutboxData]").NonQueryAsync().GetAwaiter().GetResult();
+            scope.Dispose();
 
             var v = r.Value;
             v.LastName += "X";
 
-            r = agentTester.Test<ContactAgent, Contact>()
+            r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
-                .ExpectEvent("Demo.Contact.00000001-0000-0000-0000-000000000000", "Update")
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r.Response.Headers?.ETag?.Tag);
 
-            // Make sure the event is sent from the outbox.
-            var count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutbox]").ScalarAsync<int>().GetAwaiter().GetResult();
-            Assert.AreEqual(1, count);
-
-            for (int i = 0; i < 10; i++)
+            // Make sure the event is sent according to the outbox.
+            using var scope2 = test.Services.CreateScope();
+            db = scope2.ServiceProvider.GetRequiredService<IDatabase>();
+            Assert.AreEqual(new int[] { 1 }, db.SqlStatement("SELECT * FROM [Outbox].[EventOutbox]").SelectQueryAsync(dr =>
             {
-                count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutbox] WHERE [DequeuedDate] IS NULL").ScalarAsync<int>().GetAwaiter().GetResult();
-                if (count == 0)
-                    return;
+                Assert.IsNotNull(dr.GetValue<DateTime?>("DequeuedDate"));
+                return 1;
+            }).GetAwaiter().GetResult());
 
-                System.Threading.Thread.Sleep(1000);
-            }
-
-            Assert.Fail("It would appear that the event was not dequeued by the hosted service.");
+            Assert.AreEqual(new int[] { 1 }, db.SqlStatement("SELECT * FROM [Outbox].[EventOutboxData]").SelectQueryAsync(dr =>
+            {
+                Assert.AreEqual("Demo.Contact.00000001-0000-0000-0000-000000000000", dr.GetValue<string>("Subject"));
+                Assert.AreEqual("Update", dr.GetValue<string>("Action"));
+                return 1;
+            }).GetAwaiter().GetResult());
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A150_GetAll()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent, ContactCollectionResult>()
+            var r = test.Agent<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = agentTester.Test<ContactAgent, ContactCollectionResult>()
+            r = test.Agent<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
 
-            var v = r.Value.Result[0];
+            var v = r.Value.Items[0];
             v.LastName += "X";
 
             // Update and ensure that the etag has changed as a result.
-            var r2 = agentTester.Test<ContactAgent, Contact>()
+            var r2 = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, v.Id));
 
-            r = agentTester.Test<ContactAgent, ContactCollectionResult>()
+            r = test.Agent<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
@@ -139,50 +143,62 @@ namespace Beef.Demo.Test
             Assert.AreNotEqual(etag, r2.Response.Headers?.ETag?.Tag);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A160_Delete()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            agentTester.Test<ContactAgent>()
+            test.Agent<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(1.ToGuid()));
 
-            var r = agentTester.Test<ContactAgent, Contact>()
+            var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            agentTester.Test<ContactAgent>()
+            test.Agent<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(1.ToGuid()));
+
+            using var scope = test.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
+
+            // Assert that there is only 1 single delete event.
+            var count = db.SqlStatement($"SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Demo.Contact.{1.ToGuid()}' and [Action] = 'Delete'").ScalarAsync<int>().GetAwaiter().GetResult();
+            Assert.AreEqual(1, count);
+
+            // Make sure that the contact was logically deleted; not physically.
+            count = db.SqlStatement($"SELECT COUNT(*) FROM [Demo].[Contact] WHERE [ContactId] = '{1.ToGuid()}' and [IsDeleted] = '1'").ScalarAsync<int>().GetAwaiter().GetResult();
+            Assert.AreEqual(1, count);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A200_RaiseEvent_EventOutboxFailure()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent>()
+            var r = test.Agent<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.InternalServerError)
                 .Run(a => a.RaiseEventAsync(true));
 
-            var db = new Beef.Demo.Business.Data.Database(agentTester.WebApplicationFactory.Services.GetService<IConfiguration>()["ConnectionStrings:BeefDemo"]);
-            var count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
+            using var scope = test.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
+            var count = db.SqlStatement("SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
             Assert.AreEqual(0, count);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A210_RaiseEvent_EventOutboxSuccess()
         {
-            using var agentTester = AgentTester.CreateWaf<Startup>();
+            using var test = ApiTester.Create<Startup>();
 
-            var r = agentTester.Test<ContactAgent>()
+            var r = test.Agent<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent("Contact", "Made")
                 .Run(a => a.RaiseEventAsync(false));
 
-            var db = new Beef.Demo.Business.Data.Database(agentTester.WebApplicationFactory.Services.GetService<IConfiguration>()["ConnectionStrings:BeefDemo"]);
-            var count = db.SqlStatement("SELECT COUNT(*) FROM [Demo].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
+            using var scope = test.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
+            var count = db.SqlStatement("SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
             Assert.AreEqual(1, count);
         }
     }

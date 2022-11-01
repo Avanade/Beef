@@ -171,7 +171,7 @@
     <Property Name="Status" Type="^Status" DataName="StatusCode" />
     <Property Name="InternalCode" Type="string" InternalOnly="true" EntityFrameworkMapper="Ignore" />
 
-    <Operation Name="RaiseEvent" OperationType="Custom" WebApiRoute="raise" EventOutbox="Database">
+    <Operation Name="RaiseEvent" OperationType="Custom" WebApiRoute="raise" EventPublish="Data" EventOutbox="Database">
       <Parameter Name="throwError" Text="throw a DivideByZero exception" Type="bool" />
     </Operation>
   </Entity>

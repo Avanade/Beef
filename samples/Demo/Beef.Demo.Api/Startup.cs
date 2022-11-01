@@ -1,4 +1,6 @@
 ﻿using Beef.Demo.Common.Agents;
+using CoreEx.Database;
+using CoreEx.Events;
 using AzCosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Api
@@ -69,7 +71,7 @@ namespace Beef.Demo.Api
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 
-            // Add event publishing.
+            //// Add event publishing.
             //var ehcs = _config.GetValue<string>("EventHubConnectionString");
             //var sbcs = _config.GetValue<string>("ServiceBusConnectionString");
             //if (!string.IsNullOrEmpty(sbcs))
@@ -78,8 +80,16 @@ namespace Beef.Demo.Api
             //    services.AddBeefServiceBusSender(new ServiceBusClient(sbcs));
             //else
             //    services.AddBeefNullEventPublisher();
-            services.AddEventDataFormatter(new CoreEx.Events.EventDataFormatter { SubjectAppendKey = true, SubjectCasing = CoreEx.Globalization.TextInfoCasing.None, ActionCasing = CoreEx.Globalization.TextInfoCasing.None });
-            services.AddNullEventPublisher();
+            // Add events publishing and sending - need publisher (orchestrator), formatter, serializer and sender configured to enable.
+            services.AddEventPublisher()
+                    .AddEventDataFormatter(new EventDataFormatter { SubjectAppendKey = true, SubjectCasing = CoreEx.Globalization.TextInfoCasing.None, ActionCasing = CoreEx.Globalization.TextInfoCasing.None })
+                    .AddEventDataSerializer()
+                    .AddScoped<IEventSender>(sp =>
+                    {
+                        var eoe = new EventOutboxEnqueue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<ILogger<EventOutboxEnqueue>>());
+                        eoe.SetPrimaryEventSender(new LoggerEventSender(sp.GetService<ILogger<LoggerEventSender>>()));
+                        return eoe;
+                    });
 
             // Add identifier generator services.
             //services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()

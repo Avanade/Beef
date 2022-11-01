@@ -249,7 +249,7 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether to create the `Outbox`-Schema within the database.
         /// </summary>
         [JsonProperty("outboxSchemaCreate", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "Indicates whether to create the `OutboxSchema` within the database.",
+        [CodeGenProperty("Outbox", Title = "Indicates whether to create the `OutboxSchema` within the database.",
             Description = "Defaults to `false`.")]
         public bool? OutboxSchemaCreate { get; set; }
 
@@ -362,12 +362,12 @@ namespace Beef.CodeGen.Config.Database
         public string? NamespaceBusiness { get; set; }
 
         /// <summary>
-        /// Gets or sets the Namespace (root) for the CDC-related publisher .NET artefacts.
+        /// Gets or sets the Namespace (root) for the outbox-related .NET artefacts.
         /// </summary>
-        [JsonProperty("NamespaceCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Namespace", Title = "The Namespace (root) for the CDC-related publisher .NET artefacts.",
-            Description = "Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`.")]
-        public string? NamespaceCdcPublisher { get; set; }
+        [JsonProperty("namespaceOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Outbox-related Publisher .NET artefacts.",
+            Description = "Defaults to `NamespaceBusiness`.")]
+        public string? NamespaceOutbox { get; set; }
 
         #endregion
 
@@ -424,7 +424,7 @@ namespace Beef.CodeGen.Config.Database
             NamespaceBase = DefaultWhereNull(NamespaceBase, () => $"{Company}.{AppName}");
             NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{NamespaceBase}.Common");
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
-            NamespaceCdcPublisher = DefaultWhereNull(NamespaceCdcPublisher, () => $"{NamespaceBase}.CdcPublisher");
+            NamespaceOutbox = DefaultWhereNull(NamespaceOutbox, () => NamespaceBusiness);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
