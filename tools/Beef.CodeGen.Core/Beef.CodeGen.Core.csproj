@@ -41,15 +41,8 @@
 
   <ItemGroup>
     <None Remove="Scripts\Database.yaml" />
-    <None Remove="Scripts\DatabaseEventOutbox.yaml" />
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
-    <None Remove="Templates\DbEobDataTableCreate_sql.hbs" />
-    <None Remove="Templates\DbEobOutbox_cs.hbs" />
-    <None Remove="Templates\DbEobSpDequeue_sql.hbs" />
-    <None Remove="Templates\DbEobSpEnqueue_sql.hbs" />
-    <None Remove="Templates\DbEobTableCreate_sql.hbs" />
-    <None Remove="Templates\DbEobUdt_sql.hbs" />
     <None Remove="Templates\DbSpTableCreate_sql.hbs" />
     <None Remove="Templates\DbSpTableDelete_sql.hbs" />
     <None Remove="Templates\DbSpTableGetColl_sql.hbs" />
@@ -97,19 +90,12 @@
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
     <EmbeddedResource Include="Scripts\Database.yaml" />
-    <EmbeddedResource Include="Scripts\DatabaseEventOutbox.yaml" />
     <EmbeddedResource Include="Scripts\EntityBusiness.yaml" />
     <EmbeddedResource Include="Scripts\DataModelOnly.yaml" />
     <EmbeddedResource Include="Scripts\EntityOnly.yaml" />
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.yaml" />
     <EmbeddedResource Include="Scripts\RefDataCore.yaml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.yaml" />
-    <EmbeddedResource Include="Templates\DbEobOutbox_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbEobSpDequeue_sql.hbs" />
-    <EmbeddedResource Include="Templates\DbEobSpEnqueue_sql.hbs" />
-    <EmbeddedResource Include="Templates\DbEobDataTableCreate_sql.hbs" />
-    <EmbeddedResource Include="Templates\DbEobTableCreate_sql.hbs" />
-    <EmbeddedResource Include="Templates\DbEobUdt_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />

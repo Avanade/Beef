@@ -111,21 +111,6 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", true, null),
 
             (ConfigType.Database, ConfigurationEntity.OrderBy, "Order", false, (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending")),
-
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "AliasColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "DataCtorParams", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IdentifierMappingColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumnsOnDelete", true, null),
-            (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumnsFromETag", true, null),
-
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "AliasColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IdentifierMappingColumns", true, null),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumnsOnDelete", true, null),
-            (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumnsFromETag", true, null)
         });
 
         private static string? NullValue() => (string?)null!;
@@ -416,12 +401,6 @@ namespace Beef.CodeGen.Config
         QueryOrder,
         /// <summary>Query Where configuration.</summary>
         QueryWhere,
-        /// <summary>Cdc configuration.</summary>
-        Cdc,
-        /// <summary>Cdc Join configuration.</summary>
-        CdcJoin,
-        /// <summary>Cdc Join On configuration.</summary>
-        CdcJoinOn,
         /// <summary>Stored procedure configuration.</summary>
         StoredProcedure,
         /// <summary>Parameter configuration.</summary>

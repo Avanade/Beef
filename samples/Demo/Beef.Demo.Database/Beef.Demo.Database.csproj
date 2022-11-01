@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Schema\DemoCdc\**" />
+    <EmbeddedResource Remove="Schema\DemoCdc\**" />
+    <None Remove="Schema\DemoCdc\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Migrations\20190107-162633-create-demo-person-uniquecode-index.sql" />
     <None Remove="Migrations\20191023-081540-create-demo-person2.sql" />
     <None Remove="Migrations\20200308-093308-alter-ref-gender.sql" />
@@ -22,11 +28,8 @@
     <None Remove="Migrations\20200820-142642-create-Test-Schema.sql" />
     <None Remove="Migrations\20200820-142907-create-Test-Table.sql" />
     <None Remove="Migrations\20201015-121702-create-Sec-Schema.sql" />
-    <None Remove="Migrations\20201015-122031-create-DemoCdc-Schema.sql" />
     <None Remove="Migrations\20210219-081012-create-Test-Table2.sql" />
     <None Remove="Migrations\20210219-120345-create-Test-Table3.sql" />
-    <None Remove="Migrations\20210330-151108-alter-legacy-address.sql" />
-    <None Remove="Migrations\20210331-100536-alter-legacy-contact.sql" />
     <None Remove="Migrations\20210604-161439-alter-demo-person.sql" />
     <None Remove="Migrations\20210617-132408-alter-contact-systemversioning.sql" />
     <None Remove="Migrations\20210706-111003-alter-ref-gender.sql" />
@@ -42,9 +45,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Schema\DemoCdc\Stored Procedures\Generated\" />
-    <Folder Include="Schema\Demo\Stored Procedures\" />
-    <Folder Include="Schema\Ref\" />
+    <Folder Include="Schema\Demo\" />
+    <Folder Include="Schema\Test\" />
   </ItemGroup>
 
   <ItemGroup>

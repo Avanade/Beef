@@ -26,7 +26,6 @@ namespace Beef.CodeGen.Config.Database
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
         Markdown = "")]
     [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
-    [CodeGenCategory("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CodeGenCategory("Event", Title = "Provides the _Event_ configuration.")]
@@ -156,79 +155,6 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region CDC
-
-        /// <summary>
-        /// Gets or sets the schema name for the `Cdc`-related database artefacts.
-        /// </summary>
-        [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
-            Description = "Defaults to `XCdc` (literal).")]
-        public string? CdcSchema { get; set; }
-
-        /// <summary>
-        /// Gets or sets the table name for the `Cdc`-Tracking.
-        /// </summary>
-        [JsonProperty("cdcAuditTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-Tracking.",
-            Description = "Defaults to `CdcTracking` (literal).")]
-        public string? CdcTrackingTableName { get; set; }
-
-        /// <summary>
-        /// Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
-        /// </summary>
-        [JsonProperty("cdcIdentifierMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.")]
-        public bool? CdcIdentifierMapping { get; set; }
-
-        /// <summary>
-        /// Gets or sets the table name for the `Cdc`-IdentifierMapping.
-        /// </summary>
-        [JsonProperty("cdcIdentifierMappingTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
-            Description = "Defaults to `CdcIdentifierMapping` (literal).")]
-        public string? CdcIdentifierMappingTableName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the stored procedure name for the `Cdc`-IdentifierMapping.
-        /// </summary>
-        [JsonProperty("cdcIdentifierMappingStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "The table name for the `Cdc`-IdentifierMapping.",
-            Description = "Defaults to `spCreateCdcIdentifierMapping` (literal).")]
-        public string? CdcIdentifierMappingStoredProcedureName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking).
-        /// </summary>
-        [JsonProperty("cdcExcludeColumnsFromETag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenPropertyCollection("DotNet", Title = "The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)")]
-        public List<string>? CdcExcludeColumnsFromETag { get; set; }
-
-        /// <summary>
-        /// Get or sets the JSON Serializer to use for JSON property attribution.
-        /// </summary>
-        [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
-            Description = "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).")]
-        public string? JsonSerializer { get; set; }
-
-        /// <summary>
-        /// Indicates whether the .NET collection properties should be pluralized.
-        /// </summary>
-        [JsonProperty("pluralizeCollectionProperties", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "Indicates whether the .NET collection properties should be pluralized.")]
-        public bool? PluralizeCollectionProperties { get; set; }
-
-        /// <summary>
-        /// Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.
-        /// </summary>
-        [JsonProperty("hasBeefDbo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("CDC", Title = "Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.",
-            Description = "Defaults to `true`.")]
-        public bool? HasBeefDbo { get; set; }
-
-        #endregion
-
         #region DotNet
 
         /// <summary>
@@ -304,19 +230,52 @@ namespace Beef.CodeGen.Config.Database
         #region Outbox
 
         /// <summary>
-        /// Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+        /// Indicates whether to generate the event outbox SQL and .NET artefacts.
         /// </summary>
-        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Outbox", Title = "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.")]
-        public bool? EventOutbox { get; set; }
+        [JsonProperty("outbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Outbox", Title = "Indicates whether to generate the event outbox SQL and .NET artefacts.",
+            Description = "Defaults to `false`.")]
+        public bool? Outbox { get; set; }
 
         /// <summary>
-        /// Gets or sets the table name for the `EventOutbox`.
+        /// Gets or sets the schema name of the event outbox table.
         /// </summary>
-        [JsonProperty("eventOutboxTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Outbox", Title = "The table name for the `EventOutbox`.",
+        [JsonProperty("outboxSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Outbox", Title = "The schema name of the event outbox table.",
+            Description = "Defaults to `Outbox` (literal).")]
+        public string? OutboxSchema { get; set; }
+
+        /// <summary>
+        /// Indicates whether to create the `Outbox`-Schema within the database.
+        /// </summary>
+        [JsonProperty("outboxSchemaCreate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Key", Title = "Indicates whether to create the `OutboxSchema` within the database.",
+            Description = "Defaults to `false`.")]
+        public bool? OutboxSchemaCreate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the event outbox table.
+        /// </summary>
+        [JsonProperty("outboxTable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Outbox", Title = "The name of the event outbox table.",
             Description = "Defaults to `EventOutbox` (literal).")]
-        public string? EventOutboxTableName { get; set; }
+        public string? OutboxTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stored procedure name for the event outbox enqueue.
+        /// </summary>
+        [JsonProperty("outboxEnqueueStoredProcedure", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Outbox", Title = "The stored procedure name for the event outbox enqueue.",
+            Description = "Defaults to `spEventOutboxEnqueue` (literal).")]
+        public string? OutboxEnqueueStoredProcedure { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stored procedure name for the event outbox dequeue.
+        /// </summary>
+        [JsonProperty("outboxDequeueStoredProcedure", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Outbox", Title = "The stored procedure name for the event outbox dequeue.",
+            Description = "Defaults to `spEventOutboxDequeue` (literal).")]
+        public string? OutboxDequeueStoredProcedure { get; set; }
 
         #endregion
 
@@ -477,21 +436,23 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => "UpdatedBy");
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => "UpdatedDate");
+
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
-            CdcSchema = DefaultWhereNull(CdcSchema, () => "XCdc");
-            CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
-            CdcIdentifierMappingTableName = DefaultWhereNull(CdcIdentifierMappingTableName, () => "CdcIdentifierMapping");
-            CdcIdentifierMappingStoredProcedureName = DefaultWhereNull(CdcIdentifierMappingStoredProcedureName, () => "spCreateCdcIdentifierMapping");
-            HasBeefDbo = DefaultWhereNull(HasBeefDbo, () => true);
+
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
-            EventOutboxTableName = DefaultWhereNull(EventOutboxTableName, () => "EventOutbox");
-            JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
+            OutboxSchema = DefaultWhereNull(OutboxSchema, () => "Outbox");
+
+            OutboxSchemaCreate = DefaultWhereNull(OutboxSchemaCreate, () => false);
+            OutboxTable = DefaultWhereNull(OutboxTable, () => "EventOutbox");
+            OutboxEnqueueStoredProcedure = DefaultWhereNull(OutboxEnqueueStoredProcedure, () => $"sp{OutboxTable}Enqueue");
+            OutboxDequeueStoredProcedure = DefaultWhereNull(OutboxDequeueStoredProcedure, () => $"sp{OutboxTable}Dequeue");
+
             AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "SnakeKebabToPascalCase");
 
             Queries = await PrepareCollectionAsync(Queries).ConfigureAwait(false);
