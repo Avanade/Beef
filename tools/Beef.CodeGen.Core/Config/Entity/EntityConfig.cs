@@ -9,7 +9,6 @@ using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -85,23 +84,6 @@ entities:
         [CodeGenProperty("Key", Title = "The overriding file name.",
             Description = "Overrides the Name as the code-generated file name.")]
         public string? FileName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the entity scope option.
-        /// </summary>
-        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
-            Description = "Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
-            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
-        public string? EntityScope { get; set; }
-
-        /// <summary>
-        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
-        /// </summary>
-        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
-            Description = "Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
-        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding private name.
@@ -1253,7 +1235,7 @@ entities:
         /// <summary>
         /// Gets the reference data qualified Entity name.
         /// </summary>
-        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamespace" : "RefDataNamespace")}.{Name}";
+        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"RefDataNamespace.{Name}";
 
         /// <summary>
         /// Indicates whether the Manager needs a DataSvc using statement.
@@ -1285,8 +1267,6 @@ entities:
 
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
-            EntityScope = DefaultWhereNull(EntityScope, () => Root!.EntityScope);
-            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : EntityScope);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");

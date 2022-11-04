@@ -5,8 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using Beef.Demo.Business;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

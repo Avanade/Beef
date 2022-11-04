@@ -46,7 +46,7 @@ entities:
         /// </summary>
         [JsonProperty("refDataNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement).", IsImportant = true,
-            Description = "Defaults to `Company` + `.` (literal) + AppName + `.` (literal) + `EntityUsing` + `.Entities` (literal).")]
+            Description = "Defaults to `Company` + `.` (literal) + AppName + `.Business.Entities` (literal).")]
         public string? RefDataNamespace { get; set; }
 
         /// <summary>
@@ -72,49 +72,9 @@ entities:
         [CodeGenProperty("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.", IsImportant = true)]
         public string? RefDataWebApiRoute { get; set; }
 
-        /// <summary>
-        /// Gets or sets the cache used for the ReferenceData providers.
-        /// </summary>
-        [JsonProperty("refDataCache", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("RefData", Title = "The cache used for the ReferenceData providers.", Options = new string[] { "ReferenceDataCache", "ReferenceDataMultiTenantCache" },
-            Description = "Defaults to `ReferenceDataCache`. A value of `ReferenceDataCache` specifies a single-tenant cache; otherwise, `ReferenceDataMultiTenantCache` for a multi-tenant cache leverageing the `ExecutionContext.TenantId`.")]
-        public string? RefDataCache { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Reference Data entity namespace appended to end of the standard <c>company.appname.Common.Entities.{AppendToNamespace}</c>.
-        /// </summary>
-        [JsonProperty("refDataAppendToNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("RefData", Title = "The Reference Data entity namespace appended to end of the standard `company.appname.Common.Entities.{AppendToNamespace}`.",
-            Description = "Defaults to `null`; being nothing to append.")]
-        public string? RefDataAppendToNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) for additional business-layer inclusion where requried.
-        /// </summary>
-        [JsonProperty("refDataBusNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) for additional business-layer inclusion where requried.")]
-        public string? RefDataBusNamespace { get; set; }
-
         #endregion
 
         #region Entity
-
-        /// <summary>
-        /// Gets or sets the entity scope option.
-        /// </summary>
-        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
-            Description = "Defaults to `Common` for backwards compatibility; `Autonomous` is **recommended**. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is the special case of `Autonomous` " +
-            "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
-        public string? EntityScope { get; set; }
-
-        /// <summary>
-        /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
-        /// </summary>
-        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
-            Description = "Defaults to `Common` (unless `EntityScope` is `Autonomous` and then it will default to `Business`) which will add `.Common.Entities`. Additionally, `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude any. This can be overridden for each `Entity`.")]
-        public string? EntityUsing { get; set; }
 
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
@@ -574,7 +534,6 @@ entities:
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
-            RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
@@ -583,9 +542,7 @@ entities:
             EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EventCasing = DefaultWhereNull(EventCasing, () => "None");
-            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
-            EntityUsing = DefaultWhereNull(EntityUsing, () => EntityScope == "Autonomous" ? "Business" : "Common");
-            RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.{EntityUsing}.Entities");
+            RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.Business.Entities");
             RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");

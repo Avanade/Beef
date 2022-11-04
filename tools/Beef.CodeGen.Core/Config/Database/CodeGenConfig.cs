@@ -165,14 +165,6 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
 
-        /// <summary>
-        /// Gets or sets the entity scope option.
-        /// </summary>
-        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("DotNet", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
-            Description = "Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).")]
-        public string? EntityScope { get; set; }
-
         #endregion
 
         #region Event
@@ -441,7 +433,6 @@ namespace Beef.CodeGen.Config.Database
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
 
-            EntityScope = DefaultWhereNull(EntityScope, () => "Common");
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
             EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");

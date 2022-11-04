@@ -1,5 +1,4 @@
 # Configuring the code-generation global settings
-# - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
 # - RefDataText generates a corresponding reference data text property for '$text=true' output.
 # - EventSubjectRoot specifies the root for the event subject.
 # - EventSubjectFormat specifies the name only; i.e. not include the key.
@@ -10,7 +9,6 @@
 # - AppBasedAgentArgs indicates to create a domain specific AgentArgs to simplify dependency injection usage.
 # - WebApiAutoLocation indicate to set the HTTP response location for a create.
 # - DatabaseSchema defaults the database schema name.
-entityScope: Autonomous
 refDataText: true
 eventSubjectRoot: My
 eventSubjectFormat: NameOnly

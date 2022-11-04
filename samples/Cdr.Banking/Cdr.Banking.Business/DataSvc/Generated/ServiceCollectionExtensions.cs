@@ -5,8 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using Cdr.Banking.Business.DataSvc;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

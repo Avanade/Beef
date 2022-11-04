@@ -74,7 +74,6 @@
     <None Remove="Templates\ReferenceDataIDataSvc_cs.hbs" />
     <None Remove="Templates\ReferenceDataIData_cs.hbs" />
     <None Remove="Templates\ReferenceDataProvider_cs.hbs" />
-    <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgent_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiController_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
@@ -127,7 +126,6 @@
     <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataIDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\Model_cs.hbs" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiController_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />

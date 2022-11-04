@@ -1,5 +1,4 @@
 ﻿//#if (implement_database)
-entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
@@ -41,7 +40,6 @@ entities:
   }
 //#endif
 //#if (implement_entityframework)
-entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
@@ -82,7 +80,6 @@ entities:
   }
 //#endif
 //#if (implement_cosmos)
-entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
@@ -123,7 +120,6 @@ entities:
   }
 //#endif
 //#if (implement_httpagent)
-entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
@@ -149,7 +145,6 @@ entities:
   }
 //#endif
 //#if (implement_none)
-entityScope: Autonomous
 eventSubjectRoot: Company
 eventSubjectFormat: NameOnly
 eventActionFormat: PastTense

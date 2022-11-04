@@ -49,7 +49,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         [HttpGet("{accountId}")]
-        [ProducesResponseType(typeof(AccountDetail), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetDetail(string? accountId) =>
             _webApi.GetAsync<AccountDetail?>(Request, p => _manager.GetDetailAsync(accountId));
@@ -60,7 +60,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
         [HttpGet("{accountId}/balance")]
-        [ProducesResponseType(typeof(Balance), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetBalance(string? accountId) =>
             _webApi.GetAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));

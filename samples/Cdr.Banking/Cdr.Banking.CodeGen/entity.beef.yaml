@@ -1,4 +1,3 @@
-entityScope: Autonomous
 cosmosName: ICosmos
 entities:
   # Account as per the defined schema, including corresponding collection/result.

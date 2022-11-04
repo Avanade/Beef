@@ -1,4 +1,3 @@
-entityScope: Autonomous
 cosmosName: ICosmos
 refDataWebApiRoute: api/v1/ref
 entities:

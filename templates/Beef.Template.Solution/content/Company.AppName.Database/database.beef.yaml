@@ -1,6 +1,5 @@
 ﻿schema: AppName
 eventOutbox: true
-entityScope: Autonomous
 //#if (implement_database)
 tables:
   # Reference data stored procedures

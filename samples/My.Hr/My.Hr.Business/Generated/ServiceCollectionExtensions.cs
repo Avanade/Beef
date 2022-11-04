@@ -5,8 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using My.Hr.Business;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

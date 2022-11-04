@@ -5,10 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using CoreEx.RefData;
-using Beef.Demo.Business;
-using Beef.Demo.Business.Entities;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

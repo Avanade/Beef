@@ -1,11 +1,9 @@
 # Configuring the code-generation global settings
 # - Schema defines the default for al tables unless explicitly defined.
 # - EventOutbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
-# - EntityScope of Autonomous will generate both business and common entities to allow each to be used autonomously; versus using shared common.
 # 
 schema: Hr
 eventOutbox: true
-entityScope: Autonomous
 tables:
   # Reference data tables/models.
 - { name: Gender, efModel: true }

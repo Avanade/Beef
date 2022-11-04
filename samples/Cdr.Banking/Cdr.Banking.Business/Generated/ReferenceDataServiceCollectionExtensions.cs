@@ -5,10 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using CoreEx.RefData;
-using Cdr.Banking.Business;
-using Cdr.Banking.Business.Entities;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

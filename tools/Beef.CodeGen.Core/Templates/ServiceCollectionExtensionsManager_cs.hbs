@@ -5,19 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-{{#if IsRefData}}
-using CoreEx.RefData;
-{{/if}}
-using {{Root.NamespaceBusiness}};
-{{#if IsRefData}}
-  {{#ifeq EntityUsing 'Business' 'All'}}
-using {{Root.NamespaceBusiness}}.Entities;
-  {{/ifeq}}
-  {{#ifeq EntityUsing 'Common' 'All'}}
-using {{Root.NamespaceCommon}}.Entities;
-  {{/ifeq}}
-{{/if}}
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>

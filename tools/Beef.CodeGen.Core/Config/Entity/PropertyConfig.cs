@@ -215,7 +215,7 @@ properties: [
         /// </summary>
         [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Property", Title = "Indicates whether the property is for internal use only; declared in Business entities only.",
-            Description = "This is only applicable where the `Entity.EntityScope` is `Autonomous`. In this instance the `Property` will be excluded from the `Common` entity declaration and JSON serialization.")]
+            Description = "In this instance the `Property` will be excluded from the `Common` entity declaration and `Business` JSON serialization.")]
         public bool? InternalOnly { get; set; }
 
         #endregion
@@ -646,12 +646,7 @@ properties: [
 
                 var ent = Root!.Entities?.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
-                {
-                    if ((ent.EntityScope ?? Root.EntityScope) == "Common")
-                        return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Common.Entities." + Type)})";
-                    else
-                        return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Business.Entities." + Type)})";
-                }
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Business.Entities." + Type)})";
 
                 return StringConverter.ToSentenceCase(Name);
             }));

@@ -11,12 +11,7 @@ namespace Beef.CodeGen.Generators
     /// </summary>
     public class EntityReferenceDataCodeGenerator : CodeGeneratorBase<CodeGenConfig> 
     {
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <param name="config"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => ((config ?? throw new System.ArgumentNullException(nameof(config))).EntityScope == config!.Root!.RuntimeEntityScope) || (config!.EntityScope == "Autonomous" && config!.RuntimeEntityScope == "Business") ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+        protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config) => new CodeGenConfig[] { config };
     }
 }

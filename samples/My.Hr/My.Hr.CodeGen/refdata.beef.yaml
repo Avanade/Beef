@@ -1,4 +1,3 @@
-entityScope: Autonomous
 webapiRoutePrefix: ref
 appBasedAgentArgs: true
 databaseSchema: Hr

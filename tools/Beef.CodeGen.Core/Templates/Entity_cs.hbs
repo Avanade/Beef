@@ -7,25 +7,6 @@
 #pragma warning disable
 {{set-value 'HasUsingStatement' false}}
 {{! ===== Using ===== }}
-{{#ifeq Root.RuntimeEntityScope 'Common'}}
-using System;{{set-value 'HasUsingStatement' true}}
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-{{#ifne JsonSerializer 'Newtonsoft'}}
-using System.Text.Json.Serialization;
-{{/ifne}}
-using CoreEx.Entities;
-using CoreEx.Entities.Extended;
-using CoreEx.RefData;
-{{/ifeq}}
-{{#ifeq JsonSerializer 'Newtonsoft'}}
-  {{#unless HasUsingStatement}}
-
-  {{/unless}}
-using Newtonsoft.Json;{{set-value 'HasUsingStatement' true}}
-{{/ifeq}}
 {{#if Root.UsingNamespace1}}
   {{#unless HasUsingStatement}}
 
@@ -44,42 +25,16 @@ using {{Root.UsingNamespace2}};{{set-value 'HasUsingStatement' true}}
   {{/unless}}
 using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 {{/if}}
-{{#ifeq EntityUsing 'Common' 'All'}}
-  {{#ifeq EntityScope 'Business'}}
-  {{#unless HasUsingStatement}}
-
-  {{/unless}}
-using {{Root.NamespaceCommon}}.Entities;{{set-value 'HasUsingStatement' true}}
-  {{/ifeq}}
-{{/ifeq}}
-{{#ifeq Root.RuntimeEntityScope 'Common'}}
-  {{#ifval Root.RefDataNamespace}}
-    {{#unless HasUsingStatement}}
-
-    {{/unless}}
-using RefDataNamespace = {{Root.RefDataNamespace}};{{set-value 'HasUsingStatement' true}}
-  {{/ifval}}
-{{/ifeq}}
-{{#ifval Root.RefDataBusNamespace}}
-  {{#unless HasUsingStatement}}
-
-  {{/unless}}
-using RefDataBusNamespace = {{Root.RefDataBusNamespace}};{{set-value 'HasUsingStatement' true}}
-{{/ifval}}
 {{#if HasUsingStatement}}
 
 {{/if}}
 {{! ===== Class ===== }}
-namespace {{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
     /// <summary>
     /// Represents the {{{Text}}} entity.
     /// </summary>
-{{#ifeq Root.RuntimeEntityScope 'Business'}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
-{{else}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval CommonImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{CommonImplements}}}{{/ifval}}
-{{/ifeq}}
     {
 {{! ===== Constants ===== }}
 {{#each Consts}}

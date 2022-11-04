@@ -32,11 +32,6 @@ using {{Root.UsingNamespace2}};{{set-value 'HasUsingStatement' true}}
   {{#if Root.UsingNamespace3}}
 using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
   {{/if}}
-  {{#ifeq EntityUsing 'Common' 'All'}}
-    {{#ifeq EntityScope 'Business'}}
-using {{Root.NamespaceCommon}}.Entities;{{set-value 'HasUsingStatement' true}}
-    {{/ifeq}}
-  {{/ifeq}}
 {{/unless}}
 {{#if HasUsingStatement}}
 
