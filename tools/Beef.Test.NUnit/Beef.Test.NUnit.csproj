@@ -1,49 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
-    <Version>5.0.1</Version>
-    <Authors>Beef Developers</Authors>
-    <Company>Avanade</Company>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>Business Entity Execution Framework (Beef) NUnit extensions used for testing.</Description>
-    <Copyright>Avanade (c)</Copyright>
-    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
-    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
-    <PackageIcon>Logo256x256.png</PackageIcon>
-    <RepositoryType>git</RepositoryType>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Title>Business Entity Execution Framework (Beef) NUnit extensions used for testing.</Title>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <ApplicationIcon />
-    <OutputType>Library</OutputType>
-    <StartupObject />
-    <PackageTags>beef test nunit</PackageTags>
-    <Nullable>enable</Nullable>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IncludeSymbols>true</IncludeSymbols>
-    <EmbedAllSources>true</EmbedAllSources>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IsTestProject>false</IsTestProject>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-    <OutputPath></OutputPath>
-    <NoWarn>1701;1702;CA1303</NoWarn>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <Product>Beef.Test.NUnit</Product>
+    <Description>Business Entity Execution Framework (Beef) NUnit extensions for testing backwards compatibility.</Description>
+    <PackageTags>beef test nunit unnittestex</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="UnitTestEx.NUnit" Version="1.0.27" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+  <Import Project="..\..\Common.targets" />
+  
 </Project>

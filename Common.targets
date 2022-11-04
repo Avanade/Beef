@@ -1,0 +1,38 @@
+<Project>
+	<PropertyGroup>
+		<Version>5.0.1-preview1</Version>
+		<LangVersion>preview</LangVersion>
+		<Authors>Avanade</Authors>
+		<Company>Avanade</Company>
+		<Copyright>Avanade (c)</Copyright>
+		<PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+		<RepositoryType>git</RepositoryType>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+		<PackageIcon>Logo256x256.png</PackageIcon>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+		<Nullable>enable</Nullable>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IncludeSymbols>true</IncludeSymbols>
+		<EmbedAllSources>true</EmbedAllSources>
+    <IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\images\Logo256x256.png" Link="Logo256x256.png">
+			<PackagePath>\</PackagePath>
+			<Pack>true</Pack>
+		</None>
+	</ItemGroup>
+</Project>

@@ -1,34 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
-    <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <StartupObject />
-    <Version>5.0.1</Version>
-    <Authors>Beef Developers</Authors>
-    <Company>Avanade</Company>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
-    <Copyright>Avanade (c)</Copyright>
-    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
-    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
-    <PackageIcon>Logo256x256.png</PackageIcon>
-    <RepositoryType>git</RepositoryType>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Title>Business Entity Execution Framework (Beef) SQL Server Database tool.</Title>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PackageTags>beef database sql dbup migration schema</PackageTags>
-    <Nullable>enable</Nullable>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IncludeSymbols>true</IncludeSymbols>
-    <EmbedAllSources>true</EmbedAllSources>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <Product>Beef.Database.Core</Product>
+    <Description>Business Entity Execution Framework (Beef) Database tool.</Description>
+    <PackageTags>beef database sql dbup migration schema dbex</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -49,7 +26,6 @@
     <ProjectReference Include="..\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+  <Import Project="..\..\Common.targets" />
+
 </Project>

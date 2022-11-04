@@ -2,19 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>5.0.1</Version>
-    <Authors>Beef Developers</Authors>
-    <Company>Avanade</Company>
+    <Title>Beef dotnet new template</Title>
     <Description>Business Entity Execution Framework (Beef) template solution for use with 'dotnet new'.</Description>
-    <Copyright>Avanade (c)</Copyright>
-    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
-    <PackageIcon>Logo256x256.png</PackageIcon>
-    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>beef dotnet template solution</PackageTags>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,9 +32,7 @@
     <None Remove="content\Company.AppName.Test\ImplicitUsing.cs" />
     <None Remove="content\Company.AppName.Test\Validators\PersonValidatorTest.cs" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+
+  <Import Project="..\..\Common.targets" />
   
 </Project>
