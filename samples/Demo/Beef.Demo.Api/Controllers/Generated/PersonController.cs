@@ -41,7 +41,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Person"/>.</returns>
         [HttpPost("")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
             _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/persons/{r.Id}", UriKind.Relative));
 
@@ -60,7 +60,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
             _webApi.GetAsync<Person?>(Request, p => _manager.GetAsync(id));
@@ -71,7 +71,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         [HttpGet("ex/{id}")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetEx(Guid id) =>
             _webApi.GetAsync<Person?>(Request, p => _manager.GetExAsync(id));
@@ -83,7 +83,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("{id}")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -94,7 +94,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("withRollback/{id}")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> UpdateWithRollback(Guid id) =>
             _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithRollbackAsync(p.Value!, id));
 
@@ -105,7 +105,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("{id}")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -168,7 +168,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
         [HttpPost("merge")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> Merge(Guid fromId, Guid toId) =>
             _webApi.PostAsync<Person>(Request, p => _manager.MergeAsync(fromId, toId), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Update);
@@ -187,7 +187,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="coordinates">The Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         [HttpPost("map")]
-        [ProducesResponseType(typeof(MapCoordinates), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.MapCoordinates), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> Map(MapCoordinates? coordinates = default)
         {
@@ -200,7 +200,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         [HttpGet("noargsforme")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetNoArgs() =>
             _webApi.GetAsync<Person?>(Request, p => _manager.GetNoArgsAsync());
@@ -211,7 +211,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
         [HttpGet("{id}/detail")]
-        [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetDetail(Guid id) =>
             _webApi.GetAsync<PersonDetail?>(Request, p => _manager.GetDetailAsync(id));
@@ -223,7 +223,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         [HttpPut("{id}/detail")]
         [AcceptsBody(typeof(Common.Entities.PersonDetail))]
-        [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
         public Task<IActionResult> UpdateDetail(Guid id) =>
             _webApi.PutAsync<PersonDetail, PersonDetail>(Request, p => _manager.UpdateDetailAsync(p.Value!, id));
 
@@ -234,7 +234,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The patched <see cref="PersonDetail"/>.</returns>
         [HttpPatch("{id}/detail")]
         [AcceptsBody(typeof(Common.Entities.PersonDetail))]
-        [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchDetail(Guid id) =>
             _webApi.PatchAsync<PersonDetail>(Request, get: _ => _manager.GetDetailAsync(id), put: p => _personManager.UpdateDetailAsync(p.Value!, id));
 
@@ -254,7 +254,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
         [HttpGet("null")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetNull(string? name, List<string>? names = default) =>
             _webApi.GetAsync<Person?>(Request, p => _manager.GetNullAsync(name, names), operationType: CoreEx.OperationType.Unspecified);
@@ -265,7 +265,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("publishnosend")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> EventPublishNoSend() =>
             _webApi.PutAsync<Person, Person>(Request, p => _manager.EventPublishNoSendAsync(p.Value!));
 
@@ -319,7 +319,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         [HttpGet("ef/{id}")]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetWithEf(Guid id) =>
             _webApi.GetAsync<Person?>(Request, p => _manager.GetWithEfAsync(id));
@@ -330,7 +330,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Person"/>.</returns>
         [HttpPost("ef")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
         public Task<IActionResult> CreateWithEf() =>
             _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateWithEfAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/persons/ef/{r.Id}", UriKind.Relative));
 
@@ -341,7 +341,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Person"/>.</returns>
         [HttpPut("ef/{id}")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> UpdateWithEf(Guid id) =>
             _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithEfAsync(p.Value!, id));
 
@@ -361,7 +361,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("ef/{id}")]
         [AcceptsBody(typeof(Common.Entities.Person))]
-        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchWithEf(Guid id) =>
             _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
     }

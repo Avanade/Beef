@@ -72,7 +72,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{#if HasValue}}
         [AcceptsBody(typeof(Common.Entities.{{ValueType}}))]
   {{/if}}
-        [ProducesResponseType({{#if HasReturnValue}}typeof({{#if IsEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
+        [ProducesResponseType({{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
   {{#if HasReturnValue}}
     {{#ifne WebApiAlternateStatus 'null'}}
         [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]

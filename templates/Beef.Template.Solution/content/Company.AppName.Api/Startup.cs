@@ -1,170 +1,113 @@
-﻿using System;
-using System.IO;
-#if (implement_httpagent)
-using System.Net.Http;
-#endif
-using System.Reflection;
-using Azure.Messaging.ServiceBus;
-using Beef;
-using Beef.AspNetCore.WebApi;
-using Beef.Caching.Policy;
-#if (implement_cosmos)
-using Beef.Data.Cosmos;
-#endif
-#if (implement_database || implement_entityframework)
-using Beef.Data.Database;
-#endif
-#if (implement_entityframework)
-using Beef.Data.EntityFrameworkCore;
-#endif
-using Beef.Entities;
-using Beef.Events.ServiceBus;
-using Beef.Validation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using Company.AppName.Business;
-using Company.AppName.Business.Data;
-using Company.AppName.Business.DataSvc;
+﻿namespace Company.AppName.Api;
 
-namespace Company.AppName.Api
+/// <summary>
+/// Represents the <b>startup</b> class.
+/// </summary>
+public class Startup
 {
     /// <summary>
-    /// Represents the <b>startup</b> class.
+    /// The configure services method called by the runtime; use this method to add services to the container.
     /// </summary>
-    public class Startup
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    public void ConfigureServices(IServiceCollection services)
     {
-        private readonly IConfiguration _config;
+        if (services == null)
+            throw new ArgumentNullException(nameof(services));
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
-        /// </summary>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        public Startup(IConfiguration config)
-        {
-            _config = Check.NotNull(config, nameof(config));
-
-            // Use JSON property names in validation and default the page size.
-            ValidationArgs.DefaultUseJsonNames = true;
-            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
-        }
-
-        /// <summary>
-        /// The configure services method called by the runtime; use this method to add services to the container.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        public void ConfigureServices(IServiceCollection services)
-        {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            // Add the core beef services.
-            services.AddBeefExecutionContext()
-                    .AddBeefTextProviderAsSingleton()
-                    .AddBeefSystemTime()
-                    .AddBeefRequestCache()
-                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
-                    .AddBeefWebApiServices()
-                    .AddBeefBusinessServices();
+        // Add the core services.
+        services.AddSettings<AppNameSettings>()
+                .AddExecutionContext()
+                .AddJsonSerializer()
+                .AddReferenceDataOrchestrator()
+                .AddWebApi()
+                .AddJsonMergePatch()
+                .AddReferenceDataContentWebApi()
+                .AddRequestCache()
+                .AddValidationTextProvider()
+                .AddValidators<PersonValidator>()
+                .AddSingleton<IIdentifierGenerator, IdentifierGenerator>();
 
 #if (implement_database || implement_entityframework)
-            // Add the beef database services (scoped per request/connection).
-            services.AddBeefDatabaseServices(() => new AppNameDb(WebApiStartup.GetConnectionString(_config, "Database")));
+        // Add the database services (scoped per request/connection).
+        services.AddDatabase(sp => new AppNameDb(() => new SqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
 
 #endif
 #if (implement_entityframework)
-            // Add the beef entity framework services (scoped per request/connection).
-            services.AddBeefEntityFrameworkServices<AppNameEfDbContext, AppNameEfDb>();
+        // Add the entity framework services (scoped per request/connection).
+        services.AddDbContext<AppNameEfDbContext>();
+        services.AddEfDb<AppNameEfDb>();
 
 #endif
 #if (implement_cosmos)
-            // Add the beef cosmos services (singleton).
-            services.AddBeefCosmosDbServices<AppNameCosmosDb>(_config.GetSection("CosmosDb"));
+        // Add the cosmos database.
+        services.AddSingleton<ICosmos>(sp =>
+        {
+            var settings = sp.GetRequiredService<BankingSettings>();
+            var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
+            return new CosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+        });
 
 #endif
 #if (implement_httpagent)
-            // Add the HTTP agent services.
-            services.AddHttpClient("Xxx", c => c.BaseAddress = new Uri(_config.GetValue<string>("XxxAgentUrl")));
-            services.AddScoped<IXxxAgentArgs>(sp => new XxxAgentArgs(sp.GetService<IHttpClientFactory>().CreateClient("Xxx")));
-            services.AddScoped<IXxxAgent, XxxAgent>();
+        // Add the HTTP agent services.
+        services.AddHttpClient("Xxx", c => c.BaseAddress = new Uri(_config.GetValue<string>("XxxAgentUrl")));
+        services.AddScoped<IXxxAgentArgs>(sp => new XxxAgentArgs(sp.GetService<IHttpClientFactory>().CreateClient("Xxx")));
+        services.AddScoped<IXxxAgent, XxxAgent>();
 
 #endif
-            // Add the generated reference data services.
-            services.AddGeneratedReferenceDataManagerServices()
-                    .AddGeneratedReferenceDataDataSvcServices()
-                    .AddGeneratedReferenceDataDataServices();
+        // Add the generated reference data services.
+        services.AddGeneratedReferenceDataManagerServices()
+                .AddGeneratedReferenceDataDataSvcServices()
+                .AddGeneratedReferenceDataDataServices();
 
-            // Add the generated entity services.
-            services.AddGeneratedManagerServices()
-                    .AddGeneratedValidationServices()
-                    .AddGeneratedDataSvcServices()
-                    .AddGeneratedDataServices();
+        // Add the generated entity services.
+        services.AddGeneratedManagerServices()
+                .AddGeneratedDataSvcServices()
+                .AddGeneratedDataServices();
 
-            // Add GUID identifier generator service.
-            services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>();
-
-#if (implement_database || implement_entityframework)
-            // Add transactional event outbox services.
-            services.AddGeneratedDatabaseEventOutbox();
-            services.AddBeefDatabaseEventOutboxPublisherService();
-
+#if (implement_entityframework || implement_cosmos)
+        // Add AutoMapper services via Assembly-based probing for Profiles.
+        services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(PersonData).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
+        services.AddAutoMapperWrapper();
 #endif
-            // Add event publishing services.
-            var sbcs = _config.GetValue<string>("ServiceBusConnectionString");
-            if (!string.IsNullOrEmpty(sbcs))
-                services.AddBeefServiceBusSender(new ServiceBusClient(sbcs));
-            else
-                services.AddBeefNullEventPublisher();
 
-            // Add AutoMapper services via Assembly-based probing for Profiles.
-            services.AddAutoMapper(Beef.Mapper.AutoMapperProfile.Assembly, typeof(PersonData).Assembly);
+        // Add additional services.
+        services.AddControllers();
+        services.AddHealthChecks();
+        services.AddHttpClient();
 
-            // Add additional services; note Beef requires NewtonsoftJson.
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddHealthChecks();
-            services.AddHttpClient();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Company.AppName API", Version = "v1" });
-
-                var xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
-                var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
-                if (File.Exists(xmlFile))
-                    c.IncludeXmlComments(xmlFile);
-            });
-
-            services.AddSwaggerGenNewtonsoftSupport();
-        }
-
-        /// <summary>
-        /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
-        /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
-        public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
+        services.AddSwaggerGen(options =>
         {
-            // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Company.AppName API", Version = "v1" });
+            options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
+        });
+    }
 
-            // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName"));
+    /// <summary>
+    /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
+    /// </summary>
+    /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
+    /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
+    public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
+    {
+        // Handle any unhandled exceptions.
+        app.UseWebApiExceptionHandler();
 
-            // Add execution context set up to the pipeline.
-            app.UseExecutionContext();
+        // Add Swagger as an endpoint and to serve the swagger-ui to the pipeline.
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName"));
 
-            // Add health checks.
-            app.UseHealthChecks("/health");
+        // Add execution context set up to the pipeline.
+        app.UseExecutionContext();
 
-            // Use controllers.
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+        // Add health checks.
+        app.UseHealthChecks("/health");
+
+        // Use controllers.
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

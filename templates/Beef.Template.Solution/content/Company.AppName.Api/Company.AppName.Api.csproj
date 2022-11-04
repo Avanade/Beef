@@ -2,21 +2,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="webapisettings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="webapisettings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.2.6" />
-    <PackageReference Include="Beef.Events" Version="4.2.5" />
-    <PackageReference Include="Beef.Events.EventHubs" Version="4.2.4" />
-    <PackageReference Include="Beef.Events.ServiceBus" Version="4.2.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Business\Company.AppName.Business.csproj" />

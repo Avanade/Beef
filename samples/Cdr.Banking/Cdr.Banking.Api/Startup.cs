@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using AzCosmos = Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Api
 {
@@ -8,21 +8,6 @@ namespace Cdr.Banking.Api
     public class Startup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
-        /// </summary>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        public Startup(IConfiguration config)
-        {
-            // Use JSON property names in validation; and determine whether unhandled exception details are to be included in the response.
-            ValidationArgs.DefaultUseJsonNames = true;
-
-            // Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification; and default the page size to 25 from config.
-            HttpConsts.PagingArgsPageQueryStringNames.Add("page");
-            HttpConsts.PagingArgsTakeQueryStringNames.Add("page-size");
-            PagingArgs.DefaultTake = new BankingSettings(config).GetValue<int>("DefaultPageSize");
-        }
-
-        /// <summary>
         /// The configure services method called by the runtime; use this method to add services to the container.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
@@ -30,6 +15,10 @@ namespace Cdr.Banking.Api
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
+
+            // Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification.
+            HttpConsts.PagingArgsPageQueryStringNames.Add("page");
+            HttpConsts.PagingArgsTakeQueryStringNames.Add("page-size");
 
             // Add the core services (including the customized ExecutionContext).
             services.AddSettings<BankingSettings>()
@@ -43,11 +32,11 @@ namespace Cdr.Banking.Api
                     .AddValidators<AccountManager>();
 
             // Add the cosmos database.
-            services.AddSingleton<Business.Data.ICosmos>(sp =>
+            services.AddSingleton<ICosmos>(sp =>
             {
                 var settings = sp.GetRequiredService<BankingSettings>();
-                var cco = new CosmosClientOptions { SerializerOptions = new CosmosSerializationOptions { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
-                return new Business.Data.CosmosDb(new CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+                var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
+                return new CosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
             });
 
             // Add the generated reference data services.
@@ -72,11 +61,7 @@ namespace Cdr.Banking.Api
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Cdr.Banking API", Version = "v1" });
-
-                var xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
-                var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
-                if (File.Exists(xmlFile))
-                    options.IncludeXmlComments(xmlFile);
+                options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
             });
         }
 

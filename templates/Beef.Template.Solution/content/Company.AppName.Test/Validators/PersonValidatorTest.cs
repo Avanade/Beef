@@ -1,84 +1,82 @@
-﻿using Beef.Test.NUnit;
-using Beef.Validation;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
-using Company.AppName.Business;
-using Company.AppName.Business.Data;
-using Company.AppName.Business.DataSvc;
-using Company.AppName.Business.Entities;
-using Company.AppName.Business.Validation;
+﻿using Company.AppName.Business.Entities;
 
-namespace Company.AppName.Test.Validators
+namespace Company.AppName.Test.Validators;
+
+[TestFixture]
+public class PersonValidatorTest
 {
-    [TestFixture]
-    public class PersonValidatorTest
+    private Action<IServiceCollection>? _testSetup;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        private Func<IServiceCollection, IServiceCollection>? _testSetup;
+        var rd = new Mock<IReferenceDataData>();
+        rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
+        _testSetup = sc => sc
+            .AddValidationTextProvider()
+            .AddValidators<PersonValidator>()
+            .AddJsonSerializer()
+            .AddReferenceDataOrchestrator(sp => new ReferenceDataOrchestrator(sp).Register())
+            .AddGeneratedReferenceDataManagerServices()
+            .AddGeneratedReferenceDataDataSvcServices()
+            .AddScoped(_ => rd.Object);
+    }
+
+    [Test]
+    public async Task A110_Validation_Empty()
+    {
+        using var test = ValidationTester.Create();
+
+        await test
+            .ConfigureServices(_testSetup!)
+            .ExpectErrors(
+                "First Name is required.",
+                "Last Name is required.",
+                "Gender is required.",
+                "Birthday is required.")
+            .RunAsync<IValidator<Person>, Person>(new Person());
+    }
+
+    [Test]
+    public async Task A120_Validation_Invalid()
+    {
+        var p = new Person
         {
-            var rd = new Mock<IReferenceDataData>();
-            rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+            FirstName = 'x'.ToLongString(),
+            LastName = 'x'.ToLongString(),
+            Gender = "X",
+            Birthday = DateTime.UtcNow.AddDays(1)
+        };
 
-            _testSetup = sc => sc
-                .AddGeneratedValidationServices()
-                .AddGeneratedReferenceDataManagerServices()
-                .AddGeneratedReferenceDataDataSvcServices()
-                .AddScoped(_ => rd.Object);
-        }
+        using var test = ValidationTester.Create();
 
-        [Test]
-        public async Task A110_Validation_Empty()
+        await test
+            .ConfigureServices(_testSetup!)
+            .ExpectErrors(
+                "First Name must not exceed 100 characters in length.",
+                "Last Name must not exceed 100 characters in length.",
+                "Gender is invalid.",
+                "Birthday must be less than or equal to Today.")
+            .RunAsync<IValidator<Person>, Person>(p);
+    }
+
+    [Test]
+    public async Task A130_Validation_OK()
+    {
+        var p = new Person
         {
-            await ValidationTester.Test()
-                .ConfigureServices(_testSetup!)
-                .ExpectMessages(
-                    "First Name is required.",
-                    "Last Name is required.",
-                    "Gender is required.",
-                    "Birthday is required.")
-                .CreateAndRunAsync<IValidator<Person>, Person>(new Person());
-        }
+            FirstName = "Sam",
+            LastName = "Reilly",
+            Gender = "F",
+            Birthday = DateTime.UtcNow.AddYears(-18)
+        };
 
-        [Test]
-        public async Task A120_Validation_Invalid()
-        {
-            var p = new Person
-            {
-                FirstName = 'x'.ToLongString(),
-                LastName = 'x'.ToLongString(),
-                GenderSid = "X",
-                Birthday = DateTime.UtcNow.AddDays(1)
-            };
+        using var test = ValidationTester.Create();
 
-            await ValidationTester.Test()
-                .ConfigureServices(_testSetup!)
-                .ExpectMessages(
-                    "First Name must not exceed 100 characters in length.",
-                    "Last Name must not exceed 100 characters in length.",
-                    "Gender is invalid.",
-                    "Birthday must be less than or equal to Today.")
-                .CreateAndRunAsync<IValidator<Person>, Person>(p);
-        }
-
-        [Test]
-        public async Task A130_Validation_OK()
-        {
-            var p = new Person
-            {
-                FirstName = "Sam",
-                LastName = "Reilly",
-                GenderSid = "F",
-                Birthday = DateTime.UtcNow.AddYears(-18)
-            };
-
-            await ValidationTester.Test()
-                .ConfigureServices(_testSetup!)
-                .CreateAndRunAsync<IValidator<Person>, Person>(p);
-        }
+        await test
+            .ConfigureServices(_testSetup!)
+            .ExpectSuccess()
+            .RunAsync<IValidator<Person>, Person>(p);
     }
 }

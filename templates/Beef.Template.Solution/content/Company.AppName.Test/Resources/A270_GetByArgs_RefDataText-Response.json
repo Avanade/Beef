@@ -1,0 +1,18 @@
+﻿[
+  {
+    "id": "00000003-0000-0000-0000-000000000000",
+    "firstName": "Rachael",
+    "lastName": "Browne",
+    "gender": "F",
+    "genderText": "Female",
+    "birthday": "1972-06-28T00:00:00"
+  },
+  {
+    "id": "00000001-0000-0000-0000-000000000000",
+    "firstName": "Wendy",
+    "lastName": "Jones",
+    "gender": "F",
+    "genderText": "Female",
+    "birthday": "1985-03-18T00:00:00"
+  }
+]

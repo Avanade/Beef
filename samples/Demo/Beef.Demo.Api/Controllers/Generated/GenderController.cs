@@ -34,7 +34,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
             _webApi.GetAsync<Gender?>(Request, p => _manager.GetAsync(id));
@@ -45,7 +45,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Gender"/>.</returns>
         [HttpPost("")]
         [AcceptsBody(typeof(Common.Entities.Gender))]
-        [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
             _webApi.PostAsync<Gender, Gender>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
@@ -56,7 +56,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Gender"/>.</returns>
         [HttpPut("{id}")]
         [AcceptsBody(typeof(Common.Entities.Gender))]
-        [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Gender, Gender>(Request, p => _manager.UpdateAsync(p.Value!, id));
     }

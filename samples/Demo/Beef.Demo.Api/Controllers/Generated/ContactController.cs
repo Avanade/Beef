@@ -51,7 +51,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
             _webApi.GetAsync<Contact?>(Request, p => _manager.GetAsync(id));
@@ -62,7 +62,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The created <see cref="Contact"/>.</returns>
         [HttpPost("")]
         [AcceptsBody(typeof(Common.Entities.Contact))]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
             _webApi.PostAsync<Contact, Contact>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
@@ -73,7 +73,7 @@ namespace Beef.Demo.Api.Controllers
         /// <returns>The updated <see cref="Contact"/>.</returns>
         [HttpPut("{id}")]
         [AcceptsBody(typeof(Common.Entities.Contact))]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
             _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));
 

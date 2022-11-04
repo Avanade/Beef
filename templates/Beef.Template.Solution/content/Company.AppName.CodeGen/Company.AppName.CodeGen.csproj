@@ -3,8 +3,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.CodeGen.Core" Version="4.2.16" />
+    <PackageReference Include="Beef.CodeGen.Core" Version="BeefVersion" />
   </ItemGroup>
 </Project>

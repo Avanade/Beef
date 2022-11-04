@@ -150,6 +150,7 @@ namespace My.Hr.Test.Validators
             using var test = ValidationTester.Create();
 
             test.ConfigureServices(_testSetup!)
+                .ExpectSuccess()
                 .Run<IValidator<Employee>, Employee>(e);
         }
 

@@ -658,6 +658,11 @@ operations: [
         public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
 
         /// <summary>
+        /// Indicates whether the <see cref="ReturnType"/> is an entity.
+        /// </summary>
+        public bool IsReturnTypeEntity => Root!.Entities!.Any(x => x.Name == ReturnType);
+
+        /// <summary>
         /// The operation event properties.
         /// </summary>
         public class OperationEvent

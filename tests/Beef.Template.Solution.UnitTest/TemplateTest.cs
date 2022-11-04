@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -136,7 +137,11 @@ namespace Beef.Template.Solution.UnitTest
             Assert.Zero(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, "dotnet new beef");
 
             // Restore nuget packages from our repository.
-            Assert.Zero(ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "packageonly")}", dir).exitCode, "dotnet restore");
+            var path = Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "nuget-publish");
+            if (!Directory.Exists(path))
+                path = null;
+
+            Assert.Zero(ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "packageonly")} {(path == null ? "" : $"-s {path}")}", dir).exitCode, "dotnet restore");
 
             // CodeGen: Execute code-generation.
             Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
@@ -146,7 +151,6 @@ namespace Beef.Template.Solution.UnitTest
             {
                 Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
-                Assert.Zero(ExecuteCommand("dotnet", "run codegen --script DatabaseEventOutbox.yaml", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run codegen --script DatabaseEventOutbox.yaml [database]");
             }
 
             // Run the intra-integration tests.

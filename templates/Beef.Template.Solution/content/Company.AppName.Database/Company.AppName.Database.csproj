@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Database.Core" Version="4.2.5" />
-    <PackageReference Include="Beef.CodeGen.Core" Version="4.2.16" />
+    <PackageReference Include="Beef.Database.Core" Version="BeefVersion" />
+    <PackageReference Include="Beef.CodeGen.Core" Version="BeefVersion" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,11 +17,6 @@
     <!--#endif -->
     <EmbeddedResource Include="Migrations\**\*" />
     <EmbeddedResource Include="Data\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Schema\" />
-    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

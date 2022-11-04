@@ -97,8 +97,6 @@
 
                 options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
             });
-
-            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         /// <summary>

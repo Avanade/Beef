@@ -1,29 +1,4 @@
-﻿#if (implement_database || implement_entityframework)
-using Beef.Database.Core;
-#endif
-#if (implement_cosmos)
-using Beef.Data.Cosmos;
-#endif
-using Beef.Test.NUnit;
-#if (implement_cosmos)
-using Microsoft.Extensions.Configuration;
-using Cosmos = Microsoft.Azure.Cosmos;
-#endif
-using NUnit.Framework;
-#if (implement_database || implement_entityframework)
-using System.Reflection;
-#endif
-#if (!implement_httpagent)
-using System.Threading.Tasks;
-using Company.AppName.Api;
-#endif
-using Company.AppName.Common.Agents;
-#if (implement_cosmos)
-using Company.AppName.Business.Data;
-using Company.AppName.Business.Entities;
-#endif
-
-namespace Company.AppName.Test.Apis
+﻿namespace Company.AppName.Test.Apis
 {
     [SetUpFixture]
     public class FixtureSetUp
@@ -32,64 +7,56 @@ namespace Company.AppName.Test.Apis
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
-            TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
-            TestSetUp.DefaultExpectNoEvents = false;
+            TestSetUp.Default.ExpectedEventsEnabled = true;
+            TestSetUp.Default.ExpectNoEvents = true;
 
-            var config = AgentTester.BuildConfiguration<Startup>("AppName");
-
-            TestSetUp.RegisterSetUp(async (count, _) =>
+            TestSetUp.Default.RegisterSetUp(async (count, _, __) =>
             {
-                var args = new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData,
-                    config["ConnectionStrings:Database"],
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) 
-                { UseBeefDbo = true };
+                using var test = ApiTester.Create<Startup>();
+                var settings = test.Services.GetRequiredService<AppNameSettings>();
 
-                return await DatabaseExecutor.RunAsync(args).ConfigureAwait(false) == 0;
+                return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, settings.DatabaseConnectionString,
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true }).ConfigureAwait(false) == 0;
             });
         }
 #endif
 #if (implement_cosmos)
-        private bool _removeAfterUse;
-        private AppNameCosmosDb? _cosmosDb;
-
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
-            TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
-            TestSetUp.DefaultExpectNoEvents = false;
+            using var test = ApiTester.Create<Startup>();
+            _cosmosDb = test.Services.GetRequiredService<ICosmos>();
 
-            var config = AgentTester.BuildConfiguration<Startup>("AppName");
+            await _cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(_cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
-            TestSetUp.RegisterSetUp(async (count, _) =>
+            var ac = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
             {
-                var cc = config.GetSection("CosmosDb");
-                _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
-                _cosmosDb = new AppNameCosmosDb(new Cosmos.CosmosClient(cc.GetValue<string>("EndPoint"), cc.GetValue<string>("AuthKey")), cc.GetValue<string>("Database"), createDatabaseIfNotExists: true);
+                Id = _cosmosDb.Accounts.Container.Id,
+                PartitionKeyPath = "/_partitionKey"
+            }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-                var rc = await _cosmosDb.ReplaceOrCreateContainerAsync(
-                    new Cosmos.ContainerProperties
-                    {
-                        Id = "Person",
-                        PartitionKeyPath = "/_partitionKey"
-                    }, 400).ConfigureAwait(false);
+            var tc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
+            {
+                Id = _cosmosDb.Transactions.Container.Id,
+                PartitionKeyPath = "/accountId"
+            }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-                await rc.ImportBatchAsync<PersonTest, Person>("Person.yaml", "Person").ConfigureAwait(false);
+            var rdc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
+            {
+                Id = "RefData",
+                PartitionKeyPath = "/_partitionKey",
+                UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
+            }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-                var rdc = await _cosmosDb.ReplaceOrCreateContainerAsync(
-                    new Cosmos.ContainerProperties
-                    {
-                        Id = "RefData",
-                        PartitionKeyPath = "/_partitionKey",
-                        UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                    }, 400).ConfigureAwait(false);
+            var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
+            await _cosmosDb.Accounts.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
+            await _cosmosDb.Transactions.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
-                await rdc.ImportValueRefDataBatchAsync<PersonTest, ReferenceData>("RefData.yaml").ConfigureAwait(false);
+            jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
+            await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
 
-                return true;
-            });
+            return true;
         }
 
         [OneTimeTearDown]

@@ -4,10 +4,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.Abstractions" Version="4.2.6" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Agents\" />
-    <Folder Include="Entities\" />
+    <PackageReference Include="CoreEx" Version="CoreExVersion" />
   </ItemGroup>
 </Project>

@@ -20,17 +20,12 @@ namespace Cdr.Banking.Business
         public BankingSettings(IConfiguration configuration) : base(configuration, Prefixes) { }
 
         /// <summary>
-        /// Gets the default page size (see <see cref="CoreEx.Entities.PagingArgs.Take>).
-        /// </summary>
-        public int DefaultPageSize => GetValue(defaultValue: 100);
-
-        /// <summary>
-        /// Gets the Cosmos DB connection string.
+        /// Gets the CosmosDB connection string.
         /// </summary>
         public string CosmosConnectionString => GetRequiredValue<string>();
 
         /// <summary>
-        /// Gtes the Cosmods DB database identifier.
+        /// Gtes the CosmosDB database identifier.
         /// </summary>
         public string CosmosDatabaseId => GetRequiredValue<string>();
     }

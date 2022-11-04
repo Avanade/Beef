@@ -1,5 +1,7 @@
 using Beef.Database.Core;
+using Microsoft.Extensions.DependencyInjection;
 using My.Hr.Api;
+using My.Hr.Business;
 using NUnit.Framework;
 using System.Reflection;
 using UnitTestEx;
@@ -19,9 +21,10 @@ namespace My.Hr.Test.Apis
             TestSetUp.Default.RegisterSetUp(async (count, _, __) =>
             {
                 using var test = ApiTester.Create<Startup>();
+                var settings = test.Services.GetRequiredService<HrSettings>();
 
                 return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, test.Configuration["ConnectionStrings:Database"],
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, settings.DatabaseConnectionString,
                     typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true }).ConfigureAwait(false) == 0;
             });
         }
