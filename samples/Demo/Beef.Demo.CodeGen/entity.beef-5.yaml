@@ -1,0 +1,273 @@
+refDataNamespace: Beef.Demo.Common.Entities
+grpc: true
+validatorLayer: Business
+refDataDefaultMapperConverter: ReferenceDataCodeConverter
+refDataText: true
+eventPublish: DataSvc
+eventSourceKind: Relative
+cosmosName: DemoCosmosDb
+appBasedAgentArgs: true
+entities:
+- { name: Person, text: Person, implements: 'IETag, IChangeLog', collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: Guid, grpcFieldNo: 1, uniqueKey: true, dataName: PersonId, annotation1: '[System.Xml.Serialization.XmlElement("Id")]' },
+      { name: FirstName, type: string, grpcFieldNo: 2 },
+      { name: LastName, type: string, grpcFieldNo: 3 },
+      { name: UniqueCode, type: string, grpcFieldNo: 4 },
+      { name: Gender, type: ^Gender, refDataType: string, grpcFieldNo: 5, dataName: GenderId, dataConverter: 'ReferenceDataNullableGuidIdConverter{T}' },
+      { name: EyeColor, type: ^EyeColor, partitionKey: true, grpcFieldNo: 6, dataName: EyeColorCode },
+      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly, grpcFieldNo: 7, databaseDbType: Date },
+      { name: Address, type: Address, isEntity: true, grpcFieldNo: 8, databaseMapper: AddressData.DbMapper, entityFrameworkMapper: Skip },
+      { name: ETag, type: string, grpcFieldNo: 500 },
+      { name: Metadata, type: 'Dictionary<string, string>', dataConverter: 'ObjectToJsonConverter{T}', dataName: MetadataJson },
+      { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 501 }
+    ],
+    operations: [
+      { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', managerExtensions: false, dataSvcExtensions: false, dataExtensions: false },
+      { name: GetEx, type: Get, uniqueKey: true, webApiRoute: 'ex/{id}' },
+      { name: Update, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: '{id}', dataSvcTransaction: true, managerExtensions: true, dataSvcExtensions: false, dataExtensions: false },
+      { name: UpdateWithRollback, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: 'withRollback/{id}', dataSvcTransaction: true, databaseStoredProc: spPersonUpdate },
+      { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+      { name: GetAll, type: GetColl, paging: true, webApiRoute: all },
+      { name: GetAll2, type: GetColl, paging: false, webApiRoute: allnopaging, databaseStoredProc: spPersonGetAll },
+      { name: GetByArgs, type: GetColl, paging: true,
+        parameters: [
+          { name: Args, type: PersonArgs, validator: PersonArgsValidator }
+        ]
+      },
+      { name: GetDetailByArgs, type: GetColl, returnType: PersonDetail, paging: true, webApiRoute: argsdetail, autoImplement: None,
+        parameters: [
+          { name: Args, type: PersonArgs, validator: PersonArgsValidator }
+        ]
+      },
+      { name: Merge, text: 'Merge first {{Person}} into second', type: Custom, returnType: Person, webApiRoute: merge, managerOperationType: Update, eventPublish: DataSvc, eventSubject: 'Demo.Person.{fromId}:MergeFrom;Demo.Person.{toId}:MergeTo',
+        parameters: [
+          { name: FromId, text: 'from {{Person}} identifier', type: Guid, isMandatory: true },
+          { name: ToId, text: 'to {{Person}} identifier', type: Guid, isMandatory: true, validatorCode: 'CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!)' }
+        ]
+      },
+      { name: Mark, text: 'Mark {{Person}}', type: Custom, webApiRoute: mark, webApiStatus: Accepted, managerOperationType: Update, eventPublish: DataSvc },
+      { name: Map, text: 'Get {{Person}} at specified {{MapCoordinates}}', type: Custom, returnType: MapCoordinates, webApiRoute: map, webApiStatus: OK, managerOperationType: Read,
+        parameters: [
+          { name: Args, type: MapArgs }
+        ]
+      },
+      { name: GetNoArgs, text: Get no arguments, type: Get, webApiRoute: noargsforme, autoImplement: None },
+      { name: GetDetail, type: Get, returnType: PersonDetail, uniqueKey: true, webApiRoute: '{id}/detail', autoImplement: None },
+      { name: UpdateDetail, type: Update, valueType: PersonDetail, returnType: PersonDetail, validator: PersonDetailValidator, uniqueKey: true, webApiRoute: '{id}/detail', autoImplement: None },
+      { name: PatchDetail, type: Patch, valueType: PersonDetail, returnType: PersonDetail, uniqueKey: true, webApiRoute: '{id}/detail', webApiGetOperation: GetDetail, webApiUpdateOperation: IPersonManager.UpdateDetail },
+      { name: Add, text: Actually validating the FromBody parameter generation, type: Custom, webApiRoute: fromBody, webApiStatus: Created, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,
+        parameters: [
+          { name: Person, type: Person, nullable: false, webApiFrom: FromBody }
+        ]
+      },
+      { name: DataSvcCustom, type: Custom, text: Validate a DataSvc Custom generation, returnType: int, dataSvcCustom: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
+      { name: ManagerCustom, type: Get, text: Validate a Manager Custom generation, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
+      { name: GetNull, type: Custom, returnType: 'Person?', webApiRoute: 'null', webApiMethod: HttpGet, webApiAlternateStatus: NotFound,
+        parameters: [
+          { name: Name, type: string },
+          { name: Names, type: 'List<string>', default: default }
+        ]
+      },
+      { name: EventPublishNoSend, type: Update, text: Validate when an Event is published but not sent, webApiRoute: publishnosend, eventPublish: None, dataSvcCustom: true, excludeData: true, excludeIData: true },
+      # Entity Framework
+      { name: GetByArgsWithEf, type: GetColl, paging: true, webApiRoute: args, autoImplement: EntityFramework,
+        parameters: [
+          { name: Args, type: PersonArgs, validator: PersonArgsValidator }
+        ]
+      },
+      { name: ThrowError, type: Custom, returnType: void, webApiRoute: error, autoImplement: None, managerTransaction: true },
+      { name: InvokeApiViaAgent, type: Custom, returnType: string, uniqueKey: true, webApiRoute: invokeApi, autoImplement: None },
+      { name: ParamColl, type: Custom, returnType: void, webApiRoute: paramcoll, dataSvcCustom: true, excludeIData: true, excludeData: true,
+        parameters: [
+          { name: Addresses, type: AddressCollection, validator: AddressCollectionValidator, webApiFrom: FromBody }
+        ]
+      },
+      { name: GetWithEf, type: Get, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
+      { name: CreateWithEf, type: Create, validator: PersonValidator, webApiRoute: ef, webApiLocation: ^GetWithEf, autoImplement: EntityFramework, eventPublish: None },
+      { name: UpdateWithEf, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
+      { name: DeleteWithEf, type: Delete, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework, eventSubject: 'Demo.Person.{id}' },
+      { name: PatchWithEf, type: Patch, validator: PersonValidator, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework }
+    ]
+  }
+
+- { name: PersonArgs, text: '{{Person}} arguments', excludeAll: true,
+    properties: [
+      { name: FirstName, type: string },
+      { name: LastName, type: string },
+      { name: Genders, type: Gender, refDataType: string, refDataList: true }
+    ]
+  }
+
+- { name: MapArgs, text: Mapping arguments, excludeAll: true,
+    properties: [
+      { name: Coordinates, type: MapCoordinates, WebApiQueryStringConverter: MapCoordinatesToStringConverter }
+    ]
+  }
+
+- { name: MapCoordinates, excludeAll: true,
+    properties: [
+      { name: Latitude, type: decimal },
+      { name: Longitude, type: decimal }
+    ]
+  }
+
+- { name: Address, grpc: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, collection: true,
+    properties: [
+      { name: Street, grpcFieldNo: 1, type: string },
+      { name: City, grpcFieldNo: 2, type: string }
+    ]
+  }
+
+- { name: PersonDetail, text: '{{Person}} detail', inherits: Person, collection: true, collectionResult: true, excludeAll: true,
+    properties: [
+      { name: History, type: WorkHistoryCollection, isEntity: true }
+    ]
+  }
+
+- { name: WorkHistory, collection: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
+    properties: [
+      { name: PersonId, text: '{{Person}} identifier (not serialized/read-only for internal data merging)', type: Guid, immutable: true, serializationIgnore: true },
+      { name: Name, type: string, uniqueKey: true },
+      { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
+      { name: EndDate, type: DateTime, nullable: true, dateTimeTransform: DateOnly }
+    ]
+  }
+
+  # <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" AutoInferImplements="false" WebApiRoutePrefix="api/v1/products" DataSvcCaching="false" AutoImplement="OData" ODataName="TestOData" ODataEntity="Model.Product" ODataCollectionName="Products">
+  # <Property Name="Id" Text="{{Product}} identifier" Type="int" Immutable="true" UniqueKey="true" DataName="ID" EmitDefaultValue="true" />
+  # <Property Name="Name" Type="string"/>
+  # <Property Name="Description" Type="string"/>
+  # 
+  # <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
+  # <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
+  # <Parameter Name="Args" Type="ProductArgs" Validator="ProductArgsValidator" />
+  # </Operation>
+  # </Entity>
+- { name: ProductArgs, text: '{{Product}} arguments', excludeAll: true,
+    properties: [
+      { name: Name, type: string },
+      { name: Description, type: string }
+    ]
+  }
+
+  # CosmosDb
+- { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot,
+    properties: [
+      { name: Id, text: '{{Robot}} identifier', type: Guid, uniqueKey: true, dataConverter: 'TypeToStringConverter{T}', grpcFieldNo: 1 },
+      { name: ModelNo, text: Model number, type: string, grpcFieldNo: 2 },
+      { name: SerialNo, text: Unique serial number, type: string, grpcFieldNo: 3 },
+      { name: EyeColor, type: ^EyeColor, refDataType: string, grpcFieldNo: 4 },
+      { name: PowerSource, type: ^PowerSource, refDataType: string, grpcFieldNo: 5 },
+      { name: ETag, type: string, grpcFieldNo: 6 },
+      { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 7 }
+    ],
+    operations: [
+      { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Create, type: Create, webApiLocation: ^Get, grpc: true },
+      { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+      { name: Delete, type: Delete, uniqueKey: true, webApiRoute: '{id}', grpc: true },
+      { name: GetByArgs, type: GetColl, paging: true, grpc: true,
+        parameters: [
+          { name: Args, type: RobotArgs, validator: RobotArgsValidator }
+        ]
+      },
+      { name: RaisePowerSourceChange, text: 'Raises a {{Robot.PowerSource}} change event', type: Custom, webApiRoute: '{id}/powerSource/{powerSource}', webApiStatus: Accepted, uniqueKey: true, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,
+        parameters: [
+          { name: PowerSource, type: ^PowerSource, refDataType: string }
+        ]
+      }
+    ]
+  }
+
+- { name: RobotArgs, text: '{{Robot}} arguments', excludeAll: true, grpc: true,
+    properties: [
+      { name: ModelNo, jsonName: 'model-no', text: Model number, type: string, grpcFieldNo: 1 },
+      { name: SerialNo, jsonName: 'serial-no', text: Unique serial number, type: string, grpcFieldNo: 2 },
+      { name: PowerSources, jsonName: 'power-sources', type: ^PowerSource, refDataType: string, refDataList: true, grpcFieldNo: 3 }
+    ]
+  }
+
+  # Entity with no etag or changelog
+- { name: Contact, collection: true, collectionResult: true, isInitialOverride: false, webApiRoutePrefix: api/v1/contacts, webApiAuthorize: AllowAnonymous, webApiCtorParams: [ Microsoft.Extensions.Configuration.IConfiguration^Config ], eventPublish: Data, eventOutbox: Database, get: true, create: true, update: true, delete: true, getAll: true, autoImplement: EntityFramework, databaseSchema: Demo, entityFrameworkModel: EfModel.Contact,
+    properties: [
+      { name: Id, text: '{{Contact}} identifier', type: Guid, uniqueKey: true, dataAutoGenerated: true, dataName: ContactId },
+      { name: FirstName, type: string },
+      { name: LastName, type: string },
+      { name: Status, type: ^Status, dataName: StatusCode },
+      { name: InternalCode, type: string, internalOnly: true, entityFrameworkMapper: Ignore }
+    ],
+    operations: [
+      { name: RaiseEvent, type: Custom, webApiRoute: raise, eventPublish: Data, eventOutbox: Database,
+        parameters: [
+          { name: throwError, text: throw a DivideByZero exception, type: bool }
+        ]
+      }
+    ]
+  }
+
+- { name: Config, webApiRoutePrefix: api/v1/envvars, excludeEntity: true, excludeDataSvc: true, excludeIDataSvc: true, excludeData: Exclude, excludeIData: true,
+    operations: [
+      { name: GetEnvVars, type: Custom, managerCustom: true, returnType: System.Collections.IDictionary }
+    ]
+  }
+
+  # Non EntityBase entity
+- { name: PersonOther, text: 'other {{Person}} without {{EntityBase}} capabilities', omitEntityBase: true, collection: true, excludeAll: true,
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true },
+      { name: FirstName, type: string },
+      { name: LastName, type: string },
+      { name: ETag, type: string, jsonName: etag },
+      { name: ChangeLog, type: ChangeLog, isEntity: true }
+    ]
+  }
+
+- { name: PostalInfo, dataModel: true, autoImplement: HttpAgent, webApiRoutePrefix: api/v1/postal, httpAgentName: ZippoAgent, httpAgentModel: Model.PostalInfo, httpAgentCode: WithRetry(), webApiConcurrency: true, webApiGetOperation: GetPostCodes,
+    properties: [
+      { name: Country, type: ^Country, jsonDataModelName: country abbreviation },
+      { name: City, jsonDataModelName: place name },
+      { name: State, jsonDataModelName: state abbreviation },
+      { name: Places, type: PlaceInfoCollection },
+      { name: ETag, internalOnly: true, dataModelSerializationIgnore: true }
+    ],
+    operations: [
+      { name: GetPostCodes, type: Get, webApiRoute: '{country}/{state}/{city}', httpAgentRoute: '{country.Code}/{state}/{city}', httpAgentCode: Reset(),
+        parameters: [
+          { name: Country, type: ^Country, isMandatory: true, validatorCode: IsValid() },
+          { name: State, isMandatory: true },
+          { name: City, isMandatory: true }
+        ]
+      },
+      { name: CreatePostCodes, type: Create, webApiRoute: '{country}/{state}/{city}', httpAgentRoute: '{country.Code}/{state}/{city}',
+        parameters: [
+          { name: Country, type: ^Country, isMandatory: true, validatorCode: IsValid() },
+          { name: State, isMandatory: true },
+          { name: City, isMandatory: true }
+        ]
+      },
+      { name: UpdatePostCodes, type: Update, webApiRoute: '{country}/{state}/{city}', httpAgentRoute: '{country.Code}/{state}/{city}',
+        parameters: [
+          { name: Country, type: ^Country, isMandatory: true, validatorCode: IsValid() },
+          { name: State, isMandatory: true },
+          { name: City, isMandatory: true }
+        ]
+      },
+      { name: PatchPostCodes, type: Patch, webApiRoute: '{country}/{state}/{city}', httpAgentRoute: '{country.Code}/{state}/{city}', webApiUpdateOperation: UpdatePostCodes,
+        parameters: [
+          { name: Country, type: ^Country, isMandatory: true, validatorCode: IsValid() },
+          { name: State, isMandatory: true },
+          { name: City, isMandatory: true }
+        ]
+      }
+    ]
+  }
+
+- { name: PlaceInfo, collection: true, dataModel: true, autoImplement: HttpAgent, excludeData: RequiresMapper,
+    properties: [
+      { name: Name, jsonDataModelName: place name },
+      { name: PostCode, jsonDataModelName: post code }
+    ]
+  }
+

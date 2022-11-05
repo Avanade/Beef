@@ -1,0 +1,41 @@
+refDataNamespace: Beef.Demo.Common.Entities
+refDataWebApiRoute: api/v1/demo/ref
+refDataDefaultMapperConverter: ReferenceDataInt32IdConverter
+webApiAuthorize: AllowAnonymous
+appBasedAgentArgs: true
+cosmosName: DemoCosmosDb
+entities:
+  # A Get/Create/Update/Delete are not required unless specific CRUD operations are required.
+- { name: Country, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/countries, autoImplement: Database, databaseSchema: Ref }
+
+- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/usStates, autoImplement: Database, databaseSchema: Ref }
+
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/genders, get: true, create: true, update: true, autoImplement: Database, databaseSchema: Ref,
+    properties: [
+      { name: AlternateName, type: string },
+      { name: TripCode, text: Trip OData Code, type: string, refDataMapping: true, serializationIgnore: true },
+      { name: Country, type: ^Country, dataName: CountryId, dataConverter: 'ReferenceDataNullableGuidIdConverter{T}' }
+    ],
+    consts: [
+      # Ignore how this relationship makes NO sense; is for testing purposes only!
+      { name: Female, value: F },
+      { name: Male, value: M }
+    ]
+  }
+
+- { name: EyeColor, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/eyeColors, autoImplement: EntityFramework, databaseSchema: Ref, entityFrameworkModel: EfModel.EyeColor }
+
+- { name: PowerSource, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/powerSources, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.PowerSource, dataModel: true,
+    properties: [
+      { name: AdditionalInfo, type: string }
+    ]
+  }
+
+- { name: Company, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/companies,
+    properties: [
+      { name: ExternalCode, type: string, refDataMapping: true, immutable: true }
+    ]
+  }
+
+- { name: Status, refDataType: string, collection: true, webApiRoutePrefix: api/v1/demo/ref/statuses, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Status }
+

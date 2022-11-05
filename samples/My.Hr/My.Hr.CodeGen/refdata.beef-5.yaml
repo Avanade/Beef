@@ -1,0 +1,9 @@
+webapiRoutePrefix: ref
+appBasedAgentArgs: true
+databaseSchema: Hr
+entities:
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
+- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
+- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
+- { name: PerformanceOutcome, refDataType: Guid, collection: true, webApiRoutePrefix: performanceOutcomes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.PerformanceOutcome }

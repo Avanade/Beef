@@ -1,0 +1,153 @@
+schema: Demo
+eventSubjectFormat: NameOnly
+eventSourceKind: Relative
+eventSourceRoot: /cdc
+eventActionFormat: PastTense
+outbox: true
+outboxSchemaCreate: true
+autoDotNetRename: SnakeKebabToPascalCase
+queries:
+  # New "Query" configuration.
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [ CreatedBy,  UpdatedBy ], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [ CreatedDate,  UpdatedDate ], aliasColumns: [ RowVersion^RowVersionP ],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+tables:
+
+  # Override the OrgUnitId to bypass the automatic handling as already applied wihin the underlying view.
+- { name: vwTestQuery, schema: Test, columnNameOrgUnitId: N/A,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, storedProcedureName: spTestQueryGetByArgs,
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE }
+        ]
+      }
+    ]
+  }
+
+- { name: Table, schema: Test, efModel: true }
+
+- { name: Table2, schema: Test, get: true, create: true, update: true, delete: true, upsert: true }
+
+- { name: Table3, schema: Test, get: true, create: true, update: true, delete: true, upsert: true }
+
+  # Special test to generate all variations.
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], orgUnitImmutable: true, permission: TestSec,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE },
+          { name: MinCount, operator: GE, column: Count },
+          { name: MaxCount, operator: LE, column: Count, nullable: true }
+        ]
+      },
+      { name: Get, type: Get, withHints: NOLOCK,
+        execute: [
+          { statement: EXEC Demo.Before, location: Before },
+          { statement: EXEC Demo.After }
+        ]
+      },
+      { name: Update, type: Update }
+    ]
+  }
+
+  # Reference data stored procedures
+- { name: Gender, schema: Ref, getAll: true, get: true, create: true, update: true }
+
+- { name: Country, schema: Ref, getAll: true }
+
+- { name: USState, schema: Ref, getAll: true }
+
+  # Reference data entity framework
+- { name: EyeColor, schema: Ref, efModel: true }
+
+- { name: Status, schema: Ref, efModel: true }
+
+  # Master data stored procedures.
+- { name: Person, schema: Demo, get: true, create: true, update: true, delete: true, efModel: true,
+    storedProcedures: [
+      { name: GetAll, paging: true,
+        orderby: [
+          { name: LastName, order: Ascending },
+          { name: FirstName, order: Ascending }
+        ]
+      },
+      { name: GetByArgs, paging: true,
+        parameters: [
+          { name: FirstName, nullable: true, collection: false, operator: LIKE },
+          { name: LastName, nullable: true, collection: false, operator: LIKE },
+          { name: GenderId, nullable: true, collection: true }
+        ],
+        orderby: [
+          { name: LastName, order: Ascending },
+          { name: FirstName, order: Ascending }
+        ]
+      },
+      { name: GetDetailByArgs, paging: true, intoTempTable: true,
+        parameters: [
+          { name: FirstName, nullable: true, collection: false, operator: LIKE },
+          { name: LastName, nullable: true, collection: false, operator: LIKE },
+          { name: GenderId, nullable: true, collection: true }
+        ],
+        orderby: [
+          { name: LastName, order: Ascending },
+          { name: FirstName, order: Ascending }
+        ],
+        execute: [
+          { statement: 'EXEC [Demo].[spWorkHistoryGetUsingTempTable]' }
+        ]
+      },
+      { name: GetDetail, type: Get,
+        execute: [
+          { statement: 'EXEC [Demo].[spWorkHistoryGetByPersonId] @PersonId' }
+        ]
+      },
+      { name: UpdateDetail, type: Update, reselectStatement: 'EXEC [Demo].[spPersonGetDetail] @PersonId',
+        parameters: [
+          { name: WorkHistoryList, sqlType: '[Demo].[udtWorkHistoryList] READONLY' }
+        ],
+        execute: [
+          { statement: 'EXEC [Demo].[spWorkHistoryMerge] @PersonId, @WorkHistoryList', location: After }
+        ]
+      }
+    ]
+  }
+
+- { name: WorkHistory, schema: Demo, udt: true, tvp: WorkHistory, udtExcludeColumns: [ PersonId ],
+    storedProcedures: [
+      { name: GetByPersonId, type: GetColl,
+        parameters: [
+          { name: PersonId }
+        ],
+        orderby: [
+          { name: StartDate, order: Descending }
+        ]
+      },
+      { name: Merge, type: Merge, mergeOverrideIdentityColumns: [ Name ],
+        parameters: [
+          { name: PersonId, sqlType: UNIQUEIDENTIFIER }
+        ]
+      },
+      { name: GetUsingTempTable, type: GetColl,
+        where: [
+          { statement: '[PersonId] IN (SELECT [PersonId] from #p)' }
+        ],
+        orderby: [
+          { name: PersonId, order: Ascending },
+          { name: StartDate, order: Descending }
+        ]
+      }
+    ]
+  }
+
+  # Check the generated output for the IsDeleted.
+- { name: Person2, schema: Demo, create: true, update: true, upsert: true, delete: true, get: true, getAll: true }
+
+  # Basic table with no row version or change log.
+- { name: Contact, schema: Demo, efModel: true }
+
