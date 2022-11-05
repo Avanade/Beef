@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <Product>Beef.Database.Core</Product>
     <Description>Business Entity Execution Framework (Beef) Database tool.</Description>
     <PackageTags>beef database sql dbup migration schema dbex</PackageTags>

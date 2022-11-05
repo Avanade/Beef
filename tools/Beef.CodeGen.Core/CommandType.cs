@@ -33,6 +33,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// All command types selected.
         /// </summary>
-        All = Entity | Database | RefData | DataModel
+        All = Entity | Database | RefData | DataModel,
+
+        /// <summary>
+        /// Cleans (removes) all child 'Generated' directories.
+        /// </summary>
+        Clean = 2048
     }
 }

@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Config;
-using Beef.CodeGen.Generators;
 using Microsoft.Extensions.Logging;
 using OnRamp.Config;
 using OnRamp.Console;
@@ -32,14 +30,10 @@ namespace Beef.CodeGen
             {
                 switch (args[0].ToUpperInvariant())
                 {
-                    case "--GENERATEENTITYXMLSCHEMA": return SpecialActivitiesCenter("Generate Entity XML Schema", "./Schema/codegen.entity.xsd", fn => XmlSchemaGenerator.Create<Config.Entity.CodeGenConfig>(ConfigType.Entity).Save(fn, System.Xml.Linq.SaveOptions.None));
                     case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => JsonSchemaGenerator.Generate<Config.Entity.CodeGenConfig>(fn, "JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef)."));
-                    case "--GENERATEDATABASEXMLSCHEMA": return SpecialActivitiesCenter("Generate Database XML Schema", "./Schema/codegen.table.xsd", fn => XmlSchemaGenerator.Create<Config.Database.CodeGenConfig>(ConfigType.Database).Save(fn, System.Xml.Linq.SaveOptions.None));
                     case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => JsonSchemaGenerator.Generate<Config.Database.CodeGenConfig>(fn, "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef)."));
-                    case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity, true));
-                    case "--GENERATEENTITYXMLMARKDOWN": return SpecialActivitiesCenter("Generate Entity XML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity, false));
-                    case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database, true));
-                    case "--GENERATEDATABASEXMLMARKDOWN": return SpecialActivitiesCenter("Generate Database XML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database, false));
+                    case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity));
+                    case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database));
                 }
             }
 
@@ -69,20 +63,8 @@ namespace Beef.CodeGen
         /// <summary>
         /// Invoke the <see cref="MarkdownDocumentationGenerator"/>.
         /// </summary>
-        private static void GenerateMarkdown<T>(string directory, ConfigType configType, bool isYaml) where T : ConfigBase, IRootConfig
-            => MarkdownDocumentationGenerator.Generate<T>(createFileName: (_, cgca) => $"{configType}-{cgca.Name}-{(isYaml ? "Config" : "Config-Xml")}.md",
-                directory: directory, includeExample: isYaml, addBreaksBetweenSections: true, propertyData: pd =>
-                {
-                    if (isYaml)
-                        return;
-
-                    if (!Enum.TryParse<ConfigurationEntity>(pd.Class!.Name, out var ce))
-                        ce = ConfigurationEntity.CodeGen;
-
-                    pd.Name = XmlYamlTranslate.GetXmlName(configType, ce, pd.Name!);
-                    var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(configType, ce, pd.Name).Attribute;
-                    if (xpsa != null)
-                        pd.Psa = xpsa;
-                }, fileCreation: fn => _logger.LogWarning("{Content}", $" > {fn}"));
+        private static void GenerateMarkdown<T>(string directory, ConfigType configType) where T : ConfigBase, IRootConfig
+            => MarkdownDocumentationGenerator.Generate<T>(createFileName: (_, cgca) => $"{configType}-{cgca.Name}-Config.md",
+                directory: directory, includeExample: true, addBreaksBetweenSections: true, fileCreation: fn => _logger.LogWarning("{Content}", $" > {fn}"));
     }
 }

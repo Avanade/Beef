@@ -22,8 +22,7 @@ namespace Beef.Database.Core
     public class DatabaseConsole
     {
         private const string EntryAssemblyOnlyOptionName = "EO";
-        private const string XmlToYamlOptionName = "X2Y";
-        private readonly Dictionary<string, CommandOption> _options = new Dictionary<string, CommandOption>();
+        private readonly Dictionary<string, CommandOption> _options = new ();
         private CommandArgument<DatabaseExecutorCommand>? _cmdArg;
         private CommandArgument? _additionalArgs;
 
@@ -190,7 +189,6 @@ namespace Beef.Database.Core
             _options.Add(nameof(DatabaseConsoleArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified). [CodeGen]", CommandOptionType.MultipleValue));
             _options.Add(nameof(DatabaseConsoleArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
             _options.Add(nameof(DatabaseConsoleArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
-            _options.Add(XmlToYamlOptionName, app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen). [CodeGen]", CommandOptionType.NoValue));
             _additionalArgs = app.Argument("args", "Additional arguments; 'Script' arguments (first being the script name) -or- 'Execute' (each a SQL statement to invoke).", multipleValues: true);
 
 
@@ -224,10 +222,6 @@ namespace Beef.Database.Core
                 UpdateStringOption(nameof(DatabaseConsoleArgs.OutputDirectory), v => Args.OutputDirectory = new DirectoryInfo(v));
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.ExpectNoChanges), () => Args.ExpectNoChanges = true);
                 UpdateBooleanOption(nameof(DatabaseConsoleArgs.IsSimulation), () => Args.IsSimulation = true);
-
-                if (GetCommandOption(XmlToYamlOptionName).HasValue() && _cmdArg.ParsedValue != DatabaseExecutorCommand.CodeGen)
-                    return new ValidationResult($"Command '{_cmdArg.ParsedValue}' is not compatible with --xml-to-yaml; the command must be '{nameof(DatabaseExecutorCommand.CodeGen)}'.");
-
                 UpdateStringOption(nameof(DatabaseConsoleArgs.ConnectionStringEnvironmentVariableName), v => Args.ConnectionStringEnvironmentVariableName = v);
                 Args.OverrideConnectionString(GetCommandOption(nameof(DatabaseConsoleArgs.ConnectionString)).Value());
 
@@ -344,12 +338,6 @@ namespace Beef.Database.Core
                 // Write the header.
                 Args.Logger?.LogInformation("{Content}", AppTitle);
                 Args.Logger?.LogInformation("{Content}", string.Empty);
-
-                if (GetCommandOption(XmlToYamlOptionName).HasValue())
-                {
-                    var success = await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, Args.GetCompany(), Args.GetAppName()), Args.Logger).ConfigureAwait(false);
-                    return success ? 0 : 4;
-                }
 
                 // Write the options.
                 Args.Logger?.LogInformation("{Content}", $"Command = {_cmdArg!.ParsedValue}");

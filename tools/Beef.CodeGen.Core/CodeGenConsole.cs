@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Converters;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -25,7 +25,6 @@ namespace Beef.CodeGen
         private string _databaseScript = "Database.yaml";
 
         private CommandArgument<CommandType>? _cmdArg;
-        private CommandOption? _x2yOpt;
 
         /// <summary>
         /// Gets the 'Company' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
@@ -188,7 +187,6 @@ namespace Beef.CodeGen
         protected override void OnBeforeExecute(CommandLineApplication app)
         {
             _cmdArg = app.Argument<CommandType>("command", "Execution command type.", false).IsRequired();
-            _x2yOpt = app.Option("-x2y|--xml-to-yaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
         }
 
         /// <inheritdoc/>
@@ -202,9 +200,6 @@ namespace Beef.CodeGen
 
                 if (!string.IsNullOrEmpty(Args.ConfigFileName))
                     return new ValidationResult("Command 'All' is not compatible with --config; the command must be more specific when using a specified configuration file.");
-
-                if (_x2yOpt!.HasValue())
-                    return new ValidationResult("Command 'All' is not compatible with --xml-to-yaml; the command must be more specific when converting XML configuration to YAML.");
             }
             else
             {
@@ -240,15 +235,6 @@ namespace Beef.CodeGen
             if (company == null || appName == null)
                 throw new CodeGenException($"Parameters '{CompanyParamName}' and {AppNameParamName}  must be specified.");
 
-            // Where XML to YAML requested do so, then exit.
-            if (_x2yOpt!.HasValue())
-            {
-                if (await CodeGenFileManager.ConvertXmlToYamlAsync(cmd, Args.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(exedir, cmd, company, appName), Args.Logger).ConfigureAwait(false))
-                    return new CodeGenStatistics();
-                else
-                    throw new CodeGenException("An error occured whilst converting XML to YAML.");
-            }
-
             var count = 0;
             var stats = new CodeGenStatistics();
             if (IsDatabaseSupported && cmd.HasFlag(CommandType.Database))
@@ -262,6 +248,9 @@ namespace Beef.CodeGen
 
             if (IsDataModelSupported && cmd.HasFlag(CommandType.DataModel))
                 stats.Add(await ExecuteCodeGenerationAsync(_dataModelScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.DataModel, company, appName), count++).ConfigureAwait(false));
+
+            if (cmd.HasFlag(CommandType.Clean))
+                ExecuteCleanAsync();
 
             if (count > 1)
             {
@@ -308,38 +297,37 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenStatistics"/>.</returns>
         public static async Task<CodeGenStatistics> ExecuteCodeGenerationAsync(CodeGeneratorArgsBase args)
         {
-            CodeGenStatistics stats;
             var cg = await CodeGenerator.CreateAsync(args).ConfigureAwait(false);
             var fi = new FileInfo(args.ConfigFileName ?? throw new CodeGenException("Configuration file not specified."));
-            switch (fi.Extension.ToUpperInvariant())
+            return await cg.GenerateAsync(fi.FullName).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Executes the clean.
+        /// </summary>
+        private void ExecuteCleanAsync()
+        {
+            if (Args.OutputDirectory == null)
+                return;
+
+            Args.Logger?.LogInformation("{Content}", $"CodeGen Clean initiated for: {Args.OutputDirectory.FullName}");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", "The following 'Generated' directories were cleaned/deleted (all contents were deleted):");
+            var list = Args.OutputDirectory.EnumerateDirectories("Generated", SearchOption.AllDirectories);
+            if (list == null)
+                Args.Logger?.LogInformation("{Content}", "  No directories found.");
+            else
             {
-                // XML not natively supported so must be converted to YAML.
-                case ".XML":
-                    using (var xfs = fi.OpenText())
-                    {
-                        var xml = XDocument.Load(xfs, LoadOptions.None);
-                        if (cg.Scripts.GetConfigType() == typeof(Config.Entity.CodeGenConfig))
-                        {
-                            var sr = new StringReader(new EntityXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = await cg.GenerateAsync(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName).ConfigureAwait(false);
-                        }
-                        else if (cg.Scripts.GetConfigType() == typeof(Config.Database.CodeGenConfig))
-                        {
-                            var sr = new StringReader(new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
-                            stats = await cg.GenerateAsync(sr, OnRamp.Utility.StreamContentType.Yaml, fi.FullName).ConfigureAwait(false);
-                        }
-                        else
-                            throw new CodeGenException($"Configuration Type '{cg.Scripts.GetConfigType().FullName}' is not expected; must be either '{typeof(Config.Entity.CodeGenConfig).FullName}' or '{typeof(Config.Database.CodeGenConfig).FullName}'.");
-                    }
-
-                    break;
-
-                default:
-                    stats = await cg.GenerateAsync(fi.FullName).ConfigureAwait(false);
-                    break;
+                foreach (var di in list)
+                {
+                    Args.Logger?.LogWarning("  {Directory} [{FileCount} files]", di.FullName, di.GetFiles().Length);
+                    //di.Delete();
+                }
             }
 
-            return stats;
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", "Complete.");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
         }
     }
 }
