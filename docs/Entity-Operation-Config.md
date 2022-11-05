@@ -19,10 +19,10 @@ The valid `Type` values are as follows:
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 operations: [
-  { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', autoImplement: None },
   { name: Create, type: Create, webApiRoute: , autoImplement: None },
-  { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
-  { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+  { name: Update, type: Update, primaryKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },
   { name: Delete, type: Delete, webApiRoute: '{id}',
     parameters: [
       { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
@@ -65,7 +65,7 @@ Property | Description
 **`name`** | The unique operation name. [Mandatory]
 **`type`** | The type of operation that is to be code-generated. Valid options are: `Get`, `GetColl`, `Create`, `Update`, `Patch`, `Delete`, `Custom`.
 `text` | The text for use in comments.<br/>&dagger; The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
-**`uniqueKey`** | Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters.<br/>&dagger; This simplifies the specification of these properties versus having to declare each specifically.
+**`primaryKey`** | Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.<br/>&dagger; This simplifies the specification of these properties versus having to declare each specifically.
 **`paging`** | Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.
 `valueType` | The .NET value parameter `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Create` or `Update`.
 `returnType` | The .NET return `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.
@@ -91,7 +91,6 @@ Provides the _Events_ configuration.
 Property | Description
 -|-
 **`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`.<br/>&dagger; Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
-**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`.<br/>&dagger; Defaults to `Entity.EventOutbox` configuration property (inherits) where not specified and `EventPublish` is `Data`; otherwise, `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
 `eventSource` | The Event Source.<br/>&dagger; Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.
 `eventSubject` | The event subject template and corresponding event action pair (separated by a colon).<br/>&dagger; The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
@@ -106,7 +105,7 @@ Property | Description
 `webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.<br/>&dagger; Where not specified no attribute output will occur; it will then inherit as supported by .NET.
 **`webApiMethod`** | The HTTP Method for the operation. Valid options are: `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`.<br/>&dagger; The value defaults as follows: `HttpGet` for `Operation.Type` value `Get` or `GetColl`, `HttpPost` for `Operation.Type` value `Create` or `Custom`, `HttpPut` for `Operation.Type` value `Update`, and `HttpDelete` for `Operation.Type` value `Delete`. An `Operation.Type` value `Patch` can not be specified and will always default to `HttpPatch`.
 `webApiStatus` | The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value. Valid options are: `OK`, `Accepted`, `Created`, `NoContent`, `NotFound`.<br/>&dagger; The value defaults as follows: `OK` for `Operation.Type` value `Get`, `GetColl`, `Update`, `Delete` or `Custom`, `Created` for `Operation.Type` value `Create`.
-`webApiAlternateStatus` | The primary HTTP Status Code that will be returned for the operation where there is a `null` return value. Valid options are: `OK`, `Accepted`, `Created`, `NoContent`, `NotFound`, `ThrowException`.<br/>&dagger; The value defaults as follows: `NotFound` for `Operation.Type` value `Get`, `NoContent` for `Operation.Type` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.
+`webApiAlternateStatus` | The primary HTTP Status Code that will be returned for the operation where there is a `null` return value. Valid options are: `OK`, `Accepted`, `Created`, `NoContent`, `NotFound`.<br/>&dagger; The value defaults as follows: `NotFound` for `Operation.Type` value `Get` and `NoContent` for `Operation.Type` value `GetColl`; otherwise, `null`.
 `webApiLocation` | The HTTP Response Location Header route.<br/>&dagger; This uses similar formatting to the `WebApiRoute`. The response value is accessed using `r.` notation to access underlying properties; for example `{r.Id}` or `person/{r.Id}`. The `Entity.WebApiRoutePrefix` will be prepended automatically; however, to disable set the first character to `!`, e.g. `!person/{r.Id}`. The URI can be inferred from another `Operation` by using a lookup `^`; for example `^Get` indicates to infer from the named `Get` operation (where only `^` is specified this is shorthand for `^Get` as this is the most common value). The Location URI will ensure the first character is a `/` so it acts a 'relative URL absolute path'.
 `webApiConcurrency` | Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.<br/>&dagger; This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the `Operation.Type` is `Update` or `Patch`, the request ETag will be matched against the response for a corresponding `Get` operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the `Get` must be the same as that returned from the corresponding `Create`, `Update` and `Patch` (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. Defaults to `Entity.WebApiConcurrency`.
 `webApiGetOperation` | The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Update` and `SimulateConcurrency` is `true`.<br/>&dagger; Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.
@@ -122,7 +121,7 @@ Property | Description
 **`managerCustom`** | Indicates whether the `Manager` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `managerTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer.
 **`validator`** | The name of the .NET Type that will perform the validation.<br/>&dagger; Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.
+`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidatorEx<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.
 `managerOperationType` | The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer. Valid options are: `Create`, `Read`, `Update`, `Delete`, `Unspecified`.<br/>&dagger; The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.
 
 <br/>
@@ -134,6 +133,7 @@ Property | Description
 -|-
 **`dataSvcCustom`** | Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `dataSvcTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
+`dataSvcInvoker` | Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.<br/>&dagger; Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then orchestration will default to `true`.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.<br/>&dagger; Defaults to `Entity.ManagerExtensions`.
 
 <br/>
@@ -146,6 +146,7 @@ Property | Description
 **`autoImplement`** | The operation override for the `Entity.AutoImplement`. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `HttpAgent`, `None`.<br/>&dagger; Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.
 `dataEntityMapper` | The override for the data entity `Mapper`.<br/>&dagger; Used where the default generated `Mapper` is not applicable.
 `dataExtensions` | Indicates whether the `Data` extensions logic should be generated.<br/>&dagger; Defaults to `Entity.DataExtensions`.
+`dataInvoker` | Indicates whether a `DataInvoker` should orchestrate the `Data`-layer.<br/>&dagger; Where `Dataransaction` or `EventPublish` is `Data` then orchestration will default to `true`.
 `dataTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Data`-layer.<br/>&dagger; Where using an `EventOutbox` this is ignored as it is implied through its usage.
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.<br/>&dagger; Defaults to `Entity.ManagerExtensions`.
 
@@ -188,6 +189,7 @@ Property | Description
 **`httpAgentMethod`** | The HTTP Agent Method for the operation. Valid options are: `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpPatch`.<br/>&dagger; Defaults to `Operation.WebApiMethod`.
 **`httpAgentModel`** | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; This can be overridden within the `Operation`(s).
 `httpAgentReturnModel` | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; Defaults to `Operation.HttpAgentModel` where the `Operation.ReturnType` is equal to `Entity.Name` (same type). This can be overridden within the `Operation`(s).
+`httpAgentCode` | The fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Appended to `Entity.HttpAgentCode` where specified to extend.
 
 <br/>
 

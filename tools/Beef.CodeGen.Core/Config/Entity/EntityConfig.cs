@@ -192,7 +192,7 @@ entities:
         /// </summary>
         [JsonProperty("namespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Entity", Title = "The entity namespace to be appended.",
-            Description = "Appended to the end of the standard structure as follows: `{Company}.{AppName}.Common.Entities.{Namespace}`.")]
+            Description = "Appended to the end of the standard structure as follows: `{Company}.{AppName}.Business.Entities.{Namespace}`.")]
         public string? Namespace { get; set; }
 
         /// <summary>
@@ -381,7 +381,7 @@ entities:
         /// </summary>
         [JsonProperty("entityFrameworkName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.", IsImportant = true,
-            Description = "Defaults to the `CodeGeneration.EntityFrameworkName` configuration property (its default value is `IEfDb`).")]
+            Description = "Defaults to `CodeGeneration.EntityFrameworkName`.")]
         public string? EntityFrameworkName { get; set; }
 
         /// <summary>
@@ -390,14 +390,6 @@ entities:
         [JsonProperty("entityFrameworkModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("EntityFramework", Title = "The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
         public string? EntityFrameworkModel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the <c>Mapper</c> that the generated Entity Framework <c>Mapper</c> inherits from.
-        /// </summary>
-        [JsonProperty("entityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("EntityFramework", Title = "The name of the `Mapper  that the generated Entity Framework `Mapper` inherits from.",
-            Description = "Defaults to `Model.{Name}`; i.e. an entity with the same name in the `Model` namespace.")]
-        public string? EntityFrameworkMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.
@@ -449,13 +441,6 @@ entities:
         public bool? CosmosValueContainer { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the <c>Mapper</c> that the generated Cosmos <c>Mapper</c> inherits from.
-        /// </summary>
-        [JsonProperty("cosmosMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Cosmos", Title = "The name of the `Mapper` that the generated Cosmos `Mapper` inherits from.")]
-        public string? CosmosMapperInheritsFrom { get; set; }
-
-        /// <summary>
         /// Indicates that a custom Cosmos <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
         [JsonProperty("cosmosCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -489,13 +474,6 @@ entities:
         [CodeGenProperty("OData", Title = "The name of the underlying OData collection where `AutoImplement` is `OData`.", IsImportant = true,
             Description = "The underlying `Simple.OData.Client` will attempt to infer.")]
         public string? ODataCollectionName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the <c>Mapper</c> that the generated OData <c>Mapper</c> inherits from.
-        /// </summary>
-        [JsonProperty("odataMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("OData", Title = "The name of the `Mapper` that the generated OData `Mapper` inherits from.")]
-        public string? ODataMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom OData <c>Mapper</c> will be used; i.e. not generated.
@@ -599,14 +577,6 @@ entities:
         public string? EventPublish { get; set; }
 
         /// <summary>
-        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
-        /// </summary>
-        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
-            Description = "Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
-        public string? EventOutbox { get; set; }
-
-        /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -614,22 +584,6 @@ entities:
             Description = "Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
             "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.")]
         public string? EventSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the casing for the Subject and Action (with the exception of the key).
-        /// </summary>
-        [JsonProperty("eventCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The casing for the Subject and Action (with the exception of the key)", Options = new string[] { "None", "Lower", "Upper" }, IsImportant = true,
-            Description = "Defaults to `CodeGeneration.EventCasing`.")]
-        public string? EventCasing { get; set; }
 
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated whereever generating event publishing logic.
@@ -901,12 +855,12 @@ entities:
         /// <summary>
         /// Gets the list of properties that form the unique key; excluding inherited.
         /// </summary>
-        public List<PropertyConfig> UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+        public List<PropertyConfig> PrimaryKeyProperties => Properties!.Where(x => (x.PrimaryKey.HasValue && x.PrimaryKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key; including inherited.
         /// </summary>
-        public List<PropertyConfig> UniqueKeyPropertiesIncludeInherited => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
+        public List<PropertyConfig> PrimaryKeyPropertiesIncludeInherited => Properties!.Where(x => x.PrimaryKey.HasValue && x.PrimaryKey.Value).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the partition key.
@@ -1284,11 +1238,8 @@ entities:
             HttpAgentName = DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName);
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
-            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => Parent!.EventSubjectFormat);
-            EventCasing = DefaultWhereNull(EventCasing, () => Parent!.EventCasing);
             EventSource = DefaultWhereNull(EventSource, () => $"{Name!.ToLowerInvariant()}/{{$key}}");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
-            EventOutbox = DefaultWhereNull(EventOutbox, () => Parent!.EventOutbox);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
@@ -1342,6 +1293,8 @@ entities:
             ExcludeWebApi = DefaultWhereNull(ExcludeWebApi, () => CompareValue(ExcludeAll, true));
             ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, true));
             ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, true));
+
+            CheckDeprecatedProperties();
         }
 
         /// <summary>
@@ -1376,7 +1329,7 @@ entities:
             EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
             {
                 if (RefDataType == null)
-                    return CompareValue(CollectionKeyed, true) ? $"EntityBaseKeyedCollection<UniqueKey, {EntityName}>" : $"EntityBaseCollection<{EntityName}, {EntityCollectionName}>";
+                    return CompareValue(CollectionKeyed, true) ? $"EntityKeyBaseCollection<{EntityName}, {EntityCollectionName}>" : $"EntityBaseCollection<{EntityName}, {EntityCollectionName}>";
                 else
                     return $"ReferenceDataCollectionBase<{RefDataType}{(RefDataType == "string" ? "?" : "")}, {EntityName}, {EntityCollectionName}>";
             });
@@ -1393,13 +1346,12 @@ entities:
         /// </summary>
         private async Task PreparePropertiesAsync()
         {
-            if (Properties == null)
-                Properties = new List<PropertyConfig>();
+            Properties ??= new List<PropertyConfig>();
 
             if (RefDataType != null)
             {
                 var i = 0;
-                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, UniqueKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
+                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, PrimaryKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
                 AddInheritedProperty("Code", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("Text", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool" });
@@ -1432,27 +1384,26 @@ entities:
         /// </summary>
         private async Task PrepareOperationsAsync()
         {
-            if (Operations == null)
-                Operations = new List<OperationConfig>();
+            Operations ??= new List<OperationConfig>();
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !Operations.Any(x => x.Name == "Delete"))
-                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", UniqueKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", PrimaryKey = true });
 
             if (CompareValue(Patch, true) && !Operations.Any(x => x.Name == "Patch"))
-                Operations.Insert(0, new OperationConfig { Name = "Patch", Type = "Patch", UniqueKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Patch", Type = "Patch", PrimaryKey = true });
 
             if (CompareValue(Update, true) && !Operations.Any(x => x.Name == "Update"))
-                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", UniqueKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true });
 
             if (CompareValue(Create, true) && !Operations.Any(x => x.Name == "Create"))
-                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", UniqueKey = false, WebApiRoute = "" });
+                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", PrimaryKey = false, WebApiRoute = "" });
 
             if (CompareValue(Get, true) && !Operations.Any(x => x.Name == "Get"))
-                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", UniqueKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true });
 
             if (CompareValue(GetAll, true) && !Operations.Any(x => x.Name == "GetAll"))
-                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", UniqueKey = false, WebApiRoute = "" });
+                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", PrimaryKey = false, WebApiRoute = "" });
 
             // Prepare each operations.
             foreach (var operation in Operations)
@@ -1505,7 +1456,7 @@ entities:
                     }
                 }
 
-                if (UniqueKeyProperties.Count == 1)
+                if (PrimaryKeyProperties.Count == 1)
                 {
                     var id = Properties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
                     if (id != null)
@@ -1530,7 +1481,7 @@ entities:
                 }
             }
 
-            if (!HasIdentifier && Properties!.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+            if (!HasIdentifier && Properties!.Any(x => CompareValue(x.PrimaryKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
                 implements.Insert(i++, "IPrimaryKey");
                 commonImplements.Insert(c++, "IPrimaryKey");
@@ -1693,5 +1644,19 @@ entities:
 
             return pc;
         }
+
+        /// <summary>
+        /// Check for any deprecate properties and error.
+        /// </summary>
+        private void CheckDeprecatedProperties() => CodeGenConfig.WarnWhereDeprecated(Root!, this,
+            "entityScope",
+            "entityUsing",
+            "refDataStringFormat",
+            "entityFrameworkMapperInheritsFrom",
+            "cosmosMapperInheritsFrom",
+            "odataMapperInheritsFrom",
+            "eventOutbox",
+            "eventSubjectFormat",
+            "eventCasing");
     }
 }

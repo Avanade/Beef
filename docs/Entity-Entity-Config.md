@@ -60,11 +60,10 @@ Property | Description
 **`name`** | The unique entity name. [Mandatory]
 `text` | The overriding text for use in comments.<br/>&dagger; Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
 `fileName` | The overriding file name.<br/>&dagger; Overrides the Name as the code-generated file name.
-`entityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`.<br/>&dagger; Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
 `argumentName` | The overriding argument name.<br/>&dagger; Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
 `constType` | The Const .NET Type option. Valid options are: `int`, `long`, `Guid`, `string`.<br/>&dagger; The .NET Type to be used for the `const` values. Defaults to `string`.
-`isInitialOverride` | Indicates whether to override the `ICleanup.IsInitial` property.<br/>&dagger; Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.
+`isInitialOverride` | Indicates whether to override the `IInitial.IsInitial` property.<br/>&dagger; Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.
 
 <br/>
 
@@ -76,7 +75,6 @@ Property | Description
 **`refDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `long`, `Guid`, `string`.<br/>&dagger; Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
 `refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.<br/>&dagger; This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `refDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`.<br/>&dagger; Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
-`refDataStringFormat` | The Reference Data `ToString` composite format.<br/>&dagger; The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.
 
 <br/>
 
@@ -85,15 +83,14 @@ Provides the _Entity class_ configuration.
 
 Property | Description
 -|-
-`entityUsing` | The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement). Valid options are: `Common`, `Business`, `All`, `None`.<br/>&dagger; Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.
-`inherits` | The base class that the entity inherits from.<br/>&dagger; Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
+`inherits` | The base class that the entity inherits from.<br/>&dagger; Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBase<xxx>` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
 `implements` | The list of comma separated interfaces that are to be declared for the entity class.
-`implementsAutoInfer` | Indicates whether to automatically infer the interface implements for the entity from the properties declared.<br/>&dagger; Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.
+`implementsAutoInfer` | Indicates whether to automatically infer the interface implements for the entity from the properties declared.<br/>&dagger; Will attempt to infer the following: `IIdentifier<Guid>`, `IIdentifier<int>`, `IIdentifier<long>`, `IIdentifier<string>`, `IETag` and `IChangeLog`. Defaults to `true`.
 `abstract` | Indicates whether the class should be defined as abstract.
 `genericWithT` | Indicates whether the class should be defined as a generic with a single parameter `T`.
-`namespace` | The entity namespace to be appended.<br/>&dagger; Appended to the end of the standard structure as follows: `{Company}.{AppName}.Common.Entities.{Namespace}`.
+`namespace` | The entity namespace to be appended.<br/>&dagger; Appended to the end of the standard structure as follows: `{Company}.{AppName}.Business.Entities.{Namespace}`.
 `omitEntityBase` | Indicates that the entity should not inherit from `EntityBase`.<br/>&dagger; As such any of the `EntityBase` related capabilites are not supported (are omitted from generation). The intention for this is more for the generation of simple internal entities.
-`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`.<br/>&dagger; Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `Newtonsoft`.
+`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `SystemText`, `Newtonsoft`.<br/>&dagger; Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `SystemText`.
 
 <br/>
 
@@ -139,10 +136,8 @@ Provides the _Events_ configuration.
 Property | Description
 -|-
 **`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`.<br/>&dagger; Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).
-**`eventOutbox`** | The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing). Valid options are: `None`, `Database`.<br/>&dagger; Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.
 `eventSource` | The Event Source.<br/>&dagger; Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.
-`eventSubjectFormat` | The default formatting for the Subject when an Event is published. Valid options are: `NameOnly`, `NameAndKey`.<br/>&dagger; Defaults to `CodeGeneration.EventSubjectFormat`.
-**`eventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.<br/>&dagger; Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where `EventPublish` is `DataSvc` and a transactionally-aware data source is being used.
+**`eventTransaction`** | Indicates whether a `System.TransactionScope` should be created and orchestrated whereever generating event publishing logic.<br/>&dagger; Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified. This should only be used where a transactionally-aware data source is being used.
 
 <br/>
 
@@ -170,7 +165,8 @@ Property | Description
 **`managerCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.ManagerExtensions`.
 **`validator`** | The name of the .NET `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
+`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to `IValidatorEx<Xxx>` (where `Xxx` is the entity `Name`) where `Validator` is not `null`. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
+`identifierGenerator` | Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.
 
 <br/>
 
@@ -215,9 +211,8 @@ Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement
 
 Property | Description
 -|-
-**`entityFrameworkName`** | The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to the `CodeGeneration.EntityFrameworkName` configuration property (its default value is `IEfDb`).
+**`entityFrameworkName`** | The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to `CodeGeneration.EntityFrameworkName`.
 **`entityFrameworkModel`** | The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).
-`entityFrameworkMapperInheritsFrom` | The name of the `Mapper  that the generated Entity Framework `Mapper` inherits from.<br/>&dagger; Defaults to `Model.{Name}`; i.e. an entity with the same name in the `Model` namespace.
 `entityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
 
 <br/>
@@ -230,9 +225,8 @@ Property | Description
 **`cosmosName`** | The .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.<br/>&dagger; Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`).
 **`cosmosModel`** | The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).
 **`cosmosContainerId`** | The Cosmos `ContainerId` required where `AutoImplement` is `Cosmos`.
-`cosmosPartitionKey` | The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.<br/>&dagger; Defaults to `PartitionKey.None`.
+`cosmosPartitionKey` | The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.<br/>&dagger; The value `PartitionKey.None` can be specified. Literals will need to be quoted.
 `cosmosValueContainer` | Indicates whether the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer`.
-`cosmosMapperInheritsFrom` | The name of the `Mapper` that the generated Cosmos `Mapper` inherits from.
 `cosmosCustomMapper` | Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
 
 <br/>
@@ -245,7 +239,6 @@ Property | Description
 **`odataName`** | The .NET OData interface name used where `AutoImplement` is `OData`.<br/>&dagger; Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).
 **`odataModel`** | The corresponding OData model name (required where `AutoImplement` is `OData`).
 **`odataCollectionName`** | The name of the underlying OData collection where `AutoImplement` is `OData`.<br/>&dagger; The underlying `Simple.OData.Client` will attempt to infer.
-`odataMapperInheritsFrom` | The name of the `Mapper` that the generated OData `Mapper` inherits from.
 `odataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
 
 <br/>
@@ -259,6 +252,7 @@ Property | Description
 `httpAgentRoutePrefix` | The base HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; This is the base (prefix) `URI` for the HTTP Agent endpoint and can be further extended when defining the underlying `Operation`(s).
 **`httpAgentModel`** | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; This can be overridden within the `Operation`(s).
 `httpAgentReturnModel` | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; This can be overridden within the `Operation`(s).
+`httpAgentCode` | The fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Prepended to `Operation.HttpAgentCode` where specified to enable standardized functionality.
 
 <br/>
 

@@ -1,9 +1,9 @@
 # Configuring the code-generation global settings
 # - Schema defines the default for al tables unless explicitly defined.
-# - EventOutbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+# - Outbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
 # 
 schema: Hr
-eventOutbox: true
+# outbox: true - temporarily deprecated
 tables:
   # Reference data tables/models.
 - { name: Gender, efModel: true }

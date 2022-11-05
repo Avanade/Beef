@@ -397,8 +397,7 @@ queries:
                 }
             }
 
-            if (Where == null)
-                Where = new List<QueryWhereConfig>();
+            Where ??= new List<QueryWhereConfig>();
 
             if (ColumnTenantId != null)
                 Where.Add(new QueryWhereConfig { Statement = $"[{Alias}].[{ColumnTenantId.Name}] = dbo.fnGetTenantId(NULL)" });
@@ -460,8 +459,7 @@ queries:
         /// </summary>
         private async Task PrepareJoinsAsync()
         {
-            if (Joins == null)
-                Joins = new List<QueryJoinConfig>();
+            Joins ??= new List<QueryJoinConfig>();
 
             // Prepare the Join and also make sure the alias is unique.
             var dict = new Dictionary<string, int> { { Alias!, 1 } };

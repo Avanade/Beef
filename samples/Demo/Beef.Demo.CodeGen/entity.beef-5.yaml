@@ -10,7 +10,7 @@ appBasedAgentArgs: true
 entities:
 - { name: Person, text: Person, implements: 'IETag, IChangeLog', collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, grpcFieldNo: 1, uniqueKey: true, dataName: PersonId, annotation1: '[System.Xml.Serialization.XmlElement("Id")]' },
+      { name: Id, text: '{{Person}} identifier', type: Guid, grpcFieldNo: 1, primaryKey: true, dataName: PersonId, annotation1: '[System.Xml.Serialization.XmlElement("Id")]' },
       { name: FirstName, type: string, grpcFieldNo: 2 },
       { name: LastName, type: string, grpcFieldNo: 3 },
       { name: UniqueCode, type: string, grpcFieldNo: 4 },
@@ -23,11 +23,11 @@ entities:
       { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 501 }
     ],
     operations: [
-      { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', managerExtensions: false, dataSvcExtensions: false, dataExtensions: false },
-      { name: GetEx, type: Get, uniqueKey: true, webApiRoute: 'ex/{id}' },
-      { name: Update, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: '{id}', dataSvcTransaction: true, managerExtensions: true, dataSvcExtensions: false, dataExtensions: false },
-      { name: UpdateWithRollback, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: 'withRollback/{id}', dataSvcTransaction: true, databaseStoredProc: spPersonUpdate },
-      { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', managerExtensions: false, dataSvcExtensions: false, dataExtensions: false },
+      { name: GetEx, type: Get, primaryKey: true, webApiRoute: 'ex/{id}' },
+      { name: Update, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: '{id}', dataSvcTransaction: true, managerExtensions: true, dataSvcExtensions: false, dataExtensions: false },
+      { name: UpdateWithRollback, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: 'withRollback/{id}', dataSvcTransaction: true, databaseStoredProc: spPersonUpdate },
+      { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },
       { name: GetAll, type: GetColl, paging: true, webApiRoute: all },
       { name: GetAll2, type: GetColl, paging: false, webApiRoute: allnopaging, databaseStoredProc: spPersonGetAll },
       { name: GetByArgs, type: GetColl, paging: true,
@@ -53,9 +53,9 @@ entities:
         ]
       },
       { name: GetNoArgs, text: Get no arguments, type: Get, webApiRoute: noargsforme, autoImplement: None },
-      { name: GetDetail, type: Get, returnType: PersonDetail, uniqueKey: true, webApiRoute: '{id}/detail', autoImplement: None },
-      { name: UpdateDetail, type: Update, valueType: PersonDetail, returnType: PersonDetail, validator: PersonDetailValidator, uniqueKey: true, webApiRoute: '{id}/detail', autoImplement: None },
-      { name: PatchDetail, type: Patch, valueType: PersonDetail, returnType: PersonDetail, uniqueKey: true, webApiRoute: '{id}/detail', webApiGetOperation: GetDetail, webApiUpdateOperation: IPersonManager.UpdateDetail },
+      { name: GetDetail, type: Get, returnType: PersonDetail, primaryKey: true, webApiRoute: '{id}/detail', autoImplement: None },
+      { name: UpdateDetail, type: Update, valueType: PersonDetail, returnType: PersonDetail, validator: PersonDetailValidator, primaryKey: true, webApiRoute: '{id}/detail', autoImplement: None },
+      { name: PatchDetail, type: Patch, valueType: PersonDetail, returnType: PersonDetail, primaryKey: true, webApiRoute: '{id}/detail', webApiGetOperation: GetDetail, webApiUpdateOperation: IPersonManager.UpdateDetail },
       { name: Add, text: Actually validating the FromBody parameter generation, type: Custom, webApiRoute: fromBody, webApiStatus: Created, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,
         parameters: [
           { name: Person, type: Person, nullable: false, webApiFrom: FromBody }
@@ -77,17 +77,17 @@ entities:
         ]
       },
       { name: ThrowError, type: Custom, returnType: void, webApiRoute: error, autoImplement: None, managerTransaction: true },
-      { name: InvokeApiViaAgent, type: Custom, returnType: string, uniqueKey: true, webApiRoute: invokeApi, autoImplement: None },
+      { name: InvokeApiViaAgent, type: Custom, returnType: string, primaryKey: true, webApiRoute: invokeApi, autoImplement: None },
       { name: ParamColl, type: Custom, returnType: void, webApiRoute: paramcoll, dataSvcCustom: true, excludeIData: true, excludeData: true,
         parameters: [
           { name: Addresses, type: AddressCollection, validator: AddressCollectionValidator, webApiFrom: FromBody }
         ]
       },
-      { name: GetWithEf, type: Get, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
+      { name: GetWithEf, type: Get, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
       { name: CreateWithEf, type: Create, validator: PersonValidator, webApiRoute: ef, webApiLocation: ^GetWithEf, autoImplement: EntityFramework, eventPublish: None },
-      { name: UpdateWithEf, type: Update, validator: PersonValidator, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
-      { name: DeleteWithEf, type: Delete, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework, eventSubject: 'Demo.Person.{id}' },
-      { name: PatchWithEf, type: Patch, validator: PersonValidator, uniqueKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework }
+      { name: UpdateWithEf, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
+      { name: DeleteWithEf, type: Delete, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework, eventSubject: 'Demo.Person.{id}' },
+      { name: PatchWithEf, type: Patch, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework }
     ]
   }
 
@@ -128,18 +128,18 @@ entities:
 - { name: WorkHistory, collection: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
     properties: [
       { name: PersonId, text: '{{Person}} identifier (not serialized/read-only for internal data merging)', type: Guid, immutable: true, serializationIgnore: true },
-      { name: Name, type: string, uniqueKey: true },
+      { name: Name, type: string, primaryKey: true, serializationAlwaysInclude: true },
       { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
       { name: EndDate, type: DateTime, nullable: true, dateTimeTransform: DateOnly }
     ]
   }
 
   # <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" AutoInferImplements="false" WebApiRoutePrefix="api/v1/products" DataSvcCaching="false" AutoImplement="OData" ODataName="TestOData" ODataEntity="Model.Product" ODataCollectionName="Products">
-  # <Property Name="Id" Text="{{Product}} identifier" Type="int" Immutable="true" UniqueKey="true" DataName="ID" EmitDefaultValue="true" />
+  # <Property Name="Id" Text="{{Product}} identifier" Type="int" Immutable="true" primaryKey="true" DataName="ID" EmitDefaultValue="true" />
   # <Property Name="Name" Type="string"/>
   # <Property Name="Description" Type="string"/>
   # 
-  # <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
+  # <Operation Name="Get" OperationType="Get" primaryKey="true" WebApiRoute="{id}" />
   # <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
   # <Parameter Name="Args" Type="ProductArgs" Validator="ProductArgsValidator" />
   # </Operation>
@@ -154,7 +154,7 @@ entities:
   # CosmosDb
 - { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot,
     properties: [
-      { name: Id, text: '{{Robot}} identifier', type: Guid, uniqueKey: true, dataConverter: 'TypeToStringConverter{T}', grpcFieldNo: 1 },
+      { name: Id, text: '{{Robot}} identifier', type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter{T}', grpcFieldNo: 1 },
       { name: ModelNo, text: Model number, type: string, grpcFieldNo: 2 },
       { name: SerialNo, text: Unique serial number, type: string, grpcFieldNo: 3 },
       { name: EyeColor, type: ^EyeColor, refDataType: string, grpcFieldNo: 4 },
@@ -163,17 +163,17 @@ entities:
       { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 7 }
     ],
     operations: [
-      { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', grpc: true },
       { name: Create, type: Create, webApiLocation: ^Get, grpc: true },
-      { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', grpc: true },
-      { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
-      { name: Delete, type: Delete, uniqueKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Update, type: Update, primaryKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },
+      { name: Delete, type: Delete, primaryKey: true, webApiRoute: '{id}', grpc: true },
       { name: GetByArgs, type: GetColl, paging: true, grpc: true,
         parameters: [
           { name: Args, type: RobotArgs, validator: RobotArgsValidator }
         ]
       },
-      { name: RaisePowerSourceChange, text: 'Raises a {{Robot.PowerSource}} change event', type: Custom, webApiRoute: '{id}/powerSource/{powerSource}', webApiStatus: Accepted, uniqueKey: true, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,
+      { name: RaisePowerSourceChange, text: 'Raises a {{Robot.PowerSource}} change event', type: Custom, webApiRoute: '{id}/powerSource/{powerSource}', webApiStatus: Accepted, primaryKey: true, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,
         parameters: [
           { name: PowerSource, type: ^PowerSource, refDataType: string }
         ]
@@ -192,7 +192,7 @@ entities:
   # Entity with no etag or changelog
 - { name: Contact, collection: true, collectionResult: true, isInitialOverride: false, webApiRoutePrefix: api/v1/contacts, webApiAuthorize: AllowAnonymous, webApiCtorParams: [ Microsoft.Extensions.Configuration.IConfiguration^Config ], eventPublish: Data, eventOutbox: Database, get: true, create: true, update: true, delete: true, getAll: true, autoImplement: EntityFramework, databaseSchema: Demo, entityFrameworkModel: EfModel.Contact,
     properties: [
-      { name: Id, text: '{{Contact}} identifier', type: Guid, uniqueKey: true, dataAutoGenerated: true, dataName: ContactId },
+      { name: Id, text: '{{Contact}} identifier', type: Guid, primaryKey: true, dataAutoGenerated: true, dataName: ContactId },
       { name: FirstName, type: string },
       { name: LastName, type: string },
       { name: Status, type: ^Status, dataName: StatusCode },
@@ -216,7 +216,7 @@ entities:
   # Non EntityBase entity
 - { name: PersonOther, text: 'other {{Person}} without {{EntityBase}} capabilities', omitEntityBase: true, collection: true, excludeAll: true,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },
       { name: FirstName, type: string },
       { name: LastName, type: string },
       { name: ETag, type: string, jsonName: etag },

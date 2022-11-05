@@ -303,17 +303,13 @@ tables:
                 _ => "WRITE"
             });
 
-            if (Parameters == null)
-                Parameters = new List<ParameterConfig>();
+            Parameters ??= new List<ParameterConfig>();
 
-            if (Where == null)
-                Where = new List<WhereConfig>();
+            Where ??= new List<WhereConfig>();
 
-            if (OrderBy == null)
-                OrderBy = new List<OrderByConfig>();
+            OrderBy ??= new List<OrderByConfig>();
 
-            if (Execute == null)
-                Execute = new List<ExecuteConfig>();
+            Execute ??= new List<ExecuteConfig>();
 
             foreach (var parameter in Parameters)
             {
@@ -474,8 +470,7 @@ tables:
                         SettableColumns.Insert(0, new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn, MergeValueSql = p?.ParameterName });
                     }
 
-                    if (MergeOverrideIdentityColumns == null)
-                        MergeOverrideIdentityColumns = new List<string>();
+                    MergeOverrideIdentityColumns ??= new List<string>();
 
                     MergeOn = new List<string>();
                     MergeMatchSourceColumns = new List<string>();

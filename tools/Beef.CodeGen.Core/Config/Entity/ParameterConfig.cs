@@ -68,7 +68,7 @@ parameters: [
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
+        [CodeGenProperty("Key", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `int?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
@@ -166,7 +166,7 @@ parameters: [
         [CodeGenProperty("Manager", Title = "The option that determines the layers in which the parameter is passed.", Options = new string[] { "All", "ToManagerSet", "ToManagerCollSet" },
             Description = "Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, " +
             "`ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. " +
-            "Where using the `UniqueKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.")]
+            "Where using the `PrimaryKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.")]
         public string? LayerPassing { get; set; }
 
         #endregion
@@ -317,6 +317,8 @@ parameters: [
                 "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
                 _ => null
             };
+
+            CodeGenConfig.WarnWhereDeprecated(Root!, this, "dataConverterIsGeneric");
 
             return Task.CompletedTask;
         }

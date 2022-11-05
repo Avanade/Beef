@@ -40,7 +40,7 @@ Property | Description
 **`name`** | The unique parameter name. [Mandatory]
 `text` | The overriding text for use in comments.<br/>&dagger; By default the `Text` will be the `Name` reformatted as sentence casing.
 **`type`** | The .NET `Type`.<br/>&dagger; Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data `using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`
-**`nullable`** | Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.
+**`nullable`** | Indicates whether the .NET `Type should be declared as nullable; e.g. `int?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.
 `default` | The C# code to default the value.<br/>&dagger; Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
 `argumentName` | The overriding argument name.<br/>&dagger; Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
@@ -72,10 +72,10 @@ Provides the _Manager-layer_ configuration.
 Property | Description
 -|-
 **`validator`** | The name of the .NET `Type` that will perform the validation.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to `IValidator<{Type}>` where the `{Type}` is `Type`.
+`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to `IValidatorEx<{Type}>` where the `{Type}` is `Type`.
 `validatorCode` | The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
 `isMandatory` | Indicates whether a `ValidationException` should be thrown when the parameter value has its default value (null, zero, etc).
-`layerPassing` | The option that determines the layers in which the parameter is passed. Valid options are: `All`, `ToManagerSet`, `ToManagerCollSet`.<br/>&dagger; Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, `ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. Where using the `UniqueKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.
+`layerPassing` | The option that determines the layers in which the parameter is passed. Valid options are: `All`, `ToManagerSet`, `ToManagerCollSet`.<br/>&dagger; Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, `ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. Where using the `PrimaryKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.
 
 <br/>
 
@@ -84,8 +84,7 @@ Provides the _data_ configuration.
 
 Property | Description
 -|-
-`dataConverter` | The data `Converter` class name where specific data conversion is required.<br/>&dagger; A `Converter` is used to convert a data source value to/from a .NET `Type` where the standard data type conversion is not applicable.
-`dataConverterIsGeneric` | Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.
+`dataConverter` | The data `Converter` class name where specific data conversion is required.<br/>&dagger; A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Type`.
 
 <br/>
 

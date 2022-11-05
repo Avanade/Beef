@@ -2,7 +2,7 @@ entities:
   # CosmosDb model - needs the Newtonsoft serializer as per: https://github.com/Azure/azure-cosmos-dotnet-v3/issues/2533 and https://github.com/Azure/azure-cosmos-dotnet-v2/issues/317
 - { name: Robot, text: Robot, collection: true, jsonSerializer: Newtonsoft,
     properties: [
-      { name: Id, type: string, uniqueKey: true },
+      { name: Id, primaryKey: true },
       { name: ModelNo },
       { name: SerialNo },
       { name: EyeColor },

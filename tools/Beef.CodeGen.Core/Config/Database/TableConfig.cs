@@ -529,8 +529,7 @@ tables:
         /// </summary>
         private void PrepareStoredProcedures()
         {
-            if (StoredProcedures == null)
-                StoredProcedures = new List<StoredProcedureConfig>();
+            StoredProcedures ??= new List<StoredProcedureConfig>();
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !StoredProcedures.Any(x => x.Name == "Delete"))

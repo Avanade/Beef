@@ -67,17 +67,25 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}")]
+        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
+          {{#if SerializationAlwaysInclude}}
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+          {{/if}}
         {{/ifeq}}
       {{else}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{ArgumentName}}")]
+        [JsonProperty("{{ArgumentName}}{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}}")]
         {{else}}
         [JsonPropertyName("{{ArgumentName}}")]
         {{/ifeq}}
       {{/ifval}}
+      {{#ifeq Parent.JsonSerializer 'SystemText'}}
+        {{#if SerializationAlwaysInclude}}
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        {{/if}}
+      {{/ifeq}}
     {{/if}}
     {{#ifval DisplayName}}
         [System.ComponentModel.DataAnnotations.Display(Name="{{DisplayName}}")]
@@ -146,11 +154,22 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}")]
+        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{/ifval}}
+      {{#ifeq Parent.JsonSerializer 'SystemText'}}
+        {{#if SerializationAlwaysInclude}}
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        {{/if}}
+      {{else}}
+        {{#ifnull JsonName}}
+          {{#if SerializationAlwaysInclude}}
+        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+          {{/if}}
+        {{/ifnull}}
+      {{/ifeq}}
     {{/if}}
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
@@ -182,22 +201,22 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
 {{! ===== PrimaryKey ===== }}
 {{#unless HasIdentifier}}
   {{#unless RefDataType}}
-    {{#ifne UniqueKeyProperties.Count 0}}
+    {{#ifne PrimaryKeyProperties.Count 0}}
 
         /// <summary>
         /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
         /// <returns>The <see cref="CompositeKey"/>.</returns>
-    {{#each UniqueKeyProperties}}
+    {{#each PrimaryKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
-        public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
         [JsonIgnore]
-        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
     {{/ifne}}
   {{/unless}}
 {{/unless}}

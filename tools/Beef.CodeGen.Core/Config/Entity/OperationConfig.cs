@@ -30,10 +30,10 @@ namespace Beef.CodeGen.Config.Entity
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 operations: [
-  { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', autoImplement: None },
   { name: Create, type: Create, webApiRoute: , autoImplement: None },
-  { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
-  { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+  { name: Update, type: Update, primaryKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },
   { name: Delete, type: Delete, webApiRoute: '{id}',
     parameters: [
       { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
@@ -91,12 +91,12 @@ operations: [
         public string? Text { get; set; }
 
         /// <summary>
-        /// Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters. 
+        /// Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters. 
         /// </summary>
-        [JsonProperty("uniqueKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters.", IsImportant = true,
+        [JsonProperty("primaryKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Key", Title = "Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.", IsImportant = true,
             Description = "This simplifies the specification of these properties versus having to declare each specifically.")]
-        public bool? UniqueKey { get; set; }
+        public bool? PrimaryKey { get; set; }
 
         /// <summary>
         /// Indicates whether a PagingArgs argument is to be added to the operation to enable paging related logic.
@@ -372,14 +372,6 @@ operations: [
         [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
             Description = "Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
         public string? EventPublish { get; set; }
-
-        /// <summary>
-        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
-        /// </summary>
-        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
-            Description = "Defaults to `Entity.EventOutbox` configuration property (inherits) where not specified and `EventPublish` is `Data`; otherwise, `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
-        public string? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the URI event source.
@@ -756,7 +748,7 @@ operations: [
         /// <summary>
         /// Indicates whether the operation supports caching.
         /// </summary>
-        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.UniqueKeyPropertiesIncludeInherited.Count > 0;
+        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.PrimaryKeyPropertiesIncludeInherited.Count > 0;
 
         /// <summary>
         /// Gets or sets the data arguments.
@@ -988,13 +980,12 @@ operations: [
 
             EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
             EventPublish = DefaultWhereNull(EventPublish, () => new string[] { "Create", "Update", "Delete" }.Contains(Type) ? Parent!.EventPublish : "None");
-            EventOutbox = DefaultWhereNull(EventOutbox, () => EventPublish != "None" ? Parent!.EventOutbox : "None");
 
             EventFormatKey = Type switch
             {
-                "Create" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
-                "Update" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
-                "Delete" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}",
+                "Create" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
+                "Update" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
+                "Delete" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}",
                 _ => null
             };
 
@@ -1091,9 +1082,9 @@ operations: [
             if (isCreateUpdate)
                 Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IValidator = IValidator, IsValueArg = true, WebApiFrom = "FromBody" });
 
-            if (UniqueKey.HasValue && UniqueKey.Value)
+            if (PrimaryKey.HasValue && PrimaryKey.Value)
             {
-                foreach (var pc in Parent!.Properties!.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value))
+                foreach (var pc in Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value))
                 {
                     // Do not add where same parameter (name) has been configured manually, assume overridden on purpose.
                     if (Parameters.Any(x => x.Name == pc.Name))
@@ -1143,7 +1134,7 @@ operations: [
 
                 if (HasReturnValue)
                     ed.Value = "__result";
-                else if (Type == "Delete" && UniqueKey == true)
+                else if (Type == "Delete" && PrimaryKey == true)
                 {
                     var sb = new StringBuilder();
                     foreach (var dp in DataParameters)
@@ -1395,13 +1386,19 @@ operations: [
             if (ExtraProperties == null || ExtraProperties.Count == 0)
                 return;
 
-            var ep = ExtraProperties.Where(x => string.Compare(x.Key, "patchGetOperation", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
+            var ep = ExtraProperties.Where(x => string.Compare(x.Key, "uniqueKey", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
+            if (ep.Key != null)
+                throw new CodeGenException(this, ep.Key, $"The 'uniqueKey' configuration has been renamed to 'primaryKey'; please update the configuration accordingly.");
+
+            ep = ExtraProperties.Where(x => string.Compare(x.Key, "patchGetOperation", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
             if (ep.Key != null)
                 throw new CodeGenException(this, ep.Key, $"The 'patchGetOperation' configuration has been renamed to 'webApiGetOperation'; please update the configuration accordingly.");
 
             ep = ExtraProperties.Where(x => string.Compare(x.Key, "patchUpdateOperation", StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
             if (ep.Key != null)
-                throw new CodeGenException(this, nameof(EventOutbox), $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
+                throw new CodeGenException(this, ep.Key, $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
+
+            CodeGenConfig.WarnWhereDeprecated(Root!, this, "eventOutbox");
         }
     }
 }

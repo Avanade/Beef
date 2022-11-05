@@ -1,12 +1,8 @@
 ﻿//#if (implement_database)
 eventSubjectRoot: Company
-eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
-eventOutbox: Database
-appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
 databaseSchema: AppName
@@ -14,7 +10,7 @@ entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
 - { name: Person, text: Person, collection: true, collectionResult: true, identifierGenerator: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, dataName: PersonId },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataName: PersonId },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender, dataName: GenderCode },
@@ -41,20 +37,16 @@ entities:
 //#endif
 //#if (implement_entityframework)
 eventSubjectRoot: Company
-eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
-eventOutbox: Database
-appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, identifierGenerator: IGuidIdentifierGenerator, dataName: PersonId },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender, dataName: GenderCode },
@@ -81,12 +73,9 @@ entities:
 //#endif
 //#if (implement_cosmos)
 eventSubjectRoot: Company
-eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
-appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
 entities:
@@ -94,7 +83,7 @@ entities:
 
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, identifierGenerator: IGuidIdentifierGenerator },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -121,12 +110,9 @@ entities:
 //#endif
 //#if (implement_httpagent)
 eventSubjectRoot: Company
-eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
-appBasedAgentArgs: true
 webApiAutoLocation: true
 httpAgentName: IXxxAgent
 refDataText: true
@@ -134,7 +120,7 @@ entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: HttpAgent, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, identifierGenerator: IGuidIdentifierGenerator },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -146,19 +132,16 @@ entities:
 //#endif
 //#if (implement_none)
 eventSubjectRoot: Company
-eventSubjectFormat: NameOnly
 eventActionFormat: PastTense
-eventCasing: Lower
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
-appBasedAgentArgs: true
 webApiAutoLocation: true
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, uniqueKey: true, identifierGenerator: IGuidIdentifierGenerator },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, identifierGenerator: IGuidIdentifierGenerator },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },

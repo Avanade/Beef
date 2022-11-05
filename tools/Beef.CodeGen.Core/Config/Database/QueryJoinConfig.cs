@@ -347,8 +347,7 @@ queries:
         /// </summary>
         public async Task PrepareJoinOnAsync()
         {
-            if (On == null)
-                On = new List<QueryJoinOnConfig>();
+            On ??= new List<QueryJoinOnConfig>();
 
             foreach (var on in On)
             {

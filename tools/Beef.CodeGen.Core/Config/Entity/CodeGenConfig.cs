@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using CoreEx.Entities.Extended;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OnRamp;
 using OnRamp.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +30,6 @@ entities:
     [CodeGenCategory("Entity", Title = "Provides the _Entity class_ configuration.")]
     [CodeGenCategory("Events", Title = "Provides the _Events_ configuration.")]
     [CodeGenCategory("WebApi", Title = "Provides the _Web API (Controller)_ configuration.")]
-    [CodeGenCategory("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CodeGenCategory("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CodeGenCategory("Database", Title = "Provides the _Database Data-layer_ configuration.")]
     [CodeGenCategory("EntityFramework", Title = "Provides the _Entity Framewotrk (EF) Data-layer_ configuration.")]
@@ -129,13 +132,6 @@ entities:
         public string? WebApiAuthorize { get; set; }
 
         /// <summary>
-        /// Indicates whether to create and use an application-based (domain) API Args to simplify dependency injection usage.
-        /// </summary>
-        [JsonProperty("appBasedAgentArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "Indicates whether to create and use a domain-specific API Args to simplify dependency injection usage.")]
-        public bool? AppBasedAgentArgs { get; set; } // TODO: determine if still used?
-
-        /// <summary>
         /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.
         /// </summary>
         [JsonProperty("webApiAutoLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -150,18 +146,6 @@ entities:
         [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
             Description = "This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).")]
         public string? WebApiRoutePrefix { get; set; }
-
-        #endregion
-
-        #region Manager
-
-        /// <summary>
-        /// Gets or sets the layer namespace where the Validators are defined.
-        /// </summary>
-        [JsonProperty("validatorLayer", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement).", Options = new string[] { "Business", "Common" },
-            Description = "Defaults to `Business`. A value of `Business` indicates that the Validators will be defined within the `Business` namespace/assembly; otherwise, defined within the `Common` namespace/assembly.")]
-        public string? ValidatorLayer { get; set; }
 
         #endregion
 
@@ -234,41 +218,6 @@ entities:
             Description = "Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically be set to the `Type`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
 
-        /// <summary>
-        /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code.
-        /// </summary>
-        [JsonProperty("dataUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Data", Title = "The additional Namespace using statement to be added to the generated `Data` code.")]
-        public string? DataUsingNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code where <c>Operation.AutoImplement</c> is <c>Database</c>.
-        /// </summary>
-        [JsonProperty("databaseUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Database", Title = "The additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `Database`.")]
-        public string? DatabaseUsingNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code where <c>Operation.AutoImplement</c> is <c>EntityFramework</c>.
-        /// </summary>
-        [JsonProperty("entityFrameworkUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("EntityFramework", Title = "The additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `EntityFramework`.")]
-        public string? EntityFrameworkUsingNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code where <c>Operation.AutoImplement</c> is <c>Cosmos</c>.
-        /// </summary>
-        [JsonProperty("cosmosUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Cosmos", Title = "additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `Cosmos`.")]
-        public string? CosmosUsingNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets the additional Namespace using statement to the added to the generated <c>Data</c> code where <c>Operation.AutoImplement</c> is <c>OData</c>.
-        /// </summary>
-        [JsonProperty("odataUsingNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("OData", Title = "additional Namespace using statement to be added to the generated `Data` code where `Operation.AutoImplement` is `OData`.")]
-        public string? ODataUsingNamespace { get; set; }
-
         #endregion
 
         #region Events
@@ -278,16 +227,8 @@ entities:
         /// </summary>
         [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
-            Description = "Defaults to `DataSvc`; unless the `EventOutbox` is not `None` where it will default to `Data`. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
+            Description = "Defaults to `DataSvc`. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventPublish { get; set; }
-
-        /// <summary>
-        /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
-        /// </summary>
-        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
-            Description = "Defaults to `None`. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
-        public string? EventOutbox { get; set; }
 
         /// <summary>
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
@@ -310,16 +251,8 @@ entities:
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Events", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the `Entity`(s).")]
+            Description = "Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventSubjectRoot { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
-        public string? EventSubjectFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the subject path separator.
@@ -336,14 +269,6 @@ entities:
         [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the casing for the Subject and Action (with the exception of the key).
-        /// </summary>
-        [JsonProperty("eventCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The casing for the Subject and Action (with the exception of the key)", Options = new string[] { "None", "Lower", "Upper" }, IsImportant = true,
-            Description = "Defaults to `None` (no casing required, i.e. as-is)`.")]
-        public string? EventCasing { get; set; }
 
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
@@ -534,14 +459,10 @@ entities:
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
-            ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
-            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
-            EventOutbox = DefaultWhereNull(EventOutbox, () => "None");
-            EventPublish = DefaultWhereNull(EventPublish, () => EventOutbox == "Database" ? "Data" : "DataSvc");
+            EventPublish = DefaultWhereNull(EventPublish, () => "DataSvc");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
-            EventCasing = DefaultWhereNull(EventCasing, () => "None");
             RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.Business.Entities");
             RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
@@ -574,6 +495,42 @@ entities:
                             Validators.Add(pc);
                     }
                 }
+            }
+
+            // Check for any deprecate properties and warn.
+            WarnWhereDeprecated(this, this,
+                "refDataCache",
+                "refDataAppendToNamespace",
+                "refDataBusNamespace",
+                "entityScope",
+                "entityUsing",
+                "appBasedAgentArgs",
+                "validatorLayer",
+                "dataUsingNamespace",
+                "databaseUsingNamespace",
+                "entityFrameworkUsingNamespace",
+                "cosmosUsingNamespace",
+                "odataUsingNamespace",
+                "eventOutbox",
+                "eventSubjectFormat",
+                "eventCasing");
+        }
+
+        /// <summary>
+        /// Warn where the property has been deprecated.
+        /// </summary>
+        /// <param name="root">The root <see cref="CodeGenConfig"/>.</param>
+        /// <param name="config">The <see cref="ConfigBase"/>.</param>
+        /// <param name="names">The list of deprecated properties.</param>
+        internal static void WarnWhereDeprecated(CodeGenConfig root, ConfigBase config, params string[] names)
+        {
+            if (config.ExtraProperties == null || config.ExtraProperties.Count == 0 || names.Length == 0)
+                return;
+
+            foreach (var xp in config.ExtraProperties)
+            {
+                if (names.Contains(xp.Key))
+                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.");
             }
         }
     }

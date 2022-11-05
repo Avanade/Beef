@@ -27,11 +27,13 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Gets or sets the Current Balance.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public decimal CurrentBalance { get; set; }
 
         /// <summary>
         /// Gets or sets the Available Balance.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public decimal AvailableBalance { get; set; }
 
         /// <summary>

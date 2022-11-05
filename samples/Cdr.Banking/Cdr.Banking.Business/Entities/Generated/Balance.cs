@@ -29,11 +29,13 @@ namespace Cdr.Banking.Business.Entities
         /// <summary>
         /// Gets or sets the Current Balance.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public decimal CurrentBalance { get => _currentBalance; set => SetValue(ref _currentBalance, value); }
 
         /// <summary>
         /// Gets or sets the Available Balance.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public decimal AvailableBalance { get => _availableBalance; set => SetValue(ref _availableBalance, value); }
 
         /// <summary>

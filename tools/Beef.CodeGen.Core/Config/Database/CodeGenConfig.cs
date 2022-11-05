@@ -448,6 +448,22 @@ namespace Beef.CodeGen.Config.Database
 
             Queries = await PrepareCollectionAsync(Queries).ConfigureAwait(false);
             Tables = await PrepareCollectionAsync(Tables).ConfigureAwait(false);
+
+            WarnWhereDeprecated(this, this,
+                "cdcSchema",
+                "cdcAuditTableName",
+                "cdcIdentifierMapping",
+                "cdcIdentifierMappingTableName",
+                "cdcIdentifierMappingStoredProcedureName",
+                "cdcExcludeColumnsFromETag",
+                "jsonSerializer",
+                "pluralizeCollectionProperties",
+                "hasBeefDbo",
+                "entityScope",
+                "eventOutbox",
+                "eventOutboxTableName",
+                "NamespaceCdcPublisher",
+                "entityScope");
         }
 
         /// <summary>
@@ -485,6 +501,24 @@ namespace Beef.CodeGen.Config.Database
             var sb = new StringBuilder();
             name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Warn where the property has been deprecated.
+        /// </summary>
+        /// <param name="root">The root <see cref="CodeGenConfig"/>.</param>
+        /// <param name="config">The <see cref="ConfigBase"/>.</param>
+        /// <param name="names">The list of deprecated properties.</param>
+        internal static void WarnWhereDeprecated(CodeGenConfig root, ConfigBase config, params string[] names)
+        {
+            if (config.ExtraProperties == null || config.ExtraProperties.Count == 0 || names.Length == 0)
+                return;
+
+            foreach (var xp in config.ExtraProperties)
+            {
+                if (names.Contains(xp.Key))
+                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.");
+            }
         }
     }
 }

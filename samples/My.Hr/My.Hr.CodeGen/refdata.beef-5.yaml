@@ -1,5 +1,4 @@
 webapiRoutePrefix: ref
-appBasedAgentArgs: true
 databaseSchema: Hr
 entities:
 - { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }

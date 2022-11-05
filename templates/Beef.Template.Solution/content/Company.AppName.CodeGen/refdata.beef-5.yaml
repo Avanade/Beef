@@ -1,5 +1,4 @@
 ﻿webapiRoutePrefix: ref
-appBasedAgentArgs: true
 //#if (implement_database)
 databaseSchema: AppName
 entities:

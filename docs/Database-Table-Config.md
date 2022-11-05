@@ -110,7 +110,6 @@ Property | Description
 **`udt`** | Indicates whether a `User Defined Table (UDT)` type should be created.
 `udtExcludeColumns` | The list of `Column` names to be excluded from the `User Defined Table (UDT)`.<br/>&dagger; Where not specified this indicates that no `Columns` are to be excluded.
 **`tvp`** | The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
-`entityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`.<br/>&dagger; Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
 
 <br/>
 

@@ -10,7 +10,6 @@ The `CodeGeneration` object supports a number of properties that control the gen
 Category | Description
 -|-
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
-[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Event`](#Event) | Provides the _Event_ configuration.
@@ -44,22 +43,6 @@ Property | Description
 
 <br/>
 
-## CDC
-Provides the _Change Data Capture (CDC)_ configuration.
-
-Property | Description
--|-
-`cdcSchema` | The schema name for the generated `CDC`-related database artefacts.<br/>&dagger; Defaults to `XCdc` (literal).
-`cdcAuditTableName` | The table name for the `Cdc`-Tracking.<br/>&dagger; Defaults to `CdcTracking` (literal).
-`cdcIdentifierMapping` | Indicates whether to include the generation of the generic `Cdc`-IdentifierMapping database capabilities.
-`cdcIdentifierMappingTableName` | The table name for the `Cdc`-IdentifierMapping.<br/>&dagger; Defaults to `CdcIdentifierMapping` (literal).
-`cdcIdentifierMappingStoredProcedureName` | The table name for the `Cdc`-IdentifierMapping.<br/>&dagger; Defaults to `spCreateCdcIdentifierMapping` (literal).
-`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`.<br/>&dagger; Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
-`pluralizeCollectionProperties` | Indicates whether the .NET collection properties should be pluralized.
-`hasBeefDbo` | Indicates whether the database has (contains) the standard _Beef_ `dbo` schema objects.<br/>&dagger; Defaults to `true`.
-
-<br/>
-
 ## Path
 Provides the _Path (Directory)_ configuration for the generated artefacts.
 
@@ -78,9 +61,7 @@ Provides the _.NET_ configuration.
 
 Property | Description
 -|-
-`cdcExcludeColumnsFromETag` | The default list of `Column` names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)
 `autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`.<br/>&dagger; Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
-`entityScope` | The entity scope option. Valid options are: `Common`, `Business`, `Autonomous`.<br/>&dagger; Defaults to `Common` for backwards compatibility; `Autonomous` is recommended. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).
 
 <br/>
 
@@ -103,8 +84,12 @@ Provides the _Event Outbox_ configuration.
 
 Property | Description
 -|-
-`eventOutbox` | Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
-`eventOutboxTableName` | The table name for the `EventOutbox`.<br/>&dagger; Defaults to `EventOutbox` (literal).
+`outbox` | Indicates whether to generate the event outbox SQL and .NET artefacts.<br/>&dagger; Defaults to `false`.
+`outboxSchema` | The schema name of the event outbox table.<br/>&dagger; Defaults to `Outbox` (literal).
+`outboxSchemaCreate` | Indicates whether to create the `OutboxSchema` within the database.<br/>&dagger; Defaults to `false`.
+`outboxTable` | The name of the event outbox table.<br/>&dagger; Defaults to `EventOutbox` (literal).
+`outboxEnqueueStoredProcedure` | The stored procedure name for the event outbox enqueue.<br/>&dagger; Defaults to `spEventOutboxEnqueue` (literal).
+`outboxDequeueStoredProcedure` | The stored procedure name for the event outbox dequeue.<br/>&dagger; Defaults to `spEventOutboxDequeue` (literal).
 
 <br/>
 
@@ -125,7 +110,7 @@ Property | Description
 `namespaceBase` | The base Namespace (root) for the .NET artefacts.<br/>&dagger; Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
 `namespaceCommon` | The Namespace (root) for the Common-related .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.
 `namespaceBusiness` | The Namespace (root) for the Business-related .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`NamespaceCdcPublisher` | The Namespace (root) for the CDC-related publisher .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.CdcPublisher` (literal). For example `Beef.Demo.CdcPublisher`.
+`namespaceOutbox` | The Namespace (root) for the Outbox-related Publisher .NET artefacts.<br/>&dagger; Defaults to `NamespaceBusiness`.
 
 <br/>
 

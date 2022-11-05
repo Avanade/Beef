@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using OnRamp;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Beef.CodeGen
 {
@@ -310,23 +310,35 @@ namespace Beef.CodeGen
             if (Args.OutputDirectory == null)
                 return;
 
-            Args.Logger?.LogInformation("{Content}", $"CodeGen Clean initiated for: {Args.OutputDirectory.FullName}");
+            Args.Logger?.LogInformation("{Content}", $"Cleaning: {Args.OutputDirectory.FullName}");
             Args.Logger?.LogInformation("{Content}", string.Empty);
-            Args.Logger?.LogInformation("{Content}", "The following 'Generated' directories were cleaned/deleted (all contents were deleted):");
-            var list = Args.OutputDirectory.EnumerateDirectories("Generated", SearchOption.AllDirectories);
-            if (list == null)
-                Args.Logger?.LogInformation("{Content}", "  No directories found.");
-            else
+            Args.Logger?.LogInformation("{Content}", "The following 'Generated' directories were cleaned/deleted:");
+            int fileCount = 0;
+            bool dirDeleted = false;
+            var sw = Stopwatch.StartNew();
+
+            var list = Args.OutputDirectory.EnumerateDirectories("Generated", SearchOption.AllDirectories)
+                .Where(x => !x.FullName.Contains(Path.Combine("obj", "debug"), StringComparison.OrdinalIgnoreCase) && !x.FullName.Contains(Path.Combine("obj", "release"), StringComparison.OrdinalIgnoreCase) 
+                   && !x.FullName.Contains(Path.Combine("bin", "debug"), StringComparison.OrdinalIgnoreCase) && !x.FullName.Contains(Path.Combine("bin", "release"), StringComparison.OrdinalIgnoreCase));
+
+            if (list != null)
             {
-                foreach (var di in list)
+                int count;
+                foreach (var di in list.Where(x => x.Exists))
                 {
-                    Args.Logger?.LogWarning("  {Directory} [{FileCount} files]", di.FullName, di.GetFiles().Length);
-                    //di.Delete();
+                    dirDeleted = true;
+                    fileCount += count = di.GetFiles().Length;
+                    Args.Logger?.LogWarning("  {Directory} [{FileCount} files]", di.FullName, count);
+                    di.Delete(true);
                 }
             }
 
+            sw.Stop();
+            if (!dirDeleted)
+                Args.Logger?.LogInformation("{Content}", "  ** No directories found.");
+
             Args.Logger?.LogInformation("{Content}", string.Empty);
-            Args.Logger?.LogInformation("{Content}", "Complete.");
+            Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms, Files: {fileCount}]");
             Args.Logger?.LogInformation("{Content}", string.Empty);
         }
     }

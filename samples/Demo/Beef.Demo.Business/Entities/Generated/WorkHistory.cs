@@ -26,6 +26,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public string? Name { get => _name; set => SetValue(ref _name, value); }
 
         /// <summary>

@@ -90,11 +90,22 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{else}}
       {{#ifval JsonDataModelName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonDataModelName}}")]
+        [JsonProperty("{{JsonDataModelName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
         [JsonPropertyName("{{JsonDataModelName}}")]
         {{/ifeq}}
       {{/ifval}}
+      {{#ifeq Parent.JsonSerializer 'SystemText'}}
+        {{#if SerializationAlwaysInclude}}
+        [JsonIgnore(Condition=JsonIgnoreCondition.Never)]
+        {{/if}}
+      {{else}}
+        {{#ifnull JsonDataModelName}}
+          {{#if SerializationAlwaysInclude}}
+        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+          {{/if}}
+        {{/ifnull}}
+      {{/ifeq}}
     {{/if}}
   {{else}}
     {{#if SerializationIgnore}}
@@ -102,11 +113,22 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}")]
+        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
         [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{/ifval}}
+      {{#ifeq Parent.JsonSerializer 'SystemText'}}
+        {{#if SerializationAlwaysInclude}}
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        {{/if}}
+      {{else}}
+        {{#ifnull JsonName}}
+          {{#if SerializationAlwaysInclude}}
+        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+          {{/if}}
+        {{/ifnull}}
+      {{/ifeq}}
     {{/if}}
   {{/if}}
     {{#unless Root.IsDataModel}}
@@ -124,22 +146,22 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
 {{/each}}
 {{#unless HasIdentifier}}
   {{#unless RefDataType}}
-    {{#ifne UniqueKeyProperties.Count 0}}
+    {{#ifne PrimaryKeyProperties.Count 0}}
         
         /// <summary>
         /// Creates the primary <see cref="CompositeKey"/>.
         /// </summary>
         /// <returns>The primary <see cref="CompositeKey"/>.</returns>
-    {{#each UniqueKeyProperties}}
+    {{#each PrimaryKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
-        public static CompositeKey CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
         [JsonIgnore]
-        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
     {{/ifne}}
   {{/unless}}
 {{/unless}}

@@ -1,5 +1,4 @@
 ﻿schema: AppName
-eventOutbox: true
 //#if (implement_database)
 tables:
   # Reference data stored procedures
