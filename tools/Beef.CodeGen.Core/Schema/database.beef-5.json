@@ -77,55 +77,6 @@
           "title": "The SQL function that is to be used for 'Permission' verification.",
           "description": "Defaults to '[Sec].[fnGetUserHasPermission]'."
         },
-        "cdcSchema": {
-          "type": "string",
-          "title": "The schema name for the generated 'CDC'-related database artefacts.",
-          "description": "Defaults to 'XCdc' (literal)."
-        },
-        "cdcAuditTableName": {
-          "type": "string",
-          "title": "The table name for the 'Cdc'-Tracking.",
-          "description": "Defaults to 'CdcTracking' (literal)."
-        },
-        "cdcIdentifierMapping": {
-          "type": "boolean",
-          "title": "Indicates whether to include the generation of the generic 'Cdc'-IdentifierMapping database capabilities."
-        },
-        "cdcIdentifierMappingTableName": {
-          "type": "string",
-          "title": "The table name for the 'Cdc'-IdentifierMapping.",
-          "description": "Defaults to 'CdcIdentifierMapping' (literal)."
-        },
-        "cdcIdentifierMappingStoredProcedureName": {
-          "type": "string",
-          "title": "The table name for the 'Cdc'-IdentifierMapping.",
-          "description": "Defaults to 'spCreateCdcIdentifierMapping' (literal)."
-        },
-        "cdcExcludeColumnsFromETag": {
-          "type": "array",
-          "title": "The default list of 'Column' names that should be excluded from the generated ETag (used for the likes of duplicate send tracking)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "jsonSerializer": {
-          "type": "string",
-          "title": "The JSON Serializer to use for JSON property attribution.",
-          "description": "Defaults to 'Newtonsoft'. This can be overridden within the 'Entity'(s).",
-          "enum": [
-            "None",
-            "Newtonsoft"
-          ]
-        },
-        "pluralizeCollectionProperties": {
-          "type": "boolean",
-          "title": "Indicates whether the .NET collection properties should be pluralized."
-        },
-        "hasBeefDbo": {
-          "type": "boolean",
-          "title": "Indicates whether the database has (contains) the standard _Beef_ 'dbo' schema objects.",
-          "description": "Defaults to 'true'."
-        },
         "autoDotNetRename": {
           "type": "string",
           "title": "The option to automatically rename the SQL Tables and Columns for use in .NET.",
@@ -136,73 +87,35 @@
             "SnakeKebabToPascalCase"
           ]
         },
-        "entityScope": {
-          "type": "string",
-          "title": "The entity scope option.",
-          "description": "Defaults to 'Common' for backwards compatibility; 'Autonomous' is recommended. Determines where the entity is scoped/defined, being 'Common' or 'Business' (i.e. not externally visible).",
-          "enum": [
-            "Common",
-            "Business",
-            "Autonomous"
-          ]
-        },
-        "eventSubjectRoot": {
-          "type": "string",
-          "title": "The root for the event name by prepending to all event subject names via CDC.",
-          "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the 'Entity'(s)."
-        },
-        "eventSubjectFormat": {
-          "type": "string",
-          "title": "The default formatting for the Subject when an Event is published via CDC.",
-          "description": "Defaults to 'NameAndKey' (being the event subject name appended with the corresponding unique key.)'.",
-          "enum": [
-            "NameOnly",
-            "NameAndKey"
-          ]
-        },
-        "eventActionFormat": {
-          "type": "string",
-          "title": "The formatting for the Action when an Event is published via CDC.",
-          "description": "Defaults to 'None' (no formatting required, i.e. as-is).",
-          "enum": [
-            "None",
-            "PastTense"
-          ]
-        },
-        "eventSourceRoot": {
-          "type": "string",
-          "title": "The URI root for the event source by prepending to all event source URIs for CDC.",
-          "description": "The event source is only updated where an 'EventSourceKind' is not 'None'. This can be extended within the 'Entity'(s)."
-        },
-        "eventSourceKind": {
-          "type": "string",
-          "title": "The URI kind for the event source URIs for CDC.",
-          "description": "Defaults to 'None' (being the event source is not updated).",
-          "enum": [
-            "None",
-            "Absolute",
-            "Relative",
-            "RelativeOrAbsolute"
-          ]
-        },
-        "eventSourceFormat": {
-          "type": "string",
-          "title": "The default formatting for the Source when an Event is published via CDC.",
-          "description": "Defaults to 'NameAndKey' (being the event subject name appended with the corresponding unique key.)'.",
-          "enum": [
-            "NameOnly",
-            "NameAndKey",
-            "NameAndGlobalId"
-          ]
-        },
-        "eventOutbox": {
+        "outbox": {
           "type": "boolean",
-          "title": "Indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required."
+          "title": "Indicates whether to generate the event outbox SQL and .NET artefacts.",
+          "description": "Defaults to 'false'."
         },
-        "eventOutboxTableName": {
+        "outboxSchema": {
           "type": "string",
-          "title": "The table name for the 'EventOutbox'.",
+          "title": "The schema name of the event outbox table.",
+          "description": "Defaults to 'Outbox' (literal)."
+        },
+        "outboxSchemaCreate": {
+          "type": "boolean",
+          "title": "Indicates whether to create the 'OutboxSchema' within the database.",
+          "description": "Defaults to 'false'."
+        },
+        "outboxTable": {
+          "type": "string",
+          "title": "The name of the event outbox table.",
           "description": "Defaults to 'EventOutbox' (literal)."
+        },
+        "outboxEnqueueStoredProcedure": {
+          "type": "string",
+          "title": "The stored procedure name for the event outbox enqueue.",
+          "description": "Defaults to 'spEventOutboxEnqueue' (literal)."
+        },
+        "outboxDequeueStoredProcedure": {
+          "type": "string",
+          "title": "The stored procedure name for the event outbox dequeue.",
+          "description": "Defaults to 'spEventOutboxDequeue' (literal)."
         },
         "pathBase": {
           "type": "string",
@@ -224,11 +137,6 @@
           "title": "The path (directory) for the Business-related (.NET) artefacts.",
           "description": "Defaults to 'PathBase' + '.Business' (literal). For example 'Beef.Demo.Business'."
         },
-        "PathCdcPublisher": {
-          "type": "string",
-          "title": "The path (directory) for the CDC-related (.NET) artefacts.",
-          "description": "Defaults to 'PathBase' + '.Cdc' (literal). For example 'Beef.Demo.Cdc'."
-        },
         "orgUnitImmutable": {
           "type": "boolean",
           "title": "Indicates whether the 'OrgUnitId' column is considered immutable, in that it can not be changed once set.",
@@ -249,10 +157,10 @@
           "title": "The Namespace (root) for the Business-related .NET artefacts.",
           "description": "Defaults to 'NamespaceBase' + '.Business' (literal). For example 'Beef.Demo.Business'."
         },
-        "NamespaceCdcPublisher": {
+        "namespaceOutbox": {
           "type": "string",
-          "title": "The Namespace (root) for the CDC-related publisher .NET artefacts.",
-          "description": "Defaults to 'NamespaceBase' + '.CdcPublisher' (literal). For example 'Beef.Demo.CdcPublisher'."
+          "title": "The Namespace (root) for the Outbox-related Publisher .NET artefacts.",
+          "description": "Defaults to 'NamespaceBusiness'."
         },
         "tables": {
           "type": "array",
@@ -367,16 +275,6 @@
         "tvp": {
           "type": "string",
           "title": "The name of the .NET entity associated with the 'Udt' so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding 'DbMapper'."
-        },
-        "entityScope": {
-          "type": "string",
-          "title": "The entity scope option.",
-          "description": "Defaults to 'CodeGeneration.EntityScope'. Determines where the entity is scoped/defined, being 'Common' or 'Business' (i.e. not externally visible).",
-          "enum": [
-            "Common",
-            "Business",
-            "Autonomous"
-          ]
         },
         "permission": {
           "type": "string",

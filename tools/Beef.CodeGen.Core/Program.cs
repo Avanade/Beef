@@ -30,8 +30,8 @@ namespace Beef.CodeGen
             {
                 switch (args[0].ToUpperInvariant())
                 {
-                    case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => JsonSchemaGenerator.Generate<Config.Entity.CodeGenConfig>(fn, "JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef)."));
-                    case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => JsonSchemaGenerator.Generate<Config.Database.CodeGenConfig>(fn, "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef)."));
+                    case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef-5.json", fn => JsonSchemaGenerator.Generate<Config.Entity.CodeGenConfig>(fn, "JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef)."));
+                    case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef-5.json", fn => JsonSchemaGenerator.Generate<Config.Database.CodeGenConfig>(fn, "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef)."));
                     case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Entity.CodeGenConfig>(dn, ConfigType.Entity));
                     case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", dn => GenerateMarkdown<Config.Database.CodeGenConfig>(dn, ConfigType.Database));
                 }

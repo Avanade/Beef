@@ -28,7 +28,6 @@ namespace Beef.CodeGen.Config.Database
     [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
-    [CodeGenCategory("Event", Title = "Provides the _Event_ configuration.")]
     [CodeGenCategory("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
     [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CodeGenCategory("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
@@ -167,58 +166,6 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region Event
-
-        /// <summary>
-        /// Gets or sets the root for the event name by prepending to all event subject names.
-        /// </summary>
-        [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The root for the event name by prepending to all event subject names via CDC.",
-            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).", IsImportant = true)]
-        public string? EventSubjectRoot { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Subject when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The default formatting for the Subject when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey" },
-            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
-        public string? EventSubjectFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the formatting for the Action when an Event is published.
-        /// </summary>
-        [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published via CDC.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
-            Description = "Defaults to `None` (no formatting required, i.e. as-is).")]
-        public string? EventActionFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URI root for the event source by prepending to all event source URIs.
-        /// </summary>
-        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The URI root for the event source by prepending to all event source URIs for CDC.",
-            Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
-        public string? EventSourceRoot { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URI kind for the event source URIs.
-        /// </summary>
-        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The URI kind for the event source URIs for CDC.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
-            Description = "Defaults to `None` (being the event source is not updated).")]
-        public string? EventSourceKind { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default formatting for the Source when an Event is published.
-        /// </summary>
-        [JsonProperty("eventSourceFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Event", Title = "The default formatting for the Source when an Event is published via CDC.", Options = new string[] { "NameOnly", "NameAndKey", "NameAndGlobalId" },
-            Description = "Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.")]
-        public string? EventSourceFormat { get; set; }
-
-        #endregion
-
         #region Outbox
 
         /// <summary>
@@ -304,14 +251,6 @@ namespace Beef.CodeGen.Config.Database
         [CodeGenProperty("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? PathBusiness { get; set; }
-
-        /// <summary>
-        /// Gets or sets the path (directory) for the CDC-related (.NET) artefacts.
-        /// </summary>
-        [JsonProperty("PathCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
-            Description = "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
-        public string? PathCdcPublisher { get; set; }
 
         #endregion
 
@@ -412,7 +351,6 @@ namespace Beef.CodeGen.Config.Database
             PathDatabaseSchema = DefaultWhereNull(PathDatabaseSchema, () => $"{PathBase}.Database/Schema");
             PathDatabaseMigrations = DefaultWhereNull(PathDatabaseMigrations, () => $"{PathBase}.Database/Migrations");
             PathBusiness = DefaultWhereNull(PathBusiness, () => $"{PathBase}.Business");
-            PathCdcPublisher = DefaultWhereNull(PathCdcPublisher, () => $"{PathBase}.CdcPublisher");
             NamespaceBase = DefaultWhereNull(NamespaceBase, () => $"{Company}.{AppName}");
             NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{NamespaceBase}.Common");
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
@@ -433,12 +371,7 @@ namespace Beef.CodeGen.Config.Database
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
 
-            EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
-            EventSourceFormat = DefaultWhereNull(EventSourceFormat, () => "NameAndKey");
-            EventSubjectFormat = DefaultWhereNull(EventSubjectFormat, () => "NameAndKey");
-            EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             OutboxSchema = DefaultWhereNull(OutboxSchema, () => "Outbox");
-
             OutboxSchemaCreate = DefaultWhereNull(OutboxSchemaCreate, () => false);
             OutboxTable = DefaultWhereNull(OutboxTable, () => "EventOutbox");
             OutboxEnqueueStoredProcedure = DefaultWhereNull(OutboxEnqueueStoredProcedure, () => $"sp{OutboxTable}Enqueue");
@@ -456,6 +389,13 @@ namespace Beef.CodeGen.Config.Database
                 "cdcIdentifierMappingTableName",
                 "cdcIdentifierMappingStoredProcedureName",
                 "cdcExcludeColumnsFromETag",
+                "EventSubjectRoot",
+                "EventSubjectFormat",
+                "EventActionFormat",
+                "EventSourceRoot",
+                "EventSourceKind",
+                "EventSourceFormat",
+                "PathCdcPublisher",
                 "jsonSerializer",
                 "pluralizeCollectionProperties",
                 "hasBeefDbo",

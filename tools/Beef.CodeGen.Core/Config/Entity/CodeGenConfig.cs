@@ -321,7 +321,7 @@ entities:
         public string? PathBusiness { get; set; }
 
         /// <summary>
-        /// Gets or sets the path (directory) for the CDC-related (.NET) artefacts.
+        /// Gets or sets the path (directory) for the API-related (.NET) artefacts.
         /// </summary>
         [JsonProperty("pathApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Path", Title = "The path (directory) for the API-related (.NET) artefacts.",

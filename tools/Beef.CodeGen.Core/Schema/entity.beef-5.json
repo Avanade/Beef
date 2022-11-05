@@ -10,7 +10,7 @@
         "refDataNamespace": {
           "type": "string",
           "title": "The namespace for the Reference Data entities (adds as a c# 'using' statement).",
-          "description": "Defaults to 'Company' + '.' (literal) + AppName + '.' (literal) + 'EntityUsing' + '.Entities' (literal)."
+          "description": "Defaults to 'Company' + '.' (literal) + AppName + '.Business.Entities' (literal)."
         },
         "refDataCommonNamespace": {
           "type": "string",
@@ -26,51 +26,12 @@
           "type": "string",
           "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching. The 'WebApiRoutePrefix' will be prepended where specified."
         },
-        "refDataCache": {
-          "type": "string",
-          "title": "The cache used for the ReferenceData providers.",
-          "description": "Defaults to 'ReferenceDataCache'. A value of 'ReferenceDataCache' specifies a single-tenant cache; otherwise, 'ReferenceDataMultiTenantCache' for a multi-tenant cache leverageing the 'ExecutionContext.TenantId'.",
-          "enum": [
-            "ReferenceDataCache",
-            "ReferenceDataMultiTenantCache"
-          ]
-        },
-        "refDataAppendToNamespace": {
-          "type": "string",
-          "title": "The Reference Data entity namespace appended to end of the standard 'company.appname.Common.Entities.{AppendToNamespace}'.",
-          "description": "Defaults to 'null'; being nothing to append."
-        },
-        "refDataBusNamespace": {
-          "type": "string",
-          "title": "The namespace for the Reference Data entities (adds as a c# 'using' statement) for additional business-layer inclusion where requried."
-        },
-        "entityScope": {
-          "type": "string",
-          "title": "The entity scope option.",
-          "description": "Defaults to 'Common' for backwards compatibility; 'Autonomous' is **recommended**. Determines where the entity is scoped/defined, being 'Common' or 'Business' (i.e. not externally visible). Additionally, there is the special case of 'Autonomous' where both a 'Common' and 'Business' entity are generated (where only the latter inherits from 'EntityBase', etc).",
-          "enum": [
-            "Common",
-            "Business",
-            "Autonomous"
-          ]
-        },
-        "entityUsing": {
-          "type": "string",
-          "title": "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).",
-          "description": "Defaults to 'Common' (unless 'EntityScope' is 'Autonomous' and then it will default to 'Business') which will add '.Common.Entities'. Additionally, 'Business' to add '.Business.Entities', 'All' to add both, and 'None' to exclude any. This can be overridden for each 'Entity'.",
-          "enum": [
-            "Common",
-            "Business",
-            "All",
-            "None"
-          ]
-        },
         "jsonSerializer": {
           "type": "string",
           "title": "The JSON Serializer to use for JSON property attribution.",
-          "description": "Defaults to 'Newtonsoft'. This can be overridden within the 'Entity'(s).",
+          "description": "Defaults to 'SystemText'. This can be overridden within the 'Entity'(s).",
           "enum": [
-            "None",
+            "SystemText",
             "Newtonsoft"
           ]
         },
@@ -107,10 +68,6 @@
           "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either 'Authorize' or 'AllowAnonymous'.",
           "description": "This can be overridden within the 'Entity'(s) and/or their corresponding 'Operation'(s)."
         },
-        "appBasedAgentArgs": {
-          "type": "boolean",
-          "title": "Indicates whether to create and use a domain-specific 'WebApi.WebApiAgentArgs' to simplify dependency injection usage."
-        },
         "webApiAutoLocation": {
           "type": "boolean",
           "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
@@ -120,15 +77,6 @@
           "type": "string",
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
           "description": "This is the base (prefix) 'URI' prepended to all entity and underlying 'Operation'(s)."
-        },
-        "validatorLayer": {
-          "type": "string",
-          "title": "The namespace for the Reference Data entities (adds as a c# 'using' statement).",
-          "description": "Defaults to 'Business'. A value of 'Business' indicates that the Validators will be defined within the 'Business' namespace/assembly; otherwise, defined within the 'Common' namespace/assembly.",
-          "enum": [
-            "Business",
-            "Common"
-          ]
         },
         "databaseName": {
           "type": "string",
@@ -163,11 +111,23 @@
         "refDataDefaultMapperConverter": {
           "type": "string",
           "title": "The default Reference Data property 'Converter' used by the generated 'Mapper'(s) where not specifically defined.",
-          "description": "Defaults to 'ReferenceDataCodeConverter<T>'. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'Property.DataConverterIsGeneric' to 'true'.",
+          "description": "Defaults to 'ReferenceDataCodeConverter<T>'. Where this value is suffixed by '<T>' or '{T}' this will automatically be set to the 'Type'.",
           "enum": [
             "ReferenceDataCodeConverter",
             "ReferenceDataCodeConverter{T}",
             "ReferenceDataCodeConverter<T>",
+            "ReferenceDataIdConverter{T, int}",
+            "ReferenceDataIdConverter<T, int>",
+            "ReferenceDataIdConverter{T, int?}",
+            "ReferenceDataIdConverter<T, int?>",
+            "ReferenceDataIdConverter{T, long}",
+            "ReferenceDataIdConverter<T, long>",
+            "ReferenceDataIdConverter{T, long?}",
+            "ReferenceDataIdConverter<T, long?>",
+            "ReferenceDataIdConverter{T, Guid}",
+            "ReferenceDataIdConverter<T, Guid>",
+            "ReferenceDataIdConverter{T, Guid?}",
+            "ReferenceDataIdConverter<T, Guid?>",
             "ReferenceDataInt32IdConverter",
             "ReferenceDataInt32IdConverter{T}",
             "ReferenceDataInt32IdConverter<T>",
@@ -188,43 +148,14 @@
             "ReferenceDataNullableGuidIdConverter<T>"
           ]
         },
-        "dataUsingNamespace": {
-          "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Data' code."
-        },
-        "databaseUsingNamespace": {
-          "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'Database'."
-        },
-        "entityFrameworkUsingNamespace": {
-          "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'EntityFramework'."
-        },
-        "cosmosUsingNamespace": {
-          "type": "string",
-          "title": "additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'Cosmos'."
-        },
-        "odataUsingNamespace": {
-          "type": "string",
-          "title": "additional Namespace using statement to be added to the generated 'Data' code where 'Operation.AutoImplement' is 'OData'."
-        },
         "eventPublish": {
           "type": "string",
           "title": "The layer to add logic to publish an event for a 'Create', 'Update' or 'Delete' operation.",
-          "description": "Defaults to 'DataSvc'; unless the 'EventOutbox' is not 'None' where it will default to 'Data'. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the 'Entity'(s).",
+          "description": "Defaults to 'DataSvc'. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the 'Entity'(s).",
           "enum": [
             "None",
             "DataSvc",
             "Data"
-          ]
-        },
-        "eventOutbox": {
-          "type": "string",
-          "title": "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).",
-          "description": "Defaults to 'None'. A value of 'Database' will result in the 'DatabaseEventOutboxInvoker' being used to orchestrate.",
-          "enum": [
-            "None",
-            "Database"
           ]
         },
         "eventSourceRoot": {
@@ -246,16 +177,7 @@
         "eventSubjectRoot": {
           "type": "string",
           "title": "The root for the event Subject name by prepending to all event subject names.",
-          "description": "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overridden within the 'Entity'(s)."
-        },
-        "eventSubjectFormat": {
-          "type": "string",
-          "title": "The default formatting for the Subject when an Event is published.",
-          "description": "Defaults to 'NameAndKey' (being the event subject name appended with the corresponding unique key.)'.",
-          "enum": [
-            "NameOnly",
-            "NameAndKey"
-          ]
+          "description": "Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the 'Entity'(s)."
         },
         "eventSubjectSeparator": {
           "type": "string",
@@ -269,16 +191,6 @@
           "enum": [
             "None",
             "PastTense"
-          ]
-        },
-        "eventCasing": {
-          "type": "string",
-          "title": "The casing for the Subject and Action (with the exception of the key)",
-          "description": "Defaults to 'None' (no casing required, i.e. as-is)'.",
-          "enum": [
-            "None",
-            "Lower",
-            "Upper"
           ]
         },
         "eventTransaction": {
@@ -359,27 +271,6 @@
           "title": "The overriding file name.",
           "description": "Overrides the Name as the code-generated file name."
         },
-        "entityScope": {
-          "type": "string",
-          "title": "The entity scope option.",
-          "description": "Defaults to the 'CodeGeneration.EntityScope'. Determines where the entity is scoped/defined, being 'Common' or 'Business' (i.e. not externally visible). Additionally, there is a special case of 'Autonomous' where both a 'Common' and 'Business' entity are generated (where only the latter inherits from 'EntityBase', etc).",
-          "enum": [
-            "Common",
-            "Business",
-            "Autonomous"
-          ]
-        },
-        "entityUsing": {
-          "type": "string",
-          "title": "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).",
-          "description": "Defaults to 'EntityScope' ('Autonomous' will result in 'Business'). A value of 'Common' will add '.Common.Entities', 'Business' will add '.Business.Entities', 'All' to add both, and 'None' to exclude any.",
-          "enum": [
-            "Common",
-            "Business",
-            "All",
-            "None"
-          ]
-        },
         "privateName": {
           "type": "string",
           "title": "The overriding private name.",
@@ -403,7 +294,7 @@
         },
         "isInitialOverride": {
           "type": "boolean",
-          "title": "Indicates whether to override the 'ICleanup.IsInitial' property.",
+          "title": "Indicates whether to override the 'IInitial.IsInitial' property.",
           "description": "Set to either 'true' or 'false' to override as specified; otherwise, 'null' to check each property. Defaults to 'null'."
         },
         "refDataType": {
@@ -433,15 +324,10 @@
             "Text"
           ]
         },
-        "refDataStringFormat": {
-          "type": "string",
-          "title": "The Reference Data 'ToString' composite format.",
-          "description": "The string format supports the standard composite formatting; where the following indexes are used: '{0}' for 'Id', '{1}' for 'Code' and '{2}' for 'Text'. Defaults to '{2}'."
-        },
         "inherits": {
           "type": "string",
           "title": "The base class that the entity inherits from.",
-          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseXxx' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
+          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBase<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
         },
         "implements": {
           "type": "string",
@@ -450,7 +336,7 @@
         "implementsAutoInfer": {
           "type": "boolean",
           "title": "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-          "description": "Will attempt to infer the following: 'IGuidIdentifier', 'IInt32Identifier', 'IInt64Identifier', 'IStringIdentifier', 'IETag' and 'IChangeLog'. Defaults to 'true'."
+          "description": "Will attempt to infer the following: 'IIdentifier<Guid>', 'IIdentifier<int>', 'IIdentifier<long>', 'IIdentifier<string>', 'IETag' and 'IChangeLog'. Defaults to 'true'."
         },
         "abstract": {
           "type": "boolean",
@@ -463,7 +349,7 @@
         "namespace": {
           "type": "string",
           "title": "The entity namespace to be appended.",
-          "description": "Appended to the end of the standard structure as follows: '{Company}.{AppName}.Common.Entities.{Namespace}'."
+          "description": "Appended to the end of the standard structure as follows: '{Company}.{AppName}.Business.Entities.{Namespace}'."
         },
         "omitEntityBase": {
           "type": "boolean",
@@ -473,9 +359,9 @@
         "jsonSerializer": {
           "type": "string",
           "title": "The JSON Serializer to use for JSON property attribution.",
-          "description": "Defaults to the 'CodeGeneration.JsonSerializer' configuration property where specified; otherwise, 'Newtonsoft'.",
+          "description": "Defaults to the 'CodeGeneration.JsonSerializer' configuration property where specified; otherwise, 'SystemText'.",
           "enum": [
-            "None",
+            "SystemText",
             "Newtonsoft"
           ]
         },
@@ -584,16 +470,11 @@
         "entityFrameworkName": {
           "type": "string",
           "title": "The .NET Entity Framework interface name used where 'AutoImplement' is 'EntityFramework'.",
-          "description": "Defaults to the 'CodeGeneration.EntityFrameworkName' configuration property (its default value is 'IEfDb')."
+          "description": "Defaults to 'CodeGeneration.EntityFrameworkName'."
         },
         "entityFrameworkModel": {
           "type": "string",
           "title": "The corresponding Entity Framework model name (required where 'AutoImplement' is 'EntityFramework')."
-        },
-        "entityFrameworkMapperInheritsFrom": {
-          "type": "string",
-          "title": "The name of the 'Mapper  that the generated Entity Framework 'Mapper' inherits from.",
-          "description": "Defaults to 'Model.{Name}'; i.e. an entity with the same name in the 'Model' namespace."
         },
         "entityFrameworkCustomMapper": {
           "type": "boolean",
@@ -616,15 +497,11 @@
         "cosmosPartitionKey": {
           "type": "string",
           "title": "The C# code to be used for setting the optional Cosmos 'PartitionKey' where 'AutoImplement' is 'Cosmos'.",
-          "description": "Defaults to 'PartitionKey.None'."
+          "description": "The value 'PartitionKey.None' can be specified. Literals will need to be quoted."
         },
         "cosmosValueContainer": {
           "type": "boolean",
           "title": "Indicates whether the 'CosmosDbValueContainer' is to be used; otherwise, 'CosmosDbContainer'."
-        },
-        "cosmosMapperInheritsFrom": {
-          "type": "string",
-          "title": "The name of the 'Mapper' that the generated Cosmos 'Mapper' inherits from."
         },
         "cosmosCustomMapper": {
           "type": "boolean",
@@ -644,10 +521,6 @@
           "type": "string",
           "title": "The name of the underlying OData collection where 'AutoImplement' is 'OData'.",
           "description": "The underlying 'Simple.OData.Client' will attempt to infer."
-        },
-        "odataMapperInheritsFrom": {
-          "type": "string",
-          "title": "The name of the 'Mapper' that the generated OData 'Mapper' inherits from."
         },
         "odataCustomMapper": {
           "type": "boolean",
@@ -673,6 +546,11 @@
           "type": "string",
           "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
           "description": "This can be overridden within the 'Operation'(s)."
+        },
+        "httpAgentCode": {
+          "type": "string",
+          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Prepended to 'Operation.HttpAgentCode' where specified to enable standardized functionality."
         },
         "dataSvcCaching": {
           "type": "boolean",
@@ -712,43 +590,15 @@
             "Data"
           ]
         },
-        "eventOutbox": {
-          "type": "string",
-          "title": "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).",
-          "description": "Defaults to 'CodeGeneration.EventOutbox' configuration property (inherits) where not specified. A value of 'Database' will result in the 'DatabaseEventOutboxInvoker' being used to orchestrate.",
-          "enum": [
-            "None",
-            "Database"
-          ]
-        },
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
           "description": "Defaults to 'Name' (as lowercase) appended with the '/{$key}' placeholder. Note: when used in code-generation the 'CodeGeneration.EventSourceRoot' will be prepended where specified. To include the entity id/key include a '{$key}' placeholder ('Create', 'Update' or 'Delete' operation only); for example: 'person/{$key}'. This can be overridden for the 'Operation'."
         },
-        "eventSubjectFormat": {
-          "type": "string",
-          "title": "The default formatting for the Subject when an Event is published.",
-          "description": "Defaults to 'CodeGeneration.EventSubjectFormat'.",
-          "enum": [
-            "NameOnly",
-            "NameAndKey"
-          ]
-        },
-        "eventCasing": {
-          "type": "string",
-          "title": "The casing for the Subject and Action (with the exception of the key)",
-          "description": "Defaults to 'CodeGeneration.EventCasing'.",
-          "enum": [
-            "None",
-            "Lower",
-            "Upper"
-          ]
-        },
         "eventTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'DataSvc'-layer whereever generating event publishing logic.",
-          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an 'EventPublish' error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to 'CodeGeneration.EventTransaction'. This essentially defaults the 'Operation.DataSvcTransaction' where not otherwise specified. This should only be used where 'EventPublish' is 'DataSvc' and a transactionally-aware data source is being used."
+          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated whereever generating event publishing logic.",
+          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an 'EventPublish' error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to 'CodeGeneration.EventTransaction'. This essentially defaults the 'Operation.DataSvcTransaction' where not otherwise specified. This should only be used where a transactionally-aware data source is being used."
         },
         "managerCtor": {
           "type": "string",
@@ -781,7 +631,11 @@
         "iValidator": {
           "type": "string",
           "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
+          "description": "Defaults to 'IValidatorEx<Xxx>' (where 'Xxx' is the entity 'Name') where 'Validator' is not 'null'. Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
+        },
+        "identifierGenerator": {
+          "type": "boolean",
+          "title": "Indicates whether the 'IIdentifierGenerator' should be used to generate the 'Id' property where the operation types ('Operation.Type') is 'Create'."
         },
         "webApiRoutePrefix": {
           "type": "string",
@@ -960,9 +814,9 @@
           "title": "The overriding argument name.",
           "description": "Overrides the 'Name' to be used for argument parameters. By default reformatted from 'Name'; e.g. 'FirstName' as 'firstName'."
         },
-        "uniqueKey": {
+        "primaryKey": {
           "type": "boolean",
-          "title": "Indicates whether the property is considered part of the unique (primary) key.",
+          "title": "Indicates whether the property is considered part of the primary (unique) key.",
           "description": "This is also used to simplify the parameter specification for an Entity Operation by inferrence."
         },
         "isEntity": {
@@ -1024,23 +878,10 @@
           "title": "Indicates whether the property is considered part of the Partition Key.",
           "description": "This will implement 'IPartitionKey' for the generated entity."
         },
-        "secondaryPropertyChanged": {
-          "type": "string",
-          "title": "The names of the secondary property(s), comma delimited, that are to be notified on a property change."
-        },
-        "bubblePropertyChanges": {
-          "type": "boolean",
-          "title": "Indicates whether the value should bubble up property changes versus only recording within the sub-entity itself.",
-          "description": "Note that the 'IsEntity' property is also required to enable."
-        },
-        "excludeCleanup": {
-          "type": "boolean",
-          "title": "Indicates that 'CleanUp' is not to be performed for the property within the 'Entity.CleanUp' method."
-        },
         "internalOnly": {
           "type": "boolean",
           "title": "Indicates whether the property is for internal use only; declared in Business entities only.",
-          "description": "This is only applicable where the 'Entity.EntityScope' is 'Autonomous'. In this instance the 'Property' will be excluded from the 'Common' entity declaration."
+          "description": "In this instance the 'Property' will be excluded from the 'Common' entity declaration and 'Business' JSON serialization."
         },
         "refDataType": {
           "type": "string",
@@ -1082,19 +923,19 @@
           "title": "Indicates whether the property is not to be serialized.",
           "description": "All properties are serialized by default."
         },
-        "serializationEmitDefault": {
+        "serializationAlwaysInclude": {
           "type": "boolean",
-          "title": "Indicates whether to emit the default value when serializing."
+          "title": "Indicates whether to include the value (default or otherwise) when serializing."
         },
-        "dataModelJsonName": {
-          "type": "string",
-          "title": "The override JSON property name where outputting as a data model.",
-          "description": "Defaults to 'JsonName' where not specified."
+        "dataModelIgnore": {
+          "type": "boolean",
+          "title": "Indicates whether the property is to be included within the data model.",
+          "description": "All properties are included in the data model by default."
         },
-        "identifierGenerator": {
-          "type": "string",
-          "title": "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
-          "description": "Should be formatted as 'Type' + '^' + 'Name'; e.g. 'IGuidIdentifierGenerator^GuidIdGen'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored. See 'Beef.Entities.IInt32IdentifierGenerator', 'Beef.Entities.IInt64IdentifierGenerator', 'Beef.Entities.IGuidIdentifierGenerator' or 'Beef.Entities.IStringIdentifierGenerator' for underlying implementation requirements."
+        "dataModelSerializationIgnore": {
+          "type": "boolean",
+          "title": "Indicates whether the property is not to be serialized where outputting as a data model.",
+          "description": "All properties are included in the data model by default."
         },
         "dataName": {
           "type": "string",
@@ -1104,11 +945,7 @@
         "dataConverter": {
           "type": "string",
           "title": "The data 'Converter' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where no standard data conversion can be applied. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'DataConverterIsGeneric' to 'true'."
-        },
-        "dataConverterIsGeneric": {
-          "type": "boolean",
-          "title": "Indicates whether the data 'Converter' is a generic class and will automatically use the corresponding property 'Type' as the generic 'T'."
+          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where no standard data conversion can be applied. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'Type'."
         },
         "dataMapperIgnore": {
           "type": "boolean",
@@ -1117,7 +954,7 @@
         },
         "dataAutoGenerated": {
           "type": "boolean",
-          "title": "Indicates whether the 'UniqueKey' property value is automatically generated by the data source on 'Create'."
+          "title": "Indicates whether the 'PrimaryKey' property value is automatically generated by the data source on 'Create'."
         },
         "dataOperationTypes": {
           "type": "string",
@@ -1205,10 +1042,6 @@
           "type": "string",
           "title": "The property annotation (e.g. attribute) declaration code."
         },
-        "webApiQueryStringConverter": {
-          "type": "string",
-          "title": "The 'IPropertyMapperConverter' to perform 'Type' to 'string' conversion for writing to and parsing from the query string."
-        },
         "grpcFieldNo": {
           "type": "integer",
           "title": "The unique (immutable) field number required to enable gRPC support."
@@ -1249,9 +1082,9 @@
           "title": "The text for use in comments.",
           "description": "The 'Text' will be defaulted for all the 'Operation.Type' options with the exception of 'Custom'. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
         },
-        "uniqueKey": {
+        "primaryKey": {
           "type": "boolean",
-          "title": "Indicates whether the properties marked as a unique key ('Property.UniqueKey') are to be used as the parameters.",
+          "title": "Indicates whether the properties marked as a primary key ('Property.PrimaryKey') are to be used as the parameters.",
           "description": "This simplifies the specification of these properties versus having to declare each specifically."
         },
         "paging": {
@@ -1306,6 +1139,11 @@
           "title": "Indicates whether the 'Data' extensions logic should be generated.",
           "description": "Defaults to 'Entity.DataExtensions'."
         },
+        "dataInvoker": {
+          "type": "boolean",
+          "title": "Indicates whether a 'DataInvoker' should orchestrate the 'Data'-layer.",
+          "description": "Where 'Dataransaction' or 'EventPublish' is 'Data' then orchestration will default to 'true'."
+        },
         "dataTransaction": {
           "type": "boolean",
           "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'Data'-layer.",
@@ -1358,6 +1196,11 @@
           "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
           "description": "Defaults to 'Operation.HttpAgentModel' where the 'Operation.ReturnType' is equal to 'Entity.Name' (same type). This can be overridden within the 'Operation'(s)."
         },
+        "httpAgentCode": {
+          "type": "string",
+          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
+          "description": "Appended to 'Entity.HttpAgentCode' where specified to extend."
+        },
         "managerCustom": {
           "type": "boolean",
           "title": "Indicates whether the 'Manager' logic is a custom implementation; i.e. no auto-'DataSvc' invocation logic is to be generated."
@@ -1379,7 +1222,7 @@
         "iValidator": {
           "type": "string",
           "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to the 'Entity.IValidator' where specified; otherwise, defaults to 'IValidator<{Type}>' where the '{Type}' is 'ValueType'. Only used 'Operation.Type' options 'Create' or 'Update'."
+          "description": "Defaults to the 'Entity.IValidator' where specified; otherwise, defaults to 'IValidatorEx<{Type}>' where the '{Type}' is 'ValueType'. Only used 'Operation.Type' options 'Create' or 'Update'."
         },
         "managerOperationType": {
           "type": "string",
@@ -1401,6 +1244,11 @@
           "type": "boolean",
           "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'DataSvc'-layer."
         },
+        "dataSvcInvoker": {
+          "type": "boolean",
+          "title": "Indicates whether a 'DataSvcInvoker' should orchestrate the 'DataSvc'-layer.",
+          "description": "Where 'DataSvcTransaction' or 'EventPublish' is 'DataSvc' then orchestration will default to 'true'."
+        },
         "dataSvcExtensions": {
           "type": "boolean",
           "title": "Indicates whether the 'DataSvc' extensions logic should be generated.",
@@ -1414,15 +1262,6 @@
             "None",
             "DataSvc",
             "Data"
-          ]
-        },
-        "eventOutbox": {
-          "type": "string",
-          "title": "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).",
-          "description": "Defaults to 'Entity.EventOutbox' configuration property (inherits) where not specified and 'EventPublish' is 'Data'; otherwise, 'None'. A value of 'Database' will result in the 'DatabaseEventOutboxInvoker' being used to orchestrate.",
-          "enum": [
-            "None",
-            "Database"
           ]
         },
         "eventSource": {
@@ -1470,14 +1309,13 @@
         "webApiAlternateStatus": {
           "type": "string",
           "title": "The primary HTTP Status Code that will be returned for the operation where there is a 'null' return value.",
-          "description": "The value defaults as follows: 'NotFound' for 'Operation.Type' value 'Get', 'NoContent' for 'Operation.Type' value 'GetColl', 'Create', 'Update' or 'Patch'; otherwise, 'ThrowException' which will result in an 'InvalidOperationException'.",
+          "description": "The value defaults as follows: 'NotFound' for 'Operation.Type' value 'Get' and 'NoContent' for 'Operation.Type' value 'GetColl'; otherwise, 'null'.",
           "enum": [
             "OK",
             "Accepted",
             "Created",
             "NoContent",
-            "NotFound",
-            "ThrowException"
+            "NotFound"
           ]
         },
         "webApiLocation": {
@@ -1587,7 +1425,7 @@
         },
         "nullable": {
           "type": "boolean",
-          "title": "Indicates whether the .NET 'Type should be declared as nullable; e.g. 'string?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'."
+          "title": "Indicates whether the .NET 'Type should be declared as nullable; e.g. 'int?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'."
         },
         "default": {
           "type": "string",
@@ -1630,7 +1468,7 @@
         "iValidator": {
           "type": "string",
           "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to 'IValidator<{Type}>' where the '{Type}' is 'Type'."
+          "description": "Defaults to 'IValidatorEx<{Type}>' where the '{Type}' is 'Type'."
         },
         "validatorCode": {
           "type": "string",
@@ -1643,7 +1481,7 @@
         "layerPassing": {
           "type": "string",
           "title": "The option that determines the layers in which the parameter is passed.",
-          "description": "Defaults to 'All'. To further describe, 'All' passes the parameter through all layeys, 'ToManagerSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' parameter, 'ToManagerCollSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' collection parameter. Where using the 'UniqueKey' option to automatically set 'Parameters', and the 'Operation.Type' is 'Create' or 'Update' it will default to 'ToManagerSet'.",
+          "description": "Defaults to 'All'. To further describe, 'All' passes the parameter through all layeys, 'ToManagerSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' parameter, 'ToManagerCollSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' collection parameter. Where using the 'PrimaryKey' option to automatically set 'Parameters', and the 'Operation.Type' is 'Create' or 'Update' it will default to 'ToManagerSet'.",
           "enum": [
             "All",
             "ToManagerSet",
@@ -1653,11 +1491,7 @@
         "dataConverter": {
           "type": "string",
           "title": "The data 'Converter' class name where specific data conversion is required.",
-          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where the standard data type conversion is not applicable."
-        },
-        "dataConverterIsGeneric": {
-          "type": "boolean",
-          "title": "Indicates whether the data 'Converter' is a generic class and will automatically use the corresponding property 'Type' as the generic 'T'."
+          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where no standard data conversion can be applied. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'Type'."
         },
         "webApiFrom": {
           "type": "string",

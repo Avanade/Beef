@@ -12,7 +12,6 @@ Category | Description
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
-[`Event`](#Event) | Provides the _Event_ configuration.
 [`Outbox`](#Outbox) | Provides the _Event Outbox_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
@@ -52,7 +51,6 @@ Property | Description
 `pathDatabaseSchema` | The path (directory) for the Schema Database-related artefacts.<br/>&dagger; Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`.
 `pathDatabaseMigrations` | The path (directory) for the Schema Database-related artefacts.<br/>&dagger; Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`.
 `pathBusiness` | The path (directory) for the Business-related (.NET) artefacts.<br/>&dagger; Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.
-`PathCdcPublisher` | The path (directory) for the CDC-related (.NET) artefacts.<br/>&dagger; Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
 
 <br/>
 
@@ -62,20 +60,6 @@ Provides the _.NET_ configuration.
 Property | Description
 -|-
 `autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`.<br/>&dagger; Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
-
-<br/>
-
-## Event
-Provides the _Event_ configuration.
-
-Property | Description
--|-
-**`eventSubjectRoot`** | The root for the event name by prepending to all event subject names via CDC.<br/>&dagger; Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be extended within the `Entity`(s).
-`eventSubjectFormat` | The default formatting for the Subject when an Event is published via CDC. Valid options are: `NameOnly`, `NameAndKey`.<br/>&dagger; Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
-**`eventActionFormat`** | The formatting for the Action when an Event is published via CDC. Valid options are: `None`, `PastTense`.<br/>&dagger; Defaults to `None` (no formatting required, i.e. as-is).
-`eventSourceRoot` | The URI root for the event source by prepending to all event source URIs for CDC.<br/>&dagger; The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).
-`eventSourceKind` | The URI kind for the event source URIs for CDC. Valid options are: `None`, `Absolute`, `Relative`, `RelativeOrAbsolute`.<br/>&dagger; Defaults to `None` (being the event source is not updated).
-`eventSourceFormat` | The default formatting for the Source when an Event is published via CDC. Valid options are: `NameOnly`, `NameAndKey`, `NameAndGlobalId`.<br/>&dagger; Defaults to `NameAndKey` (being the event subject name appended with the corresponding unique key.)`.
 
 <br/>
 

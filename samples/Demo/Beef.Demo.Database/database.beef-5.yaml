@@ -1,8 +1,4 @@
 schema: Demo
-eventSubjectFormat: NameOnly
-eventSourceKind: Relative
-eventSourceRoot: /cdc
-eventActionFormat: PastTense
 outbox: true
 outboxSchemaCreate: true
 autoDotNetRename: SnakeKebabToPascalCase
