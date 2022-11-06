@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -43,6 +44,14 @@
   <ItemGroup>
     <ProjectReference Include="..\My.Hr.Api\My.Hr.Api.csproj" />
     <ProjectReference Include="..\My.Hr.Database\My.Hr.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ImplicitUsing.cs">
+      <PackagePath>contentFiles\any\any\Schema\</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Pack>true</Pack>
+    </Compile>
   </ItemGroup>
   
 </Project>

@@ -14,8 +14,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Schema\**\*" />
     <EmbeddedResource Include="Migrations\**\*" />
+    <!--#if (implement_database || implement_entityframework) -->
     <EmbeddedResource Include="Data\**\*" />
+    <!--#endif -->
+    <!--#if (implement_cosmos) -->
     <EmbeddedResource Include="Cosmos\**\*" />
+    <!--#endif -->
     <EmbeddedResource Include="Resources\**\*" />
   </ItemGroup>
 

@@ -1,61 +1,41 @@
-﻿using CoreEx.RefData;
-using My.Hr.Api;
-using My.Hr.Common.Agents;
-using My.Hr.Common.Entities;
-using NUnit.Framework;
-using System.Linq;
-using UnitTestEx;
-using UnitTestEx.NUnit;
+﻿using My.Hr.Common.Entities;
 
-namespace My.Hr.Test.Apis
+namespace My.Hr.Test.Apis;
+
+[TestFixture, NonParallelizable]
+public class ReferenceDataTest : UsingApiTester<Startup>
 {
-    [TestFixture, NonParallelizable]
-    public class ReferenceDataTest
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Default.SetUp();
+        TestSetUp.Default.SetUp();
+        ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
+    }
 
-        [Test]
-        public void A110_GendersAll()
-        {
-            using var test = ApiTester.Create<Startup>().UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
+    [Test]
+    public void A110_GendersAll()
+    {
+        Agent<ReferenceDataAgent, GenderCollection>()
+            .Run(a => a.GenderGetAllAsync())
+            .AssertOK()
+            .AssertJsonFromResource("RefDataGendersAll_Response.json", "id", "etag");
+    }
 
-            var v = test.Agent<ReferenceDataAgent, GenderCollection>()
-                .Run(a => a.GenderGetAllAsync())
-                .AssertOK()
-                .AssertJsonFromResource("RefDataGendersAll_Response.json", "id", "etag")
-                .Value;
+    [Test]
+    public void A120_GendersFilter()
+    {
+        Agent<ReferenceDataAgent, GenderCollection>()
+            .Run(a => a.GenderGetAllAsync(new ReferenceDataFilter { Codes = new string[] { "F" } }))
+            .AssertOK()
+            .AssertJsonFromResource("RefDataGendersFilter_Response.json", "id", "etag");
+    }
 
-            Assert.IsNotNull(v);
-            Assert.AreEqual(3, v!.Count);
-            Assert.AreEqual(new string[] { "F", "M", "N" }, v.Select(x => x.Code).ToArray());
-        }
-
-        [Test]
-        public void A120_GendersFilter()
-        {
-            using var test = ApiTester.Create<Startup>().UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-
-            var v = test.Agent<ReferenceDataAgent, GenderCollection>()
-                .Run(a => a.GenderGetAllAsync(new ReferenceDataFilter { Codes = new string[] { "F" } }))
-                .AssertOK()
-                .AssertJsonFromResource("RefDataGendersFilter_Response.json", "id", "etag")
-                .Value;
-
-            Assert.IsNotNull(v);
-            Assert.AreEqual(1, v!.Count);
-            Assert.AreEqual(new string[] { "F" }, v.Select(x => x.Code).ToArray());
-        }
-
-        [Test]
-        public void A130_GetNamed()
-        {
-            using var test = ApiTester.Create<Startup>().UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-
-            test.Agent<ReferenceDataAgent>()
-                .Run(a => a.GetNamedAsync(new string[] { "Gender" }))
-                .AssertOK()
-                .AssertJsonFromResource("RefDataGetNamed_Response.json", "items.id", "items.etag");
-        }
+    [Test]
+    public void A130_GetNamed()
+    {
+        Agent<ReferenceDataAgent>()
+            .Run(a => a.GetNamedAsync(new string[] { "Gender" }))
+            .AssertOK()
+            .AssertJsonFromResource("RefDataGetNamed_Response.json", "items.id", "items.etag");
     }
 }
