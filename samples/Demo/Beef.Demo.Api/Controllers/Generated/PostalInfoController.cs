@@ -74,7 +74,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="city">The City.</param>
         /// <returns>The patched <see cref="PostalInfo"/>.</returns>
         [HttpPatch("{country}/{state}/{city}")]
-        [AcceptsBody(typeof(Common.Entities.PostalInfo))]
+        [AcceptsBody(typeof(Common.Entities.PostalInfo), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchPostCodes(string? country, string? state, string? city) =>
             _webApi.PatchAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);

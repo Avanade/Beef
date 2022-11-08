@@ -65,7 +65,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="Employee"/>.</returns>
         [HttpPatch("{id}")]
-        [AcceptsBody(typeof(Common.Entities.Employee))]
+        [AcceptsBody(typeof(Common.Entities.Employee), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
@@ -90,7 +90,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
         /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(EmployeeBaseCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, DateTime? startFrom = default, DateTime? startTo = default, [FromQuery(Name="includeTerminated")] bool? isIncludeTerminated = default)
         {

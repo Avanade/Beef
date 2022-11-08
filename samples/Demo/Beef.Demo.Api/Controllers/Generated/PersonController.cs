@@ -104,7 +104,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("{id}")]
-        [AcceptsBody(typeof(Common.Entities.Person))]
+        [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
@@ -114,7 +114,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("all")]
-        [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetAll() =>
             _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAllAsync(p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
@@ -124,7 +124,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("allnopaging")]
-        [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetAll2() =>
             _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAll2Async(), alternateStatusCode: HttpStatusCode.NoContent);
@@ -137,7 +137,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
@@ -153,7 +153,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonDetailCollection"/></returns>
         [HttpGet("argsdetail")]
-        [ProducesResponseType(typeof(PersonDetailCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
@@ -233,7 +233,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="PersonDetail"/>.</returns>
         [HttpPatch("{id}/detail")]
-        [AcceptsBody(typeof(Common.Entities.PersonDetail))]
+        [AcceptsBody(typeof(Common.Entities.PersonDetail), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchDetail(Guid id) =>
             _webApi.PatchAsync<PersonDetail>(Request, get: _ => _manager.GetDetailAsync(id), put: p => _personManager.UpdateDetailAsync(p.Value!, id));
@@ -277,7 +277,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("args")]
-        [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
@@ -360,7 +360,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
         [HttpPatch("ef/{id}")]
-        [AcceptsBody(typeof(Common.Entities.Person))]
+        [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchWithEf(Guid id) =>
             _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));

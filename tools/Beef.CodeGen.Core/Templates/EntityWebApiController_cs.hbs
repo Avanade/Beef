@@ -70,7 +70,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{/ifval}}
         [{{WebApiMethod}}("{{WebApiRoute}}")]
   {{#if HasValue}}
-        [AcceptsBody(typeof(Common.Entities.{{ValueType}}))]
+        [AcceptsBody(typeof(Common.Entities.{{ValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
   {{/if}}
         [ProducesResponseType({{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
   {{#if HasReturnValue}}

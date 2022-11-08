@@ -652,7 +652,7 @@ operations: [
         /// <summary>
         /// Indicates whether the <see cref="ReturnType"/> is an entity.
         /// </summary>
-        public bool IsReturnTypeEntity => Root!.Entities!.Any(x => x.Name == ReturnType);
+        public bool IsReturnTypeEntity => DotNet.SystemTypes.Contains(ReturnType!) ? false : (!ReturnType!.StartsWith("System.") && !ReturnType!.StartsWith("Microsoft."));
 
         /// <summary>
         /// The operation event properties.

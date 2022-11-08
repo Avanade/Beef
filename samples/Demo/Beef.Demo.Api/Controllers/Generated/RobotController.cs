@@ -65,7 +65,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The patched <see cref="Robot"/>.</returns>
         [HttpPatch("{id}")]
-        [AcceptsBody(typeof(Common.Entities.Robot))]
+        [AcceptsBody(typeof(Common.Entities.Robot), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
@@ -87,7 +87,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         /// <returns>The <see cref="RobotCollection"/></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs([FromQuery(Name="model-no")] string? modelNo = default, [FromQuery(Name="serial-no")] string? serialNo = default, [FromQuery(Name="power-sources")] List<string>? powerSources = default)
         {

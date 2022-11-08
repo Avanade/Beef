@@ -44,7 +44,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
         [HttpGet("employees/{employeeId}/reviews")]
-        [ProducesResponseType(typeof(PerformanceReviewCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByEmployeeId(Guid employeeId) =>
             _webApi.GetAsync<PerformanceReviewCollectionResult>(Request, p => _manager.GetByEmployeeIdAsync(employeeId, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
@@ -77,7 +77,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
         [HttpPatch("reviews/{id}")]
-        [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
+        [AcceptsBody(typeof(Common.Entities.PerformanceReview), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
             _webApi.PatchAsync<PerformanceReview>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));

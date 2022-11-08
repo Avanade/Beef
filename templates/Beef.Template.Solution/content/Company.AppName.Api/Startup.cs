@@ -69,7 +69,11 @@ public class Startup
         // Add AutoMapper services via Assembly-based probing for Profiles.
         services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(PersonData).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
         services.AddAutoMapperWrapper();
+
 #endif
+        // Add the event publishing; this will need to be updated from the logger publisher to the actual as appropriate.
+        services.AddEventDataFormatter()
+                .AddLoggerEventPublisher();
 
         // Add additional services.
         services.AddControllers();

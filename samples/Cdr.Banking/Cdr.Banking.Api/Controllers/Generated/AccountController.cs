@@ -35,7 +35,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="isOwned">Indicates whether Is Owned.</param>
         /// <returns>The <see cref="AccountCollection"/></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(AccountCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.AccountCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetAccounts([FromQuery(Name="product-category")] string? productCategory = default, [FromQuery(Name="open-status")] string? openStatus = default, [FromQuery(Name="is-owned")] bool? isOwned = default)
         {

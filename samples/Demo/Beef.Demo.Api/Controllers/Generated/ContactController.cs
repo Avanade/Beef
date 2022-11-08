@@ -40,7 +40,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The <see cref="ContactCollection"/></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(ContactCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetAll() =>
             _webApi.GetAsync<ContactCollectionResult>(Request, p => _manager.GetAllAsync(), alternateStatusCode: HttpStatusCode.NoContent);
