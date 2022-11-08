@@ -11,8 +11,8 @@
     <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.10" />
-    <PackageReference Include="CoreEx.Cosmos" Version="1.0.10" />
-    <PackageReference Include="CoreEx.Validation" Version="1.0.10" />
+    <PackageReference Include="CoreEx.AutoMapper" Version="1.0.11" />
+    <PackageReference Include="CoreEx.Cosmos" Version="1.0.11" />
+    <PackageReference Include="CoreEx.Validation" Version="1.0.11" />
   </ItemGroup>
 </Project>

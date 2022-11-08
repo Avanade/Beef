@@ -19,10 +19,12 @@ It is recommended that the following is installed to simplify the opening of a c
 
 The [`Beef.Template.Solution`](../templates/Beef.Template.Solution/README.md) needs to be installed so that it can be used to easily create the required [solution structure](./Solution-Structure.md).
 
-Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the `dotnet new -i` command as follows:
+Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the [`dotnet new -i`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new-install) command as follows (or alternatively specify the required version):
 
 ```
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
+
+dotnet new -i beef.template.solution::5.1.preview1 --nuget-source https://api.nuget.org/v3/index.json
 ``` 
 
 <br/>
@@ -83,10 +85,9 @@ Generate the configured tables and C# models:
 ```
 cd Foo.Bar.Database
 dotnet run all
-dotnet run codegen --script DatabaseEventOutbox.xml
 ```
 
-This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated. The final command will create the required migration scripts for the event outbox functionality.
+This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated.
 
 <br/>
 

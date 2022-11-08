@@ -2,7 +2,7 @@
 
 using CoreEx.Database.SqlServer;
 using DbEx;
-using DbEx.Schema;
+using DbEx.DbSchema;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

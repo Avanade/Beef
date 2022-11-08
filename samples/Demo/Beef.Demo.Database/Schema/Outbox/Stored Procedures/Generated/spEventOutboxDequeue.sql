@@ -42,6 +42,7 @@ BEGIN
         [Source],
         [Timestamp],
         [CorrelationId],
+        [Key],
         [TenantId],
         [PartitionKey],
         [ETag],

@@ -34,6 +34,7 @@ BEGIN
             @source NVARCHAR(1023),
             @timestamp DATETIMEOFFSET,
             @correlationId NVARCHAR(127),
+            @key NVARCHAR(1023),
             @tenantId NVARCHAR(127),
             @partitionKey NVARCHAR(127),
             @etag NVARCHAR(127),
@@ -42,10 +43,10 @@ BEGIN
 
     -- Declare, open, and fetch first event from cursor.
     DECLARE c CURSOR FORWARD_ONLY
-      FOR SELECT [EventId], [EventDequeued], [Destination], [Subject], [Action], [Type], [Source], [Timestamp], [CorrelationId], [TenantId], [PartitionKey], [ETag], [Attributes], [Data] FROM @EventList
+      FOR SELECT [EventId], [EventDequeued], [Destination], [Subject], [Action], [Type], [Source], [Timestamp], [CorrelationId], [Key], [TenantId], [PartitionKey], [ETag], [Attributes], [Data] FROM @EventList
 
     OPEN c
-    FETCH NEXT FROM c INTO @eventId, @eventDequeued, @destination, @subject, @action, @type, @source, @timestamp, @correlationId, @tenantId, @partitionKey, @etag, @attributes, @data
+    FETCH NEXT FROM c INTO @eventId, @eventDequeued, @destination, @subject, @action, @type, @source, @timestamp, @correlationId, @key, @tenantId, @partitionKey, @etag, @attributes, @data
 
     -- Iterate the event(s).
     WHILE @@FETCH_STATUS = 0
@@ -68,6 +69,7 @@ BEGIN
           [Source],
           [Timestamp],
           [CorrelationId],
+          [Key],
           [TenantId],
           [PartitionKey],
           [ETag],
@@ -84,6 +86,7 @@ BEGIN
           @source,
           @timestamp,
           @correlationId,
+          @key,
           @tenantId,
           @partitionKey,
           @etag,
@@ -92,7 +95,7 @@ BEGIN
         )
 
         -- Fetch the next event from the cursor.
-        FETCH NEXT FROM c INTO @eventId, @eventDequeued, @destination, @subject, @action, @type, @source, @timestamp, @correlationId, @tenantId, @partitionKey, @etag, @attributes, @data
+        FETCH NEXT FROM c INTO @eventId, @eventDequeued, @destination, @subject, @action, @type, @source, @timestamp, @correlationId, @key, @tenantId, @partitionKey, @etag, @attributes, @data
     END
 
     -- Close the cursor.

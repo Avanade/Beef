@@ -1,4 +1,4 @@
-﻿using Foo.Ef.Bar.Business.Data.EfModel;
+﻿using Company.AppName.Business.Data.EfModel;
 
 namespace Company.AppName.Business.Data;
 

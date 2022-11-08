@@ -8,6 +8,16 @@ This sample will walkthrough an approach of adding the capabilities in a series 
 
 </br>
 
+## Beef primer
+
+_Beef_ is obstensibly the code-generation engine that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof:
+- [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilties (extends .NET core);
+- [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilties;
+- [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality; and,
+- [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing.
+
+</br>
+
 ## Scope
 
 Within the sample there will two primary entities exposed:
@@ -102,4 +112,6 @@ The basis of the functional capabilities have been created for our fictitious so
 
 The developer should have witnessed that reasonably complicated logic can be built using this _config_ to _code-gen_ to _custom_ approach. Where the _custom_ effort is for the most part focused on the key business value delivery; not the related boilerplate. Plus, with the testing framework, how complex end-to-end intra-domain integration tests can be created to appropriately validate the underlying logic - which can easily be integrated into the developer build-test-release lifecycle.
 
-It is acknowledged that there is a learning curve required for using _Beef_; and in time greater acceleration will be achieved as experience is gained. Please review the extended documentation and provide feedback, questions, defects, etc. via a [issue](https://github.com/Avanade/Beef/issues). Thanks and enjoy :-)
+It is acknowledged that there is a learning curve required for using _Beef_; and in time greater acceleration will be achieved as experience is gained. Please review the extended documentation and provide feedback, questions, defects, etc. via an [issue](https://github.com/Avanade/Beef/issues).
+
+Thanks and enjoy :-)

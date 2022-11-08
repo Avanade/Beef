@@ -91,14 +91,18 @@ namespace Beef.Template.Solution.UnitTest
             }
 
             // Build Beef and package (nuget) - only local package, no deployment.
-            Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} packageonly").exitCode, "nuget publish");
+            Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} -configuration 'Debug' -IncludeSymbols -IncludeSource").exitCode, "nuget publish");
 
-            // Uninstall any previous beef templates.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "new -u beef.template.solution").exitCode, "uninstall beef.template.solution");
+            // Uninstall any previous beef templates (failure is ok here)
+            ExecuteCommand("dotnet", "new -u beef.template.solution");
+
+            // Determine the "actual" version to publish so we are explicit.
+            var pf = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish"), "Beef.Template.Solution.*.nupkg").FirstOrDefault();
+            Assert.IsNotNull(pf, "Beef.Template.Solution.*.nupkg could not be found.");
 
             // Install the Beef template solution from local package.
             // dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution --nuget-source {Path.Combine(_rootDir.FullName, "packageonly")}").exitCode, "install beef.template.solution");
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution::{new FileInfo(pf).Name[23..^6]} --nuget-source {nugets}").exitCode, "install beef.template.solution");
         }
 
         [Test]
@@ -137,11 +141,8 @@ namespace Beef.Template.Solution.UnitTest
             Assert.Zero(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, "dotnet new beef");
 
             // Restore nuget packages from our repository.
-            var path = Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "nuget-publish");
-            if (!Directory.Exists(path))
-                path = null;
-
-            Assert.Zero(ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "packageonly")} {(path == null ? "" : $"-s {path}")}", dir).exitCode, "dotnet restore");
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish");
+            Assert.Zero(ExecuteCommand("dotnet", $"restore -s {path}", dir).exitCode, "dotnet restore");
 
             // CodeGen: Execute code-generation.
             Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
