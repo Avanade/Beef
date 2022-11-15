@@ -28,7 +28,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            ApiTester.SetUp.SetUp();
+            Assert.IsTrue(ApiTester.SetUp.SetUp());
             ApiTester.SetUp.ExpectedEventsEnabled = true;
         }
 

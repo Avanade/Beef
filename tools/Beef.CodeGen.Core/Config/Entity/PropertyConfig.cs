@@ -362,8 +362,8 @@ properties: [
         /// The Entity Framework `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
-            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        [CodeGenProperty("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+            Description = "Defaults to `Set`.")]
         public string? EntityFrameworkMapper { get; set; }
 
         #endregion
@@ -374,8 +374,8 @@ properties: [
         /// The Cosmos `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("cosmosMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
-            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        [CodeGenProperty("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+            Description = "Defaults to `Set`.")]
         public string? CosmosMapper { get; set; }
 
         #endregion
@@ -398,8 +398,8 @@ properties: [
         /// The HttpAgent `Mapper` approach for the property.
         /// </summary>
         [JsonProperty("httpAgentMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("HttpAgent", Title = "The HttpAgent `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
-            Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
+        [CodeGenProperty("HttpAgent", Title = "The HttpAgent `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+            Description = "Defaults to `Set`.")]
         public string? HttpAgentMapper { get; set; }
 
         #endregion
@@ -557,7 +557,7 @@ properties: [
         /// <summary>
         /// Gets or sets the data converter name.
         /// </summary>
-        public string? MapperDataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"AutoMapper{DataConverter}.Default";
+        public string? MapperDataConverterName => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}.Default";
 
         /// <summary>
         /// Gets the data converter C# code.
@@ -568,6 +568,72 @@ properties: [
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
         public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ToSource.Convert(";
+
+        /// <summary>
+        /// Gets the EntityFramework data mapper - entity to model code.
+        /// </summary>
+        public string? EntityFrameworkDataMapperToModelCode => EntityFrameworkMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
+
+        /// <summary>
+        /// Gets the EntityFramework data mapper - model to entity code.
+        /// </summary>
+        public string? EntityFrameworkDataMapperFromModelCode => EntityFrameworkMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
+
+        /// <summary>
+        /// Gets the Cosmos data mapper - entity to model code.
+        /// </summary>
+        public string? CosmosDataMapperToModelCode => CosmosMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
+
+        /// <summary>
+        /// Gets the Cosmos data mapper - model to entity code.
+        /// </summary>
+        public string? CosmosDataMapperFromModelCode => CosmosMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
+
+        /// <summary>
+        /// Gets the HttpAgent data mapper - entity to model code.
+        /// </summary>
+        public string? HttpAgentDataMapperToModelCode => HttpAgentMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
+
+        /// <summary>
+        /// Gets the HttpAgent data mapper - model to entity code.
+        /// </summary>
+        public string? HttpAgentDataMapperFromModelCode => HttpAgentMapper switch
+        {
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            _ => "!! code-gen error !!"
+        };
 
         /// <summary>
         /// Gets the WebAPI parameter type.
@@ -640,21 +706,22 @@ properties: [
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationAlwaysInclude = DefaultWhereNull(SerializationAlwaysInclude, () => false);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
-            IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
+            IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Type.EndsWith("Collection") || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => RefDataMapping.HasValue && RefDataMapping.Value == true);
 
             if (CompareValue(InternalOnly, true))
                 SerializationIgnore = true;
 
-            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
+            DataName = DefaultWhereNull(DataName, () => (Name == "ETag" && (Parent!.AutoImplement == "Database" || Parent.AutoImplement == "EntityFramework")) ? "RowVersion" : null);
+            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? ((Name == "ETag" && (Parent!.AutoImplement == "Database" || Parent.AutoImplement == "EntityFramework")) ? "StringToBase64Converter" : "") : Root!.RefDataDefaultMapperConverter);
             var rdc = ReformatDataConverter(DataConverter, Type, RefDataType, RefDataGetValueType);
             DataConverter = rdc.DataConverter;
             RefDataGetValueType = rdc.RefDataGetValueType;
 
-            EntityFrameworkMapper = DefaultWhereNull(EntityFrameworkMapper, () => "Map");
-            CosmosMapper = DefaultWhereNull(CosmosMapper, () => "Map");
-            ODataMapper = DefaultWhereNull(ODataMapper, () => "Map");
-            HttpAgentMapper = DefaultWhereNull(HttpAgentMapper, () => "Map");
+            EntityFrameworkMapper = DefaultWhereNull(EntityFrameworkMapper, () => CompareValue(IsEntity, true) ? "Flatten" : "Set");
+            CosmosMapper = DefaultWhereNull(CosmosMapper, () => CompareValue(IsEntity, true) ? "Map" : "Set");
+            ODataMapper = DefaultWhereNull(ODataMapper, () => CompareValue(IsEntity, true) ? "Map" : "Set");
+            HttpAgentMapper = DefaultWhereNull(HttpAgentMapper, () => CompareValue(IsEntity, true) ? "Map" : "Set");
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
             GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;

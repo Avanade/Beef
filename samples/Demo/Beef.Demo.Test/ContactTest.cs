@@ -16,7 +16,7 @@ namespace Beef.Demo.Test
     public class ContactTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Default.SetUp();
+        public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
 
         [Test]
         public void A110_Get()

@@ -55,6 +55,10 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.Gender, RefDataNamespace.Gender>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.GenderId));
+                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
+                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
+                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
+                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 GenderMapperProfileCtor(d2s);
@@ -75,6 +79,10 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.TerminationReason, RefDataNamespace.TerminationReason>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.TerminationReasonId));
+                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
+                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
+                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
+                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 TerminationReasonMapperProfileCtor(d2s);
@@ -95,6 +103,10 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.RelationshipType, RefDataNamespace.RelationshipType>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.RelationshipTypeId));
+                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
+                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
+                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
+                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 RelationshipTypeMapperProfileCtor(d2s);
@@ -115,6 +127,10 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.USState, RefDataNamespace.USState>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.USStateId));
+                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
+                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
+                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
+                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 USStateMapperProfileCtor(d2s);
@@ -135,6 +151,10 @@ namespace My.Hr.Business.Data
             {
                 var d2s = CreateMap<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>();
                 d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceOutcomeId));
+                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
+                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
+                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
+                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
                 d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
 
                 PerformanceOutcomeMapperProfileCtor(d2s);

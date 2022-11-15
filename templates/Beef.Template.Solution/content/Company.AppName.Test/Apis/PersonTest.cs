@@ -7,7 +7,7 @@ public class PersonTest : UsingApiTester<Startup>
 {
 #if (!implement_httpagent)
     [OneTimeSetUp]
-    public void OneTimeSetUp() => TestSetUp.Default.SetUp();
+    public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
 
     #region Get
 

@@ -17,7 +17,7 @@ namespace Beef.Demo.Test
         [Test]
         public async Task A100_EnqueueAndDequeue()
         {
-            TestSetUp.Default.SetUp();
+            Assert.IsTrue(TestSetUp.Default.SetUp());
 
             var ims = new InMemorySender();
             var test = ApiTester.Create<Startup>().ReplaceScoped<IEventSender>(_ => ims).ReplaceScoped<EventOutboxDequeue>();

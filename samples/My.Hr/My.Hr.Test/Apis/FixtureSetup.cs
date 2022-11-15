@@ -9,14 +9,14 @@ public class FixtureSetUp
         TestSetUp.Default.ExpectedEventsEnabled = true;
         TestSetUp.Default.ExpectNoEvents = true;
 
-        TestSetUp.Default.RegisterSetUp(async (count, _, __) =>
+        TestSetUp.Default.RegisterSetUp(async (count, _, ct) =>
         {
             using var test = ApiTester.Create<Startup>();
             var settings = test.Services.GetRequiredService<HrSettings>();
 
-            return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
-                count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, settings.DatabaseConnectionString,
-                typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true }).ConfigureAwait(false) == 0;
+            return await new SqlServerMigration(new MigrationArgs(
+                count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString,
+                typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefSchema = true }).MigrateAsync(ct).ConfigureAwait(false);
         });
     }
 }

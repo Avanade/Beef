@@ -14,27 +14,39 @@ namespace Beef.Demo.Business.Data
     {
 
         /// <summary>
-        /// Provides the <see cref="PlaceInfo"/> and HttpAgent <see cref="Model.PlaceInfo"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="PlaceInfo"/> to Entity Framework <see cref="Model.PlaceInfo"/> mapping.
         /// </summary>
-        public partial class HttpAgentMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelHttpAgentMapper : Mapper<PlaceInfo, Model.PlaceInfo>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="HttpAgentMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelHttpAgentMapper"/> class.
             /// </summary>
-            public HttpAgentMapperProfile()
+            public EntityToModelHttpAgentMapper()
             {
-                var s2d = CreateMap<PlaceInfo, Model.PlaceInfo>();
-                s2d.ForMember(d => d.Name, o => o.MapFrom(s => s.Name));
-                s2d.ForMember(d => d.PostCode, o => o.MapFrom(s => s.PostCode));
-
-                var d2s = CreateMap<Model.PlaceInfo, PlaceInfo>();
-                d2s.ForMember(s => s.Name, o => o.MapFrom(d => d.Name));
-                d2s.ForMember(s => s.PostCode, o => o.MapFrom(d => d.PostCode));
-
-                HttpAgentMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Name = s.Name);
+                Map((s, d) => d.PostCode = s.PostCode);
+                EntityToModelHttpAgentMapperCtor();
             }
 
-            partial void HttpAgentMapperProfileCtor(AutoMapper.IMappingExpression<PlaceInfo, Model.PlaceInfo> s2d, AutoMapper.IMappingExpression<Model.PlaceInfo, PlaceInfo> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.PlaceInfo"/> to <see cref="PlaceInfo"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityHttpAgentMapper : Mapper<Model.PlaceInfo, PlaceInfo>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityHttpAgentMapper"/> class.
+            /// </summary>
+            public ModelToEntityHttpAgentMapper()
+            {
+                Map((s, d) => d.Name = (string?)s.Name);
+                Map((s, d) => d.PostCode = (string?)s.PostCode);
+                ModelToEntityHttpAgentMapperCtor();
+            }
+
+            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -103,22 +103,22 @@ namespace Beef.Demo.Business.Data.EfModel
             modelBuilder.Entity<Person>(entity =>
             {
                 entity.ToTable("Person", "Demo");
-                entity.HasKey("PersonId");
-                entity.Property(p => p.PersonId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.FirstName).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.LastName).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Birthday).HasColumnType("DATE");
-                entity.Property(p => p.GenderId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Street).HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.City).HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.RowVersion).HasColumnType("TIMESTAMP").IsRowVersion();
-                entity.Property(p => p.CreatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
-                entity.Property(p => p.CreatedDate).HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
-                entity.Property(p => p.UpdatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
-                entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
-                entity.Property(p => p.UniqueCode).HasColumnType("NVARCHAR(20)");
-                entity.Property(p => p.EyeColorCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.MetadataJson).HasColumnType("NVARCHAR(2048)");
+                entity.HasKey(nameof(PersonId));
+                entity.Property(p => p.PersonId).HasColumnName("PersonId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Birthday).HasColumnName("Birthday").HasColumnType("DATE");
+                entity.Property(p => p.GenderId).HasColumnName("GenderId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.Street).HasColumnName("Street").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.City).HasColumnName("City").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.RowVersion).HasColumnName("RowVersion").HasColumnType("TIMESTAMP").IsRowVersion();
+                entity.Property(p => p.CreatedBy).HasColumnName("CreatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
+                entity.Property(p => p.CreatedDate).HasColumnName("CreatedDate").HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
+                entity.Property(p => p.UpdatedBy).HasColumnName("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
+                entity.Property(p => p.UpdatedDate).HasColumnName("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
+                entity.Property(p => p.UniqueCode).HasColumnName("UniqueCode").HasColumnType("NVARCHAR(20)");
+                entity.Property(p => p.EyeColorCode).HasColumnName("EyeColorCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.MetadataJson).HasColumnName("MetadataJson").HasColumnType("NVARCHAR(2048)");
                 AddToModel(entity);
             });
         }

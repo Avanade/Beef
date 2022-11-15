@@ -106,6 +106,14 @@ tables:
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         public List<string>? ExcludeColumns { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
+        /// </summary>
+        [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
+        public List<string>? AliasColumns { get; set; }
+
         #endregion
 
         #region CodeGen
@@ -185,7 +193,7 @@ tables:
         /// </summary>
         [JsonProperty("efModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("EntityFramework", Title = "The .NET (C#) EntityFramework (EF) model name.",
-            Description = "Defaults to `Name`.")]
+            Description = "Defaults to `Name` applying the `CodeGeneration.AutoDotNetRename`.")]
         public string? EfModelName { get; set; }
 
         #endregion
@@ -427,7 +435,7 @@ tables:
         public List<TableColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();
 
         /// <summary>
-        /// Gets the columns considered part of the primary key.
+        /// Gets the identity columns considered part of the primary key.
         /// </summary>
         public List<TableColumnConfig> PrimaryKeyIdentityColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey && x.DbColumn!.IsIdentity).ToList();
 
@@ -472,7 +480,7 @@ tables:
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
-            EfModelName = DefaultWhereNull(EfModelName, () => Name);
+            EfModelName = DefaultWhereNull(EfModelName, () => Root.RenameForDotNet(Name));
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
@@ -491,6 +499,16 @@ tables:
             foreach (var c in DbTable.Columns)
             {
                 var cc = new TableColumnConfig { Name = c.Name, DbColumn = c };
+                var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
+                if (ca != null)
+                {
+                    var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2 && parts[1].Length > 0)
+                        cc.NameAlias = parts[1];
+                }
+
+                cc.NameAlias ??= Root.RenameForDotNet(cc.Name);
+
                 await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
 
                 // Certain special columns have to always be included.

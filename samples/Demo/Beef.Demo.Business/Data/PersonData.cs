@@ -122,25 +122,25 @@
 
         private Task<Person> GetNullOnImplementationAsync(string _, List<string> __) => Task.FromResult<Person>(null!);
 
-        public partial class EfMapperProfile
-        {
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Person, EfModel.Person> s2d, AutoMapper.IMappingExpression<EfModel.Person, Person> d2s)
-            {
-                // Flatten and unflatten the address.
-                //CreateMap<Address, EfModel.Person>()
-                //    .ForMember(d => d.Street, o => o.MapFrom(s => s.Street))
-                //    .ForMember(d => d.City, o => o.MapFrom(s => s.City));
+        //public partial class EfMapperProfile
+        //{
+        //    partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Person, EfModel.Person> s2d, AutoMapper.IMappingExpression<EfModel.Person, Person> d2s)
+        //    {
+        //        // Flatten and unflatten the address.
+        //        //CreateMap<Address, EfModel.Person>()
+        //        //    .ForMember(d => d.Street, o => o.MapFrom(s => s.Street))
+        //        //    .ForMember(d => d.City, o => o.MapFrom(s => s.City));
 
-                //CreateMap<EfModel.Person, Address>()
-                //    .ForMember(s => s.Street, o => o.MapFrom(d => d.Street))
-                //    .ForMember(s => s.City, o => o.MapFrom(d => d.City));
+        //        //CreateMap<EfModel.Person, Address>()
+        //        //    .ForMember(s => s.Street, o => o.MapFrom(d => d.Street))
+        //        //    .ForMember(s => s.City, o => o.MapFrom(d => d.City));
 
-                //s2d.IncludeMembers(s => s.Address);
-                //d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
-                CreateMap<Address, EfModel.Person>().ReverseMap();
-                s2d.IncludeMembers(s => s.Address);
-                d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
-            }
-        }
+        //        //s2d.IncludeMembers(s => s.Address);
+        //        //d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
+        //        CreateMap<Address, EfModel.Person>().ReverseMap();
+        //        s2d.IncludeMembers(s => s.Address);
+        //        d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
+        //    }
+        //}
     }
 }

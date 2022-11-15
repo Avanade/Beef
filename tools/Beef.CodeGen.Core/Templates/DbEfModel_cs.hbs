@@ -21,7 +21,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
         /// <summary>
         /// Gets or sets the '{{Name}}' column value.
         /// </summary>
-        public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{Name}} { get; set; }
+        public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{NameAlias}} { get; set; }
 
 {{/each}}
 {{#ifval ColumnIsDeleted}}
@@ -47,19 +47,19 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
             if (modelBuilder == null)
                 throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.Entity<{{Name}}>(entity =>
+            modelBuilder.Entity<{{EfModelName}}>(entity =>
             {
                 entity.{{#if DbTable.IsAView}}ToView{{else}}ToTable{{/if}}("{{Name}}", "{{Schema}}");
-                entity.HasKey({{#each PrimaryKeyColumns}}"{{Name}}"{{#unless @last}}, {{/unless}}{{/each}});
+                entity.HasKey({{#each PrimaryKeyColumns}}nameof({{NameAlias}}){{#unless @last}}, {{/unless}}{{/each}});
 {{#each CoreColumns}}
-                entity.Property(p => p.{{Name}}).HasColumnType("{{EfSqlType}}"){{#if DbColumn.IsComputed}}.ValueGeneratedOnAddOrUpdate(){{/if}}{{#if IsRowVersionColumn}}.IsRowVersion(){{/if}}{{#if IsCreated}}.ValueGeneratedOnUpdate(){{/if}}{{#if IsUpdated}}.ValueGeneratedOnAdd(){{/if}};
+                entity.Property(p => p.{{NameAlias}}).HasColumnName("{{Name}}").HasColumnType("{{EfSqlType}}"){{#if DbColumn.IsComputed}}.ValueGeneratedOnAddOrUpdate(){{/if}}{{#if IsRowVersionColumn}}.IsRowVersion(){{/if}}{{#if IsCreated}}.ValueGeneratedOnUpdate(){{/if}}{{#if IsUpdated}}.ValueGeneratedOnAdd(){{/if}};
 {{/each}}
 {{#ifval ColumnIsDeleted}}
-                entity.Property(p => p.IsDeleted).HasColumnType("{{ColumnIsDeleted.EfSqlType}}");
+                entity.Property(p => p.IsDeleted).HasColumnName("{{ColumnIsDeleted.Name}}").HasColumnType("{{ColumnIsDeleted.EfSqlType}}");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
 {{/ifval}}
 {{#ifval ColumnTenantId}}
-                entity.Property(p => p.TenantId).HasColumnType("{{ColumnTenantId.EfSqlType}}");
+                entity.Property(p => p.TenantId).HasColumnName("{{ColumnTenantId.Name}}").HasColumnType("{{ColumnTenantId.EfSqlType}}");
                 entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
 {{/ifval}}
                 AddToModel(entity);
@@ -69,7 +69,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
         /// <summary>
         /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
         /// </summary>
-        static partial void AddToModel(EntityTypeBuilder<{{Name}}> entity);
+        static partial void AddToModel(EntityTypeBuilder<{{EfModelName}}> entity);
     }
 }
 

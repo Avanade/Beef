@@ -64,62 +64,137 @@ namespace Beef.Demo.Business.Data
             => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.EyeColor"/> to Entity Framework <see cref="EfModel.EyeColor"/> mapping.
         /// </summary>
-        public partial class EyeColorMapperProfile : AutoMapper.Profile
+        public partial class EyeColorToModelEfMapper : Mapper<RefDataNamespace.EyeColor, EfModel.EyeColor>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EyeColorMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EyeColorToModelEfMapper"/> class.
             /// </summary>
-            public EyeColorMapperProfile()
+            public EyeColorToModelEfMapper()
             {
-                var d2s = CreateMap<EfModel.EyeColor, RefDataNamespace.EyeColor>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EyeColorId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                EyeColorMapperProfileCtor(d2s);
+                Map((s, d) => d.EyeColorId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                EyeColorToModelEfMapperCtor();
             }
 
-            partial void EyeColorMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.EyeColor, RefDataNamespace.EyeColor> d2s); // Enables the constructor to be extended.
+            partial void EyeColorToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.PowerSource"/> and Entity Framework <see cref="Model.PowerSource"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="EfModel.EyeColor"/> to <see cref="RefDataNamespace.EyeColor"/> mapping.
         /// </summary>
-        public partial class PowerSourceMapperProfile : AutoMapper.Profile
+        public partial class ModelToEyeColorEfMapper : Mapper<EfModel.EyeColor, RefDataNamespace.EyeColor>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="PowerSourceMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
             /// </summary>
-            public PowerSourceMapperProfile()
+            public ModelToEyeColorEfMapper()
             {
-                var d2s = CreateMap<Model.PowerSource, RefDataNamespace.PowerSource>();
-                d2s.ForMember(s => s.AdditionalInfo, o => o.MapFrom(d => d.AdditionalInfo));
-
-                PowerSourceMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.EyeColorId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToEyeColorEfMapperCtor();
             }
 
-            partial void PowerSourceMapperProfileCtor(AutoMapper.IMappingExpression<Model.PowerSource, RefDataNamespace.PowerSource> d2s); // Enables the constructor to be extended.
+            partial void ModelToEyeColorEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.Status"/> and Entity Framework <see cref="EfModel.Status"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.PowerSource"/> to Entity Framework <see cref="Model.PowerSource"/> mapping.
         /// </summary>
-        public partial class StatusMapperProfile : AutoMapper.Profile
+        public partial class PowerSourceToModelCosmosMapper : Mapper<RefDataNamespace.PowerSource, Model.PowerSource>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="StatusMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="PowerSourceToModelCosmosMapper"/> class.
             /// </summary>
-            public StatusMapperProfile()
+            public PowerSourceToModelCosmosMapper()
             {
-                var d2s = CreateMap<EfModel.Status, RefDataNamespace.Status>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.StatusId));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                StatusMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.AdditionalInfo = s.AdditionalInfo);
+                PowerSourceToModelCosmosMapperCtor();
             }
 
-            partial void StatusMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.Status, RefDataNamespace.Status> d2s); // Enables the constructor to be extended.
+            partial void PowerSourceToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.PowerSource"/> to <see cref="RefDataNamespace.PowerSource"/> mapping.
+        /// </summary>
+        public partial class ModelToPowerSourceCosmosMapper : Mapper<Model.PowerSource, RefDataNamespace.PowerSource>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToPowerSourceCosmosMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.AdditionalInfo = (string?)s.AdditionalInfo);
+                ModelToPowerSourceCosmosMapperCtor();
+            }
+
+            partial void ModelToPowerSourceCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.Status"/> to Entity Framework <see cref="EfModel.Status"/> mapping.
+        /// </summary>
+        public partial class StatusToModelEfMapper : Mapper<RefDataNamespace.Status, EfModel.Status>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StatusToModelEfMapper"/> class.
+            /// </summary>
+            public StatusToModelEfMapper()
+            {
+                Map((s, d) => d.StatusId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                StatusToModelEfMapperCtor();
+            }
+
+            partial void StatusToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.Status"/> to <see cref="RefDataNamespace.Status"/> mapping.
+        /// </summary>
+        public partial class ModelToStatusEfMapper : Mapper<EfModel.Status, RefDataNamespace.Status>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToStatusEfMapper()
+            {
+                Map((s, d) => d.Id = (string?)s.StatusId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToStatusEfMapperCtor();
+            }
+
+            partial void ModelToStatusEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

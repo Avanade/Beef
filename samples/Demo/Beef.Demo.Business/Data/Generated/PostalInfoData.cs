@@ -62,33 +62,45 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="PostalInfo"/> and HttpAgent <see cref="Model.PostalInfo"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.
         /// </summary>
-        public partial class HttpAgentMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelHttpAgentMapper : Mapper<PostalInfo, Model.PostalInfo>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="HttpAgentMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelHttpAgentMapper"/> class.
             /// </summary>
-            public HttpAgentMapperProfile()
+            public EntityToModelHttpAgentMapper()
             {
-                var s2d = CreateMap<PostalInfo, Model.PostalInfo>();
-                s2d.ForMember(d => d.Country, o => o.MapFrom(s => s.CountrySid));
-                s2d.ForMember(d => d.City, o => o.MapFrom(s => s.City));
-                s2d.ForMember(d => d.State, o => o.MapFrom(s => s.State));
-                s2d.ForMember(d => d.Places, o => o.MapFrom(s => s.Places));
-                s2d.ForMember(d => d.ETag, o => o.MapFrom(s => s.ETag));
-
-                var d2s = CreateMap<Model.PostalInfo, PostalInfo>();
-                d2s.ForMember(s => s.CountrySid, o => o.MapFrom(d => d.Country));
-                d2s.ForMember(s => s.City, o => o.MapFrom(d => d.City));
-                d2s.ForMember(s => s.State, o => o.MapFrom(d => d.State));
-                d2s.ForMember(s => s.Places, o => o.MapFrom(d => d.Places));
-                d2s.ForMember(s => s.ETag, o => o.MapFrom(d => d.ETag));
-
-                HttpAgentMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Country = s.CountrySid);
+                Map((s, d) => d.City = s.City);
+                Map((s, d) => d.State = s.State);
+                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places));
+                Map((s, d) => d.ETag = s.ETag);
+                EntityToModelHttpAgentMapperCtor();
             }
 
-            partial void HttpAgentMapperProfileCtor(AutoMapper.IMappingExpression<PostalInfo, Model.PostalInfo> s2d, AutoMapper.IMappingExpression<Model.PostalInfo, PostalInfo> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.PostalInfo"/> to <see cref="PostalInfo"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityHttpAgentMapper : Mapper<Model.PostalInfo, PostalInfo>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityHttpAgentMapper"/> class.
+            /// </summary>
+            public ModelToEntityHttpAgentMapper()
+            {
+                Map((s, d) => d.CountrySid = (string?)s.Country);
+                Map((s, d) => d.City = (string?)s.City);
+                Map((s, d) => d.State = (string?)s.State);
+                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places));
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToEntityHttpAgentMapperCtor();
+            }
+
+            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

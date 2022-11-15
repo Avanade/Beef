@@ -3,8 +3,6 @@
 using CoreEx.Entities.Extended;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Collections.Generic;
@@ -217,6 +215,46 @@ entities:
                 "ReferenceDataNullableGuidIdConverter", "ReferenceDataNullableGuidIdConverter{T}", "ReferenceDataNullableGuidIdConverter<T>" },
             Description = "Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically be set to the `Type`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data code data name
+        /// </summary>
+        [JsonProperty("refDataCodeDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `Code` data name.",
+            Description = "Defaults to `Code` (literal).")]
+        public string? RefDataCodeDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data text data name.
+        /// </summary>
+        [JsonProperty("refDataTextDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `Text` data name.",
+            Description = "Defaults to `Text` (literal).")]
+        public string? RefDataTextDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data is active name.
+        /// </summary>
+        [JsonProperty("refDataIsActiveDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `IsActive` data name.",
+            Description = "Defaults to `IsActive` (literal).")]
+        public string? RefDataIsActiveDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data sort order data name.
+        /// </summary>
+        [JsonProperty("refDataSortOrderDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `SortOrder` data name.",
+            Description = "Defaults to `SortOrder` (literal).")]
+        public string? RefDataSortOrderDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data is ETag name.
+        /// </summary>
+        [JsonProperty("refDataETagDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `ETag` data name.",
+            Description = "Defaults to `RowVersion` (literal).")]
+        public string? RefDataETagDataName { get; set; } = "*";
 
         #endregion
 
@@ -474,6 +512,10 @@ entities:
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "SystemText");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter<T>");
+            RefDataCodeDataName = DefaultWhereNull(RefDataCodeDataName, () => "Code");
+            RefDataTextDataName = DefaultWhereNull(RefDataTextDataName, () => "Text");
+            RefDataIsActiveDataName = DefaultWhereNull(RefDataIsActiveDataName, () => "IsActive");
+            RefDataSortOrderDataName = DefaultWhereNull(RefDataSortOrderDataName, () => "SortOrder");
 
             if (!string.IsNullOrEmpty(WebApiRoutePrefix))
                 RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :

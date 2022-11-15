@@ -53,12 +53,12 @@ namespace Beef.Demo.Business.Data.EfModel
             modelBuilder.Entity<Contact>(entity =>
             {
                 entity.ToTable("Contact", "Demo");
-                entity.HasKey("ContactId");
-                entity.Property(p => p.ContactId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.FirstName).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.LastName).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.StatusCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.IsDeleted).HasColumnType("BIT");
+                entity.HasKey(nameof(ContactId));
+                entity.Property(p => p.ContactId).HasColumnName("ContactId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.StatusCode).HasColumnName("StatusCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.IsDeleted).HasColumnName("IsDeleted").HasColumnType("BIT");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
                 AddToModel(entity);
             });

@@ -89,32 +89,43 @@ namespace Beef.Demo.Business.Data
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
-        /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Contact"/> to Entity Framework <see cref="EfModel.Contact"/> mapping.
         /// </summary>
-        public partial class EfMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelEfMapper : Mapper<Contact, EfModel.Contact>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
             /// </summary>
-            public EfMapperProfile()
+            public EntityToModelEfMapper()
             {
-                var s2d = CreateMap<Contact, EfModel.Contact>();
-                s2d.ForMember(d => d.ContactId, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName));
-                s2d.ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName));
-                s2d.ForMember(d => d.StatusCode, o => o.MapFrom(s => s.StatusSid));
-
-                var d2s = CreateMap<EfModel.Contact, Contact>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.ContactId));
-                d2s.ForMember(s => s.FirstName, o => o.MapFrom(d => d.FirstName));
-                d2s.ForMember(s => s.LastName, o => o.MapFrom(d => d.LastName));
-                d2s.ForMember(s => s.StatusSid, o => o.MapFrom(d => d.StatusCode));
-                d2s.ForMember(s => s.InternalCode, o => o.Ignore());
-
-                EfMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.ContactId = s.Id);
+                Map((s, d) => d.FirstName = s.FirstName);
+                Map((s, d) => d.LastName = s.LastName);
+                Map((s, d) => d.StatusCode = s.StatusSid);
+                EntityToModelEfMapperCtor();
             }
 
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Contact, EfModel.Contact> s2d, AutoMapper.IMappingExpression<EfModel.Contact, Contact> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.Contact"/> to <see cref="Contact"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityEfMapper : Mapper<EfModel.Contact, Contact>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToEntityEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.ContactId);
+                Map((s, d) => d.FirstName = (string?)s.FirstName);
+                Map((s, d) => d.LastName = (string?)s.LastName);
+                Map((s, d) => d.StatusSid = (string?)s.StatusCode);
+                ModelToEntityEfMapperCtor();
+            }
+
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -48,105 +48,267 @@ namespace Cdr.Banking.Business.Data
             => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionStatus, Model.TransactionStatus>("RefData").Query().SelectQueryAsync<RefDataNamespace.TransactionStatusCollection>());
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> and Entity Framework <see cref="Model.OpenStatus"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> to Entity Framework <see cref="Model.OpenStatus"/> mapping.
         /// </summary>
-        public partial class OpenStatusMapperProfile : AutoMapper.Profile
+        public partial class OpenStatusToModelCosmosMapper : Mapper<RefDataNamespace.OpenStatus, Model.OpenStatus>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="OpenStatusMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="OpenStatusToModelCosmosMapper"/> class.
             /// </summary>
-            public OpenStatusMapperProfile()
+            public OpenStatusToModelCosmosMapper()
             {
-                var d2s = CreateMap<Model.OpenStatus, RefDataNamespace.OpenStatus>();
-                OpenStatusMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                OpenStatusToModelCosmosMapperCtor();
             }
 
-            partial void OpenStatusMapperProfileCtor(AutoMapper.IMappingExpression<Model.OpenStatus, RefDataNamespace.OpenStatus> d2s); // Enables the constructor to be extended.
+            partial void OpenStatusToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> and Entity Framework <see cref="Model.ProductCategory"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="Model.OpenStatus"/> to <see cref="RefDataNamespace.OpenStatus"/> mapping.
         /// </summary>
-        public partial class ProductCategoryMapperProfile : AutoMapper.Profile
+        public partial class ModelToOpenStatusCosmosMapper : Mapper<Model.OpenStatus, RefDataNamespace.OpenStatus>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ProductCategoryMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
             /// </summary>
-            public ProductCategoryMapperProfile()
+            public ModelToOpenStatusCosmosMapper()
             {
-                var d2s = CreateMap<Model.ProductCategory, RefDataNamespace.ProductCategory>();
-                ProductCategoryMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToOpenStatusCosmosMapperCtor();
             }
 
-            partial void ProductCategoryMapperProfileCtor(AutoMapper.IMappingExpression<Model.ProductCategory, RefDataNamespace.ProductCategory> d2s); // Enables the constructor to be extended.
+            partial void ModelToOpenStatusCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.AccountUType"/> and Entity Framework <see cref="Model.AccountUType"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> to Entity Framework <see cref="Model.ProductCategory"/> mapping.
         /// </summary>
-        public partial class AccountUTypeMapperProfile : AutoMapper.Profile
+        public partial class ProductCategoryToModelCosmosMapper : Mapper<RefDataNamespace.ProductCategory, Model.ProductCategory>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="AccountUTypeMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ProductCategoryToModelCosmosMapper"/> class.
             /// </summary>
-            public AccountUTypeMapperProfile()
+            public ProductCategoryToModelCosmosMapper()
             {
-                var d2s = CreateMap<Model.AccountUType, RefDataNamespace.AccountUType>();
-                AccountUTypeMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                ProductCategoryToModelCosmosMapperCtor();
             }
 
-            partial void AccountUTypeMapperProfileCtor(AutoMapper.IMappingExpression<Model.AccountUType, RefDataNamespace.AccountUType> d2s); // Enables the constructor to be extended.
+            partial void ProductCategoryToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> and Entity Framework <see cref="Model.MaturityInstructions"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="Model.ProductCategory"/> to <see cref="RefDataNamespace.ProductCategory"/> mapping.
         /// </summary>
-        public partial class MaturityInstructionsMapperProfile : AutoMapper.Profile
+        public partial class ModelToProductCategoryCosmosMapper : Mapper<Model.ProductCategory, RefDataNamespace.ProductCategory>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="MaturityInstructionsMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
             /// </summary>
-            public MaturityInstructionsMapperProfile()
+            public ModelToProductCategoryCosmosMapper()
             {
-                var d2s = CreateMap<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions>();
-                MaturityInstructionsMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToProductCategoryCosmosMapperCtor();
             }
 
-            partial void MaturityInstructionsMapperProfileCtor(AutoMapper.IMappingExpression<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions> d2s); // Enables the constructor to be extended.
+            partial void ModelToProductCategoryCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionType"/> and Entity Framework <see cref="Model.TransactionType"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.AccountUType"/> to Entity Framework <see cref="Model.AccountUType"/> mapping.
         /// </summary>
-        public partial class TransactionTypeMapperProfile : AutoMapper.Profile
+        public partial class AccountUTypeToModelCosmosMapper : Mapper<RefDataNamespace.AccountUType, Model.AccountUType>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TransactionTypeMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="AccountUTypeToModelCosmosMapper"/> class.
             /// </summary>
-            public TransactionTypeMapperProfile()
+            public AccountUTypeToModelCosmosMapper()
             {
-                var d2s = CreateMap<Model.TransactionType, RefDataNamespace.TransactionType>();
-                TransactionTypeMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                AccountUTypeToModelCosmosMapperCtor();
             }
 
-            partial void TransactionTypeMapperProfileCtor(AutoMapper.IMappingExpression<Model.TransactionType, RefDataNamespace.TransactionType> d2s); // Enables the constructor to be extended.
+            partial void AccountUTypeToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> and Entity Framework <see cref="Model.TransactionStatus"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="Model.AccountUType"/> to <see cref="RefDataNamespace.AccountUType"/> mapping.
         /// </summary>
-        public partial class TransactionStatusMapperProfile : AutoMapper.Profile
+        public partial class ModelToAccountUTypeCosmosMapper : Mapper<Model.AccountUType, RefDataNamespace.AccountUType>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TransactionStatusMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
             /// </summary>
-            public TransactionStatusMapperProfile()
+            public ModelToAccountUTypeCosmosMapper()
             {
-                var d2s = CreateMap<Model.TransactionStatus, RefDataNamespace.TransactionStatus>();
-                TransactionStatusMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToAccountUTypeCosmosMapperCtor();
             }
 
-            partial void TransactionStatusMapperProfileCtor(AutoMapper.IMappingExpression<Model.TransactionStatus, RefDataNamespace.TransactionStatus> d2s); // Enables the constructor to be extended.
+            partial void ModelToAccountUTypeCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> to Entity Framework <see cref="Model.MaturityInstructions"/> mapping.
+        /// </summary>
+        public partial class MaturityInstructionsToModelCosmosMapper : Mapper<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MaturityInstructionsToModelCosmosMapper"/> class.
+            /// </summary>
+            public MaturityInstructionsToModelCosmosMapper()
+            {
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                MaturityInstructionsToModelCosmosMapperCtor();
+            }
+
+            partial void MaturityInstructionsToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.MaturityInstructions"/> to <see cref="RefDataNamespace.MaturityInstructions"/> mapping.
+        /// </summary>
+        public partial class ModelToMaturityInstructionsCosmosMapper : Mapper<Model.MaturityInstructions, RefDataNamespace.MaturityInstructions>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToMaturityInstructionsCosmosMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToMaturityInstructionsCosmosMapperCtor();
+            }
+
+            partial void ModelToMaturityInstructionsCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.TransactionType"/> to Entity Framework <see cref="Model.TransactionType"/> mapping.
+        /// </summary>
+        public partial class TransactionTypeToModelCosmosMapper : Mapper<RefDataNamespace.TransactionType, Model.TransactionType>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TransactionTypeToModelCosmosMapper"/> class.
+            /// </summary>
+            public TransactionTypeToModelCosmosMapper()
+            {
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                TransactionTypeToModelCosmosMapperCtor();
+            }
+
+            partial void TransactionTypeToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.TransactionType"/> to <see cref="RefDataNamespace.TransactionType"/> mapping.
+        /// </summary>
+        public partial class ModelToTransactionTypeCosmosMapper : Mapper<Model.TransactionType, RefDataNamespace.TransactionType>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToTransactionTypeCosmosMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToTransactionTypeCosmosMapperCtor();
+            }
+
+            partial void ModelToTransactionTypeCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> to Entity Framework <see cref="Model.TransactionStatus"/> mapping.
+        /// </summary>
+        public partial class TransactionStatusToModelCosmosMapper : Mapper<RefDataNamespace.TransactionStatus, Model.TransactionStatus>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TransactionStatusToModelCosmosMapper"/> class.
+            /// </summary>
+            public TransactionStatusToModelCosmosMapper()
+            {
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.ETag = s.ETag);
+                TransactionStatusToModelCosmosMapperCtor();
+            }
+
+            partial void TransactionStatusToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.TransactionStatus"/> to <see cref="RefDataNamespace.TransactionStatus"/> mapping.
+        /// </summary>
+        public partial class ModelToTransactionStatusCosmosMapper : Mapper<Model.TransactionStatus, RefDataNamespace.TransactionStatus>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToTransactionStatusCosmosMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.Id);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                ModelToTransactionStatusCosmosMapperCtor();
+            }
+
+            partial void ModelToTransactionStatusCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

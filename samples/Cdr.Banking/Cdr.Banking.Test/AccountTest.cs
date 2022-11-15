@@ -19,7 +19,7 @@ namespace Cdr.Banking.Test
         public void OneTimeSetUp()
         {
             ApiTester.UseUser("jessica");
-            TestSetUp.Default.SetUp();
+            Assert.IsTrue(TestSetUp.Default.SetUp());
         }
 
         #region GetAccounts

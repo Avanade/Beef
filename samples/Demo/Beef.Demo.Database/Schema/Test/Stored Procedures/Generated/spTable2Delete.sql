@@ -16,8 +16,8 @@ BEGIN
     DELETE [t] FROM [Test].[Table2] AS [t]
       WHERE [t].[Table2Id] = @Table2Id
 
-   -- Select the row count.
-   SELECT @@ROWCOUNT
+    -- Select the row count.
+    SELECT @@ROWCOUNT
 
     -- Commit the transaction.
     COMMIT TRANSACTION

@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
     public class AgentTesterTest : UsingAgentTesterServer<Startup>
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => base.ApiTester.SetUp.SetUp();
+        public void OneTimeSetUp() => Assert.IsTrue(ApiTester.SetUp.SetUp());
 
         [Test, TestSetUp("USER_NAME")]
         public void A010_UserDefault()

@@ -17,7 +17,7 @@ entities:
       { name: Gender, type: ^Gender, refDataType: string, grpcFieldNo: 5, dataName: GenderId, dataConverter: 'ReferenceDataNullableGuidIdConverter{T}' },
       { name: EyeColor, type: ^EyeColor, partitionKey: true, grpcFieldNo: 6, dataName: EyeColorCode },
       { name: Birthday, type: DateTime, dateTimeTransform: DateOnly, grpcFieldNo: 7, databaseDbType: Date },
-      { name: Address, type: Address, isEntity: true, grpcFieldNo: 8, databaseMapper: AddressData.DbMapper, entityFrameworkMapper: Skip },
+      { name: Address, type: Address, isEntity: true, grpcFieldNo: 8, databaseMapper: AddressData.DbMapper, entityFrameworkMapper: Flatten },
       { name: ETag, type: string, grpcFieldNo: 500 },
       { name: Metadata, type: 'Dictionary<string, string>', dataConverter: 'ObjectToJsonConverter{T}', dataName: MetadataJson },
       { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 501 }
@@ -112,7 +112,7 @@ entities:
     ]
   }
 
-- { name: Address, grpc: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, collection: true,
+- { name: Address, grpc: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, entityFrameworkModel: EfModel.Person,  collection: true,
     properties: [
       { name: Street, grpcFieldNo: 1, type: string },
       { name: City, grpcFieldNo: 2, type: string }

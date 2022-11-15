@@ -75,37 +75,49 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Robot"/> and Entity Framework <see cref="Model.Robot"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Robot"/> to Entity Framework <see cref="Model.Robot"/> mapping.
         /// </summary>
-        public partial class CosmosMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelCosmosMapper : Mapper<Robot, Model.Robot>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
             /// </summary>
-            public CosmosMapperProfile()
+            public EntityToModelCosmosMapper()
             {
-                var s2d = CreateMap<Robot, Model.Robot>();
-                s2d.ForMember(d => d.Id, o => o.ConvertUsing(AutoMapperTypeToStringConverter<Guid>.Default.ToDestination, s => s.Id));
-                s2d.ForMember(d => d.ModelNo, o => o.MapFrom(s => s.ModelNo));
-                s2d.ForMember(d => d.SerialNo, o => o.MapFrom(s => s.SerialNo));
-                s2d.ForMember(d => d.EyeColor, o => o.MapFrom(s => s.EyeColorSid));
-                s2d.ForMember(d => d.PowerSource, o => o.MapFrom(s => s.PowerSourceSid));
-                s2d.ForMember(d => d.ETag, o => o.MapFrom(s => s.ETag));
-                s2d.ForMember(d => d.ChangeLog, o => o.MapFrom(s => s.ChangeLog));
-
-                var d2s = CreateMap<Model.Robot, Robot>();
-                d2s.ForMember(s => s.Id, o => o.ConvertUsing(AutoMapperTypeToStringConverter<Guid>.Default.ToSource, d => d.Id));
-                d2s.ForMember(s => s.ModelNo, o => o.MapFrom(d => d.ModelNo));
-                d2s.ForMember(s => s.SerialNo, o => o.MapFrom(d => d.SerialNo));
-                d2s.ForMember(s => s.EyeColorSid, o => o.MapFrom(d => d.EyeColor));
-                d2s.ForMember(s => s.PowerSourceSid, o => o.MapFrom(d => d.PowerSource));
-                d2s.ForMember(s => s.ETag, o => o.MapFrom(d => d.ETag));
-                d2s.ForMember(s => s.ChangeLog, o => o.MapFrom(d => d.ChangeLog));
-
-                CosmosMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Id = TypeToStringConverter<Guid>.Default.ToDestination.Convert(s.Id));
+                Map((s, d) => d.ModelNo = s.ModelNo);
+                Map((s, d) => d.SerialNo = s.SerialNo);
+                Map((s, d) => d.EyeColor = s.EyeColorSid);
+                Map((s, d) => d.PowerSource = s.PowerSourceSid);
+                Map((s, d) => d.ETag = s.ETag);
+                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog));
+                EntityToModelCosmosMapperCtor();
             }
 
-            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Robot, Model.Robot> s2d, AutoMapper.IMappingExpression<Model.Robot, Robot> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.Robot"/> to <see cref="Robot"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityCosmosMapper : Mapper<Model.Robot, Robot>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToEntityCosmosMapper()
+            {
+                Map((s, d) => d.Id = (Guid)TypeToStringConverter<Guid>.Default.ToSource.Convert(s.Id));
+                Map((s, d) => d.ModelNo = (string?)s.ModelNo);
+                Map((s, d) => d.SerialNo = (string?)s.SerialNo);
+                Map((s, d) => d.EyeColorSid = (string?)s.EyeColor);
+                Map((s, d) => d.PowerSourceSid = (string?)s.PowerSource);
+                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog));
+                ModelToEntityCosmosMapperCtor();
+            }
+
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

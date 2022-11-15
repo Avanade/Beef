@@ -63,26 +63,41 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments EntityFrameworkModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments EntityFrameworkModel}}} mapping.
         /// </summary>
-        public partial class {{Name}}MapperProfile : AutoMapper.Profile
+        public partial class {{Name}}ToModelEfMapper : Mapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="{{Name}}MapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="{{Name}}ToModelEfMapper"/> class.
             /// </summary>
-            public {{Name}}MapperProfile()
+            public {{Name}}ToModelEfMapper()
             {
-                var d2s = CreateMap<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.{{Name}}Id));
-          {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
-          {{/each}}
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                {{Name}}MapperProfileCtor(d2s);
+    {{#each EntityFrameworkMapperProperties}}
+                {{EntityFrameworkDataMapperToModelCode}}
+    {{/each}}
+                {{Name}}ToModelEfMapperCtor();
             }
 
-            partial void {{Name}}MapperProfileCtor(AutoMapper.IMappingExpression<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}> d2s); // Enables the constructor to be extended.
+            partial void {{Name}}ToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework {{{see-comments EntityFrameworkModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
+        /// </summary>
+        public partial class ModelTo{{Name}}EfMapper : Mapper<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelTo{{Name}}EfMapper()
+            {
+    {{#each EntityFrameworkMapperProperties}}
+                {{EntityFrameworkDataMapperFromModelCode}}
+    {{/each}}
+                ModelTo{{Name}}EfMapperCtor();
+            }
+
+            partial void ModelTo{{Name}}EfMapperCtor(); // Enables the constructor to be extended.
         }
     {{/unless}}
   {{/ifeq}}
@@ -90,26 +105,41 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{see-comments RefDataQualifiedEntityName}} and Entity Framework {{{see-comments CosmosModel}}} <i>AutoMapper</i> mapping.
+        /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments CosmosModel}}} mapping.
         /// </summary>
-        public partial class {{Name}}MapperProfile : AutoMapper.Profile
+        public partial class {{Name}}ToModelCosmosMapper : Mapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="{{Name}}MapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="{{Name}}ToModelCosmosMapper"/> class.
             /// </summary>
-            public {{Name}}MapperProfile()
+            public {{Name}}ToModelCosmosMapper()
             {
-                var d2s = CreateMap<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>();
-          {{#each CoreProperties}}
-                d2s.ForMember(s => s.{{DataMapperPropertyName}}, o => o.{{#ifval DataConverterName}}ConvertUsing({{DataConverterName}}.ToSrce, {{else}}MapFrom({{/ifval}}d => d.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}));
-            {{#if @last}}
-
-            {{/if}}
-          {{/each}}
-                {{Name}}MapperProfileCtor(d2s);
+    {{#each CosmosMapperProperties}}
+                {{CosmosDataMapperToModelCode}}
+    {{/each}}
+                {{Name}}ToModelCosmosMapperCtor();
             }
 
-            partial void {{Name}}MapperProfileCtor(AutoMapper.IMappingExpression<{{CosmosModel}}, {{RefDataQualifiedEntityName}}> d2s); // Enables the constructor to be extended.
+            partial void {{Name}}ToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework {{{see-comments CosmosModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
+        /// </summary>
+        public partial class ModelTo{{Name}}CosmosMapper : Mapper<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelTo{{Name}}CosmosMapper()
+            {
+    {{#each CosmosMapperProperties}}
+                {{CosmosDataMapperFromModelCode}}
+    {{/each}}
+                ModelTo{{Name}}CosmosMapperCtor();
+            }
+
+            partial void ModelTo{{Name}}CosmosMapperCtor(); // Enables the constructor to be extended.
         }
     {{/unless}}
   {{/ifeq}}

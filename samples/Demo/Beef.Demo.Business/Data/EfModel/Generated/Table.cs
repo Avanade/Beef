@@ -98,22 +98,22 @@ namespace Beef.Demo.Business.Data.EfModel
             modelBuilder.Entity<Table>(entity =>
             {
                 entity.ToTable("Table", "Test");
-                entity.HasKey("TableId");
-                entity.Property(p => p.TableId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Name).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Count).HasColumnType("INT");
-                entity.Property(p => p.Amount).HasColumnType("DECIMAL(16, 9)");
-                entity.Property(p => p.Other).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.GenderCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.OrgUnitId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.RowVersion).HasColumnType("TIMESTAMP").IsRowVersion();
-                entity.Property(p => p.CreatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
-                entity.Property(p => p.CreatedDate).HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
-                entity.Property(p => p.UpdatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
-                entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
-                entity.Property(p => p.IsDeleted).HasColumnType("BIT");
+                entity.HasKey(nameof(TableId));
+                entity.Property(p => p.TableId).HasColumnName("TableId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.Name).HasColumnName("Name").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Count).HasColumnName("Count").HasColumnType("INT");
+                entity.Property(p => p.Amount).HasColumnName("Amount").HasColumnType("DECIMAL(16, 9)");
+                entity.Property(p => p.Other).HasColumnName("Other").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.GenderCode).HasColumnName("GenderCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.OrgUnitId).HasColumnName("OrgUnitId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.RowVersion).HasColumnName("RowVersion").HasColumnType("TIMESTAMP").IsRowVersion();
+                entity.Property(p => p.CreatedBy).HasColumnName("CreatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
+                entity.Property(p => p.CreatedDate).HasColumnName("CreatedDate").HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
+                entity.Property(p => p.UpdatedBy).HasColumnName("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
+                entity.Property(p => p.UpdatedDate).HasColumnName("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
+                entity.Property(p => p.IsDeleted).HasColumnName("IsDeleted").HasColumnType("BIT");
                 entity.HasQueryFilter(v => v.IsDeleted != true);
-                entity.Property(p => p.TenantId).HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.TenantId).HasColumnName("TenantId").HasColumnType("NVARCHAR(50)");
                 entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
                 AddToModel(entity);
             });

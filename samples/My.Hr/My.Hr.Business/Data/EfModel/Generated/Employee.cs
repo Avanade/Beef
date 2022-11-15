@@ -78,17 +78,17 @@ namespace My.Hr.Business.Data.EfModel
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.ToTable("Employee", "Hr");
-                entity.HasKey("EmployeeId");
-                entity.Property(p => p.EmployeeId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Email).HasColumnType("NVARCHAR(250)");
-                entity.Property(p => p.FirstName).HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.LastName).HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.GenderCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Birthday).HasColumnType("DATE");
-                entity.Property(p => p.StartDate).HasColumnType("DATE");
-                entity.Property(p => p.TerminationDate).HasColumnType("DATE");
-                entity.Property(p => p.TerminationReasonCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.PhoneNo).HasColumnType("NVARCHAR(50)");
+                entity.HasKey(nameof(EmployeeId));
+                entity.Property(p => p.EmployeeId).HasColumnName("EmployeeId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.Email).HasColumnName("Email").HasColumnType("NVARCHAR(250)");
+                entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.GenderCode).HasColumnName("GenderCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Birthday).HasColumnName("Birthday").HasColumnType("DATE");
+                entity.Property(p => p.StartDate).HasColumnName("StartDate").HasColumnType("DATE");
+                entity.Property(p => p.TerminationDate).HasColumnName("TerminationDate").HasColumnType("DATE");
+                entity.Property(p => p.TerminationReasonCode).HasColumnName("TerminationReasonCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.PhoneNo).HasColumnName("PhoneNo").HasColumnType("NVARCHAR(50)");
                 AddToModel(entity);
             });
         }

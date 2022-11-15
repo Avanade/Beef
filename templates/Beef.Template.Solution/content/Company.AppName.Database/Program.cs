@@ -1,4 +1,4 @@
-﻿using Beef.Database.Core;
+﻿using Beef.Database.Core.SqlServer;
 using System.Threading.Tasks;
 
 namespace Company.AppName.Database;
@@ -13,10 +13,5 @@ public static class Program
     /// </summary>
     /// <param name="args">The startup arguments.</param>
     /// <returns>The status code whereby zero indicates success.</returns>
-#if (implement_database)
-    public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True;TrustServerCertificate=true", "Company", "AppName", useBeefDbo: true).RunAsync(args);
-#endif
-#if (implement_entityframework)
-    public static Task<int> Main(string[] args) => DatabaseConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True;TrustServerCertificate=true", "Company", "AppName", useBeefDbo: true).RunAsync(args);
-#endif
+    public static Task<int> Main(string[] args) => SqlServerMigrationConsole.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True;TrustServerCertificate=true", "Company", "AppName", useBeefSchema: true).RunAsync(args);
 }

@@ -60,7 +60,7 @@
     "coreex_version": {
       "type": "parameter",
       "replaces": "CoreExVersion",
-      "defaultValue": "1.0.11",
+      "defaultValue": "1.0.12",
       "datatype": "text",
       "description": "The CoreEx packages version."
     },
@@ -74,7 +74,7 @@
     "beef_version": {
       "type": "parameter",
       "replaces": "BeefVersion",
-      "defaultValue": "5.0.1-preview1",
+      "defaultValue": "5.0.1-preview2",
       "datatype": "text",
       "description": "The Beef packages version."
     },

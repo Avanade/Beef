@@ -349,49 +349,71 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Person"/> and Entity Framework <see cref="EfModel.Person"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Person"/> to Entity Framework <see cref="EfModel.Person"/> mapping.
         /// </summary>
-        public partial class EfMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelEfMapper : Mapper<Person, EfModel.Person>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
             /// </summary>
-            public EfMapperProfile()
+            public EntityToModelEfMapper()
             {
-                var s2d = CreateMap<Person, EfModel.Person>();
-                s2d.ForMember(d => d.PersonId, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName));
-                s2d.ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName));
-                s2d.ForMember(d => d.UniqueCode, o => o.MapFrom(s => s.UniqueCode));
-                s2d.ForMember(d => d.GenderId, o => o.ConvertUsing(AutoMapperReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToDestination, s => s.Gender));
-                s2d.ForMember(d => d.EyeColorCode, o => o.MapFrom(s => s.EyeColorSid));
-                s2d.ForMember(d => d.Birthday, o => o.MapFrom(s => s.Birthday));
-                s2d.ForMember(d => d.MetadataJson, o => o.ConvertUsing(AutoMapperObjectToJsonConverter<Dictionary<string, string>>.Default.ToDestination, s => s.Metadata));
-                s2d.ForMember(d => d.RowVersion, o => o.OperationTypes(OperationTypes.AnyExceptCreate).ConvertUsing(AutoMapperStringToBase64Converter.Default.ToDestination, s => s.ETag));
-                s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
-                s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
-                s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
-                s2d.ForMember(d => d.UpdatedDate, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedDate));
-
-                var d2s = CreateMap<EfModel.Person, Person>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PersonId));
-                d2s.ForMember(s => s.FirstName, o => o.MapFrom(d => d.FirstName));
-                d2s.ForMember(s => s.LastName, o => o.MapFrom(d => d.LastName));
-                d2s.ForMember(s => s.UniqueCode, o => o.MapFrom(d => d.UniqueCode));
-                d2s.ForMember(s => s.Gender, o => o.ConvertUsing(AutoMapperReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource, d => d.GenderId));
-                d2s.ForMember(s => s.EyeColorSid, o => o.MapFrom(d => d.EyeColorCode));
-                d2s.ForMember(s => s.Birthday, o => o.MapFrom(d => d.Birthday));
-                d2s.ForMember(s => s.Metadata, o => o.ConvertUsing(AutoMapperObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource, d => d.MetadataJson));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
-
-                EfMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.PersonId = s.Id);
+                Map((s, d) => d.FirstName = s.FirstName);
+                Map((s, d) => d.LastName = s.LastName);
+                Map((s, d) => d.UniqueCode = s.UniqueCode);
+                Map((s, d) => d.GenderId = ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToDestination.Convert(s.Gender));
+                Map((s, d) => d.EyeColorCode = s.EyeColorSid);
+                Map((s, d) => d.Birthday = s.Birthday);
+                Flatten(s => s.Address);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.MetadataJson = ObjectToJsonConverter<Dictionary<string, string>>.Default.ToDestination.Convert(s.Metadata));
+                Flatten(s => s.ChangeLog);
+                EntityToModelEfMapperCtor();
             }
 
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<Person, EfModel.Person> s2d, AutoMapper.IMappingExpression<EfModel.Person, Person> d2s); // Enables the constructor to be extended.
+            /// <inheritdoc/>
+            protected override void OnRegister(Mapper<Person, EfModel.Person> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.Person>()
+                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.Person"/> to <see cref="Person"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityEfMapper : Mapper<EfModel.Person, Person>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToEntityEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.PersonId);
+                Map((s, d) => d.FirstName = (string?)s.FirstName);
+                Map((s, d) => d.LastName = (string?)s.LastName);
+                Map((s, d) => d.UniqueCode = (string?)s.UniqueCode);
+                Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource.Convert(s.GenderId));
+                Map((s, d) => d.EyeColorSid = (string?)s.EyeColorCode);
+                Map((s, d) => d.Birthday = (DateTime)s.Birthday);
+                Expand<Address>((d, v) => d.Address = v, (s, d) => true);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson));
+                Expand<ChangeLog>((d, v) => d.ChangeLog = v, (s, d) => true);
+                ModelToEntityEfMapperCtor();
+            }
+
+            /// <inheritdoc/>
+            protected override void OnRegister(Mapper<EfModel.Person, Person> mapper) => mapper.Owner.Register(new Mapper<EfModel.Person, ChangeLog>()
+                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

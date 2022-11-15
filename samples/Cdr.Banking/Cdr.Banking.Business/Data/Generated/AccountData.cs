@@ -53,41 +53,53 @@ namespace Cdr.Banking.Business.Data
         public Task<Balance?> GetBalanceAsync(string? accountId) => GetBalanceOnImplementationAsync(accountId);
 
         /// <summary>
-        /// Provides the <see cref="Account"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Account"/> to Entity Framework <see cref="Model.Account"/> mapping.
         /// </summary>
-        public partial class CosmosMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelCosmosMapper : Mapper<Account, Model.Account>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
             /// </summary>
-            public CosmosMapperProfile()
+            public EntityToModelCosmosMapper()
             {
-                var s2d = CreateMap<Account, Model.Account>();
-                s2d.ForMember(d => d.Id, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate));
-                s2d.ForMember(d => d.DisplayName, o => o.MapFrom(s => s.DisplayName));
-                s2d.ForMember(d => d.Nickname, o => o.MapFrom(s => s.Nickname));
-                s2d.ForMember(d => d.OpenStatus, o => o.MapFrom(s => s.OpenStatusSid));
-                s2d.ForMember(d => d.IsOwned, o => o.MapFrom(s => s.IsOwned));
-                s2d.ForMember(d => d.MaskedNumber, o => o.MapFrom(s => s.MaskedNumber));
-                s2d.ForMember(d => d.ProductCategory, o => o.MapFrom(s => s.ProductCategorySid));
-                s2d.ForMember(d => d.ProductName, o => o.MapFrom(s => s.ProductName));
-
-                var d2s = CreateMap<Model.Account, Account>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.Id));
-                d2s.ForMember(s => s.CreationDate, o => o.MapFrom(d => d.CreationDate));
-                d2s.ForMember(s => s.DisplayName, o => o.MapFrom(d => d.DisplayName));
-                d2s.ForMember(s => s.Nickname, o => o.MapFrom(d => d.Nickname));
-                d2s.ForMember(s => s.OpenStatusSid, o => o.MapFrom(d => d.OpenStatus));
-                d2s.ForMember(s => s.IsOwned, o => o.MapFrom(d => d.IsOwned));
-                d2s.ForMember(s => s.MaskedNumber, o => o.MapFrom(d => d.MaskedNumber));
-                d2s.ForMember(s => s.ProductCategorySid, o => o.MapFrom(d => d.ProductCategory));
-                d2s.ForMember(s => s.ProductName, o => o.MapFrom(d => d.ProductName));
-
-                CosmosMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.CreationDate = s.CreationDate);
+                Map((s, d) => d.DisplayName = s.DisplayName);
+                Map((s, d) => d.Nickname = s.Nickname);
+                Map((s, d) => d.OpenStatus = s.OpenStatusSid);
+                Map((s, d) => d.IsOwned = s.IsOwned);
+                Map((s, d) => d.MaskedNumber = s.MaskedNumber);
+                Map((s, d) => d.ProductCategory = s.ProductCategorySid);
+                Map((s, d) => d.ProductName = s.ProductName);
+                EntityToModelCosmosMapperCtor();
             }
 
-            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Account, Model.Account> s2d, AutoMapper.IMappingExpression<Model.Account, Account> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.Account"/> to <see cref="Account"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityCosmosMapper : Mapper<Model.Account, Account>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToEntityCosmosMapper()
+            {
+                Map((s, d) => d.Id = (string?)s.Id);
+                Map((s, d) => d.CreationDate = (DateTime)s.CreationDate);
+                Map((s, d) => d.DisplayName = (string?)s.DisplayName);
+                Map((s, d) => d.Nickname = (string?)s.Nickname);
+                Map((s, d) => d.OpenStatusSid = (string?)s.OpenStatus);
+                Map((s, d) => d.IsOwned = (bool)s.IsOwned);
+                Map((s, d) => d.MaskedNumber = (string?)s.MaskedNumber);
+                Map((s, d) => d.ProductCategorySid = (string?)s.ProductCategory);
+                Map((s, d) => d.ProductName = (string?)s.ProductName);
+                ModelToEntityCosmosMapperCtor();
+            }
+
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

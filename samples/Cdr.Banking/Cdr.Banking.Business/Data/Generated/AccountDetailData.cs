@@ -14,35 +14,47 @@ namespace Cdr.Banking.Business.Data
     {
 
         /// <summary>
-        /// Provides the <see cref="AccountDetail"/> and Entity Framework <see cref="Model.Account"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="AccountDetail"/> to Entity Framework <see cref="Model.Account"/> mapping.
         /// </summary>
-        public partial class CosmosMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelCosmosMapper : Mapper<AccountDetail, Model.Account>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
             /// </summary>
-            public CosmosMapperProfile()
+            public EntityToModelCosmosMapper()
             {
-                var s2d = CreateMap<AccountDetail, Model.Account>();
-                s2d.ForMember(d => d.Bsb, o => o.MapFrom(s => s.Bsb));
-                s2d.ForMember(d => d.AccountNumber, o => o.MapFrom(s => s.AccountNumber));
-                s2d.ForMember(d => d.BundleName, o => o.MapFrom(s => s.BundleName));
-                s2d.ForMember(d => d.SpecificAccountUType, o => o.MapFrom(s => s.SpecificAccountUTypeSid));
-                s2d.ForMember(d => d.TermDeposit, o => o.MapFrom(s => s.TermDeposit));
-                s2d.ForMember(d => d.CreditCard, o => o.MapFrom(s => s.CreditCard));
-
-                var d2s = CreateMap<Model.Account, AccountDetail>();
-                d2s.ForMember(s => s.Bsb, o => o.MapFrom(d => d.Bsb));
-                d2s.ForMember(s => s.AccountNumber, o => o.MapFrom(d => d.AccountNumber));
-                d2s.ForMember(s => s.BundleName, o => o.MapFrom(d => d.BundleName));
-                d2s.ForMember(s => s.SpecificAccountUTypeSid, o => o.MapFrom(d => d.SpecificAccountUType));
-                d2s.ForMember(s => s.TermDeposit, o => o.MapFrom(d => d.TermDeposit));
-                d2s.ForMember(s => s.CreditCard, o => o.MapFrom(d => d.CreditCard));
-
-                CosmosMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Bsb = s.Bsb);
+                Map((s, d) => d.AccountNumber = s.AccountNumber);
+                Map((s, d) => d.BundleName = s.BundleName);
+                Map((s, d) => d.SpecificAccountUType = s.SpecificAccountUTypeSid);
+                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit));
+                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard));
+                EntityToModelCosmosMapperCtor();
             }
 
-            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<AccountDetail, Model.Account> s2d, AutoMapper.IMappingExpression<Model.Account, AccountDetail> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.Account"/> to <see cref="AccountDetail"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityCosmosMapper : Mapper<Model.Account, AccountDetail>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToEntityCosmosMapper()
+            {
+                Map((s, d) => d.Bsb = (string?)s.Bsb);
+                Map((s, d) => d.AccountNumber = (string?)s.AccountNumber);
+                Map((s, d) => d.BundleName = (string?)s.BundleName);
+                Map((s, d) => d.SpecificAccountUTypeSid = (string?)s.SpecificAccountUType);
+                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit));
+                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard));
+                ModelToEntityCosmosMapperCtor();
+            }
+
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

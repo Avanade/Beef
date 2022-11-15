@@ -337,6 +337,54 @@ entities:
             Description = "This can be overridden using `Operation.DataExtensions`.")]
         public bool? DataExtensions { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Reference Data identifier data name.
+        /// </summary>
+        [JsonProperty("refDataIdDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `Id` data name.",
+            Description = "Defaults to `Name` + `Id` (literal).")]
+        public string? RefDataIdDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data code data name
+        /// </summary>
+        [JsonProperty("refDataCodeDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `Code` data name.",
+            Description = "Defaults to `Code` (literal).")]
+        public string? RefDataCodeDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data text data name.
+        /// </summary>
+        [JsonProperty("refDataTextDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `Text` data name.",
+            Description = "Defaults to `Text` (literal).")]
+        public string? RefDataTextDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data is active name.
+        /// </summary>
+        [JsonProperty("refDataIsActiveDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `IsActive` data name.",
+            Description = "Defaults to `IsActive` (literal).")]
+        public string? RefDataIsActiveDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data sort order data name.
+        /// </summary>
+        [JsonProperty("refDataSortOrderDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `SortOrder` data name.",
+            Description = "Defaults to `SortOrder` (literal).")]
+        public string? RefDataSortOrderDataName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data is ETag name.
+        /// </summary>
+        [JsonProperty("refDataETagDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data `ETag` data name.",
+            Description = "Defaults to `RowVersion` (literal).")]
+        public string? RefDataETagDataName { get; set; }
+
         #endregion
 
         #region Database
@@ -880,32 +928,22 @@ entities:
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
-        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => CompareValue(x.EntityFrameworkMapper, "Map") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
-
-        /// <summary>
-        /// Gets the list of properties that are to be used for entity framework mapping.
-        /// </summary>
-        public List<PropertyConfig>? EntityFrameworkAutoMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Skip") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
-        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareValue(x.CosmosMapper, "Map") && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
-
-        /// <summary>
-        /// Gets the list of properties that are to be used for cosmos mapping.
-        /// </summary>
-        public List<PropertyConfig>? CosmosAutoMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Skip")).ToList();
+        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for odata mapping.
         /// </summary>
-        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => !CompareValue(x.ODataMapper, "Skip")).ToList();
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => !CompareValue(x.ODataMapper, "Ignore")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for http agent mapping.
         /// </summary>
-        public List<PropertyConfig>? HttpAgentMapperProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Skip")).ToList();
+        public List<PropertyConfig>? HttpAgentMapperProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Ignore")).ToList();
 
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
@@ -920,12 +958,12 @@ entities:
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
         /// </summary>
-        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && !CompareValue(x.EntityFrameworkMapper, "Skip"));
+        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && !CompareValue(x.EntityFrameworkMapper, "Ignore"));
 
         /// <summary>
         /// Indicates where there is a <see cref="IETag"/> property.
         /// </summary>
-        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && !CompareValue(x.EntityFrameworkMapper, "Skip"));
+        public bool HasEntityFrameworkETagProperty => Properties!.Any(x => x.Name == "ETag" && !CompareValue(x.EntityFrameworkMapper, "Ignore"));
 
         /// <summary>
         /// Gets the list of properties that are to be used for gRPC.
@@ -1246,6 +1284,12 @@ entities:
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
             WebApiConcurrency = DefaultWhereNull(WebApiConcurrency, () => false);
+            RefDataIdDataName = DefaultWhereNull(RefDataIdDataName, () => AutoImplement == "EntityFramework" || AutoImplement == "Database" ? $"{Name}Id" : "Id");
+            RefDataCodeDataName = DefaultWhereNull(RefDataCodeDataName, () => Root!.RefDataCodeDataName);
+            RefDataTextDataName = DefaultWhereNull(RefDataTextDataName, () => Root!.RefDataTextDataName);
+            RefDataIsActiveDataName = DefaultWhereNull(RefDataIsActiveDataName, () => Root!.RefDataIsActiveDataName);
+            RefDataSortOrderDataName = DefaultWhereNull(RefDataSortOrderDataName, () => Root!.RefDataSortOrderDataName);
+            RefDataETagDataName = DefaultWhereNull(RefDataETagDataName, () => Root!.RefDataETagDataName == "*" ? (AutoImplement == "EntityFramework" || AutoImplement == "Database" ? $"RowVersion" : "ETag") : Root!.RefDataETagDataName);
 
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
@@ -1351,12 +1395,18 @@ entities:
             if (RefDataType != null)
             {
                 var i = 0;
-                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, PrimaryKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
-                AddInheritedProperty("Code", ref i, () => new PropertyConfig { Type = "string" });
-                AddInheritedProperty("Text", ref i, () => new PropertyConfig { Type = "string" });
-                AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool" });
-                AddInheritedProperty("SortOrder", ref i, () => new PropertyConfig { Type = "int" });
-                AddInheritedProperty("ETag", ref i, () => new PropertyConfig { Type = "string" });
+                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, PrimaryKey = true, DataAutoGenerated = true, DataName = RefDataIdDataName == "Id" ? null : RefDataIdDataName });
+                AddInheritedProperty("Code", ref i, () => new PropertyConfig { Type = "string", DataName = RefDataCodeDataName == "Code" ? null : RefDataCodeDataName });
+                AddInheritedProperty("Text", ref i, () => new PropertyConfig { Type = "string", DataName = RefDataTextDataName == "Text" ? null : RefDataTextDataName });
+
+                if (!string.IsNullOrEmpty(RefDataIsActiveDataName))
+                    AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool", DataName = RefDataIsActiveDataName == "IsActive" ? null : RefDataIsActiveDataName });
+
+                if (!string.IsNullOrEmpty(RefDataSortOrderDataName))
+                    AddInheritedProperty("SortOrder", ref i, () => new PropertyConfig { Type = "int", DataName = RefDataSortOrderDataName == "SortOrder" ? null : RefDataSortOrderDataName });
+
+                if (!string.IsNullOrEmpty(RefDataETagDataName))
+                    AddInheritedProperty("ETag", ref i, () => new PropertyConfig { Type = "string", DataName = RefDataETagDataName == "ETag" ? null : RefDataETagDataName });
             }
 
             foreach (var property in Properties)

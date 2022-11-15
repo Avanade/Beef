@@ -1,11 +1,15 @@
 ﻿#if (implement_database || implement_entityframework)
 global using Beef.Database.Core;
+global using Beef.Database.Core.SqlServer;
 #endif
 global using CoreEx;
 global using CoreEx.Entities;
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
+#if (implement_database || implement_entityframework)
+global using DbEx;
+#endif
 #if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
 #endif

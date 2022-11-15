@@ -37,55 +37,67 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Transaction"/> and Entity Framework <see cref="Model.Transaction"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="Transaction"/> to Entity Framework <see cref="Model.Transaction"/> mapping.
         /// </summary>
-        public partial class CosmosMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelCosmosMapper : Mapper<Transaction, Model.Transaction>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CosmosMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
             /// </summary>
-            public CosmosMapperProfile()
+            public EntityToModelCosmosMapper()
             {
-                var s2d = CreateMap<Transaction, Model.Transaction>();
-                s2d.ForMember(d => d.Id, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.AccountId, o => o.MapFrom(s => s.AccountId));
-                s2d.ForMember(d => d.IsDetailAvailable, o => o.MapFrom(s => s.IsDetailAvailable));
-                s2d.ForMember(d => d.Type, o => o.MapFrom(s => s.TypeSid));
-                s2d.ForMember(d => d.Status, o => o.MapFrom(s => s.StatusSid));
-                s2d.ForMember(d => d.Description, o => o.MapFrom(s => s.Description));
-                s2d.ForMember(d => d.PostingDateTime, o => o.MapFrom(s => s.PostingDateTime));
-                s2d.ForMember(d => d.ExecutionDateTime, o => o.MapFrom(s => s.ExecutionDateTime));
-                s2d.ForMember(d => d.Amount, o => o.MapFrom(s => s.Amount));
-                s2d.ForMember(d => d.Currency, o => o.MapFrom(s => s.Currency));
-                s2d.ForMember(d => d.Reference, o => o.MapFrom(s => s.Reference));
-                s2d.ForMember(d => d.MerchantName, o => o.MapFrom(s => s.MerchantName));
-                s2d.ForMember(d => d.MerchantCategoryCode, o => o.MapFrom(s => s.MerchantCategoryCode));
-                s2d.ForMember(d => d.BillerCode, o => o.MapFrom(s => s.BillerCode));
-                s2d.ForMember(d => d.BillerName, o => o.MapFrom(s => s.BillerName));
-                s2d.ForMember(d => d.ApcaNumber, o => o.MapFrom(s => s.ApcaNumber));
-
-                var d2s = CreateMap<Model.Transaction, Transaction>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.Id));
-                d2s.ForMember(s => s.AccountId, o => o.MapFrom(d => d.AccountId));
-                d2s.ForMember(s => s.IsDetailAvailable, o => o.MapFrom(d => d.IsDetailAvailable));
-                d2s.ForMember(s => s.TypeSid, o => o.MapFrom(d => d.Type));
-                d2s.ForMember(s => s.StatusSid, o => o.MapFrom(d => d.Status));
-                d2s.ForMember(s => s.Description, o => o.MapFrom(d => d.Description));
-                d2s.ForMember(s => s.PostingDateTime, o => o.MapFrom(d => d.PostingDateTime));
-                d2s.ForMember(s => s.ExecutionDateTime, o => o.MapFrom(d => d.ExecutionDateTime));
-                d2s.ForMember(s => s.Amount, o => o.MapFrom(d => d.Amount));
-                d2s.ForMember(s => s.Currency, o => o.MapFrom(d => d.Currency));
-                d2s.ForMember(s => s.Reference, o => o.MapFrom(d => d.Reference));
-                d2s.ForMember(s => s.MerchantName, o => o.MapFrom(d => d.MerchantName));
-                d2s.ForMember(s => s.MerchantCategoryCode, o => o.MapFrom(d => d.MerchantCategoryCode));
-                d2s.ForMember(s => s.BillerCode, o => o.MapFrom(d => d.BillerCode));
-                d2s.ForMember(s => s.BillerName, o => o.MapFrom(d => d.BillerName));
-                d2s.ForMember(s => s.ApcaNumber, o => o.MapFrom(d => d.ApcaNumber));
-
-                CosmosMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.Id = s.Id);
+                Map((s, d) => d.AccountId = s.AccountId);
+                Map((s, d) => d.IsDetailAvailable = s.IsDetailAvailable);
+                Map((s, d) => d.Type = s.TypeSid);
+                Map((s, d) => d.Status = s.StatusSid);
+                Map((s, d) => d.Description = s.Description);
+                Map((s, d) => d.PostingDateTime = s.PostingDateTime);
+                Map((s, d) => d.ExecutionDateTime = s.ExecutionDateTime);
+                Map((s, d) => d.Amount = s.Amount);
+                Map((s, d) => d.Currency = s.Currency);
+                Map((s, d) => d.Reference = s.Reference);
+                Map((s, d) => d.MerchantName = s.MerchantName);
+                Map((s, d) => d.MerchantCategoryCode = s.MerchantCategoryCode);
+                Map((s, d) => d.BillerCode = s.BillerCode);
+                Map((s, d) => d.BillerName = s.BillerName);
+                Map((s, d) => d.ApcaNumber = s.ApcaNumber);
+                EntityToModelCosmosMapperCtor();
             }
 
-            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Transaction, Model.Transaction> s2d, AutoMapper.IMappingExpression<Model.Transaction, Transaction> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="Model.Transaction"/> to <see cref="Transaction"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityCosmosMapper : Mapper<Model.Transaction, Transaction>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+            /// </summary>
+            public ModelToEntityCosmosMapper()
+            {
+                Map((s, d) => d.Id = (string?)s.Id);
+                Map((s, d) => d.AccountId = (string?)s.AccountId);
+                Map((s, d) => d.IsDetailAvailable = (bool)s.IsDetailAvailable);
+                Map((s, d) => d.TypeSid = (string?)s.Type);
+                Map((s, d) => d.StatusSid = (string?)s.Status);
+                Map((s, d) => d.Description = (string?)s.Description);
+                Map((s, d) => d.PostingDateTime = (DateTime)s.PostingDateTime);
+                Map((s, d) => d.ExecutionDateTime = (DateTime)s.ExecutionDateTime);
+                Map((s, d) => d.Amount = (decimal)s.Amount);
+                Map((s, d) => d.Currency = (string?)s.Currency);
+                Map((s, d) => d.Reference = (string?)s.Reference);
+                Map((s, d) => d.MerchantName = (string?)s.MerchantName);
+                Map((s, d) => d.MerchantCategoryCode = (string?)s.MerchantCategoryCode);
+                Map((s, d) => d.BillerCode = (string?)s.BillerCode);
+                Map((s, d) => d.BillerName = (string?)s.BillerName);
+                Map((s, d) => d.ApcaNumber = (string?)s.ApcaNumber);
+                ModelToEntityCosmosMapperCtor();
+            }
+
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

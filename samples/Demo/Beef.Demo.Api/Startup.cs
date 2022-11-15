@@ -106,9 +106,10 @@ namespace Beef.Demo.Api
             //services.AddScoped<Common.Agents.IPersonAgent, Common.Agents.PersonAgent>();
             services.AddHttpClient<IPersonAgent, PersonAgent>("person", (sp, c) => c.BaseAddress = new Uri("http://unittest"));
 
-            // Add services; note Beef requires NewtonsoftJson.
-            services.AddAutoMapper(CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(ContactData).Assembly)
-                    .AddAutoMapperWrapper();
+            // Add explicit mappers from the ContactData assembly.
+            services.AddMappers<ContactData>();
+            //services.AddAutoMapper(CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(ContactData).Assembly)
+            //        .AddAutoMapperWrapper();
 
             services.AddControllers().AddNewtonsoftJson();
             //services.AddGrpc();

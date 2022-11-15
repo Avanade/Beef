@@ -83,18 +83,18 @@ namespace My.Hr.Business.Data.EfModel
             modelBuilder.Entity<PerformanceReview>(entity =>
             {
                 entity.ToTable("PerformanceReview", "Hr");
-                entity.HasKey("PerformanceReviewId");
-                entity.Property(p => p.PerformanceReviewId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.EmployeeId).HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Date).HasColumnType("DATETIME2");
-                entity.Property(p => p.PerformanceOutcomeCode).HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Reviewer).HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.Notes).HasColumnType("NVARCHAR(4000)");
-                entity.Property(p => p.RowVersion).HasColumnType("TIMESTAMP").IsRowVersion();
-                entity.Property(p => p.CreatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
-                entity.Property(p => p.CreatedDate).HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
-                entity.Property(p => p.UpdatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
-                entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
+                entity.HasKey(nameof(PerformanceReviewId));
+                entity.Property(p => p.PerformanceReviewId).HasColumnName("PerformanceReviewId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.EmployeeId).HasColumnName("EmployeeId").HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.Date).HasColumnName("Date").HasColumnType("DATETIME2");
+                entity.Property(p => p.PerformanceOutcomeCode).HasColumnName("PerformanceOutcomeCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Reviewer).HasColumnName("Reviewer").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.Notes).HasColumnName("Notes").HasColumnType("NVARCHAR(4000)");
+                entity.Property(p => p.RowVersion).HasColumnName("RowVersion").HasColumnType("TIMESTAMP").IsRowVersion();
+                entity.Property(p => p.CreatedBy).HasColumnName("CreatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
+                entity.Property(p => p.CreatedDate).HasColumnName("CreatedDate").HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
+                entity.Property(p => p.UpdatedBy).HasColumnName("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
+                entity.Property(p => p.UpdatedDate).HasColumnName("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
                 AddToModel(entity);
             });
         }
