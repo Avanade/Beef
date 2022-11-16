@@ -28,9 +28,6 @@ namespace Beef.Database.Core
         /// <param name="args">The default <see cref="MigrationArgs"/> that will be overridden/updated by the command-line argument values.</param>
         protected MigrationConsoleBase(MigrationArgs? args = null) : base(args ?? new MigrationArgs()) 
         {
-            if (Args.OutputDirectory == null)
-                Args.OutputDirectory = new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
-
             if (string.IsNullOrEmpty(Args.ScriptFileName))
                 Args.ScriptFileName = DefaultDatabaseScript;
 
@@ -84,6 +81,11 @@ namespace Beef.Database.Core
             var vr = new ParametersValidator(Args).GetValidationResult(GetCommandOption(nameof(MigrationArgs.Parameters)), context);
             if (vr != ValidationResult.Success)
                 return vr;
+
+            if (Args.OutputDirectory == null)
+                Args.OutputDirectory = Args.MigrationCommand == DbEx.MigrationCommand.Script
+                    ? new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory())
+                    : new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
 
             return ValidationResult.Success;
         }

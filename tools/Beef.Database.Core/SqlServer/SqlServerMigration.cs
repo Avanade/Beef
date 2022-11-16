@@ -19,6 +19,17 @@ namespace Beef.Database.Core.SqlServer
         public SqlServerMigration(MigrationArgs args) : base(args)
         {
             IsCodeGenEnabled = true;
+
+            // Add in the beef schema stuff where requested.
+            if (args.UseBeefSchema)
+            {
+                if (!args.SchemaOrder.Contains("dbo"))
+                    args.SchemaOrder.Insert(0, "dbo");
+
+                if (!args.Assemblies.Contains(typeof(SqlServerMigration).Assembly))
+                    args.Assemblies.Add(typeof(SqlServerMigration).Assembly);
+            }
+
             this.Initialization();
         }
 

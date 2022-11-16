@@ -39,39 +39,64 @@ namespace My.Hr.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="EmployeeBase"/> and Entity Framework <see cref="EfModel.Employee"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="EmployeeBase"/> to Entity Framework <see cref="EfModel.Employee"/> mapping.
         /// </summary>
-        public partial class EfMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelEfMapper : Mapper<EmployeeBase, EfModel.Employee>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
             /// </summary>
-            public EfMapperProfile()
+            public EntityToModelEfMapper()
             {
-                var s2d = CreateMap<EmployeeBase, EfModel.Employee>();
-                s2d.ForMember(d => d.EmployeeId, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.Email, o => o.MapFrom(s => s.Email));
-                s2d.ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName));
-                s2d.ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName));
-                s2d.ForMember(d => d.GenderCode, o => o.MapFrom(s => s.GenderSid));
-                s2d.ForMember(d => d.Birthday, o => o.MapFrom(s => s.Birthday));
-                s2d.ForMember(d => d.StartDate, o => o.MapFrom(s => s.StartDate));
-                s2d.ForMember(d => d.PhoneNo, o => o.MapFrom(s => s.PhoneNo));
-
-                var d2s = CreateMap<EfModel.Employee, EmployeeBase>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.EmployeeId));
-                d2s.ForMember(s => s.Email, o => o.MapFrom(d => d.Email));
-                d2s.ForMember(s => s.FirstName, o => o.MapFrom(d => d.FirstName));
-                d2s.ForMember(s => s.LastName, o => o.MapFrom(d => d.LastName));
-                d2s.ForMember(s => s.GenderSid, o => o.MapFrom(d => d.GenderCode));
-                d2s.ForMember(s => s.Birthday, o => o.MapFrom(d => d.Birthday));
-                d2s.ForMember(s => s.StartDate, o => o.MapFrom(d => d.StartDate));
-                d2s.ForMember(s => s.PhoneNo, o => o.MapFrom(d => d.PhoneNo));
-
-                EfMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.EmployeeId = s.Id);
+                Map((s, d) => d.Email = s.Email);
+                Map((s, d) => d.FirstName = s.FirstName);
+                Map((s, d) => d.LastName = s.LastName);
+                Map((s, d) => d.GenderCode = s.GenderSid);
+                Map((s, d) => d.Birthday = s.Birthday);
+                Map((s, d) => d.StartDate = s.StartDate);
+                Flatten(s => s.Termination);
+                Map((s, d) => d.PhoneNo = s.PhoneNo);
+                EntityToModelEfMapperCtor();
             }
 
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<EmployeeBase, EfModel.Employee> s2d, AutoMapper.IMappingExpression<EfModel.Employee, EmployeeBase> d2s); // Enables the constructor to be extended.
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.Employee"/> to <see cref="EmployeeBase"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityEfMapper : Mapper<EfModel.Employee, EmployeeBase>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToEntityEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.EmployeeId);
+                Map((s, d) => d.Email = (string?)s.Email);
+                Map((s, d) => d.FirstName = (string?)s.FirstName);
+                Map((s, d) => d.LastName = (string?)s.LastName);
+                Map((s, d) => d.GenderSid = (string?)s.GenderCode);
+                Map((s, d) => d.Birthday = (DateTime)s.Birthday);
+                Map((s, d) => d.StartDate = (DateTime)s.StartDate);
+                Expand<TerminationDetail>((d, v) => d.Termination = v);
+                Map((s, d) => d.PhoneNo = (string?)s.PhoneNo);
+                ModelToEntityEfMapperCtor();
+            }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.Employee s)
+                => s.EmployeeId == default
+                && s.Email == default
+                && s.FirstName == default
+                && s.LastName == default
+                && s.GenderCode == default
+                && s.Birthday == default
+                && s.StartDate == default
+                && s.PhoneNo == default;
+
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -447,6 +447,13 @@ entities:
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? EntityFrameworkCustomMapper { get; set; }
 
+        /// <summary>
+        /// Gets or sets the EntityFramework data-layer name that should be used for base mappings.
+        /// </summary>
+        [JsonProperty("entityFrameworkMapperBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("EntityFramework", Title = "The EntityFramework data-layer name that should be used for base mappings.")]
+        public string? EntityFrameworkMapperBase { get; set; }
+
         #endregion
 
         #region Cosmos
@@ -495,6 +502,13 @@ entities:
         [CodeGenProperty("Cosmos", Title = "Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? CosmosCustomMapper { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Cosmos data-layer name that should be used for base mappings.
+        /// </summary>
+        [JsonProperty("cosmosMapperBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Cosmos", Title = "The Cosmos data-layer name that should be used for base mappings.")]
+        public string? CosmosMapperBase { get; set; }
 
         #endregion
 
@@ -574,6 +588,13 @@ entities:
         [CodeGenProperty("HttpAgent", Title = "The fluent-style method-chaining C# HTTP Agent API code to include where `Operation.AutoImplement` is `HttpAgent`.",
             Description = "Prepended to `Operation.HttpAgentCode` where specified to enable standardized functionality.")]
         public string? HttpAgentCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `HttpAgent` data-layer name that should be used for base mappings.
+        /// </summary>
+        [JsonProperty("httpAgentMapperBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Cosmos", Title = "The HTTP Agent data-layer name that should be used for base mappings.")]
+        public string? HttpAgentMapperBase { get; set; }
 
         #endregion 
 
@@ -931,9 +952,19 @@ entities:
         public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore")).ToList();
 
         /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? EntityFrameworkMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore") && !CompareValue(x.EntityFrameworkMapper, "Flatten")).ToList();
+
+        /// <summary>
         /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
         public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore")).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for cosmos mapping.
+        /// </summary>
+        public List<PropertyConfig>? CosmosMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore") && !CompareValue(x.CosmosMapper, "Flatten")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for odata mapping.
@@ -944,6 +975,11 @@ entities:
         /// Gets the list of properties that are to be used for http agent mapping.
         /// </summary>
         public List<PropertyConfig>? HttpAgentMapperProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Ignore")).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for http agent mapping.
+        /// </summary>
+        public List<PropertyConfig>? HttpAgentMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Ignore") && !CompareValue(x.HttpAgentMapper, "Flatten")).ToList();
 
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.

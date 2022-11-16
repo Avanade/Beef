@@ -5,9 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <!--#if (implement_entityframework || implement_cosmos) -->
-    <PackageReference Include="CoreEx.AutoMapper" Version="CoreExVersion" />
-    <!--#endif -->
     <PackageReference Include="CoreEx" Version="CoreExVersion" />
     <!--#if (implement_cosmos) -->
     <PackageReference Include="CoreEx.Cosmos" Version="CoreExVersion" />

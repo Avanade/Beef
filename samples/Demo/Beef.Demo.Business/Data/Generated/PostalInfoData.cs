@@ -100,6 +100,14 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityHttpAgentMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Model.PostalInfo s)
+                => s.Country == default
+                && s.City == default
+                && s.State == default
+                && s.Places == default
+                && s.ETag == default;
+
             partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
     }

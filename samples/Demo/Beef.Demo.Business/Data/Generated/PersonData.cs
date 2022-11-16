@@ -399,12 +399,24 @@ namespace Beef.Demo.Business.Data
                 Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource.Convert(s.GenderId));
                 Map((s, d) => d.EyeColorSid = (string?)s.EyeColorCode);
                 Map((s, d) => d.Birthday = (DateTime)s.Birthday);
-                Expand<Address>((d, v) => d.Address = v, (s, d) => true);
+                Expand<Address>((d, v) => d.Address = v);
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson));
-                Expand<ChangeLog>((d, v) => d.ChangeLog = v, (s, d) => true);
+                Expand<ChangeLog>((d, v) => d.ChangeLog = v);
                 ModelToEntityEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.Person s)
+                => s.PersonId == default
+                && s.FirstName == default
+                && s.LastName == default
+                && s.UniqueCode == default
+                && s.GenderId == default
+                && s.EyeColorCode == default
+                && s.Birthday == default
+                && s.RowVersion == default
+                && s.MetadataJson == default;
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<EfModel.Person, Person> mapper) => mapper.Owner.Register(new Mapper<EfModel.Person, ChangeLog>()

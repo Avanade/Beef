@@ -221,6 +221,9 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
+    {{#ifval EntityFrameworkMapperBase}}
+                Base<{{EntityFrameworkMapperBase}}.EntityToModelEfMapper>();
+    {{/ifval}}
     {{#each EntityFrameworkMapperProperties}}
                 {{EntityFrameworkDataMapperToModelCode}}
     {{/each}}
@@ -249,11 +252,22 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
+    {{#ifval EntityFrameworkMapperBase}}
+                Base<{{EntityFrameworkMapperBase}}.ModelToEntityEfMapper>();
+    {{/ifval}}
     {{#each EntityFrameworkMapperProperties}}
                 {{EntityFrameworkDataMapperFromModelCode}}
     {{/each}}
                 ModelToEntityEfMapperCtor();
             }
+    {{#each EntityFrameworkMapperIsSourceProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.EntityFrameworkModel}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
         {{#if HasEntityFrameworkChangeLogProperty}}
             /// <inheritdoc/>
@@ -281,6 +295,9 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
+    {{#ifval CosmosMapperBase}}
+                Base<{{CosmosMapperBase}}.EntityToModelCosmosMapper>();
+    {{/ifval}}
     {{#each CosmosMapperProperties}}
                 {{CosmosDataMapperToModelCode}}
     {{/each}}
@@ -300,11 +317,22 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
+    {{#ifval CosmosMapperBase}}
+                Base<{{CosmosMapperBase}}.ModelToEntityCosmosMapper>();
+    {{/ifval}}
     {{#each CosmosMapperProperties}}
                 {{CosmosDataMapperFromModelCode}}
     {{/each}}
                 ModelToEntityCosmosMapperCtor();
             }
+    {{#each CosmosMapperIsSourceProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.CosmosModel}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
@@ -353,6 +381,9 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public EntityToModelHttpAgentMapper()
             {
+    {{#ifval HttpAgentMapperBase}}
+                Base<{{HttpAgentMapperBase}}.EntityToModelHttpAgentMapper>();
+    {{/ifval}}
     {{#each HttpAgentMapperProperties}}
                 {{HttpAgentDataMapperToModelCode}}
     {{/each}}
@@ -372,11 +403,22 @@ namespace {{Root.NamespaceBusiness}}.Data
             /// </summary>
             public ModelToEntityHttpAgentMapper()
             {
+    {{#ifval HttpAgentMapperBase}}
+                Base<{{HttpAgentMapperBase}}.ModelToEntityHttpAgentMapper>();
+    {{/ifval}}
     {{#each HttpAgentMapperProperties}}
                 {{HttpAgentDataMapperFromModelCode}}
     {{/each}}
                 ModelToEntityHttpAgentMapperCtor();
             }
+    {{#each HttpAgentMapperIsSourceProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.HttpAgentModel}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
             partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }

@@ -117,6 +117,16 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityCosmosMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Model.Robot s)
+                => s.Id == default
+                && s.ModelNo == default
+                && s.SerialNo == default
+                && s.EyeColor == default
+                && s.PowerSource == default
+                && s.ETag == default
+                && s.ChangeLog == default;
+
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }

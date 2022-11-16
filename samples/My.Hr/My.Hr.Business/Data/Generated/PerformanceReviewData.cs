@@ -82,45 +82,75 @@ namespace My.Hr.Business.Data
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
-        /// Provides the <see cref="PerformanceReview"/> and Entity Framework <see cref="EfModel.PerformanceReview"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="PerformanceReview"/> to Entity Framework <see cref="EfModel.PerformanceReview"/> mapping.
         /// </summary>
-        public partial class EfMapperProfile : AutoMapper.Profile
+        public partial class EntityToModelEfMapper : Mapper<PerformanceReview, EfModel.PerformanceReview>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="EfMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
             /// </summary>
-            public EfMapperProfile()
+            public EntityToModelEfMapper()
             {
-                var s2d = CreateMap<PerformanceReview, EfModel.PerformanceReview>();
-                s2d.ForMember(d => d.PerformanceReviewId, o => o.MapFrom(s => s.Id));
-                s2d.ForMember(d => d.EmployeeId, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.EmployeeId));
-                s2d.ForMember(d => d.Date, o => o.MapFrom(s => s.Date));
-                s2d.ForMember(d => d.PerformanceOutcomeCode, o => o.MapFrom(s => s.OutcomeSid));
-                s2d.ForMember(d => d.Reviewer, o => o.MapFrom(s => s.Reviewer));
-                s2d.ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
-                s2d.ForMember(d => d.RowVersion, o => o.OperationTypes(OperationTypes.AnyExceptCreate).ConvertUsing(AutoMapperStringToBase64Converter.Default.ToDestination, s => s.ETag));
-                s2d.ForMember(d => d.CreatedBy, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedBy));
-                s2d.ForMember(d => d.CreatedDate, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(s => s.ChangeLog.CreatedDate));
-                s2d.ForMember(d => d.UpdatedBy, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedBy));
-                s2d.ForMember(d => d.UpdatedDate, o => o.OperationTypes(OperationTypes.AnyExceptCreate).MapFrom(s => s.ChangeLog.UpdatedDate));
-
-                var d2s = CreateMap<EfModel.PerformanceReview, PerformanceReview>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceReviewId));
-                d2s.ForMember(s => s.EmployeeId, o => o.OperationTypes(OperationTypes.AnyExceptUpdate).MapFrom(d => d.EmployeeId));
-                d2s.ForMember(s => s.Date, o => o.MapFrom(d => d.Date));
-                d2s.ForMember(s => s.OutcomeSid, o => o.MapFrom(d => d.PerformanceOutcomeCode));
-                d2s.ForMember(s => s.Reviewer, o => o.MapFrom(d => d.Reviewer));
-                d2s.ForMember(s => s.Notes, o => o.MapFrom(d => d.Notes));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-                d2s.ForPath(s => s.ChangeLog.CreatedBy, o => o.MapFrom(d => d.CreatedBy));
-                d2s.ForPath(s => s.ChangeLog.CreatedDate, o => o.MapFrom(d => d.CreatedDate));
-                d2s.ForPath(s => s.ChangeLog.UpdatedBy, o => o.MapFrom(d => d.UpdatedBy));
-                d2s.ForPath(s => s.ChangeLog.UpdatedDate, o => o.MapFrom(d => d.UpdatedDate));
-
-                EfMapperProfileCtor(s2d, d2s);
+                Map((s, d) => d.PerformanceReviewId = s.Id);
+                Map((s, d) => d.EmployeeId = s.EmployeeId, OperationTypes.AnyExceptUpdate);
+                Map((s, d) => d.Date = s.Date);
+                Map((s, d) => d.PerformanceOutcomeCode = s.OutcomeSid);
+                Map((s, d) => d.Reviewer = s.Reviewer);
+                Map((s, d) => d.Notes = s.Notes);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Flatten(s => s.ChangeLog);
+                EntityToModelEfMapperCtor();
             }
 
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<PerformanceReview, EfModel.PerformanceReview> s2d, AutoMapper.IMappingExpression<EfModel.PerformanceReview, PerformanceReview> d2s); // Enables the constructor to be extended.
+            /// <inheritdoc/>
+            protected override void OnRegister(Mapper<PerformanceReview, EfModel.PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.PerformanceReview>()
+                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.PerformanceReview"/> to <see cref="PerformanceReview"/> mapping.
+        /// </summary>
+        public partial class ModelToEntityEfMapper : Mapper<EfModel.PerformanceReview, PerformanceReview>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToEntityEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.PerformanceReviewId);
+                Map((s, d) => d.EmployeeId = (Guid)s.EmployeeId, OperationTypes.AnyExceptUpdate);
+                Map((s, d) => d.Date = (DateTime)s.Date);
+                Map((s, d) => d.OutcomeSid = (string?)s.PerformanceOutcomeCode);
+                Map((s, d) => d.Reviewer = (string?)s.Reviewer);
+                Map((s, d) => d.Notes = (string?)s.Notes);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Expand<ChangeLog>((d, v) => d.ChangeLog = v);
+                ModelToEntityEfMapperCtor();
+            }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.PerformanceReview s)
+                => s.PerformanceReviewId == default
+                && s.EmployeeId == default
+                && s.Date == default
+                && s.PerformanceOutcomeCode == default
+                && s.Reviewer == default
+                && s.Notes == default
+                && s.RowVersion == default;
+
+            /// <inheritdoc/>
+            protected override void OnRegister(Mapper<EfModel.PerformanceReview, PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<EfModel.PerformanceReview, ChangeLog>()
+                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

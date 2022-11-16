@@ -23,6 +23,7 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
+                Base<AccountData.EntityToModelCosmosMapper>();
                 Map((s, d) => d.Bsb = s.Bsb);
                 Map((s, d) => d.AccountNumber = s.AccountNumber);
                 Map((s, d) => d.BundleName = s.BundleName);
@@ -45,6 +46,7 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
+                Base<AccountData.ModelToEntityCosmosMapper>();
                 Map((s, d) => d.Bsb = (string?)s.Bsb);
                 Map((s, d) => d.AccountNumber = (string?)s.AccountNumber);
                 Map((s, d) => d.BundleName = (string?)s.BundleName);
@@ -53,6 +55,15 @@ namespace Cdr.Banking.Business.Data
                 Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard));
                 ModelToEntityCosmosMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Model.Account s)
+                => s.Bsb == default
+                && s.AccountNumber == default
+                && s.BundleName == default
+                && s.SpecificAccountUType == default
+                && s.TermDeposit == default
+                && s.CreditCard == default;
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }

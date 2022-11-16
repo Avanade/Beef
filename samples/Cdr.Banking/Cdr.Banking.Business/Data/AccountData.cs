@@ -1,7 +1,4 @@
-﻿using Cdr.Banking.Business.Entities;
-using Microsoft.Azure.Cosmos.Linq;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.Azure.Cosmos.Linq;
 
 namespace Cdr.Banking.Business.Data
 {
@@ -55,17 +52,6 @@ namespace Cdr.Banking.Business.Data
             var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(val.Balance)!;
             bal.Id = val.Id;
             return Task.FromResult<Balance?>(bal);
-        }
-
-        public partial class CosmosMapperProfile
-        {
-            partial void CosmosMapperProfileCtor(AutoMapper.IMappingExpression<Account, Model.Account> s2d, AutoMapper.IMappingExpression<Model.Account, Account> d2s)
-            {
-                CreateMap<Model.CreditCardAccount, CreditCardAccount>();
-                CreateMap<Model.TermDepositAccount, TermDepositAccount>();
-                CreateMap<Model.Balance, Balance>();
-                CreateMap<Model.BalancePurse, BalancePurse>();
-            }
         }
     }
 }

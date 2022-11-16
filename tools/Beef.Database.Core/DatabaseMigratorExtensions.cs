@@ -21,8 +21,11 @@ namespace Beef.Database.Core
         /// <param name="migrator">The <see cref="DatabaseMigrationBase"/>.</param>
         public static void Initialization(this DatabaseMigrationBase migrator)
         {
-            migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("IsActive", _ => true);
-            migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("SortOrder", i => i);
+            if (migrator.Args.DataParserArgs.RefDataColumnDefaults.Count == 0)
+            {
+                migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("IsActive", _ => true);
+                migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("SortOrder", i => i);
+            }
         }
 
         /// <summary>

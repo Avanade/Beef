@@ -66,9 +66,8 @@ public class Startup
                 .AddGeneratedDataServices();
 
 #if (implement_entityframework || implement_cosmos)
-        // Add AutoMapper services via Assembly-based probing for Profiles.
-        services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(PersonData).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
-        services.AddAutoMapperWrapper();
+        // Add type-to-type mapping services using reflection.
+        services.AddMappers<AppNameSettings>();
 
 #endif
         // Add the event publishing; this will need to be updated from the logger publisher to the actual as appropriate.
@@ -91,8 +90,7 @@ public class Startup
     /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
     /// </summary>
     /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-    /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
-    public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
+    public void Configure(IApplicationBuilder app)
     {
         // Handle any unhandled exceptions.
         app.UseWebApiExceptionHandler();

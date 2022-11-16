@@ -44,123 +44,223 @@ namespace My.Hr.Business.Data
             => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>().SelectQueryAsync<RefDataNamespace.PerformanceOutcomeCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.Gender"/> and Entity Framework <see cref="EfModel.Gender"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.Gender"/> to Entity Framework <see cref="EfModel.Gender"/> mapping.
         /// </summary>
-        public partial class GenderMapperProfile : AutoMapper.Profile
+        public partial class GenderToModelEfMapper : Mapper<RefDataNamespace.Gender, EfModel.Gender>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="GenderMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="GenderToModelEfMapper"/> class.
             /// </summary>
-            public GenderMapperProfile()
+            public GenderToModelEfMapper()
             {
-                var d2s = CreateMap<EfModel.Gender, RefDataNamespace.Gender>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.GenderId));
-                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
-                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
-                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
-                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                GenderMapperProfileCtor(d2s);
+                Map((s, d) => d.GenderId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                GenderToModelEfMapperCtor();
             }
 
-            partial void GenderMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.Gender, RefDataNamespace.Gender> d2s); // Enables the constructor to be extended.
+            partial void GenderToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TerminationReason"/> and Entity Framework <see cref="EfModel.TerminationReason"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="EfModel.Gender"/> to <see cref="RefDataNamespace.Gender"/> mapping.
         /// </summary>
-        public partial class TerminationReasonMapperProfile : AutoMapper.Profile
+        public partial class ModelToGenderEfMapper : Mapper<EfModel.Gender, RefDataNamespace.Gender>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TerminationReasonMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
             /// </summary>
-            public TerminationReasonMapperProfile()
+            public ModelToGenderEfMapper()
             {
-                var d2s = CreateMap<EfModel.TerminationReason, RefDataNamespace.TerminationReason>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.TerminationReasonId));
-                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
-                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
-                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
-                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                TerminationReasonMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.GenderId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToGenderEfMapperCtor();
             }
 
-            partial void TerminationReasonMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.TerminationReason, RefDataNamespace.TerminationReason> d2s); // Enables the constructor to be extended.
+            partial void ModelToGenderEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.RelationshipType"/> and Entity Framework <see cref="EfModel.RelationshipType"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.TerminationReason"/> to Entity Framework <see cref="EfModel.TerminationReason"/> mapping.
         /// </summary>
-        public partial class RelationshipTypeMapperProfile : AutoMapper.Profile
+        public partial class TerminationReasonToModelEfMapper : Mapper<RefDataNamespace.TerminationReason, EfModel.TerminationReason>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="RelationshipTypeMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="TerminationReasonToModelEfMapper"/> class.
             /// </summary>
-            public RelationshipTypeMapperProfile()
+            public TerminationReasonToModelEfMapper()
             {
-                var d2s = CreateMap<EfModel.RelationshipType, RefDataNamespace.RelationshipType>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.RelationshipTypeId));
-                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
-                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
-                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
-                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                RelationshipTypeMapperProfileCtor(d2s);
+                Map((s, d) => d.TerminationReasonId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                TerminationReasonToModelEfMapperCtor();
             }
 
-            partial void RelationshipTypeMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.RelationshipType, RefDataNamespace.RelationshipType> d2s); // Enables the constructor to be extended.
+            partial void TerminationReasonToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.USState"/> and Entity Framework <see cref="EfModel.USState"/> <i>AutoMapper</i> mapping.
+        /// Provides the Entity Framework <see cref="EfModel.TerminationReason"/> to <see cref="RefDataNamespace.TerminationReason"/> mapping.
         /// </summary>
-        public partial class USStateMapperProfile : AutoMapper.Profile
+        public partial class ModelToTerminationReasonEfMapper : Mapper<EfModel.TerminationReason, RefDataNamespace.TerminationReason>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="USStateMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
             /// </summary>
-            public USStateMapperProfile()
+            public ModelToTerminationReasonEfMapper()
             {
-                var d2s = CreateMap<EfModel.USState, RefDataNamespace.USState>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.USStateId));
-                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
-                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
-                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
-                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                USStateMapperProfileCtor(d2s);
+                Map((s, d) => d.Id = (Guid)s.TerminationReasonId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToTerminationReasonEfMapperCtor();
             }
 
-            partial void USStateMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.USState, RefDataNamespace.USState> d2s); // Enables the constructor to be extended.
+            partial void ModelToTerminationReasonEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.PerformanceOutcome"/> and Entity Framework <see cref="EfModel.PerformanceOutcome"/> <i>AutoMapper</i> mapping.
+        /// Provides the <see cref="RefDataNamespace.RelationshipType"/> to Entity Framework <see cref="EfModel.RelationshipType"/> mapping.
         /// </summary>
-        public partial class PerformanceOutcomeMapperProfile : AutoMapper.Profile
+        public partial class RelationshipTypeToModelEfMapper : Mapper<RefDataNamespace.RelationshipType, EfModel.RelationshipType>
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="PerformanceOutcomeMapperProfile"/> class.
+            /// Initializes a new instance of the <see cref="RelationshipTypeToModelEfMapper"/> class.
             /// </summary>
-            public PerformanceOutcomeMapperProfile()
+            public RelationshipTypeToModelEfMapper()
             {
-                var d2s = CreateMap<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>();
-                d2s.ForMember(s => s.Id, o => o.MapFrom(d => d.PerformanceOutcomeId));
-                d2s.ForMember(s => s.Code, o => o.MapFrom(d => d.Code));
-                d2s.ForMember(s => s.Text, o => o.MapFrom(d => d.Text));
-                d2s.ForMember(s => s.IsActive, o => o.MapFrom(d => d.IsActive));
-                d2s.ForMember(s => s.SortOrder, o => o.MapFrom(d => d.SortOrder));
-                d2s.ForMember(s => s.ETag, o => o.ConvertUsing(AutoMapperStringToBase64Converter.Default.ToSource, d => d.RowVersion));
-
-                PerformanceOutcomeMapperProfileCtor(d2s);
+                Map((s, d) => d.RelationshipTypeId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                RelationshipTypeToModelEfMapperCtor();
             }
 
-            partial void PerformanceOutcomeMapperProfileCtor(AutoMapper.IMappingExpression<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome> d2s); // Enables the constructor to be extended.
+            partial void RelationshipTypeToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.RelationshipType"/> to <see cref="RefDataNamespace.RelationshipType"/> mapping.
+        /// </summary>
+        public partial class ModelToRelationshipTypeEfMapper : Mapper<EfModel.RelationshipType, RefDataNamespace.RelationshipType>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToRelationshipTypeEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.RelationshipTypeId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToRelationshipTypeEfMapperCtor();
+            }
+
+            partial void ModelToRelationshipTypeEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.USState"/> to Entity Framework <see cref="EfModel.USState"/> mapping.
+        /// </summary>
+        public partial class USStateToModelEfMapper : Mapper<RefDataNamespace.USState, EfModel.USState>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="USStateToModelEfMapper"/> class.
+            /// </summary>
+            public USStateToModelEfMapper()
+            {
+                Map((s, d) => d.USStateId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                USStateToModelEfMapperCtor();
+            }
+
+            partial void USStateToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.USState"/> to <see cref="RefDataNamespace.USState"/> mapping.
+        /// </summary>
+        public partial class ModelToUSStateEfMapper : Mapper<EfModel.USState, RefDataNamespace.USState>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToUSStateEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.USStateId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToUSStateEfMapperCtor();
+            }
+
+            partial void ModelToUSStateEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.PerformanceOutcome"/> to Entity Framework <see cref="EfModel.PerformanceOutcome"/> mapping.
+        /// </summary>
+        public partial class PerformanceOutcomeToModelEfMapper : Mapper<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PerformanceOutcomeToModelEfMapper"/> class.
+            /// </summary>
+            public PerformanceOutcomeToModelEfMapper()
+            {
+                Map((s, d) => d.PerformanceOutcomeId = s.Id);
+                Map((s, d) => d.Code = s.Code);
+                Map((s, d) => d.Text = s.Text);
+                Map((s, d) => d.IsActive = s.IsActive);
+                Map((s, d) => d.SortOrder = s.SortOrder);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                PerformanceOutcomeToModelEfMapperCtor();
+            }
+
+            partial void PerformanceOutcomeToModelEfMapperCtor(); // Enables the constructor to be extended.
+        }
+
+        /// <summary>
+        /// Provides the Entity Framework <see cref="EfModel.PerformanceOutcome"/> to <see cref="RefDataNamespace.PerformanceOutcome"/> mapping.
+        /// </summary>
+        public partial class ModelToPerformanceOutcomeEfMapper : Mapper<EfModel.PerformanceOutcome, RefDataNamespace.PerformanceOutcome>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+            /// </summary>
+            public ModelToPerformanceOutcomeEfMapper()
+            {
+                Map((s, d) => d.Id = (Guid)s.PerformanceOutcomeId);
+                Map((s, d) => d.Code = (string?)s.Code);
+                Map((s, d) => d.Text = (string?)s.Text);
+                Map((s, d) => d.IsActive = (bool)s.IsActive);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                ModelToPerformanceOutcomeEfMapperCtor();
+            }
+
+            partial void ModelToPerformanceOutcomeEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

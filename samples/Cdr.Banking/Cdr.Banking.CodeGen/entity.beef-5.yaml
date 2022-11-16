@@ -59,7 +59,7 @@ entities:
   # Specifying the arguments for the Account.GetAccounts; note usage of the JsonName to override the default query string parameter names.
   # ExcludeAll ensures that only the corresponding Entity is generated; i.e. other layer artefacts are only required where an operation is being exposed.
   # 
-- { name: AccountArgs, text: '{{Account}} arguments', excludeAll: true,
+- { name: AccountArgs, text: '{{Account}} arguments',
     properties: [
       { name: ProductCategory, jsonName: 'product-category', type: ^ProductCategory, refDataType: string },
       { name: OpenStatus, jsonName: 'open-status', type: ^OpenStatus, refDataType: string },
@@ -69,7 +69,7 @@ entities:
 
   # As per the AccountDetail schema it inherits from Account and extends the properties (also inherits the data mapper).
   # 
-- { name: AccountDetail, text: '{{Account}} Detail', inherits: Account, excludeAll: true, excludeData: RequiresMapper, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account, cosmosValueContainer: true,
+- { name: AccountDetail, text: '{{Account}} Detail', inherits: Account, excludeData: RequiresMapper, cosmosMapperBase: AccountData, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Account, cosmosValueContainer: true,
     properties: [
       { name: Bsb },
       { name: AccountNumber },
@@ -82,7 +82,7 @@ entities:
 
   # Remaining entities required as per defined schema.
   # 
-- { name: TermDepositAccount, excludeAll: true,
+- { name: TermDepositAccount, excludeData: RequiresMapper, cosmosModel: Model.TermDepositAccount,
     properties: [
       { name: LodgementDate, type: DateTime, dateTimeTransform: DateOnly },
       { name: MaturityDate, type: DateTime, dateTimeTransform: DateOnly },
@@ -92,7 +92,7 @@ entities:
     ]
   }
 
-- { name: CreditCardAccount, excludeAll: true,
+- { name: CreditCardAccount, excludeData: RequiresMapper, cosmosModel: Model.CreditCardAccount,
     properties: [
       { name: MinPaymentAmount, type: decimal },
       { name: PaymentDueAmount, type: decimal },
@@ -101,9 +101,9 @@ entities:
     ]
   }
 
-- { name: Balance, excludeAll: true,
+- { name: Balance, excludeData: RequiresMapper, cosmosModel: Model.Balance,
     properties: [
-      { name: Id, jsonName: accountId, text: '{{Account}} identifier', primaryKey: true },
+      { name: Id, jsonName: accountId, text: '{{Account}} identifier', primaryKey: true, cosmosMapper: Ignore },
       { name: CurrentBalance, type: decimal, serializationAlwaysInclude: true },
       { name: AvailableBalance, type: decimal, serializationAlwaysInclude: true },
       { name: CreditLimit, type: decimal },
@@ -113,7 +113,7 @@ entities:
     ]
   }
 
-- { name: BalancePurse, collection: true, excludeAll: true,
+- { name: BalancePurse, collection: true, excludeData: RequiresMapper, cosmosModel: Model.BalancePurse,
     properties: [
       { name: Amount, type: decimal },
       { name: Currency }
@@ -164,7 +164,7 @@ entities:
   # Specifying the arguments for the Transaction.GetTransactions; note usage of the JsonName to override the default query string parameter names.
   # FromDate & ToDate are so named for C# access; however, they are referred to 'Oldest time' and 'Newest time' externally - DisplayName is used for corresponding error message text.
   # 
-- { name: TransactionArgs, text: '{{Account}} arguments', excludeAll: true,
+- { name: TransactionArgs, text: '{{Account}} arguments',
     properties: [
       { name: FromDate, text: From (oldest time), displayName: Oldest time, jsonName: 'oldest-time', type: DateTime, nullable: true },
       { name: ToDate, text: To (newest time), displayName: Newest time, jsonName: 'newest-time', type: DateTime, nullable: true },

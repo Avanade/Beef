@@ -587,7 +587,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 
@@ -609,7 +609,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 
@@ -631,7 +631,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v, (s, d) => true{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 

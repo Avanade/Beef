@@ -50,8 +50,7 @@ namespace Cdr.Banking.Api
                     .AddGeneratedDataServices();
 
             // Add AutoMapper services via Assembly-based probing for Profiles.
-            services.AddAutoMapper(new Assembly[] { CoreEx.Mapping.AutoMapperProfile.Assembly, typeof(AccountManager).Assembly }, serviceLifetime: ServiceLifetime.Singleton);
-            services.AddAutoMapperWrapper();
+            services.AddMappers<BankingSettings>();
 
             // Add additional services.
             services.AddControllers();
