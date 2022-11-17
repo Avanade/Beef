@@ -46,6 +46,11 @@ namespace My.Hr.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(TerminationDetail s)
+                => s.Date == default
+                && s.ReasonSid == default;
+
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 

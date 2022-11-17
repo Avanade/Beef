@@ -73,6 +73,7 @@ Property | Description
 -|-
 **`includeColumns`** | The list of `Column` names to be included in the underlying generated output.<br/>&dagger; Where not specified this indicates that all `Columns` are to be included.
 **`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output.<br/>&dagger; Where not specified this indicates no `Columns` are to be excluded.
+**`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/>&dagger; Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.
 
 <br/>
 
@@ -98,7 +99,7 @@ Provides the _Entity Framework (EF) model_ configuration.
 Property | Description
 -|-
 `efModel` | Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
-`efModelName` | The .NET (C#) EntityFramework (EF) model name.<br/>&dagger; Defaults to `Name`.
+`efModelName` | The .NET (C#) EntityFramework (EF) model name.<br/>&dagger; Defaults to `Name` applying the `CodeGeneration.AutoDotNetRename`.
 
 <br/>
 

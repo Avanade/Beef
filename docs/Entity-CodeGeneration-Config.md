@@ -50,6 +50,11 @@ Property | Description
 **`refDataCommonNamespace`** | The namespace for the Reference Data common entities (adds as a c# `using` statement).<br/>&dagger; Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).
 **`refDataText`** | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`.<br/>&dagger; This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 **`refDataWebApiRoute`** | The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.
+`refDataCodeDataName` | The Reference Data `Code` data name.<br/>&dagger; Defaults to `Code` (literal).
+`refDataTextDataName` | The Reference Data `Text` data name.<br/>&dagger; Defaults to `Text` (literal).
+`refDataIsActiveDataName` | The Reference Data `IsActive` data name.<br/>&dagger; Defaults to `IsActive` (literal).
+`refDataSortOrderDataName` | The Reference Data `SortOrder` data name.<br/>&dagger; Defaults to `SortOrder` (literal).
+`refDataETagDataName` | The Reference Data `ETag` data name.<br/>&dagger; Defaults to `RowVersion` (literal).
 
 <br/>
 

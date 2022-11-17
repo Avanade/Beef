@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using DbEx.Migration;
 using System;
 using System.Reflection;
 
-namespace Beef.Database.Core.SqlServer
+namespace Beef.Database.SqlServer
 {
     /// <summary>
     /// Provides the SQL Server migration console capability.
@@ -25,13 +24,11 @@ namespace Beef.Database.Core.SqlServer
         /// <param name="connectionString">The default connection string.</param>
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
-        /// <param name="useBeefSchema">Indicates whether to use the standard <i>Beef</i> schema objects (defaults to <c>true</c>).</param>
         /// <returns>The <see cref="SqlServerMigrationConsole"/> instance.</returns>
-        public static SqlServerMigrationConsole Create(string connectionString, string company, string appName, bool useBeefSchema = true)
-            => new(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)), UseBeefSchema = useBeefSchema }
+        public static SqlServerMigrationConsole Create(string connectionString, string company, string appName)
+            => new(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)) }
                 .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company ?? throw new ArgumentNullException(nameof(company)))
-                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName)))
-                .AddAssembly(System.Reflection.Assembly.GetEntryAssembly()!));
+                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName))));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlServerMigrationConsole"/> class.
@@ -46,6 +43,6 @@ namespace Beef.Database.Core.SqlServer
         public SqlServerMigrationConsole(string connectionString) : this(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)) }) { }
 
         /// <inheritdoc/>
-        protected override DatabaseMigrationBase CreateMigrator() => new SqlServerMigration(Args);
+        protected override DbEx.Migration.DatabaseMigrationBase CreateMigrator() => new SqlServerMigration(Args);
     }
 }

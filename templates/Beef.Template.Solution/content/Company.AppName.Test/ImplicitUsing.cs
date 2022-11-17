@@ -1,6 +1,6 @@
 ﻿#if (implement_database || implement_entityframework)
-global using Beef.Database.Core;
-global using Beef.Database.Core.SqlServer;
+global using Beef.Database;
+global using Beef.Database.SqlServer;
 #endif
 global using CoreEx;
 global using CoreEx.Entities;

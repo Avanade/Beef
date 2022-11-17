@@ -132,7 +132,7 @@ Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoIm
 
 Property | Description
 -|-
-`entityFrameworkMapper` | The Entity Framework `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`.<br/>&dagger; Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
+`entityFrameworkMapper` | The Entity Framework `Mapper` approach for the property. Valid options are: `Set`, `Ignore`, `Map`, `Flatten`.<br/>&dagger; Defaults to `Set`.
 
 <br/>
 
@@ -141,7 +141,7 @@ Provides the specific _Cosmos DB_ configuration where `Entity.AutoImplement` or 
 
 Property | Description
 -|-
-`cosmosMapper` | The Cosmos `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`.<br/>&dagger; Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
+`cosmosMapper` | The Cosmos `Mapper` approach for the property. Valid options are: `Set`, `Ignore`, `Map`, `Flatten`.<br/>&dagger; Defaults to `Set`.
 
 <br/>
 
@@ -159,7 +159,7 @@ Provides the specific _HTTP Agent_ configuration where `Entity.AutoImplement` or
 
 Property | Description
 -|-
-`httpAgentMapper` | The HttpAgent `Mapper` approach for the property. Valid options are: `Map`, `Ignore`, `Skip`.<br/>&dagger; Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.
+`httpAgentMapper` | The HttpAgent `Mapper` approach for the property. Valid options are: `Set`, `Ignore`, `Map`, `Flatten`.<br/>&dagger; Defaults to `Set`.
 
 <br/>
 

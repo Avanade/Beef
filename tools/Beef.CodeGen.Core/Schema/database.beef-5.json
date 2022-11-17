@@ -213,6 +213,14 @@
             "type": "string"
           }
         },
+        "aliasColumns": {
+          "type": "array",
+          "title": "The list of 'Column' and 'Alias' pairs (split by a '^' lookup character) to enable column aliasing/renaming.",
+          "description": "Each alias value should be formatted as 'Column' + '^' + 'Alias'; e.g. 'PCODE^ProductCode'.",
+          "items": {
+            "type": "string"
+          }
+        },
         "get": {
           "type": "boolean",
           "title": "Indicates whether a 'Get' stored procedure is to be automatically generated where not otherwise explicitly specified."
@@ -258,7 +266,7 @@
         "efModelName": {
           "type": "string",
           "title": "The .NET (C#) EntityFramework (EF) model name.",
-          "description": "Defaults to 'Name'."
+          "description": "Defaults to 'Name' applying the 'CodeGeneration.AutoDotNetRename'."
         },
         "udt": {
           "type": "boolean",

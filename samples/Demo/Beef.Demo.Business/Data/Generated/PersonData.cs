@@ -373,6 +373,20 @@ namespace Beef.Demo.Business.Data
             }
 
             /// <inheritdoc/>
+            public override bool IsSourceInitial(Person s)
+                => s.Id == default
+                && s.FirstName == default
+                && s.LastName == default
+                && s.UniqueCode == default
+                && s.Gender == default
+                && s.EyeColorSid == default
+                && s.Birthday == default
+                && s.Address == default
+                && s.ETag == default
+                && s.Metadata == default
+                && s.ChangeLog == default;
+
+            /// <inheritdoc/>
             protected override void OnRegister(Mapper<Person, EfModel.Person> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.Person>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)

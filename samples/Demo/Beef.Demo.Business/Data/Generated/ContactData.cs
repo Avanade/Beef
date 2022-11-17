@@ -105,6 +105,13 @@ namespace Beef.Demo.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Contact s)
+                => s.Id == default
+                && s.FirstName == default
+                && s.LastName == default
+                && s.StatusSid == default;
+
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 

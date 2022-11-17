@@ -32,6 +32,15 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Balance s)
+                => s.CurrentBalance == default
+                && s.AvailableBalance == default
+                && s.CreditLimit == default
+                && s.AmortisedLimit == default
+                && s.Currency == default
+                && s.Purses == default;
+
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 

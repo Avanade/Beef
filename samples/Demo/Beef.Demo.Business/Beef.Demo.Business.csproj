@@ -18,6 +18,7 @@
     <PackageReference Include="CoreEx" Version="1.0.12" />
     <PackageReference Include="CoreEx.Cosmos" Version="1.0.12" />
     <PackageReference Include="CoreEx.Database" Version="1.0.12" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="1.0.12" />
     <PackageReference Include="CoreEx.EntityFrameworkCore" Version="1.0.12" />
     <PackageReference Include="CoreEx.Validation" Version="1.0.12" />
   </ItemGroup>

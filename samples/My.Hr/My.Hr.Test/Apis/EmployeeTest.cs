@@ -6,7 +6,7 @@ namespace My.Hr.Test.Apis;
 public class EmployeeTest : UsingApiTester<Startup>
 {
     [OneTimeSetUp]
-    public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
+    public void OneTimeSetUp() => TestSetUp.Default.SetUp();
 
     #region Get
 

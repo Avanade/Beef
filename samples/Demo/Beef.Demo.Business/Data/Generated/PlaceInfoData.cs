@@ -28,6 +28,11 @@ namespace Beef.Demo.Business.Data
                 EntityToModelHttpAgentMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(PlaceInfo s)
+                => s.Name == default
+                && s.PostCode == default;
+
             partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
 

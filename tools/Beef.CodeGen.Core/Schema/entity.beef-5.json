@@ -148,6 +148,31 @@
             "ReferenceDataNullableGuidIdConverter<T>"
           ]
         },
+        "refDataCodeDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Code' data name.",
+          "description": "Defaults to 'Code' (literal)."
+        },
+        "refDataTextDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Text' data name.",
+          "description": "Defaults to 'Text' (literal)."
+        },
+        "refDataIsActiveDataName": {
+          "type": "string",
+          "title": "The Reference Data 'IsActive' data name.",
+          "description": "Defaults to 'IsActive' (literal)."
+        },
+        "refDataSortOrderDataName": {
+          "type": "string",
+          "title": "The Reference Data 'SortOrder' data name.",
+          "description": "Defaults to 'SortOrder' (literal)."
+        },
+        "refDataETagDataName": {
+          "type": "string",
+          "title": "The Reference Data 'ETag' data name.",
+          "description": "Defaults to 'RowVersion' (literal)."
+        },
         "eventPublish": {
           "type": "string",
           "title": "The layer to add logic to publish an event for a 'Create', 'Update' or 'Delete' operation.",
@@ -448,6 +473,36 @@
           "title": "Indicates whether the 'Data' extensions logic should be generated.",
           "description": "This can be overridden using 'Operation.DataExtensions'."
         },
+        "refDataIdDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Id' data name.",
+          "description": "Defaults to 'Name' + 'Id' (literal)."
+        },
+        "refDataCodeDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Code' data name.",
+          "description": "Defaults to 'Code' (literal)."
+        },
+        "refDataTextDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Text' data name.",
+          "description": "Defaults to 'Text' (literal)."
+        },
+        "refDataIsActiveDataName": {
+          "type": "string",
+          "title": "The Reference Data 'IsActive' data name.",
+          "description": "Defaults to 'IsActive' (literal)."
+        },
+        "refDataSortOrderDataName": {
+          "type": "string",
+          "title": "The Reference Data 'SortOrder' data name.",
+          "description": "Defaults to 'SortOrder' (literal)."
+        },
+        "refDataETagDataName": {
+          "type": "string",
+          "title": "The Reference Data 'ETag' data name.",
+          "description": "Defaults to 'RowVersion' (literal)."
+        },
         "databaseName": {
           "type": "string",
           "title": "The .NET database interface name (used where 'AutoImplement' is 'Database').",
@@ -481,6 +536,10 @@
           "title": "Indicates that a custom Entity Framework 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
         },
+        "entityFrameworkMapperBase": {
+          "type": "string",
+          "title": "The EntityFramework data-layer name that should be used for base mappings."
+        },
         "cosmosName": {
           "type": "string",
           "title": "The .NET Cosmos interface name used where 'AutoImplement' is 'Cosmos'.",
@@ -507,6 +566,10 @@
           "type": "boolean",
           "title": "Indicates that a custom Cosmos 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
+        },
+        "cosmosMapperBase": {
+          "type": "string",
+          "title": "The Cosmos data-layer name that should be used for base mappings."
         },
         "odataName": {
           "type": "string",
@@ -551,6 +614,10 @@
           "type": "string",
           "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
           "description": "Prepended to 'Operation.HttpAgentCode' where specified to enable standardized functionality."
+        },
+        "httpAgentMapperBase": {
+          "type": "string",
+          "title": "The HTTP Agent data-layer name that should be used for base mappings."
         },
         "dataSvcCaching": {
           "type": "boolean",
@@ -988,21 +1055,23 @@
         "entityFrameworkMapper": {
           "type": "string",
           "title": "The Entity Framework 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "cosmosMapper": {
           "type": "string",
           "title": "The Cosmos 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "odataMapper": {
@@ -1018,11 +1087,12 @@
         "httpAgentMapper": {
           "type": "string",
           "title": "The HttpAgent 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "displayName": {

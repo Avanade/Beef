@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.Database.Core.SqlServer;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp.Console;
@@ -9,7 +8,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 
-namespace Beef.Database.Core
+namespace Beef.Database
 {
     /// <summary>
     /// Enables the base <i>Beef</i> console including extenfed command-line arguments/options.
@@ -56,9 +55,6 @@ namespace Beef.Database.Core
             Args.ScriptFileName = script ?? throw new ArgumentNullException(nameof(script));
             return (TSelf)this;
         }
-
-        /// <inheritdoc/>
-        protected override DbEx.Migration.DatabaseMigrationBase CreateMigrator() => new SqlServerMigration(Args);
 
         /// <inheritdoc/>
         protected override void OnBeforeExecute(CommandLineApplication app)

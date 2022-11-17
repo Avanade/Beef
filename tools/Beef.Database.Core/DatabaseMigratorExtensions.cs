@@ -4,11 +4,13 @@ using Beef.CodeGen;
 using DbEx.Migration;
 using Microsoft.Extensions.Logging;
 using OnRamp;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Beef.Database.Core
+namespace Beef.Database
 {
     /// <summary>
     /// Provides extension methods for the <see cref="DatabaseMigrationBase"/>.
@@ -45,13 +47,26 @@ namespace Beef.Database.Core
             cga.Logger = margs.Logger;
             cga.ExpectNoChanges = margs.ExpectNoChanges;
             cga.IsSimulation = margs.IsSimulation;
-            cga.Assemblies.Add(typeof(DbEx.Console.MigrationConsoleBase).Assembly);
-            cga.Assemblies.Add(typeof(Beef.CodeGen.CodeGenConsole).Assembly);
+
+            // Walk the assembly hierarchy.
+            var alist = new List<Assembly>();
+            var type = migrator.GetType();
+            do
+            {
+                if (!alist.Contains(type.Assembly))
+                    alist.Add(type.Assembly);
+
+                type = type.BaseType!;
+            } while (type != typeof(object));
+
             cga.AddAssembly(margs.Assemblies.ToArray());
+            cga.AddAssembly(alist.ToArray());
+
             cga.AddParameters(margs.Parameters);
             cga.ValidateCompanyAndAppName();
             cga.ScriptFileName = margs.ScriptFileName;
             cga.ConfigFileName = margs.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, cga.GetCompany(true), cga.GetAppName(true));
+            cga.AddDatabase(migrator.Database);
 
             migrator.Logger.LogInformation("{Content}", string.Empty);
             OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Product>Beef.Database.SqlServer</Product>
+    <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
+    <PackageTags>beef database sql sqlserver dbup migration schema dbex</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <NoWarn>1701;1702;CA1303</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbEx.SqlServer" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\**\*" />
+    <EmbeddedResource Include="Scripts\**\*" />
+    <EmbeddedResource Include="Templates\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
+    <ProjectReference Include="..\Beef.Database.Core\Beef.Database.Core.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\Common.targets" />
+
+</Project>

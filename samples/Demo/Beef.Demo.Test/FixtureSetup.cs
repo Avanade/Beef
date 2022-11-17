@@ -1,11 +1,10 @@
-﻿using Beef.Database.Core;
-using Beef.Database.Core.SqlServer;
+﻿using Beef.Database;
+using Beef.Database.SqlServer;
 using Beef.Demo.Api;
 using Beef.Demo.Business;
 using DbEx;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using System.Reflection;
 using UnitTestEx;
 using UnitTestEx.NUnit;
 
@@ -22,12 +21,16 @@ namespace Beef.Demo.Test
                 using var test = ApiTester.Create<Startup>();
                 var settings = test.Services.GetRequiredService<DemoSettings>();
 
-                var args = new MigrationArgs(
-                    count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString,
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Abc.Database.Scripts).Assembly)
-                { UseBeefSchema = true }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
+                var args = Database.Program.ConfigureMigrationArgs(new MigrationArgs(count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString))
+                    .AddAssembly<FixtureSetUp>()
+                    .AddAssembly<Abc.Database.Scripts>()
+                    .AddSchemaOrder("Test");
 
-                return await new SqlServerMigration(args).MigrateAsync(ct).ConfigureAwait(false);
+                var (Success, Output) = await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+                if (!Success)
+                    Assert.Fail(Output);
+
+                return Success;
             });
         }
     }

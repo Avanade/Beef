@@ -46,6 +46,11 @@ namespace Beef.Demo.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Address s)
+                => s.Street == default
+                && s.City == default;
+
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 

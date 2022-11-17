@@ -4,13 +4,13 @@ using DbEx;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Beef.Database.Core.SqlServer
+namespace Beef.Database.SqlServer
 {
     /// <summary>
-    /// Provides the <see href="https://docs.microsoft.com/en-us/sql/connect/ado-net/microsoft-ado-net-sql-server">SQL Server</see> migration orchestration extending <see cref="DbEx.Migration.SqlServer.SqlServerMigration"/>
+    /// Provides the <see href="https://docs.microsoft.com/en-us/sql/connect/ado-net/microsoft-ado-net-sql-server">SQL Server</see> migration orchestration extending <see cref="DbEx.SqlServer.Migration.SqlServerMigration"/>
     /// to further enable <see cref="MigrationCommand.CodeGen"/>.
     /// </summary>
-    public class SqlServerMigration : DbEx.Migration.SqlServer.SqlServerMigration
+    public class SqlServerMigration : DbEx.SqlServer.Migration.SqlServerMigration
     {
         /// <summary>
         /// Initializes an instance of the <see cref="SqlServerMigration"/> class.
@@ -21,7 +21,7 @@ namespace Beef.Database.Core.SqlServer
             IsCodeGenEnabled = true;
 
             // Add in the beef schema stuff where requested.
-            if (args.UseBeefSchema)
+            if (args.BeefSchema)
             {
                 if (!args.SchemaOrder.Contains("dbo"))
                     args.SchemaOrder.Insert(0, "dbo");

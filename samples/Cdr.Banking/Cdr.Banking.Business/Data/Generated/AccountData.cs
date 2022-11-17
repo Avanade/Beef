@@ -74,6 +74,18 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Account s)
+                => s.Id == default
+                && s.CreationDate == default
+                && s.DisplayName == default
+                && s.Nickname == default
+                && s.OpenStatusSid == default
+                && s.IsOwned == default
+                && s.MaskedNumber == default
+                && s.ProductCategorySid == default
+                && s.ProductName == default;
+
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 

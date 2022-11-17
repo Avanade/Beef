@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Beef.Database.Core
+namespace Beef.Database
 {
     /// <summary>
     /// Provides the extended <i>Beef</i> migration arguments.
@@ -44,9 +44,21 @@ namespace Beef.Database.Core
         public bool IsSimulation { get; set; }
 
         /// <summary>
-        /// Indicates whether to use the standard <i>Beef</i> schema objects (defaults to <c>true</c>).
+        /// Indicates whether to use the standard <i>Beef</i> schema objects (defaults to <c>false</c>).
         /// </summary>
-        public bool UseBeefSchema { get; set; } = true;
+        /// <remarks>This depends on the underlying database provider as to whether there are <i>Beef</i> schema objects to use.</remarks>
+        public bool BeefSchema { get; set; }
+
+        /// <summary>
+        /// Indicates whether to use the standard <i>Beef</i> schema objects.
+        /// </summary>
+        /// <param name="usebeefSchema">The option that default to <c>true</c> where not specified.</param>
+        /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
+        public MigrationArgs UseBeefSchema(bool usebeefSchema = true)
+        {
+            BeefSchema = usebeefSchema;
+            return this;
+        }
 
         /// <inheritdoc/>
         public Dictionary<string, object?> Parameters { get; } = new Dictionary<string, object?>();

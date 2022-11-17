@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using CoreEx.Database;
 using OnRamp;
 using System;
 using System.Collections.Generic;
@@ -36,5 +37,20 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty((args ?? throw new ArgumentNullException(nameof(args))).GetCompany()) || string.IsNullOrEmpty(args.GetAppName()))
                 throw new CodeGenException($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName} must be specified.");
         }
+
+        /// <summary>
+        /// Gets the <see cref="IDatabase"/> from the coonection details within the <see cref="ICodeGeneratorDbArgs"/>.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <returns>The <see cref="IDatabase"/> instance.</returns>
+        public static IDatabase GetDatabase(this ICodeGeneratorArgs args, string connectionString) => (args ?? throw new ArgumentNullException(nameof(args))).GetParameter<IDatabase>(CodeGenConsole.CodeGenDatabaseParamName, true)!;
+
+        /// <summary>
+        /// Adds the <paramref name="database"/> as the <see cref="CodeGenConsole.CodeGenDatabaseParamName"/> <see cref="ICodeGeneratorArgs.Parameters"/> value.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="database">The <see cref="IDatabase"/> instance.</param>
+        public static void AddDatabase(this ICodeGeneratorArgs args, IDatabase database) => args.AddParameter(CodeGenConsole.CodeGenDatabaseParamName, database ?? throw new ArgumentNullException(nameof(args)));
     }
 }

@@ -1,5 +1,5 @@
-﻿global using Beef.Database.Core;
-global using Beef.Database.Core.SqlServer;
+﻿global using Beef.Database;
+global using Beef.Database.SqlServer;
 global using CoreEx;
 global using CoreEx.Entities;
 global using CoreEx.Http;

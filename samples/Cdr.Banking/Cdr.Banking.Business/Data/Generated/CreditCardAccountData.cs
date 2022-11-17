@@ -30,6 +30,13 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(CreditCardAccount s)
+                => s.MinPaymentAmount == default
+                && s.PaymentDueAmount == default
+                && s.PaymentCurrency == default
+                && s.PaymentDueDate == default;
+
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 

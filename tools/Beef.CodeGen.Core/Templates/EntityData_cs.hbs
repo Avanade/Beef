@@ -229,6 +229,14 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelEfMapperCtor();
             }
+    {{#each EntityFrameworkMapperIsDestinationProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.EntityName}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
         {{#if HasEntityFrameworkChangeLogProperty}}
             /// <inheritdoc/>
@@ -303,6 +311,14 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelCosmosMapperCtor();
             }
+    {{#each CosmosMapperIsDestinationProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.EntityName}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
@@ -389,6 +405,14 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelHttpAgentMapperCtor();
             }
+    {{#each HttpAgentMapperIsDestinationProperties}}
+      {{#if @first}}
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial({{Parent.EntityName}} s)
+      {{/if}}
+                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
+    {{/each}}
 
             partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }

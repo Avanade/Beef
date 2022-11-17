@@ -6,7 +6,7 @@
 #pragma warning disable
 
 using CoreEx.Database;
-using CoreEx.Database.SqlServer;
+using CoreEx.Database.SqlServer.Outbox;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Data;

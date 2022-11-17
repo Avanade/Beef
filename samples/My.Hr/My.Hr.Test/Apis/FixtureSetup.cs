@@ -13,10 +13,12 @@ public class FixtureSetUp
         {
             using var test = ApiTester.Create<Startup>();
             var settings = test.Services.GetRequiredService<HrSettings>();
+            var args = Database.Program.ConfigureMigrationArgs(new MigrationArgs(count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString)).AddAssembly<FixtureSetUp>();
+            var (Success, Output) = await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+            if (!Success)
+                Assert.Fail(Output);
 
-            return await new SqlServerMigration(new MigrationArgs(
-                count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString,
-                typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefSchema = true }).MigrateAsync(ct).ConfigureAwait(false);
+            return Success;
         });
     }
 }

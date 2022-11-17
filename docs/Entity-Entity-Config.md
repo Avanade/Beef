@@ -75,6 +75,12 @@ Property | Description
 **`refDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `long`, `Guid`, `string`.<br/>&dagger; Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
 `refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.<br/>&dagger; This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
 `refDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`.<br/>&dagger; Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
+`refDataIdDataName` | The Reference Data `Id` data name.<br/>&dagger; Defaults to `Name` + `Id` (literal).
+`refDataCodeDataName` | The Reference Data `Code` data name.<br/>&dagger; Defaults to `Code` (literal).
+`refDataTextDataName` | The Reference Data `Text` data name.<br/>&dagger; Defaults to `Text` (literal).
+`refDataIsActiveDataName` | The Reference Data `IsActive` data name.<br/>&dagger; Defaults to `IsActive` (literal).
+`refDataSortOrderDataName` | The Reference Data `SortOrder` data name.<br/>&dagger; Defaults to `SortOrder` (literal).
+`refDataETagDataName` | The Reference Data `ETag` data name.<br/>&dagger; Defaults to `RowVersion` (literal).
 
 <br/>
 
@@ -214,6 +220,7 @@ Property | Description
 **`entityFrameworkName`** | The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to `CodeGeneration.EntityFrameworkName`.
 **`entityFrameworkModel`** | The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).
 `entityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
+`entityFrameworkMapperBase` | The EntityFramework data-layer name that should be used for base mappings.
 
 <br/>
 
@@ -228,6 +235,8 @@ Property | Description
 `cosmosPartitionKey` | The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.<br/>&dagger; The value `PartitionKey.None` can be specified. Literals will need to be quoted.
 `cosmosValueContainer` | Indicates whether the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer`.
 `cosmosCustomMapper` | Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
+`cosmosMapperBase` | The Cosmos data-layer name that should be used for base mappings.
+`httpAgentMapperBase` | The HTTP Agent data-layer name that should be used for base mappings.
 
 <br/>
 

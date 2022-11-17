@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Database.Core" Version="BeefVersion" />
+    <PackageReference Include="Beef.Database.SqlServer" Version="BeefVersion" />
     <PackageReference Include="Beef.CodeGen.Core" Version="BeefVersion" />
   </ItemGroup>
 

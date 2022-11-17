@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Product>Beef.Database.Core</Product>
     <Description>Business Entity Execution Framework (Beef) Database tool.</Description>
-    <PackageTags>beef database sql dbup migration schema dbex</PackageTags>
+    <PackageTags>beef database dbup migration schema dbex</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,10 +12,6 @@
     <WarningsAsErrors />
     <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Schema\**\*" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DbEx" Version="1.1.1" />

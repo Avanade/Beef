@@ -957,6 +957,11 @@ entities:
         public List<PropertyConfig>? EntityFrameworkMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore") && !CompareValue(x.EntityFrameworkMapper, "Flatten")).ToList();
 
         /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? EntityFrameworkMapperIsDestinationProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore") && !CompareValue(x.EntityFrameworkMapper, "Expand")).ToList();
+
+        /// <summary>
         /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
         public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore")).ToList();
@@ -965,6 +970,11 @@ entities:
         /// Gets the list of properties that are to be used for cosmos mapping.
         /// </summary>
         public List<PropertyConfig>? CosmosMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore") && !CompareValue(x.CosmosMapper, "Flatten")).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for cosmos mapping.
+        /// </summary>
+        public List<PropertyConfig>? CosmosMapperIsDestinationProperties => Properties!.Where(x => !CompareValue(x.CosmosMapper, "Ignore") && !CompareValue(x.CosmosMapper, "Expand")).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for odata mapping.
@@ -980,6 +990,11 @@ entities:
         /// Gets the list of properties that are to be used for http agent mapping.
         /// </summary>
         public List<PropertyConfig>? HttpAgentMapperIsSourceProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Ignore") && !CompareValue(x.HttpAgentMapper, "Flatten")).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for http agent mapping.
+        /// </summary>
+        public List<PropertyConfig>? HttpAgentMapperIsDestinationProperties => Properties!.Where(x => !CompareValue(x.HttpAgentMapper, "Ignore") && !CompareValue(x.HttpAgentMapper, "Expand")).ToList();
 
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.

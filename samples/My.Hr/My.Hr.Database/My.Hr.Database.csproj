@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\tools\Beef.Database.Core\Beef.Database.Core.csproj" />
+    <ProjectReference Include="..\..\..\tools\Beef.Database.SqlServer\Beef.Database.SqlServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

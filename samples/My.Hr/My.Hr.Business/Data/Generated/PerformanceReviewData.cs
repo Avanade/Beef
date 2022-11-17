@@ -103,6 +103,17 @@ namespace My.Hr.Business.Data
             }
 
             /// <inheritdoc/>
+            public override bool IsSourceInitial(PerformanceReview s)
+                => s.Id == default
+                && s.EmployeeId == default
+                && s.Date == default
+                && s.OutcomeSid == default
+                && s.Reviewer == default
+                && s.Notes == default
+                && s.ETag == default
+                && s.ChangeLog == default;
+
+            /// <inheritdoc/>
             protected override void OnRegister(Mapper<PerformanceReview, EfModel.PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.PerformanceReview>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)

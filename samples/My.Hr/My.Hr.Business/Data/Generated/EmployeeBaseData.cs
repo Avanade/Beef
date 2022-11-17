@@ -60,6 +60,18 @@ namespace My.Hr.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EmployeeBase s)
+                => s.Id == default
+                && s.Email == default
+                && s.FirstName == default
+                && s.LastName == default
+                && s.GenderSid == default
+                && s.Birthday == default
+                && s.StartDate == default
+                && s.Termination == default
+                && s.PhoneNo == default;
+
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
