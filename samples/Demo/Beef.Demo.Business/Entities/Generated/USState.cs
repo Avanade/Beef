@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the US State entity.
     /// </summary>
-    public partial class USState : ReferenceDataBase<Guid, USState>
+    public partial class USState : ReferenceDataBaseEx<Guid, USState>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="USState"/>.

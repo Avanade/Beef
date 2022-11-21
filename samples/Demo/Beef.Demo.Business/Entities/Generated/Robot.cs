@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Robot entity.
     /// </summary>
-    public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLog
+    public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLogEx
     {
         private Guid _id;
         private string? _modelNo;
@@ -20,7 +20,7 @@ namespace Beef.Demo.Business.Entities
         private string? _powerSourceSid;
         private string? _powerSourceText;
         private string? _etag;
-        private ChangeLog? _changeLog;
+        private ChangeLogEx? _changeLog;
 
         /// <summary>
         /// Gets or sets the <see cref="Robot"/> identifier.
@@ -82,7 +82,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
         /// </summary>
-        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+        public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

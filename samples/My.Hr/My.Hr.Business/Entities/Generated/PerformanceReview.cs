@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Performance Review entity.
     /// </summary>
-    public partial class PerformanceReview : EntityBase, IIdentifier<Guid>, IETag, IChangeLog
+    public partial class PerformanceReview : EntityBase, IIdentifier<Guid>, IETag, IChangeLogEx
     {
         private Guid _id;
         private Guid _employeeId;
@@ -20,7 +20,7 @@ namespace My.Hr.Business.Entities
         private string? _reviewer;
         private string? _notes;
         private string? _etag;
-        private ChangeLog? _changeLog;
+        private ChangeLogEx? _changeLog;
 
         /// <summary>
         /// Gets or sets the <see cref="Employee"/> identifier.
@@ -74,7 +74,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
         /// </summary>
-        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+        public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

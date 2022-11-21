@@ -53,7 +53,7 @@ namespace Beef.Demo.Business
         {
             value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidatorEx<Robot>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<RobotValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Create);
 
@@ -67,7 +67,7 @@ namespace Beef.Demo.Business
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidatorEx<Robot>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<RobotValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Update);
 
@@ -91,7 +91,7 @@ namespace Beef.Demo.Business
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<IValidatorEx<RobotArgs>>().ValidateAsync(true).ConfigureAwait(false);
+            await args.Validate(nameof(args)).Entity().With<RobotArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
         }, InvokerArgs.Read);
 

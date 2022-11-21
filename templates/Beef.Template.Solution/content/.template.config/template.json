@@ -60,21 +60,21 @@
     "coreex_version": {
       "type": "parameter",
       "replaces": "CoreExVersion",
-      "defaultValue": "1.0.12",
+      "defaultValue": "1.0.13",
       "datatype": "text",
       "description": "The CoreEx packages version."
     },
     "unittestex_version": {
       "type": "parameter",
       "replaces": "UnitTestExVersion",
-      "defaultValue": "1.0.27",
+      "defaultValue": "1.0.28",
       "datatype": "text",
       "description": "The UnitTestEx packages version."
     },
     "beef_version": {
       "type": "parameter",
       "replaces": "BeefVersion",
-      "defaultValue": "5.0.1-preview2",
+      "defaultValue": "5.0.1-preview3",
       "datatype": "text",
       "description": "The Beef packages version."
     },

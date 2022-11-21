@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Account U Type entity.
     /// </summary>
-    public partial class AccountUType : ReferenceDataBase<Guid, AccountUType>
+    public partial class AccountUType : ReferenceDataBaseEx<Guid, AccountUType>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="AccountUType"/>.

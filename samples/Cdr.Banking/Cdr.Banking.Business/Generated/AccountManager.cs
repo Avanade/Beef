@@ -32,7 +32,7 @@ namespace Cdr.Banking.Business
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<IValidatorEx<AccountArgs>>().ValidateAsync(true).ConfigureAwait(false);
+            await args.Validate(nameof(args)).Entity().With<AccountArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
         }, InvokerArgs.Read);
 

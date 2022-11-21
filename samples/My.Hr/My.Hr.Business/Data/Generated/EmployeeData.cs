@@ -106,7 +106,7 @@ namespace My.Hr.Business.Data
                 InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
                 Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
                 Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-                Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
+                Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
                 DbMapperCtor();
             }
             

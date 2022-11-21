@@ -54,7 +54,7 @@ namespace {{Root.NamespaceApi}}.Controllers
 {{/ifval}}
         [HttpGet()]
         [Route("{{RefDataWebApiRoute}}")]
-        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.Models.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

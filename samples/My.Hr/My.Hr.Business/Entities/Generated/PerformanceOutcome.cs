@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Performance Outcome entity.
     /// </summary>
-    public partial class PerformanceOutcome : ReferenceDataBase<Guid, PerformanceOutcome>
+    public partial class PerformanceOutcome : ReferenceDataBaseEx<Guid, PerformanceOutcome>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="PerformanceOutcome"/>.

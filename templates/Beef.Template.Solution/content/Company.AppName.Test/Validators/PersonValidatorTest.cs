@@ -35,7 +35,7 @@ public class PersonValidatorTest
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.")
-            .RunAsync<IValidator<Person>, Person>(new Person());
+            .RunAsync<PersonValidator, Person>(new Person());
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class PersonValidatorTest
                 "Last Name must not exceed 100 characters in length.",
                 "Gender is invalid.",
                 "Birthday must be less than or equal to Today.")
-            .RunAsync<IValidator<Person>, Person>(p);
+            .RunAsync<PersonValidator, Person>(p);
     }
 
     [Test]
@@ -77,6 +77,6 @@ public class PersonValidatorTest
         await test
             .ConfigureServices(_testSetup!)
             .ExpectSuccess()
-            .RunAsync<IValidator<Person>, Person>(p);
+            .RunAsync<PersonValidator, Person>(p);
     }
 }

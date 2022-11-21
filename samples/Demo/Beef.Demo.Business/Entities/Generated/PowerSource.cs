@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Power Source entity.
     /// </summary>
-    public partial class PowerSource : ReferenceDataBase<Guid, PowerSource>
+    public partial class PowerSource : ReferenceDataBaseEx<Guid, PowerSource>
     {
         private string? _additionalInfo;
 

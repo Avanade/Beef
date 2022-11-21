@@ -8,7 +8,7 @@ eventSourceKind: Relative
 cosmosName: DemoCosmosDb
 appBasedAgentArgs: true
 entities:
-- { name: Person, text: Person, implements: 'IETag, IChangeLog', collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
+- { name: Person, text: Person, collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, grpcFieldNo: 1, primaryKey: true, dataName: PersonId, annotation1: '[System.Xml.Serialization.XmlElement("Id")]' },
       { name: FirstName, type: string, grpcFieldNo: 2 },

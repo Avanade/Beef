@@ -57,7 +57,7 @@ namespace My.Hr.Business
         {
             value.EnsureValue().EmployeeId = employeeId;
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Create);
 
@@ -71,7 +71,7 @@ namespace My.Hr.Business
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidatorEx<PerformanceReview>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Update);
 

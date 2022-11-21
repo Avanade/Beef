@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Transaction Status entity.
     /// </summary>
-    public partial class TransactionStatus : ReferenceDataBase<Guid, TransactionStatus>
+    public partial class TransactionStatus : ReferenceDataBaseEx<Guid, TransactionStatus>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="TransactionStatus"/>.

@@ -488,11 +488,21 @@ properties: [
         public string? PropertyNameSeeComments => StringConverter.ToSeeComments(Name);
 
         /// <summary>
+        /// Indicates whether the property is a ChangeLog (name and type).
+        /// </summary>
+        public bool IsChangeLog => Name == "ChangeLog" && (Type == "ChangeLog" || Type == "ChangeLogEx");
+
+        /// <summary>
+        /// Interim property type to make on-the-fly tweaks to the type.
+        /// </summary>
+        private string? InterimPropertyType => IsChangeLog ? "ChangeLogEx" : Type;
+
+        /// <summary>
         /// Gets the computed declared property type.
         /// </summary>
         public string PropertyType => string.IsNullOrEmpty(RefDataType) 
             ? PrivateType 
-            : (CompareValue(RefDataList, true) ? $"ReferenceDataCodeList<{Type}{(RefDataType == "string" ? "?" : "")}, {RefDataType}>?" : CompareValue(Nullable, true) ? Type + "?" : Type!);
+            : (CompareValue(RefDataList, true) ? $"ReferenceDataCodeList<{Type}{(RefDataType == "string" ? "?" : "")}, {RefDataType}>?" : CompareValue(Nullable, true) ? InterimPropertyType + "?" : InterimPropertyType!);
 
         /// <summary>
         /// Gets the computed declared private type.
@@ -502,7 +512,7 @@ properties: [
             get
             {
                 if (string.IsNullOrEmpty(RefDataType))
-                    return CompareValue(Nullable, true) ? Type + "?" : Type!;
+                    return CompareValue(Nullable, true) ? InterimPropertyType + "?" : InterimPropertyType!;
 
                 var rt = CompareValue(RefDataList, true) ? $"List<{RefDataType}{(RefDataType == "string" ? "?" : "")}>" : RefDataType!;
                 return CompareValue(Nullable, true) ? rt + "?" : rt!;
@@ -512,7 +522,7 @@ properties: [
         /// <summary>
         /// Gets the computed declared private type for a model.
         /// </summary>
-        public string ModelType => Root!.IsDataModel && Name == "ChangeLog" && Type == "ChangeLog" ? "CoreEx.Entities.Models.ChangeLog" : PrivateType;
+        public string ModelType => IsChangeLog ? "ChangeLog?" : PrivateType;
 
         /// <summary>
         /// Gets or sets the declared type including nullability.
@@ -587,7 +597,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 
@@ -609,7 +619,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 
@@ -631,7 +641,7 @@ properties: [
         {
             "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}){(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
-            "Flatten" => $"Expand<{Type}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
+            "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v{(DataOperationTypes == "Any" ? "" : $", OperationTypes.{DataOperationTypes}")});",
             _ => "!! code-gen error !!"
         };
 
@@ -706,7 +716,7 @@ properties: [
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationAlwaysInclude = DefaultWhereNull(SerializationAlwaysInclude, () => false);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
-            IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Type.EndsWith("Collection") || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
+            IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Type == "ChangeLogEx" || Type.EndsWith("Collection") || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => RefDataMapping.HasValue && RefDataMapping.Value == true);
 
             if (CompareValue(InternalOnly, true))

@@ -307,17 +307,9 @@ operations: [
         /// Gets or sets the name of the .NET Type that will perform the validation.
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The name of the .NET Type that will perform the validation.", IsImportant = true,
-            Description = "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.")]
+        [CodeGenProperty("Manager", Title = "The name of the .NET implementing `Type` or interface `Type` that will perform the validation.", IsImportant = true,
+            Description = "Defaults to the `Entity.Validator` where not specified explicitly (where `Operation.Type` options `Create` or `Update`).")]
         public string? Validator { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
-        /// </summary>
-        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidatorEx<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.")]
-        public string? IValidator { get; set; }
 
         /// <summary>
         /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.
@@ -923,7 +915,6 @@ operations: [
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
-            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? Parent!.IValidator ?? $"IValidatorEx<{ValueType}>" : null);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             if (Type == "Custom")
                 AutoImplement = "None";
@@ -1080,7 +1071,7 @@ operations: [
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
             if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IValidator = IValidator, IsValueArg = true, WebApiFrom = "FromBody" });
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
 
             if (PrimaryKey.HasValue && PrimaryKey.Value)
             {
@@ -1398,7 +1389,7 @@ operations: [
             if (ep.Key != null)
                 throw new CodeGenException(this, ep.Key, $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
 
-            CodeGenConfig.WarnWhereDeprecated(Root!, this, "eventOutbox");
+            CodeGenConfig.WarnWhereDeprecated(Root!, this, "eventOutbox", "iValidator");
         }
     }
 }

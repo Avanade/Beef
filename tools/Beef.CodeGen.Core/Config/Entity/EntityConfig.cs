@@ -154,7 +154,7 @@ entities:
         /// </summary>
         [JsonProperty("inherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Entity", Title = "The base class that the entity inherits from.",
-            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBase<xxx>` depending on the corresponding `RefDataType` value. " +
+            Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseEx<xxx>` depending on the corresponding `RefDataType` value. " +
                           "See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.")]
         public string? Inherits { get; set; }
 
@@ -697,17 +697,9 @@ entities:
         /// Gets or sets the name of the .NET Type that will perform the validation.
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true,
+        [CodeGenProperty("Manager", Title = "The name of the .NET implementing `Type` or interface `Type` that will perform the validation.", IsImportant = true,
             Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? Validator { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
-        /// </summary>
-        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Defaults to `IValidatorEx<Xxx>` (where `Xxx` is the entity `Name`) where `Validator` is not `null`. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
-        public string? IValidator { get; set; }
 
         /// <summary>
         /// Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property on `Create`.
@@ -944,7 +936,7 @@ entities:
         /// <summary>
         /// Gets the list of properties that are to be used for database mapping.
         /// </summary>
-        public List<PropertyConfig>? DatabaseMapperProperties => Properties!.Where(x => CompareNullOrValue(x.DatabaseIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+        public List<PropertyConfig>? DatabaseMapperProperties => Properties!.Where(x => CompareNullOrValue(x.DatabaseIgnore, false) && x.Name != "ETag" && !x.IsChangeLog).ToList();
 
         /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
@@ -999,7 +991,7 @@ entities:
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
         /// </summary>
-        public bool HasDatabaseChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && CompareNullOrValue(x.DatabaseIgnore, false));
+        public bool HasDatabaseChangeLogProperty => Properties!.Any(x => x.IsChangeLog && CompareNullOrValue(x.DatabaseIgnore, false));
 
         /// <summary>
         /// Indicates where there is a <see cref="IETag"/> property.
@@ -1009,7 +1001,7 @@ entities:
         /// <summary>
         /// Indicates where there is a <see cref="IChangeLog"/> property.
         /// </summary>
-        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.Name == "ChangeLog" && !CompareValue(x.EntityFrameworkMapper, "Ignore"));
+        public bool HasEntityFrameworkChangeLogProperty => Properties!.Any(x => x.IsChangeLog && !CompareValue(x.EntityFrameworkMapper, "Ignore"));
 
         /// <summary>
         /// Indicates where there is a <see cref="IETag"/> property.
@@ -1404,10 +1396,10 @@ entities:
             EntityInherits = Inherits;
             EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                "int" => $"ReferenceDataBase<int, {Name}>",
-                "long" => $"ReferenceDataBase<long, {Name}>",
-                "Guid" => $"ReferenceDataBase<Guid, {Name}>",
-                "string" => $"ReferenceDataBase<string?, {Name}>",
+                "int" => $"ReferenceDataBaseEx<int, {Name}>",
+                "long" => $"ReferenceDataBaseEx<long, {Name}>",
+                "Guid" => $"ReferenceDataBaseEx<Guid, {Name}>",
+                "string" => $"ReferenceDataBaseEx<string?, {Name}>",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? $"EntityBase" : null
             });
 
@@ -1607,13 +1599,13 @@ entities:
                         commonImplements.Insert(c++, "IETag");
                 }
 
-                if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
+                if (Properties!.Any(x => x.IsChangeLog && CompareNullOrValue(x.Inherited, false)))
                 {
-                    implements.Insert(i++, "IChangeLog");
-                    if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.DataModelIgnore, false)))
-                        modelImplements.Insert(m++, "CoreEx.Entities.Models.IChangeLog");
+                    implements.Insert(i++, "IChangeLogEx");
+                    if (Properties!.Any(x => x.IsChangeLog && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.DataModelIgnore, false)))
+                        modelImplements.Insert(m++, "IChangeLog");
 
-                    if (Properties!.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.InternalOnly, false)))
+                    if (Properties!.Any(x => x.IsChangeLog && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.InternalOnly, false)))
                         commonImplements.Insert(c++, "IChangeLog");
                 }
             }
@@ -1758,6 +1750,7 @@ entities:
             "odataMapperInheritsFrom",
             "eventOutbox",
             "eventSubjectFormat",
-            "eventCasing");
+            "eventCasing",
+            "iValidator");
     }
 }

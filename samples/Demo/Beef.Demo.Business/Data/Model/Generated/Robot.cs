@@ -12,7 +12,7 @@ namespace Beef.Demo.Business.Data.Model
     /// <summary>
     /// Represents the Robot model.
     /// </summary>
-    public partial class Robot : IIdentifier<string>, IETag, CoreEx.Entities.Models.IChangeLog
+    public partial class Robot : IIdentifier<string>, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the Id.
@@ -48,7 +48,7 @@ namespace Beef.Demo.Business.Data.Model
         /// <summary>
         /// Gets or sets the Change Log.
         /// </summary>
-        public CoreEx.Entities.Models.ChangeLog ChangeLog { get; set; }
+        public ChangeLog? ChangeLog { get; set; }
     }
 
     /// <summary>

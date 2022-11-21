@@ -199,7 +199,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
     {{/if}}
     {{#if  HasDatabaseChangeLogProperty}}
-                Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
+                Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
     {{/if}}
                 DbMapperCtor();
             }
@@ -240,7 +240,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
         {{#if HasEntityFrameworkChangeLogProperty}}
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, {{EntityFrameworkModel}}>()
+            protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
@@ -279,7 +279,7 @@ namespace {{Root.NamespaceBusiness}}.Data
 
         {{#if HasEntityFrameworkChangeLogProperty}}
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLog>()
+            protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)

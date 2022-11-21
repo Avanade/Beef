@@ -114,7 +114,7 @@ namespace My.Hr.Business.Data
                 && s.ChangeLog == default;
 
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<PerformanceReview, EfModel.PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.PerformanceReview>()
+            protected override void OnRegister(Mapper<PerformanceReview, EfModel.PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, EfModel.PerformanceReview>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
@@ -140,7 +140,7 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.Reviewer = (string?)s.Reviewer);
                 Map((s, d) => d.Notes = (string?)s.Notes);
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
-                Expand<ChangeLog>((d, v) => d.ChangeLog = v);
+                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v);
                 ModelToEntityEfMapperCtor();
             }
 
@@ -155,7 +155,7 @@ namespace My.Hr.Business.Data
                 && s.RowVersion == default;
 
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<EfModel.PerformanceReview, PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<EfModel.PerformanceReview, ChangeLog>()
+            protected override void OnRegister(Mapper<EfModel.PerformanceReview, PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<EfModel.PerformanceReview, ChangeLogEx>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)

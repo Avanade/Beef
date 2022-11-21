@@ -62,6 +62,17 @@ namespace My.Hr.Business.Data
                 GenderToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(Gender s)
+                => s.Id == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.ETag == default;
+
+
+
             partial void GenderToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -83,6 +94,15 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 ModelToGenderEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.Gender s)
+                => s.GenderId == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.RowVersion == default;
 
             partial void ModelToGenderEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -106,6 +126,17 @@ namespace My.Hr.Business.Data
                 TerminationReasonToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(TerminationReason s)
+                => s.Id == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.ETag == default;
+
+
+
             partial void TerminationReasonToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -127,6 +158,15 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 ModelToTerminationReasonEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.TerminationReason s)
+                => s.TerminationReasonId == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.RowVersion == default;
 
             partial void ModelToTerminationReasonEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -150,6 +190,17 @@ namespace My.Hr.Business.Data
                 RelationshipTypeToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(RelationshipType s)
+                => s.Id == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.ETag == default;
+
+
+
             partial void RelationshipTypeToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -171,6 +222,15 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 ModelToRelationshipTypeEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.RelationshipType s)
+                => s.RelationshipTypeId == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.RowVersion == default;
 
             partial void ModelToRelationshipTypeEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -194,6 +254,17 @@ namespace My.Hr.Business.Data
                 USStateToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(USState s)
+                => s.Id == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.ETag == default;
+
+
+
             partial void USStateToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -215,6 +286,15 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 ModelToUSStateEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.USState s)
+                => s.USStateId == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.RowVersion == default;
 
             partial void ModelToUSStateEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -238,6 +318,17 @@ namespace My.Hr.Business.Data
                 PerformanceOutcomeToModelEfMapperCtor();
             }
 
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(PerformanceOutcome s)
+                => s.Id == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.ETag == default;
+
+
+
             partial void PerformanceOutcomeToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -259,6 +350,15 @@ namespace My.Hr.Business.Data
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 ModelToPerformanceOutcomeEfMapperCtor();
             }
+
+            /// <inheritdoc/>
+            public override bool IsSourceInitial(EfModel.PerformanceOutcome s)
+                => s.PerformanceOutcomeId == default
+                && s.Code == default
+                && s.Text == default
+                && s.IsActive == default
+                && s.SortOrder == default
+                && s.RowVersion == default;
 
             partial void ModelToPerformanceOutcomeEfMapperCtor(); // Enables the constructor to be extended.
         }

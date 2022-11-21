@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Company entity.
     /// </summary>
-    public partial class Company : ReferenceDataBase<Guid, Company>
+    public partial class Company : ReferenceDataBaseEx<Guid, Company>
     {
 
         /// <summary>

@@ -53,7 +53,7 @@ public class EmployeeValidatorTest
                 "Birthday is required.",
                 "Start Date is required.",
                 "Phone No is required.")
-            .Run<IValidator<Employee>, Employee>(new Employee());
+            .Run<EmployeeValidator, Employee>(new Employee());
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class EmployeeValidatorTest
                 "Gender is invalid.",
                 "Birthday is invalid as the Employee must be at least 18 years of age.",
                 "Start Date must be greater than or equal to January 1, 1999.")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class EmployeeValidatorTest
                 "City is required.",
                 "State is required.",
                 "Post Code is required.")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class EmployeeValidatorTest
             .ExpectErrors(
                 "State is invalid.",
                 "Post Code is invalid.")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -137,7 +137,7 @@ public class EmployeeValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .ExpectSuccess()
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -154,7 +154,7 @@ public class EmployeeValidatorTest
                 "Last Name is required.",
                 "Phone No is required.",
                 "Relationship is required.")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class EmployeeValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Relationship is invalid.")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -200,7 +200,7 @@ public class EmployeeValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Emergency Contacts must not exceed 5 item(s).")
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -218,7 +218,7 @@ public class EmployeeValidatorTest
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.ValidationException>("Once an Employee has been Terminated the data can no longer be updated.")
             .OperationType(CoreEx.OperationType.Update)
-            .Run<IValidator<Employee>, Employee>(e);
+            .Run<EmployeeValidator, Employee>(e);
     }
 
     [Test]

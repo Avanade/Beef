@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Status entity.
     /// </summary>
-    public partial class Status : ReferenceDataBase<string?, Status>
+    public partial class Status : ReferenceDataBaseEx<string?, Status>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Status"/>.

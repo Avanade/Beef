@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Person entity.
     /// </summary>
-    public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETag, IChangeLog
+    public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETag, IChangeLogEx
     {
         private Guid _id;
         private string? _firstName;
@@ -24,7 +24,7 @@ namespace Beef.Demo.Business.Entities
         private Address? _address;
         private string? _etag;
         private Dictionary<string, string>? _metadata;
-        private ChangeLog? _changeLog;
+        private ChangeLogEx? _changeLog;
 
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier.
@@ -107,7 +107,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
         /// </summary>
-        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+        public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 
         /// <summary>
         /// Creates the <see cref="IPartitionKey.PartitionKey"/>.

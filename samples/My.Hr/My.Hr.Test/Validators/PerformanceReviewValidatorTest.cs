@@ -44,7 +44,7 @@ public class PerformanceReviewValidatorTest
                 "Date is required.",
                 "Outcome is required.",
                 "Reviewer is required.")
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(new PerformanceReview());
+            .Run<PerformanceReviewValidator, PerformanceReview>(new PerformanceReview());
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class PerformanceReviewValidatorTest
                 "Employee is not found; a valid value is required.",
                 "Reviewer must not exceed 256 characters in length.",
                 "Notes must not exceed 4000 characters in length.")
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class PerformanceReviewValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Date must not be prior to the Employee starting.")
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class PerformanceReviewValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Date must not be after the Employee has terminated.")
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class PerformanceReviewValidatorTest
         test.ConfigureServices(_testSetup!)
             .OperationType(OperationType.Update)
             .ExpectErrorType(CoreEx.Abstractions.ErrorType.NotFoundError)
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class PerformanceReviewValidatorTest
         test.ConfigureServices(_testSetup!)
             .OperationType(OperationType.Update)
             .ExpectErrors("Employee is not allowed to change; please reset value.")
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -170,7 +170,7 @@ public class PerformanceReviewValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .OperationType(OperationType.Create)
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -191,6 +191,6 @@ public class PerformanceReviewValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .OperationType(OperationType.Update)
-            .Run<IValidator<PerformanceReview>, PerformanceReview>(pr);
+            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 }

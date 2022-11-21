@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Eye Color entity.
     /// </summary>
-    public partial class EyeColor : ReferenceDataBase<Guid, EyeColor>
+    public partial class EyeColor : ReferenceDataBaseEx<Guid, EyeColor>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="EyeColor"/>.

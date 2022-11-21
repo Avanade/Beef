@@ -13,7 +13,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonDetailValidator"/>.
         /// </summary>
-        public PersonDetailValidator(IValidatorEx<Person> personValidator)
+        public PersonDetailValidator(PersonValidator personValidator)
         {
             IncludeBase(personValidator);
             Property(x => x.History).Collection(item: CollectionRuleItem.Create(_workHistoryValidator).DuplicateCheck(nameof(WorkHistory.Name)));

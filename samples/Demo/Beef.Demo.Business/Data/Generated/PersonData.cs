@@ -341,7 +341,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
                 Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string, string>>.Default);
                 Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-                Property(s => s.ChangeLog).SetMapper(ChangeLogDatabaseMapper.Default);
+                Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
                 DbMapperCtor();
             }
             
@@ -387,7 +387,7 @@ namespace Beef.Demo.Business.Data
                 && s.ChangeLog == default;
 
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<Person, EfModel.Person> mapper) => mapper.Owner.Register(new Mapper<ChangeLog, EfModel.Person>()
+            protected override void OnRegister(Mapper<Person, EfModel.Person> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, EfModel.Person>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
@@ -416,7 +416,7 @@ namespace Beef.Demo.Business.Data
                 Expand<Address>((d, v) => d.Address = v);
                 Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
                 Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson));
-                Expand<ChangeLog>((d, v) => d.ChangeLog = v);
+                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v);
                 ModelToEntityEfMapperCtor();
             }
 
@@ -433,7 +433,7 @@ namespace Beef.Demo.Business.Data
                 && s.MetadataJson == default;
 
             /// <inheritdoc/>
-            protected override void OnRegister(Mapper<EfModel.Person, Person> mapper) => mapper.Owner.Register(new Mapper<EfModel.Person, ChangeLog>()
+            protected override void OnRegister(Mapper<EfModel.Person, Person> mapper) => mapper.Owner.Register(new Mapper<EfModel.Person, ChangeLogEx>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)

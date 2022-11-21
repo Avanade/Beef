@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Product Category entity.
     /// </summary>
-    public partial class ProductCategory : ReferenceDataBase<Guid, ProductCategory>
+    public partial class ProductCategory : ReferenceDataBaseEx<Guid, ProductCategory>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="ProductCategory"/>.

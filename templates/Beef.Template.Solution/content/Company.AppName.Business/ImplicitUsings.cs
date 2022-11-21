@@ -26,7 +26,7 @@ global using CoreEx.Json;
 global using CoreEx.Mapping;
 global using CoreEx.Mapping.Converters;
 global using CoreEx.RefData;
-global using CoreEx.RefData.Models;
+global using CoreEx.RefData.Extended;
 global using CoreEx.Validation;
 global using CoreEx.Validation.Rules;
 #if (implement_cosmos)

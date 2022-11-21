@@ -43,7 +43,7 @@ namespace My.Hr.Business
         public Task<Employee> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(value.EnsureValue());
-            await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<EmployeeValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Create);
 
@@ -57,7 +57,7 @@ namespace My.Hr.Business
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
-            await value.Validate().Entity().With<IValidatorEx<Employee>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<EmployeeValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Update);
 
@@ -81,7 +81,7 @@ namespace My.Hr.Business
         public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<IValidatorEx<EmployeeArgs>>().ValidateAsync(true).ConfigureAwait(false);
+            await args.Validate(nameof(args)).Entity().With<EmployeeArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
         }, InvokerArgs.Read);
 
@@ -94,7 +94,7 @@ namespace My.Hr.Business
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(value.EnsureValue(), id);
-            await value.Validate().Entity().With<IValidatorEx<TerminationDetail>>().ValidateAsync(true).ConfigureAwait(false);
+            await value.Validate().Entity().With<TerminationDetailValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.TerminateAsync(value, id).ConfigureAwait(false));
         }, InvokerArgs.Update);
     }

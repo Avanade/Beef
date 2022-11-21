@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Gender entity.
     /// </summary>
-    public partial class Gender : ReferenceDataBase<Guid, Gender>
+    public partial class Gender : ReferenceDataBaseEx<Guid, Gender>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Gender"/>.

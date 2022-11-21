@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Transaction Type entity.
     /// </summary>
-    public partial class TransactionType : ReferenceDataBase<Guid, TransactionType>
+    public partial class TransactionType : ReferenceDataBaseEx<Guid, TransactionType>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="TransactionType"/>.

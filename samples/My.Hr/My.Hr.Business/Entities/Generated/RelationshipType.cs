@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Relationship Type entity.
     /// </summary>
-    public partial class RelationshipType : ReferenceDataBase<Guid, RelationshipType>
+    public partial class RelationshipType : ReferenceDataBaseEx<Guid, RelationshipType>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="RelationshipType"/>.

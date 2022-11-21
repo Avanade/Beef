@@ -35,7 +35,7 @@ namespace Cdr.Banking.Business
             Cleaner.CleanUp(accountId, args);
             await MultiValidator.Create()
                 .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
-                .Add(args.Validate(nameof(args)).Entity().With<IValidatorEx<TransactionArgs>>())
+                .Add(args.Validate(nameof(args)).Entity().With<TransactionArgsValidator>())
                 .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));

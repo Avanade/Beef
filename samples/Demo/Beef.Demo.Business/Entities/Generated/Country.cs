@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the Country entity.
     /// </summary>
-    public partial class Country : ReferenceDataBase<Guid, Country>
+    public partial class Country : ReferenceDataBaseEx<Guid, Country>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Country"/>.

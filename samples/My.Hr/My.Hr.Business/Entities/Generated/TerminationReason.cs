@@ -10,7 +10,7 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Termination Reason entity.
     /// </summary>
-    public partial class TerminationReason : ReferenceDataBase<Guid, TerminationReason>
+    public partial class TerminationReason : ReferenceDataBaseEx<Guid, TerminationReason>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="TerminationReason"/>.

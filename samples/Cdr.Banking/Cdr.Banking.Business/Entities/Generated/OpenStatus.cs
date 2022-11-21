@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Open Status entity.
     /// </summary>
-    public partial class OpenStatus : ReferenceDataBase<Guid, OpenStatus>
+    public partial class OpenStatus : ReferenceDataBaseEx<Guid, OpenStatus>
     {
         /// <summary>
         /// Represents a All (both Open and Closed) constant value.

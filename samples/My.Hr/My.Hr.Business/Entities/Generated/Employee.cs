@@ -10,12 +10,12 @@ namespace My.Hr.Business.Entities
     /// <summary>
     /// Represents the Employee entity.
     /// </summary>
-    public partial class Employee : EmployeeBase, IETag, IChangeLog
+    public partial class Employee : EmployeeBase, IETag, IChangeLogEx
     {
         private Address? _address;
         private EmergencyContactCollection? _emergencyContacts;
         private string? _etag;
-        private ChangeLog? _changeLog;
+        private ChangeLogEx? _changeLog;
 
         /// <summary>
         /// Gets or sets the Address (see <see cref="Business.Entities.Address"/>).
@@ -36,7 +36,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
         /// </summary>
-        public ChangeLog? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+        public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

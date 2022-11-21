@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Entities
     /// <summary>
     /// Represents the Maturity Instructions entity.
     /// </summary>
-    public partial class MaturityInstructions : ReferenceDataBase<Guid, MaturityInstructions>
+    public partial class MaturityInstructions : ReferenceDataBaseEx<Guid, MaturityInstructions>
     {
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="MaturityInstructions"/>.
