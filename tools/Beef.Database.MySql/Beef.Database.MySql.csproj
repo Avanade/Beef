@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Product>Beef.Database.SqlServer</Product>
-    <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
-    <PackageTags>beef database sql sqlserver dbup migration schema dbex</PackageTags>
+    <Product>Beef.Database.MySql</Product>
+    <Description>Business Entity Execution Framework (Beef) MySQL Database tool.</Description>
+    <PackageTags>beef database sql mysql dbup migration schema dbex</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,13 +14,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbEx.SqlServer" Version="1.1.2" />
+    <PackageReference Include="DbEx.MySql" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Schema\**\*" />
     <EmbeddedResource Include="Scripts\**\*" />
     <EmbeddedResource Include="Templates\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\Database.yaml" />
+    <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
+    <None Remove="Templates\DbEfModel_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>

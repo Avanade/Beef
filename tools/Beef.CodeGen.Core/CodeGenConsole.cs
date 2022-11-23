@@ -42,9 +42,9 @@ namespace Beef.CodeGen
         public const string ApiNameParamName = "ApiName";
 
         /// <summary>
-        /// Gets the 'CodeGenDatabase' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
+        /// Gets the 'DatabaseMigrator' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
         /// </summary>
-        public const string CodeGenDatabaseParamName = "CodeGenDatabase";
+        public const string DatabaseMigratorParamName = "DatabaseMigrator";
 
         /// <summary>
         /// Gets the default masthead text.

@@ -2,6 +2,7 @@
 
 using DbEx;
 using DbEx.DbSchema;
+using DbEx.Migration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OnRamp;
@@ -317,6 +318,11 @@ namespace Beef.CodeGen.Config.Database
         public List<QueryConfig>? Queries { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DatabaseMigrationBase"/>.
+        /// </summary>
+        public DatabaseMigrationBase? Migrator { get; set; }
+
+        /// <summary>
         /// Gets all the tables that require an EfModel to be generated.
         /// </summary>
         public List<TableConfig> EFModels => Tables!.Where(x => CompareValue(x.EfModel, true)).ToList();
@@ -414,8 +420,9 @@ namespace Beef.CodeGen.Config.Database
             var cs = CodeGenArgs.ConnectionString ?? throw new CodeGenException("Connection string must be specified via an environment variable or as a command-line option.");
 
             var sw = Stopwatch.StartNew();
-            using var db = CodeGenArgs.GetDatabase(cs);
-            DbTables = await db.SelectSchemaAsync().ConfigureAwait(false);
+            Migrator = CodeGenArgs.GetDatabaseMigrator();
+            var db = Migrator.Database;
+            DbTables = await db.SelectSchemaAsync(Migrator.DatabaseSchemaConfig, Migrator.Args.DataParserArgs).ConfigureAwait(false);
 
             sw.Stop();
             CodeGenArgs.Logger?.Log(LogLevel.Information, $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");

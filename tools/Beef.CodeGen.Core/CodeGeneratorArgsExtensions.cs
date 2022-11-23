@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using CoreEx.Database;
+using DbEx.Migration;
 using OnRamp;
 using System;
 using System.Collections.Generic;
@@ -39,18 +40,17 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Gets the <see cref="IDatabase"/> from the coonection details within the <see cref="ICodeGeneratorDbArgs"/>.
+        /// Gets the <see cref="DatabaseMigrationBase"/> from the connection details within the <see cref="ICodeGeneratorDbArgs"/>.
         /// </summary>
         /// <param name="args">The arguments.</param>
-        /// <param name="connectionString">The connection string.</param>
-        /// <returns>The <see cref="IDatabase"/> instance.</returns>
-        public static IDatabase GetDatabase(this ICodeGeneratorArgs args, string connectionString) => (args ?? throw new ArgumentNullException(nameof(args))).GetParameter<IDatabase>(CodeGenConsole.CodeGenDatabaseParamName, true)!;
+        /// <returns>The <see cref="DatabaseMigrationBase"/> instance.</returns>
+        public static DatabaseMigrationBase GetDatabaseMigrator(this ICodeGeneratorArgs args) => (args ?? throw new ArgumentNullException(nameof(args))).GetParameter<DatabaseMigrationBase>(CodeGenConsole.DatabaseMigratorParamName, true)!;
 
         /// <summary>
-        /// Adds the <paramref name="database"/> as the <see cref="CodeGenConsole.CodeGenDatabaseParamName"/> <see cref="ICodeGeneratorArgs.Parameters"/> value.
+        /// Adds the <paramref name="migrator"/> as the <see cref="CodeGenConsole.DatabaseMigratorParamName"/> <see cref="ICodeGeneratorArgs.Parameters"/> value.
         /// </summary>
         /// <param name="args">The arguments.</param>
-        /// <param name="database">The <see cref="IDatabase"/> instance.</param>
-        public static void AddDatabase(this ICodeGeneratorArgs args, IDatabase database) => args.AddParameter(CodeGenConsole.CodeGenDatabaseParamName, database ?? throw new ArgumentNullException(nameof(args)));
+        /// <param name="migrator">The <see cref="DatabaseMigrationBase"/> instance.</param>
+        public static void AddDatabaseMigrator(this ICodeGeneratorArgs args, DatabaseMigrationBase migrator) => args.AddParameter(CodeGenConsole.DatabaseMigratorParamName, migrator ?? throw new ArgumentNullException(nameof(args)));
     }
 }

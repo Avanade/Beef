@@ -66,7 +66,7 @@ namespace Beef.Database
             cga.ValidateCompanyAndAppName();
             cga.ScriptFileName = margs.ScriptFileName;
             cga.ConfigFileName = margs.ConfigFileName ?? CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, cga.GetCompany(true), cga.GetAppName(true));
-            cga.AddDatabase(migrator.Database);
+            cga.AddDatabaseMigrator(migrator);
 
             migrator.Logger.LogInformation("{Content}", string.Empty);
             OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);

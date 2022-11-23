@@ -343,7 +343,7 @@ queries:
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
-            Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x[..1].ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
             ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
 
@@ -487,7 +487,7 @@ queries:
         /// </summary>
         private void UpdateViewMetadata()
         {
-            var dt = new DbTableSchema(ViewSchema!, ViewName!) { IsAView = true };
+            var dt = new DbTableSchema(Root!.Migrator!.DatabaseSchemaConfig, ViewSchema!, ViewName!) { IsAView = true };
             foreach (var c in SelectedColumns)
             {
                 var dc = new DbColumnSchema(dt, c.NameAlias!, c.DbColumn!.Type);
