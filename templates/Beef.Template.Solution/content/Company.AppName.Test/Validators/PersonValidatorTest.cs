@@ -11,7 +11,12 @@ public class PersonValidatorTest
     public void OneTimeSetUp()
     {
         var rd = new Mock<IReferenceDataData>();
+#if (!implement_mysql)
         rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+#endif
+#if (implement_mysql)
+        rd.Setup(x => x.GenderGetAllAsync()).ReturnsAsync(new GenderCollection { new Gender { Id = 1, Code = "F" } });
+#endif
 
         _testSetup = sc => sc
             .AddValidationTextProvider()

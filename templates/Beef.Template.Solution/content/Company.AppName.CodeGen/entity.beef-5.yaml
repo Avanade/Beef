@@ -41,12 +41,20 @@ eventActionFormat: PastTense
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
+//#if (implement_mysql)
+etagDefaultMapperConverter: EncodedStringToDateTimeConverter
+//#endif
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework.
+  # The following is an example Entity with CRUD operations defined accessing a database using EntityFramework.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
     properties: [
+//#if (implement_sqlserver)
       { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataName: PersonId },
+//#endif
+//#if (implement_mysql)
+      { name: Id, text: '{{Person}} identifier', type: int, primaryKey: true, dataName: PersonId },
+//#endif
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender, dataName: GenderCode },
@@ -72,6 +80,7 @@ entities:
   }
 //#endif
 //#if (implement_cosmos)
+cosmosName: ICosmos
 eventSubjectRoot: Company
 eventActionFormat: PastTense
 eventSourceRoot: Company/AppName
@@ -79,11 +88,11 @@ eventSourceKind: Relative
 webApiAutoLocation: true
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing Cosmos DB.
+  # The following is an example Entity with CRUD operations defined accessing a Cosmos DB.
 
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: Cosmos, cosmosContainerId: Person, cosmosModel: Model.Person,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Cosmos, cosmosContainerId: Persons, cosmosModel: Model.Person,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },
+      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -114,10 +123,10 @@ eventActionFormat: PastTense
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
-httpAgentName: IXxxAgent
+httpAgentName: XxxAgent
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
+  # The following is an example Entity with CRUD operations defined accessing an HTTP endpoint.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: HttpAgent, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },
@@ -138,7 +147,7 @@ eventSourceKind: Relative
 webApiAutoLocation: true
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
+  # The following is an example Entity with CRUD operations with no auto implementation.
 - { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true,
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },

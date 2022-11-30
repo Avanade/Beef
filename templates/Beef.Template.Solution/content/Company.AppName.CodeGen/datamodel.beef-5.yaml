@@ -1,0 +1,15 @@
+# Defines the internal model (persisted in Cosmos).
+jsonSerializer: Newtonsoft
+etagJsonName: _etag
+entities:
+- { name: Person, text: Person model for data persistence,
+    properties: [
+      { name: Id, text: '{{Person}} identifier', type: string, primaryKey: true },
+      { name: FirstName },
+      { name: LastName },
+      { name: Gender },
+      { name: Birthday, type: DateTime },
+      { name: ETag, },
+      { name: ChangeLog, type: ChangeLog }
+    ]
+  }

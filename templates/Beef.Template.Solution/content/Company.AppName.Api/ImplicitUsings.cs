@@ -9,11 +9,14 @@ global using Microsoft.AspNetCore.Mvc;
 #if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
 #endif
-#if (implement_database || implement_entityframework)
+#if (implement_database || implement_sqlserver)
 global using Microsoft.Data.SqlClient;
 #endif
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
+#if (implement_mysql)
+global using MySql.Data.MySqlClient;
+#endif
 global using System.Net;
 global using System.Reflection;
 global using Company.AppName.Business;

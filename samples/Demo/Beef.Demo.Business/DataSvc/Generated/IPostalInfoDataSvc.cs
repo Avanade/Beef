@@ -40,6 +40,14 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
         Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city);
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city);
     }
 }
 

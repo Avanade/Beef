@@ -1,4 +1,9 @@
 ﻿AppName:
+//#if (implement_database || implement_sqlserver)
   - $Gender:
+//#endif
+//#if (implement_mysql)
+  - $gender:
+//#endif
     - M: Male
     - F: Female

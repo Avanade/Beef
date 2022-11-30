@@ -1,5 +1,5 @@
-﻿schema: AppName
-//#if (implement_database)
+﻿//#if (implement_database)
+schema: AppName
 tables:
   # Reference data stored procedures
 - { name: Gender, getAll: true }
@@ -21,11 +21,23 @@ tables:
     ]
   }
 //#endif
-//#if (implement_entityframework)
+//#if (implement_sqlserver)
+schema: AppName
 tables:
   # Reference data tables/models.
 - { name: Gender, efModel: true }
 
   # Master data tables/models.
 - { name: Person, efModel: true }
+//#endif
+//#if (implement_mysql)
+schema: ''
+autoDotNetRename: SnakeKebabToPascalCase
+columnNameRowVersion: row_version
+tables:
+  # Reference data tables/models.
+- { name: gender, efModel: true }
+
+  # Master data tables/models.
+- { name: person, efModel: true }
 //#endif

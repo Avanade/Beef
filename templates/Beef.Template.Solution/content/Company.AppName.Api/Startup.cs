@@ -27,9 +27,14 @@ public class Startup
                 .AddValidators<PersonValidator>()
                 .AddSingleton<IIdentifierGenerator, IdentifierGenerator>();
 
-#if (implement_database || implement_entityframework)
+#if (implement_database || implement_sqlserver)
         // Add the database services (scoped per request/connection).
         services.AddDatabase(sp => new AppNameDb(() => new SqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+
+#endif
+#if (implement_mysql)
+        // Add the database services (scoped per request/connection).
+        services.AddDatabase(sp => new AppNameDb(() => new MySqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
 
 #endif
 #if (implement_entityframework)
@@ -42,7 +47,7 @@ public class Startup
         // Add the cosmos database.
         services.AddSingleton<ICosmos>(sp =>
         {
-            var settings = sp.GetRequiredService<BankingSettings>();
+            var settings = sp.GetRequiredService<AppNameSettings>();
             var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
             return new CosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
         });
@@ -50,9 +55,7 @@ public class Startup
 #endif
 #if (implement_httpagent)
         // Add the HTTP agent services.
-        services.AddHttpClient("Xxx", c => c.BaseAddress = new Uri(_config.GetValue<string>("XxxAgentUrl")));
-        services.AddScoped<IXxxAgentArgs>(sp => new XxxAgentArgs(sp.GetService<IHttpClientFactory>().CreateClient("Xxx")));
-        services.AddScoped<IXxxAgent, XxxAgent>();
+        services.AddHttpClient<XxxAgent>("Xxx", (sp, c) => c.BaseAddress = new Uri(sp.GetRequiredService<AppNameSettings>().XxxAgentUrl));
 
 #endif
         // Add the generated reference data services.

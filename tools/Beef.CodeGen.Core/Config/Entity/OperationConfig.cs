@@ -1289,7 +1289,12 @@ operations: [
             if (!string.IsNullOrEmpty(HttpAgentCode))
                 sb.Append($".{HttpAgentCode}");
 
-            sb.Append($".{HttpAgentMethod}MappedAsync");
+            sb.Append($".{HttpAgentMethod}");
+            if (HttpAgentMethod != "Delete")
+                sb.Append("MappedAsync");
+            else
+                sb.Append("Async");
+
             if (HttpAgentModel != null && HttpAgentReturnModel != null)
                 sb.Append($"<{ValueType}, {HttpAgentModel}, {BaseReturnType}, {HttpAgentReturnModel}>(");
             else if (HttpAgentModel != null)

@@ -29,7 +29,12 @@ public class AppNameEfDbContext : DbContext, IEfDbContext
 
         // Uses the DB connection management from the database class - ensures DB connection pooling and required DB session context setting.
         if (!optionsBuilder.IsConfigured)
+#if (implement_sqlserver)
             optionsBuilder.UseSqlServer(BaseDatabase.GetConnection());
+#endif
+#if (implement_mysql)
+            optionsBuilder.UseMySQL(BaseDatabase.GetConnection());
+#endif
     }
 
     /// <summary>

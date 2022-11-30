@@ -81,6 +81,24 @@ namespace Beef.Demo.Business
 
             return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
         }, InvokerArgs.Update);
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        public Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        {
+            Cleaner.CleanUp(country, state, city);
+            await MultiValidator.Create()
+                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
+                .Add(state.Validate(nameof(state)).Mandatory())
+                .Add(city.Validate(nameof(city)).Mandatory())
+                .ValidateAsync(true).ConfigureAwait(false);
+
+            await _dataService.DeletePostCodesAsync(country, state, city).ConfigureAwait(false);
+        }, InvokerArgs.Delete);
     }
 }
 

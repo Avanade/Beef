@@ -260,6 +260,13 @@ entities:
           { name: State, isMandatory: true },
           { name: City, isMandatory: true }
         ]
+      },
+      { name: DeletePostCodes, type: Delete, webApiRoute: '{country}/{state}/{city}', httpAgentRoute: '{country.Code}/{state}/{city}',
+        parameters: [
+          { name: Country, type: ^Country, isMandatory: true, validatorCode: IsValid() },
+          { name: State, isMandatory: true },
+          { name: City, isMandatory: true }
+        ]
       }
     ]
   }

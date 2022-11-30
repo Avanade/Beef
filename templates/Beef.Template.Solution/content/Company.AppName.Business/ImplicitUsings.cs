@@ -11,8 +11,11 @@ global using CoreEx.Cosmos;
 global using CoreEx.Database.Extended;
 global using CoreEx.Database.Mapping;
 #endif
-#if (implement_database || implement_entityframework)
+#if (implement_database || implement_sqlserver)
 global using CoreEx.Database.SqlServer;
+#endif
+#if (implement_mysql)
+global using CoreEx.Database.MySql;
 #endif
 global using CoreEx.Entities;
 global using CoreEx.Entities.Extended;
@@ -21,6 +24,7 @@ global using CoreEx.EntityFrameworkCore;
 #endif
 global using CoreEx.Events;
 global using CoreEx.Http;
+global using CoreEx.Http.Extended;
 global using CoreEx.Invokers;
 global using CoreEx.Json;
 global using CoreEx.Mapping;
@@ -32,7 +36,7 @@ global using CoreEx.Validation.Rules;
 #if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
 #endif
-#if (implement_database || implement_entityframework)
+#if (implement_database || implement_sqlserver)
 global using Microsoft.Data.SqlClient;
 #endif
 #if (implement_entityframework)
@@ -40,6 +44,9 @@ global using Microsoft.EntityFrameworkCore;
 #endif
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Logging;
+#if (implement_mysql)
+global using MySql.Data.MySqlClient;
+#endif
 global using System;
 global using System.Collections.Generic;
 #if (implement_database || implement_entityframework)

@@ -72,6 +72,17 @@ namespace Beef.Demo.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> DeletePostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -141,6 +152,18 @@ namespace Beef.Demo.Common.Agents
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult> DeletePostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => DeleteAsync("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
     }
 }
 

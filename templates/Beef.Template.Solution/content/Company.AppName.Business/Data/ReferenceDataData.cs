@@ -2,10 +2,12 @@
 
 public partial class ReferenceDataData
 {
-    private Task GenderGetAll_OnImplementation(GenderCollection coll)
+    private Task<GenderCollection> GenderGetAll_OnImplementationAsync()
     {
-        coll.Add(new Gender { Id = Guid.NewGuid(), Code = "F", Text = "Female", IsActive = true, SortOrder = 1 });
-        coll.Add(new Gender { Id = Guid.NewGuid(), Code = "M", Text = "Male", IsActive = true, SortOrder = 2 });
-        return Task.CompletedTask;
+        return Task.FromResult(new GenderCollection
+        {
+            new Gender { Id = Guid.NewGuid(), Code = "F", Text = "Female", IsActive = true, SortOrder = 1 },
+            new Gender { Id = Guid.NewGuid(), Code = "M", Text = "Male", IsActive = true, SortOrder = 2 }
+        });
     }
 }

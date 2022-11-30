@@ -35,15 +35,19 @@
       "choices": [
         {
           "choice": "Cosmos",
-          "description": "Indicates that the data source is Cosmos DB."
+          "description": "Indicates that the data source is an Azure Cosmos DB."
         },
         {
           "choice": "Database",
-          "description": "Indicates that the data source is a SQL Database accessed via Stored Procedures."
+          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Stored Procedures."
         },
         {
-          "choice": "EntityFramework",
-          "description": "Indicates that the data source is a SQL Database accessed via Entity Framework Core."
+          "choice": "SqlServer",
+          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Entity Framework Core."
+        },
+        {
+          "choice": "MySQL",
+          "description": "Indicates that the data source is a MySQL Database accessed via Entity Framework Core."
         },
         {
           "choice": "HttpAgent",
@@ -74,7 +78,7 @@
     "beef_version": {
       "type": "parameter",
       "replaces": "BeefVersion",
-      "defaultValue": "5.0.1-preview3",
+      "defaultValue": "5.0.1-preview4",
       "datatype": "text",
       "description": "The Beef packages version."
     },
@@ -86,9 +90,17 @@
       "type": "computed",
       "value": "(datasource == \"Database\")"
     },
+    "implement_sqlserver": {
+      "type": "computed",
+      "value": "(datasource == \"SqlServer\")"
+    },
+    "implement_mysql": {
+      "type": "computed",
+      "value": "(datasource == \"MySQL\")"
+    },
     "implement_entityframework": {
       "type": "computed",
-      "value": "(datasource == \"EntityFramework\")"
+      "value": "(datasource == \"SqlServer\" || datasource == \"MySQL\")"
     },
     "implement_httpagent": {
       "type": "computed",
@@ -119,12 +131,20 @@
           "exclude": [ "Company.AppName.Database/**/*" ]
         },
         {
+          "condition": "(implement_database || implement_sqlserver)",
+          "exclude": [ "Company.AppName.Database/Migrations/20190101-000001-create-gender.sql", "Company.AppName.Database/Migrations/20190101-000002-create-person.sql" ]
+        },
+        {
+          "condition": "(implement_mysql)",
+          "exclude": [ "Company.AppName.Database/Migrations/20190101-000001-create-AppName-schema.sql", "Company.AppName.Database/Migrations/20190101-000002-create-AppName-Gender.sql", "Company.AppName.Database/Migrations/20190101-000003-create-AppName-Person.sql" ]
+        },
+        {
           "condition": "(!implement_entityframework)",
           "exclude": [ "Company.AppName.Business/Data/AppNameEfDb.cs", "Company.AppName.Business/Data/AppNameEfDbContext.cs" ]
         },
         {
           "condition": "(!implement_cosmos)",
-          "exclude": [ "Company.AppName.Business/Data/AppNameCosmosDb.cs", "Company.AppName.Test/Cosmos/**/*" ]
+          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs", "Company.AppName.Test/Cosmos/**/*", "Company.AppName.CodeGen/datamodel.beef-5.yaml" ]
         },
         {
           "condition": "(!implement_httpagent)",

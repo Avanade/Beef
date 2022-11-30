@@ -1,6 +1,11 @@
 ﻿[
   {
+    //#if (!implement_mysql)
     "id": "00000003-0000-0000-0000-000000000000",
+    //#endif
+    //#if (implement_mysql)
+    "id": 3,
+    //#endif
     "firstName": "Rachael",
     "lastName": "Browne",
     "gender": "F",
@@ -8,7 +13,12 @@
     "birthday": "1972-06-28T00:00:00"
   },
   {
+    //#if (!implement_mysql)
     "id": "00000001-0000-0000-0000-000000000000",
+    //#endif
+    //#if (implement_mysql)
+    "id": 1,
+    //#endif
     "firstName": "Wendy",
     "lastName": "Jones",
     "gender": "F",

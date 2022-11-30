@@ -62,6 +62,17 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        public async Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
+        {
+            await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.
         /// </summary>
         public partial class EntityToModelHttpAgentMapper : Mapper<PostalInfo, Model.PostalInfo>

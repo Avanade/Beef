@@ -15,7 +15,12 @@ public class FixtureSetUp
             using var test = ApiTester.Create<Startup>();
             var settings = test.Services.GetRequiredService<AppNameSettings>();
             var args = Database.Program.ConfigureMigrationArgs(new MigrationArgs(count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString)).AddAssembly<FixtureSetUp>();
+#if (implement_database || implement_sqlserver)
             var (Success, Output) = await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+#endif
+#if (implement_mysql)
+            var (Success, Output) = await new MySqlMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+#endif
             if (!Success)
                 Assert.Fail(Output);
 
@@ -27,54 +32,49 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        using var test = ApiTester.Create<Startup>();
-        _cosmosDb = test.Services.GetRequiredService<ICosmos>();
+        TestSetUp.Default.ExpectedEventsEnabled = true;
+        TestSetUp.Default.ExpectNoEvents = true;
 
-        await _cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(_cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
-
-        var ac = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
+        TestSetUp.Default.RegisterSetUp(async (count, _, ct) =>
         {
-            Id = _cosmosDb.Accounts.Container.Id,
-            PartitionKeyPath = "/_partitionKey"
-        }, 400, cancellationToken: ct).ConfigureAwait(false);
+            // Setup and load cosmos once only.
+            if (count == 0)
+            {
+                using var test = ApiTester.Create<Startup>();
+                var cosmosDb = test.Services.GetRequiredService<ICosmos>();
 
-        var tc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
-        {
-            Id = _cosmosDb.Transactions.Container.Id,
-            PartitionKeyPath = "/accountId"
-        }, 400, cancellationToken: ct).ConfigureAwait(false);
+                await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
-        var rdc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
-        {
-            Id = "RefData",
-            PartitionKeyPath = "/_partitionKey",
-            UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-        }, 400, cancellationToken: ct).ConfigureAwait(false);
+                var ac = await cosmosDb.Database.ReplaceOrCreateContainerAsync(new AzCosmos.ContainerProperties
+                {
+                    Id = cosmosDb.Persons.Container.Id,
+                    PartitionKeyPath = "/_partitionKey"
+                }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-        var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
-        await _cosmosDb.Accounts.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
-        await _cosmosDb.Transactions.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
+                var rdc = await cosmosDb.Database.ReplaceOrCreateContainerAsync(new AzCosmos.ContainerProperties
+                {
+                    Id = "RefData",
+                    PartitionKeyPath = "/_partitionKey",
+                    UniqueKeyPolicy = new AzCosmos.UniqueKeyPolicy { UniqueKeys = { new AzCosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
+                }, 400, cancellationToken: ct).ConfigureAwait(false);
 
-        jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
-        await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
+                var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Person.yaml");
+                await cosmosDb.Persons.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
-        return true;
-    }
+                jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
+                await cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
+            }
 
-    [OneTimeTearDown]
-    public async Task OneTimeTearDown()
-    {
-        if (_cosmosDb != null && _removeAfterUse)
-            await _cosmosDb.Database.DeleteAsync().ConfigureAwait(false);
+            return true;
+        });
     }
 #endif
 #if (implement_httpagent || implement_none)
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
-        TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
-        TestSetUp.DefaultExpectNoEvents = false;
+        TestSetUp.Default.ExpectedEventsEnabled = true;
+        TestSetUp.Default.ExpectNoEvents = true;
     }
 #endif
 }

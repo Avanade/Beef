@@ -8,6 +8,7 @@ public class PersonTest : UsingApiTester<Startup>
 #if (!implement_httpagent)
     [OneTimeSetUp]
     public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
+#endif
 
     #region Get
 
@@ -16,7 +17,12 @@ public class PersonTest : UsingApiTester<Startup>
     {
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.NotFound)
+#if (!implement_mysql)
             .Run(a => a.GetAsync(404.ToGuid()));
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(404));
+#endif
     }
 
     [Test]
@@ -28,13 +34,23 @@ public class PersonTest : UsingApiTester<Startup>
             .IgnoreETag()
             .ExpectValue(_ => new Person
             {
+#if (!implement_mysql)
                 Id = 1.ToGuid(),
+#endif
+#if (implement_mysql)
+                Id = 1,
+#endif
                 FirstName = "Wendy",
                 LastName = "Jones",
                 Gender = "F",
                 Birthday = new DateTime(1985, 03, 18)
             })
+#if (!implement_mysql)
             .Run(a => a.GetAsync(1.ToGuid()));
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(1));
+#endif
     }
 
     [Test]
@@ -42,13 +58,23 @@ public class PersonTest : UsingApiTester<Startup>
     {
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (!implement_mysql)
             .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag })).Value!;
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(1, new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag })).Value!;
+#endif
 
         Assert.NotNull(v);
 
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.NotModified)
+#if (!implement_mysql)
             .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { ETag = v.ETag }));
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(1, new HttpRequestOptions { ETag = v.ETag }));
+#endif
     }
 
     #endregion
@@ -189,19 +215,34 @@ public class PersonTest : UsingApiTester<Startup>
         // Get an existing value.
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (!implement_mysql)
             .Run(a => a.GetAsync(2.ToGuid())).Value!;
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(2)).Value!;
+#endif
 
         // Try updating with an invalid identifier.
         Agent<PersonAgent, Person>()
             .ExpectStatusCode(HttpStatusCode.NotFound)
+#if (!implement_mysql)
             .Run(a => a.UpdateAsync(v, 404.ToGuid()));
+#endif
+#if (implement_mysql)
+            .Run(a => a.UpdateAsync(v, 404));
+#endif
     }
 
     [Test]
     public void C120_Update_Concurrency()
     {
         // Get an existing value.
+#if (!implement_mysql)
         var id = 2.ToGuid();
+#endif
+#if (implement_mysql)
+        var id = 2;
+#endif
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(id)).Value!;
@@ -222,7 +263,12 @@ public class PersonTest : UsingApiTester<Startup>
     public void C130_Update()
     {
         // Get an existing value.
+#if (!implement_mysql)
         var id = 2.ToGuid();
+#endif
+#if (implement_mysql)
+        var id = 2;
+#endif
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(id)).Value!;
@@ -258,19 +304,34 @@ public class PersonTest : UsingApiTester<Startup>
         // Get an existing value.
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (!implement_mysql)
             .Run(a => a.GetAsync(2.ToGuid())).Value!;
+#endif
+#if (implement_mysql)
+            .Run(a => a.GetAsync(2)).Value!;
+#endif
 
         // Try patching with an invalid identifier.
         Agent<PersonAgent, Person>()
             .ExpectStatusCode(HttpStatusCode.NotFound)
+#if (!implement_mysql)
             .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404.ToGuid()));
+#endif
+#if (implement_mysql)
+            .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404));
+#endif
     }
 
     [Test]
     public void D120_Patch_Concurrency()
     {
         // Get an existing value.
+#if (!implement_mysql)
         var id = 2.ToGuid();
+#endif
+#if (implement_mysql)
+        var id = 2;
+#endif
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(id)).Value!;
@@ -290,7 +351,12 @@ public class PersonTest : UsingApiTester<Startup>
     public void D130_Patch()
     {
         // Get an existing value.
+#if (!implement_mysql)
         var id = 2.ToGuid();
+#endif
+#if (implement_mysql)
+        var id = 2;
+#endif
         var v = Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(id)).Value!;
@@ -323,7 +389,12 @@ public class PersonTest : UsingApiTester<Startup>
     public void E110_Delete()
     {
         // Check value exists.
+#if (!implement_mysql)
         var id = 4.ToGuid();
+#endif
+#if (implement_mysql)
+        var id = 4;
+#endif
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(id));

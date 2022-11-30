@@ -113,14 +113,21 @@ namespace Beef.Template.Solution.UnitTest
         }
 
         [Test]
-        public void EntityFramework()
+        public void SqlServer()
         {
             OneTimeSetUp();
-            SolutionCreateGenerateTest("Foo.Ef", "Bar", "EntityFramework");
+            SolutionCreateGenerateTest("Foo.Ef", "Bar", "SqlServer");
         }
 
         [Test]
-        public void CosmosDb()
+        public void MySQL()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.My", "Bar", "MySQL");
+        }
+
+        [Test]
+        public void Cosmos()
         {
             OneTimeSetUp();
             SolutionCreateGenerateTest("Foo.Co", "Bar", "Cosmos");
@@ -148,7 +155,7 @@ namespace Beef.Template.Solution.UnitTest
             Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
-            if (datasource == "Database" || datasource == "EntityFramework")
+            if (datasource == "Database" || datasource == "SqlServer" || datasource == "MySQL")
             {
                 Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");

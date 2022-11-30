@@ -1,9 +1,21 @@
 ﻿#if (implement_database || implement_entityframework)
 global using Beef.Database;
+#endif
+#if (implement_database || implement_sqlserver)
 global using Beef.Database.SqlServer;
 #endif
+#if (implement_mysql)
+global using Beef.Database.MySql;
+#endif
 global using CoreEx;
+#if (implement_cosmos)
+global using CoreEx.Cosmos;
+global using CoreEx.Cosmos.Batch;
+#endif
 global using CoreEx.Entities;
+#if (implement_cosmos)
+global using CoreEx.Json.Data;
+#endif
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;

@@ -22,7 +22,7 @@ public class AppNameSettings : SettingsBase
     /// </summary>
     public string DatabaseConnectionString => GetValue<string>("ConnectionStrings__Database");
 #endif
-#if (implement_database)
+#if (implement_cosmos)
 
     /// <summary>
     /// Gets the CosmosDB connection string.
@@ -33,5 +33,12 @@ public class AppNameSettings : SettingsBase
     /// Gtes the CosmosDB database identifier.
     /// </summary>
     public string CosmosDatabaseId => GetRequiredValue<string>();
+#endif
+#if (implement_httpagent)
+
+    /// <summary>
+    /// Gets the XxxAgent URL.
+    /// </summary>
+    public string XxxAgentUrl => GetRequiredValue<string>();
 #endif
 }

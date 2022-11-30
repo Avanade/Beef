@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Database.SqlServer" Version="BeefVersion" />
     <PackageReference Include="Beef.CodeGen.Core" Version="BeefVersion" />
+    <!--#if (implement_database || implement_sqlserver) -->
+    <PackageReference Include="Beef.Database.SqlServer" Version="BeefVersion" />
+    <!--#endif -->
+    <!--#if (implement_mysql) -->
+    <PackageReference Include="Beef.Database.MySql" Version="BeefVersion" />
+    <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>

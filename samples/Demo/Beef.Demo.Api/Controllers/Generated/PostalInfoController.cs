@@ -78,6 +78,17 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchPostCodes(string? country, string? state, string? city) =>
             _webApi.PatchAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        [HttpDelete("{country}/{state}/{city}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public Task<IActionResult> DeletePostCodes(string? country, string? state, string? city) =>
+            _webApi.DeleteAsync(Request, p => _manager.DeletePostCodesAsync(country, state, city));
     }
 }
 

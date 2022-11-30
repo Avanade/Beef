@@ -135,7 +135,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'HttpAgent'}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}{{HttpAgentSendStatement}}
+            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}__result = {{/if}}{{else}}{{#if DataSingleLine}}{{#if HasReturnValue}}return {{/if}}{{/if}}{{/ifor}}{{HttpAgentSendStatement}}
       {{/ifeq}}
       {{#if DataExtensions}}
             await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each CoreDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{ArgumentName}}{{/each}})).ConfigureAwait(false);

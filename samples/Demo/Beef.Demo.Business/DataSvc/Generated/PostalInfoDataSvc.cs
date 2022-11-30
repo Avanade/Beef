@@ -63,6 +63,18 @@ namespace Beef.Demo.Business.DataSvc
             _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
             return __result;
         }, new InvokerArgs { EventPublisher = _events });
+
+        /// <summary>
+        /// Deletes the specified <see cref="PostalInfo"/>.
+        /// </summary>
+        /// <param name="country">The Country.</param>
+        /// <param name="state">The State.</param>
+        /// <param name="city">The City.</param>
+        public Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        {
+            await _data.DeletePostCodesAsync(country, state, city).ConfigureAwait(false);
+            _events.PublishEvent(new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete");
+        }, new InvokerArgs { EventPublisher = _events });
     }
 }
 

@@ -25,7 +25,7 @@ namespace Cdr.Banking.Business
         public string CosmosConnectionString => GetRequiredValue<string>();
 
         /// <summary>
-        /// Gtes the CosmosDB database identifier.
+        /// Gets the CosmosDB database identifier.
         /// </summary>
         public string CosmosDatabaseId => GetRequiredValue<string>();
     }

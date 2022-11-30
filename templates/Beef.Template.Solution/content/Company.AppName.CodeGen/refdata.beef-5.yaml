@@ -5,15 +5,22 @@ entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures.
   - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: Database }
 //#endif
-//#if (implement_entityframework)
+//#if (implement_sqlserver)
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
   - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
 //#endif
+//#if (implement_mysql)
+etagDefaultMapperConverter: EncodedStringToDateTimeConverter
+entities:
+  # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
+  - { name: Gender, refDataType: int, Collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+//#endif
 //#if (implement_cosmos)
+cosmosName: ICosmos
 entities:
   # The following is an example read-only reference data Entity accessing Cosmos DB.
-  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, dataModel: true, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosModel: Model.Gender }
+  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.Gender, dataModel: true }
 //#endif
 //#if (implement_httpagent)
 entities:

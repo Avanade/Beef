@@ -9,15 +9,21 @@
     <!--#if (implement_cosmos) -->
     <PackageReference Include="CoreEx.Cosmos" Version="CoreExVersion" />
     <!--#endif -->
-    <!--#if (implement_database || implement_entityframework) -->
+    <!--#if (implement_database || implement_sqlserver) -->
     <PackageReference Include="CoreEx.Database.SqlServer" Version="CoreExVersion" />
+    <!--#endif -->
+    <!--#if (implement_mysql) -->
+    <PackageReference Include="CoreEx.Database.MySql" Version="CoreExVersion" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
     <PackageReference Include="CoreEx.EntityFrameworkCore" Version="CoreExVersion" />
     <!--#endif -->
     <PackageReference Include="CoreEx.Validation" Version="CoreExVersion" />
-    <!--#if (implement_entityframework) -->
+    <!--#if (implement_sqlserver) -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+    <!--#endif -->
+    <!--#if (implement_mysql) -->
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
     <!--#endif -->
   </ItemGroup>
 </Project>
