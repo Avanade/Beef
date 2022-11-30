@@ -29,8 +29,6 @@ namespace Beef.Database.SqlServer
                 if (!args.Assemblies.Contains(typeof(SqlServerMigration).Assembly))
                     args.Assemblies.Add(typeof(SqlServerMigration).Assembly);
             }
-
-            this.Initialization();
         }
 
         /// <summary>

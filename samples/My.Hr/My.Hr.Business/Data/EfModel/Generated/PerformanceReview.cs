@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Hr.PerformanceReview'.
+    /// Represents the Entity Framework (EF) model for database object '[Hr].[PerformanceReview]'.
     /// </summary>
     public partial class PerformanceReview
     {

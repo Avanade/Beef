@@ -108,6 +108,11 @@
           "title": "The default .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
           "description": "Defaults to 'IHttpAgent'. This can be overridden within the 'Entity'(s)."
         },
+        "etagDefaultMapperConverter": {
+          "type": "string",
+          "title": "The default ETag to/from RowVersion column Mapping Converter used where 'Operation.AutoImplement' is 'Database' or 'EntityFramework'.",
+          "description": "Defaults to 'StringToBase64Converter'."
+        },
         "refDataDefaultMapperConverter": {
           "type": "string",
           "title": "The default Reference Data property 'Converter' used by the generated 'Mapper'(s) where not specifically defined.",
@@ -352,7 +357,7 @@
         "inherits": {
           "type": "string",
           "title": "The base class that the entity inherits from.",
-          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBase<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
+          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseEx<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
         },
         "implements": {
           "type": "string",
@@ -692,13 +697,8 @@
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET 'Type' that will perform the validation.",
+          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
           "description": "Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
-        },
-        "iValidator": {
-          "type": "string",
-          "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to 'IValidatorEx<Xxx>' (where 'Xxx' is the entity 'Name') where 'Validator' is not 'null'. Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
         },
         "identifierGenerator": {
           "type": "boolean",
@@ -1286,13 +1286,8 @@
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET Type that will perform the validation.",
-          "description": "Defaults to the 'Entity.Validator' where not specified explicitly. Only used for 'Operation.Type' options 'Create' or 'Update'."
-        },
-        "iValidator": {
-          "type": "string",
-          "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to the 'Entity.IValidator' where specified; otherwise, defaults to 'IValidatorEx<{Type}>' where the '{Type}' is 'ValueType'. Only used 'Operation.Type' options 'Create' or 'Update'."
+          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
+          "description": "Defaults to the 'Entity.Validator' where not specified explicitly (where 'Operation.Type' options 'Create' or 'Update')."
         },
         "managerOperationType": {
           "type": "string",

@@ -60,14 +60,14 @@
     "coreex_version": {
       "type": "parameter",
       "replaces": "CoreExVersion",
-      "defaultValue": "1.0.13",
+      "defaultValue": "2.0.0",
       "datatype": "text",
       "description": "The CoreEx packages version."
     },
     "unittestex_version": {
       "type": "parameter",
       "replaces": "UnitTestExVersion",
-      "defaultValue": "1.0.28",
+      "defaultValue": "2.0.0",
       "datatype": "text",
       "description": "The UnitTestEx packages version."
     },

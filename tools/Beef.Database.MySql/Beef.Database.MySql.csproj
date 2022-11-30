@@ -14,19 +14,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbEx.MySql" Version="1.1.2" />
+    <PackageReference Include="DbEx.MySql" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Schema\**\*" />
     <EmbeddedResource Include="Scripts\**\*" />
-    <EmbeddedResource Include="Templates\**\*" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Scripts\Database.yaml" />
-    <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
-    <None Remove="Templates\DbEfModel_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>

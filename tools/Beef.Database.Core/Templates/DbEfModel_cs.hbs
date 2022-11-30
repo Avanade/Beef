@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object '{{Name}}'.
+    /// Represents the Entity Framework (EF) model for database object '{{DbTable.QualifiedName}}'.
     /// </summary>
     public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{#ifval ColumnTenantId}}, ITenantId{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : ITenantId{{/ifval}}{{/ifval}}
     {
@@ -49,7 +49,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 
             modelBuilder.Entity<{{EfModelName}}>(entity =>
             {
-                entity.{{#if DbTable.IsAView}}ToView{{else}}ToTable{{/if}}("{{Name}}"");
+                entity.{{#if DbTable.IsAView}}ToView{{else}}ToTable{{/if}}("{{Name}}"{{#ifne Schema ''}}, "{{Schema}}"{{/ifne}});
                 entity.HasKey({{#each PrimaryKeyColumns}}nameof({{NameAlias}}){{#unless @last}}, {{/unless}}{{/each}});
 {{#each CoreColumns}}
                 entity.Property(p => p.{{NameAlias}}).HasColumnName("{{Name}}").HasColumnType("{{EfSqlType}}"){{#if DbColumn.IsComputed}}.ValueGeneratedOnAddOrUpdate(){{/if}}{{#if IsRowVersionColumn}}.IsRowVersion(){{/if}}{{#if IsCreated}}.ValueGeneratedOnUpdate(){{/if}}{{#if IsUpdated}}.ValueGeneratedOnAdd(){{/if}};

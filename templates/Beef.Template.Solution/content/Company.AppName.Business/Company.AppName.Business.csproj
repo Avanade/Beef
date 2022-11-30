@@ -16,5 +16,8 @@
     <PackageReference Include="CoreEx.EntityFrameworkCore" Version="CoreExVersion" />
     <!--#endif -->
     <PackageReference Include="CoreEx.Validation" Version="CoreExVersion" />
+    <!--#if (implement_entityframework) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+    <!--#endif -->
   </ItemGroup>
 </Project>

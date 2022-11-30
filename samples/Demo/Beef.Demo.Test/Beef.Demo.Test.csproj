@@ -57,7 +57,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="UnitTestEx.NUnit" Version="1.0.28" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

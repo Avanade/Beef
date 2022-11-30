@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Beef.Demo.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Test.Table'.
+    /// Represents the Entity Framework (EF) model for database object '[Test].[Table]'.
     /// </summary>
     public partial class Table : ILogicallyDeleted, ITenantId
     {

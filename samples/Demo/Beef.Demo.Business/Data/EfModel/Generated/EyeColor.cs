@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Beef.Demo.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.EyeColor'.
+    /// Represents the Entity Framework (EF) model for database object '[Ref].[EyeColor]'.
     /// </summary>
     public partial class EyeColor
     {

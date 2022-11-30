@@ -198,6 +198,14 @@ entities:
         public string? HttpAgentName { get; set; }
 
         /// <summary>
+        /// Gets or sets the default ETag to/from RowVersion Mapping Converter used.
+        /// </summary>
+        [JsonProperty("etagDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Data", Title = "The default ETag to/from RowVersion column Mapping Converter used where `Operation.AutoImplement` is `Database` or `EntityFramework`.", IsImportant = true,
+            Description = "Defaults to `StringToBase64Converter`.")]
+        public string? ETagDefaultMapperConverter { get; set; }
+
+        /// <summary>
         /// Gets or sets the default Reference Data property Converter used by the generated Mapper(s) where not specifically defined.
         /// </summary>
         [JsonProperty("refDataDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -511,6 +519,7 @@ entities:
             HttpAgentName = DefaultWhereNull(HttpAgentName, () => "IHttpAgent");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "SystemText");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
+            ETagDefaultMapperConverter = DefaultWhereNull(ETagDefaultMapperConverter, () => nameof(CoreEx.Mapping.Converters.StringToBase64Converter));
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter<T>");
             RefDataCodeDataName = DefaultWhereNull(RefDataCodeDataName, () => "Code");
             RefDataTextDataName = DefaultWhereNull(RefDataTextDataName, () => "Text");

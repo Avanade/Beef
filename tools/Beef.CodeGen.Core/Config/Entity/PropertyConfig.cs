@@ -723,7 +723,7 @@ properties: [
                 SerializationIgnore = true;
 
             DataName = DefaultWhereNull(DataName, () => (Name == "ETag" && (Parent!.AutoImplement == "Database" || Parent.AutoImplement == "EntityFramework")) ? "RowVersion" : null);
-            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? ((Name == "ETag" && (Parent!.AutoImplement == "Database" || Parent.AutoImplement == "EntityFramework")) ? "StringToBase64Converter" : "") : Root!.RefDataDefaultMapperConverter);
+            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? ((Name == "ETag" && (Parent!.AutoImplement == "Database" || Parent.AutoImplement == "EntityFramework")) ? Root!.ETagDefaultMapperConverter : "") : Root!.RefDataDefaultMapperConverter);
             var rdc = ReformatDataConverter(DataConverter, Type, RefDataType, RefDataGetValueType);
             DataConverter = rdc.DataConverter;
             RefDataGetValueType = rdc.RefDataGetValueType;

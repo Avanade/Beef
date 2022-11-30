@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
+using DbEx.Console;
 using DbEx.Migration;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,19 +19,6 @@ namespace Beef.Database
     /// </summary>
     public static class DatabaseMigrationExtensions
     {
-        /// <summary>
-        /// Performs standard <see cref="DatabaseMigrationBase"/> initialization.
-        /// </summary>
-        /// <param name="migrator">The <see cref="DatabaseMigrationBase"/>.</param>
-        public static void Initialization(this DatabaseMigrationBase migrator)
-        {
-            if (migrator.Args.DataParserArgs.RefDataColumnDefaults.Count == 0)
-            {
-                migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("IsActive", _ => true);
-                migrator.Args.DataParserArgs.RefDataColumnDefaults.TryAdd("SortOrder", i => i);
-            }
-        }
-
         /// <summary>
         /// Performs the database code-generation execution.
         /// </summary>
@@ -56,11 +45,18 @@ namespace Beef.Database
                 if (!alist.Contains(type.Assembly))
                     alist.Add(type.Assembly);
 
+                // Ensure the _Beef.Database.Core_ assembly is included, and within the correct order.
+                if (type.Assembly.GetReferencedAssemblies().Any(x => x.FullName == typeof(MigrationArgs).Assembly.GetName().FullName))
+                {
+                    if (!alist.Contains(typeof(MigrationArgs).Assembly))
+                        alist.Add(typeof(MigrationArgs).Assembly);
+                }
+
                 type = type.BaseType!;
             } while (type != typeof(object));
 
-            cga.AddAssembly(margs.Assemblies.ToArray());
             cga.AddAssembly(alist.ToArray());
+            cga.AddAssembly(margs.Assemblies.ToArray());
 
             cga.AddParameters(margs.Parameters);
             cga.ValidateCompanyAndAppName();

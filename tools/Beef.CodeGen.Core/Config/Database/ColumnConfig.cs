@@ -325,7 +325,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
-        public string DotNetType => Root!.Migrator!.DatabaseSchemaConfig.GetDotNetTypeName(DbColumn!.Type);
+        public string DotNetType => DbColumn!.DotNetType;
 
         /// <summary>
         /// Indicates whether the .NET property is nullable.

@@ -15,12 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="1.0.13" />
-    <PackageReference Include="CoreEx.Cosmos" Version="1.0.13" />
-    <PackageReference Include="CoreEx.Database" Version="1.0.13" />
-    <PackageReference Include="CoreEx.Database.SqlServer" Version="1.0.13" />
-    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="1.0.13" />
-    <PackageReference Include="CoreEx.Validation" Version="1.0.13" />
+    <PackageReference Include="CoreEx" Version="2.0.0" />
+    <PackageReference Include="CoreEx.Cosmos" Version="2.0.0" />
+    <PackageReference Include="CoreEx.Database" Version="2.0.0" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="2.0.0" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="CoreEx.Validation" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
   </ItemGroup>
 
   <ItemGroup>

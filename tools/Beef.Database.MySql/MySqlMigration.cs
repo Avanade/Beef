@@ -26,8 +26,6 @@ namespace Beef.Database.MySql
                 if (!args.Assemblies.Contains(typeof(MySqlMigration).Assembly))
                     args.Assemblies.Add(typeof(MySqlMigration).Assembly);
             }
-
-            this.Initialization();
         }
 
         /// <summary>
