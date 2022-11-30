@@ -108,6 +108,11 @@
           "title": "The default .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
           "description": "Defaults to 'IHttpAgent'. This can be overridden within the 'Entity'(s)."
         },
+        "etagDefaultMapperConverter": {
+          "type": "string",
+          "title": "The default ETag to/from RowVersion column Mapping Converter used where 'Operation.AutoImplement' is 'Database' or 'EntityFramework'.",
+          "description": "Defaults to 'StringToBase64Converter'."
+        },
         "refDataDefaultMapperConverter": {
           "type": "string",
           "title": "The default Reference Data property 'Converter' used by the generated 'Mapper'(s) where not specifically defined.",
@@ -147,6 +152,31 @@
             "ReferenceDataNullableGuidIdConverter{T}",
             "ReferenceDataNullableGuidIdConverter<T>"
           ]
+        },
+        "refDataCodeDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Code' data name.",
+          "description": "Defaults to 'Code' (literal)."
+        },
+        "refDataTextDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Text' data name.",
+          "description": "Defaults to 'Text' (literal)."
+        },
+        "refDataIsActiveDataName": {
+          "type": "string",
+          "title": "The Reference Data 'IsActive' data name.",
+          "description": "Defaults to 'IsActive' (literal)."
+        },
+        "refDataSortOrderDataName": {
+          "type": "string",
+          "title": "The Reference Data 'SortOrder' data name.",
+          "description": "Defaults to 'SortOrder' (literal)."
+        },
+        "refDataETagDataName": {
+          "type": "string",
+          "title": "The Reference Data 'ETag' data name.",
+          "description": "Defaults to 'RowVersion' (literal)."
         },
         "eventPublish": {
           "type": "string",
@@ -327,7 +357,7 @@
         "inherits": {
           "type": "string",
           "title": "The base class that the entity inherits from.",
-          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBase<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
+          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseEx<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
         },
         "implements": {
           "type": "string",
@@ -448,6 +478,36 @@
           "title": "Indicates whether the 'Data' extensions logic should be generated.",
           "description": "This can be overridden using 'Operation.DataExtensions'."
         },
+        "refDataIdDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Id' data name.",
+          "description": "Defaults to 'Name' + 'Id' (literal)."
+        },
+        "refDataCodeDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Code' data name.",
+          "description": "Defaults to 'Code' (literal)."
+        },
+        "refDataTextDataName": {
+          "type": "string",
+          "title": "The Reference Data 'Text' data name.",
+          "description": "Defaults to 'Text' (literal)."
+        },
+        "refDataIsActiveDataName": {
+          "type": "string",
+          "title": "The Reference Data 'IsActive' data name.",
+          "description": "Defaults to 'IsActive' (literal)."
+        },
+        "refDataSortOrderDataName": {
+          "type": "string",
+          "title": "The Reference Data 'SortOrder' data name.",
+          "description": "Defaults to 'SortOrder' (literal)."
+        },
+        "refDataETagDataName": {
+          "type": "string",
+          "title": "The Reference Data 'ETag' data name.",
+          "description": "Defaults to 'RowVersion' (literal)."
+        },
         "databaseName": {
           "type": "string",
           "title": "The .NET database interface name (used where 'AutoImplement' is 'Database').",
@@ -481,6 +541,10 @@
           "title": "Indicates that a custom Entity Framework 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
         },
+        "entityFrameworkMapperBase": {
+          "type": "string",
+          "title": "The EntityFramework data-layer name that should be used for base mappings."
+        },
         "cosmosName": {
           "type": "string",
           "title": "The .NET Cosmos interface name used where 'AutoImplement' is 'Cosmos'.",
@@ -507,6 +571,10 @@
           "type": "boolean",
           "title": "Indicates that a custom Cosmos 'Mapper' will be used; i.e. not generated.",
           "description": "Otherwise, by default, a 'Mapper' will be generated."
+        },
+        "cosmosMapperBase": {
+          "type": "string",
+          "title": "The Cosmos data-layer name that should be used for base mappings."
         },
         "odataName": {
           "type": "string",
@@ -551,6 +619,10 @@
           "type": "string",
           "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
           "description": "Prepended to 'Operation.HttpAgentCode' where specified to enable standardized functionality."
+        },
+        "httpAgentMapperBase": {
+          "type": "string",
+          "title": "The HTTP Agent data-layer name that should be used for base mappings."
         },
         "dataSvcCaching": {
           "type": "boolean",
@@ -625,13 +697,8 @@
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET 'Type' that will perform the validation.",
+          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
           "description": "Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
-        },
-        "iValidator": {
-          "type": "string",
-          "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to 'IValidatorEx<Xxx>' (where 'Xxx' is the entity 'Name') where 'Validator' is not 'null'. Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
         },
         "identifierGenerator": {
           "type": "boolean",
@@ -988,21 +1055,23 @@
         "entityFrameworkMapper": {
           "type": "string",
           "title": "The Entity Framework 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "cosmosMapper": {
           "type": "string",
           "title": "The Cosmos 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "odataMapper": {
@@ -1018,11 +1087,12 @@
         "httpAgentMapper": {
           "type": "string",
           "title": "The HttpAgent 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "description": "Defaults to 'Set'.",
           "enum": [
-            "Map",
+            "Set",
             "Ignore",
-            "Skip"
+            "Map",
+            "Flatten"
           ]
         },
         "displayName": {
@@ -1216,13 +1286,8 @@
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET Type that will perform the validation.",
-          "description": "Defaults to the 'Entity.Validator' where not specified explicitly. Only used for 'Operation.Type' options 'Create' or 'Update'."
-        },
-        "iValidator": {
-          "type": "string",
-          "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to the 'Entity.IValidator' where specified; otherwise, defaults to 'IValidatorEx<{Type}>' where the '{Type}' is 'ValueType'. Only used 'Operation.Type' options 'Create' or 'Update'."
+          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
+          "description": "Defaults to the 'Entity.Validator' where not specified explicitly (where 'Operation.Type' options 'Create' or 'Update')."
         },
         "managerOperationType": {
           "type": "string",
