@@ -18,24 +18,6 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="content\Company.AppName.Api\ImplicitUsings.cs" />
-    <None Remove="content\Company.AppName.Business\AppNameSettings.cs" />
-    <None Remove="content\Company.AppName.Business\Data\PersonData.cs" />
-    <None Remove="content\Company.AppName.Business\Data\ReferenceDataData.cs" />
-    <None Remove="content\Company.AppName.Business\Data\XxxAgent.cs" />
-    <None Remove="content\Company.AppName.Business\ImplicitUsings.cs" />
-    <None Remove="content\Company.AppName.Business\Validation\PersonArgsValidator.cs" />
-    <None Remove="content\Company.AppName.CodeGen\datamodel.beef-5.yaml" />
-    <None Remove="content\Company.AppName.Database\Migrations\20190101-000001-create-gender.sql" />
-    <None Remove="content\Company.AppName.Database\Migrations\20190101-000002-create-person.sql" />
-    <None Remove="content\Company.AppName.Test\Cosmos\Person.yaml" />
-    <None Remove="content\Company.AppName.Test\Cosmos\RefData.yaml" />
-    <None Remove="content\Company.AppName.Test\Resources\A270_GetByArgs_RefDataText-Response.json" />
-    <None Remove="content\Company.AppName.Test\ImplicitUsing.cs" />
-    <None Remove="content\Company.AppName.Test\Validators\PersonValidatorTest.cs" />
-  </ItemGroup>
-
   <Import Project="..\..\Common.targets" />
   
 </Project>

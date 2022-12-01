@@ -1,6 +1,6 @@
 ﻿# Getting started
 
-This tutorial will demonstrate how to get a .NET Solution using _Beef_ created on your machine connecting to a local Microsoft SQL Server using stored procedures for data access. A pre-configured soluion will be created to enable, and demonstrate, the key end-to-end capabilities. 
+This tutorial will demonstrate how to get a .NET Solution using _Beef_ created on your machine connecting to a local Microsoft SQL Server using [Entity Framework](https://docs.microsoft.com/en-us/ef/core/) for data access. A pre-configured soluion will be created to enable, and demonstrate, the key end-to-end capabilities. 
 
 <br/>
 
@@ -19,22 +19,23 @@ It is recommended that the following is installed to simplify the opening of a c
 
 The [`Beef.Template.Solution`](../templates/Beef.Template.Solution/README.md) needs to be installed so that it can be used to easily create the required [solution structure](./Solution-Structure.md).
 
-Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the `dotnet new -i` command as follows:
+Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the [`dotnet new -i`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new-install) command as follows (or alternatively specify the required version):
 
 ```
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
+dotnet new -i beef.template.solution::5.0.1.preview4 --nuget-source https://api.nuget.org/v3/index.json
 ``` 
 
 <br/>
 
 ## Create solution
 
-To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname`; which is also the recommended directory name (it will also represent the .NET namespace). For this tutorial we will also choose the `Database` data source (this uses stored procedures).
+To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname`; which is also the recommended directory name (it will also represent the .NET namespace). For this tutorial we will also choose the `SqlServer` data source.
 
 ```
 mkdir Foo.Bar
 cd Foo.Bar
-dotnet new beef --company Foo --appname Bar --datasource Database
+dotnet new beef --company Foo --appname Bar --datasource SqlServer
 ```
 
 The solution should now have been created; and the file system should look like the following:
@@ -57,10 +58,10 @@ The solution should now have been created; and the file system should look like 
 The solution has been created with a sample `Person` entity defined and related [reference data](./Reference-Data.md) to demonstrate the code generation configuration. There are other `Person` related classes within the solutiom to demonstrate the corresponding non-generated interactions, as well as the [intra-integration testing](../tools/Beef.Test.NUnit/README.md).
 
 The [code-generation](../tools/Beef.CodeGen.Core/README.md) will reference the following configuration within the `Foo.Bar.CodeGen` directory:
-- `Foo.Bar.xml` - contains the entity(s) configuration.
-- `Foo.RefData.xml` - contains the reference data configuration.
+- `entity.beef-5.yaml` - contains the entity(s) configuration.
+- `refdata.beef-5.yaml` - contains the reference data configuration.
 
-Generate the configured entities and reference data:
+Generate the configured entities and reference data by performing the following:
 
 ```
 cd Foo.Bar.CodeGen
@@ -73,26 +74,25 @@ This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code g
 
 ## Database generation and configuration
 
-The solution has been created with the sample `Person` table defined and related reference data tables, migration scripts to create the database objects, and finally includes the stored procedure generation configuration.
+The solution has been created with the sample `Person` table defined and related reference data tables, migration scripts to create the database objects.
 
 The [database generation](../tools/Beef.Database.Core/README.md) will reference the following configuration within the `Foo.Bar.Database` directory:
-- `Foo.Bar.Database.xml` - contains the database/table(s) configuration.
+- `database.beef-5.yaml` - contains the table(s) and related C# model configuration.
 
-Generate the configured tables and stored procedures:
+Generate the configured tables and C# models by performing the following:
 
 ```
 cd Foo.Bar.Database
 dotnet run all
-dotnet run codegen --script DatabaseEventOutbox.xml
 ```
 
-This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated. The final command will create the required migration scripts for the event outbox functionality.
+This will build and run the `Foo.Bar.Database` console; the outcome of the code generation and database setup/configuration will be logged to the console showing what was added or updated.
 
 <br/>
 
 ## Testing
 
-To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/[PATCH](./Http-Patch.md)/DELETE operations:
+To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/PATCH/DELETE operations:
 
 ```
 cd ..\Foo.Bar.Test

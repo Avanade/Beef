@@ -34,20 +34,20 @@
       "datatype": "choice",
       "choices": [
         {
-          "choice": "Cosmos",
-          "description": "Indicates that the data source is an Azure Cosmos DB."
-        },
-        {
-          "choice": "Database",
-          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Stored Procedures."
-        },
-        {
           "choice": "SqlServer",
-          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Entity Framework Core."
+          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Entity Framework Core (default)."
+        },
+        {
+          "choice": "SqlServerProcs",
+          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Stored Procedures."
         },
         {
           "choice": "MySQL",
           "description": "Indicates that the data source is a MySQL Database accessed via Entity Framework Core."
+        },
+        {
+          "choice": "Cosmos",
+          "description": "Indicates that the data source is an Azure Cosmos DB."
         },
         {
           "choice": "HttpAgent",
@@ -55,32 +55,35 @@
         },
         {
           "choice": "None",
-          "description": "Indicates that no data source is to be implemented."
+          "description": "Indicates that no data source is to be implemented (largely empty projects)."
         }
       ],
-      "defaultValue": "Database",
+      "defaultValue": "SqlServer",
       "description": "The data source implementation option."
     },
     "coreex_version": {
-      "type": "parameter",
-      "replaces": "CoreExVersion",
-      "defaultValue": "2.0.0",
-      "datatype": "text",
-      "description": "The CoreEx packages version."
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "2.0.0"
+      },
+      "replaces": "CoreExVersion"
     },
     "unittestex_version": {
-      "type": "parameter",
-      "replaces": "UnitTestExVersion",
-      "defaultValue": "2.0.0",
-      "datatype": "text",
-      "description": "The UnitTestEx packages version."
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "2.0.0"
+      },
+      "replaces": "UnitTestExVersion"
     },
     "beef_version": {
-      "type": "parameter",
-      "replaces": "BeefVersion",
-      "defaultValue": "5.0.1-preview4",
-      "datatype": "text",
-      "description": "The Beef packages version."
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "5.0.1-preview4"
+      },
+      "replaces": "BeefVersion"
     },
     "implement_cosmos": {
       "type": "computed",
@@ -88,7 +91,7 @@
     },
     "implement_database": {
       "type": "computed",
-      "value": "(datasource == \"Database\")"
+      "value": "(datasource == \"SqlServerProcs\")"
     },
     "implement_sqlserver": {
       "type": "computed",

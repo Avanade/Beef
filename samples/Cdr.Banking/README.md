@@ -216,7 +216,7 @@ In this case, we are setting this using the code-generation for the operation. T
 }
 ```
 
-As stated in the above YAML comments, a common [validator](../../docs/Beef-Validation.md) will be used to perform the authorization logic. The static [`Validators.AccountId`](./Cdr.Banking.Business/Validation/Validators.cs) is used to perform the validation.
+As stated in the above YAML comments, a common [validator](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) will be used to perform the authorization logic. The static [`Validators.AccountId`](./Cdr.Banking.Business/Validation/Validators.cs) is used to perform the validation.
 
 ``` csharp
 public static CommonValidator<string?> AccountId => CommonValidator.Create<string?>(v => v.Custom(ctx =>

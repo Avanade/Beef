@@ -19,10 +19,11 @@ It is recommended that the following is installed to simplify the opening of a c
 
 The [`Beef.Template.Solution`](../templates/Beef.Template.Solution/README.md) needs to be installed so that it can be used to easily create the required [solution structure](./Solution-Structure.md).
 
-Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the `dotnet new -i` command as follows:
+Install (or update) the latest template from the public [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/) repository using the `dotnet new -i` command as follows (or alternatively specify the required version):
 
 ```
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
+dotnet new -i beef.template.solution::5.0.1.preview4 --nuget-source https://api.nuget.org/v3/index.json
 ``` 
 
 <br/>
@@ -56,8 +57,8 @@ The solution should now have been created; and the file system should look like 
 The solution has been created with a sample `Person` entity defined and related [reference data](./Reference-Data.md) to demonstrate the code generation configuration. There are other `Person` related classes within the solutiom to demonstrate the corresponding non-generated interactions, as well as the [intra-integration testing](../tools/Beef.Test.NUnit/README.md).
 
 The [code-generation](../tools/Beef.CodeGen.Core/README.md) will reference the following configuration within the `Foo.Bar.CodeGen` directory:
-- `Foo.Bar.xml` - contains the entity(s) configuration.
-- `Foo.RefData.xml` - contains the reference data configuration.
+- `entity.beef-5.yaml` - contains the entity(s) configuration.
+- `refdata.beef-5.yaml` - contains the reference data configuration.
 
 Generate the configured entities and reference data:
 
@@ -72,7 +73,7 @@ This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code g
 
 ## Testing
 
-To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/[PATCH](./Http-Patch.md)/DELETE operations:
+To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/PATCH/DELETE operations:
 
 ```
 cd ..\Foo.Bar.Test

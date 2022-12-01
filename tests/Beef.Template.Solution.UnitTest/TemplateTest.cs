@@ -106,10 +106,10 @@ namespace Beef.Template.Solution.UnitTest
         }
 
         [Test]
-        public void Database()
+        public void SqlServerProcs()
         {
             OneTimeSetUp();
-            SolutionCreateGenerateTest("Foo.Db", "Bar", "Database");
+            SolutionCreateGenerateTest("Foo.Db", "Bar", "SqlServerProcs");
         }
 
         [Test]

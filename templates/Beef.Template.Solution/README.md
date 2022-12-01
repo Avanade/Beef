@@ -1,6 +1,6 @@
 ﻿# Beef.Template.Solution
 
-This is the capability to enable the initial creation of the _beef_ solution and all projects as defined by the [solution structure](../../docs/Solution-Structure.md). This leverages the .NET Core [templating](https://docs.microsoft.com/en-au/dotnet/core/tools/custom-templates) functionality.
+This is the capability to enable the initial creation of the _Beef_ solution and all projects as defined by the [solution structure](../../docs/Solution-Structure.md). This leverages the .NET Core [templating](https://docs.microsoft.com/en-au/dotnet/core/tools/custom-templates) functionality.
 
 <br/>
 
@@ -43,18 +43,21 @@ dotnet new -i beef.template.solution --nuget-source C:\source\repos\Avanade\Beef
 
 To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname` attributes as discussed above; it is important that these are entered in your desired casing as they will be used as-is. 
 
-Additionally, there is a futher optional `datasource` attribute to drive the desired output. This parameter supports the following values:
-- `Database` (default),
-- `EntityFramework`,
-- `Cosmos`
-- `HttpAgent`
-- `None`
+Additionally, there is a futher optional `datasource` parameter to drive the desired output. This parameter supports the following values:
+
+Parameter | Description
+-|-
+`SqlServer` | Microsoft SQL Server with Entity Framework (default).
+`SqlServerProcs` | Microsoft SQL Server with Stored Procedures.
+`MySQL` | Oracle MySQL with Entity Framework.
+`Cosmos` | Azure Cosmos DB.
+`HttpAgent` | Backend HTTP.
+`None` | Empty solution/projects skeleton.
 
 The `dotnet new` command is used to create, e.g.:
 
 ```
 dotnet new beef --company My.Company --appname Sales
-
 dotnet new beef --company My.Company --appname Sales --datasource Cosmos
 ```
 
@@ -76,9 +79,9 @@ dotnet new beef --company My.Company --appname Sales --datasource Cosmos
 
 ## What is created?
 
-The solution and projects created contain all the requisite .NET Classes and NuGet references to build a _beef_ solution.
+The solution and projects created contain all the requisite .NET Classes and NuGet references to build the solution.
 
-_Note:_ the solution will **not** compile. There is a reference to `ReferenceDataProvider` within [`Startup.cs`](./content/Company.AppName.Api/Startup.cs) that does not initially exist (and needs to be created/generated).
+_Note:_ the solution will **not** intially compile. The code and database generation must first be performed.
 
 To get the solution up and running quickly, an example `Person` entity and database table has been preconfigured for code generation. The next sub-sections describe content and how to perform the requisite generation. The entity-driven code-gen step will resolve the aforementioned compilation error.
 
@@ -87,8 +90,8 @@ To get the solution up and running quickly, an example `Person` entity and datab
 ### Entity-driven code-gen
 
 The `Company.AppName.CodeGen` project contains the following:
-- [`Company.AppName.xml`](./content/Company.AppName.CodeGen/Company.AppName.xml) - a basic `Person` entity example is pre-configured; this can either be extended or replaced.
-- [`Company.RefData.xml`](./content/Company.AppName.CodeGen/Company.RefData.xml) - a basic `Gender` reference data entity example is pre-configured; this can either be extended or replaced.
+- [`entity.beef-5.yaml`](./content/Company.AppName.CodeGen/entity.beef-5.yaml) - a basic `Person` entity example is pre-configured; this can either be extended or replaced.
+- [`refdata.beef-5.yaml`](./content/Company.AppName.CodeGen/refdata.beef-5.yaml) - a basic `Gender` reference data entity example is pre-configured; this can either be extended or replaced.
 
 To perform the code generation, first navigate to the directory where the above files reside, then execute the following:
 
@@ -103,9 +106,9 @@ For more information see: [code-generation](../../tools/Beef.CodeGen.Core/README
 ### Database table-driven code-gen
 
 The `Company.AppName.Database` project contains the following:
-- [`Company.AppName.Database.xml`](./content/Company.AppName.Database/Company.AppName.Database.xml) - the basic `Person` and `Gender` stored procedure examples are pre-configured; these can either be extended or replaced.
+- [`database.beef-5.yaml`](./content/Company.AppName.Database/database.beef-5.yaml) - the basic `Person` and `Gender` Entity Framework or Stored Procedure examples are pre-configured; these can either be extended or replaced.
 - [`RefData.xml`](./content/Company.AppName.Database/Data/RefData.yaml) - the example `Gender` data has been preconfigured; these can either be extended or replaced.
-- [`Company.AppName.Database/Migrations`](./content/Company.AppName.Database/Migrations) - the example scripts for create the requite schema and table for `Person` and `Gender`; these can either be extended or replaced.
+- [`Company.AppName.Database/Migrations`](./content/Company.AppName.Database/Migrations) - the example scripts for creating the requite tables for `Person` and `Gender`; these can either be extended or replaced.
 
 To perform the data generation, first navigate to the directory where the above files reside, then execute the following:
 
@@ -119,5 +122,7 @@ For more information see: [data-generation](../../tools/Beef.Database.Core/READM
 
 ## Samples
 
-See the following for example end-to-end usage:
+See the following examples for end-to-end usage:
+- [SQL Server Entity Framework sample](../../docs/Sample-SqlServer-EF-GettingStarted.md)
+- [SQL Server Stored Procedure sample](../../docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
 - [Cosmos sample](../../docs/Sample-Cosmos-GettingStarted.md)

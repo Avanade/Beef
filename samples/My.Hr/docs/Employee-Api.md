@@ -280,7 +280,7 @@ namespace My.Hr.Business.Data
 
 ### Validation
 
-The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](../../../docs/Beef-Validation.md) to simplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity - as Deep Throat said to Mulder in the [X-Files](https://en.wikipedia.org/wiki/The_X-Files), "trust no one"!
+The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) to simplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity - as Deep Throat said to Mulder in the [X-Files](https://en.wikipedia.org/wiki/The_X-Files), "trust no one"!
 
 To encourage reuse, _Beef_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `My.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
