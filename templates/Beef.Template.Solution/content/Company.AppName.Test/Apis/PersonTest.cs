@@ -15,6 +15,13 @@ public class PersonTest : UsingApiTester<Startup>
     [Test]
     public void A110_Get_NotFound()
     {
+#if (implement_httpagent)
+        var mcf = MockHttpClientFactory.Create();
+        mcf.CreateClient("Xxx", "https://backend/").Request(HttpMethod.Get, $"People/{404.ToGuid()}").Respond.With(HttpStatusCode.NotFound);
+
+        ApiTester.ResetHost().ReplaceHttpClientFactory(mcf);
+
+#endif
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.NotFound)
 #if (!implement_mysql)
@@ -28,6 +35,15 @@ public class PersonTest : UsingApiTester<Startup>
     [Test]
     public void A120_Get_Found()
     {
+#if (implement_httpagent)
+        var dmp = new Business.Data.Model.Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", Birthday = new DateTime(1985, 03, 18, 0, 0, 0, DateTimeKind.Unspecified) };
+
+        var mcf = MockHttpClientFactory.Create();
+        mcf.CreateClient("Xxx", "https://backend/").Request(HttpMethod.Get, $"People/{1.ToGuid()}").Respond.WithJson(dmp);
+
+        ApiTester.ResetHost().ReplaceHttpClientFactory(mcf);
+
+#endif
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .IgnoreChangeLog()
@@ -52,6 +68,10 @@ public class PersonTest : UsingApiTester<Startup>
             .Run(a => a.GetAsync(1));
 #endif
     }
+
+#if (implement_httpagent)
+    /* The remainder of the tests for an HttpAgent are commented out and are provided as a guide; MockHttpClientFactory will be needed per test to enable. 
+#endif
 
     [Test]
     public void A120_Get_Modified_NotModified()
@@ -415,6 +435,10 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.NoContent)
             .Run(a => a.DeleteAsync(id));
     }
+
+#if (implement_httpagent)
+    */
+#endif
 
     #endregion
 }

@@ -68,7 +68,7 @@ public class Startup
                 .AddGeneratedDataSvcServices()
                 .AddGeneratedDataServices();
 
-#if (implement_entityframework || implement_cosmos)
+#if (!implement_database)
         // Add type-to-type mapping services using reflection.
         services.AddMappers<AppNameSettings>();
 
