@@ -155,7 +155,7 @@ namespace Beef.Template.Solution.UnitTest
             Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
-            if (datasource == "Database" || datasource == "SqlServer" || datasource == "MySQL")
+            if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL")
             {
                 Assert.Zero(ExecuteCommand("dotnet", "run drop", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run drop [database]");
                 Assert.Zero(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet run all [database]");
