@@ -16,7 +16,6 @@ namespace My.Hr.Business.Entities
         private Guid _employeeId;
         private DateTime _date;
         private string? _outcomeSid;
-        private string? _outcomeText;
         private string? _reviewer;
         private string? _notes;
         private string? _etag;

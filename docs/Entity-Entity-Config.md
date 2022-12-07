@@ -73,7 +73,7 @@ Provides the _Reference Data_ configuration.
 Property | Description
 -|-
 **`refDataType`** | The Reference Data identifier Type option. Valid options are: `int`, `long`, `Guid`, `string`.<br/>&dagger; Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.
-`refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.<br/>&dagger; This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).
+`refDataText` | Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.<br/>&dagger; This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`). Defaults from `CodeGeneration.RefDataText`.
 `refDataSortOrder` | The Reference Data sort order option. Valid options are: `SortOrder`, `Id`, `Code`, `Text`.<br/>&dagger; Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.
 `refDataIdDataName` | The Reference Data `Id` data name.<br/>&dagger; Defaults to `Name` + `Id` (literal).
 `refDataCodeDataName` | The Reference Data `Code` data name.<br/>&dagger; Defaults to `Code` (literal).
@@ -89,7 +89,7 @@ Provides the _Entity class_ configuration.
 
 Property | Description
 -|-
-`inherits` | The base class that the entity inherits from.<br/>&dagger; Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBase<xxx>` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
+`inherits` | The base class that the entity inherits from.<br/>&dagger; Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseEx<xxx>` depending on the corresponding `RefDataType` value. See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.
 `implements` | The list of comma separated interfaces that are to be declared for the entity class.
 `implementsAutoInfer` | Indicates whether to automatically infer the interface implements for the entity from the properties declared.<br/>&dagger; Will attempt to infer the following: `IIdentifier<Guid>`, `IIdentifier<int>`, `IIdentifier<long>`, `IIdentifier<string>`, `IETag` and `IChangeLog`. Defaults to `true`.
 `abstract` | Indicates whether the class should be defined as abstract.
@@ -97,6 +97,7 @@ Property | Description
 `namespace` | The entity namespace to be appended.<br/>&dagger; Appended to the end of the standard structure as follows: `{Company}.{AppName}.Business.Entities.{Namespace}`.
 `omitEntityBase` | Indicates that the entity should not inherit from `EntityBase`.<br/>&dagger; As such any of the `EntityBase` related capabilites are not supported (are omitted from generation). The intention for this is more for the generation of simple internal entities.
 `jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `SystemText`, `Newtonsoft`.<br/>&dagger; Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `SystemText`.
+`internalOnly` | Indicates whether the entity is for internal use only; declared in Business entities only.
 
 <br/>
 
@@ -170,8 +171,7 @@ Property | Description
 `managerCtor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`.<br/>&dagger; Defaults to `Public`.
 **`managerCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.ManagerExtensions`.
-**`validator`** | The name of the .NET `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to `IValidatorEx<Xxx>` (where `Xxx` is the entity `Name`) where `Validator` is not `null`. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
+**`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `identifierGenerator` | Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.
 
 <br/>

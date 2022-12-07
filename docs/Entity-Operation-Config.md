@@ -120,8 +120,7 @@ Property | Description
 -|-
 **`managerCustom`** | Indicates whether the `Manager` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `managerTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer.
-**`validator`** | The name of the .NET Type that will perform the validation.<br/>&dagger; Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidatorEx<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.
+**`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Defaults to the `Entity.Validator` where not specified explicitly (where `Operation.Type` options `Create` or `Update`).
 `managerOperationType` | The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer. Valid options are: `Create`, `Read`, `Update`, `Delete`, `Unspecified`.<br/>&dagger; The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.
 
 <br/>

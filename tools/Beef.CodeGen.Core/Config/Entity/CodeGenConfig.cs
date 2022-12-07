@@ -63,7 +63,7 @@ entities:
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`.", IsImportant = true,
-            Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
+            Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`). This can be further configured on the `Entity` and for each `Property`.")]
         public bool? RefDataText { get; set; }
 
         /// <summary>
@@ -72,6 +72,15 @@ entities:
         [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.", IsImportant = true)]
         public string? RefDataWebApiRoute { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `ReferenceDataData` constructor.
+        /// </summary>
+        [JsonProperty("refDataDataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenPropertyCollection("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `ReferenceDataData` constructor.",
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored.")]
+        public List<string>? RefDataDataCtorParams { get; set; }
 
         #endregion
 

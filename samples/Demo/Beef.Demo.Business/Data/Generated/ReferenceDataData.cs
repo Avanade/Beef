@@ -15,6 +15,7 @@ namespace Beef.Demo.Business.Data
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
         private readonly DemoCosmosDb _cosmos;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
@@ -22,8 +23,9 @@ namespace Beef.Demo.Business.Data
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="cosmos">The <see cref="DemoCosmosDb"/>.</param>
-        public ReferenceDataData(IDatabase db, IEfDb ef, DemoCosmosDb cosmos)
-            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ReferenceDataDataCtor(); }
+        /// <param name="mapper">The <see cref="IMapper"/>.</param>
+        public ReferenceDataData(IDatabase db, IEfDb ef, DemoCosmosDb cosmos, IMapper mapper)
+            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ReferenceDataDataCtor(); }
 
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -90,8 +92,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-
 
             partial void EyeColorToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -200,8 +200,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-
 
             partial void StatusToModelEfMapperCtor(); // Enables the constructor to be extended.
         }

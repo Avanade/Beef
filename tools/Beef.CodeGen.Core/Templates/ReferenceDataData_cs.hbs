@@ -95,8 +95,6 @@ namespace {{Root.NamespaceBusiness}}.Data
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
 
         {{/if}}
-
-
             partial void {{Name}}ToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 

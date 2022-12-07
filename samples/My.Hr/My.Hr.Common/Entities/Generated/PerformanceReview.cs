@@ -36,7 +36,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
-        public string? OutcomeText { get; set ; }
+        public string? OutcomeText { get; set; }
 
         /// <summary>
         /// Gets or sets the Outcome.

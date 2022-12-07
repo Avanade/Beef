@@ -2,7 +2,7 @@
 
 This will walk through the process of creating the required tables, and stored procedures, etc. needed for the `Employee` within a Microsoft SQL Server database. All of this work will occur within the context of the `My.Hr.Database` project.
 
-The [`Beef.Database.Core`](../../../tools/Beef.Database.Core/README.md) provides the capabilities that will be leveraged. The underlying documentation describes these capabilities and the database approach in greater detail.
+The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`DbEx`](https://github.com/Avanade/dbex) provide the capabilities that will be leveraged. The underlying [documentation](https://github.com/Avanade/dbex#readme) describes these capabilities and the database approach in greater detail.
 
 _Note:_ Any time that command line execution is requested, this should be performed from the base `My.Hr.Database` folder.
 
@@ -31,8 +31,8 @@ Within the `Migrations` folder there will three entries that were created during
 ```
 └── Migrations
   └── 20190101-000001-create-Hr-schema.sql     <- remove
-  └── 20190101-000002-create-Hr-gender.sql     <- remove
-  └── 20190101-000003-create-Hr-person.sql     <- remove
+  └── 20190101-000002-create-Hr-Gender.sql     <- remove
+  └── 20190101-000003-create-Hr-Person.sql     <- remove
 ```
 
 <br/>
@@ -54,10 +54,10 @@ Create the migration script for the `Employee` table table within the `Hr` schem
 dotnet run script create Hr Employee
 ```
 
-For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable.
+For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable. Note that the reference data values use `Code` and no database constraint is added as this relationship (and consistency) is managed by the owning business logic.
 
 ``` SQL
--- Create table: Hr.Employee
+-- Create table: [Hr].[Employee]
 
 BEGIN TRANSACTION
 
@@ -66,11 +66,11 @@ CREATE TABLE [Hr].[Employee] (
   [Email] NVARCHAR(250) NULL UNIQUE,                                               -- This is the employee's unique email address
   [FirstName] NVARCHAR(100) NULL,
   [LastName] NVARCHAR(100) NULL,
-  [GenderCode] NVARCHAR(50) NULL,                                                  -- This is the related Gender code; see Ref.Gender table
+  [GenderCode] NVARCHAR(50) NULL,                                                  -- This is the related Gender code; see Hr.Gender table
   [Birthday] DATE NULL,    
   [StartDate] DATE NULL,
   [TerminationDate] DATE NULL,
-  [TerminationReasonCode] NVARCHAR(50) NULL,                                       -- This is the related Termination Reason code; see Ref.TerminationReason table
+  [TerminationReasonCode] NVARCHAR(50) NULL,                                       -- This is the related Termination Reason code; see Hr.TerminationReason table
   [PhoneNo] NVARCHAR(50) NULL,
   [AddressJson] NVARCHAR(500) NULL,                                                -- This is the full address persisted as JSON.
   [RowVersion] TIMESTAMP NOT NULL,                                                 -- This is used for concurrency version checking. 
@@ -96,7 +96,7 @@ dotnet run script create Hr EmergencyContact
 Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
 
 ``` SQL
--- Create table: Hr.EmergencyContact
+-- Create table: [Hr].[EmergencyContact]
 
 BEGIN TRANSACTION
 
@@ -154,13 +154,13 @@ Hr:
 
 ## Reference Data query
 
-To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `efModel: true` option. 
+To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `efModel: true` attribute. 
 
 Remove all existing configuration from `database.beef.yaml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
 
 ``` yaml
 # Configuring the code-generation global settings
-# - Schema defines the default for al tables unless explicitly defined.
+# - Schema defines the default for all tables unless explicitly defined.
 # 
 schema: Hr
 tables:
@@ -175,7 +175,7 @@ tables:
 
 ## Stored Procedure CRUD
 
-Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, in this case `EmergencyContact`.
+Stored procedures will be used for the primary `Employee` [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) as this also allows a simplified (and performant) means to select and update related tables as required, in this case `EmergencyContact`.
 
 Where these related tables contain a related collection (i.e. zero or more rows), then a SQL [Merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql?view=sql-server-ver15) is used as it will `insert`, `update` or `delete` each row accordingly. To generate this the _Beef code-gen_ enables a `Type` of `Merge`. Additionally, a SQL [User-Defined Type (UDT)](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql?view=sql-server-ver15) and corresponding .NET (C#) [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) will also need to be generated to support the passing of the data (multiple rows) between .NET and SQL Server.
 

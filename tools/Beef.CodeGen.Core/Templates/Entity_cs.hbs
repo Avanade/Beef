@@ -47,13 +47,6 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
 {{! ===== Privates ===== }}
 {{#each PrivateProperties}}
         private {{{PrivateType}}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
-  {{#ifval RefDataType}}
-    {{#unless RefDataList}}
-      {{#if RefDataText}}
-        private string? {{PrivateName}}Text;
-      {{/if}}
-    {{/unless}}
-  {{/ifval}}
 {{/each}}
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}
@@ -97,7 +90,7 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
     {{/if}}
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
-        {{#if RefDataText}}
+        {{#ifeq RefDataText 'Optional' 'Always'}}
 
         /// <summary>
         /// {{{SummaryRefDataText}}}
@@ -109,8 +102,8 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
         [JsonPropertyName("{{JsonName}}Text")]
           {{/ifeq}}
         {{/ifval}}
-        public string? {{Name}}Text => {{{Type}}}.GetRefDataText({{PropertyPrivateName}}); 
-        {{/if}}
+        public string? {{RefDataTextName}} => {{#ifeq RefDataText 'Optional'}}{{{Type}}}.GetRefDataText({{PropertyPrivateName}}){{else}}{{Name}}?.Text{{/ifeq}};
+        {{/ifeq}}
       {{/unless}}
     {{/unless}}
 
@@ -279,9 +272,16 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
         {{/ifne}}
       {{/ifne}}
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a {{{EntityNameSeeComments}}}.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to {{{EntityNameSeeComments}}}.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
+        public static implicit operator {{{EntityName}}}?({{RefDataType}} id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to {{{EntityNameSeeComments}}}.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
         public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
   {{/unless}}

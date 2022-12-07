@@ -16,7 +16,6 @@ namespace My.Hr.Business.Entities
         private string? _street2;
         private string? _city;
         private string? _stateSid;
-        private string? _stateText;
         private string? _postCode;
 
         /// <summary>

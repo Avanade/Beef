@@ -36,7 +36,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
         /// </summary>
-        public string? StatusText { get; set ; }
+        public string? StatusDescription { get; set; }
 
         /// <summary>
         /// Gets or sets the Status.

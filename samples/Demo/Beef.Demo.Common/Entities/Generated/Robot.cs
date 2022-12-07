@@ -36,7 +36,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText { get; set ; }
+        public string? EyeColorText { get; set; }
 
         /// <summary>
         /// Gets or sets the Eye Color.
@@ -46,7 +46,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
         /// </summary>
-        public string? PowerSourceText { get; set ; }
+        public string? PowerSourceText { get; set; }
 
         /// <summary>
         /// Gets or sets the Power Source.

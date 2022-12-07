@@ -1,6 +1,6 @@
 ﻿# My.Hr APIs
 
-The purpose of this sample is to demonstrate the usage of _Beef_ within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
+The purpose of this sample is to demonstrate the usage of _Beef_ (and [_CoreEx_](https://github.com/Avanade/CoreEx) runtime) within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
 
 Also, it will demonstrate how the data can be shaped differently between the database and the entity to leverage both relational and object-oriented constructs to provide a natural consuming experience from the API that accounts for the [object-relational impedence mismatch](https://en.wikipedia.org/wiki/Object-relational_impedance_mismatch#:~:text=The%20object-relational%20impedance%20mismatch%20is%20a%20set%20of,to%20database%20tables%20defined%20by%20a%20relational%20schema.).
 
@@ -12,9 +12,9 @@ This sample will walkthrough an approach of adding the capabilities in a series 
 
 _Beef_ is obstensibly the code-generation engine that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof:
 - [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilties (extends .NET core);
+- [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing.
 - [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilties;
 - [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality; and,
-- [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing.
 
 </br>
 
@@ -63,15 +63,15 @@ Endpoint | Description
 
 ## Solution skeleton
 
-This solution should be created using the solution [template](../../templates/Beef.Template.Solution/README.md) capability, following the getting started [guide](../../docs/Sample-EntityFramework-GettingStarted.md).
+This solution should be created using the solution [template](../../templates/Beef.Template.Solution/README.md) capability, following the getting started [guide](../../docs/Sample-SqlServer-EF-GettingStarted.md).
 
-The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is highly recommended that the `My.Hr` naming convention below is used.
+The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is _highly recommended_ that the `My.Hr` naming convention below is used.
 
 ```
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
 mkdir My.Hr
 cd My.Hr
-dotnet new beef --company My --appname Hr --datasource EntityFramework
+dotnet new beef --company My --appname Hr --datasource SqlServer
 ```
 
 The following solution structure will have been generated. Open `My.Hr.sln` in Visual Studio.
@@ -90,7 +90,7 @@ The following solution structure will have been generated. Open `My.Hr.sln` in V
 
 _Note:_ Code generation should **not** be performed before updating the corresponding YAML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
 
-Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the base-line to build up the solution from.
+Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the baseline to build up the solution from.
 
 </br>
 
@@ -108,10 +108,10 @@ As described earlier, this sample will walk through the implementation in a numb
 
 ## Conclusion
 
-The basis of the functional capabilities have been created for our fictitious solution. In the end, the developer should have a reasonable understanding of how to build a relatively complicated back-end (API and database) solution leveraging _Beef_.
+The basis of the functional capabilities have been created for our fictitious solution. In the end, the developer should have a reasonable understanding of how to build a relatively complicated back-end (API and database) solution leveraging _Beef_ as the code-generator, and `CoreEx` as the extended runtime.
 
-The developer should have witnessed that reasonably complicated logic can be built using this _config_ to _code-gen_ to _custom_ approach. Where the _custom_ effort is for the most part focused on the key business value delivery; not the related boilerplate. Plus, with the testing framework, how complex end-to-end intra-domain integration tests can be created to appropriately validate the underlying logic - which can easily be integrated into the developer build-test-release lifecycle.
+The developer should have witnessed that reasonably complicated logic can be built using this _config_ to _code-gen_ to _custom_ approach. Where the _custom_ effort is for the most part focused on the key business value delivery; not the related boilerplate. Plus, with the [_UnitTestEx_](https://github.com/Avanade/UnitTestEx) testing framework, how complex end-to-end intra-domain integration tests can be created to appropriately validate the underlying logic - which can easily be integrated into the developer build-test-release lifecycle.
 
-It is acknowledged that there is a learning curve required for using _Beef_; and in time greater acceleration will be achieved as experience is gained. Please review the extended documentation and provide feedback, questions, defects, etc. via an [issue](https://github.com/Avanade/Beef/issues).
+It is acknowledged that there is a learning curve required for using _Beef_ et al; and in time greater acceleration will be achieved as experience is gained. Please review the extended documentation and provide feedback, questions, defects, etc. via an [issue](https://github.com/Avanade/Beef/issues) to any of the repos.
 
 Thanks and enjoy :-)

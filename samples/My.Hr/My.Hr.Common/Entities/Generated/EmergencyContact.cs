@@ -41,7 +41,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
         /// </summary>
-        public string? RelationshipText { get; set ; }
+        public string? RelationshipText { get; set; }
 
         /// <summary>
         /// Gets or sets the Relationship.

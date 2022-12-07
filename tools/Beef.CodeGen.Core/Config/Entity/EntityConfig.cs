@@ -134,7 +134,7 @@ entities:
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.",
-            Description = "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
+            Description = "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`). Defaults from `CodeGeneration.RefDataText`.")]
         public bool? RefDataText { get; set; }
 
         /// <summary>
@@ -210,6 +210,13 @@ entities:
         [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
             Description = "Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `SystemText`.")]
         public string? JsonSerializer { get; set; }
+
+        /// <summary>
+        /// Indicates whether the entity is for internal use only; declared in the Business entities only.
+        /// </summary>
+        [JsonProperty("internalOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Entity", Title = "Indicates whether the entity is for internal use only; declared in Business entities only.")]
+        public bool? InternalOnly { get; set; }
 
         #endregion
 

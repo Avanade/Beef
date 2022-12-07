@@ -42,7 +42,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        public string? GenderText { get; set ; }
+        public string? GenderText { get; set; }
 
         /// <summary>
         /// Gets or sets the Gender.
@@ -52,7 +52,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText { get; set ; }
+        public string? EyeColorText { get; set; }
 
         /// <summary>
         /// Gets or sets the Eye Color.

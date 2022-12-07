@@ -13,6 +13,6 @@ namespace Beef.CodeGen.Generators
     public class EntityOmitBaseCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <inheritdoc/>
-        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config) => config.Entities!.Where(x => IsFalse(x.ExcludeEntity) && (IsTrue(x.OmitEntityBase) || x.Root!.RuntimeEntityScope == "Common")).AsEnumerable();
+        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config) => config.Entities!.Where(x => IsFalse(x.ExcludeEntity) && (IsTrue(x.OmitEntityBase) || (x.Root!.RuntimeEntityScope == "Common" && IsFalse(x.InternalOnly)))).AsEnumerable();
     }
 }

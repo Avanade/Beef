@@ -20,11 +20,19 @@
         "refDataText": {
           "type": "boolean",
           "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data 'Property' for an 'Entity'.",
-          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true')."
+          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true'). This can be further configured on the 'Entity' and for each 'Property'."
         },
         "refDataWebApiRoute": {
           "type": "string",
           "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching. The 'WebApiRoutePrefix' will be prepended where specified."
+        },
+        "refDataDataCtorParams": {
+          "type": "array",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'ReferenceDataData' constructor.",
+          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "items": {
+            "type": "string"
+          }
         },
         "jsonSerializer": {
           "type": "string",
@@ -341,7 +349,7 @@
         "refDataText": {
           "type": "boolean",
           "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data 'Property' overriding the 'CodeGeneration.RefDataText' selection.",
-          "description": "This is used where serializing within the Web API'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true')."
+          "description": "This is used where serializing within the Web API'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true'). Defaults from 'CodeGeneration.RefDataText'."
         },
         "refDataSortOrder": {
           "type": "string",
@@ -394,6 +402,10 @@
             "SystemText",
             "Newtonsoft"
           ]
+        },
+        "internalOnly": {
+          "type": "boolean",
+          "title": "Indicates whether the entity is for internal use only; declared in Business entities only."
         },
         "collection": {
           "type": "boolean",
@@ -966,9 +978,18 @@
           "description": "This is required to enable a list of Reference Data values (as per 'RefDataType') to be passed as an argument for example."
         },
         "refDataText": {
-          "type": "boolean",
+          "type": "string",
           "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data property, overriding the 'Entity.RefDataText' selection.",
-          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true')."
+          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true').'Optional' indicates when 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' then a value is output, 'Always' indicates that the value is _always_ output, and 'Never' indicates that feature is turned off.",
+          "enum": [
+            "Optional",
+            "Always",
+            "Never"
+          ]
+        },
+        "refDataTextName": {
+          "type": "string",
+          "title": "The corresponding reference data 'Text' property name; defaults to 'Name' + 'Text'."
         },
         "refDataMapping": {
           "type": "boolean",

@@ -13,9 +13,16 @@ namespace Beef.Demo.Business.Entities
     public partial class EyeColor : ReferenceDataBaseEx<Guid, EyeColor>
     {
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="EyeColor"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="EyeColor"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
+        public static implicit operator EyeColor?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="EyeColor"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
         public static implicit operator EyeColor?(string? code) => ConvertFromCode(code);
     }

@@ -220,9 +220,17 @@ properties: [
         /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overriding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.",
-            Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
-        public bool? RefDataText { get; set; }
+        [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.", Options = new string[] { "Optional", "Always", "Never" },
+            Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`)." +
+                          "`Optional` indicates when `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` then a value is output, `Always` indicates that the value is _always_ output, and `Never` indicates that feature is turned off.")]
+        public string? RefDataText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding <i>text</i> property name.
+        /// </summary>
+        [JsonProperty("refDataTextName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The corresponding reference data `Text` property name; defaults to `Name` + 'Text'.")]
+        public string? RefDataTextName { get; set; }
 
         /// <summary>
         /// Indicates whether the property should use the underlying Reference Data mapping capabilities. 
@@ -710,7 +718,8 @@ properties: [
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
-            RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
+            RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText == true ? "Optional" : "Never");
+            RefDataTextName = DefaultWhereNull(RefDataTextName, () => Name + "Text");
             Nullable = DefaultWhereNull(Nullable, () => !DotNet.IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => Name == "ETag" ? Root!.ETagJsonName : null);
             JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);

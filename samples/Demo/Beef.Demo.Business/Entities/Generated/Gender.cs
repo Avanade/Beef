@@ -65,9 +65,16 @@ namespace Beef.Demo.Business.Entities
         }
 
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="Gender"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="Gender"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="Gender"/>.</returns>
+        public static implicit operator Gender?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="Gender"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="Gender"/>.</returns>
         public static implicit operator Gender?(string? code) => ConvertFromCode(code);
     }

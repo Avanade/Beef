@@ -13,7 +13,6 @@ namespace Beef.Demo.Business.Entities
     public partial class PostalInfo : EntityBase, IETag
     {
         private string? _countrySid;
-        private string? _countryText;
         private string? _city;
         private string? _state;
         private PlaceInfoCollection? _places;

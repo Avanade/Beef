@@ -26,7 +26,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
         /// </summary>
-        public string? ReasonText { get; set ; }
+        public string? ReasonText { get; set; }
 
         /// <summary>
         /// Gets or sets the Reason.

@@ -41,7 +41,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        public string? GenderText { get; set ; }
+        public string? GenderText { get; set; }
 
         /// <summary>
         /// Gets or sets the Gender.

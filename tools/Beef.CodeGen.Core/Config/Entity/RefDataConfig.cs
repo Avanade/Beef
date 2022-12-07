@@ -58,6 +58,8 @@ namespace Beef.CodeGen.Config.Entity
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataName, Text = $"{{{{{Root!.ODataName}}}}}" });
 
+            EntityConfig.AddConfiguredParameters(Root!.RefDataDataCtorParams, DataCtorParameters);
+
             foreach (var ctor in DataCtorParameters)
             {
                 await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);

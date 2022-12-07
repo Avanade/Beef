@@ -63,7 +63,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
         {{#unless Root.IsDataModel}}
-          {{#if RefDataText}}
+          {{#ifeq RefDataText 'Optional' 'Always'}}
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
@@ -74,9 +74,9 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
               {{/ifeq}}
             {{/ifval}}
-        public string? {{Name}}Text { get; set ; }
+        public string? {{RefDataTextName}} { get; set; }
 
-          {{/if}}
+          {{/ifeq}}
         {{/unless}}
       {{/unless}}
     {{/unless}}

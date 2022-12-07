@@ -16,9 +16,7 @@ namespace Beef.Demo.Business.Entities
         private string? _modelNo;
         private string? _serialNo;
         private string? _eyeColorSid;
-        private string? _eyeColorText;
         private string? _powerSourceSid;
-        private string? _powerSourceText;
         private string? _etag;
         private ChangeLogEx? _changeLog;
 

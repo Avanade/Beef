@@ -17,7 +17,6 @@ namespace My.Hr.Business.Entities
         private string? _lastName;
         private string? _phoneNo;
         private string? _relationshipSid;
-        private string? _relationshipText;
 
         /// <summary>
         /// Gets or sets the Id.

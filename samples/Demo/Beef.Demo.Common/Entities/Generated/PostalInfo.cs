@@ -21,7 +21,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Country"/> text (read-only where selected).
         /// </summary>
-        public string? CountryText { get; set ; }
+        public string? CountryText { get; set; }
 
         /// <summary>
         /// Gets or sets the Country.

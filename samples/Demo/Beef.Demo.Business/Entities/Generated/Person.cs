@@ -17,9 +17,7 @@ namespace Beef.Demo.Business.Entities
         private string? _lastName;
         private string? _uniqueCode;
         private string? _genderSid;
-        private string? _genderText;
         private string? _eyeColorSid;
-        private string? _eyeColorText;
         private DateTime _birthday;
         private Address? _address;
         private string? _etag;

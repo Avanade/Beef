@@ -188,7 +188,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("outboxSchemaCreate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Outbox", Title = "Indicates whether to create the `OutboxSchema` within the database.",
-            Description = "Defaults to `false`.")]
+            Description = "Defaults to `true`.")]
         public bool? OutboxSchemaCreate { get; set; }
 
         /// <summary>
@@ -376,7 +376,7 @@ namespace Beef.CodeGen.Config.Database
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
 
             OutboxSchema = DefaultWhereNull(OutboxSchema, () => "Outbox");
-            OutboxSchemaCreate = DefaultWhereNull(OutboxSchemaCreate, () => false);
+            OutboxSchemaCreate = DefaultWhereNull(OutboxSchemaCreate, () => true);
             OutboxTable = DefaultWhereNull(OutboxTable, () => "EventOutbox");
             OutboxEnqueueStoredProcedure = DefaultWhereNull(OutboxEnqueueStoredProcedure, () => $"sp{OutboxTable}Enqueue");
             OutboxDequeueStoredProcedure = DefaultWhereNull(OutboxDequeueStoredProcedure, () => $"sp{OutboxTable}Dequeue");

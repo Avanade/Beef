@@ -16,7 +16,6 @@ namespace Beef.Demo.Business.Entities
         private string? _firstName;
         private string? _lastName;
         private string? _statusSid;
-        private string? _statusText;
         private string? _internalCode;
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
         /// </summary>
-        public string? StatusText => RefDataNamespace.Status.GetRefDataText(_statusSid); 
+        public string? StatusDescription => Status?.Text; 
 
         /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).

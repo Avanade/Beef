@@ -17,7 +17,6 @@ namespace My.Hr.Business.Entities
         private string? _firstName;
         private string? _lastName;
         private string? _genderSid;
-        private string? _genderText;
         private DateTime _birthday;
         private DateTime _startDate;
         private TerminationDetail? _termination;

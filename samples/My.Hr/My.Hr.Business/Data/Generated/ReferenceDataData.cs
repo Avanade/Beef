@@ -71,8 +71,6 @@ namespace My.Hr.Business.Data
                 && s.SortOrder == default
                 && s.ETag == default;
 
-
-
             partial void GenderToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -134,8 +132,6 @@ namespace My.Hr.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-
 
             partial void TerminationReasonToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -199,8 +195,6 @@ namespace My.Hr.Business.Data
                 && s.SortOrder == default
                 && s.ETag == default;
 
-
-
             partial void RelationshipTypeToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -263,8 +257,6 @@ namespace My.Hr.Business.Data
                 && s.SortOrder == default
                 && s.ETag == default;
 
-
-
             partial void USStateToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
@@ -326,8 +318,6 @@ namespace My.Hr.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-
 
             partial void PerformanceOutcomeToModelEfMapperCtor(); // Enables the constructor to be extended.
         }

@@ -36,7 +36,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the corresponding <see cref="State"/> text (read-only where selected).
         /// </summary>
-        public string? StateText { get; set ; }
+        public string? StateText { get; set; }
 
         /// <summary>
         /// Gets or sets the State.

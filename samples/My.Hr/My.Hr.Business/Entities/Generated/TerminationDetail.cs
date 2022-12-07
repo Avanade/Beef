@@ -14,7 +14,6 @@ namespace My.Hr.Business.Entities
     {
         private DateTime _date;
         private string? _reasonSid;
-        private string? _reasonText;
 
         /// <summary>
         /// Gets or sets the Date.
