@@ -666,7 +666,16 @@ operations: [
         /// <summary>
         /// Indicates whether the <see cref="ReturnType"/> is an entity.
         /// </summary>
-        public bool IsReturnTypeEntity => DotNet.SystemTypes.Contains(ReturnType!) ? false : (!ReturnType!.StartsWith("System.") && !ReturnType!.StartsWith("Microsoft."));
+        public bool IsReturnTypeEntity => !DotNet.SystemTypes.Contains(ReturnType!) && (!ReturnType!.StartsWith("System.") && !ReturnType!.StartsWith("Microsoft."));
+
+        /// <summary>
+        /// Gets the fully qualified database stored procedure name.
+        /// </summary>
+        public string FullyQualifiedStoredProcedureName => Root!.DatabaseProvider switch
+        {
+            "MySql" => $"`{DatabaseStoredProc}`",
+            _ => $"[{Parent!.DatabaseSchema}].[{DatabaseStoredProc}]"
+        };
 
         /// <summary>
         /// The operation event properties.

@@ -39,7 +39,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("[{{DatabaseSchema}}].[sp{{Name}}GetAll]").LoadAsync("{{Name}}Id"), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
             {
-                return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("[{{DatabaseSchema}}].[sp{{Name}}GetAll]").LoadAsync("{{Name}}Id", additionalProperties: (dr, item) =>
+                return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadAsync("{{Name}}Id", additionalProperties: (dr, item) =>
                 {
       {{#each CoreProperties}}
                     item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{RefDataGetValueType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};

@@ -175,6 +175,14 @@ entities:
         public string? DatabaseSchema { get; set; }
 
         /// <summary>
+        /// Gets or sets the database provider.
+        /// </summary>
+        [JsonProperty("databaseProvider", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = new string[] { "SqlServer", "MySQL" },
+            Description = "Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.")]
+        public string? DatabaseProvider { get; set; }
+
+        /// <summary>
         /// Gets or sets the default .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.
         /// </summary>
         [JsonProperty("entityFrameworkName", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -520,7 +528,8 @@ entities:
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.Business.Entities");
             RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
-            DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
+            DatabaseProvider = DefaultWhereNull(DatabaseProvider, () => "SqlServer");
+            DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => DatabaseProvider == "SqlServer" ? "dbo" : "");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");

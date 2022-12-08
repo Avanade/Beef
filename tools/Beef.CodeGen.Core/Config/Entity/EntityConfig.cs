@@ -392,6 +392,14 @@ entities:
             Description = "Defaults to `RowVersion` (literal).")]
         public string? RefDataETagDataName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Reference Data stored procedure name.
+        /// </summary>
+        [JsonProperty("refDataStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data database stored procedure name.",
+            Description = "Defaults to `sp` (literal) + `Name` + `GetAll` (literal).")]
+        public string? RefDataStoredProcedureName { get; set; }
+
         #endregion
 
         #region Database
@@ -1280,6 +1288,15 @@ entities:
         public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"RefDataNamespace.{Name}";
 
         /// <summary>
+        /// Gets the reference data fully qualified stored procedure name.
+        /// </summary>
+        public string RefDataFullyQualifiedStoredProcedureName => Root!.DatabaseProvider switch
+        {
+            "MySQL" => $"`{RefDataStoredProcedureName}`",
+            _ => $"[{DatabaseSchema}].[{RefDataStoredProcedureName}]"
+        };
+
+        /// <summary>
         /// Indicates whether the Manager needs a DataSvc using statement.
         /// </summary>
         public bool ManagerNeedsUsingDataSvc => Operations!.Any(x => x.ManagerCustom == null || x.ManagerCustom == false);
@@ -1334,6 +1351,7 @@ entities:
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
             WebApiConcurrency = DefaultWhereNull(WebApiConcurrency, () => false);
+            RefDataStoredProcedureName = DefaultWhereNull(RefDataStoredProcedureName, () => $"sp{Name}GetAll");
             RefDataIdDataName = DefaultWhereNull(RefDataIdDataName, () => AutoImplement == "EntityFramework" || AutoImplement == "Database" ? $"{Name}Id" : "Id");
             RefDataCodeDataName = DefaultWhereNull(RefDataCodeDataName, () => Root!.RefDataCodeDataName);
             RefDataTextDataName = DefaultWhereNull(RefDataTextDataName, () => Root!.RefDataTextDataName);
