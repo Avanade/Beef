@@ -56,25 +56,25 @@ This is an instance where there is some validation logic that has been added to 
 Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously.
 
 ``` csharp
-        /// <summary>
-        /// Terminates an existing employee by updating their termination columns.
-        /// </summary>
-        private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
-        {
-            // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-            var curr = await GetOnImplementationAsync(id).ConfigureAwait(false);
-            if (curr == null)
-                throw new NotFoundException();
+/// <summary>
+/// Terminates an existing employee by updating their termination columns.
+/// </summary>
+private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
+{
+    // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
+    var curr = await GetOnImplementationAsync(id).ConfigureAwait(false);
+    if (curr == null)
+        throw new NotFoundException();
 
-            if (curr.Termination != null)
-                throw new ValidationException("An Employee can not be terminated more than once.");
+    if (curr.Termination != null)
+        throw new ValidationException("An Employee can not be terminated more than once.");
 
-            if (value.Date < curr.StartDate)
-                throw new ValidationException("An Employee can not be terminated prior to their start date.");
+    if (value.Date < curr.StartDate)
+        throw new ValidationException("An Employee can not be terminated prior to their start date.");
 
-            curr.Termination = value;
-            return await UpdateOnImplementationAsync(curr).ConfigureAwait(false);
-        }
+    curr.Termination = value;
+    return await UpdateOnImplementationAsync(curr).ConfigureAwait(false);
+}
 ```
 
 <br/>
@@ -86,24 +86,20 @@ Although, some of the validation was added into the data access logic, the prope
 Within the `My.Hr.Business/Validation` folder create `TerminationDetailValidator.cs` and implement as follows.
 
 ``` csharp
-using Beef.Validation;
-using My.Hr.Business.Entities;
+namespace My.Hr.Business.Validation;
 
-namespace My.Hr.Business.Validation
+/// <summary>
+/// Represents a <see cref="TerminationDetail"/> validator.
+/// </summary>
+public class TerminationDetailValidator : Validator<TerminationDetail>
 {
     /// <summary>
-    /// Represents a <see cref="TerminationDetail"/> validator.
+    /// Initializes a new instance of the <see cref="TerminationDetailValidator"/> class.
     /// </summary>
-    public class TerminationDetailValidator : Validator<TerminationDetail>
+    public TerminationDetailValidator()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TerminationDetailValidator"/> class.
-        /// </summary>
-        public TerminationDetailValidator()
-        {
-            Property(x => x.Date).Mandatory();
-            Property(x => x.Reason).Mandatory().IsValid();
-        }
+        Property(x => x.Date).Mandatory();
+        Property(x => x.Reason).Mandatory().IsValid();
     }
 }
 ```

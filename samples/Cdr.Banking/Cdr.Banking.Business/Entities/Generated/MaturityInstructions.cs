@@ -13,9 +13,16 @@ namespace Cdr.Banking.Business.Entities
     public partial class MaturityInstructions : ReferenceDataBaseEx<Guid, MaturityInstructions>
     {
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="MaturityInstructions"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="MaturityInstructions"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
+        public static implicit operator MaturityInstructions?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="MaturityInstructions"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
         public static implicit operator MaturityInstructions?(string? code) => ConvertFromCode(code);
     }

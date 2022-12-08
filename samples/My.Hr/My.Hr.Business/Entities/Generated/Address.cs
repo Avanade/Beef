@@ -42,7 +42,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="State"/> text (read-only where selected).
         /// </summary>
-        public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid); 
+        public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid);
 
         /// <summary>
         /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).

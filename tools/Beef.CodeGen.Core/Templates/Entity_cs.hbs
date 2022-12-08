@@ -271,12 +271,14 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
 
         {{/ifne}}
       {{/ifne}}
+      {{#ifne RefDataType 'string'}}
         /// <summary>
         /// An implicit cast from an <see cref="IIdentifier.Id"> to {{{EntityNameSeeComments}}}.
         /// </summary>
         /// <param name="id">The <see cref="IIdentifier.Id">.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
         public static implicit operator {{{EntityName}}}?({{RefDataType}} id) => ConvertFromId(id);
+      {{/ifne}}
 
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to {{{EntityNameSeeComments}}}.

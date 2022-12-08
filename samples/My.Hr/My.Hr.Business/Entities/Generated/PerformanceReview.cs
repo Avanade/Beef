@@ -45,7 +45,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
         /// </summary>
-        public string? OutcomeText => RefDataNamespace.PerformanceOutcome.GetRefDataText(_outcomeSid); 
+        public string? OutcomeText => RefDataNamespace.PerformanceOutcome.GetRefDataText(_outcomeSid);
 
         /// <summary>
         /// Gets or sets the Outcome (see <see cref="RefDataNamespace.PerformanceOutcome"/>).

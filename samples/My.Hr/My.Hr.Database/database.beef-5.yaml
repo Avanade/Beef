@@ -3,7 +3,7 @@
 # - Outbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
 # 
 schema: Hr
-# outbox: true - temporarily deprecated
+outbox: true
 tables:
   # Reference data tables/models.
 - { name: Gender, efModel: true }

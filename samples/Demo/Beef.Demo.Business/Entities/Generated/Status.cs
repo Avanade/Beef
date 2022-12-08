@@ -12,12 +12,6 @@ namespace Beef.Demo.Business.Entities
     /// </summary>
     public partial class Status : ReferenceDataBaseEx<string?, Status>
     {
-        /// <summary>
-        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="Status"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
-        /// <returns>The corresponding <see cref="Status"/>.</returns>
-        public static implicit operator Status?(string id) => ConvertFromId(id);
 
         /// <summary>
         /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="Status"/>.

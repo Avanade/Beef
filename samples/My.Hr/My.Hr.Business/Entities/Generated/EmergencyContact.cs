@@ -47,7 +47,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
         /// </summary>
-        public string? RelationshipText => RefDataNamespace.RelationshipType.GetRefDataText(_relationshipSid); 
+        public string? RelationshipText => RefDataNamespace.RelationshipType.GetRefDataText(_relationshipSid);
 
         /// <summary>
         /// Gets or sets the Relationship (see <see cref="RefDataNamespace.RelationshipType"/>).

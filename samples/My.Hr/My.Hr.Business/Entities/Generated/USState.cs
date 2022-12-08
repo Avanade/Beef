@@ -13,9 +13,16 @@ namespace My.Hr.Business.Entities
     public partial class USState : ReferenceDataBaseEx<Guid, USState>
     {
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="USState"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="USState"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="USState"/>.</returns>
+        public static implicit operator USState?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="USState"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="USState"/>.</returns>
         public static implicit operator USState?(string? code) => ConvertFromCode(code);
     }

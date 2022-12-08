@@ -49,6 +49,7 @@ operations: [
     [CodeGenCategory("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
     [CodeGenCategory("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CodeGenCategory("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.")]
+    [CodeGenCategory("EntityFramework", Title = "Provides the specific _EntityFramework_ configuration where `AutoImplement` is `EntityFramework`.")]
     [CodeGenCategory("Cosmos", Title = "Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.")]
     [CodeGenCategory("OData", Title = "Provides the specific _OData_ configuration where `AutoImplement` is `OData`.")]
     [CodeGenCategory("HttpAgent", Title = "Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.")]
@@ -203,7 +204,28 @@ operations: [
 
         #endregion
 
+        #region EntityFramework
+
+        /// <summary>
+        /// Gets or sets the corresponding Entity Framework model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
+        /// </summary>
+        [JsonProperty("entityFrameworkModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("EntityFramework", Title = "The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true,
+            Description = "Overrides the `Entity.EntityFrameworkModel`.")]
+
+        public string? EntityFrameworkModel { get; set; }
+
+        #endregion
+
         #region Cosmos
+
+        /// <summary>
+        /// Gets or sets the corresponding Cosmos model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
+        /// </summary>
+        [JsonProperty("cosmosModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Cosmos", Title = "The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true,
+            Description = "Overrides the `Entity.CosmosModel`.")]
+        public string? CosmosModel { get; set; }
 
         /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> override.
@@ -932,6 +954,8 @@ operations: [
             });
 
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
+            EntityFrameworkModel = DefaultWhereNull(EntityFrameworkModel, () => Parent!.EntityFrameworkModel);
+            CosmosModel = DefaultWhereNull(CosmosModel, () => Parent!.CosmosModel);
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);

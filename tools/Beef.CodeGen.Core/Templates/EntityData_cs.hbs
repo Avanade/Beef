@@ -29,13 +29,13 @@ namespace {{Root.NamespaceBusiness}}.Data
         private Action<DatabaseParameterCollection{{#each CoreDataParameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnQuery;
         {{/ifeq}}
         {{#ifeq AutoImplement 'EntityFramework'}}
-        private Func<IQueryable<{{Parent.EntityFrameworkModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{Parent.EntityFrameworkModel}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{EntityFrameworkModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{EntityFrameworkModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}}   
         {{#ifeq AutoImplement 'Cosmos'}}
           {{#ifval Parent.CosmosValueContainer}}
-        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<CosmosDbValue<{{CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<CosmosDbValue<{{CosmosModel}}>>>? {{PrivateName}}OnQuery;
           {{else}}
-        private Func<IQueryable<{{Parent.CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{Parent.CosmosModel}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}IQueryable<{{CosmosModel}}>>? {{PrivateName}}OnQuery;
           {{/ifval}}
         {{/ifeq}}  
         {{#ifeq AutoImplement 'OData'}}
@@ -115,9 +115,9 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'EntityFramework'}}
         {{#ifeq Type 'GetColl'}}
-            {{#if DataExtensions}}var __result = await{{else}}return{{/if}} {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{Parent.EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}.ConfigureAwait(false){{/if}};
+            {{#if DataExtensions}}var __result = await{{else}}return{{/if}} {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}.ConfigureAwait(false){{/if}};
         {{else}}
-            {{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var __result = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}{{#unless DataSingleLine}}await {{/unless}}{{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{Parent.EntityFrameworkModel}}>({{#if HasValue}}value ?? throw new ArgumentNullException(nameof(value)){{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#unless DataSingleLine}}.ConfigureAwait(false){{/unless}};
+            {{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var __result = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}{{#unless DataSingleLine}}await {{/unless}}{{DataArgs.Name}}.{{Type}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{EntityFrameworkModel}}>({{#if HasValue}}value ?? throw new ArgumentNullException(nameof(value)){{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#unless DataSingleLine}}.ConfigureAwait(false){{/unless}};
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
@@ -209,6 +209,7 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{/unless}}
 {{/if}}
 {{#if UsesEntityFramework}}
+ {{#ifval EntityFrameworkModel}}
   {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
@@ -289,8 +290,10 @@ namespace {{Root.NamespaceBusiness}}.Data
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
   {{/unless}}
+ {{/ifval}}
 {{/if}}
 {{#if UsesCosmos}}
+ {{#ifval CosmosModel}}
   {{#unless CosmosCustomMapper}}
 
         /// <summary>
@@ -353,6 +356,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
   {{/unless}}
+ {{/ifval}}
 {{/if}}
 {{#if UsesOData}}
   {{#unless ODataCustomMapper}}

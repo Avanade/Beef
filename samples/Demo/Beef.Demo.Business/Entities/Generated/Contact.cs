@@ -42,7 +42,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
         /// </summary>
-        public string? StatusDescription => Status?.Text; 
+        public string? StatusDescription => Status?.Text;
 
         /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.Status"/>).

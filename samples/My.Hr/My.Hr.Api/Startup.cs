@@ -1,4 +1,7 @@
-﻿namespace My.Hr.Api
+﻿using CoreEx.Database;
+using CoreEx.Events;
+
+namespace My.Hr.Api
 {
     /// <summary>
     /// Represents the <b>startup</b> class.
@@ -67,17 +70,21 @@
 
             // Add event publishing services.
             //var ehcs = _config.GetValue<string>("EventHubConnectionString");
-            //if (!string.IsNullOrEmpty(ehcs))
+            //if (!string.IsNullOrEmpty(ehcs)) 
             //    services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
             //else
             //    services.AddBeefNullEventPublisher();
             services.AddNullEventPublisher();
 
             // Add transactional event outbox services.
-            //services.AddGeneratedDatabaseEventOutbox();
-            //services.AddBeefDatabaseEventOutboxPublisherService();
+            services.AddScoped<IEventSender>(sp =>
+            {
+                var eoe = new EventOutboxEnqueue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<ILogger<EventOutboxEnqueue>>());
+                //eoe.SetPrimaryEventSender(/* the primary sender instance; i.e. service bus */); // This is optional.
+                return eoe;
+            });
 
-            // Add AutoMapper services via Assembly-based probing for Profiles.
+            // Add entity mapping services using assembly probing.
             services.AddMappers<HrSettings>();
 
             // Add additional services.

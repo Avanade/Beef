@@ -54,7 +54,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
         /// </summary>
-        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid); 
+        public string? GenderText => RefDataNamespace.Gender.GetRefDataText(_genderSid);
 
         /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
@@ -72,7 +72,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid); 
+        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
 
         /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).

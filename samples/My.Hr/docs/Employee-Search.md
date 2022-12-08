@@ -34,9 +34,9 @@ During the initial database set up process the `Employee` table (with a subset o
 
 ## Selection criteria
 
-The API selection criteria will be enabled by defining a class with all of the requisite properties. _Beef_ will then expose each of the properties individually within the API Controller to enable their usage. _Beef_ can automatically enable paging support when selected to do so; therefore, this does not need to be enabled via the selection criteria directly.
+The API selection criteria will be enabled by defining a class with all of the requisite properties. _Beef_ will then expose each of the properties individually within the API Controller to enable their usage. _Beef_ can also automatically enable paging support when selected to do so; therefore, this does not need to be enabled via the selection criteria directly.
 
-Add the following entity code-gen configuration after all the other existing entities within `entity.beef.yaml` (`My.Hr.CodeGen` project).
+Add the following entity code-gen configuration after all the other existing entities within `entity.beef-5.yaml` (`My.Hr.CodeGen` project).
 
 ``` yaml
   # Creating an EmployeeArgs entity
@@ -55,7 +55,7 @@ Add the following entity code-gen configuration after all the other existing ent
   }
 ```
 
-The `GetByArgs` operation needs to be added to the `Employee` entity configuration; add the following after the existing `Delete` operation.
+The requisite `GetByArgs` operation needs to be added to the `Employee` entity configuration; add the following after the existing `Delete` operation.
 
 ``` yaml
       # Search operation
@@ -64,18 +64,19 @@ The `GetByArgs` operation needs to be added to the `Employee` entity configurati
       # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
       # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
       # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
-      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework,
+      # - EntityFrameworkModel needs to be specified as it can not be inferred from the entity itself. 
+      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee,
         parameters: [
           { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }
         ]
       }
 ```
 
-So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` object configuration. Replace the previous YAML for the `Employee` (including the new comment) with the following.
+So that the code-gen knows what Entity Framework model mapping is to be generated this needs to be appended to the existing `EmployeeBase` object configurations. Append `entityFrameworkModel: EfModel.Employee,` to the previous YAML for the `EmployeeBase`. These should now look similar to the following.
 
 ``` yaml
-  # - The EntityFrameworkModel is required so that the GetByArgs code-gen knows what EfModel is to be used; however, EntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required).
-- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
+- { name: EmployeeBase, text: '{{Employee}} base', collection: true, collectionResult: true, excludeData: RequiresMapper, autoImplement: Database, entityFrameworkModel: EfModel.Employee,
+    properties: [
 ```
 
 Execute the code-generation using the command line.
@@ -88,55 +89,31 @@ dotnet run entity
 
 ## Data access logic
 
-The existing `EmployeeData.cs` logic will need to be extended to support the new `GetByArgs`. 
+The existing customized `EmployeeData.cs` (non-generated) logic will need to be extended to support the new `GetByArgs`. 
 
-For query operations generally we do not implement using the custom `OnImplementation` approach, as the primary code with the exception of the actual search criteria can be generated. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
+For query operations generally we do not implement using the custom `*OnImplementation` approach; as the primary code, with the exception of the actual search criteria can be generated successfully. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
 
 Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
 
-Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. The `With` methods are enabled by _Beef_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards.
+Add the following code to the top of the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards.
 
 ``` csharp
-        partial void EmployeeDataCtor()
-        {
-            // Implement the GetByArgs OnQuery search/filtering logic.
-            _getByArgsOnQuery = (q, args, _) =>
-            {
-                _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-                _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-                _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
-                _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
-                _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
-
-                if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
-                    q = q.Where(x => x.TerminationDate == null);
-
-                return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);
-            };
-        }
-```
-
-Additionally to support the `AutoMapper` logic needed for the `TerminationDetail` reshaping, the existing `EmployeeBaseData` needs to be extended. This is performed similar to above using a partial class.
-
-Create a new non-generated `EmployeeBaseData.cs` (`My.Hr.Business/Data`) and replace with the following `AutoMapper` code. Note that only the EF to Entity mappings is required as the update occurs using Stored Procedures.
-
-``` csharp
-using My.Hr.Business.Entities;
-
-namespace My.Hr.Business.Data
+partial void EmployeeDataCtor()
 {
-    public partial class EmployeeBaseData
+    // Implement the GetByArgs OnQuery search/filtering logic.
+    _getByArgsOnQuery = (q, args) =>
     {
-        public partial class EfMapperProfile
-        {
-            partial void EfMapperProfileCtor(AutoMapper.IMappingExpression<EmployeeBase, EfModel.Employee> s2d, AutoMapper.IMappingExpression<EfModel.Employee, EmployeeBase> d2s)
-            {
-                // Reshape the Termination-related columns into a TermaintionDetail type.
-                d2s.ForPath(s => s.Termination!.Date, o => o.MapFrom(d => d.TerminationDate));
-                d2s.ForPath(s => s.Termination!.ReasonSid, o => o.MapFrom(d => d.TerminationReasonCode));
-            }
-        }
-    }
+        _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
+        _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
+        _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
+        _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
+        _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
+
+        if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
+            q = q.Where(x => x.TerminationDate == null);
+
+        return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);
+    };
 }
 ```
 
@@ -144,29 +121,25 @@ namespace My.Hr.Business.Data
 
 ## Validation
 
-Within the `My.Hr.Business/Validation` folder create `EmployeeArgsValidator.cs` and implement as follows.
+Within the `My.Hr.Business/Validation` folder, create `EmployeeArgsValidator.cs` and implement as follows.
 
 ``` csharp
-using Beef.Validation;
-using My.Hr.Business.Entities;
+namespace My.Hr.Business.Validation;
 
-namespace My.Hr.Business.Validation
+/// <summary>
+/// Represents a <see cref="EmployeeArgs"/> validator.
+/// </summary>
+public class EmployeeArgsValidator : Validator<EmployeeArgs>
 {
     /// <summary>
-    /// Represents a <see cref="EmployeeArgs"/> validator.
+    /// Initializes a new instance of the <see cref="EmployeeValidator"/> class.
     /// </summary>
-    public class EmployeeArgsValidator : Validator<EmployeeArgs>
+    public EmployeeArgsValidator()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EmployeeValidator"/> class.
-        /// </summary>
-        public EmployeeArgsValidator()
-        {
-            Property(x => x.FirstName).Common(CommonValidators.PersonName).Wildcard();
-            Property(x => x.LastName).Common(CommonValidators.PersonName).Wildcard();
-            Property(x => x.Genders).AreValid();
-            Property(x => x.StartFrom).CompareProperty(CompareOperator.LessThanEqual, x => x.StartTo);
-        }
+        Property(x => x.FirstName).Common(CommonValidators.PersonName).Wildcard();
+        Property(x => x.LastName).Common(CommonValidators.PersonName).Wildcard();
+        Property(x => x.Genders).AreValid();
+        Property(x => x.StartFrom).CompareProperty(CompareOperator.LessThanEqual, x => x.StartTo);
     }
 }
 ```

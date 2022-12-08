@@ -40,7 +40,7 @@ The base code-generation tooling is enabled by [`OnRamp`](https://github.com/Ava
 
 ### Configuration
 
-The code-gen is driven by a configuration data source, in this case YAML, JSON or XML.
+The code-gen is driven by a configuration data source, in this case YAML or JSON.
 
 The two supported configurations are:
 - [Entity-driven](#Entity-driven-code-gen) - the configuration root definition is [`Entity.CodeGenConfig`](./Config/Entity/CodeGenConfig.cs). All the related types are found [here](./Config/Entity).
@@ -76,20 +76,20 @@ The entity-driven gen-many code generation is enabled by an **Entity** configura
 ```
 
 Configuration details for each of the above are as follows:
-- `CodeGeneration` - [YAML/JSON](../../docs/Entity-CodeGeneration-Config.md) or [XML](../../docs/Entity-CodeGeneration-Config-Xml.md)
-- `Entity` - [YAML/JSON](../../docs/Entity-Entity-Config.md) or [XML](../../docs/Entity-Entity-Config-Xml.md)
-- `Property` - [YAML/JSON](../../docs/Entity-Property-Config.md) or [XML](../../docs/Entity-Property-Config-Xml.md)
-- `Const` - [YAML/JSON](../../docs/Entity-Const-Config.md) or [XML](../../docs/Entity-Const-Config-Xml.md)
-- `Operation` - [YAML/JSON](../../docs/Entity-Operation-Config.md) or [XML](../../docs/Entity-Operation-Config-Xml.md)
-- `Parameter` - [YAML/JSON](../../docs/Entity-Parameter-Config.md) or [XML](../../docs/Entity-Parameter-Config-Xml.md)
+- `CodeGeneration` - [YAML/JSON](../../docs/Entity-CodeGeneration-Config.md)
+- `Entity` - [YAML/JSON](../../docs/Entity-Entity-Config.md)
+- `Property` - [YAML/JSON](../../docs/Entity-Property-Config.md)
+- `Const` - [YAML/JSON](../../docs/Entity-Const-Config.md) or [XML]
+- `Operation` - [YAML/JSON](../../docs/Entity-Operation-Config.md)
+- `Parameter` - [YAML/JSON](../../docs/Entity-Parameter-Config.md)
 
-The Entity configuration supported filenames are, in the order in which they are searched by the code generator: `entity.beef.yaml`, `entity.beef.json`, `entity.beef.xml`, `{Company}.{AppName}.xml`.
+The Entity configuration supported filenames are, in the order in which they are searched by the code generator: `entity.beef-5.yaml` and `entity.beef-5.json`.
 
-The Entity configuration is defined by a schema, YAML/JSON-based [entity.beef.json](../../tools/Beef.CodeGen.Core/Schema/entity.beef.json) and XML-based [codegen.entity.xsd](../../tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd). These schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
+The Entity configuration is defined by a schema, YAML/JSON-based [entity.beef.json](../../tools/Beef.CodeGen.Core/Schema/entity.beef.json). This schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
 There are two additional configuration files that share the same schema:
-- [Reference Data](./../../docs/Reference-Data.md) - used to define (configure) the _Beef_-specific Reference Data. Supported filenames are in the order in which they are searched by the code generator: `refdata.beef.yaml`, `refdata.beef.json`, `refdata.beef.xml`, `{Company}.{AppName}.RefData.xml`.
-- Data Model - used to define (configure) basic data model .NET classes typically used to represent internal/backend contracts that do not require the full funcionality of a _Beef_ entity. Supported filenames are in the order in which they are searched by the code generator: `datamodel.beef.yaml`, `datamodel.beef.json`, `datamodel.beef.xml`, `{Company}.{AppName}.DataModel.xml`.
+- [Reference Data](./../../docs/Reference-Data.md) - used to define (configure) the _Beef_-specific Reference Data. Supported filenames are in the order in which they are searched by the code generator: `refdata.beef-5.yaml` and `refdata.beef-5.json`.
+- Data Model - used to define (configure) basic data model .NET classes typically used to represent internal/backend contracts that do not require the full funcionality of a _Beef_ entity. Supported filenames are in the order in which they are searched by the code generator: `datamodel.beef-5.yaml` and `datamodel.beef-5.json`.
 
 <br/>
 
@@ -110,31 +110,25 @@ The database-driven code generation is enabled by a **Database** configuration f
       └── Where(s)
       └── OrderBy(s)
       └── Execute(s)
-  └── Cdc(s)
-    └── CdcJoin(s)
-      └── CdcJoinOn(s)
 ```
 
 Configuration details for each of the above are as follows:
-- CodeGeneration - [YAML/JSON](../../docs/Database-CodeGeneration-Config.md) or [XML](../../docs/Database-CodeGeneration-Config-Xml.md)
-- Query - [YAML/JSON](../../docs/Database-Query-Config.md) or [XML](../../docs/Database-Query-Config-Xml.md)
-- QueryJoin - [YAML/JSON](../../docs/Database-QueryJoin-Config.md) or [XML](../../docs/Database-QueryJoin-Config-Xml.md)
-- QueryJoinOn - [YAML/JSON](../../docs/Database-QueryJoinOn-Config.md) or [XML](../../docs/Database-QueryJoinOn-Config-Xml.md)
-- QueryWhere - [YAML/JSON](../../docs/Database-QueryWhere-Config.md) or [XML](../../docs/Database-QueryWhere-Config-Xml.md)
-- QueryOrder - [YAML/JSON](../../docs/Database-QueryOrder-Config.md) or [XML](../../docs/Database-QueryOrder-Config-Xml.md)
-- Table - [YAML/JSON](../../docs/Database-Table-Config.md) or [XML](../../docs/Database-Table-Config-Xml.md)
-- StoredProcedure - [YAML/JSON](../../docs/Database-StoredProcedure-Config.md) or [XML](../../docs/Database-StoredProcedure-Config-Xml.md)
-- Parameter - [YAML/JSON](../../docs/Database-Parameter-Config.md) or [XML](../../docs/Database-Parameter-Config-Xml.md)
-- Where - [YAML/JSON](../../docs/Database-Where-Config.md) or [XML](../../docs/Database-Where-Config-Xml.md)
-- OrderBy - [YAML/JSON](../../docs/Database-OrderBy-Config.md) or [XML](../../docs/Database-OrderBy-Config-Xml.md)
-- Execute - [YAML/JSON](../../docs/Database-Execute-Config.md) or [XML](../../docs/Database-Execute-Config-Xml.md)
-- Cdc - [YAML/JSON](../../docs/Database-Cdc-Config.md) or [XML](../../docs/Database-Cdc-Config-Xml.md)
-- CdcJoin - [YAML/JSON](../../docs/Database-CdcJoin-Config.md) or [XML](../../docs/Database-CdcJoin-Config-Xml.md)
-- CdcJoinOn - [YAML/JSON](../../docs/Database-CdcJoinOn-Config.md) or [XML](../../docs/Database-CdcJoinOn-Config-Xml.md)
+- CodeGeneration - [YAML/JSON](../../docs/Database-CodeGeneration-Config.md)
+- Query - [YAML/JSON](../../docs/Database-Query-Config.md)
+- QueryJoin - [YAML/JSON](../../docs/Database-QueryJoin-Config.md)
+- QueryJoinOn - [YAML/JSON](../../docs/Database-QueryJoinOn-Config.md)
+- QueryWhere - [YAML/JSON](../../docs/Database-QueryWhere-Config.md)
+- QueryOrder - [YAML/JSON](../../docs/Database-QueryOrder-Config.md)
+- Table - [YAML/JSON](../../docs/Database-Table-Config.md)
+- StoredProcedure - [YAML/JSON](../../docs/Database-StoredProcedure-Config.md)
+- Parameter - [YAML/JSON](../../docs/Database-Parameter-Config.md)
+- Where - [YAML/JSON](../../docs/Database-Where-Config.md)
+- OrderBy - [YAML/JSON](../../docs/Database-OrderBy-Config.md)
+- Execute - [YAML/JSON](../../docs/Database-Execute-Config.md)
 
 The Database configuration supported filenames are, in the order in which they are searched by the code generator: `database.beef.yaml`, `database.beef.json`, `database.beef.xml`, `{Company}.{AppName}.Database.xml`.
 
-The Database configuration is defined by a schema, YAML/JSON-based [database.beef.json](../../tools/Beef.CodeGen.Core/Schema/database.beef.json) and XML-based [codegen.table.xsd](../../tools/Beef.CodeGen.Core/Schema/codegen.table.xsd). These schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
+The Database configuration is defined by a schema, YAML/JSON-based [database.beef.json](../../tools/Beef.CodeGen.Core/Schema/database.beef.json). The schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
 Finally, this is not intended as an all purpose database schema generation capability. It is expected that the tables pre-exist within the database. The database schema/table catalog information is queried from the database directly during code generation, to be additive to the configuration, to minimise the need to replicate (duplicate) column configuration and require on-going synchronization.
 
@@ -156,8 +150,8 @@ Command | Description
 -|-
 `Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.xml`](./Scripts/EntityWebApiCoreAgent.yaml) script.
 `RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.xml`](./Scripts/RefDataCoreCrud.yaml) script.
-`Database` | Performs code generation using the `Company.AppName.Database.xml` configuration and [`Database.xml`](./Scripts/Database.yaml) script.
-`DataModel` | Performs code generation using the `Company.AppName.DataModel.xml` configuration and [`DataModelOnly.xml`](./Scripts/DataModelOnly.yaml) script.
+`Database` | Performs code generation using the _database_ configuration and [`Database.xml`](../Beef.Database.SqlServer/Scripts/Database.yaml) script.
+`DataModel` | Performs code generation using the _data model_ configuration and [`DataModelOnly.xml`](./Scripts/DataModelOnly.yaml) script.
 `All` | Performs all of the above (where each is supported as per set up).
 
 Additionally, there are a number of command line options that can be used.
@@ -182,22 +176,21 @@ Options:
   -cv|--connection-varname  Database connection string environment variable name.
   -enc|--expect-no-changes  Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline).
   -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
-  -x2y|--xml-to-yaml        Convert the XML configuration into YAML equivalent (will not codegen).
 ```
 
 <br/>
 
 ### Program.cs
 
-The `Program.cs` for the new console application should be updated similar to the following. The `Company` and `AppName` values are specified, as well as optionally indicating whether the `Entity`, `RefData`, `Database` and/or `DataModel` commands are supported.
+The `Program.cs` for the new console application should be updated similar to the following. The `Company` and `AppName` values are specified, as well as optionally indicating whether the `Entity`, `RefData`, `DataModel` and/or `Database` commands are supported.
 
 ``` csharp
 public class Program
 {
-    static int Main(string[] args) => CodeGenConsole
+    static Task<int> Main(string[] args) => CodeGenConsole
         .Create("Company", "AppName")           // Create the Console setting Company and AppName.
         .Supports(entity: true, refData: true)  // Set which of the Commands are supported.
-        .Run(args);                             // Run the console.
+        .RunAsync(args);                        // Run the console.
 }
 ```
 
@@ -208,7 +201,7 @@ To run the console application, simply specify the required command; e.g:
 dotnet run entity      -- Default filename: Company.AppName.xml
 dotnet run refdata     -- Default filename: Company.RefData.xml
 dotnet run datamodel   -- Default filename: Company.AppName.DataModel.xml
-dotnet run all         -- All of the above
+dotnet run all         -- All of the above (that are supported)
 
 -- Override the configuration filename.
 dotnet run entity --configFile configfilename.xml
@@ -238,10 +231,10 @@ The [`Beef.Demo.Codegen`](./../../samples/Demo/Beef.Demo.Codegen) provides an ex
 
 Code | Description
 -|-
-[`TestConfigEditor.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Config/TestConfigEditor.cs) | This implements [`IConfigEditor`](./Config/IConfigEditor.cs) and demonstrates `ConfigBase.TryGetExtraProperty` and `ConfigBase.CustomProperties` usage.
-[`TestCodeGenerator.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Generators/TestCodeGenerator.cs) | This inherits from [`CodeGeneratorBase<TRootConfig, TGenConfig>`](./Generators/CodeGeneratorBase.cs) overriding the `SelectGenConfig` to select the configuration that will be used by the associated Template.
+[`TestConfigEditor.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Config/TestConfigEditor.cs) | This implements [`IConfigEditor`](https://github.com/Avanade/OnRamp/blob/main/src/OnRamp/Config/IConfigEditor.cs) and demonstrates `ConfigBase.TryGetExtraProperty` and `ConfigBase.CustomProperties` usage.
+[`TestCodeGenerator.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Generators/TestCodeGenerator.cs) | This inherits from [`CodeGeneratorBase<TRootConfig, TGenConfig>`](https://github.com/Avanade/OnRamp/blob/main/src/OnRamp/Generators/CodeGeneratorBaseT2.cs) overriding the `SelectGenConfig` to select the configuration that will be used by the associated Template.
 [`Test_cs.hbs`](./../../samples/Demo/Beef.Demo.CodeGen/Templates/Test_cs.hbs) | This demonstrates how to reference both the `ExtraProperties` and `CustomProperties` using _Handlebars_ syntax. This file must be added as an embedded resource.
-[`TestScript.xml`](./../../samples/Demo/Beef.Demo.CodeGen/Scripts/TestScript.xml) | This demonstrates the required configuration to wire-up the previous so that they are leveraged apprpropriately at runtime. This file must be added as an embedded resource.
+[`TestScript.yaml`](./../../samples/Demo/Beef.Demo.CodeGen/Scripts/TestScript.yaml) | This demonstrates the required configuration to wire-up the previous so that they are leveraged apprpropriately at runtime. This file must be added as an embedded resource.
 
 Finally the [`Program.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Program.cs) will need to be updated similar as follows to use the new Scripts resource.
 

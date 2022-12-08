@@ -44,7 +44,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
         /// </summary>
-        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid); 
+        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
 
         /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
         /// </summary>
-        public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid); 
+        public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid);
 
         /// <summary>
         /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).

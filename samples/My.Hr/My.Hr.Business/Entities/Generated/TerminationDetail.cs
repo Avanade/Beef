@@ -29,7 +29,7 @@ namespace My.Hr.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
         /// </summary>
-        public string? ReasonText => RefDataNamespace.TerminationReason.GetRefDataText(_reasonSid); 
+        public string? ReasonText => RefDataNamespace.TerminationReason.GetRefDataText(_reasonSid);
 
         /// <summary>
         /// Gets or sets the Reason (see <see cref="RefDataNamespace.TerminationReason"/>).

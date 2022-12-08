@@ -13,9 +13,16 @@ namespace My.Hr.Business.Entities
     public partial class RelationshipType : ReferenceDataBaseEx<Guid, RelationshipType>
     {
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="RelationshipType"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="RelationshipType"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="RelationshipType"/>.</returns>
+        public static implicit operator RelationshipType?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="RelationshipType"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="RelationshipType"/>.</returns>
         public static implicit operator RelationshipType?(string? code) => ConvertFromCode(code);
     }

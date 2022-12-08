@@ -1,11 +1,11 @@
 ﻿global using CoreEx;
 global using CoreEx.Caching;
 global using CoreEx.Configuration;
-#if (implement_database || implement_entityframework)
-global using CoreEx.Database;
-#endif
 #if (implement_cosmos)
 global using CoreEx.Cosmos;
+#endif
+#if (implement_database || implement_entityframework)
+global using CoreEx.Database;
 #endif
 #if (implement_database)
 global using CoreEx.Database.Extended;

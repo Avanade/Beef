@@ -27,7 +27,7 @@ namespace Beef.Demo.Business.Entities
         /// <summary>
         /// Gets the corresponding <see cref="Country"/> text (read-only where selected).
         /// </summary>
-        public string? CountryText => RefDataNamespace.Country.GetRefDataText(_countrySid); 
+        public string? CountryText => RefDataNamespace.Country.GetRefDataText(_countrySid);
 
         /// <summary>
         /// Gets or sets the Country (see <see cref="RefDataNamespace.Country"/>).

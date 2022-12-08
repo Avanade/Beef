@@ -24,7 +24,7 @@ public class Startup
                 .AddReferenceDataContentWebApi()
                 .AddRequestCache()
                 .AddValidationTextProvider()
-                .AddValidators<PersonValidator>()
+                .AddValidators<AppNameSettings>()
                 .AddSingleton<IIdentifierGenerator, IdentifierGenerator>();
 
 #if (implement_database || implement_sqlserver)

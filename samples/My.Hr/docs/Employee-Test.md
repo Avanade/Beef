@@ -2,22 +2,25 @@
 
 This will walk through the process of creating the required end-to-end intra-domain integration tests to validate the employee CRUD APIs.
 
-The [`Beef.Test.NUnit`](../../../tools/Beef.Test.NUnit/README.md) provides the integration testing capabilities that will be leveraged. The underlying documentation describes these capabilities and the approach in greater detail.
+[`UnitTestEx`](https://github.com/Avanade/unittestex) provides the unit and intra-domain integration testing capabilities that will be leveraged. The underlying documentation within describes these capabilities and the approach in greater detail.
 
 <br/>
 
 ## Project structure
 
-The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs` and `PersonValidatorTest.cs` should be removed (deleted).
+The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs`, `PersonValidatorTest.cs` and `A270_GetByArgs_RefDataText-Response.json` file should be removed (deleted).
 
 ```
 └── Apis
-  └── FixtureSetup.cs           <- leave; contains key logic to set up database
-  └── PersonTest.cs             <- remove
+  └── FixtureSetup.cs                            <- leave; contains key logic to set up database
+  └── PersonTest.cs                              <- remove
 └── Data
-  └── Data.yaml                 <- leave; will replace contents
+  └── Data.yaml                                  <- leave; will replace contents
+└── Resources
+  └── A270_GetByArgs_RefDataText-Response.json   <- remove
 └── Validators
-  └── PersonValidatorTest.cs    <- remove
+  └── PersonValidatorTest.cs                     <- remove
+└── ImplicitUsings.cs                            <- leave; contains all the requisite global using statements
 ```
 
 <br/>
@@ -53,7 +56,7 @@ Review and execute the tests and ensure they all pass as expected.
 
 ## Employee Validator test
 
-This is more of a pure unit test; in that all data repository access is mocked out. This allows these to execute faster without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
+This is more of a pure unit test; in that all data repository access is mocked out. This allows these to executed faster without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
 
 For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../My.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
 
@@ -63,7 +66,7 @@ Review and execute the tests and ensure they all pass as expected.
 
 ## Conclusion
 
-At this stage we now have a set of functioning and tested performance review APIs. All the desired functionality is now complete. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
+At this stage we now have a set of functioning and tested employee CRUD-based APIs. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
 
-Next we will implement the [employee search](./Employee-Search.md) endpoint.
+Next we will implement a new [employee search](./Employee-Search.md) endpoint.
 

@@ -19,9 +19,16 @@ namespace Cdr.Banking.Business.Entities
 
 
         /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to a <see cref="OpenStatus"/>.
+        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="OpenStatus"/>.
         /// </summary>
-        /// <param name="code">The <b>Code</b>.</param>
+        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+        /// <returns>The corresponding <see cref="OpenStatus"/>.</returns>
+        public static implicit operator OpenStatus?(Guid id) => ConvertFromId(id);
+
+        /// <summary>
+        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="OpenStatus"/>.
+        /// </summary>
+        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
         /// <returns>The corresponding <see cref="OpenStatus"/>.</returns>
         public static implicit operator OpenStatus?(string? code) => ConvertFromCode(code);
     }
