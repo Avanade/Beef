@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.Logging;
 using System;
 using System.Reflection;
 
@@ -44,5 +45,20 @@ namespace Beef.Database.MySql
 
         /// <inheritdoc/>
         protected override DbEx.Migration.DatabaseMigrationBase CreateMigrator() => new MySqlMigration(Args);
+
+        /// <inheritdoc/>
+        public override string AppTitle => base.AppTitle + " [MySQL]";
+
+        /// <inheritdoc/>
+        protected override void OnWriteHelp()
+        {
+            base.OnWriteHelp();
+            Logger?.LogInformation("{help}", "Script command and argument(s):");
+            Logger?.LogInformation("{help}", "  script [default]         Creates a default (empty) SQL script.");
+            Logger?.LogInformation("{help}", "  script alter <table>     Creates a SQL script to perform an ALTER TABLE.");
+            Logger?.LogInformation("{help}", "  script create <table>    Creates a SQL script to perform a CREATE TABLE.");
+            Logger?.LogInformation("{help}", "  script refdata <table>   Creates a SQL script to perform a CREATE TABLE as reference data.");
+            Logger?.LogInformation("{help}", string.Empty);
+        }
     }
 }
