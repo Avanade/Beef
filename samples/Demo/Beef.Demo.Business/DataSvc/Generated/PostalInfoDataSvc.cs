@@ -73,7 +73,7 @@ namespace Beef.Demo.Business.DataSvc
         public Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
             await _data.DeletePostCodesAsync(country, state, city).ConfigureAwait(false);
-            _events.PublishEvent(new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete");
+            _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete");
         }, new InvokerArgs { EventPublisher = _events });
     }
 }

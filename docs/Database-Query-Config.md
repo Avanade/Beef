@@ -44,7 +44,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The name of the primary table of the query. [Mandatory]
-`schema` | The schema name of the primary table of the view.<br/>&dagger; Defaults to `CodeGeneration.dbo`.
+`schema` | The schema name of the primary table of the view.<br/>&dagger; Defaults to `CodeGeneration.Schema`.
 `alias` | The `Schema.Table` alias name.<br/>&dagger; Will automatically default where not specified.
 
 <br/>

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CA1707</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\**\*" />
+    <EmbeddedResource Include="Migrations\**\*" />
+    <EmbeddedResource Include="Data\**\*" />
+    <EmbeddedResource Include="Cosmos\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Data\PerfReview.yaml" />
+    <None Remove="Resources\RefDataGendersAll_Response.json" />
+    <None Remove="Resources\RefDataGendersFilter_Response.json" />
+    <None Remove="Resources\RefDataGetNamed_Response.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RefDataGendersAll_Response.json" />
+    <EmbeddedResource Include="Resources\RefDataGendersFilter_Response.json" />
+    <EmbeddedResource Include="Resources\RefDataGetNamed_Response.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CoreEx" Version="2.2.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyEf.Hr.Api\MyEf.Hr.Api.csproj" />
+    <ProjectReference Include="..\MyEf.Hr.Database\MyEf.Hr.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ImplicitUsing.cs">
+      <PackagePath>contentFiles\any\any\Schema\</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Pack>true</Pack>
+    </Compile>
+  </ItemGroup>
+  
+</Project>

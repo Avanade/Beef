@@ -70,7 +70,7 @@ Property | Description
 -|-
 `outbox` | Indicates whether to generate the event outbox SQL and .NET artefacts.<br/>&dagger; Defaults to `false`.
 `outboxSchema` | The schema name of the event outbox table.<br/>&dagger; Defaults to `Outbox` (literal).
-`outboxSchemaCreate` | Indicates whether to create the `OutboxSchema` within the database.<br/>&dagger; Defaults to `false`.
+`outboxSchemaCreate` | Indicates whether to create the `OutboxSchema` within the database.<br/>&dagger; Defaults to `true`.
 `outboxTable` | The name of the event outbox table.<br/>&dagger; Defaults to `EventOutbox` (literal).
 `outboxEnqueueStoredProcedure` | The stored procedure name for the event outbox enqueue.<br/>&dagger; Defaults to `spEventOutboxEnqueue` (literal).
 `outboxDequeueStoredProcedure` | The stored procedure name for the event outbox dequeue.<br/>&dagger; Defaults to `spEventOutboxDequeue` (literal).

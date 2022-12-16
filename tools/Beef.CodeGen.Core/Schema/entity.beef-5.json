@@ -96,6 +96,15 @@
           "title": "The default database schema name.",
           "description": "Defaults to 'dbo'."
         },
+        "databaseProvider": {
+          "type": "string",
+          "title": "The default database schema name.",
+          "description": "Defaults to 'SqlServer'. Enables specific database provider functionality/formatting/etc. where applicable.",
+          "enum": [
+            "SqlServer",
+            "MySQL"
+          ]
+        },
         "entityFrameworkName": {
           "type": "string",
           "title": "The .NET Entity Framework interface name used where 'Operation.AutoImplement' is 'EntityFramework'.",
@@ -519,6 +528,11 @@
           "type": "string",
           "title": "The Reference Data 'ETag' data name.",
           "description": "Defaults to 'RowVersion' (literal)."
+        },
+        "refDataStoredProcedureName": {
+          "type": "string",
+          "title": "The Reference Data database stored procedure name.",
+          "description": "Defaults to 'sp' (literal) + 'Name' + 'GetAll' (literal)."
         },
         "databaseName": {
           "type": "string",
@@ -1244,6 +1258,16 @@
           "type": "string",
           "title": "The database stored procedure name used where 'Operation.AutoImplement' is 'Database'.",
           "description": "Defaults to 'sp' + 'Entity.Name' + 'Operation.Name'; e.g. 'spPersonCreate'."
+        },
+        "entityFrameworkModel": {
+          "type": "string",
+          "title": "The corresponding Entity Framework model name (required where 'AutoImplement' is 'EntityFramework').",
+          "description": "Overrides the 'Entity.EntityFrameworkModel'."
+        },
+        "cosmosModel": {
+          "type": "string",
+          "title": "The corresponding Cosmos model name (required where 'AutoImplement' is 'Cosmos').",
+          "description": "Overrides the 'Entity.CosmosModel'."
         },
         "cosmosContainerId": {
           "type": "string",

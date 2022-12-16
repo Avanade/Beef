@@ -61,7 +61,7 @@ queries:
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Key", Title = "The schema name of the primary table of the view.",
-            Description = "Defaults to `CodeGeneration.dbo`.")]
+            Description = "Defaults to `CodeGeneration.Schema`.")]
         public string? Schema { get; set; }
 
         /// <summary>
@@ -338,7 +338,7 @@ queries:
         /// </summary>
         protected override async Task PrepareAsync()
         {
-            Schema = DefaultWhereNull(Schema, () => "dbo");
+            Schema = DefaultWhereNull(Schema, () => Root!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");

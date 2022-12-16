@@ -86,7 +86,10 @@ entities:
       { name: GetWithEf, type: Get, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
       { name: CreateWithEf, type: Create, validator: PersonValidator, webApiRoute: ef, webApiLocation: ^GetWithEf, autoImplement: EntityFramework, eventPublish: None },
       { name: UpdateWithEf, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
-      { name: DeleteWithEf, type: Delete, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework, eventSubject: 'Demo.Person.{id}' },
+      { name: DeleteWithEf, type: Delete, webApiRoute: 'ef/{id}', autoImplement: EntityFramework, eventSubject: 'Demo.Person.{id}',
+        parameters: [
+          { name: Id, text: '{{Person}} identifier', type: Guid, isMandatory: true }
+        ]},
       { name: PatchWithEf, type: Patch, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework }
     ]
   }

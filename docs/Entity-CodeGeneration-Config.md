@@ -112,6 +112,7 @@ Property | Description
 -|-
 **`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`).<br/>&dagger; Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
 **`databaseSchema`** | The default database schema name.<br/>&dagger; Defaults to `dbo`.
+**`databaseProvider`** | The default database schema name. Valid options are: `SqlServer`, `MySQL`.<br/>&dagger; Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.
 
 <br/>
 

@@ -46,6 +46,7 @@ Category | Description
 [`DataSvc`](#DataSvc) | Provides the _Data Services-layer_ configuration.
 [`Data`](#Data) | Provides the generic _Data-layer_ configuration.
 [`Database`](#Database) | Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.
+[`EntityFramework`](#EntityFramework) | Provides the specific _EntityFramework_ configuration where `AutoImplement` is `EntityFramework`.
 [`Cosmos`](#Cosmos) | Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
 [`OData`](#OData) | Provides the specific _OData_ configuration where `AutoImplement` is `OData`.
 [`HttpAgent`](#HttpAgent) | Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpAgent`.
@@ -160,11 +161,21 @@ Property | Description
 
 <br/>
 
+## EntityFramework
+Provides the specific _EntityFramework_ configuration where `AutoImplement` is `EntityFramework`.
+
+Property | Description
+-|-
+**`entityFrameworkModel`** | The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).<br/>&dagger; Overrides the `Entity.EntityFrameworkModel`.
+
+<br/>
+
 ## Cosmos
 Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
 
 Property | Description
 -|-
+**`cosmosModel`** | The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).<br/>&dagger; Overrides the `Entity.CosmosModel`.
 `cosmosContainerId` | The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`.<br/>&dagger; Overrides the `Entity.CosmosContainerId`.
 `cosmosPartitionKey` | The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`.<br/>&dagger; Overrides the `Entity.CosmosPartitionKey`.
 

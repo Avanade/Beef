@@ -8,19 +8,13 @@ namespace My.Hr.Api
     /// </summary>
     public class Startup
     {
-        private readonly IConfiguration _config;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        public Startup(IConfiguration config)
+        public Startup()
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-
-            // Use JSON property names in validation and default the page size.
+            // Use JSON property names in validation.
             ValidationArgs.DefaultUseJsonNames = true;
-            PagingArgs.DefaultTake = config.GetValue<int>("DefaultPageSize");
         }
 
         /// <summary>
@@ -37,12 +31,6 @@ namespace My.Hr.Api
                     .AddExecutionContext()
                     .AddJsonSerializer()
                     .AddReferenceDataOrchestrator<IReferenceDataProvider>()
-                    //.AddBeefTextProviderAsSingleton()
-                    //.AddBeefSystemTime()
-                    //.AddBeefRequestCache()
-                    //.AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
-                    //.AddBeefWebApiServices()
-                    //.AddBeefBusinessServices()
                     .AddWebApi()
                     .AddJsonMergePatch()
                     .AddReferenceDataContentWebApi()
@@ -51,7 +39,6 @@ namespace My.Hr.Api
                     .AddValidators<EmployeeManager>();
 
             // Add the beef database services (scoped per request/connection).
-            //services.AddBeefDatabaseServices(() => new HrDb(Beef.AspNetCore.WebApi.WebApiStartup.GetConnectionString(_config, "Database")));
             services.AddDatabase(sp => new HrDb(() => new SqlConnection(sp.GetRequiredService<HrSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<HrDb>>()));
 
             // Add the beef entity framework services (scoped per request/connection).
@@ -69,11 +56,6 @@ namespace My.Hr.Api
                     .AddGeneratedDataServices();
 
             // Add event publishing services.
-            //var ehcs = _config.GetValue<string>("EventHubConnectionString");
-            //if (!string.IsNullOrEmpty(ehcs)) 
-            //    services.AddBeefEventHubEventProducer(new EventHubProducerClient(ehcs));
-            //else
-            //    services.AddBeefNullEventPublisher();
             services.AddNullEventPublisher();
 
             // Add transactional event outbox services.
@@ -109,12 +91,10 @@ namespace My.Hr.Api
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
-        //public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
         public void Configure(IApplicationBuilder app)
         {
             // Add exception handling to the pipeline.
-            //app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
+            app.UseWebApiExceptionHandler();
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();

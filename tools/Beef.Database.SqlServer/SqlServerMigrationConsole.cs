@@ -53,14 +53,7 @@ namespace Beef.Database.SqlServer
         protected override void OnWriteHelp()
         {
             base.OnWriteHelp();
-            Logger?.LogInformation("{help}", "Script command and argument(s):");
-            Logger?.LogInformation("{help}", "  script [default]                  Creates a default (empty) SQL script.");
-            Logger?.LogInformation("{help}", "  script alter <Schema> <Table>     Creates a SQL script to perform an ALTER TABLE.");
-            Logger?.LogInformation("{help}", "  script cdc <Schema> <Table>       Creates a SQL script to turn on CDC for the specified table.");
-            Logger?.LogInformation("{help}", "  script cdcdb                      Creates a SQL script to turn on CDC for the database.");
-            Logger?.LogInformation("{help}", "  script create <Schema> <Table>    Creates a SQL script to perform a CREATE TABLE.");
-            Logger?.LogInformation("{help}", "  script refdata <Schema> <Table>   Creates a SQL script to perform a CREATE TABLE as reference data.");
-            Logger?.LogInformation("{help}", "  script schema <Schema>            Creates a SQL script to perform a CREATE SCHEMA.");
+            new DbEx.SqlServer.Console.SqlServerMigrationConsole(new DbEx.Migration.MigrationArgs { Logger = Logger }).WriteScriptHelp();
             Logger?.LogInformation("{help}", string.Empty);
         }
     }

@@ -148,4 +148,5 @@ Provides related child (hierarchical) configuration.
 Property | Description
 -|-
 `storedProcedures` | The corresponding [`StoredProcedure`](Database-StoredProcedure-Config.md) collection.<br/><br/>A `StoredProcedure` object defines the stored procedure code-generation characteristics.
+`relationships` | The corresponding [`Relationship`](Database-Relationship-Config.md) collection.<br/><br/>A `Relationship` object defines an Entity Frameworrk (EF) relationship between parent and child tables.
 

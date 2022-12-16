@@ -110,6 +110,7 @@ The database-driven code generation is enabled by a **Database** configuration f
       └── Where(s)
       └── OrderBy(s)
       └── Execute(s)
+    └── Relationship(s)
 ```
 
 Configuration details for each of the above are as follows:
@@ -125,6 +126,8 @@ Configuration details for each of the above are as follows:
 - Where - [YAML/JSON](../../docs/Database-Where-Config.md)
 - OrderBy - [YAML/JSON](../../docs/Database-OrderBy-Config.md)
 - Execute - [YAML/JSON](../../docs/Database-Execute-Config.md)
+- Relationship (EF) - [YAML/JSON](../../docs/Database-Relationship-Config.md)
+
 
 The Database configuration supported filenames are, in the order in which they are searched by the code generator: `database.beef.yaml`, `database.beef.json`, `database.beef.xml`, `{Company}.{AppName}.Database.xml`.
 

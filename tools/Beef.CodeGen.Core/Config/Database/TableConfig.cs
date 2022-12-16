@@ -337,6 +337,14 @@ tables:
             Markdown = "A `StoredProcedure` object defines the stored procedure code-generation characteristics.")]
         public List<StoredProcedureConfig>? StoredProcedures { get; set; }
 
+        /// <summary>
+        /// Gets or sets the corresponding <see cref="EfRelationshipConfig"/> collection.
+        /// </summary>
+        [JsonProperty("relationships", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenPropertyCollection("Collections", Title = "The corresponding Entity Frameworrk (EF) `Relationship` collection.",
+            Markdown = "A `Relationship` object defines an Entity Frameworrk (EF) relationship between parent and child tables.")]
+        public List<EfRelationshipConfig>? Relationships { get; set; }
+
         #endregion
 
         /// <summary>
@@ -477,7 +485,7 @@ tables:
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
-                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
+                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Root.FormatSchemaTableName(Schema, Name)}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             EfModelName = DefaultWhereNull(EfModelName, () => Root.RenameForDotNet(Name));
@@ -540,6 +548,12 @@ tables:
 
             if (CompareValue(DbTable.IsAView, true))
                 PrepareView();
+
+            Relationships ??= new List<EfRelationshipConfig>();
+            foreach (var relationship in Relationships!)
+            {
+                await relationship.PrepareAsync(Root!, this).ConfigureAwait(false);
+            }
         }
 
         /// <summary>

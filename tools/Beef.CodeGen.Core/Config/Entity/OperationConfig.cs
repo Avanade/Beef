@@ -659,6 +659,26 @@ operations: [
         public ParameterConfig? PagingParameter => Parameters!.Where(x => x.IsPagingArgs).FirstOrDefault();
 
         /// <summary>
+        /// Indicates whether the <see cref="CoreParameters"/> are the same as the entity primary key.
+        /// </summary>
+        public bool IsCoreParametersSameAsPrimaryKey
+        {
+            get
+            {
+                if (CoreParameters!.Count != Parent!.PrimaryKeyProperties.Count)
+                    return false;
+
+                for (int i = 0; i < CoreParameters.Count; i++)
+                {
+                    if (CoreParameters[i].Name != Parent!.PrimaryKeyProperties[i].Name || CoreParameters[i].Type != Parent!.PrimaryKeyProperties[i].Type)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Indicates whether any parameters exist with WebApiFrom contain "FromEntityProperties".
         /// </summary>
         public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
@@ -701,6 +721,11 @@ operations: [
             /// Gets or sets the event value (if any).
             /// </summary>
             public string? Value { get; set; }
+
+            /// <summary>
+            /// Gets or sets the parent configuration.
+            /// </summary>
+            public OperationConfig? Parent { get; set; }
         }
 
         /// <summary>
@@ -1137,7 +1162,7 @@ operations: [
 
             foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))
             {
-                var ed = new OperationEvent();
+                var ed = new OperationEvent { Parent = this };
                 var parts = @event.Split(":");
                 if (parts.Length > 0)
                     ed.Subject = parts[0];
@@ -1158,13 +1183,29 @@ operations: [
 
                 if (HasReturnValue)
                     ed.Value = "__result";
-                else if (Type == "Delete" && PrimaryKey == true)
+                else if (Type == "Delete" && (PrimaryKey == true || IsCoreParametersSameAsPrimaryKey))
                 {
                     var sb = new StringBuilder();
                     foreach (var dp in DataParameters)
                     {
                         if (sb.Length == 0)
                             sb.Append($"new {Parent!.Name} {{ ");
+                        else
+                            sb.Append(", ");
+
+                        sb.Append($"{dp.Name} = {dp.ArgumentName}");
+                    }
+
+                    sb.Append(" }");
+                    ed.Value = sb.ToString();
+                }
+                else if (CoreParameters!.Count > 0)
+                {
+                    var sb = new StringBuilder();
+                    foreach (var dp in CoreParameters)
+                    {
+                        if (sb.Length == 0)
+                            sb.Append($"new {{ ");
                         else
                             sb.Append(", ");
 

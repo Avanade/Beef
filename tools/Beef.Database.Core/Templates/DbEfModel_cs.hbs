@@ -38,6 +38,13 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
         public {{ColumnTenantId.DotNetType}}{{#if ColumnTenantId.IsDotNetNullable}}?{{/if}} TenantId { get; set; }
 
 {{/ifval}}
+{{#each Relationships}}
+        /// <summary>
+        /// Gets or sets the <i>{{Type}}</i> relationship to <see cref="{{EfModelName}}"/>.
+        /// </summary>
+        public {{#ifeq Type 'OneToMany'}}List<{{/ifeq}}{{EfModelName}}{{#ifeq Type 'OneToMany'}}>{{/ifeq}} {{PropertyName}} { get; set; }
+
+{{/each}}
         /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
         /// </summary>
@@ -62,6 +69,14 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
                 entity.Property(p => p.TenantId).HasColumnName("{{ColumnTenantId.Name}}").HasColumnType("{{ColumnTenantId.EfSqlType}}");
                 entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
 {{/ifval}}
+{{#each Relationships}}
+  {{#if @first}}
+
+                // Relationships...
+  {{/if}}
+                entity.HasMany(r => r.{{PropertyName}}).WithOne().HasForeignKey({{#ifeq ForeignKeyDbColumns.Count 1}}fk => fk.{{#each ForeignKeyDbColumns}}{{PropertyName}}{{/each}}{{else}}{{#each ForeignKeyDbColumns}}{{#unless @first}}, {{/unless}}"{{PropertyName}}"{{/each}}{{/ifeq}}).OnDelete(DeleteBehavior.{{OnDelete}});
+                entity.Navigation(r => r.{{PropertyName}}).AutoInclude({{#if AutoInclude}}true{{else}}false{{/if}});
+{{/each}}
                 AddToModel(entity);
             });
         }

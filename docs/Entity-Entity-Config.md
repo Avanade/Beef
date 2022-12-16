@@ -81,6 +81,7 @@ Property | Description
 `refDataIsActiveDataName` | The Reference Data `IsActive` data name.<br/>&dagger; Defaults to `IsActive` (literal).
 `refDataSortOrderDataName` | The Reference Data `SortOrder` data name.<br/>&dagger; Defaults to `SortOrder` (literal).
 `refDataETagDataName` | The Reference Data `ETag` data name.<br/>&dagger; Defaults to `RowVersion` (literal).
+`refDataStoredProcedureName` | The Reference Data database stored procedure name.<br/>&dagger; Defaults to `sp` (literal) + `Name` + `GetAll` (literal).
 
 <br/>
 

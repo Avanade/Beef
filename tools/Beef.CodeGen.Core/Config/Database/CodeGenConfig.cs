@@ -465,5 +465,13 @@ namespace Beef.CodeGen.Config.Database
                     root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.");
             }
         }
+
+        /// <summary>
+        /// Format the <paramref name="schema"/> and <paramref name="table"/> for user output.
+        /// </summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="table">The table.</param>
+        /// <returns>The formatted name.</returns>
+        public string? FormatSchemaTableName(string? schema, string? table) => schema != null && schema.Length > 1 ? $"{schema}.{table}" : table;
     }
 }

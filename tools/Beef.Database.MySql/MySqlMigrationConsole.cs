@@ -53,11 +53,7 @@ namespace Beef.Database.MySql
         protected override void OnWriteHelp()
         {
             base.OnWriteHelp();
-            Logger?.LogInformation("{help}", "Script command and argument(s):");
-            Logger?.LogInformation("{help}", "  script [default]         Creates a default (empty) SQL script.");
-            Logger?.LogInformation("{help}", "  script alter <table>     Creates a SQL script to perform an ALTER TABLE.");
-            Logger?.LogInformation("{help}", "  script create <table>    Creates a SQL script to perform a CREATE TABLE.");
-            Logger?.LogInformation("{help}", "  script refdata <table>   Creates a SQL script to perform a CREATE TABLE as reference data.");
+            new DbEx.MySql.Console.MySqlMigrationConsole(new DbEx.Migration.MigrationArgs { Logger = Logger }).WriteScriptHelp();
             Logger?.LogInformation("{help}", string.Empty);
         }
     }

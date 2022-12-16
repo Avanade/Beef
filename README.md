@@ -6,7 +6,7 @@
 
 ## Introduction
 
-The _Beef_ framework, and the underlying code generation, has been primarily created to support the **industralisation** of API development.
+_Beef_ framework has been primarily created to support the **industralisation** of API development.
 
 > A means to have software developers focus directly on the **accelerated** delivery of **business value**; with consistently **higher quality** outcomes at an overall **lower cost**.
 
@@ -21,23 +21,34 @@ The key industralisation goals are:
 
 <br/>
 
+## Composition
+
+_Beef_ is obstensibly the code-generation engine, and solution orchestration, that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof in a standardized (albiet somewhat opinionated) manner:
+- [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilties (extends .NET core);
+- [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing;
+- [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilties;
+- [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality.
+
+Prior to version 5.x, _Beef_ was all encompassing. These capabilities have been extracted, simplified and refactored to be first class frameworks in their own right, and made into the repos listed above. This allows them to be used and maintained independently to _Beef_; therefore, offering greater opportunities for reuse versus all-or-nothing.
+
+<br/>
+
 ## Rapid enterprise-grade API development
 
 As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardised and consistent manner.
 
 The APIs created will have the following capabilities out-of-the-box with limited developer effort, so the developer can focus on the key business value:
-- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICloneable`](./src/Beef.Abstractions/Entities/ICloneable.cs), [`ICopyFrom`](./src/Beef.Abstractions/Entities/ICopyFrom.cs), [`ICleanUp`](./src/Beef.Abstractions/Entities/ICleanUp.cs), [`IUniqueKey`](./src/Beef.Abstractions/Entities/IUniqueKey.cs), etc.
+- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICopyFrom`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/ICopyFrom.cs), [`ICleanUp`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/ICleanUp.cs), [`IPrimaryKey`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/IPrimaryKey.cs), etc.
 - Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimised serialisation, and enriched API endpoints.
 - Rich [Validation](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) capability to simplify and ensure data integrity and consistency.
-- CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](./src/Beef.Data.Database/README.md) and [Entity Framework](./src/Beef.Data.EntityFrameworkCore/README.md)), [Cosmos DB](./src/Beef.Data.Cosmos/README.md) and [OData](./src/Beef.Data.OData/README.md) in a standardised manner. 
-- An approach and tooling to automate and manage [database](./tools/Beef.Database.Core/README.md) set up, configuration, and deployment.
-- [Paging](./src/Beef.Abstractions/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
+- CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Database) and [Entity Framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.EntityFrameworkCore)), [Cosmos DB](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Cosmos) and [HttpAgent](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Http) in a standardised manner. 
+- An approach and tooling to automate and manage database using [DbEx](https://github.com/Avanade/DbEx) set up, configuration, and deployment.
+- [Paging](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
 - [ETag](https://en.wikipedia.org/wiki/HTTP_ETag) (concurrency) and `If-Match`/`If-None-Match` handling.
-- JSON response field [filtering (include/exclude)](./src/Beef.Core/Json/JsonPropertyFilter.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
+- JSON response field [filtering (include/exclude)](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Text/Json/JsonFilterer.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
 - [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
 - An end-to-end intra-domain [integration testing](./tools/Beef.Test.NUnit/README.md) approach enables effective tests to be built easily and quickly.
-- [gRPC](./src/Beef.Grpc/README.md) server (and client) integration.
-- [Event](./src/Beef.Events/README.md) publishing and subcribing to enable an event-driven architecture.
+- [Event](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) publishing (and subscribing) to enable an event-driven architecture.
 
 To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined. The capabilities and implementations have been influenced by _Microsoft's best practices for cloud applications_; specifically:
 - [RESTful web API design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
@@ -97,7 +108,7 @@ Given this architecture, the .NET Solution you create using _Beef_ should adhere
 
 Each of the key layers / components above are further detailed (`Xxx` denotes the entity name): 
 - [Entity (DTO)](./docs/Layer-Entity.md) - `Xxx`
-- [Service agent](./docs/Layer-ServiceAgent.md) - `XxxAgent` and `XxxServiceAgent`
+- [Service agent](./docs/Layer-ServiceAgent.md) - `XxxAgent`
 - [Service interface](./docs/Layer-ServiceInterface.md) - `XxxController`
 - [Domain logic](./docs/Layer-Manager.md) - `XxxManager`
 - [Service orchestration](./docs/Layer-DataSvc.md) - `XxxDataSvc`
@@ -111,19 +122,17 @@ To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/
 
 ![Layers](./docs/images/EventDrivenArchitecture.png "Event-Driven Architecture")
 
-- **Producer / Publisher** - the publishing of events is integrated into the API processing pipeline; this is enabled within either the [Data](./docs/Layer-Data.md) (where leveraging the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html)) or [Service orchestration](./docs/Layer-DataSvc.md) layers to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer (unless provided, see Azure [EventHubs](./src/Beef.Events.EventHubs) or [ServiceBus](./src/Beef.Events.ServiceBus)). 
+- **Producer / Publisher** - the publishing of events is integrated into the API processing pipeline; this is enabled within either the [Data](./docs/Layer-Data.md) (where leveraging the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html)) or [Service orchestration](./docs/Layer-DataSvc.md) layers to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer (unless provided, see Azure [ServiceBus](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Azure/ServiceBus)). 
 
 - **Consumer / Subscriber** - a event subscriber is then implemented to listen to events from the underlying event/messaging infrastructure (event-stream) and perform the related action. The event subscriber is encouraged to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a subscribing domain).
 
-The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events), [`Beef.Events.EventHubs`](./src/Beef.Events.EventHubs) and [`Beef.Events.ServiceBus`](./src/Beef.Events.ServiceBus) assemblies.
-
-Additionally, _Beef_ has capabilities to support the [Transactional Outbox Pattern](./docs/Outbox-Pattern.md) where there is a requirement for events to be sent _reliably_ (with no message loss); i.e. to guarantee at-least-once sent semantics within the context of the underlying data update (currently only supported for Database repository).
+Additionally, _Beef_ has capabilities to support (and generate) the [Transactional Outbox Pattern](https://github.com/Avanade/DbEx/blob/main/docs/SqlServerEventOutbox.md) where there is a requirement for events to be sent _reliably_ (with no message loss); i.e. to guarantee at-least-once sent semantics within the context of the underlying data update (currently only supported for Database repository).
 
 <br/>
 
 ## Framework 
 
-A comprehensive **framework** has been created to support the defined architecture, to encapsulate and standardise capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
+A comprehensive [*framework*](https://github.com/Avanade/CoreEx) has been created to support the defined architecture, to encapsulate and standardise capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
 
 Standardised approach, ensures consistency of implementation:
 - Reduction in development effort.
@@ -131,42 +140,35 @@ Standardised approach, ensures consistency of implementation:
 - Greater confidence in adherence to architectural vision; minimised deviation.
 - Generation and alike enables the solution to evolve more quickly and effectively over time. 
 
-A key accelerator for _Beef_ is achieved using a flexible [code generation](./tools/Beef.CodeGen.Core/README.md) approach.
+A key accelerator for _Beef_ is achieved using a flexible [code generation](./tools/Beef.CodeGen.Core/README.md) approach leveraging [_OnRamp_](https://github.com/Avanade/onramp).
 
-An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
+<br/>
 
-The **key** capabilities for _Beef_ are enabled by the following runtime assemblies:
+## Packages
 
-Assembly | Description | NuGet | Changes
+The **key** tooling capabilities for _Beef_ are enabled by the following NuGet packages (version 5+). The included [change log](./CHANGELOG.md) details all key changes per published version.
+
+Assembly | Description | NuGet
 -|-|-|-
-[`Beef.Abstractions`](./src/Beef.Abstractions) | Core foundational framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Abstractions.svg)](https://badge.fury.io/nu/Beef.Abstractions) | [Log](./src/Beef.Abstractions/CHANGELOG.md)
-[`Beef.Core`](./src/Beef.Core) | Core foundational framework. | [![NuGet version](https://badge.fury.io/nu/Beef.core.svg)](https://badge.fury.io/nu/Beef.core) | [Log](./src/Beef.Core/CHANGELOG.md)
-[`Beef.AspNetCore.WebApi`](./src/Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi) | [Log](./src/Beef.AspNetCore.WebApi/ChangeLog.md)
-[`Beef.Data.Database`](./src/Beef.Data.Database) | ADO.NET database framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database) | [Log](./src/Beef.Data.Database/CHANGELOG.md)
-[`Beef.Data.Database.Cdc`](./src/Beef.Data.Database.Cdc) | ADO.NET database Change Data Capture (CDC) framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.Cdc.svg)](https://badge.fury.io/nu/Beef.Data.Database.Cdc) | [Log](./src/Beef.Data.Database.Cdc/CHANGELOG.md)
-[`Beef.Data.EntityFrameworkCore`](./src/Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore.svg)](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore) | [Log](./src/Beef.Data.EntityFrameworkCore/CHANGELOG.md)
-[`Beef.Data.Cosmos`](./src/Beef.Data.Cosmos) | Cosmos DB execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Cosmos.svg)](https://badge.fury.io/nu/Beef.Data.Cosmos) | [Log](./src/Beef.Data.Cosmos/CHANGELOG.md)
-[`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData) | [Log](./src/Beef.Data.OData/CHANGELOG.md)
-[`Beef.Events`](./src/Beef.Events) | Supporting Event-driven framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.svg)](https://badge.fury.io/nu/Beef.Events) | [Log](./src/Beef.Events/CHANGELOG.md)
-[`Beef.Events.EventHubs`](./src/Beef.Events.EventHubs) | Supporting Event-driven framework using Azure Event Hubs. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.EventHubs.svg)](https://badge.fury.io/nu/Beef.Events.EventHubs) | [Log](./src/Beef.Events.EventHubs/CHANGELOG.md)
-[`Beef.Events.ServiceBus`](./src/Beef.Events.ServiceBus) | Supporting Event-driven framework using Azure Service Bus. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.ServiceBus.svg)](https://badge.fury.io/nu/Beef.Events.ServiceBus) | [Log](./src/Beef.Events.ServiceBus/CHANGELOG.md)
+[`Beef.CodeGen.Core`](./tools/Beef.CodeGen.Core) | Code generation console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core)
+[`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
+[`Beef.Database.SqlServer`](./tools/Beef.Database.SqlServer) | SQL Server database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.SqlServer.svg)](https://badge.fury.io/nu/Beef.Database.SqlServer)
+[`Beef.Database.MySql`](./tools/Beef.Database.MySql) | MySQL database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.MySql.svg)](https://badge.fury.io/nu/Beef.Database.MySql)
+[`Beef.Template.Solution`](./templates/Beef.Template.Solution) | Solution and projects template. | [![NuGet version](https://badge.fury.io/nu/Beef.Template.Solution.svg)](https://badge.fury.io/nu/Beef.Template.Solution) 
 
-The tooling / supporting capabilities for _Beef_ are enabled by the following assemblies:
+The following is provided to support a level of version 4.x backwards compatibility.
 
-Assembly | Description | NuGet | Changes
+Assembly | Description | NuGet
 -|-|-|-
-[`Beef.CodeGen.Core`](./tools/Beef.CodeGen.Core) | Code generation console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core) | [Log](./tools/Beef.CodeGen.Core/CHANGELOG.md)
-[`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core) | [Log](./tools/Beef.Database.Core/CHANGELOG.md)
-[`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit) | [Log](./tools/Beef.Test.NUnit/CHANGELOG.md)
-[`Beef.Template.Solution`](./templates/Beef.Template.Solution) | Solution and projects template. | [![NuGet version](https://badge.fury.io/nu/Beef.Template.Solution.svg)](https://badge.fury.io/nu/Beef.Template.Solution) | [Log](./templates/Beef.Template.Solution/CHANGELOG.md)
+[`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework (backwards compatibility only). | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
 
 The following samples are provided to guide usage:
 
 Sample | Description
 -|-
 [`My.Hr`](./samples/My.Hr) | A sample as an end-to-end solution walkthrough to demonstrate the usage of _Beef_ within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
+[`MyEf.Hr`](./samples/MyEf.Hr) | A sample as an end-to-end solution walkthrough to demonstrate the usage of _Beef_ within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging only Entity Framework (EF).
 [`Cdr.Banking`](./samples/Cdr.Banking) | A sample as an end-to-end solution to demonstrate _Beef_ being used to solve a real-world scenario. This demonstrates an implementation of the [CDR](https://consumerdatastandards.org.au/) [Banking](https://consumerdatastandardsaustralia.github.io/standards/#consumer-data-standards-banking-apis) APIs leveraging a Cosmos DB data source.
-[`Xyz.Legacy`](./samples/Xyz.Legacy) | A sample as an end-to-end solution to demonstrate _Beef_ being used to faciliate the introduction of [Change Data Capture (CDC)](./src/Beef.Data.Database.Cdc) entity event publishing on a legacy SQL Server database.
 [`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is primarily used to further test the key end-to-end capabilities enabled by _Beef_.
 
 <br/>
@@ -178,8 +180,8 @@ The following are references to additional documentation (these are all accessib
 ### General
 
 - [Reference data](./docs/Reference-Data.md)
-- [Validation](./docs/Beef-Validation.md)
-- [HTTP PATCH](./docs/Http-Patch.md)
+- [Validation](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation)
+- [HTTP PATCH](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Http/HttpPatchOption.cs)
 - [Authentication](./docs/Authentication.md)
 
 ### Solution
@@ -195,33 +197,29 @@ The following are references to additional documentation (these are all accessib
 ### Code-generation
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
-- **Entity-driven** (.NET C#) - CodeGeneration - [YAML/JSON](./docs/Entity-CodeGeneration-Config.md) or [XML](./docs/Entity-CodeGeneration-Config-Xml.md)
-  - Entity - [YAML/JSON](./docs/Entity-Entity-Config.md) or [XML](./docs/Entity-Entity-Config-Xml.md)
-  - Properties - [YAML/JSON](./docs/Entity-Property-Config.md) or [XML](./docs/Entity-Property-Config-Xml.md)
-  - Constants - [YAML/JSON](./docs/Entity-Const-Config.md) or [XML](./docs/Entity-Const-Config-Xml.md)
-  - Operations - [YAML/JSON](./docs/Entity-Operation-Config.md) or [XML](./docs/Entity-Operation-Config-Xml.md)
-  - Parameters - [YAML/JSON](./docs/Entity-Parameter-Config.md) or [XML](./docs/Entity-Parameter-Config-Xml.md)
-- **Database-driven** ([database](./tools/Beef.Database.Core/README.md)) - CodeGeneration - [YAML/JSON](./docs/Database-CodeGeneration-Config.md) or [XML](./docs/Database-CodeGeneration-Config-Xml.md)
-  - Query - [YAML/JSON](./docs/Database-Query-Config.md) or [XML](./docs/Database-Query-Config-Xml.md)
-  - QueryJoin - [YAML/JSON](./docs/Database-QueryJoin-Config.md) or [XML](./docs/Database-QueryJoin-Config-Xml.md)
-  - QueryJoinOn - [YAML/JSON](./docs/Database-QueryJoinOn-Config.md) or [XML](./docs/Database-QueryJoinOn-Config-Xml.md)
-  - QueryWhere - [YAML/JSON](./docs/Database-QueryWhere-Config.md) or [XML](./docs/Database-QueryWhere-Config-Xml.md)
-  - QueryOrder - [YAML/JSON](./docs/Database-QueryOrder-Config.md) or [XML](./docs/Database-QueryOrder-Config-Xml.md)
-  - Table - [YAML/JSON](./docs/Database-Table-Config.md) or [XML](./docs/Database-Table-Config-Xml.md)
-  - StoredProcedure - [YAML/JSON](./docs/Database-StoredProcedure-Config.md) or [XML](./docs/Database-StoredProcedure-Config-Xml.md)
-  - Parameter - [YAML/JSON](./docs/Database-Parameter-Config.md) or [XML](./docs/Database-Parameter-Config-Xml.md)
-  - Where - [YAML/JSON](./docs/Database-Where-Config.md) or [XML](./docs/Database-Where-Config-Xml.md)
-  - OrderBy - [YAML/JSON](./docs/Database-OrderBy-Config.md) or [XML](./docs/Database-OrderBy-Config-Xml.md)
-  - Execute - [YAML/JSON](./docs/Database-Execute-Config.md) or [XML](./docs/Database-Execute-Config-Xml.md)
-  - Cdc - [YAML/JSON](./docs/Database-Cdc-Config.md) or [XML](./docs/Database-Cdc-Config-Xml.md)
-  - CdcJoin - [YAML/JSON](./docs/Database-CdcJoin-Config.md) or [XML](./docs/Database-CdcJoin-Config-Xml.md)
-  - CdcJoinOn - [YAML/JSON](./docs/Database-CdcJoinOn-Config.md) or [XML](./docs/Database-CdcJoinOn-Config-Xml.md)
 
-### Major/significant versions
+- **Entity-driven** (.NET C#) 
+  - CodeGeneration - [YAML/JSON](./docs/Entity-CodeGeneration-Config.md)
+  - Entity - [YAML/JSON](./docs/Entity-Entity-Config.md)
+  - Properties - [YAML/JSON](./docs/Entity-Property-Config.md)
+  - Constants - [YAML/JSON](./docs/Entity-Const-Config.md)
+  - Operations - [YAML/JSON](./docs/Entity-Operation-Config.md)
+  - Parameters - [YAML/JSON](./docs/Entity-Parameter-Config.md)
 
-- [.NET 6](./docs/Upgrade-dotnet-v6-0.md)
-- [v4.1](./docs/Dependency-injection-v4-1.md)
-- [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
+- **Database-driven** ([database](./tools/Beef.Database.Core/README.md)) 
+  - CodeGeneration - [YAML/JSON](./docs/Database-CodeGeneration-Config.md)
+  - Query - [YAML/JSON](./docs/Database-Query-Config.md)
+  - QueryJoin - [YAML/JSON](./docs/Database-QueryJoin-Config.md)
+  - QueryJoinOn - [YAML/JSON](./docs/Database-QueryJoinOn-Config.md)
+  - QueryWhere - [YAML/JSON](./docs/Database-QueryWhere-Config.md)
+  - QueryOrder - [YAML/JSON](./docs/Database-QueryOrder-Config.md)
+  - Table - [YAML/JSON](./docs/Database-Table-Config.md)
+  - StoredProcedure - [YAML/JSON](./docs/Database-StoredProcedure-Config.md)
+  - Parameter - [YAML/JSON](./docs/Database-Parameter-Config.md)
+  - Where - [YAML/JSON](./docs/Database-Where-Config.md)
+  - OrderBy - [YAML/JSON](./docs/Database-OrderBy-Config.md)
+  - Execute - [YAML/JSON](./docs/Database-Execute-Config.md)
+  - Relationship (EF) - [YAML/JSON](./docs/Database-Relationship-Config.md)
 
 ### External links of potential interest
 
@@ -242,12 +240,13 @@ To start using _Beef_ you do not need to clone or fork the repo; you just need t
 
 See the following for example end-to-end solution/project creation; each demonstrating the same API functionality leveraging different data sources to accomplish:
 - [Cosmos sample](./docs/Sample-Cosmos-GettingStarted.md)
-- [Database Stored Procedures sample](./docs/Sample-StoredProcs-GettingStarted.md)
-- [Database Entity Framework sample](./docs/Sample-EntityFramework-GettingStarted.md)
+- [SQL Server Stored Procedures sample](./docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
+- [SQL Server Entity Framework sample](./docs/Sample-SqlServer-EF-GettingStarted.md)
 
 Otherwise, follow along with the following sample tutorials that will provide a more in-depth walkthrough solving a defined functional problem:
 
 - [`My.Hr`](./samples/My.Hr) - microservice against a SQL Database using both stored procedures and entity framework.
+- [`MyEf.Hr`](./samples/MyEf.Hr) - microservice against a SQL Database using entity framework.
 - [`Cdr.Banking`](./samples/Cdr.Banking) - microservice against an Azure CosmosDB data source.
 - [`Xyz.Legacy`](./samples/Xyz.Legacy) - CDC implementation against a legacy database publishing messages to Azure Service Bus.
 

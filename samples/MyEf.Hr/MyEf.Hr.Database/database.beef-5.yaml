@@ -1,0 +1,26 @@
+# Configuring the code-generation global settings
+# - Schema defines the default for al tables unless explicitly defined.
+# - Outbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
+# 
+schema: Hr
+outbox: true
+tables:
+  # Reference data tables/models.
+- { name: Gender, efModel: true }
+- { name: TerminationReason, efModel: true }
+- { name: RelationshipType, efModel: true }
+- { name: USState, efModel: true }
+- { name: PerformanceOutcome, efModel: true }
+
+  # References the Employee and related tables to implement the EF Model and infer the underlying schema.
+- { name: Employee, efModel: true,
+    relationships: [
+      # Relationships can be code-generated (basic functionality), or handcrafted in the .NET using the standard EntityFramework capabilities.
+      # - One-to-many to EmergencyContacts table foreign key using EmployeeId column. Cascade the delete. Auto include collection on get and track for updates. 
+      { name: EmergencyContact, propertyName: EmergencyContacts, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade, autoInclude: true },
+      { name: PerformanceReview, propertyName: PerformanceReviews, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade }
+    ]
+  }
+
+- { name: EmergencyContact, efModel: true }
+- { name: PerformanceReview, efModel: true }
