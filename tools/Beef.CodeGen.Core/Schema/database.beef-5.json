@@ -100,7 +100,7 @@
         "outboxSchemaCreate": {
           "type": "boolean",
           "title": "Indicates whether to create the 'OutboxSchema' within the database.",
-          "description": "Defaults to 'false'."
+          "description": "Defaults to 'true'."
         },
         "outboxTable": {
           "type": "string",
@@ -213,6 +213,14 @@
             "type": "string"
           }
         },
+        "aliasColumns": {
+          "type": "array",
+          "title": "The list of 'Column' and 'Alias' pairs (split by a '^' lookup character) to enable column aliasing/renaming.",
+          "description": "Each alias value should be formatted as 'Column' + '^' + 'Alias'; e.g. 'PCODE^ProductCode'.",
+          "items": {
+            "type": "string"
+          }
+        },
         "get": {
           "type": "boolean",
           "title": "Indicates whether a 'Get' stored procedure is to be automatically generated where not otherwise explicitly specified."
@@ -258,7 +266,7 @@
         "efModelName": {
           "type": "string",
           "title": "The .NET (C#) EntityFramework (EF) model name.",
-          "description": "Defaults to 'Name'."
+          "description": "Defaults to 'Name' applying the 'CodeGeneration.AutoDotNetRename'."
         },
         "udt": {
           "type": "boolean",
@@ -340,6 +348,13 @@
           "title": "The corresponding 'StoredProcedure' collection.",
           "items": {
             "$ref": "#/definitions/StoredProcedure"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "title": "The corresponding Entity Frameworrk (EF) 'Relationship' collection.",
+          "items": {
+            "$ref": "#/definitions/Relationship"
           }
         }
       },
@@ -571,6 +586,69 @@
         "statement"
       ]
     },
+    "Relationship": {
+      "type": "object",
+      "title": "'Relationship' object (database-driven)",
+      "description": "The 'Relationship' object enables the definition of an entity framework (EF) model relationship.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "The name of the primary table of the query."
+        },
+        "schema": {
+          "type": "string",
+          "title": "The schema name of the primary table of the view.",
+          "description": "Defaults to 'CodeGeneration.Schema'."
+        },
+        "type": {
+          "type": "string",
+          "title": "The relationship type between the parent and child (self).",
+          "description": "Defaults to 'OneToMany'.",
+          "enum": [
+            "OneToMany"
+          ]
+        },
+        "foreignKeyColumns": {
+          "type": "array",
+          "title": "The list of 'Column' names to be included in the underlying generated output.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "onDelete": {
+          "type": "string",
+          "title": "The operation applied to dependent entities in the relationship when the principal is deleted or the relationship is severed.",
+          "description": "Defaults to 'NoAction'. See https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.deletebehavior for more information.",
+          "enum": [
+            "NoAction",
+            "Cascade",
+            "ClientCascade",
+            "ClientNoAction",
+            "ClientSetNull",
+            "Restrict",
+            "SetNull"
+          ]
+        },
+        "autoInclude": {
+          "type": "boolean",
+          "title": "Indicates whether to automatically include navigation to the property.",
+          "description": "Defaults to 'None'."
+        },
+        "propertyName": {
+          "type": "string",
+          "title": "The corresponding property name within the entity framework (EF) model.",
+          "description": "Defaults to 'Name' using the 'CodeGeneration.AutoDotNetRename' option."
+        },
+        "efModelName": {
+          "type": "string",
+          "title": "The corresponding entity framework (EF) model name (.NET Type).",
+          "description": "Defaults to 'Name' using the 'CodeGeneration.AutoDotNetRename' option."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
     "Query": {
       "type": "object",
       "title": "'Query' object (database-driven)",
@@ -583,7 +661,7 @@
         "schema": {
           "type": "string",
           "title": "The schema name of the primary table of the view.",
-          "description": "Defaults to 'CodeGeneration.dbo'."
+          "description": "Defaults to 'CodeGeneration.Schema'."
         },
         "alias": {
           "type": "string",
