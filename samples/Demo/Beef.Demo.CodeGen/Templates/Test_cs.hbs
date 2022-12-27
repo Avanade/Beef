@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
 Company: {{Root.Company}}
 AppName: {{Root.AppName}}
 Entity name: {{Name}}
@@ -8,4 +8,8 @@ Extra loop2: {{#ExtraProperties}}{{@key}},{{@value}}{{#unless @last}};{{/unless}
 Extra lookup: {{lookup ExtraProperties 'TestExtra'}}
 Custom lookup: {{lookup CustomProperties 'TestExtra'}}
 Custom lookup lowercase: {{lower (lookup CustomProperties 'TestExtra')}}
+Custom defined(lookup combined with if - true): {{#if (lookup CustomProperties 'TestExist-Defined')}}exist{{else}}not exist{{/if}}
+Custom defined(lookup combined with if - false): {{#if (lookup CustomProperties 'TestNotExist-Defined')}}exist{{else}}not exist{{/if}}
+Custom conditional(lookup combined with if - true): {{#ifeq (lookup CustomProperties 'TestExist') 'Exist-Value'}}true{{else}}false{{/ifeq}}
+Custom conditional(lookup combined with if - false): {{#ifeq (lookup CustomProperties 'TestNotExist') 'Exist-Value'}}true{{else}}false{{/ifeq}}
 */
