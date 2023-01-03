@@ -52,16 +52,13 @@ namespace Beef.Database
         /// <summary>
         /// Indicates whether to use the standard <i>Beef</i> schema objects.
         /// </summary>
-        /// <param name="usebeefSchema">The option that default to <c>true</c> where not specified.</param>
+        /// <param name="useBeefSchema">The option to use the standard <i>Beef</i> schema objects. Defaults to <c>true</c> where not specified.</param>
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
-        public MigrationArgs UseBeefSchema(bool usebeefSchema = true)
+        public MigrationArgs UseBeefSchema(bool useBeefSchema = true)
         {
-            BeefSchema = usebeefSchema;
+            BeefSchema = useBeefSchema;
             return this;
         }
-
-        /// <inheritdoc/>
-        public Dictionary<string, object?> Parameters { get; } = new Dictionary<string, object?>();
 
         /// <inheritdoc/>
         public T GetParameter<T>(string key, bool throwWhereNotFound = false)

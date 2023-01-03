@@ -61,7 +61,6 @@ namespace Beef.Database
         {
             ConsoleOptions.Add(nameof(MigrationArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
             ConsoleOptions.Add(nameof(MigrationArgs.ConfigFileName), app.Option("-c|--config", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
-            ConsoleOptions.Add(nameof(MigrationArgs.Parameters), app.Option("-p|--param", "Parameter expressed as a 'Name=Value' pair (multiple can be specified). [CodeGen]", CommandOptionType.MultipleValue));
             ConsoleOptions.Add(nameof(MigrationArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
             ConsoleOptions.Add(nameof(MigrationArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
         }
@@ -85,15 +84,5 @@ namespace Beef.Database
 
             return ValidationResult.Success;
         }
-
-        /// <inheritdoc/>
-        protected override void OnWriteArgs(DbEx.Migration.DatabaseMigrationBase migrator) => WriteStandardizedArgs(migrator, logger =>
-        {
-            logger?.LogInformation("{Content}", $"Parameters{(Args.Parameters.Count == 0 ? " = none" : ":")}");
-            foreach (var p in Args.Parameters)
-            {
-                logger?.LogInformation("{Content}", $"  {p.Key} = {p.Value}");
-            }
-        });
     }
 }

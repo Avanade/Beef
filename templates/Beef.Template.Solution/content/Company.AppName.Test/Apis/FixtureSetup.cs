@@ -10,21 +10,17 @@ public class FixtureSetUp
         TestSetUp.Default.ExpectedEventsEnabled = true;
         TestSetUp.Default.ExpectNoEvents = true;
 
-        TestSetUp.Default.RegisterSetUp(async (count, _, ct) =>
+        TestSetUp.Default.RegisterAutoSetUp(async (count, _, ct) =>
         {
             using var test = ApiTester.Create<Startup>();
             var settings = test.Services.GetRequiredService<AppNameSettings>();
             var args = Database.Program.ConfigureMigrationArgs(new MigrationArgs(count == 0 ? MigrationCommand.ResetAndDatabase : MigrationCommand.ResetAndData, settings.DatabaseConnectionString)).AddAssembly<FixtureSetUp>();
 #if (implement_database || implement_sqlserver)
-            var (Success, Output) = await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+            return await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
 #endif
 #if (implement_mysql)
-            var (Success, Output) = await new MySqlMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+            return await new MySqlMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
 #endif
-            if (!Success)
-                Assert.Fail(Output);
-
-            return Success;
         });
     }
 #endif

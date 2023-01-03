@@ -21,7 +21,7 @@ namespace Beef.Test.NUnit
     [DebuggerStepThrough]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
-        private static readonly AsyncLocal<string> _username = new AsyncLocal<string>();
+        private static readonly AsyncLocal<string> _username = new();
         private readonly string _testUsername;
 
         /// <summary>
@@ -98,9 +98,7 @@ namespace Beef.Test.NUnit
                     if (ex is NUnitException nex && nex.InnerException is AggregateException aex2)
                         ex = aex2.InnerException!;
 
-                    if (context.CurrentResult == null)
-                        context.CurrentResult = context.CurrentTest.MakeTestResult();
-
+                    context.CurrentResult ??= context.CurrentTest.MakeTestResult();
                     context.CurrentResult.RecordException(ex);
                 }
                 finally

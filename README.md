@@ -149,7 +149,7 @@ A key accelerator for _Beef_ is achieved using a flexible [code generation](./to
 The **key** tooling capabilities for _Beef_ are enabled by the following NuGet packages (version 5+). The included [change log](./CHANGELOG.md) details all key changes per published version.
 
 Assembly | Description | NuGet
--|-|-|-
+-|-|-
 [`Beef.CodeGen.Core`](./tools/Beef.CodeGen.Core) | Code generation console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core)
 [`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
 [`Beef.Database.SqlServer`](./tools/Beef.Database.SqlServer) | SQL Server database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.SqlServer.svg)](https://badge.fury.io/nu/Beef.Database.SqlServer)
@@ -159,8 +159,12 @@ Assembly | Description | NuGet
 The following is provided to support a level of version 4.x backwards compatibility.
 
 Assembly | Description | NuGet
--|-|-|-
+-|-|-
 [`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework (backwards compatibility only). | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
+
+<br/>
+
+## Samples
 
 The following samples are provided to guide usage:
 
