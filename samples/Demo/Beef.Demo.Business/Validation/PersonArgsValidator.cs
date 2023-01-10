@@ -15,6 +15,7 @@ namespace Beef.Demo.Business.Validation
             Property(x => x.FirstName).Common(CommonValidators.Text);
             Property(x => x.LastName).Common(CommonValidators.Text);
             Property(x => x.Genders).AreValid();
+            Property(x => x.OrderBy).Enum();
         }
     }
 }

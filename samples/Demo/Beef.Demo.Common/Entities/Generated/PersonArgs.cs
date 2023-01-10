@@ -32,6 +32,11 @@ namespace Beef.Demo.Common.Entities
         /// Gets or sets the Genders.
         /// </summary>
         public List<string?>? Genders { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Order By.
+        /// </summary>
+        public Common.Entities.OrderBy? OrderBy { get; set; }
     }
 }
 

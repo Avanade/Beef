@@ -98,7 +98,8 @@ entities:
     properties: [
       { name: FirstName, type: string },
       { name: LastName, type: string },
-      { name: Genders, type: Gender, refDataType: string, refDataList: true }
+      { name: Genders, type: Gender, refDataType: string, refDataList: true },
+      { name: OrderBy, type: Common.Entities.OrderBy }
     ]
   }
 

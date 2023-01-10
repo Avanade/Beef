@@ -135,13 +135,14 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("")]
         [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
         {
-            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
+            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, OrderBy = orderBy };
             return _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -151,13 +152,14 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonDetailCollection"/></returns>
         [HttpGet("argsdetail")]
         [ProducesResponseType(typeof(Common.Entities.PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public Task<IActionResult> GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
         {
-            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
+            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, OrderBy = orderBy };
             return _webApi.GetAsync<PersonDetailCollectionResult>(Request, p => _manager.GetDetailByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -275,13 +277,14 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("args")]
         [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public Task<IActionResult> GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
+        public Task<IActionResult> GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
         {
-            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
+            var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, OrderBy = orderBy };
             return _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetByArgsWithEfAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 

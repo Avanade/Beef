@@ -15,6 +15,7 @@ namespace Beef.Demo.Business.Entities
         private string? _firstName;
         private string? _lastName;
         private List<string?>? _gendersSids;
+        private Common.Entities.OrderBy? _orderBy;
 
         /// <summary>
         /// Gets or sets the First Name.
@@ -39,12 +40,18 @@ namespace Beef.Demo.Business.Entities
         [JsonIgnore]
         public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList()); }
 
+        /// <summary>
+        /// Gets or sets the Order By.
+        /// </summary>
+        public Common.Entities.OrderBy? OrderBy { get => _orderBy; set => SetValue(ref _orderBy, value); }
+
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
             yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
             yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
             yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
+            yield return CreateProperty(nameof(OrderBy), OrderBy, v => OrderBy = v);
         }
     }
 }

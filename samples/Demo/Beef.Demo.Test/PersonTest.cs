@@ -438,6 +438,26 @@ namespace Beef.Demo.Test
             Assert.AreEqual(2, pdcr.Value.Paging.TotalCount);
         }
 
+        [Test, TestSetUp]
+        public void D410_GetByArgs_WithEnum()
+        {
+            var args = new PersonArgs { OrderBy = OrderBy.FirstName };
+            AgentTester.Test<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetByArgsAsync(args));
+
+            // ASP.NET runtime will ignore invalid Enums and set to default (null).
+            AgentTester.Test<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetByArgsAsync(null, requestOptions: new HttpRequestOptions { UrlQueryString = "orderBy=Bananas" }));
+
+            // ASP.NET runtime will ignore invalid Enums and set to default (null).
+            args = new PersonArgs { OrderBy = ((OrderBy)88) };
+            AgentTester.Test<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetByArgsAsync(args));
+        }
+
         #endregion
 
         #region Create
