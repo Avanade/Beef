@@ -27,7 +27,7 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the Name.
         /// </summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public string? Name { get => _name; set => SetValue(ref _name, value); }
+        public string? Name { get => _name; set => SetValue(ref _name, value, casing: StringCase.Title); }
 
         /// <summary>
         /// Gets or sets the Start Date.

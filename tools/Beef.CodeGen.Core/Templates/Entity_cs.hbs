@@ -186,7 +186,7 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
       {{#if Parent.OmitEntityBase}}
         public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
       {{else}}
-        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}); }
+        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{#ifne StringCasing 'UseDefault'}}, casing: StringCase.{{StringCasing}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}{{#if Immutable}}, immutable: true{{/if}}); }
       {{/if}}
     {{/if}}
   {{/ifval}}

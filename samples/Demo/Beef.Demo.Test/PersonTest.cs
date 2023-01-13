@@ -1063,38 +1063,38 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void H150_PatchDetail_MergePatch_UniqueKeyCollection()
         {
-            Assert.Warn("HttpPatchOption.JsonPatch no longer supported; requires Newtonsoft libraries to enable: https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch");
+            //Assert.Warn("HttpPatchOption.JsonPatch no longer supported; requires Newtonsoft libraries to enable: https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch");
 
-            //// Get an existing person detail.
-            //var p = AgentTester.Test<PersonAgent, PersonDetail>()
-            //    .ExpectStatusCode(HttpStatusCode.OK)
-            //    .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
+            // Get an existing person detail.
+            var p = AgentTester.Test<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
 
-            //var jt = 
-            //    "{ \"history\": [ { \"name\": \"Amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
-            //    "{ \"name\": \"Microsoft\" }, " +
-            //    "{ \"name\": \"Google\", \"startDate\": \"2018-04-30T00:00:00\" } ] }";
+            var jt =
+                "{ \"history\": [ { \"name\": \"Amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
+                "{ \"name\": \"Microsoft\" }, " +
+                "{ \"name\": \"Google\", \"startDate\": \"2018-04-30T00:00:00\" } ] }";
 
-            //p = AgentTester.Test<PersonAgent, PersonDetail>()
-            //    .ExpectStatusCode(HttpStatusCode.OK)
-            //    .ExpectEvents()
-            //    .Run(a => a.PatchDetailAsync(HttpPatchOption.MergePatch, jt, 4.ToGuid(), new HttpRequestOptions { ETag = p.ETag })).Value;
+            p = AgentTester.Test<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectEvents()
+                .Run(a => a.PatchDetailAsync(HttpPatchOption.MergePatch, jt, 4.ToGuid(), new HttpRequestOptions { ETag = p.ETag })).Value;
 
-            //Assert.IsNotNull(p);
-            //Assert.IsNotNull(p.History);
-            //Assert.AreEqual(3, p.History.Count);
+            Assert.IsNotNull(p);
+            Assert.IsNotNull(p.History);
+            Assert.AreEqual(3, p.History.Count);
 
-            //Assert.AreEqual("Google", p.History[0].Name);
-            //Assert.AreEqual(new DateTime(2018, 04, 30), p.History[0].StartDate);
-            //Assert.IsNull(p.History[0].EndDate);
+            Assert.AreEqual("Google", p.History[0].Name);
+            Assert.AreEqual(new DateTime(2018, 04, 30), p.History[0].StartDate);
+            Assert.IsNull(p.History[0].EndDate);
 
-            //Assert.AreEqual("Amazon", p.History[1].Name);
-            //Assert.AreEqual(new DateTime(2016, 04, 16), p.History[1].StartDate);
-            //Assert.AreEqual(new DateTime(2018, 04, 16), p.History[1].EndDate);
+            Assert.AreEqual("Amazon", p.History[1].Name);
+            Assert.AreEqual(new DateTime(2016, 04, 16), p.History[1].StartDate);
+            Assert.AreEqual(new DateTime(2018, 04, 16), p.History[1].EndDate);
 
-            //Assert.AreEqual("Microsoft", p.History[2].Name);
-            //Assert.AreEqual(new DateTime(2015, 05, 23), p.History[2].StartDate);
-            //Assert.AreEqual(new DateTime(2016, 04, 06), p.History[2].EndDate);
+            Assert.AreEqual("Microsoft", p.History[2].Name);
+            Assert.AreEqual(new DateTime(2015, 05, 23), p.History[2].StartDate);
+            Assert.AreEqual(new DateTime(2016, 04, 06), p.History[2].EndDate);
         }
 
         [Test, TestSetUp]

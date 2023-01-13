@@ -15,7 +15,7 @@ namespace Beef.CodeGen.Config.Entity
     /// Represents the <b>Property</b> code-generation configuration.
     /// </summary>
     [CodeGenClass("Property", Title = "'Property' object (entity-driven)",
-        Description = "The `Property` object defines an `Entity` property and its charateristics.", 
+        Description = "The `Property` object defines an `Entity` property and its charateristics.",
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 properties: [
@@ -164,6 +164,14 @@ properties: [
         [CodeGenProperty("Property", Title = "The `string` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "NullToEmpty", "EmptyToNull" },
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringTransform { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="string"/> casing to be performed on <c>Set</c> and <c>CleanUp</c>.
+        /// </summary>
+        [JsonProperty("stringCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Property", Title = "The `string` casing to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "Lower", "Upper", "Title" },
+            Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
+        public string? StringCasing { get; set; }
 
         /// <summary>
         /// Indicates whether an instance of the <see cref="Type"/> is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).
@@ -718,6 +726,7 @@ properties: [
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
+            StringCasing = DefaultWhereNull(StringCasing, () => "UseDefault");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText == true ? "Optional" : "Never");
             RefDataTextName = DefaultWhereNull(RefDataTextName, () => Name + "Text");
             Nullable = DefaultWhereNull(Nullable, () => !DotNet.IgnoreNullableTypes.Contains(Type!));

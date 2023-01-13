@@ -132,7 +132,7 @@ entities:
 - { name: WorkHistory, collection: true, excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
     properties: [
       { name: PersonId, text: '{{Person}} identifier (not serialized/read-only for internal data merging)', type: Guid, immutable: true, serializationIgnore: true },
-      { name: Name, type: string, primaryKey: true, serializationAlwaysInclude: true },
+      { name: Name, type: string, stringCasing: Title, primaryKey: true, serializationAlwaysInclude: true },
       { name: StartDate, type: DateTime, dateTimeTransform: DateOnly },
       { name: EndDate, type: DateTime, nullable: true, dateTimeTransform: DateOnly }
     ]

@@ -65,7 +65,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "2.4.0"
+        "value": "2.5.0"
       },
       "replaces": "CoreExVersion"
     },
