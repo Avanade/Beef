@@ -1,6 +1,6 @@
-﻿# My.Hr APIs
+﻿# MyEf.Hr APIs
 
-The purpose of this sample is to demonstrate the usage of _Beef_ (and [_CoreEx_](https://github.com/Avanade/CoreEx) runtime) within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging only Entity Framework (EF).
+The purpose of this sample is to demonstrate the usage of _Beef_ (and [_CoreEx_](https://github.com/Avanade/CoreEx) runtime) within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging _only_ Entity Framework (EF).
 
 Also, it will demonstrate how the data can be shaped differently between the database and the entity to leverage both relational and object-oriented constructs to provide a natural consuming experience from the API that accounts for the [object-relational impedence mismatch](https://en.wikipedia.org/wiki/Object-relational_impedance_mismatch#:~:text=The%20object-relational%20impedance%20mismatch%20is%20a%20set%20of,to%20database%20tables%20defined%20by%20a%20relational%20schema.).
 
@@ -97,7 +97,7 @@ Also, any files that start with `Person` (being the demonstration entity) should
 ## Implementation steps
 
 As described earlier, this sample will walk through the implementation in a number of logical steps:
-1. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related stored procedures.
+1. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
 2. [Employee API](./docs/Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
 3. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
 4. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.

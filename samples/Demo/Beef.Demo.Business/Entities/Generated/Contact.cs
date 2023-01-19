@@ -17,6 +17,7 @@ namespace Beef.Demo.Business.Entities
         private string? _lastName;
         private string? _statusSid;
         private string? _internalCode;
+        private ContactCommCollection? _communications;
 
         /// <summary>
         /// Gets or sets the <see cref="Contact"/> identifier.
@@ -57,6 +58,11 @@ namespace Beef.Demo.Business.Entities
         [JsonIgnore]
         public string? InternalCode { get => _internalCode; set => SetValue(ref _internalCode, value); }
 
+        /// <summary>
+        /// Gets or sets the Communications.
+        /// </summary>
+        public ContactCommCollection? Communications { get => _communications; set => SetValue(ref _communications, value); }
+
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()
         {
@@ -65,6 +71,7 @@ namespace Beef.Demo.Business.Entities
             yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
             yield return CreateProperty(nameof(StatusSid), StatusSid, v => StatusSid = v);
             yield return CreateProperty(nameof(InternalCode), InternalCode, v => InternalCode = v);
+            yield return CreateProperty(nameof(Communications), Communications, v => Communications = v);
         }
     }
 

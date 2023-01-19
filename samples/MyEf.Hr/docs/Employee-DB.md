@@ -1,10 +1,10 @@
 ﻿# Step 1 - Employee DB
 
-This will walk through the process of creating the required tables, and stored procedures, etc. needed for the `Employee` within a Microsoft SQL Server database. All of this work will occur within the context of the `My.Hr.Database` project.
+This will walk through the process of creating the required tables, and entity framework capabilities, etc. needed for the `Employee` within a Microsoft SQL Server database. All of this work will occur within the context of the `MyEf.Hr.Database` project.
 
 The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`DbEx`](https://github.com/Avanade/dbex) provide the capabilities that will be leveraged. The underlying [documentation](https://github.com/Avanade/dbex#readme) describes these capabilities and the database approach in greater detail.
 
-_Note:_ Any time that command line execution is requested, this should be performed from the base `My.Hr.Database` folder.
+_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.Database` folder.
 
 <br/>
 
@@ -247,6 +247,6 @@ This should create migrations script files with names similar as follows (as wel
 
 ## Conclusion
 
-At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter (TVP). 
+At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter (TVP). 
 
 Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.

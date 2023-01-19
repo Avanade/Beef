@@ -90,6 +90,15 @@ namespace Beef.Demo.Common.Agents
         Task<HttpResult<RefDataNamespace.StatusCollection>> StatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> items that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
@@ -185,6 +194,16 @@ namespace Beef.Demo.Common.Agents
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.StatusCollection>> StatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.StatusCollection>("api/v1/demo/ref/statuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> items that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        public Task<HttpResult<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
+            GetAsync<RefDataNamespace.CommunicationTypeCollection>("api/v1/demo/ref/communicationTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3

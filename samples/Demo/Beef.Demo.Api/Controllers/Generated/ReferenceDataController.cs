@@ -115,6 +115,19 @@ namespace Beef.Demo.Api.Controllers
         public Task<IActionResult> StatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
             => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Status>(codes, text, p.RequestOptions.IncludeInactive));
 
+        /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> reference data items that match the specified criteria.
+        /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>A RefDataNamespace.CommunicationType collection.</returns>
+        [AllowAnonymous]
+        [HttpGet()]
+        [Route("api/v1/demo/ref/communicationTypes")]
+        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.CommunicationType>), (int)HttpStatusCode.OK)]
+        public Task<IActionResult> CommunicationTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.CommunicationType>(codes, text, p.RequestOptions.IncludeInactive));
+
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>

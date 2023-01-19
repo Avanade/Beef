@@ -78,6 +78,17 @@ namespace Beef.Demo.Api.Controllers
             _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
+        /// Patches an existing <see cref="Contact"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="Contact"/> identifier.</param>
+        /// <returns>The patched <see cref="Contact"/>.</returns>
+        [HttpPatch("{id}")]
+        [AcceptsBody(typeof(Common.Entities.Contact), HttpConsts.MergePatchMediaTypeName)]
+        [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
+        public Task<IActionResult> Patch(Guid id) =>
+            _webApi.PatchAsync<Contact>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
+
+        /// <summary>
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>

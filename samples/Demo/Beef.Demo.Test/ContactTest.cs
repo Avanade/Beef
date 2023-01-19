@@ -4,6 +4,7 @@ using Beef.Demo.Common.Entities;
 using CoreEx.Database;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using System;
 using System.Net;
 using UnitTestEx;
@@ -25,7 +26,7 @@ namespace Beef.Demo.Test
 
             var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
@@ -33,11 +34,65 @@ namespace Beef.Demo.Test
 
             r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
+        }
+
+        [Test]
+        public void A112_Patch_Dict()
+        {
+            using var test = ApiTester.Create<Startup>();
+
+            var v = test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid())).Value!;
+
+            v.Communications.Remove("fax");
+            v.Communications.Add("mobile", new ContactComm { Value = "4258762983" });
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch, "{\"communications\":{\"mobile\":{\"value\":\"4258762983\"},\"fax\":null}}", 1.ToGuid()));
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(v)
+                .Run(a => a.GetAsync(1.ToGuid()));
+        }
+
+        [Test]
+        public void A112a_Patch_Dict_KeyError()
+        {
+            using var test = ApiTester.Create<Startup>();
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid()));
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectErrors("Communication Type is invalid.")
+                .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch, "{\"communications\":{\"xyz\":{\"value\":\"4258762983\"},\"fax\":null}}", 1.ToGuid()));
+        }
+
+        [Test]
+        public void A112b_Patch_Dict_ValueError()
+        {
+            using var test = ApiTester.Create<Startup>();
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid()));
+
+            test.Agent<ContactAgent, Contact>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectErrors(
+                    "Value is required.",
+                    "Only one of the Communications can be set as Preferred.")
+                .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch, "{\"communications\":{\"work\":{\"isPreferred\":true}}}", 1.ToGuid()));
         }
 
         [Test]
@@ -67,7 +122,7 @@ namespace Beef.Demo.Test
 
             var r = test.Agent<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" })
+                .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" }, "Communications")
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);

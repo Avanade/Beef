@@ -42,6 +42,11 @@ namespace Beef.Demo.Common.Entities
         /// Gets or sets the Status.
         /// </summary>
         public string? Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Communications.
+        /// </summary>
+        public ContactCommCollection? Communications { get; set; }
     }
 
     /// <summary>

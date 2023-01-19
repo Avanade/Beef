@@ -43,7 +43,7 @@ Add the following entity code-gen configuration after all the other existing ent
   # - Genders will support a list (none or more) reference data values.
   # - StartFrom, StartTo and IncludeTerminated are all Nullable so we can tell whether a value was provided or not.
   # - The IsIncludeTerminated overrides the JsonName to meet the stated requirement name of includeTerminated.
-- { name: EmployeeArgs, text: '{{Employee}} search arguments', excludeAll: true,
+- { name: EmployeeArgs, text: '{{Employee}} search arguments',
     properties: [
       { name: FirstName },
       { name: LastName },

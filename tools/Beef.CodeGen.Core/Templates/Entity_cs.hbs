@@ -301,12 +301,14 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
         /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class.
         /// </summary>
         public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
+  {{#ifne CollectionType 'Dictionary' 'Overridden'}}
 
         /// <summary>
         /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
         /// </summary>
         /// <param name="items">The items to add.</param>
         public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
+  {{/ifne}}
     }
 {{/if}}
 {{! ===== CollectionResult ===== }}

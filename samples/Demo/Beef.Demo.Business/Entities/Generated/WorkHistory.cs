@@ -65,7 +65,7 @@ namespace Beef.Demo.Business.Entities
     /// <summary>
     /// Represents the <see cref="WorkHistory"/> collection.
     /// </summary>
-    public partial class WorkHistoryCollection : EntityBaseCollection<WorkHistory, WorkHistoryCollection>
+    public partial class WorkHistoryCollection : EntityKeyBaseCollection<WorkHistory, WorkHistoryCollection>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class.

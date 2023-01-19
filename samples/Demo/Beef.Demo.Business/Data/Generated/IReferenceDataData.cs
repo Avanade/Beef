@@ -53,6 +53,12 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.StatusCollection"/>.</returns>
         Task<RefDataNamespace.StatusCollection> StatusGetAllAsync();
+
+        /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.CommunicationType"/> items.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.CommunicationTypeCollection"/>.</returns>
+        Task<RefDataNamespace.CommunicationTypeCollection> CommunicationTypeGetAllAsync();
     }
 }
 

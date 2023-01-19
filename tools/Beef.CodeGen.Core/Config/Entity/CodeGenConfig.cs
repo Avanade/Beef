@@ -602,5 +602,24 @@ entities:
                     root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.");
             }
         }
+
+        /// <summary>
+        /// Warn where the property has been deprecated.
+        /// </summary>
+        /// <param name="root">The root <see cref="CodeGenConfig"/>.</param>
+        /// <param name="config">The <see cref="ConfigBase"/>.</param>
+        /// <param name="properties">The list of deprecated properties.</param>
+        internal static void WarnWhereDeprecated(CodeGenConfig root, ConfigBase config, params (string Property, string? Message)[] properties)
+        {
+            if (config.ExtraProperties == null || config.ExtraProperties.Count == 0 || properties.Length == 0)
+                return;
+
+            foreach (var xp in config.ExtraProperties)
+            {
+                var property = properties!.FirstOrDefault(x => x.Property == xp.Key);
+                if (properties != null)
+                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(property.Message) ? string.Empty : property.Message)}");
+            }
+        }
     }
 }

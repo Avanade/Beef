@@ -102,6 +102,7 @@ namespace Beef.Demo.Business.Data
                 Map((s, d) => d.FirstName = s.FirstName);
                 Map((s, d) => d.LastName = s.LastName);
                 Map((s, d) => d.StatusCode = s.StatusSid);
+                Map((s, d) => d.Comms = ObjectToJsonConverter<ContactCommCollection>.Default.ToDestination.Convert(s.Communications));
                 EntityToModelEfMapperCtor();
             }
 
@@ -110,7 +111,8 @@ namespace Beef.Demo.Business.Data
                 => s.Id == default
                 && s.FirstName == default
                 && s.LastName == default
-                && s.StatusSid == default;
+                && s.StatusSid == default
+                && s.Communications == default;
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
@@ -129,6 +131,7 @@ namespace Beef.Demo.Business.Data
                 Map((s, d) => d.FirstName = (string?)s.FirstName);
                 Map((s, d) => d.LastName = (string?)s.LastName);
                 Map((s, d) => d.StatusSid = (string?)s.StatusCode);
+                Map((s, d) => d.Communications = (ContactCommCollection?)ObjectToJsonConverter<ContactCommCollection>.Default.ToSource.Convert(s.Comms));
                 ModelToEntityEfMapperCtor();
             }
 
@@ -137,7 +140,8 @@ namespace Beef.Demo.Business.Data
                 => s.ContactId == default
                 && s.FirstName == default
                 && s.LastName == default
-                && s.StatusCode == default;
+                && s.StatusCode == default
+                && s.Comms == default;
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }

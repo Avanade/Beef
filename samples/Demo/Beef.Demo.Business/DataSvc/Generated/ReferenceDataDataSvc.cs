@@ -32,6 +32,7 @@ namespace Beef.Demo.Business.DataSvc
             Type _ when type == typeof(RefDataNamespace.PowerSource) => await _data.PowerSourceGetAllAsync().ConfigureAwait(false),
             Type _ when type == typeof(RefDataNamespace.Company) => await _data.CompanyGetAllAsync().ConfigureAwait(false),
             Type _ when type == typeof(RefDataNamespace.Status) => await _data.StatusGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.CommunicationType) => await _data.CommunicationTypeGetAllAsync().ConfigureAwait(false),
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };
     }

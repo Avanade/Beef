@@ -65,6 +65,10 @@ namespace Beef.Demo.Business.Data
         public Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
             => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
 
+        /// <inheritdoc/>
+        public Task<RefDataNamespace.CommunicationTypeCollection> CommunicationTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => CommunicationTypeGetAll_OnImplementationAsync());
+
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.EyeColor"/> to Entity Framework <see cref="EfModel.EyeColor"/> mapping.
         /// </summary>

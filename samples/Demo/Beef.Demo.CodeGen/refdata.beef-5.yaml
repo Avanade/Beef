@@ -40,3 +40,4 @@ entities:
 
 - { name: Status, refDataType: string, collection: true, webApiRoutePrefix: api/v1/demo/ref/statuses, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Status }
 
+- { name: CommunicationType, refDataType: int, collection: true, webApiRoutePrefix: api/v1/demo/ref/communicationTypes, autoImplement: None }

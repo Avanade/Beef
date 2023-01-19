@@ -31,7 +31,8 @@ namespace Beef.Demo.Business
             typeof(RefDataNamespace.EyeColor),
             typeof(RefDataNamespace.PowerSource),
             typeof(RefDataNamespace.Company),
-            typeof(RefDataNamespace.Status)
+            typeof(RefDataNamespace.Status),
+            typeof(RefDataNamespace.CommunicationType)
         };
 
         /// <inheritdoc/>

@@ -37,7 +37,7 @@ namespace Beef.Demo.Api
                     .AddJsonSerializer()
                     .AddReferenceDataOrchestrator<IReferenceDataProvider>()
                     .AddWebApi()
-                    .AddJsonMergePatch()
+                    .AddJsonMergePatch(o => o.EntityKeyCollectionMergeApproach = CoreEx.Json.Merge.EntityKeyCollectionMergeApproach.Merge)
                     .AddReferenceDataContentWebApi()
                     .AddRequestCache()
                     .AddValidationTextProvider()

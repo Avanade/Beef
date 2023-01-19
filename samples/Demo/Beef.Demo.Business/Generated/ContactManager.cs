@@ -52,6 +52,7 @@ namespace Beef.Demo.Business
         public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             Cleaner.CleanUp(value.EnsureValue());
+            await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Create);
 
@@ -65,6 +66,7 @@ namespace Beef.Demo.Business
         {
             value.EnsureValue().Id = id;
             Cleaner.CleanUp(value);
+            await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
         }, InvokerArgs.Update);
 

@@ -238,11 +238,11 @@ entities:
         public bool? CollectionResult { get; set; }
 
         /// <summary>
-        /// Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key.
+        /// Gets or sets the entity collection type used where <see cref="CollectionInherits"/> is not specified.
         /// </summary>
-        [JsonProperty("collectionKeyed", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Collection", Title = "Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key.")]
-        public bool? CollectionKeyed { get; set; }
+        [JsonProperty("collectionType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Collection", Title = "The entity collection type used where `CollectionInherits` is not specified.", Options = new string[] { "Standard", "Keyed", "Dictionary" })]
+        public string? CollectionType { get; set; }
 
         /// <summary>
         /// Gets or sets the base class that a <see cref="Collection"/> inherits from.
@@ -1437,11 +1437,20 @@ entities:
                 _ => EntityInherits == "EntityBase" ? null : EntityInherits
             };
 
-            EntityCollectionInherits = CompareValue(OmitEntityBase, true) ? $"List<{EntityName}>" : CollectionInherits;
+            CollectionType = DefaultWhereNull(CollectionType, () => "Standard");
+            if (!string.IsNullOrEmpty(EntityCollectionInherits))
+                CollectionType = "Overridden";
+
+            EntityCollectionInherits = CompareValue(OmitEntityBase, true) ? (CollectionType == "Dictionary" ? $"Dictionary<string, {EntityName}>" : $"List<{EntityName}>") : CollectionInherits;
             EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
             {
                 if (RefDataType == null)
-                    return CompareValue(CollectionKeyed, true) ? $"EntityKeyBaseCollection<{EntityName}, {EntityCollectionName}>" : $"EntityBaseCollection<{EntityName}, {EntityCollectionName}>";
+                    return CollectionType switch
+                    {
+                        "Keyed" => $"EntityKeyBaseCollection<{EntityName}, {EntityCollectionName}>",
+                        "Dictionary" => $"EntityBaseDictionary<{EntityName}, {EntityCollectionName}>",
+                        _ => $"EntityBaseCollection<{EntityName}, {EntityCollectionName}>"
+                    };
                 else
                     return $"ReferenceDataCollectionBase<{RefDataType}{(RefDataType == "string" ? "?" : "")}, {EntityName}, {EntityCollectionName}>";
             });
@@ -1449,7 +1458,7 @@ entities:
             EntityCollectionResultInherits = CompareValue(OmitEntityBase, true) ? $"CollectionResult<{EntityCollectionName}, {EntityName}>" : CollectionResultInherits;
             EntityCollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}, {EntityCollectionResultName}>");
 
-            CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
+            CollectionInherits = DefaultWhereNull(CollectionInherits, () => CollectionType == "Dictionary" ? $"Dictionary<string, {EntityName}>" : $"List<{EntityName}>");
             CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"CollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
@@ -1767,15 +1776,16 @@ entities:
         /// Check for any deprecate properties and error.
         /// </summary>
         private void CheckDeprecatedProperties() => CodeGenConfig.WarnWhereDeprecated(Root!, this,
-            "entityScope",
-            "entityUsing",
-            "refDataStringFormat",
-            "entityFrameworkMapperInheritsFrom",
-            "cosmosMapperInheritsFrom",
-            "odataMapperInheritsFrom",
-            "eventOutbox",
-            "eventSubjectFormat",
-            "eventCasing",
-            "iValidator");
+            ("entityScope", null),
+            ("entityUsing", null),
+            ("collectionKeyed", " Use the new 'collectionType' property with a value of 'Keyed' to achieve same functionality."),
+            ("refDataStringFormat", null),
+            ("entityFrameworkMapperInheritsFrom", null),
+            ("cosmosMapperInheritsFrom", null),
+            ("odataMapperInheritsFrom", null),
+            ("eventOutbox", null),
+            ("eventSubjectFormat", null),
+            ("eventCasing", null),
+            ("iValidator", null));
     }
 }

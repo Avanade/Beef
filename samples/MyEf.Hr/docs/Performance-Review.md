@@ -94,7 +94,7 @@ Add the additional relationship to the `Employee` table by replacing existing co
   }
 ```
 
-Finally add the `PerformanceReview` table to the end of the file to created the related Entity Framework model.
+Finally add the `PerformanceReview` table to the end of the file to create the related Entity Framework model.
 
 ```
 - { name: PerformanceReview, efModel: true }

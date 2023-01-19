@@ -1071,7 +1071,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
 
             var jt =
-                "{ \"history\": [ { \"name\": \"Amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
+                "{ \"history\": [ { \"name\": \"amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
                 "{ \"name\": \"Microsoft\" }, " +
                 "{ \"name\": \"Google\", \"startDate\": \"2018-04-30T00:00:00\" } ] }";
 
@@ -1100,25 +1100,20 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void H160_PatchDetail_MergePatch_Error()
         {
-            Assert.Warn("HttpPatchOption.JsonPatch no longer supported; requires Newtonsoft libraries to enable: https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch");
+            // Get an existing person detail.
+            var p = AgentTester.Test<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
 
-            //// Get an existing person detail.
-            //var p = AgentTester.Test<PersonAgent, PersonDetail>()
-            //    .ExpectStatusCode(HttpStatusCode.OK)
-            //    .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
+            var jt =
+                "{ \"history\": [ { \"name\": \"Amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
+                "{ \"xxx\": \"Microsoft\" }, " +
+                "{ \"name\": \"Google\", \"startDate\": \"xxx\" } ] }";
 
-            //var jt =
-            //    "{ \"history\": [ { \"name\": \"Amazon\", \"endDate\": \"2018-04-16T00:00:00\" }, " +
-            //    "{ \"xxx\": \"Microsoft\" }, " +
-            //    "{ \"name\": \"Google\", \"startDate\": \"xxx\" } ] }";
-
-            //AgentTester.Test<PersonAgent, PersonDetail>()
-            //    .ExpectStatusCode(HttpStatusCode.BadRequest)
-            //    .ExpectErrorType(ErrorType.ValidationError)
-            //    .ExpectMessages(
-            //        "The JSON object must specify the 'name' token as required for the unique key.",
-            //        "The JSON token is malformed: The string 'xxx' was not recognized as a valid DateTime. There is an unknown word starting at index '0'.")
-            //    .Run(a => a.PatchDetailAsync(HttpPatchOption.MergePatch, jt, 4.ToGuid(), new HttpRequestOptions { ETag = p.ETag }));
+            AgentTester.Test<PersonAgent, PersonDetail>()
+                .Run(a => a.PatchDetailAsync(HttpPatchOption.MergePatch, jt, 4.ToGuid(), new HttpRequestOptions { ETag = p.ETag }))
+                .AssertContentTypePlainText()
+                .Assert(HttpStatusCode.BadRequest, "The JSON value could not be converted to System.DateTime. Path: $.history[2].startDate | LineNumber: 0 | BytePositionInLine: 133.");
         }
 
         [Test, TestSetUp]
