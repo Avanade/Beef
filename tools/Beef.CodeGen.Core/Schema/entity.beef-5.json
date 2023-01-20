@@ -425,9 +425,14 @@
           "title": "Indicates whether a corresponding entity collection result class should be created",
           "description": "Enables the likes of additional paging state to be stored with the underlying collection."
         },
-        "collectionKeyed": {
-          "type": "boolean",
-          "title": "Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key."
+        "collectionType": {
+          "type": "string",
+          "title": "The entity collection type used where 'CollectionInherits' is not specified.",
+          "enum": [
+            "Standard",
+            "Keyed",
+            "Dictionary"
+          ]
         },
         "collectionInherits": {
           "type": "string",
@@ -955,6 +960,18 @@
             "None",
             "NullToEmpty",
             "EmptyToNull"
+          ]
+        },
+        "stringCasing": {
+          "type": "string",
+          "title": "The 'string' casing to be performed on 'Set' and 'CleanUp'.",
+          "description": "Defaults to 'UseDefault'. This is only applied where the 'Type' is 'string'.",
+          "enum": [
+            "UseDefault",
+            "None",
+            "Lower",
+            "Upper",
+            "Title"
           ]
         },
         "autoCreate": {
