@@ -605,12 +605,21 @@
           "title": "The relationship type between the parent and child (self).",
           "description": "Defaults to 'OneToMany'.",
           "enum": [
-            "OneToMany"
+            "OneToMany",
+            "ManyToOne"
           ]
         },
         "foreignKeyColumns": {
           "type": "array",
-          "title": "The list of 'Column' names to be included in the underlying generated output.",
+          "title": "The list of 'Column' names from the related table that reference the parent.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "principalKeyColumns": {
+          "type": "array",
+          "title": "The list of 'Column' names from the principal table that reference the child.",
+          "description": " Typically this is only used where referencing property(s) other than the primary key as the principal property(s).",
           "items": {
             "type": "string"
           }
@@ -632,7 +641,7 @@
         "autoInclude": {
           "type": "boolean",
           "title": "Indicates whether to automatically include navigation to the property.",
-          "description": "Defaults to 'None'."
+          "description": "Defaults to 'false'."
         },
         "propertyName": {
           "type": "string",

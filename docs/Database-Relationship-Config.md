@@ -24,8 +24,9 @@ Property | Description
 -|-
 **`name`** | The name of the primary table of the query. [Mandatory]
 `schema` | The schema name of the primary table of the view.<br/>&dagger; Defaults to `CodeGeneration.Schema`.
-**`type`** | The relationship type between the parent and child (self). Valid options are: `OneToMany`.<br/>&dagger; Defaults to `OneToMany`.
-**`foreignKeyColumns`** | The list of `Column` names to be included in the underlying generated output. [Mandatory]
+**`type`** | The relationship type between the parent and child (self). Valid options are: `OneToMany`, `ManyToOne`.<br/>&dagger; Defaults to `OneToMany`.
+**`foreignKeyColumns`** | The list of `Column` names from the related table that reference the parent. [Mandatory]
+`principalKeyColumns` | The list of `Column` names from the principal table that reference the child.<br/>&dagger;  Typically this is only used where referencing property(s) other than the primary key as the principal property(s).
 
 <br/>
 
@@ -35,7 +36,7 @@ Provides the _.NET Entity Framework (EF)_ specific configuration.
 Property | Description
 -|-
 `onDelete` | The operation applied to dependent entities in the relationship when the principal is deleted or the relationship is severed. Valid options are: `NoAction`, `Cascade`, `ClientCascade`, `ClientNoAction`, `ClientSetNull`, `Restrict`, `SetNull`.<br/>&dagger; Defaults to `NoAction`. See https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.deletebehavior for more information.
-`autoInclude` | Indicates whether to automatically include navigation to the property.<br/>&dagger; Defaults to `None`.
+`autoInclude` | Indicates whether to automatically include navigation to the property.<br/>&dagger; Defaults to `false`.
 
 <br/>
 

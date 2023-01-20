@@ -109,7 +109,7 @@ Property | Description
 -|-
 **`collection`** | Indicates whether a corresponding entity collection class should be created.
 **`collectionResult`** | Indicates whether a corresponding entity collection result class should be created<br/>&dagger; Enables the likes of additional paging state to be stored with the underlying collection.
-`collectionKeyed` | Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key.
+`collectionType` | The entity collection type used where `CollectionInherits` is not specified. Valid options are: `Standard`, `Keyed`, `Dictionary`.
 `collectionInherits` | The base class that a `Collection` inherits from.<br/>&dagger; Defaults to `EntityBaseCollection` or `EntityBaseKeyedCollection` depending on `CollectionKeyed`. For Reference Data it will default to `ReferenceDataCollectionBase`.
 `collectionResultInherits` | The base class that a `CollectionResult` inherits from.<br/>&dagger; Defaults to `EntityCollectionResult`.
 
