@@ -12,44 +12,34 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Beef.Demo.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object '[Demo].[Person]'.
+    /// Represents the Entity Framework (EF) model for database object '[Ref].[Gender]'.
     /// </summary>
-    public partial class Person
+    public partial class Gender
     {
-        /// <summary>
-        /// Gets or sets the 'PersonId' column value.
-        /// </summary>
-        public Guid PersonId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'FirstName' column value.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'LastName' column value.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'Birthday' column value.
-        /// </summary>
-        public DateTime? Birthday { get; set; }
-
         /// <summary>
         /// Gets or sets the 'GenderId' column value.
         /// </summary>
-        public Guid? GenderId { get; set; }
+        public Guid GenderId { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'Street' column value.
+        /// Gets or sets the 'Code' column value.
         /// </summary>
-        public string? Street { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'City' column value.
+        /// Gets or sets the 'Text' column value.
         /// </summary>
-        public string? City { get; set; }
+        public string? Text { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'IsActive' column value.
+        /// </summary>
+        public bool? IsActive { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'SortOrder' column value.
+        /// </summary>
+        public int? SortOrder { get; set; }
 
         /// <summary>
         /// Gets or sets the 'RowVersion' column value.
@@ -77,24 +67,19 @@ namespace Beef.Demo.Business.Data.EfModel
         public DateTime? UpdatedDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'UniqueCode' column value.
+        /// Gets or sets the 'AlternateName' column value.
         /// </summary>
-        public string? UniqueCode { get; set; }
+        public string? AlternateName { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'EyeColorCode' column value.
+        /// Gets or sets the 'TripCode' column value.
         /// </summary>
-        public string? EyeColorCode { get; set; }
+        public string? TripCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the 'MetadataJson' column value.
+        /// Gets or sets the 'CountryId' column value.
         /// </summary>
-        public string? MetadataJson { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <i>ManyToOne</i> relationship to <see cref="Gender"/>.
-        /// </summary>
-        public Gender Gender { get; set; }
+        public Guid? CountryId { get; set; }
 
         /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
@@ -105,29 +90,23 @@ namespace Beef.Demo.Business.Data.EfModel
             if (modelBuilder == null)
                 throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.Entity<Person>(entity =>
+            modelBuilder.Entity<Gender>(entity =>
             {
-                entity.ToTable("Person", "Demo");
-                entity.HasKey(nameof(PersonId));
-                entity.Property(p => p.PersonId).HasColumnName("PersonId").HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Birthday).HasColumnName("Birthday").HasColumnType("DATE");
+                entity.ToTable("Gender", "Ref");
+                entity.HasKey(nameof(GenderId));
                 entity.Property(p => p.GenderId).HasColumnName("GenderId").HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Street).HasColumnName("Street").HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.City).HasColumnName("City").HasColumnType("NVARCHAR(100)");
+                entity.Property(p => p.Code).HasColumnName("Code").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Text).HasColumnName("Text").HasColumnType("NVARCHAR(250)");
+                entity.Property(p => p.IsActive).HasColumnName("IsActive").HasColumnType("BIT");
+                entity.Property(p => p.SortOrder).HasColumnName("SortOrder").HasColumnType("INT");
                 entity.Property(p => p.RowVersion).HasColumnName("RowVersion").HasColumnType("TIMESTAMP").IsRowVersion();
                 entity.Property(p => p.CreatedBy).HasColumnName("CreatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
                 entity.Property(p => p.CreatedDate).HasColumnName("CreatedDate").HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
                 entity.Property(p => p.UpdatedBy).HasColumnName("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
                 entity.Property(p => p.UpdatedDate).HasColumnName("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
-                entity.Property(p => p.UniqueCode).HasColumnName("UniqueCode").HasColumnType("NVARCHAR(20)");
-                entity.Property(p => p.EyeColorCode).HasColumnName("EyeColorCode").HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.MetadataJson).HasColumnName("MetadataJson").HasColumnType("NVARCHAR(2048)");
-
-                // Relationships...
-                entity.HasOne(r => r.Gender).WithMany().HasForeignKey(fk => fk.GenderId).OnDelete(DeleteBehavior.NoAction);
-                entity.Navigation(r => r.Gender).AutoInclude(false);
+                entity.Property(p => p.AlternateName).HasColumnName("AlternateName").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.TripCode).HasColumnName("TripCode").HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.CountryId).HasColumnName("CountryId").HasColumnType("UNIQUEIDENTIFIER");
                 AddToModel(entity);
             });
         }
@@ -135,7 +114,7 @@ namespace Beef.Demo.Business.Data.EfModel
         /// <summary>
         /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
         /// </summary>
-        static partial void AddToModel(EntityTypeBuilder<Person> entity);
+        static partial void AddToModel(EntityTypeBuilder<Gender> entity);
     }
 }
 

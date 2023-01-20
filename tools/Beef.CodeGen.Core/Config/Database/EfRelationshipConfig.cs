@@ -42,7 +42,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the relationship type.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "The relationship type between the parent and child (self).", IsImportant = true, Options = new string[] { "OneToMany" },
+        [CodeGenProperty("Key", Title = "The relationship type between the parent and child (self).", IsImportant = true, Options = new string[] { "OneToMany", "ManyToOne" },
             Description = "Defaults to `OneToMany`.")]
         public string? Type { get; set; }
 
@@ -50,8 +50,16 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names from the related table that reference the parent.
         /// </summary>
         [JsonProperty("foreignKeyColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenPropertyCollection("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsMandatory = true, IsImportant = true)]
+        [CodeGenPropertyCollection("Key", Title = "The list of `Column` names from the related table that reference the parent.", IsMandatory = true, IsImportant = true)]
         public List<string>? ForeignKeyColumns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names from the principal table that reference the child.
+        /// </summary>
+        [JsonProperty("principalKeyColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenPropertyCollection("Key", Title = "The list of `Column` names from the principal table that reference the child.",
+            Description = " Typically this is only used where referencing property(s) other than the primary key as the principal property(s).")]
+        public List<string>? PrincipalKeyColumns { get; set; }
 
         #endregion
 
@@ -71,7 +79,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("autoInclude", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("EF", Title = "Indicates whether to automatically include navigation to the property.",
-            Description = "Defaults to `None`.")]
+            Description = "Defaults to `false`.")]
         public bool? AutoInclude { get; set; }
 
         #endregion
@@ -112,14 +120,19 @@ namespace Beef.CodeGen.Config.Database
         public DbTableSchema? DbTable { get; private set; }
         
         /// <summary>
-        /// Gets the list of foreign key <see cref="DbColumnSchema"/>.
+        /// Gets the list of foreign key(s) <see cref="DbColumnSchema"/>.
         /// </summary>
-        public List<FKColumn> ForeignKeyDbColumns = new();
+        public List<RefKeyColumn> ForeignKeyDbColumns = new();
 
         /// <summary>
-        /// Foreign key column.
+        /// Gets the list of principal key(s) <see cref="DbColumnSchema"/>.
         /// </summary>
-        public class FKColumn
+        public List<RefKeyColumn> PrincipalKeyDbColumns = new();
+
+        /// <summary>
+        /// Foreign/principal key column.
+        /// </summary>
+        public class RefKeyColumn
         {
             /// <summary>
             /// Gets the .NET property name.
@@ -150,14 +163,30 @@ namespace Beef.CodeGen.Config.Database
             if (ForeignKeyColumns == null || ForeignKeyColumns.Count == 0)
                 throw new CodeGenException(this, nameof(ForeignKeyColumns), $"At least one foreign key column must be specified.");
 
+            var fkt = Type == "OneToMany" ? DbTable : Parent!.DbTable!;
+            var pkt = Type == "OneToMany" ? Parent!.DbTable! : DbTable;
+
             foreach (var fkc in ForeignKeyColumns)
             {
-                var fkci = new FKColumn { DbColumn = DbTable.Columns.Where(x => x.Name == fkc).SingleOrDefault() };
+                var fkci = new RefKeyColumn { DbColumn = fkt.Columns.Where(x => x.Name == fkc).SingleOrDefault() };
                 if (fkci.DbColumn == null)
-                    throw new CodeGenException(this, nameof(ForeignKeyColumns), $"Foreign key column '{fkc}' does not exist in the child (this) table.");
+                    throw new CodeGenException(this, nameof(ForeignKeyColumns), $"Foreign key column '{fkc}' does not exist in table '{fkt.QualifiedName}'.");
 
                 fkci.PropertyName = Root!.RenameForDotNet(fkc);
                 ForeignKeyDbColumns.Add(fkci);
+            }
+
+            if (PrincipalKeyColumns is not null)
+            {
+                foreach (var pkc in PrincipalKeyColumns)
+                {
+                    var pkci = new RefKeyColumn { DbColumn = pkt.Columns.Where(x => x.Name == pkc).SingleOrDefault() };
+                    if (pkci.DbColumn == null)
+                        throw new CodeGenException(this, nameof(ForeignKeyColumns), $"Principal key column '{pkc}' does not exist in table '{pkt.QualifiedName}'.");
+
+                    pkci.PropertyName = Root!.RenameForDotNet(pkc);
+                    PrincipalKeyDbColumns.Add(pkci);
+                }
             }
 
             return Task.CompletedTask;

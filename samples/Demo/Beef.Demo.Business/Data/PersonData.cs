@@ -19,7 +19,10 @@
         {
             _ef.WithWildcard(args?.FirstName, w => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
             _ef.WithWildcard(args?.LastName, w => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
-            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToIdList<Guid>().Contains(x.GenderId!.Value)));
+
+            // The following commented line is the more correct/performant; the alternate is a test of the EF many-to-one as an example.
+            //            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToIdList<Guid>().Contains(x.GenderId!.Value)));
+            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.Gender.Code)));
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 

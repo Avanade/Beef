@@ -53,7 +53,7 @@ tables:
   }
 
   # Reference data stored procedures
-- { name: Gender, schema: Ref, getAll: true, get: true, create: true, update: true }
+- { name: Gender, schema: Ref, getAll: true, get: true, create: true, update: true, efModel: true }
 
 - { name: Country, schema: Ref, getAll: true }
 
@@ -111,6 +111,10 @@ tables:
           { statement: 'EXEC [Demo].[spWorkHistoryMerge] @PersonId, @WorkHistoryList', location: After }
         ]
       }
+    ],
+    # Creates an EF many-to-one relationship for Person->Gender - to support filtering by a field within, resulting in an inner join when used.
+    relationships: [
+      { name: Gender, schema: Ref, type: ManyToOne, foreignKeyColumns: [ GenderId ] }
     ]
   }
 

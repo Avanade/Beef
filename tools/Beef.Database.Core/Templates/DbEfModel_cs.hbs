@@ -74,7 +74,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
 
                 // Relationships...
   {{/if}}
-                entity.HasMany(r => r.{{PropertyName}}).WithOne().HasForeignKey({{#ifeq ForeignKeyDbColumns.Count 1}}fk => fk.{{#each ForeignKeyDbColumns}}{{PropertyName}}{{/each}}{{else}}{{#each ForeignKeyDbColumns}}{{#unless @first}}, {{/unless}}"{{PropertyName}}"{{/each}}{{/ifeq}}).OnDelete(DeleteBehavior.{{OnDelete}});
+                entity.{{#ifeq Type 'OneToMany'}}HasMany{{else}}HasOne{{/ifeq}}(r => r.{{PropertyName}}).{{#ifeq Type 'OneToMany'}}WithOne{{else}}WithMany{{/ifeq}}().HasForeignKey({{#ifeq ForeignKeyDbColumns.Count 1}}fk => fk.{{#each ForeignKeyDbColumns}}{{PropertyName}}{{/each}}{{else}}{{#each ForeignKeyDbColumns}}{{#unless @first}}, {{/unless}}"{{PropertyName}}"{{/each}}{{/ifeq}}){{#ifne PrincipalKeyDbColumns.Count 0}}.HasPrincipalKey({{#ifeq PrincipalKeyDbColumns.Count 1}}pk => pk.{{#each PrincipalKeyDbColumns}}{{PropertyName}}{{/each}}{{else}}{{#each PrincipalKeyDbColumns}}{{#unless @first}}, {{/unless}}"{{PropertyName}}"{{/each}}{{/ifeq}}){{/ifne}}.OnDelete(DeleteBehavior.{{OnDelete}});
                 entity.Navigation(r => r.{{PropertyName}}).AutoInclude({{#if AutoInclude}}true{{else}}false{{/if}});
 {{/each}}
                 AddToModel(entity);
