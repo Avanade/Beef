@@ -106,6 +106,8 @@ namespace Beef.Demo.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Contact s)
                 => s.Id == default
@@ -113,8 +115,6 @@ namespace Beef.Demo.Business.Data
                 && s.LastName == default
                 && s.StatusSid == default
                 && s.Communications == default;
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -135,6 +135,8 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityEfMapperCtor();
             }
 
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.Contact s)
                 => s.ContactId == default
@@ -142,8 +144,6 @@ namespace Beef.Demo.Business.Data
                 && s.LastName == default
                 && s.StatusCode == default
                 && s.Comms == default;
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

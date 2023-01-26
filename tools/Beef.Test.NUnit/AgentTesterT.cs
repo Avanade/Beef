@@ -19,7 +19,7 @@ namespace Beef.Test.NUnit
         internal AgentTester(ApiTester<TEntryPoint> parent) => _parent = parent;
 
         /// <inheritdoc/>
-        public void Dispose() =>_parent.Dispose();
+        public void Dispose() => _parent.Dispose();
 
         /// <summary>
         /// Enables an agent (<see cref="CoreEx.Http.TypedHttpClientBase"/>) to be used to send a <see cref="HttpRequestMessage"/> to the underlying <see cref="TestServer"/>.

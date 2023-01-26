@@ -9,15 +9,6 @@ namespace My.Hr.Api
     public class Startup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
-        /// </summary>
-        public Startup()
-        {
-            // Use JSON property names in validation.
-            ValidationArgs.DefaultUseJsonNames = true;
-        }
-
-        /// <summary>
         /// The configure services method called by the runtime; use this method to add services to the container.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
@@ -101,7 +92,24 @@ namespace My.Hr.Api
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My.Hr"));
 
             // Add execution context set up to the pipeline.
-            app.UseExecutionContext();
+            app.UseAuthentication();
+            app.UseExecutionContext((ctx, ec) =>
+            {
+                //ec.UserName = ctx.User.Identity?.Name ?? "Anonymous";
+                //return Task.CompletedTask;
+                if (ctx.User.Identity is not null && ctx.User.Identity.IsAuthenticated)
+                {
+                    ec.UserId = ctx.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+                    if (ec.UserId is null)
+                        throw new AuthenticationException("Token must have an 'oid' (object identifier) claim.");
+
+                    ec.UserName = $"{ctx.User.FindFirst("emails")?.Value ?? throw new AuthenticationException("Token must have an 'emails' claim.")}#{ec.UserId}";
+                }
+                else
+                    ec.UserName = "Anonymous";
+
+                return Task.CompletedTask;
+            });
 
             // Add health checks.
             app.UseHealthChecks("/health");

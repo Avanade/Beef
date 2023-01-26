@@ -2,7 +2,6 @@
 
 using Beef.CodeGen;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging;
 using OnRamp.Console;
 using System;
 using System.ComponentModel.DataAnnotations;

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0</TargetFrameworks>
     <Product>Beef.Test.NUnit</Product>
-    <Description>Business Entity Execution Framework (Beef) NUnit extensions for testing backwards compatibility.</Description>
+    <Description>Business Entity Execution Framework (Beef) NUnit extensions for testing (Beef v4.x backwards compatibility only).</Description>
     <PackageTags>beef test nunit unnittestex</PackageTags>
   </PropertyGroup>
 

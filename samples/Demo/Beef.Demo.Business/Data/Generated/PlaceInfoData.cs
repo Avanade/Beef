@@ -28,12 +28,12 @@ namespace Beef.Demo.Business.Data
                 EntityToModelHttpAgentMapperCtor();
             }
 
+            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(PlaceInfo s)
                 => s.Name == default
                 && s.PostCode == default;
-
-            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -51,12 +51,12 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityHttpAgentMapperCtor();
             }
 
+            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Model.PlaceInfo s)
                 => s.Name == default
                 && s.PostCode == default;
-
-            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

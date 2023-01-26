@@ -185,7 +185,8 @@ tables:
         /// Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
         /// </summary>
         [JsonProperty("efModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("EntityFramework", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.")]
+        [CodeGenProperty("EntityFramework", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.",
+            Description = "Defaults to `CodeGeneration.EfModel`.")]
         public bool? EfModel { get; set; }
 
         /// <summary>
@@ -488,6 +489,7 @@ tables:
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Root.FormatSchemaTableName(Schema, Name)}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            EfModel = DefaultWhereNull(EfModel, () => Parent!.EfModel);
             EfModelName = DefaultWhereNull(EfModelName, () => Root.RenameForDotNet(Name));
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
 

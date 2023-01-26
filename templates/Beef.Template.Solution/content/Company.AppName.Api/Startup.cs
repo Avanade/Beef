@@ -11,9 +11,6 @@ public class Startup
     /// <param name="services">The <see cref="IServiceCollection"/>.</param>
     public void ConfigureServices(IServiceCollection services)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
-
         // Add the core services.
         services.AddSettings<AppNameSettings>()
                 .AddExecutionContext()

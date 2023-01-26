@@ -145,6 +145,54 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5BA9A863-C
 		samples\MyEf.Hr\docs\Performance-Review.md = samples\MyEf.Hr\docs\Performance-Review.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{FDBFD331-A9EB-42BF-B501-8398A04955A7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Authentication.md = docs\Authentication.md
+		docs\Database-CodeGeneration-Config.md = docs\Database-CodeGeneration-Config.md
+		docs\Database-Execute-Config.md = docs\Database-Execute-Config.md
+		docs\Database-OrderBy-Config.md = docs\Database-OrderBy-Config.md
+		docs\Database-Parameter-Config.md = docs\Database-Parameter-Config.md
+		docs\Database-Query-Config.md = docs\Database-Query-Config.md
+		docs\Database-QueryJoin-Config.md = docs\Database-QueryJoin-Config.md
+		docs\Database-QueryJoinOn-Config.md = docs\Database-QueryJoinOn-Config.md
+		docs\Database-QueryOrder-Config.md = docs\Database-QueryOrder-Config.md
+		docs\Database-QueryWhere-Config.md = docs\Database-QueryWhere-Config.md
+		docs\Database-Relationship-Config.md = docs\Database-Relationship-Config.md
+		docs\Database-StoredProcedure-Config.md = docs\Database-StoredProcedure-Config.md
+		docs\Database-Table-Config.md = docs\Database-Table-Config.md
+		docs\Database-Where-Config.md = docs\Database-Where-Config.md
+		docs\Dependency-Injection.md = docs\Dependency-Injection.md
+		docs\Entity-CodeGeneration-Config.md = docs\Entity-CodeGeneration-Config.md
+		docs\Entity-Const-Config.md = docs\Entity-Const-Config.md
+		docs\Entity-Entity-Config.md = docs\Entity-Entity-Config.md
+		docs\Entity-Operation-Config.md = docs\Entity-Operation-Config.md
+		docs\Entity-Parameter-Config.md = docs\Entity-Parameter-Config.md
+		docs\Entity-Property-Config.md = docs\Entity-Property-Config.md
+		docs\Layer-Data.md = docs\Layer-Data.md
+		docs\Layer-DataSvc.md = docs\Layer-DataSvc.md
+		docs\Layer-Entity.md = docs\Layer-Entity.md
+		docs\Layer-Manager.md = docs\Layer-Manager.md
+		docs\Layer-ServiceAgent.md = docs\Layer-ServiceAgent.md
+		docs\Layer-ServiceInterface.md = docs\Layer-ServiceInterface.md
+		docs\Reference-Data.md = docs\Reference-Data.md
+		docs\Sample-Cosmos-GettingStarted.md = docs\Sample-Cosmos-GettingStarted.md
+		docs\Sample-SqlServer-EF-GettingStarted.md = docs\Sample-SqlServer-EF-GettingStarted.md
+		docs\Sample-SqlServer-StoredProcs-GettingStarted.md = docs\Sample-SqlServer-StoredProcs-GettingStarted.md
+		docs\Solution-Structure.md = docs\Solution-Structure.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{6739CF51-CAB1-4DD9-A98B-6E1EDED5BFE1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\images\ApiArchitecture.png = docs\images\ApiArchitecture.png
+		docs\images\CodeGen.png = docs\images\CodeGen.png
+		docs\images\EventDrivenArchitecture.png = docs\images\EventDrivenArchitecture.png
+		docs\images\Layers.png = docs\images\Layers.png
+		docs\images\Logo.png = docs\images\Logo.png
+		docs\images\Logo256x256.png = docs\images\Logo256x256.png
+		docs\images\Logo64x64.png = docs\images\Logo64x64.png
+		docs\images\LogoPill.png = docs\images\LogoPill.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -325,6 +373,7 @@ Global
 		{78AA45BA-3AF2-458D-886D-BA575D481324} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
 		{4EE60769-8A32-4B61-B54B-3CEE0C11E93F} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
 		{5BA9A863-C057-46D5-8139-6353ACCCAA0A} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
+		{6739CF51-CAB1-4DD9-A98B-6E1EDED5BFE1} = {FDBFD331-A9EB-42BF-B501-8398A04955A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42D71086-61E6-4D31-B4B8-BFC8CC471428}

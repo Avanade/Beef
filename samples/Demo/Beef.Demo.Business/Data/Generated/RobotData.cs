@@ -94,6 +94,8 @@ namespace Beef.Demo.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Robot s)
                 => s.Id == default
@@ -103,8 +105,6 @@ namespace Beef.Demo.Business.Data
                 && s.PowerSourceSid == default
                 && s.ETag == default
                 && s.ChangeLog == default;
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -127,6 +127,8 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityCosmosMapperCtor();
             }
 
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Model.Robot s)
                 => s.Id == default
@@ -136,8 +138,6 @@ namespace Beef.Demo.Business.Data
                 && s.PowerSource == default
                 && s.ETag == default
                 && s.ChangeLog == default;
-
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -100,6 +100,8 @@ namespace MyEf.Hr.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Employee s)
                 => s.Address == default
@@ -113,8 +115,6 @@ namespace MyEf.Hr.Business.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -135,6 +135,8 @@ namespace MyEf.Hr.Business.Data
                 ModelToEntityEfMapperCtor();
             }
 
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.Employee s)
                 => s.AddressJson == default
@@ -147,8 +149,6 @@ namespace MyEf.Hr.Business.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

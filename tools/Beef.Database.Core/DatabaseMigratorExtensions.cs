@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using DbEx.Console;
 using DbEx.Migration;
 using Microsoft.Extensions.Logging;
 using OnRamp;
@@ -39,6 +38,7 @@ namespace Beef.Database
 
             // Walk the assembly hierarchy.
             var alist = new List<Assembly>();
+            var maAss = typeof(MigrationArgs).Assembly;
             var type = migrator.GetType();
             do
             {
@@ -46,10 +46,10 @@ namespace Beef.Database
                     alist.Add(type.Assembly);
 
                 // Ensure the _Beef.Database.Core_ assembly is included, and within the correct order.
-                if (type.Assembly.GetReferencedAssemblies().Any(x => x.FullName == typeof(MigrationArgs).Assembly.GetName().FullName))
+                if (type.Assembly.GetReferencedAssemblies().Any(x => x.Name == maAss.GetName().Name))
                 {
-                    if (!alist.Contains(typeof(MigrationArgs).Assembly))
-                        alist.Add(typeof(MigrationArgs).Assembly);
+                    if (!alist.Contains(maAss))
+                        alist.Add(maAss);
                 }
 
                 type = type.BaseType!;

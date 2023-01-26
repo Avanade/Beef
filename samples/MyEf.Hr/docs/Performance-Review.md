@@ -84,20 +84,21 @@ For the performance review, Entity Framework will be used exclusively to support
 Add the additional relationship to the `Employee` table by replacing existing configuration.
 
 ``` yaml
-- { name: Employee, efModel: true,
-    relationships: [
-     # Relationships can be code-generated (basic functionality), or handcrafted in the .NET using the standard EntityFramework capabilities.
-     # - One-to-many to EmergencyContacts table foreign key using EmployeeId column. Cascade the delete. Auto include collection on get and track for updates. 
-     { name: EmergencyContact, propertyName: EmergencyContacts, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade, autoInclude: true },
-     { name: PerformanceReview, propertyName: PerformanceReviews, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade }
-    ]
-  }
+  # References the Employee and related tables to implement the EF Model and infer the underlying schema.
+- name: Employee
+  relationships: [
+    # Relationships can be code-generated (basic functionality), or handcrafted in the .NET code using the standard EntityFramework capabilities.
+    # - One-to-many to EmergencyContacts table foreign key using EmployeeId column. Cascade the delete. Auto include collection on get and track for updates.
+    { name: EmergencyContact, propertyName: EmergencyContacts, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade, autoInclude: true },
+    # - One-to-many to PerformanceReview table foreign key using EmployeeId column. Cascade the delete. Do _not_ auto include collection on get and track for updates (default).
+    { name: PerformanceReview, propertyName: PerformanceReviews, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade }
+  ]
 ```
 
 Finally add the `PerformanceReview` table to the end of the file to create the related Entity Framework model.
 
 ```
-- { name: PerformanceReview, efModel: true }
+- name: PerformanceReview
 ```
 
 <br/>

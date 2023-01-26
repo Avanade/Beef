@@ -230,6 +230,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelEfMapperCtor();
             }
+
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
     {{#each EntityFrameworkMapperIsDestinationProperties}}
       {{#if @first}}
 
@@ -238,17 +240,15 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
     {{/each}}
-
         {{#if HasEntityFrameworkChangeLogProperty}}
+
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-
         {{/if}}
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -269,6 +269,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 ModelToEntityEfMapperCtor();
             }
+
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
     {{#each EntityFrameworkMapperIsSourceProperties}}
       {{#if @first}}
 
@@ -277,17 +279,15 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
     {{/each}}
-
         {{#if HasEntityFrameworkChangeLogProperty}}
+
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
                 .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-
         {{/if}}
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
   {{/unless}}
  {{/ifval}}
@@ -314,6 +314,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelCosmosMapperCtor();
             }
+
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
     {{#each CosmosMapperIsDestinationProperties}}
       {{#if @first}}
 
@@ -322,8 +324,6 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
     {{/each}}
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -344,6 +344,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 ModelToEntityCosmosMapperCtor();
             }
+
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
     {{#each CosmosMapperIsSourceProperties}}
       {{#if @first}}
 
@@ -352,8 +354,6 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
     {{/each}}
-
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
   {{/unless}}
  {{/ifval}}
@@ -409,6 +409,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 EntityToModelHttpAgentMapperCtor();
             }
+
+            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
     {{#each HttpAgentMapperIsDestinationProperties}}
       {{#if @first}}
 
@@ -417,8 +419,6 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
     {{/each}}
-
-            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -439,6 +439,8 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{/each}}
                 ModelToEntityHttpAgentMapperCtor();
             }
+
+            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
     {{#each HttpAgentMapperIsSourceProperties}}
       {{#if @first}}
 
@@ -447,8 +449,6 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/if}}
                 {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
     {{/each}}
-
-            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
         }
   {{/unless}}
 {{/if}}

@@ -98,7 +98,7 @@ Provides the _Entity Framework (EF) model_ configuration.
 
 Property | Description
 -|-
-`efModel` | Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
+`efModel` | Indicates whether an `Entity Framework` .NET (C#) model is to be generated.<br/>&dagger; Defaults to `CodeGeneration.EfModel`.
 `efModelName` | The .NET (C#) EntityFramework (EF) model name.<br/>&dagger; Defaults to `Name` applying the `CodeGeneration.AutoDotNetRename`.
 
 <br/>

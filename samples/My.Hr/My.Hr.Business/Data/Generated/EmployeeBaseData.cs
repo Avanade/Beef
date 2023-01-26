@@ -60,6 +60,8 @@ namespace My.Hr.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EmployeeBase s)
                 => s.Id == default
@@ -71,8 +73,6 @@ namespace My.Hr.Business.Data
                 && s.StartDate == default
                 && s.Termination == default
                 && s.PhoneNo == default;
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -97,6 +97,8 @@ namespace My.Hr.Business.Data
                 ModelToEntityEfMapperCtor();
             }
 
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.Employee s)
                 => s.EmployeeId == default
@@ -107,8 +109,6 @@ namespace My.Hr.Business.Data
                 && s.Birthday == default
                 && s.StartDate == default
                 && s.PhoneNo == default;
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

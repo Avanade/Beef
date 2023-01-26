@@ -160,15 +160,17 @@ Remove all existing configuration from `database.beef.yaml` and replace. Each ta
 
 ``` yaml
 # Configuring the code-generation global settings
-# - Schema defines the default for all tables unless explicitly defined.
+# - Schema defines the default for al tables unless explicitly defined.
+# - EfModel indicates that an Entity Framework model should be generated for all tables unless specified otherwise.
 # 
 schema: Hr
+efModel: true
 tables:
   # Reference data tables/models.
-- { name: Gender, efModel: true }
-- { name: TerminationReason, efModel: true }
-- { name: RelationshipType, efModel: true }
-- { name: USState, efModel: true }
+- name: Gender
+- name: TerminationReason
+- name: RelationshipType
+- name: USState
 ```
 
 <br/>
@@ -181,16 +183,14 @@ Copy the following configuration and append (after reference data) to the `datab
 
 ``` yaml
   # References the Employee and related tables to implement the EF Model and infer the underlying schema.
-  # - Relationships can be code-generated (basic functionality), or handcrafted in the .NET using the standard EntityFramework capabilities. 
-- { name: Employee, efModel: true,
-    relationships: [
-      # Relationships can be code-generated (basic functionality), or handcrafted in the .NET using the standard EntityFramework capabilities.
-      # - One-to-many to EmergencyContacts table foreign key using EmployeeId column. Cascade the delete. Auto include collection on get and track for updates. 
-      { name: EmergencyContact, propertyName: EmergencyContacts, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade, autoInclude: true }
-    ]
-  }
+- name: Employee
+  relationships: [
+    # Relationships can be code-generated (basic functionality), or handcrafted in the .NET code using the standard EntityFramework capabilities.
+    # - One-to-many to EmergencyContacts table foreign key using EmployeeId column. Cascade the delete. Auto include collection on get and track for updates.
+    { name: EmergencyContact, propertyName: EmergencyContacts, foreignKeyColumns: [ EmployeeId ], onDelete: ClientCascade, autoInclude: true }
+  ]
 
-- { name: EmergencyContact, efModel: true }
+- name: EmergencyContact
 ```
 
 <br/>

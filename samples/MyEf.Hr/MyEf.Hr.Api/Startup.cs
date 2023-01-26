@@ -9,15 +9,6 @@ namespace MyEf.Hr.Api
     public class Startup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
-        /// </summary>
-        public Startup()
-        {
-            // Use JSON property names in validation.
-            ValidationArgs.DefaultUseJsonNames = true;
-        }
-
-        /// <summary>
         /// The configure services method called by the runtime; use this method to add services to the container.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>

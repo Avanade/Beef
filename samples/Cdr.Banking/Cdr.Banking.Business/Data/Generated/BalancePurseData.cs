@@ -28,12 +28,12 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(BalancePurse s)
                 => s.Amount == default
                 && s.Currency == default;
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -51,12 +51,12 @@ namespace Cdr.Banking.Business.Data
                 ModelToEntityCosmosMapperCtor();
             }
 
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Model.BalancePurse s)
                 => s.Amount == default
                 && s.Currency == default;
-
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -33,6 +33,8 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(AccountDetail s)
                 => s.Bsb == default
@@ -41,8 +43,6 @@ namespace Cdr.Banking.Business.Data
                 && s.SpecificAccountUTypeSid == default
                 && s.TermDeposit == default
                 && s.CreditCard == default;
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -65,6 +65,8 @@ namespace Cdr.Banking.Business.Data
                 ModelToEntityCosmosMapperCtor();
             }
 
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Model.Account s)
                 => s.Bsb == default
@@ -73,8 +75,6 @@ namespace Cdr.Banking.Business.Data
                 && s.SpecificAccountUType == default
                 && s.TermDeposit == default
                 && s.CreditCard == default;
-
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

@@ -65,6 +65,8 @@ namespace Cdr.Banking.Business.Data
                 EntityToModelCosmosMapperCtor();
             }
 
+            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Transaction s)
                 => s.Id == default
@@ -83,8 +85,6 @@ namespace Cdr.Banking.Business.Data
                 && s.BillerCode == default
                 && s.BillerName == default
                 && s.ApcaNumber == default;
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -116,6 +116,8 @@ namespace Cdr.Banking.Business.Data
                 ModelToEntityCosmosMapperCtor();
             }
 
+            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Model.Transaction s)
                 => s.Id == default
@@ -134,8 +136,6 @@ namespace Cdr.Banking.Business.Data
                 && s.BillerCode == default
                 && s.BillerName == default
                 && s.ApcaNumber == default;
-
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

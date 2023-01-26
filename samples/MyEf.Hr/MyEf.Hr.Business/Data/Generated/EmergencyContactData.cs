@@ -31,6 +31,8 @@ namespace MyEf.Hr.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EmergencyContact s)
                 => s.Id == default
@@ -38,8 +40,6 @@ namespace MyEf.Hr.Business.Data
                 && s.LastName == default
                 && s.PhoneNo == default
                 && s.RelationshipSid == default;
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -60,6 +60,8 @@ namespace MyEf.Hr.Business.Data
                 ModelToEntityEfMapperCtor();
             }
 
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.EmergencyContact s)
                 => s.EmergencyContactId == default
@@ -67,8 +69,6 @@ namespace MyEf.Hr.Business.Data
                 && s.LastName == default
                 && s.PhoneNo == default
                 && s.RelationshipTypeCode == default;
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

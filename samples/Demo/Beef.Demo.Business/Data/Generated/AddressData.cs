@@ -46,12 +46,12 @@ namespace Beef.Demo.Business.Data
                 EntityToModelEfMapperCtor();
             }
 
+            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Address s)
                 => s.Street == default
                 && s.City == default;
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -69,12 +69,12 @@ namespace Beef.Demo.Business.Data
                 ModelToEntityEfMapperCtor();
             }
 
+            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.Person s)
                 => s.Street == default
                 && s.City == default;
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }

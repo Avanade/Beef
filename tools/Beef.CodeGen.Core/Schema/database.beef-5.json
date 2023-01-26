@@ -87,6 +87,11 @@
             "SnakeKebabToPascalCase"
           ]
         },
+        "efModel": {
+          "type": "boolean",
+          "title": "Indicates whether an 'Entity Framework' .NET (C#) model is to be generated for all tables.",
+          "description": "This can be overridden within the 'Table'(s)."
+        },
         "outbox": {
           "type": "boolean",
           "title": "Indicates whether to generate the event outbox SQL and .NET artefacts.",
@@ -261,7 +266,8 @@
         },
         "efModel": {
           "type": "boolean",
-          "title": "Indicates whether an 'Entity Framework' .NET (C#) model is to be generated."
+          "title": "Indicates whether an 'Entity Framework' .NET (C#) model is to be generated.",
+          "description": "Defaults to 'CodeGeneration.EfModel'."
         },
         "efModelName": {
           "type": "string",

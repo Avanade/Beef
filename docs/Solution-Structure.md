@@ -192,6 +192,8 @@ public class Program
 }
 ```
 
+<br/>
+
 ### Company.AppName.Test
 
 This is a _.NET Unit Test (Class Library)_ project that by default leverages [NUnit](https://github.com/nunit/nunit) framework to enable. This also uses the [UnitTestEx](https://github.com/Avanade/unittestex) to enable (simplify) the testing of the intra-integration tests.

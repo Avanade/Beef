@@ -20,7 +20,7 @@
     <!--#endif -->
     <PackageReference Include="CoreEx.Validation" Version="CoreExVersion" />
     <!--#if (implement_sqlserver) -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.13" />
     <!--#endif -->
     <!--#if (implement_mysql) -->
     <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />

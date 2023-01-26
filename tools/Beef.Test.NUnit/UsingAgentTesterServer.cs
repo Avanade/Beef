@@ -15,6 +15,6 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets the <see cref="AgentTester"/>.
         /// </summary>
-        public AgentTester<TEntryPoint> AgentTester => new AgentTester<TEntryPoint>(this.ApiTester);
+        public AgentTester<TEntryPoint> AgentTester => new(this.ApiTester);
     }
 }

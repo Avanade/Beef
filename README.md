@@ -49,6 +49,7 @@ The APIs created will have the following capabilities out-of-the-box with limite
 - [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
 - An end-to-end intra-domain [integration testing](./tools/Beef.Test.NUnit/README.md) approach enables effective tests to be built easily and quickly.
 - [Event](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) publishing (and subscribing) to enable an event-driven architecture.
+- Runtime capabilities can be added, where applicable, using the out-of-the-box .NET framework [Dependency Injection (DI)](./docs/Dependency-Injection.md) capabilites.
 
 To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined. The capabilities and implementations have been influenced by _Microsoft's best practices for cloud applications_; specifically:
 - [RESTful web API design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)

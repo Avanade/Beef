@@ -68,7 +68,7 @@ This solution should be created using the solution [template](../../templates/Be
 The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is _highly recommended_ that the `My.Hr` naming convention below is used.
 
 ```
-dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
+dotnet new install beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
 mkdir My.Hr
 cd My.Hr
 dotnet new beef --company My --appname Hr --datasource SqlServer

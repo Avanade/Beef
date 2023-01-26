@@ -12,6 +12,7 @@ Category | Description
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
+[`EntityFramework`](#EntityFramework) | Provides the _Entity Framework (EF) model_ configuration.
 [`Outbox`](#Outbox) | Provides the _Event Outbox_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
@@ -60,6 +61,15 @@ Provides the _.NET_ configuration.
 Property | Description
 -|-
 `autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`.<br/>&dagger; Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
+
+<br/>
+
+## EntityFramework
+Provides the _Entity Framework (EF) model_ configuration.
+
+Property | Description
+-|-
+`efModel` | Indicates whether an `Entity Framework` .NET (C#) model is to be generated for all tables.<br/>&dagger; This can be overridden within the `Table`(s).
 
 <br/>
 

@@ -27,6 +27,7 @@ namespace Beef.CodeGen.Config.Database
     [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CodeGenCategory("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
     [CodeGenCategory("Outbox", Title = "Provides the _Event Outbox_ configuration.")]
     [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CodeGenCategory("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
@@ -162,6 +163,18 @@ namespace Beef.CodeGen.Config.Database
         [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
+
+        #endregion
+
+        #region EntityFramework
+
+        /// <summary>
+        /// Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
+        /// </summary>
+        [JsonProperty("efModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("EntityFramework", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated for all tables.",
+            Description = "This can be overridden within the `Table`(s).")]
+        public bool? EfModel { get; set; }
 
         #endregion
 
@@ -350,6 +363,7 @@ namespace Beef.CodeGen.Config.Database
             await LoadDbTablesConfigAsync().ConfigureAwait(false);
 
             Schema = DefaultWhereNull(Schema, () => "dbo");
+            EfModel = DefaultWhereNull(EfModel, () => false);
 
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
             PathDatabaseSchema = DefaultWhereNull(PathDatabaseSchema, () => $"{PathBase}.Database/Schema");

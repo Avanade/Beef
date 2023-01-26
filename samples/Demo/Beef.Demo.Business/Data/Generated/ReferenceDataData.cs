@@ -88,6 +88,8 @@ namespace Beef.Demo.Business.Data
                 EyeColorToModelEfMapperCtor();
             }
 
+            partial void EyeColorToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EyeColor s)
                 => s.Id == default
@@ -96,8 +98,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-            partial void EyeColorToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -119,6 +119,8 @@ namespace Beef.Demo.Business.Data
                 ModelToEyeColorEfMapperCtor();
             }
 
+            partial void ModelToEyeColorEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.EyeColor s)
                 => s.EyeColorId == default
@@ -127,8 +129,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.RowVersion == default;
-
-            partial void ModelToEyeColorEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -196,6 +196,8 @@ namespace Beef.Demo.Business.Data
                 StatusToModelEfMapperCtor();
             }
 
+            partial void StatusToModelEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(Status s)
                 => s.Id == default
@@ -204,8 +206,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.ETag == default;
-
-            partial void StatusToModelEfMapperCtor(); // Enables the constructor to be extended.
         }
 
         /// <summary>
@@ -227,6 +227,8 @@ namespace Beef.Demo.Business.Data
                 ModelToStatusEfMapperCtor();
             }
 
+            partial void ModelToStatusEfMapperCtor(); // Enables the constructor to be extended.
+
             /// <inheritdoc/>
             public override bool IsSourceInitial(EfModel.Status s)
                 => s.StatusId == default
@@ -235,8 +237,6 @@ namespace Beef.Demo.Business.Data
                 && s.IsActive == default
                 && s.SortOrder == default
                 && s.RowVersion == default;
-
-            partial void ModelToStatusEfMapperCtor(); // Enables the constructor to be extended.
         }
     }
 }
