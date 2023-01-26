@@ -6,7 +6,9 @@
 
 ## VERSION 5
 
-> **NOTE:** A new major version of _Beef, verison 5_ (https://github.com/Avanade/Beef/tree/version-5) is currently being developed and is in final stages of testing before being officially released; it is ready for usage. The samples have been updated, as has much of the related documentation. As such, development on this current version (v4+) will for the most part halt and will soon be branched; only significant (v4+) issues will then be addressed for a period of time. The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance for upgrading will be provided early 2023.
+> **NOTE:** A new major version of _Beef_, **verison 5** (https://github.com/Avanade/Beef/tree/version-5), was officially published on [26-Jan-2023](https://en.wikipedia.org/wiki/Australia_Day). The samples have been updated accordingly, as has the related documentation. As such, development on this current version (v4+) will for the most part halt and will soon be branched; only significant (v4+) issues will then be addressed for a period of time. The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance for upgrading will be provided early 2023.
+
+<br/>
 
 ## Introduction
 
