@@ -4,7 +4,7 @@ Represents the **NuGet** versions.
 
 ## v5.1.1
 
-- *Fixed:* Upgraded `CoreEx`, `DbEx` and `UnitTextEx` to latest packages to include all related fixes. Template solution updated to leverage `app.UseReferenceDataOrchestrator()` to specifically include.
+- *Fixed:* Upgraded `CoreEx`, `DbEx` and `UnitTestEx` to latest packages to include all related fixes. Template solution updated to leverage `app.UseReferenceDataOrchestrator()` to specifically include.
 
 ## v5.1.0
 
