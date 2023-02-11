@@ -10,7 +10,7 @@ This sample will walkthrough an approach of adding the capabilities in a series 
 
 ## Beef composition
 
-_Beef_ is obstensibly the code-generation engine that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof:
+_Beef_ is ostensibly the code-generation engine that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof:
 - [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilties (extends .NET core);
 - [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing;
 - [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilties;

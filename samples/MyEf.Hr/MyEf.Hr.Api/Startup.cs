@@ -93,6 +93,7 @@ namespace MyEf.Hr.Api
 
             // Add execution context set up to the pipeline.
             app.UseExecutionContext();
+            app.UseReferenceDataOrchestrator();
 
             // Add health checks.
             app.UseHealthChecks("/health");
