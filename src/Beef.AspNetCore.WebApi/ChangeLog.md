@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Fixed:* Issue [200](https://github.com/Avanade/Beef/issues/200). Added `reloadOnChange` parameter to `WebApiStartup.ConfigurationBuilder<TStartup>`; defaults to `true` to keep current behaviour. 
+
 ## v4.2.6
 - *Fixed:* Updated target frameworks to be `netcoreapp3.1;net6.0`.
 

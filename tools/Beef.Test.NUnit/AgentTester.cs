@@ -42,15 +42,16 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied). Defaults to <see cref="TestSetUp.DefaultEnvironmentVariablePrefix"/></param>
         /// <param name="environment">The environment to be used by the underlying web host. Defaults to <see cref="TestSetUp.DefaultEnvironment"/>.</param>
+        /// <param name="reloadOnChange">Indicates whether the configuration should be reloaded if the files change.</param>
         /// <returns>The <see cref="IConfiguration"/>.</returns>
-        public static IConfiguration BuildConfiguration<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment) where TStartup : class
+        public static IConfiguration BuildConfiguration<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment, bool reloadOnChange = true) where TStartup : class
         {
             var cb = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
                 .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{environment}.json", true, false)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{environment}.json", true, true);
+                .AddJsonFile("appsettings.json", true, reloadOnChange)
+                .AddJsonFile($"appsettings.{environment}.json", true, reloadOnChange);
 
             var evp = string.IsNullOrEmpty(environmentVariablePrefix) ? TestSetUp.DefaultEnvironmentVariablePrefix : environmentVariablePrefix;
             if (string.IsNullOrEmpty(evp))

@@ -49,7 +49,8 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="args">The command line args.</param>
         /// <param name="hostingEnvironment">The <see cref="IWebHostEnvironment"/>.</param>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
-        public static void ConfigurationBuilder<TStartup>(IConfigurationBuilder configurationBuilder, string[] args, IWebHostEnvironment hostingEnvironment, string? environmentVariablePrefix = null) where TStartup : class
+        /// <param name="reloadOnChange">Indicates whether the configuration should be reloaded if the files change.</param>
+        public static void ConfigurationBuilder<TStartup>(IConfigurationBuilder configurationBuilder, string[] args, IWebHostEnvironment hostingEnvironment, string? environmentVariablePrefix = null, bool reloadOnChange = true) where TStartup : class
         {
             if (configurationBuilder == null)
                 throw new ArgumentNullException(nameof(configurationBuilder));
@@ -59,8 +60,8 @@ namespace Beef.AspNetCore.WebApi
 
             configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
                 .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true);
+                .AddJsonFile("appsettings.json", true, reloadOnChange)
+                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, reloadOnChange);
 
             if (string.IsNullOrEmpty(environmentVariablePrefix))
                 configurationBuilder.AddEnvironmentVariables();
