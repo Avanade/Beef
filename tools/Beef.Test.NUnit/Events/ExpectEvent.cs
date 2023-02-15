@@ -96,6 +96,7 @@ namespace Beef.Test.NUnit.Events
             {
                 // Assert subject and action.
                 var exp = expectedEvents[i].EventData;
+                var membersToIgnore = expectedEvents[i].MembersToIgnore;
                 var act = actualEvents[i];
 
                 if (!EventSubjectMatcher.Match(_eventPublisher.TemplateWildcard, _eventPublisher.PathSeparator, exp.Subject, act.Subject))
@@ -114,6 +115,8 @@ namespace Beef.Test.NUnit.Events
 
                 var comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
                 comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
+                if(membersToIgnore != null)
+                    comparisonConfig.MembersToIgnore.AddRange(membersToIgnore);
 
                 var type = eVal?.GetType() ?? aVal?.GetType();
                 if (type != null)

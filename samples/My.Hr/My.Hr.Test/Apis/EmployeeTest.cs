@@ -288,6 +288,19 @@ namespace My.Hr.Test.Apis
                 EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
             };
 
+            var expectedEventValue = new My.Hr.Business.Entities.Employee
+            {
+                Email = "j.smith@org.com",
+                FirstName = "Jill",
+                LastName = "Smith",
+                GenderSid = "F",
+                Birthday = new DateTime(1955, 10, 28),
+                StartDate = DateTime.Today,
+                PhoneNo = "(456) 789 0123",
+                Address = new My.Hr.Business.Entities.Address { Street1 = "2732 85 PL NE", City = "Bellevue", StateSid = "WA", PostCode = "98101" },
+                EmergencyContacts = new My.Hr.Business.Entities.EmergencyContactCollection { new My.Hr.Business.Entities.EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" } }
+            };
+
             // Create value.
             v = agentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.Created)
@@ -295,7 +308,7 @@ namespace My.Hr.Test.Apis
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue(_ => v)
-                .ExpectEvent("my.hr.employee", "created")
+                .ExpectEvent<My.Hr.Business.Entities.Employee>("my.hr.employee", "created", expectedEventValue, "ETag", "ChangeLog", "Id", "EmergencyContacts[0].Id")
                 .Run(a => a.CreateAsync(v)).Value!;
 
             // Check the value was created properly.
