@@ -115,7 +115,7 @@ namespace Beef.Test.NUnit.Events
 
                 var comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
                 comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
-                if(membersToIgnore != null)
+                if (membersToIgnore != null)
                     comparisonConfig.MembersToIgnore.AddRange(membersToIgnore);
 
                 var type = eVal?.GetType() ?? aVal?.GetType();

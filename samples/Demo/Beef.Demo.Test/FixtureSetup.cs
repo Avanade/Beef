@@ -14,7 +14,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var config = AgentTester.BuildConfiguration<Startup>("Beef");
+            var config = AgentTester.BuildConfiguration<Startup>("Beef", reloadOnChange: false);
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.AddWebApiAgentArgsType<IDemoWebApiAgentArgs, DemoWebApiAgentArgs>();
             TestSetUp.RegisterSetUp(async (count, data) =>

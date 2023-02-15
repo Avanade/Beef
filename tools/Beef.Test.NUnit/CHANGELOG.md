@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.8
+- *Issue [200](https://github.com/Avanade/Beef/issues/200):* Added `reloadOnChange` parameter to `AgentTester.ConfigurationBuilder<TStartup>`; defaults to `true` to keep current behaviour. 
+
 ## v4.2.7
 - *Issue [184](https://github.com/Avanade/Beef/issues/184).* Support loading the `GetBeforeRequest` after the constructor.
 
