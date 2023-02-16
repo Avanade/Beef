@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.6
+- *Fixed:* Updated `Beef.CodeGen.Core` dependency to latest.
+
 ## v4.2.5
 - *Fixed:* Remove redundant `async`-`await` where returning `Task` will suffice within `DatabaseConsole`.
 

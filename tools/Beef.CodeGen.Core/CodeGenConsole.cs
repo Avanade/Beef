@@ -317,6 +317,8 @@ namespace Beef.CodeGen
             {
                 // XML not natively supported so must be converted to YAML.
                 case ".XML":
+                    args.Logger?.LogWarning("Recommendation: XML-based configuration will be deprecated in next major version (Beef v5); convert now to YAML using the -x2y|--xml-to-yaml command-line option.");
+
                     using (var xfs = fi.OpenText())
                     {
                         var xml = XDocument.Load(xfs, LoadOptions.None);

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.19
+- *Issue [193](https://github.com/Avanade/Beef/issues/193):* The `OmitEntityBase` option is now correctly actioned during the code-generation of entities.
+
 ## v4.2.18
 - *Fixed:* Code generation where using `CosmosValueContainer` has been corrected.
 

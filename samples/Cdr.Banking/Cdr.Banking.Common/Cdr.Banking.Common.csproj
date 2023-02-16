@@ -6,6 +6,7 @@
   <ItemGroup>
     <Folder Include="Agents\" />
     <Folder Include="Entities\" />
+    <Folder Include="Entities\Generated\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.Core\Beef.Core.csproj" />
