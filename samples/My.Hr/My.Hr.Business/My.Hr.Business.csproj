@@ -9,5 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataSvc\" />
+    <Folder Include="Entities\Generated\" />
   </ItemGroup>
 </Project>

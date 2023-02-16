@@ -18,6 +18,31 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities!.Where(x => IsFalse(x.ExcludeEntity) && ((IsFalse(x.OmitEntityBase) && x.EntityScope == x.Root!.RuntimeEntityScope) || (x.EntityScope == "Autonomous" && x.Root!.RuntimeEntityScope == "Business"))).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities!.Where(x => CheckEntity(x)).AsEnumerable();
+
+        /// <summary>
+        /// Check the entity configuration.
+        /// </summary>
+        private bool CheckEntity(EntityConfig ec)
+        {
+            if (IsTrue(ec.ExcludeEntity))
+                return false;
+
+            if (ec.Root!.RuntimeEntityScope == "Common")
+            {
+                if (ec.EntityScope == "Business" || ec.EntityScope == "Autonomous")
+                    return false;
+            }
+            else
+            {
+                if (ec.EntityScope == "Common")
+                    return false;
+            }
+
+            if (IsTrue(ec.OmitEntityBase))
+                return false;
+
+            return true;
+        }
     }
 }
