@@ -175,6 +175,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{FDBFD331-A
 		docs\Sample-SqlServer-EF-GettingStarted.md = docs\Sample-SqlServer-EF-GettingStarted.md
 		docs\Sample-SqlServer-StoredProcs-GettingStarted.md = docs\Sample-SqlServer-StoredProcs-GettingStarted.md
 		docs\Solution-Structure.md = docs\Solution-Structure.md
+		docs\Upgrade-v4-to-v5.md = docs\Upgrade-v4-to-v5.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{6739CF51-CAB1-4DD9-A98B-6E1EDED5BFE1}"

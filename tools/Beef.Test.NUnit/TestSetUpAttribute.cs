@@ -17,8 +17,9 @@ namespace Beef.Test.NUnit
     /// </summary>
     /// <remarks>Provided to support backwards compatibility to earlier <i>Beef</i> versions. It is <b>recommended</b> that usage is upgraded to the new as this will eventually be deprecated.
     /// <para>As the attribute is executed by the <i>NUnit</i> runtime outside of the context of the method itself only the <see cref="TestSetUp.Default"/> is able to be referenced. This, and the challenge of achieving consistency between
-    /// <i>MSUnit</i>, <i>NUnit</i> and <i>Xunit</i> is why this feature is being deprecated.</para></remarks>
+    /// <i>MSTest</i>, <i>NUnit</i> and <i>Xunit</i> is why this feature is being deprecated.</para></remarks>
     [DebuggerStepThrough]
+    [AttributeUsage(AttributeTargets.Method)]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
         private static readonly AsyncLocal<string> _username = new();

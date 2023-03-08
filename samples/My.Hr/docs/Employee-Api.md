@@ -257,7 +257,7 @@ public partial class EmployeeData
 }
 ```
 
-After pasting the code above there will be some compile errors that need to be resolved as the required namespaces have not been defined. Open `My.Hr.Business/ImplicitUsings.cs` and add in the following two lines of code:
+After pasting the code above there will be some compile errors that need to be resolved as the required namespaces have not been defined. Open `My.Hr.Business/GlobalUsings.cs` and add in the following two lines of code:
 
 ``` csharp
 global using CoreEx.Database.Extended;

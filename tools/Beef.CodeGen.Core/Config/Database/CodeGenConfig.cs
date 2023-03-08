@@ -407,12 +407,12 @@ namespace Beef.CodeGen.Config.Database
                 "cdcIdentifierMappingTableName",
                 "cdcIdentifierMappingStoredProcedureName",
                 "cdcExcludeColumnsFromETag",
-                "EventSubjectRoot",
-                "EventSubjectFormat",
-                "EventActionFormat",
-                "EventSourceRoot",
-                "EventSourceKind",
-                "EventSourceFormat",
+                "eventSubjectRoot",
+                "eventSubjectFormat",
+                "eventActionFormat",
+                "eventSourceRoot",
+                "eventSourceKind",
+                "eventSourceFormat",
                 "PathCdcPublisher",
                 "jsonSerializer",
                 "pluralizeCollectionProperties",
@@ -420,7 +420,7 @@ namespace Beef.CodeGen.Config.Database
                 "entityScope",
                 "eventOutbox",
                 "eventOutboxTableName",
-                "NamespaceCdcPublisher",
+                "namespaceCdcPublisher",
                 "entityScope");
         }
 

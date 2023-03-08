@@ -13,11 +13,17 @@ _Beef_ framework has been primarily created to support the **industralisation** 
 The key industralisation goals are:
 1. **Value** – focus on business value, not on boilerplate
 2. **Acceleration** – improve velocity; reduce costs and time to market
-3. **Simplicity** – increase effective usage and minimise learning
-4. **Standardised** – increase knowledgeable resource pool
+3. **Simplicity** – increase effective usage and minimize learning
+4. **Standardized** – increase knowledgeable resource pool
 5. **Consistency** – improve overall quality and maintainability
 6. **Flexibility** – enable innovation and evolution easily over time
 7. **Confidence** – reduced delivery timeframes and risk 
+
+<br/>
+
+## Version 5
+
+> **NOTE:** A new major version of _Beef_, **verison 5** (https://github.com/Avanade/Beef/tree/version-5), was released on [26-Jan-2023](https://en.wikipedia.org/wiki/Australia_Day). The samples have been updated accordingly, as has the related documentation. As such, development on the previous version (v4.x) will for the most part halt; only significant issues will now be addressed (for a period of time). The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance is provided to assist with [upgrading from v4.2.x to v5.x](./docs/Upgrade-v4-to-v5.md) where applicable.
 
 <br/>
 
@@ -29,27 +35,27 @@ _Beef_ is ostensibly the code-generation engine, and solution orchestration, tha
 - [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilties;
 - [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality.
 
-Prior to version 5.x, _Beef_ was all encompassing. These capabilities have been extracted, simplified and refactored to be first class frameworks in their own right, and made into the repos listed above. This allows them to be used and maintained independently to _Beef_; therefore, offering greater opportunities for reuse versus all-or-nothing.
+Prior to version 5.x, _Beef_ was all encompassing. These capabilities have been extracted, simplified and refactored to be first class frameworks in their own right, and made into the repos listed above. This allows them to be used and maintained independently to _Beef_; therefore, offering greater opportunities for reuse versus all-or-nothing. 
 
 <br/>
 
 ## Rapid enterprise-grade API development
 
-As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardised and consistent manner.
+As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardized and consistent manner.
 
 The APIs created will have the following capabilities out-of-the-box with limited developer effort, so the developer can focus on the key business value:
 - Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICopyFrom`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/ICopyFrom.cs), [`ICleanUp`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/ICleanUp.cs), [`IPrimaryKey`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/IPrimaryKey.cs), etc.
-- Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimised serialisation, and enriched API endpoints.
+- Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimized serialisation, and enriched API endpoints.
 - Rich [Validation](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) capability to simplify and ensure data integrity and consistency.
-- CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Database) and [Entity Framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.EntityFrameworkCore)), [Cosmos DB](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Cosmos) and [HttpAgent](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Http) in a standardised manner. 
-- An approach and tooling to automate and manage database using [DbEx](https://github.com/Avanade/DbEx) set up, configuration, and deployment.
+- CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Database) and [Entity Framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.EntityFrameworkCore)), [Cosmos DB](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Cosmos) and [HttpAgent](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Http) in a standardized manner. 
 - [Paging](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
 - [ETag](https://en.wikipedia.org/wiki/HTTP_ETag) (concurrency) and `If-Match`/`If-None-Match` handling.
-- JSON response field [filtering (include/exclude)](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Text/Json/JsonFilterer.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
+- JSON response field [filtering (include/exclude)](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Text/Json/JsonFilterer.cs) to minimize resulting payload size (e.g. `$fields=firstname,lastname`)
 - [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
 - An end-to-end intra-domain [integration testing](./tools/Beef.Test.NUnit/README.md) approach enables effective tests to be built easily and quickly.
 - [Event](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) publishing (and subscribing) to enable an event-driven architecture.
 - Runtime capabilities can be added, where applicable, using the out-of-the-box .NET framework [Dependency Injection (DI)](./docs/Dependency-Injection.md) capabilites.
+- An approach and tooling to automate and manage database using [DbEx](https://github.com/Avanade/DbEx) set up, configuration, and deployment.
 
 To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined. The capabilities and implementations have been influenced by _Microsoft's best practices for cloud applications_; specifically:
 - [RESTful web API design](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design)
@@ -89,7 +95,7 @@ An architectural pattern for creating domain-based APIs:
 - Is a software architecture style in which complex applications are composed of small, independent processes communicating with each other using language-agnostic APIs.
 - These services are small, highly decoupled and focus on doing a small task, facilitating a modular approach to system-building.
 - Implementation independence:
-  - **Loose coupling** – should have its own persistence repository; data is duplicated (synchronised), not shared; eventual consistency; no distributed transactions.
+  - **Loose coupling** – should have its own persistence repository; data is duplicated (synchronized), not shared; eventual consistency; no distributed transactions.
   - **Polyglot persistence / programming** – use the best persistence repository to support the storage requirements; use a mix of programming languages (fit-for-purpose). Note: _Beef_ provides a C# / .NET implementation approach as one option.
   - **Eventual consistency** - for the most part, eventual consistency is good enough; real-time distributed transactional integrity is rarely required (although generally desired). An asynchronous messaging system, such as Queues or a Service Bus, can be leveraged to orchestrate cross domain data (eventual) consistency.
 
@@ -107,7 +113,7 @@ The following represents the prescribed tiering and layering of the architecture
 
 Given this architecture, the .NET Solution you create using _Beef_ should adhere to the prescribed [solution structure](./docs/Solution-Structure.md).
 
-Each of the key layers / components above are further detailed (`Xxx` denotes the entity name): 
+Each of the key layers / components above are further detailed (`Xxx` denotes the entity name); further documentation for each is available via the provided links: 
 - [Entity (DTO)](./docs/Layer-Entity.md) - `Xxx`
 - [Service agent](./docs/Layer-ServiceAgent.md) - `XxxAgent`
 - [Service interface](./docs/Layer-ServiceInterface.md) - `XxxController`
@@ -133,12 +139,12 @@ Additionally, _Beef_ has capabilities to support (and generate) the [Transaction
 
 ## Framework 
 
-A comprehensive [*framework*](https://github.com/Avanade/CoreEx) has been created to support the defined architecture, to encapsulate and standardise capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
+A comprehensive [*framework*](https://github.com/Avanade/CoreEx) has been created to support the defined architecture, to encapsulate and standardize capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
 
-Standardised approach, ensures consistency of implementation:
+Standardized approach, ensures consistency of implementation:
 - Reduction in development effort.
 - Higher quality of output; reduced defects.
-- Greater confidence in adherence to architectural vision; minimised deviation.
+- Greater confidence in adherence to architectural vision; minimized deviation.
 - Generation and alike enables the solution to evolve more quickly and effectively over time. 
 
 A key accelerator for _Beef_ is achieved using a flexible [code generation](./tools/Beef.CodeGen.Core/README.md) approach leveraging [_OnRamp_](https://github.com/Avanade/onramp).
@@ -188,6 +194,7 @@ The following are references to additional documentation (these are all accessib
 - [Validation](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation)
 - [HTTP PATCH](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Http/HttpPatchOption.cs)
 - [Authentication](./docs/Authentication.md)
+- [Upgrading from v4 to v5](./docs/Upgrade-v4-to-v5.md)
 
 ### Solution
 
@@ -258,6 +265,7 @@ Otherwise, follow along with the following sample tutorials that will provide a 
 <br/>
 
 ## Contributing
+
 One of the easiest ways to contribute is to participate in discussions on GitHub issues. You can also contribute by submitting pull requests (PR) with code changes.
 
 <br/>
@@ -279,14 +287,12 @@ For further guidance see ASP.NET Core [Engineering guidelines](https://github.co
 
 ### Tests
 
-We use [`NUnit`](https://github.com/nunit/nunit) for all unit testing.
+[_NUnit_](https://github.com/nunit/nunit) is used for unit testing.
 
 - Tests need to be provided for every bug/feature that is completed.
 - Tests only need to be present for issues that need to be verified by QA (for example, not tasks).
 - If there is a scenario that is far too hard to test there does not need to be a test for it.
 - "Too hard" is determined by the team as a whole.
-
-We understand there is more work to be performed in generating a higher level of code coverage; this technical debt is on the backlog.
 
 <br/>
 
