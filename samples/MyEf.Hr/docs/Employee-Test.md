@@ -20,7 +20,7 @@ The overall `MyEf.Hr.Test` solution was created with the following; the existing
   └── A270_GetByArgs_RefDataText-Response.json   <- remove
 └── Validators
   └── PersonValidatorTest.cs                     <- remove
-└── ImplicitUsings.cs                            <- leave; contains all the requisite global using statements
+└── GlobalUsings.cs                              <- leave; contains all the requisite global using statements
 ```
 
 <br/>

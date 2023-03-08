@@ -252,7 +252,7 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectETag()
             .ExpectIdentifier()
             .ExpectValue(_ => v)
-            .ExpectEvent("myef.hr.employee", "created")
+            .ExpectEventValue(v, "myef.hr.employee", "created", "Id", "ETag", "ChangeLog")
             .Run(a => a.CreateAsync(v)).Value!;
 
         // Check the value was created properly.
