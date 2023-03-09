@@ -16,7 +16,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.Default.RegisterSetUp(async (count, _, ct) =>
+            TestSetUp.Default.RegisterAutoSetUp(async (count, _, ct) =>
             {
                 using var test = ApiTester.Create<Startup>();
                 var settings = test.Services.GetRequiredService<DemoSettings>();
@@ -26,11 +26,7 @@ namespace Beef.Demo.Test
                     .AddAssembly<Abc.Database.Scripts>()
                     .AddSchemaOrder("Test");
 
-                var (Success, Output) = await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
-                if (!Success)
-                    Assert.Fail(Output);
-
-                return Success;
+                return await new SqlServerMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
             });
         }
     }
