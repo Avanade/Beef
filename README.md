@@ -23,7 +23,7 @@ The key industralisation goals are:
 
 ## Version 5
 
-> **NOTE:** A new major version of _Beef_, **verison 5** (https://github.com/Avanade/Beef/tree/version-5), was released on [26-Jan-2023](https://en.wikipedia.org/wiki/Australia_Day). The samples have been updated accordingly, as has the related documentation. As such, development on the previous version (v4.x) will for the most part halt; only significant issues will now be addressed (for a period of time). The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance is provided to assist with [upgrading from v4.2.x to v5.x](./docs/Upgrade-v4-to-v5.md) where applicable.
+> **NOTE:** A new major version of _Beef_, **verison 5**, was released on [26-Jan-2023](https://en.wikipedia.org/wiki/Australia_Day). The samples have been updated accordingly, as has the related documentation. As such, development on the previous [version (v4.x)](https://github.com/Avanade/Beef/tree/version-4) will for the most part halt; only significant issues will now be addressed (for a period of time). The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance is provided to assist with [upgrading from v4.2.x to v5.x](./docs/Upgrade-v4-to-v5.md) where applicable.
 
 <br/>
 
