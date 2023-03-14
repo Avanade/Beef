@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using DbEx.Schema;
+using DbEx.DbSchema;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
@@ -176,7 +176,7 @@ tables:
                 else
                 {
                     sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (DbTypeMapper.TypeIsString(c.Type))
+                    if (new DbEx.SqlServer.SqlServerSchemaConfig("X").IsDbTypeString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch

@@ -2,10 +2,7 @@
   "profiles": {
     "My.Hr.Database": {
       "commandName": "Project",
-      "commandLineArgs": "execute \"WAITFOR DELAY '00:02';\"",
-      "environmentVariables": {
-        "ConnectionStrings__sqlserver__MyHr": "Data Source =.; Initial Catalog = My.Hr; Integrated Security = True; TrustServerCertificate = true; Connection Timeout=180"
-      }
+      "commandLineArgs": "all"
     }
   }
 }

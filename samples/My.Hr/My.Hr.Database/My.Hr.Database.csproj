@@ -19,6 +19,7 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Schema\Hr\" />
+    <Folder Include="Schema\Hr\Types\User-Defined Table Types\Generated\" />
   </ItemGroup>
 
   <ItemGroup>

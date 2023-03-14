@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using DbEx.Schema;
+using DbEx.DbSchema;
 using OnRamp.Config;
 using System.Threading.Tasks;
 

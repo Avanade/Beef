@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.7
+- *Fixed:* Upgraded `DbEx` from version `1.0.5` to `2.3.2` (latest).
+
 ## v4.2.6
 - *Fixed:* Updated `Beef.CodeGen.Core` dependency to latest.
 

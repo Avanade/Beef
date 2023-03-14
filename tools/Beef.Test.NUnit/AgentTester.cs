@@ -84,7 +84,7 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
-        /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
+        /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?, bool)"/> where <c>null</c>.</param>
         /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
