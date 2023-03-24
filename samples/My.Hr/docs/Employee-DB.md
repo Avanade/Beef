@@ -16,8 +16,8 @@ The following provides a visual (ERD) for the database tables that will be creat
 erDiagram
     Employee ||--o{ EmergencyContact : has
     Employee }|..|| Gender : refers
-    Employee }|..|| TerminationReason : refers
-    Employee }|..|| USState : refers
+    Employee }|..o| TerminationReason : refers
+    Address }|..|| USState : refers
     Employee ||--o{ Address : has-json
     EmergencyContact }|..|| RelationshipType : refers
 ```
