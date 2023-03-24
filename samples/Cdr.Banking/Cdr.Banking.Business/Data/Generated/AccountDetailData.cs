@@ -24,25 +24,16 @@ namespace Cdr.Banking.Business.Data
             public EntityToModelCosmosMapper()
             {
                 Base<AccountData.EntityToModelCosmosMapper>();
-                Map((s, d) => d.Bsb = s.Bsb);
-                Map((s, d) => d.AccountNumber = s.AccountNumber);
-                Map((s, d) => d.BundleName = s.BundleName);
-                Map((s, d) => d.SpecificAccountUType = s.SpecificAccountUTypeSid);
-                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit));
-                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard));
+                Map((s, d) => d.Bsb = s.Bsb, OperationTypes.Any, s => s.Bsb == default, d => d.Bsb = default);
+                Map((s, d) => d.AccountNumber = s.AccountNumber, OperationTypes.Any, s => s.AccountNumber == default, d => d.AccountNumber = default);
+                Map((s, d) => d.BundleName = s.BundleName, OperationTypes.Any, s => s.BundleName == default, d => d.BundleName = default);
+                Map((s, d) => d.SpecificAccountUType = s.SpecificAccountUTypeSid, OperationTypes.Any, s => s.SpecificAccountUTypeSid == default, d => d.SpecificAccountUType = default);
+                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit), OperationTypes.Any, s => s.TermDeposit == default, d => d.TermDeposit = default);
+                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard), OperationTypes.Any, s => s.CreditCard == default, d => d.CreditCard = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(AccountDetail s)
-                => s.Bsb == default
-                && s.AccountNumber == default
-                && s.BundleName == default
-                && s.SpecificAccountUTypeSid == default
-                && s.TermDeposit == default
-                && s.CreditCard == default;
         }
 
         /// <summary>
@@ -56,25 +47,16 @@ namespace Cdr.Banking.Business.Data
             public ModelToEntityCosmosMapper()
             {
                 Base<AccountData.ModelToEntityCosmosMapper>();
-                Map((s, d) => d.Bsb = (string?)s.Bsb);
-                Map((s, d) => d.AccountNumber = (string?)s.AccountNumber);
-                Map((s, d) => d.BundleName = (string?)s.BundleName);
-                Map((s, d) => d.SpecificAccountUTypeSid = (string?)s.SpecificAccountUType);
-                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit));
-                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard));
+                Map((s, d) => d.Bsb = (string?)s.Bsb, OperationTypes.Any, s => s.Bsb == default, d => d.Bsb = default);
+                Map((s, d) => d.AccountNumber = (string?)s.AccountNumber, OperationTypes.Any, s => s.AccountNumber == default, d => d.AccountNumber = default);
+                Map((s, d) => d.BundleName = (string?)s.BundleName, OperationTypes.Any, s => s.BundleName == default, d => d.BundleName = default);
+                Map((s, d) => d.SpecificAccountUTypeSid = (string?)s.SpecificAccountUType, OperationTypes.Any, s => s.SpecificAccountUType == default, d => d.SpecificAccountUTypeSid = default);
+                Map((o, s, d) => d.TermDeposit = o.Map(s.TermDeposit, d.TermDeposit), OperationTypes.Any, s => s.TermDeposit == default, d => d.TermDeposit = default);
+                Map((o, s, d) => d.CreditCard = o.Map(s.CreditCard, d.CreditCard), OperationTypes.Any, s => s.CreditCard == default, d => d.CreditCard = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.Account s)
-                => s.Bsb == default
-                && s.AccountNumber == default
-                && s.BundleName == default
-                && s.SpecificAccountUType == default
-                && s.TermDeposit == default
-                && s.CreditCard == default;
         }
     }
 }

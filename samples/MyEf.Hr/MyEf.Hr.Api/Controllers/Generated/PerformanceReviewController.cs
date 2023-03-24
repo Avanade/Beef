@@ -10,7 +10,6 @@ namespace MyEf.Hr.Api.Controllers
     /// <summary>
     /// Provides the <see cref="PerformanceReview"/> Web API functionality.
     /// </summary>
-    [Route("api/v1")]
     [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class PerformanceReviewController : ControllerBase
     {
@@ -58,7 +57,7 @@ namespace MyEf.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
         [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create(Guid employeeId) =>
-            _webApi.PostAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/reviews/{r.Id}", UriKind.Relative));
+            _webApi.PostAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/reviews/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.

@@ -32,14 +32,14 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="PowerSources"/> list using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("power-sources")]
-        public List<string?>? PowerSourcesSids { get => _powerSourcesSids; set => SetValue(ref _powerSourcesSids, value); }
+        public List<string?>? PowerSourcesSids { get => _powerSourcesSids; set => SetValue(ref _powerSourcesSids, value, propertyName: nameof(PowerSources)); }
 
         /// <summary>
         /// Gets or sets the Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [JsonIgnore]
-        public ReferenceDataCodeList<RefDataNamespace.PowerSource>? PowerSources { get => new ReferenceDataCodeList<RefDataNamespace.PowerSource>(ref _powerSourcesSids); set => SetValue(ref _powerSourcesSids, value?.ToCodeList()); }
+        public ReferenceDataCodeList<RefDataNamespace.PowerSource>? PowerSources { get => new ReferenceDataCodeList<RefDataNamespace.PowerSource>(ref _powerSourcesSids); set => SetValue(ref _powerSourcesSids, value?.ToCodeList(), propertyName: nameof(PowerSources)); }
 
         /// <inheritdoc/>
         protected override IEnumerable<IPropertyValue> GetPropertyValues()

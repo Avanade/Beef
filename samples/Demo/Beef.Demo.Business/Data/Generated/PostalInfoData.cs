@@ -82,23 +82,15 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelHttpAgentMapper()
             {
-                Map((s, d) => d.Country = s.CountrySid);
-                Map((s, d) => d.City = s.City);
-                Map((s, d) => d.State = s.State);
-                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places));
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Country = s.CountrySid, OperationTypes.Any, s => s.CountrySid == default, d => d.Country = default);
+                Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
+                Map((s, d) => d.State = s.State, OperationTypes.Any, s => s.State == default, d => d.State = default);
+                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 EntityToModelHttpAgentMapperCtor();
             }
 
             partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(PostalInfo s)
-                => s.CountrySid == default
-                && s.City == default
-                && s.State == default
-                && s.Places == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -111,23 +103,15 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityHttpAgentMapper()
             {
-                Map((s, d) => d.CountrySid = (string?)s.Country);
-                Map((s, d) => d.City = (string?)s.City);
-                Map((s, d) => d.State = (string?)s.State);
-                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places));
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.CountrySid = (string?)s.Country, OperationTypes.Any, s => s.Country == default, d => d.CountrySid = default);
+                Map((s, d) => d.City = (string?)s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
+                Map((s, d) => d.State = (string?)s.State, OperationTypes.Any, s => s.State == default, d => d.State = default);
+                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToEntityHttpAgentMapperCtor();
             }
 
             partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.PostalInfo s)
-                => s.Country == default
-                && s.City == default
-                && s.State == default
-                && s.Places == default
-                && s.ETag == default;
         }
     }
 }

@@ -1,22 +1,23 @@
 # Configuring the code-generation global settings
 # - RefDataText generates a corresponding reference data text property for '$text=true' output.
+# - WebApiRoutrePrefix will prefix/prepend all route Entity and Operation routes with specified value.
+# - WebApiAutoLocation indicates to set the HTTP response location for a create. 
 # - EventSubjectRoot specifies the root for the event subject.
 # - EventActionFormat specifies past tense for the event action.
 # - EventSourceRoot specifies the root for the event source.
 # - EventSourceKind will be a relative path URI.
 # - EventTransaction specifies that where event code is generated it is also marked as transactional.
 # - EventPublish specifies that the event publishing logic should occur in the data-layer.
-# - WebApiAutoLocation indicates to set the HTTP response location for a create.
 # - DatabaseSchema defaults the database schema name.
 refDataText: true
+webApiRoutePrefix: ''
+webApiAutoLocation: true
 eventSubjectRoot: My
 eventActionFormat: PastTense
 eventSourceRoot: My/Hr
 eventSourceKind: Relative
 eventTransaction: true
 eventPublish: Data
-webApiAutoLocation: true
-webApiRoutePrefix: api
 databaseSchema: Hr
 entities:
   # Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.

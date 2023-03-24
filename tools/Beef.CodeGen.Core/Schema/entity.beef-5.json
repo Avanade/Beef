@@ -86,6 +86,11 @@
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
           "description": "This is the base (prefix) 'URI' prepended to all entity and underlying 'Operation'(s)."
         },
+        "managerCleanUp": {
+          "type": "boolean",
+          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the 'Entity'(s) and 'Operation'(s)."
+        },
         "databaseName": {
           "type": "string",
           "title": "The .NET database interface name (used where 'Operation.AutoImplement' is 'Database').",
@@ -735,6 +740,11 @@
           "type": "boolean",
           "title": "Indicates whether the 'IIdentifierGenerator' should be used to generate the 'Id' property where the operation types ('Operation.Type') is 'Create'."
         },
+        "managerCleanUp": {
+          "type": "boolean",
+          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the 'CodeGeneration' and 'Operation'(s)."
+        },
         "webApiRoutePrefix": {
           "type": "string",
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
@@ -1362,6 +1372,11 @@
             "Delete",
             "Unspecified"
           ]
+        },
+        "managerCleanUp": {
+          "type": "boolean",
+          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the 'CodeGeneration' and 'Entity'."
         },
         "dataSvcCustom": {
           "type": "boolean",

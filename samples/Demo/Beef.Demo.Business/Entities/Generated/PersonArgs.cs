@@ -31,14 +31,14 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="Genders"/> list using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("genders")]
-        public List<string?>? GendersSids { get => _gendersSids; set => SetValue(ref _gendersSids, value); }
+        public List<string?>? GendersSids { get => _gendersSids; set => SetValue(ref _gendersSids, value, propertyName: nameof(Genders)); }
 
         /// <summary>
         /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [JsonIgnore]
-        public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList()); }
+        public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList(), propertyName: nameof(Genders)); }
 
         /// <summary>
         /// Gets or sets the Order By.

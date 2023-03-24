@@ -46,7 +46,7 @@ namespace MyEf.Hr.Business.Entities
         /// Gets or sets the <see cref="Gender"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("gender")]
-        public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value); }
+        public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value, propertyName: nameof(Gender)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).

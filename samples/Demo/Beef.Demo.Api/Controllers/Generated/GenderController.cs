@@ -15,7 +15,7 @@ namespace Beef.Demo.Api.Controllers
     [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class GenderController : ControllerBase
     {
-        private readonly WebApi _webApi;
+        private readonly ReferenceDataContentWebApi _webApi;
         private readonly IGenderManager _manager;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>
-        public GenderController(WebApi webApi, IGenderManager manager)
+        public GenderController(ReferenceDataContentWebApi webApi, IGenderManager manager)
             { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); GenderControllerCtor(); }
 
         partial void GenderControllerCtor(); // Enables additional functionality to be added to the constructor.

@@ -24,7 +24,7 @@ namespace MyEf.Hr.Business.Entities
         /// Gets or sets the <see cref="Reason"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("reason")]
-        public string? ReasonSid { get => _reasonSid; set => SetValue(ref _reasonSid, value); }
+        public string? ReasonSid { get => _reasonSid; set => SetValue(ref _reasonSid, value, propertyName: nameof(Reason)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).

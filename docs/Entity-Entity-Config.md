@@ -174,6 +174,7 @@ Property | Description
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.ManagerExtensions`.
 **`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `identifierGenerator` | Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.
+`managerCleanUp` | Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.<br/>&dagger; This can be overridden within the `CodeGeneration` and `Operation`(s).
 
 <br/>
 

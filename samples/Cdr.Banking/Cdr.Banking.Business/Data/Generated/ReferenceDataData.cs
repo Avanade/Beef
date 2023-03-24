@@ -57,12 +57,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public OpenStatusToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 OpenStatusToModelCosmosMapperCtor();
             }
 
@@ -79,12 +79,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToOpenStatusCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToOpenStatusCosmosMapperCtor();
             }
 
@@ -101,12 +101,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ProductCategoryToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ProductCategoryToModelCosmosMapperCtor();
             }
 
@@ -123,12 +123,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToProductCategoryCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToProductCategoryCosmosMapperCtor();
             }
 
@@ -145,12 +145,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public AccountUTypeToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 AccountUTypeToModelCosmosMapperCtor();
             }
 
@@ -167,12 +167,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToAccountUTypeCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToAccountUTypeCosmosMapperCtor();
             }
 
@@ -189,12 +189,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public MaturityInstructionsToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 MaturityInstructionsToModelCosmosMapperCtor();
             }
 
@@ -211,12 +211,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToMaturityInstructionsCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToMaturityInstructionsCosmosMapperCtor();
             }
 
@@ -233,12 +233,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public TransactionTypeToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 TransactionTypeToModelCosmosMapperCtor();
             }
 
@@ -255,12 +255,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToTransactionTypeCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToTransactionTypeCosmosMapperCtor();
             }
 
@@ -277,12 +277,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public TransactionStatusToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 TransactionStatusToModelCosmosMapperCtor();
             }
 
@@ -299,12 +299,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToTransactionStatusCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
                 ModelToTransactionStatusCosmosMapperCtor();
             }
 

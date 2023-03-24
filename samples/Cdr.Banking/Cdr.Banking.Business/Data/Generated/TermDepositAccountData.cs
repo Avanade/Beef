@@ -23,23 +23,15 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.LodgementDate = s.LodgementDate);
-                Map((s, d) => d.MaturityDate = s.MaturityDate);
-                Map((s, d) => d.MaturityAmount = s.MaturityAmount);
-                Map((s, d) => d.MaturityCurrency = s.MaturityCurrency);
-                Map((s, d) => d.MaturityInstructions = s.MaturityInstructionsSid);
+                Map((s, d) => d.LodgementDate = s.LodgementDate, OperationTypes.Any, s => s.LodgementDate == default, d => d.LodgementDate = default);
+                Map((s, d) => d.MaturityDate = s.MaturityDate, OperationTypes.Any, s => s.MaturityDate == default, d => d.MaturityDate = default);
+                Map((s, d) => d.MaturityAmount = s.MaturityAmount, OperationTypes.Any, s => s.MaturityAmount == default, d => d.MaturityAmount = default);
+                Map((s, d) => d.MaturityCurrency = s.MaturityCurrency, OperationTypes.Any, s => s.MaturityCurrency == default, d => d.MaturityCurrency = default);
+                Map((s, d) => d.MaturityInstructions = s.MaturityInstructionsSid, OperationTypes.Any, s => s.MaturityInstructionsSid == default, d => d.MaturityInstructions = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(TermDepositAccount s)
-                => s.LodgementDate == default
-                && s.MaturityDate == default
-                && s.MaturityAmount == default
-                && s.MaturityCurrency == default
-                && s.MaturityInstructionsSid == default;
         }
 
         /// <summary>
@@ -52,23 +44,15 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.LodgementDate = (DateTime)s.LodgementDate);
-                Map((s, d) => d.MaturityDate = (DateTime)s.MaturityDate);
-                Map((s, d) => d.MaturityAmount = (decimal)s.MaturityAmount);
-                Map((s, d) => d.MaturityCurrency = (string?)s.MaturityCurrency);
-                Map((s, d) => d.MaturityInstructionsSid = (string?)s.MaturityInstructions);
+                Map((s, d) => d.LodgementDate = (DateTime)s.LodgementDate, OperationTypes.Any, s => s.LodgementDate == default, d => d.LodgementDate = default);
+                Map((s, d) => d.MaturityDate = (DateTime)s.MaturityDate, OperationTypes.Any, s => s.MaturityDate == default, d => d.MaturityDate = default);
+                Map((s, d) => d.MaturityAmount = (decimal)s.MaturityAmount, OperationTypes.Any, s => s.MaturityAmount == default, d => d.MaturityAmount = default);
+                Map((s, d) => d.MaturityCurrency = (string?)s.MaturityCurrency, OperationTypes.Any, s => s.MaturityCurrency == default, d => d.MaturityCurrency = default);
+                Map((s, d) => d.MaturityInstructionsSid = (string?)s.MaturityInstructions, OperationTypes.Any, s => s.MaturityInstructions == default, d => d.MaturityInstructionsSid = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.TermDepositAccount s)
-                => s.LodgementDate == default
-                && s.MaturityDate == default
-                && s.MaturityAmount == default
-                && s.MaturityCurrency == default
-                && s.MaturityInstructions == default;
         }
     }
 }

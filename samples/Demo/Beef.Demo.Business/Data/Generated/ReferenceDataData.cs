@@ -79,25 +79,16 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EyeColorToModelEfMapper()
             {
-                Map((s, d) => d.EyeColorId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.EyeColorId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.EyeColorId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 EyeColorToModelEfMapperCtor();
             }
 
             partial void EyeColorToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EyeColor s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -110,25 +101,16 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEyeColorEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.EyeColorId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.EyeColorId, OperationTypes.Any, s => s.EyeColorId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToEyeColorEfMapperCtor();
             }
 
             partial void ModelToEyeColorEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.EyeColor s)
-                => s.EyeColorId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
 
         /// <summary>
@@ -141,13 +123,13 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public PowerSourceToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.ETag = s.ETag);
-                Map((s, d) => d.AdditionalInfo = s.AdditionalInfo);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+                Map((s, d) => d.AdditionalInfo = s.AdditionalInfo, OperationTypes.Any, s => s.AdditionalInfo == default, d => d.AdditionalInfo = default);
                 PowerSourceToModelCosmosMapperCtor();
             }
 
@@ -164,13 +146,13 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToPowerSourceCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.Id);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)s.ETag);
-                Map((s, d) => d.AdditionalInfo = (string?)s.AdditionalInfo);
+                Map((s, d) => d.Id = (Guid)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+                Map((s, d) => d.AdditionalInfo = (string?)s.AdditionalInfo, OperationTypes.Any, s => s.AdditionalInfo == default, d => d.AdditionalInfo = default);
                 ModelToPowerSourceCosmosMapperCtor();
             }
 
@@ -187,25 +169,16 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public StatusToModelEfMapper()
             {
-                Map((s, d) => d.StatusId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.StatusId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.StatusId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 StatusToModelEfMapperCtor();
             }
 
             partial void StatusToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Status s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -218,25 +191,16 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToStatusEfMapper()
             {
-                Map((s, d) => d.Id = (string?)s.StatusId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (string?)s.StatusId, OperationTypes.Any, s => s.StatusId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToStatusEfMapperCtor();
             }
 
             partial void ModelToStatusEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Status s)
-                => s.StatusId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
     }
 }

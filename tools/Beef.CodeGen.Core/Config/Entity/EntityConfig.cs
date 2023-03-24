@@ -723,6 +723,14 @@ entities:
         [CodeGenProperty("Manager", Title = "Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.")]
         public bool? IdentifierGenerator { get; set; }
 
+        /// <summary>
+        /// Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.
+        /// </summary>
+        [JsonProperty("managerCleanUp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.",
+            Description = "This can be overridden within the `CodeGeneration` and `Operation`(s).")]
+        public bool? ManagerCleanUp { get; set; }
+
         #endregion
 
         #region WebApi
@@ -1347,6 +1355,7 @@ entities:
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
+            ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => Parent!.ManagerCleanUp);
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);
@@ -1361,7 +1370,7 @@ entities:
 
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
-                    $"{(Parent!.WebApiRoutePrefix.EndsWith('/') ? Parent!.WebApiRoutePrefix[..^1] : Parent!.WebApiRoutePrefix)}/{(WebApiRoutePrefix.StartsWith('/') ? WebApiRoutePrefix[1..] : WebApiRoutePrefix)}";
+                    $"{(Parent!.WebApiRoutePrefix.EndsWith('/') ? Parent!.WebApiRoutePrefix[..^1] : Parent!.WebApiRoutePrefix)}{(string.IsNullOrEmpty(WebApiRoutePrefix) ? "" : "/")}{(WebApiRoutePrefix.StartsWith('/') ? WebApiRoutePrefix[1..] : WebApiRoutePrefix)}";
 
             if (IsTrue(DataModel))
             {
@@ -1723,7 +1732,7 @@ entities:
             if (RequiresManager)
                 WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
 
-            WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "WebApi", Type = $"WebApi", Text = $"{{{{WebApi}}}}" });
+            WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "WebApi", Type = RefDataType is null ? "WebApi" : "ReferenceDataContentWebApi", Text = $"{{{{WebApi}}}}" });
             AddConfiguredParameters(WebApiCtorParams, WebApiCtorParameters);
             foreach (var ctor in WebApiCtorParameters)
             {

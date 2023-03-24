@@ -48,31 +48,19 @@ namespace My.Hr.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.EmployeeId = s.Id);
-                Map((s, d) => d.Email = s.Email);
-                Map((s, d) => d.FirstName = s.FirstName);
-                Map((s, d) => d.LastName = s.LastName);
-                Map((s, d) => d.GenderCode = s.GenderSid);
-                Map((s, d) => d.Birthday = s.Birthday);
-                Map((s, d) => d.StartDate = s.StartDate);
-                Flatten(s => s.Termination);
-                Map((s, d) => d.PhoneNo = s.PhoneNo);
+                Map((s, d) => d.EmployeeId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.EmployeeId = default);
+                Map((s, d) => d.Email = s.Email, OperationTypes.Any, s => s.Email == default, d => d.Email = default);
+                Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.GenderCode = s.GenderSid, OperationTypes.Any, s => s.GenderSid == default, d => d.GenderCode = default);
+                Map((s, d) => d.Birthday = s.Birthday, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
+                Map((s, d) => d.StartDate = s.StartDate, OperationTypes.Any, s => s.StartDate == default, d => d.StartDate = default);
+                Flatten(s => s.Termination, OperationTypes.Any, s => s.Termination == default);
+                Map((s, d) => d.PhoneNo = s.PhoneNo, OperationTypes.Any, s => s.PhoneNo == default, d => d.PhoneNo = default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EmployeeBase s)
-                => s.Id == default
-                && s.Email == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.GenderSid == default
-                && s.Birthday == default
-                && s.StartDate == default
-                && s.Termination == default
-                && s.PhoneNo == default;
         }
 
         /// <summary>
@@ -85,30 +73,19 @@ namespace My.Hr.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.EmployeeId);
-                Map((s, d) => d.Email = (string?)s.Email);
-                Map((s, d) => d.FirstName = (string?)s.FirstName);
-                Map((s, d) => d.LastName = (string?)s.LastName);
-                Map((s, d) => d.GenderSid = (string?)s.GenderCode);
-                Map((s, d) => d.Birthday = (DateTime)s.Birthday);
-                Map((s, d) => d.StartDate = (DateTime)s.StartDate);
-                Expand<TerminationDetail>((d, v) => d.Termination = v);
-                Map((s, d) => d.PhoneNo = (string?)s.PhoneNo);
+                Map((s, d) => d.Id = (Guid)s.EmployeeId, OperationTypes.Any, s => s.EmployeeId == default, d => d.Id = default);
+                Map((s, d) => d.Email = (string?)s.Email, OperationTypes.Any, s => s.Email == default, d => d.Email = default);
+                Map((s, d) => d.FirstName = (string?)s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = (string?)s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.GenderSid = (string?)s.GenderCode, OperationTypes.Any, s => s.GenderCode == default, d => d.GenderSid = default);
+                Map((s, d) => d.Birthday = (DateTime)s.Birthday, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
+                Map((s, d) => d.StartDate = (DateTime)s.StartDate, OperationTypes.Any, s => s.StartDate == default, d => d.StartDate = default);
+                Expand<TerminationDetail>((d, v) => d.Termination = v, OperationTypes.Any, d => d.Termination = default);
+                Map((s, d) => d.PhoneNo = (string?)s.PhoneNo, OperationTypes.Any, s => s.PhoneNo == default, d => d.PhoneNo = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Employee s)
-                => s.EmployeeId == default
-                && s.Email == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.GenderCode == default
-                && s.Birthday == default
-                && s.StartDate == default
-                && s.PhoneNo == default;
         }
     }
 }

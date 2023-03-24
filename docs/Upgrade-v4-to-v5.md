@@ -60,6 +60,12 @@ Where overridding previous `Async`-related methods these will need to be updated
 
 <br/>
 
+### Cleaning
+
+[Cleaning](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/Cleaner.cs) is where the underlying value for a parameter within the Manager-layer is adjusted based on `Type` and underlying configuration; specifically where [`ICleanUp`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Entities/ICleanUp.cs) is leveraged. This is now only performed where explicitly configured; within `CodeGeneration`, `Entity`(s) and/or `Operation`(s) YAML. Cleaning is a feature that is generally infrequently used and is best excluded unless needed.
+
+<br/>
+
 ### Check class
 
 _Beef_ previously contained a `Check` class that was used to check method parameters and throw a corresponding `ArgumentNullException` or `ArgumentException`; this class does not exist in _CoreEx_. The code that previously leveraged will need to be refactored, or the developer will need to re-implement the `Check` class.

@@ -23,21 +23,14 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.MinPaymentAmount = s.MinPaymentAmount);
-                Map((s, d) => d.PaymentDueAmount = s.PaymentDueAmount);
-                Map((s, d) => d.PaymentCurrency = s.PaymentCurrency);
-                Map((s, d) => d.PaymentDueDate = s.PaymentDueDate);
+                Map((s, d) => d.MinPaymentAmount = s.MinPaymentAmount, OperationTypes.Any, s => s.MinPaymentAmount == default, d => d.MinPaymentAmount = default);
+                Map((s, d) => d.PaymentDueAmount = s.PaymentDueAmount, OperationTypes.Any, s => s.PaymentDueAmount == default, d => d.PaymentDueAmount = default);
+                Map((s, d) => d.PaymentCurrency = s.PaymentCurrency, OperationTypes.Any, s => s.PaymentCurrency == default, d => d.PaymentCurrency = default);
+                Map((s, d) => d.PaymentDueDate = s.PaymentDueDate, OperationTypes.Any, s => s.PaymentDueDate == default, d => d.PaymentDueDate = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(CreditCardAccount s)
-                => s.MinPaymentAmount == default
-                && s.PaymentDueAmount == default
-                && s.PaymentCurrency == default
-                && s.PaymentDueDate == default;
         }
 
         /// <summary>
@@ -50,21 +43,14 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.MinPaymentAmount = (decimal)s.MinPaymentAmount);
-                Map((s, d) => d.PaymentDueAmount = (decimal)s.PaymentDueAmount);
-                Map((s, d) => d.PaymentCurrency = (string?)s.PaymentCurrency);
-                Map((s, d) => d.PaymentDueDate = (DateTime)s.PaymentDueDate);
+                Map((s, d) => d.MinPaymentAmount = (decimal)s.MinPaymentAmount, OperationTypes.Any, s => s.MinPaymentAmount == default, d => d.MinPaymentAmount = default);
+                Map((s, d) => d.PaymentDueAmount = (decimal)s.PaymentDueAmount, OperationTypes.Any, s => s.PaymentDueAmount == default, d => d.PaymentDueAmount = default);
+                Map((s, d) => d.PaymentCurrency = (string?)s.PaymentCurrency, OperationTypes.Any, s => s.PaymentCurrency == default, d => d.PaymentCurrency = default);
+                Map((s, d) => d.PaymentDueDate = (DateTime)s.PaymentDueDate, OperationTypes.Any, s => s.PaymentDueDate == default, d => d.PaymentDueDate = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.CreditCardAccount s)
-                => s.MinPaymentAmount == default
-                && s.PaymentDueAmount == default
-                && s.PaymentCurrency == default
-                && s.PaymentDueDate == default;
         }
     }
 }

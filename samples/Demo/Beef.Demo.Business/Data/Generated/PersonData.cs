@@ -358,35 +358,21 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.PersonId = s.Id);
-                Map((s, d) => d.FirstName = s.FirstName);
-                Map((s, d) => d.LastName = s.LastName);
-                Map((s, d) => d.UniqueCode = s.UniqueCode);
-                Map((s, d) => d.GenderId = ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToDestination.Convert(s.Gender));
-                Map((s, d) => d.EyeColorCode = s.EyeColorSid);
-                Map((s, d) => d.Birthday = s.Birthday);
-                Flatten(s => s.Address);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
-                Map((s, d) => d.MetadataJson = ObjectToJsonConverter<Dictionary<string, string>>.Default.ToDestination.Convert(s.Metadata));
-                Flatten(s => s.ChangeLog);
+                Map((s, d) => d.PersonId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.PersonId = default);
+                Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.UniqueCode = s.UniqueCode, OperationTypes.Any, s => s.UniqueCode == default, d => d.UniqueCode = default);
+                Map((s, d) => d.GenderId = ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToDestination.Convert(s.Gender), OperationTypes.Any, s => s.Gender == default, d => d.GenderId = default);
+                Map((s, d) => d.EyeColorCode = s.EyeColorSid, OperationTypes.Any, s => s.EyeColorSid == default, d => d.EyeColorCode = default);
+                Map((s, d) => d.Birthday = s.Birthday, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
+                Flatten(s => s.Address, OperationTypes.Any, s => s.Address == default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+                Map((s, d) => d.MetadataJson = ObjectToJsonConverter<Dictionary<string, string>>.Default.ToDestination.Convert(s.Metadata), OperationTypes.Any, s => s.Metadata == default, d => d.MetadataJson = default);
+                Flatten(s => s.ChangeLog, OperationTypes.Any, s => s.ChangeLog == default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Person s)
-                => s.Id == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.UniqueCode == default
-                && s.Gender == default
-                && s.EyeColorSid == default
-                && s.Birthday == default
-                && s.Address == default
-                && s.ETag == default
-                && s.Metadata == default
-                && s.ChangeLog == default;
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<Person, EfModel.Person> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, EfModel.Person>()
@@ -406,33 +392,21 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.PersonId);
-                Map((s, d) => d.FirstName = (string?)s.FirstName);
-                Map((s, d) => d.LastName = (string?)s.LastName);
-                Map((s, d) => d.UniqueCode = (string?)s.UniqueCode);
-                Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource.Convert(s.GenderId));
-                Map((s, d) => d.EyeColorSid = (string?)s.EyeColorCode);
-                Map((s, d) => d.Birthday = (DateTime)s.Birthday);
-                Expand<Address>((d, v) => d.Address = v);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
-                Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson));
-                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v);
+                Map((s, d) => d.Id = (Guid)s.PersonId, OperationTypes.Any, s => s.PersonId == default, d => d.Id = default);
+                Map((s, d) => d.FirstName = (string?)s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = (string?)s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.UniqueCode = (string?)s.UniqueCode, OperationTypes.Any, s => s.UniqueCode == default, d => d.UniqueCode = default);
+                Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource.Convert(s.GenderId), OperationTypes.Any, s => s.GenderId == default, d => d.Gender = default);
+                Map((s, d) => d.EyeColorSid = (string?)s.EyeColorCode, OperationTypes.Any, s => s.EyeColorCode == default, d => d.EyeColorSid = default);
+                Map((s, d) => d.Birthday = (DateTime)s.Birthday, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
+                Expand<Address>((d, v) => d.Address = v, OperationTypes.Any, d => d.Address = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+                Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson), OperationTypes.Any, s => s.MetadataJson == default, d => d.Metadata = default);
+                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v, OperationTypes.Any, d => d.ChangeLog = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Person s)
-                => s.PersonId == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.UniqueCode == default
-                && s.GenderId == default
-                && s.EyeColorCode == default
-                && s.Birthday == default
-                && s.RowVersion == default
-                && s.MetadataJson == default;
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<EfModel.Person, Person> mapper) => mapper.Owner.Register(new Mapper<EfModel.Person, ChangeLogEx>()

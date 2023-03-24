@@ -42,7 +42,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="MaturityInstructions"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("maturityInstructions")]
-        public string? MaturityInstructionsSid { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value); }
+        public string? MaturityInstructionsSid { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value, propertyName: nameof(MaturityInstructions)); }
 
         /// <summary>
         /// Gets or sets the Maturity Instructions (see <see cref="RefDataNamespace.MaturityInstructions"/>).

@@ -84,27 +84,17 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = TypeToStringConverter<Guid>.Default.ToDestination.Convert(s.Id));
-                Map((s, d) => d.ModelNo = s.ModelNo);
-                Map((s, d) => d.SerialNo = s.SerialNo);
-                Map((s, d) => d.EyeColor = s.EyeColorSid);
-                Map((s, d) => d.PowerSource = s.PowerSourceSid);
-                Map((s, d) => d.ETag = s.ETag);
-                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog));
+                Map((s, d) => d.Id = TypeToStringConverter<Guid>.Default.ToDestination.Convert(s.Id), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.ModelNo = s.ModelNo, OperationTypes.Any, s => s.ModelNo == default, d => d.ModelNo = default);
+                Map((s, d) => d.SerialNo = s.SerialNo, OperationTypes.Any, s => s.SerialNo == default, d => d.SerialNo = default);
+                Map((s, d) => d.EyeColor = s.EyeColorSid, OperationTypes.Any, s => s.EyeColorSid == default, d => d.EyeColor = default);
+                Map((s, d) => d.PowerSource = s.PowerSourceSid, OperationTypes.Any, s => s.PowerSourceSid == default, d => d.PowerSource = default);
+                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog), OperationTypes.Any, s => s.ChangeLog == default, d => d.ChangeLog = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Robot s)
-                => s.Id == default
-                && s.ModelNo == default
-                && s.SerialNo == default
-                && s.EyeColorSid == default
-                && s.PowerSourceSid == default
-                && s.ETag == default
-                && s.ChangeLog == default;
         }
 
         /// <summary>
@@ -117,27 +107,17 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.Id = (Guid)TypeToStringConverter<Guid>.Default.ToSource.Convert(s.Id));
-                Map((s, d) => d.ModelNo = (string?)s.ModelNo);
-                Map((s, d) => d.SerialNo = (string?)s.SerialNo);
-                Map((s, d) => d.EyeColorSid = (string?)s.EyeColor);
-                Map((s, d) => d.PowerSourceSid = (string?)s.PowerSource);
-                Map((s, d) => d.ETag = (string?)s.ETag);
-                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog));
+                Map((s, d) => d.Id = (Guid)TypeToStringConverter<Guid>.Default.ToSource.Convert(s.Id), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.ModelNo = (string?)s.ModelNo, OperationTypes.Any, s => s.ModelNo == default, d => d.ModelNo = default);
+                Map((s, d) => d.SerialNo = (string?)s.SerialNo, OperationTypes.Any, s => s.SerialNo == default, d => d.SerialNo = default);
+                Map((s, d) => d.EyeColorSid = (string?)s.EyeColor, OperationTypes.Any, s => s.EyeColor == default, d => d.EyeColorSid = default);
+                Map((s, d) => d.PowerSourceSid = (string?)s.PowerSource, OperationTypes.Any, s => s.PowerSource == default, d => d.PowerSourceSid = default);
+                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+                Map((o, s, d) => d.ChangeLog = o.Map(s.ChangeLog, d.ChangeLog), OperationTypes.Any, s => s.ChangeLog == default, d => d.ChangeLog = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.Robot s)
-                => s.Id == default
-                && s.ModelNo == default
-                && s.SerialNo == default
-                && s.EyeColor == default
-                && s.PowerSource == default
-                && s.ETag == default
-                && s.ChangeLog == default;
         }
     }
 }

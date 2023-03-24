@@ -42,7 +42,7 @@ namespace My.Hr.Business.Entities
         /// Gets or sets the <see cref="Relationship"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("relationship")]
-        public string? RelationshipSid { get => _relationshipSid; set => SetValue(ref _relationshipSid, value); }
+        public string? RelationshipSid { get => _relationshipSid; set => SetValue(ref _relationshipSid, value, propertyName: nameof(Relationship)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).

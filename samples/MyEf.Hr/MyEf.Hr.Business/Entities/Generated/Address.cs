@@ -37,7 +37,7 @@ namespace MyEf.Hr.Business.Entities
         /// Gets or sets the <see cref="State"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("state")]
-        public string? StateSid { get => _stateSid; set => SetValue(ref _stateSid, value); }
+        public string? StateSid { get => _stateSid; set => SetValue(ref _stateSid, value, propertyName: nameof(State)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="State"/> text (read-only where selected).

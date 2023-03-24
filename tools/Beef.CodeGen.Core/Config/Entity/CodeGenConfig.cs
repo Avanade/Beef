@@ -28,6 +28,7 @@ entities:
     [CodeGenCategory("Entity", Title = "Provides the _Entity class_ configuration.")]
     [CodeGenCategory("Events", Title = "Provides the _Events_ configuration.")]
     [CodeGenCategory("WebApi", Title = "Provides the _Web API (Controller)_ configuration.")]
+    [CodeGenCategory("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CodeGenCategory("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CodeGenCategory("Database", Title = "Provides the _Database Data-layer_ configuration.")]
     [CodeGenCategory("EntityFramework", Title = "Provides the _Entity Framewotrk (EF) Data-layer_ configuration.")]
@@ -153,6 +154,18 @@ entities:
         [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
             Description = "This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).")]
         public string? WebApiRoutePrefix { get; set; }
+
+        #endregion
+
+        #region Manager
+
+        /// <summary>
+        /// Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.
+        /// </summary>
+        [JsonProperty("managerCleanUp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.",
+            Description = "This can be overridden within the `Entity`(s) and `Operation`(s).")]
+        public bool? ManagerCleanUp { get; set; }
 
         #endregion
 
@@ -521,6 +534,7 @@ entities:
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
+            ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => false);
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
@@ -616,9 +630,9 @@ entities:
 
             foreach (var xp in config.ExtraProperties)
             {
-                var property = properties!.FirstOrDefault(x => x.Property == xp.Key);
-                if (properties != null)
-                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(property.Message) ? string.Empty : property.Message)}");
+                var (Property, Message) = properties!.FirstOrDefault(x => x.Property == xp.Key);
+                if (Property != null)
+                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
             }
         }
     }

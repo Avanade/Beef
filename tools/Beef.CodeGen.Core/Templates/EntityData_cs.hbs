@@ -232,15 +232,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-    {{#each EntityFrameworkMapperIsDestinationProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityName}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
-    {{/each}}
-        {{#if HasEntityFrameworkChangeLogProperty}}
+    {{#if HasEntityFrameworkChangeLogProperty}}
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
@@ -248,7 +240,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-        {{/if}}
+    {{/if}}
         }
 
         /// <summary>
@@ -271,15 +263,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-    {{#each EntityFrameworkMapperIsSourceProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityFrameworkModel}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
-    {{/each}}
-        {{#if HasEntityFrameworkChangeLogProperty}}
+    {{#if HasEntityFrameworkChangeLogProperty}}
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
@@ -287,7 +271,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-        {{/if}}
+    {{/if}}
         }
   {{/unless}}
  {{/ifval}}
@@ -316,14 +300,6 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-    {{#each CosmosMapperIsDestinationProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityName}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
-    {{/each}}
         }
 
         /// <summary>
@@ -346,14 +322,6 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-    {{#each CosmosMapperIsSourceProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.CosmosModel}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
-    {{/each}}
         }
   {{/unless}}
  {{/ifval}}
@@ -411,14 +379,6 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
-    {{#each HttpAgentMapperIsDestinationProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityName}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
-    {{/each}}
         }
 
         /// <summary>
@@ -441,14 +401,6 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
-    {{#each HttpAgentMapperIsSourceProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.HttpAgentModel}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
-    {{/each}}
         }
   {{/unless}}
 {{/if}}

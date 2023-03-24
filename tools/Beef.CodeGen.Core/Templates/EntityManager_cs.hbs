@@ -96,7 +96,7 @@ namespace {{Root.NamespaceBusiness}}
     {{/ifeq}}
   {{/each}}
   {{#if ManagerCustom}}
-            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
             Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}});
@@ -129,10 +129,10 @@ namespace {{Root.NamespaceBusiness}}
             {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false);
             await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}})).ConfigureAwait(false);
       {{#if HasReturnValue}}
-            return Cleaner.Clean(__result);
+            return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}__result{{#if ManagerCleanUp}}){{/if}};
       {{/if}}
     {{else}}
-            {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
+            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}

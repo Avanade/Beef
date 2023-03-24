@@ -118,7 +118,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<Employee?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => GetAsync<Employee?>("api/employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+            => GetAsync<Employee?>("employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -128,7 +128,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<Employee>> CreateAsync(Employee value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PostAsync<Employee, Employee>("api/employees", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+            => PostAsync<Employee, Employee>("employees", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -139,7 +139,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<Employee>> UpdateAsync(Employee value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PutAsync<Employee, Employee>("api/employees/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+            => PutAsync<Employee, Employee>("employees/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Patches an existing <see cref="Employee"/>.
@@ -151,7 +151,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<Employee>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PatchAsync<Employee>("api/employees/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+            => PatchAsync<Employee>("employees/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -161,7 +161,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => DeleteAsync("api/employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+            => DeleteAsync("employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -172,7 +172,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => GetAsync<EmployeeBaseCollectionResult>("api/employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+            => GetAsync<EmployeeBaseCollectionResult>("employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
@@ -183,7 +183,7 @@ namespace My.Hr.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<Employee>> TerminateAsync(TerminationDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PostAsync<TerminationDetail, Employee>("api/employees/{id}/terminate", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+            => PostAsync<TerminationDetail, Employee>("employees/{id}/terminate", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
     }
 }
 

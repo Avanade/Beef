@@ -49,7 +49,7 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="Gender"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("gender")]
-        public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value); }
+        public string? GenderSid { get => _genderSid; set => SetValue(ref _genderSid, value, propertyName: nameof(Gender)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
@@ -67,7 +67,7 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="EyeColor"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("eyeColor")]
-        public string? EyeColorSid { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value); }
+        public string? EyeColorSid { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value, propertyName: nameof(EyeColor)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).

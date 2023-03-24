@@ -302,7 +302,7 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenStatistics"/>.</returns>
         public static async Task<CodeGenStatistics> ExecuteCodeGenerationAsync(CodeGeneratorArgsBase args)
         {
-            var cg = await CodeGenerator.CreateAsync(args).ConfigureAwait(false);
+            var cg = await OnRamp.CodeGenerator.CreateAsync<CodeGenerator>(args).ConfigureAwait(false);
             var fi = new FileInfo(args.ConfigFileName ?? throw new CodeGenException("Configuration file not specified."));
             return await cg.GenerateAsync(fi.FullName).ConfigureAwait(false);
         }

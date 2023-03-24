@@ -44,7 +44,7 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="Country"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("country")]
-        public string? CountrySid { get => _countrySid; set => SetValue(ref _countrySid, value); }
+        public string? CountrySid { get => _countrySid; set => SetValue(ref _countrySid, value, propertyName: nameof(Country)); }
 
         /// <summary>
         /// Gets or sets the Country (see <see cref="RefDataNamespace.Country"/>).
