@@ -15,11 +15,11 @@ The following provides a visual (ERD) for the database tables that will be creat
 ``` mermaid
 erDiagram
     Employee ||--o{ EmergencyContact : has
-    Employee }|..|{ Gender : refers
-    Employee }|..|{ TerminationReason : refers
-    Employee }|..|{ USState : refers
-    Employee ||--o{ Address : has (via JSON)
-    EmergencyContact }|..|{ RelationshipType : refers
+    Employee }|..|| Gender : refers
+    Employee }|..|| TerminationReason : refers
+    Employee }|..|| USState : refers
+    Employee ||--o{ Address : has-json
+    EmergencyContact }|..|| RelationshipType : refers
 ```
 
 <br/>
