@@ -40,7 +40,7 @@ namespace MyEf.Hr.Business.Entities
         /// Gets or sets the <see cref="Outcome"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("outcome")]
-        public string? OutcomeSid { get => _outcomeSid; set => SetValue(ref _outcomeSid, value); }
+        public string? OutcomeSid { get => _outcomeSid; set => SetValue(ref _outcomeSid, value, propertyName: nameof(Outcome)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).

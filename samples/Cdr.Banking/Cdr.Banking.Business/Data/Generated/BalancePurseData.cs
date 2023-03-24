@@ -23,17 +23,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.Amount = s.Amount);
-                Map((s, d) => d.Currency = s.Currency);
+                Map((s, d) => d.Amount = s.Amount, OperationTypes.Any, s => s.Amount == default, d => d.Amount = default);
+                Map((s, d) => d.Currency = s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(BalancePurse s)
-                => s.Amount == default
-                && s.Currency == default;
         }
 
         /// <summary>
@@ -46,17 +41,12 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.Amount = (decimal)s.Amount);
-                Map((s, d) => d.Currency = (string?)s.Currency);
+                Map((s, d) => d.Amount = (decimal)s.Amount, OperationTypes.Any, s => s.Amount == default, d => d.Amount = default);
+                Map((s, d) => d.Currency = (string?)s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.BalancePurse s)
-                => s.Amount == default
-                && s.Currency == default;
         }
     }
 }

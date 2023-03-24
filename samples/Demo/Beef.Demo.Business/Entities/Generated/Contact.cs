@@ -38,7 +38,7 @@ namespace Beef.Demo.Business.Entities
         /// Gets or sets the <see cref="Status"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("status")]
-        public string? StatusSid { get => _statusSid; set => SetValue(ref _statusSid, value); }
+        public string? StatusSid { get => _statusSid; set => SetValue(ref _statusSid, value, propertyName: nameof(Status)); }
 
         /// <summary>
         /// Gets the corresponding <see cref="Status"/> text (read-only where selected).

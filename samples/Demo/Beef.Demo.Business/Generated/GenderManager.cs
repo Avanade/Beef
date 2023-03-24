@@ -30,9 +30,8 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
         public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(id);
             await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
+            return await _dataService.GetAsync(id).ConfigureAwait(false);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -42,8 +41,7 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(value.EnsureValue());
-            return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
+            return await _dataService.CreateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -55,8 +53,7 @@ namespace Beef.Demo.Business
         public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             value.EnsureValue().Id = id;
-            Cleaner.CleanUp(value);
-            return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
+            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Update);
     }
 }

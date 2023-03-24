@@ -84,29 +84,18 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.PerformanceReviewId = s.Id);
-                Map((s, d) => d.EmployeeId = s.EmployeeId, OperationTypes.AnyExceptUpdate);
-                Map((s, d) => d.Date = s.Date);
-                Map((s, d) => d.PerformanceOutcomeCode = s.OutcomeSid);
-                Map((s, d) => d.Reviewer = s.Reviewer);
-                Map((s, d) => d.Notes = s.Notes);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
-                Flatten(s => s.ChangeLog);
+                Map((s, d) => d.PerformanceReviewId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.PerformanceReviewId = default);
+                Map((s, d) => d.EmployeeId = s.EmployeeId, OperationTypes.AnyExceptUpdate, s => s.EmployeeId == default, d => d.EmployeeId = default);
+                Map((s, d) => d.Date = s.Date, OperationTypes.Any, s => s.Date == default, d => d.Date = default);
+                Map((s, d) => d.PerformanceOutcomeCode = s.OutcomeSid, OperationTypes.Any, s => s.OutcomeSid == default, d => d.PerformanceOutcomeCode = default);
+                Map((s, d) => d.Reviewer = s.Reviewer, OperationTypes.Any, s => s.Reviewer == default, d => d.Reviewer = default);
+                Map((s, d) => d.Notes = s.Notes, OperationTypes.Any, s => s.Notes == default, d => d.Notes = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+                Flatten(s => s.ChangeLog, OperationTypes.Any, s => s.ChangeLog == default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(PerformanceReview s)
-                => s.Id == default
-                && s.EmployeeId == default
-                && s.Date == default
-                && s.OutcomeSid == default
-                && s.Reviewer == default
-                && s.Notes == default
-                && s.ETag == default
-                && s.ChangeLog == default;
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<PerformanceReview, EfModel.PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, EfModel.PerformanceReview>()
@@ -126,28 +115,18 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.PerformanceReviewId);
-                Map((s, d) => d.EmployeeId = (Guid)s.EmployeeId, OperationTypes.AnyExceptUpdate);
-                Map((s, d) => d.Date = (DateTime)s.Date);
-                Map((s, d) => d.OutcomeSid = (string?)s.PerformanceOutcomeCode);
-                Map((s, d) => d.Reviewer = (string?)s.Reviewer);
-                Map((s, d) => d.Notes = (string?)s.Notes);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
-                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v);
+                Map((s, d) => d.Id = (Guid)s.PerformanceReviewId, OperationTypes.Any, s => s.PerformanceReviewId == default, d => d.Id = default);
+                Map((s, d) => d.EmployeeId = (Guid)s.EmployeeId, OperationTypes.AnyExceptUpdate, s => s.EmployeeId == default, d => d.EmployeeId = default);
+                Map((s, d) => d.Date = (DateTime)s.Date, OperationTypes.Any, s => s.Date == default, d => d.Date = default);
+                Map((s, d) => d.OutcomeSid = (string?)s.PerformanceOutcomeCode, OperationTypes.Any, s => s.PerformanceOutcomeCode == default, d => d.OutcomeSid = default);
+                Map((s, d) => d.Reviewer = (string?)s.Reviewer, OperationTypes.Any, s => s.Reviewer == default, d => d.Reviewer = default);
+                Map((s, d) => d.Notes = (string?)s.Notes, OperationTypes.Any, s => s.Notes == default, d => d.Notes = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+                Expand<ChangeLogEx>((d, v) => d.ChangeLog = v, OperationTypes.Any, d => d.ChangeLog = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.PerformanceReview s)
-                => s.PerformanceReviewId == default
-                && s.EmployeeId == default
-                && s.Date == default
-                && s.PerformanceOutcomeCode == default
-                && s.Reviewer == default
-                && s.Notes == default
-                && s.RowVersion == default;
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<EfModel.PerformanceReview, PerformanceReview> mapper) => mapper.Owner.Register(new Mapper<EfModel.PerformanceReview, ChangeLogEx>()

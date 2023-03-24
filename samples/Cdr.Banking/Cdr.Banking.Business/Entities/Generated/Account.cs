@@ -47,7 +47,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="OpenStatus"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("openStatus")]
-        public string? OpenStatusSid { get => _openStatusSid; set => SetValue(ref _openStatusSid, value); }
+        public string? OpenStatusSid { get => _openStatusSid; set => SetValue(ref _openStatusSid, value, propertyName: nameof(OpenStatus)); }
 
         /// <summary>
         /// Gets or sets the Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).
@@ -70,7 +70,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="ProductCategory"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("productCategory")]
-        public string? ProductCategorySid { get => _productCategorySid; set => SetValue(ref _productCategorySid, value); }
+        public string? ProductCategorySid { get => _productCategorySid; set => SetValue(ref _productCategorySid, value, propertyName: nameof(ProductCategory)); }
 
         /// <summary>
         /// Gets or sets the Product Category (see <see cref="RefDataNamespace.ProductCategory"/>).

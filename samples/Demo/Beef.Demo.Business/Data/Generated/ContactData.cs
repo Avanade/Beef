@@ -98,23 +98,15 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.ContactId = s.Id);
-                Map((s, d) => d.FirstName = s.FirstName);
-                Map((s, d) => d.LastName = s.LastName);
-                Map((s, d) => d.StatusCode = s.StatusSid);
-                Map((s, d) => d.Comms = ObjectToJsonConverter<ContactCommCollection>.Default.ToDestination.Convert(s.Communications));
+                Map((s, d) => d.ContactId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.ContactId = default);
+                Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.StatusCode = s.StatusSid, OperationTypes.Any, s => s.StatusSid == default, d => d.StatusCode = default);
+                Map((s, d) => d.Comms = ObjectToJsonConverter<ContactCommCollection>.Default.ToDestination.Convert(s.Communications), OperationTypes.Any, s => s.Communications == default, d => d.Comms = default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Contact s)
-                => s.Id == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.StatusSid == default
-                && s.Communications == default;
         }
 
         /// <summary>
@@ -127,23 +119,15 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.ContactId);
-                Map((s, d) => d.FirstName = (string?)s.FirstName);
-                Map((s, d) => d.LastName = (string?)s.LastName);
-                Map((s, d) => d.StatusSid = (string?)s.StatusCode);
-                Map((s, d) => d.Communications = (ContactCommCollection?)ObjectToJsonConverter<ContactCommCollection>.Default.ToSource.Convert(s.Comms));
+                Map((s, d) => d.Id = (Guid)s.ContactId, OperationTypes.Any, s => s.ContactId == default, d => d.Id = default);
+                Map((s, d) => d.FirstName = (string?)s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = (string?)s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.StatusSid = (string?)s.StatusCode, OperationTypes.Any, s => s.StatusCode == default, d => d.StatusSid = default);
+                Map((s, d) => d.Communications = (ContactCommCollection?)ObjectToJsonConverter<ContactCommCollection>.Default.ToSource.Convert(s.Comms), OperationTypes.Any, s => s.Comms == default, d => d.Communications = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Contact s)
-                => s.ContactId == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.StatusCode == default
-                && s.Comms == default;
         }
     }
 }

@@ -41,17 +41,12 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.Street = s.Street);
-                Map((s, d) => d.City = s.City);
+                Map((s, d) => d.Street = s.Street, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
+                Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Address s)
-                => s.Street == default
-                && s.City == default;
         }
 
         /// <summary>
@@ -64,17 +59,12 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Street = (string?)s.Street);
-                Map((s, d) => d.City = (string?)s.City);
+                Map((s, d) => d.Street = (string?)s.Street, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
+                Map((s, d) => d.City = (string?)s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Person s)
-                => s.Street == default
-                && s.City == default;
         }
     }
 }

@@ -46,45 +46,26 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.AccountId = s.AccountId);
-                Map((s, d) => d.IsDetailAvailable = s.IsDetailAvailable);
-                Map((s, d) => d.Type = s.TypeSid);
-                Map((s, d) => d.Status = s.StatusSid);
-                Map((s, d) => d.Description = s.Description);
-                Map((s, d) => d.PostingDateTime = s.PostingDateTime);
-                Map((s, d) => d.ExecutionDateTime = s.ExecutionDateTime);
-                Map((s, d) => d.Amount = s.Amount);
-                Map((s, d) => d.Currency = s.Currency);
-                Map((s, d) => d.Reference = s.Reference);
-                Map((s, d) => d.MerchantName = s.MerchantName);
-                Map((s, d) => d.MerchantCategoryCode = s.MerchantCategoryCode);
-                Map((s, d) => d.BillerCode = s.BillerCode);
-                Map((s, d) => d.BillerName = s.BillerName);
-                Map((s, d) => d.ApcaNumber = s.ApcaNumber);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.AccountId = s.AccountId, OperationTypes.Any, s => s.AccountId == default, d => d.AccountId = default);
+                Map((s, d) => d.IsDetailAvailable = s.IsDetailAvailable, OperationTypes.Any, s => s.IsDetailAvailable == default, d => d.IsDetailAvailable = default);
+                Map((s, d) => d.Type = s.TypeSid, OperationTypes.Any, s => s.TypeSid == default, d => d.Type = default);
+                Map((s, d) => d.Status = s.StatusSid, OperationTypes.Any, s => s.StatusSid == default, d => d.Status = default);
+                Map((s, d) => d.Description = s.Description, OperationTypes.Any, s => s.Description == default, d => d.Description = default);
+                Map((s, d) => d.PostingDateTime = s.PostingDateTime, OperationTypes.Any, s => s.PostingDateTime == default, d => d.PostingDateTime = default);
+                Map((s, d) => d.ExecutionDateTime = s.ExecutionDateTime, OperationTypes.Any, s => s.ExecutionDateTime == default, d => d.ExecutionDateTime = default);
+                Map((s, d) => d.Amount = s.Amount, OperationTypes.Any, s => s.Amount == default, d => d.Amount = default);
+                Map((s, d) => d.Currency = s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+                Map((s, d) => d.Reference = s.Reference, OperationTypes.Any, s => s.Reference == default, d => d.Reference = default);
+                Map((s, d) => d.MerchantName = s.MerchantName, OperationTypes.Any, s => s.MerchantName == default, d => d.MerchantName = default);
+                Map((s, d) => d.MerchantCategoryCode = s.MerchantCategoryCode, OperationTypes.Any, s => s.MerchantCategoryCode == default, d => d.MerchantCategoryCode = default);
+                Map((s, d) => d.BillerCode = s.BillerCode, OperationTypes.Any, s => s.BillerCode == default, d => d.BillerCode = default);
+                Map((s, d) => d.BillerName = s.BillerName, OperationTypes.Any, s => s.BillerName == default, d => d.BillerName = default);
+                Map((s, d) => d.ApcaNumber = s.ApcaNumber, OperationTypes.Any, s => s.ApcaNumber == default, d => d.ApcaNumber = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Transaction s)
-                => s.Id == default
-                && s.AccountId == default
-                && s.IsDetailAvailable == default
-                && s.TypeSid == default
-                && s.StatusSid == default
-                && s.Description == default
-                && s.PostingDateTime == default
-                && s.ExecutionDateTime == default
-                && s.Amount == default
-                && s.Currency == default
-                && s.Reference == default
-                && s.MerchantName == default
-                && s.MerchantCategoryCode == default
-                && s.BillerCode == default
-                && s.BillerName == default
-                && s.ApcaNumber == default;
         }
 
         /// <summary>
@@ -97,45 +78,26 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.Id = (string?)s.Id);
-                Map((s, d) => d.AccountId = (string?)s.AccountId);
-                Map((s, d) => d.IsDetailAvailable = (bool)s.IsDetailAvailable);
-                Map((s, d) => d.TypeSid = (string?)s.Type);
-                Map((s, d) => d.StatusSid = (string?)s.Status);
-                Map((s, d) => d.Description = (string?)s.Description);
-                Map((s, d) => d.PostingDateTime = (DateTime)s.PostingDateTime);
-                Map((s, d) => d.ExecutionDateTime = (DateTime)s.ExecutionDateTime);
-                Map((s, d) => d.Amount = (decimal)s.Amount);
-                Map((s, d) => d.Currency = (string?)s.Currency);
-                Map((s, d) => d.Reference = (string?)s.Reference);
-                Map((s, d) => d.MerchantName = (string?)s.MerchantName);
-                Map((s, d) => d.MerchantCategoryCode = (string?)s.MerchantCategoryCode);
-                Map((s, d) => d.BillerCode = (string?)s.BillerCode);
-                Map((s, d) => d.BillerName = (string?)s.BillerName);
-                Map((s, d) => d.ApcaNumber = (string?)s.ApcaNumber);
+                Map((s, d) => d.Id = (string?)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.AccountId = (string?)s.AccountId, OperationTypes.Any, s => s.AccountId == default, d => d.AccountId = default);
+                Map((s, d) => d.IsDetailAvailable = (bool)s.IsDetailAvailable, OperationTypes.Any, s => s.IsDetailAvailable == default, d => d.IsDetailAvailable = default);
+                Map((s, d) => d.TypeSid = (string?)s.Type, OperationTypes.Any, s => s.Type == default, d => d.TypeSid = default);
+                Map((s, d) => d.StatusSid = (string?)s.Status, OperationTypes.Any, s => s.Status == default, d => d.StatusSid = default);
+                Map((s, d) => d.Description = (string?)s.Description, OperationTypes.Any, s => s.Description == default, d => d.Description = default);
+                Map((s, d) => d.PostingDateTime = (DateTime)s.PostingDateTime, OperationTypes.Any, s => s.PostingDateTime == default, d => d.PostingDateTime = default);
+                Map((s, d) => d.ExecutionDateTime = (DateTime)s.ExecutionDateTime, OperationTypes.Any, s => s.ExecutionDateTime == default, d => d.ExecutionDateTime = default);
+                Map((s, d) => d.Amount = (decimal)s.Amount, OperationTypes.Any, s => s.Amount == default, d => d.Amount = default);
+                Map((s, d) => d.Currency = (string?)s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+                Map((s, d) => d.Reference = (string?)s.Reference, OperationTypes.Any, s => s.Reference == default, d => d.Reference = default);
+                Map((s, d) => d.MerchantName = (string?)s.MerchantName, OperationTypes.Any, s => s.MerchantName == default, d => d.MerchantName = default);
+                Map((s, d) => d.MerchantCategoryCode = (string?)s.MerchantCategoryCode, OperationTypes.Any, s => s.MerchantCategoryCode == default, d => d.MerchantCategoryCode = default);
+                Map((s, d) => d.BillerCode = (string?)s.BillerCode, OperationTypes.Any, s => s.BillerCode == default, d => d.BillerCode = default);
+                Map((s, d) => d.BillerName = (string?)s.BillerName, OperationTypes.Any, s => s.BillerName == default, d => d.BillerName = default);
+                Map((s, d) => d.ApcaNumber = (string?)s.ApcaNumber, OperationTypes.Any, s => s.ApcaNumber == default, d => d.ApcaNumber = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.Transaction s)
-                => s.Id == default
-                && s.AccountId == default
-                && s.IsDetailAvailable == default
-                && s.Type == default
-                && s.Status == default
-                && s.Description == default
-                && s.PostingDateTime == default
-                && s.ExecutionDateTime == default
-                && s.Amount == default
-                && s.Currency == default
-                && s.Reference == default
-                && s.MerchantName == default
-                && s.MerchantCategoryCode == default
-                && s.BillerCode == default
-                && s.BillerName == default
-                && s.ApcaNumber == default;
         }
     }
 }

@@ -78,7 +78,7 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => {{AgentOperationHttpMethod}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}value, {{/if}}requestOptions: requestOptions{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
+            => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}value, {{/if}}requestOptions: requestOptions{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
 {{/each}}
     }
 }

@@ -26,6 +26,7 @@ Category | Description
 [`Entity`](#Entity) | Provides the _Entity class_ configuration.
 [`Events`](#Events) | Provides the _Events_ configuration.
 [`WebApi`](#WebApi) | Provides the _Web API (Controller)_ configuration.
+[`Manager`](#Manager) | Provides the _Manager-layer_ configuration.
 [`Data`](#Data) | Provides the generic _Data-layer_ configuration.
 [`Database`](#Database) | Provides the _Database Data-layer_ configuration.
 [`EntityFramework`](#EntityFramework) | Provides the _Entity Framewotrk (EF) Data-layer_ configuration.
@@ -91,6 +92,15 @@ Property | Description
 `webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.<br/>&dagger; This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).
 `webApiAutoLocation` | Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.<br/>&dagger; This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).
 **`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller.<br/>&dagger; This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).
+
+<br/>
+
+## Manager
+Provides the _Manager-layer_ configuration.
+
+Property | Description
+-|-
+`managerCleanUp` | Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.<br/>&dagger; This can be overridden within the `Entity`(s) and `Operation`(s).
 
 <br/>
 

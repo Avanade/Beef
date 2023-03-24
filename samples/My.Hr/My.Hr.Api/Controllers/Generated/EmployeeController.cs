@@ -10,7 +10,7 @@ namespace My.Hr.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Employee"/> Web API functionality.
     /// </summary>
-    [Route("api/employees")]
+    [Route("employees")]
     [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
     public partial class EmployeeController : ControllerBase
     {
@@ -46,7 +46,7 @@ namespace My.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/employees/{r.Id}", UriKind.Relative));
+            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/employees/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.

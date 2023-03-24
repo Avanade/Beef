@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using UnitTestEx;
 using UnitTestEx.Expectations;
 using UnitTestEx.NUnit;
 
@@ -23,6 +24,7 @@ namespace Beef.Demo.Test
         public async Task OneTimeSetUp()
         {
             ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
+            Assert.IsTrue(TestSetUp.Default.SetUp());
             await RobotTest.CosmosOneTimeSetUp(ApiTester.Services.GetService<DemoCosmosDb>()).ConfigureAwait(false);
         }
 
@@ -141,7 +143,7 @@ namespace Beef.Demo.Test
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
-            Assert.AreEqual(0, r.Value.Count());
+            Assert.AreEqual(0, r.Value.Count);
 
             r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -157,11 +159,8 @@ namespace Beef.Demo.Test
         {
             var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
-
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(r.GetContent());
-            Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.GetContent());
+                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }))
+                .AssertJson("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]");
         }
 
         [Test, Parallelizable]

@@ -31,9 +31,8 @@ namespace Cdr.Banking.Business
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(args);
             await args.Validate(nameof(args)).Entity().With<AccountArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
+            return await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -43,9 +42,8 @@ namespace Cdr.Banking.Business
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(accountId);
             await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
+            return await _dataService.GetDetailAsync(accountId).ConfigureAwait(false);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -55,9 +53,8 @@ namespace Cdr.Banking.Business
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(accountId);
             await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
+            return await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false);
         }, InvokerArgs.Read);
     }
 }

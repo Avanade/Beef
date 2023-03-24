@@ -23,23 +23,15 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.EmergencyContactId = s.Id);
-                Map((s, d) => d.FirstName = s.FirstName);
-                Map((s, d) => d.LastName = s.LastName);
-                Map((s, d) => d.PhoneNo = s.PhoneNo);
-                Map((s, d) => d.RelationshipTypeCode = s.RelationshipSid);
+                Map((s, d) => d.EmergencyContactId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.EmergencyContactId = default);
+                Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.PhoneNo = s.PhoneNo, OperationTypes.Any, s => s.PhoneNo == default, d => d.PhoneNo = default);
+                Map((s, d) => d.RelationshipTypeCode = s.RelationshipSid, OperationTypes.Any, s => s.RelationshipSid == default, d => d.RelationshipTypeCode = default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EmergencyContact s)
-                => s.Id == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.PhoneNo == default
-                && s.RelationshipSid == default;
         }
 
         /// <summary>
@@ -52,23 +44,15 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.EmergencyContactId);
-                Map((s, d) => d.FirstName = (string?)s.FirstName);
-                Map((s, d) => d.LastName = (string?)s.LastName);
-                Map((s, d) => d.PhoneNo = (string?)s.PhoneNo);
-                Map((s, d) => d.RelationshipSid = (string?)s.RelationshipTypeCode);
+                Map((s, d) => d.Id = (Guid)s.EmergencyContactId, OperationTypes.Any, s => s.EmergencyContactId == default, d => d.Id = default);
+                Map((s, d) => d.FirstName = (string?)s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
+                Map((s, d) => d.LastName = (string?)s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
+                Map((s, d) => d.PhoneNo = (string?)s.PhoneNo, OperationTypes.Any, s => s.PhoneNo == default, d => d.PhoneNo = default);
+                Map((s, d) => d.RelationshipSid = (string?)s.RelationshipTypeCode, OperationTypes.Any, s => s.RelationshipTypeCode == default, d => d.RelationshipSid = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.EmergencyContact s)
-                => s.EmergencyContactId == default
-                && s.FirstName == default
-                && s.LastName == default
-                && s.PhoneNo == default
-                && s.RelationshipTypeCode == default;
         }
     }
 }

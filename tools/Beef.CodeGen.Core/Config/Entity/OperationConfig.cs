@@ -341,6 +341,14 @@ operations: [
             Description = "The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.")]
         public string? ManagerOperationType { get; set; }
 
+        /// <summary>
+        /// Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.
+        /// </summary>
+        [JsonProperty("managerCleanUp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.",
+            Description = "This can be overridden within the `CodeGeneration` and `Entity`.")]
+        public bool? ManagerCleanUp { get; set; }
+
         #endregion
 
         #region DataSvc
@@ -651,7 +659,7 @@ operations: [
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
         /// </summary>
-        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
+        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs && IsTrue(x.Parent!.ManagerCleanUp)).ToList();
 
         /// <summary>
         /// Gets the parameter that is <see cref="ParameterConfig.IsPagingArgs"/>.
@@ -762,6 +770,11 @@ operations: [
         /// Gets the agent operation HTTP method call/invoke statement.
         /// </summary>
         public string AgentOperationHttpMethod => CreateAgentOperationHttpMethod();
+
+        /// <summary>
+        /// Gets tthe agent web api route.
+        /// </summary>
+        public string AgentWebApiRoute => (string.IsNullOrEmpty(Parent!.WebApiRoutePrefix) ? WebApiRoute : $"{Parent!.WebApiRoutePrefix}{(string.IsNullOrEmpty(WebApiRoute) || WebApiRoute.StartsWith("/") ? "" : "/")}{WebApiRoute}") ?? "";
 
         /// <summary>
         /// Gets the gRPC return type.
@@ -1016,6 +1029,7 @@ operations: [
                 _ => HasReturnValue ? "NoContent" : "null"
             });
 
+            ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => Parent!.ManagerCleanUp);
             ManagerOperationType = DefaultWhereNull(ManagerOperationType, () => Type switch
             {
                 "Get" => "Read",
@@ -1283,10 +1297,7 @@ operations: [
                 if (WebApiLocation.StartsWith('^'))
                 {
                     var name = WebApiLocation.Length == 1 ? "Get" : WebApiLocation[1..];
-                    var op = Parent!.Operations!.FirstOrDefault(x => x.Name == name);
-                    if (op == null)
-                        throw new CodeGenException(this, nameof(WebApiLocation), $"Attempt to lookup Operation '{name}' which does not exist.");
-
+                    var op = Parent!.Operations!.FirstOrDefault(x => x.Name == name) ?? throw new CodeGenException(this, nameof(WebApiLocation), $"Attempt to lookup Operation '{name}' which does not exist.");
                     WebApiLocation = op.WebApiRoute;
                     var s = 0;
                     if (WebApiLocation != null)
@@ -1302,10 +1313,7 @@ operations: [
                                 throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' tokens are invalid.");
 
                             var arg = WebApiLocation.Substring(i, j - i + 1);
-                            var p = op.Parameters!.FirstOrDefault(x => x.ArgumentName == arg[1..^1]);
-                            if (p == null)
-                                throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' references Parameter token '{arg}' that does not exist.");
-
+                            var p = op.Parameters!.FirstOrDefault(x => x.ArgumentName == arg[1..^1]) ?? throw new CodeGenException(this, nameof(WebApiLocation), $"Operation '{name}' WebApiRoute '{op.WebApiRoute}' references Parameter token '{arg}' that does not exist.");
                             WebApiLocation = WebApiLocation.Replace(arg, "{r." + p.Name + "}");
                             s = j + 1;
                         }

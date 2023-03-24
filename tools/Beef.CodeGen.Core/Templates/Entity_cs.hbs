@@ -86,7 +86,7 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
     {{#if Parent.OmitEntityBase}}
         public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
     {{else}}
-        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}); }
+        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}, propertyName: nameof({{Name}})); }
     {{/if}}
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
@@ -128,7 +128,7 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
       {{#if Parent.OmitEntityBase}}
         public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
       {{else}}
-        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}); }
+        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}, propertyName: nameof({{Name}})); }
       {{/if}}   
     {{else}}
       {{#if Parent.OmitEntityBase}}

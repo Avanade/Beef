@@ -23,25 +23,16 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.CurrentBalance = s.CurrentBalance);
-                Map((s, d) => d.AvailableBalance = s.AvailableBalance);
-                Map((s, d) => d.CreditLimit = s.CreditLimit);
-                Map((s, d) => d.AmortisedLimit = s.AmortisedLimit);
-                Map((s, d) => d.Currency = s.Currency);
-                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses));
+                Map((s, d) => d.CurrentBalance = s.CurrentBalance, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
+                Map((s, d) => d.AvailableBalance = s.AvailableBalance, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
+                Map((s, d) => d.CreditLimit = s.CreditLimit, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
+                Map((s, d) => d.AmortisedLimit = s.AmortisedLimit, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
+                Map((s, d) => d.Currency = s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Balance s)
-                => s.CurrentBalance == default
-                && s.AvailableBalance == default
-                && s.CreditLimit == default
-                && s.AmortisedLimit == default
-                && s.Currency == default
-                && s.Purses == default;
         }
 
         /// <summary>
@@ -54,25 +45,16 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.CurrentBalance = (decimal)s.CurrentBalance);
-                Map((s, d) => d.AvailableBalance = (decimal)s.AvailableBalance);
-                Map((s, d) => d.CreditLimit = (decimal)s.CreditLimit);
-                Map((s, d) => d.AmortisedLimit = (decimal)s.AmortisedLimit);
-                Map((s, d) => d.Currency = (string?)s.Currency);
-                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses));
+                Map((s, d) => d.CurrentBalance = (decimal)s.CurrentBalance, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
+                Map((s, d) => d.AvailableBalance = (decimal)s.AvailableBalance, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
+                Map((s, d) => d.CreditLimit = (decimal)s.CreditLimit, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
+                Map((s, d) => d.AmortisedLimit = (decimal)s.AmortisedLimit, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
+                Map((s, d) => d.Currency = (string?)s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.Balance s)
-                => s.CurrentBalance == default
-                && s.AvailableBalance == default
-                && s.CreditLimit == default
-                && s.AmortisedLimit == default
-                && s.Currency == default
-                && s.Purses == default;
         }
     }
 }

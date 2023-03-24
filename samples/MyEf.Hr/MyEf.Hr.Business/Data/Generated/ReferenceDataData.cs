@@ -53,25 +53,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public GenderToModelEfMapper()
             {
-                Map((s, d) => d.GenderId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.GenderId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.GenderId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 GenderToModelEfMapperCtor();
             }
 
             partial void GenderToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Gender s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -84,25 +75,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToGenderEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.GenderId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.GenderId, OperationTypes.Any, s => s.GenderId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToGenderEfMapperCtor();
             }
 
             partial void ModelToGenderEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Gender s)
-                => s.GenderId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
 
         /// <summary>
@@ -115,25 +97,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public TerminationReasonToModelEfMapper()
             {
-                Map((s, d) => d.TerminationReasonId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.TerminationReasonId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.TerminationReasonId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 TerminationReasonToModelEfMapperCtor();
             }
 
             partial void TerminationReasonToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(TerminationReason s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -146,25 +119,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToTerminationReasonEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.TerminationReasonId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.TerminationReasonId, OperationTypes.Any, s => s.TerminationReasonId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToTerminationReasonEfMapperCtor();
             }
 
             partial void ModelToTerminationReasonEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.TerminationReason s)
-                => s.TerminationReasonId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
 
         /// <summary>
@@ -177,25 +141,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public RelationshipTypeToModelEfMapper()
             {
-                Map((s, d) => d.RelationshipTypeId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.RelationshipTypeId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.RelationshipTypeId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 RelationshipTypeToModelEfMapperCtor();
             }
 
             partial void RelationshipTypeToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(RelationshipType s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -208,25 +163,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToRelationshipTypeEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.RelationshipTypeId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.RelationshipTypeId, OperationTypes.Any, s => s.RelationshipTypeId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToRelationshipTypeEfMapperCtor();
             }
 
             partial void ModelToRelationshipTypeEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.RelationshipType s)
-                => s.RelationshipTypeId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
 
         /// <summary>
@@ -239,25 +185,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public USStateToModelEfMapper()
             {
-                Map((s, d) => d.USStateId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.USStateId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.USStateId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 USStateToModelEfMapperCtor();
             }
 
             partial void USStateToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(USState s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -270,25 +207,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToUSStateEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.USStateId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.USStateId, OperationTypes.Any, s => s.USStateId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToUSStateEfMapperCtor();
             }
 
             partial void ModelToUSStateEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.USState s)
-                => s.USStateId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
 
         /// <summary>
@@ -301,25 +229,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public PerformanceOutcomeToModelEfMapper()
             {
-                Map((s, d) => d.PerformanceOutcomeId = s.Id);
-                Map((s, d) => d.Code = s.Code);
-                Map((s, d) => d.Text = s.Text);
-                Map((s, d) => d.IsActive = s.IsActive);
-                Map((s, d) => d.SortOrder = s.SortOrder);
-                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag));
+                Map((s, d) => d.PerformanceOutcomeId = s.Id, OperationTypes.Any, s => s.Id == default, d => d.PerformanceOutcomeId = default);
+                Map((s, d) => d.Code = s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
                 PerformanceOutcomeToModelEfMapperCtor();
             }
 
             partial void PerformanceOutcomeToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(PerformanceOutcome s)
-                => s.Id == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.ETag == default;
         }
 
         /// <summary>
@@ -332,25 +251,16 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToPerformanceOutcomeEfMapper()
             {
-                Map((s, d) => d.Id = (Guid)s.PerformanceOutcomeId);
-                Map((s, d) => d.Code = (string?)s.Code);
-                Map((s, d) => d.Text = (string?)s.Text);
-                Map((s, d) => d.IsActive = (bool)s.IsActive);
-                Map((s, d) => d.SortOrder = (int)s.SortOrder);
-                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion));
+                Map((s, d) => d.Id = (Guid)s.PerformanceOutcomeId, OperationTypes.Any, s => s.PerformanceOutcomeId == default, d => d.Id = default);
+                Map((s, d) => d.Code = (string?)s.Code, OperationTypes.Any, s => s.Code == default, d => d.Code = default);
+                Map((s, d) => d.Text = (string?)s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
+                Map((s, d) => d.IsActive = (bool)s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
+                Map((s, d) => d.SortOrder = (int)s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
+                Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
                 ModelToPerformanceOutcomeEfMapperCtor();
             }
 
             partial void ModelToPerformanceOutcomeEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.PerformanceOutcome s)
-                => s.PerformanceOutcomeId == default
-                && s.Code == default
-                && s.Text == default
-                && s.IsActive == default
-                && s.SortOrder == default
-                && s.RowVersion == default;
         }
     }
 }

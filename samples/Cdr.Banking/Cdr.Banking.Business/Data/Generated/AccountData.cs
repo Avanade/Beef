@@ -62,31 +62,19 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public EntityToModelCosmosMapper()
             {
-                Map((s, d) => d.Id = s.Id);
-                Map((s, d) => d.CreationDate = s.CreationDate);
-                Map((s, d) => d.DisplayName = s.DisplayName);
-                Map((s, d) => d.Nickname = s.Nickname);
-                Map((s, d) => d.OpenStatus = s.OpenStatusSid);
-                Map((s, d) => d.IsOwned = s.IsOwned);
-                Map((s, d) => d.MaskedNumber = s.MaskedNumber);
-                Map((s, d) => d.ProductCategory = s.ProductCategorySid);
-                Map((s, d) => d.ProductName = s.ProductName);
+                Map((s, d) => d.Id = s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.CreationDate = s.CreationDate, OperationTypes.Any, s => s.CreationDate == default, d => d.CreationDate = default);
+                Map((s, d) => d.DisplayName = s.DisplayName, OperationTypes.Any, s => s.DisplayName == default, d => d.DisplayName = default);
+                Map((s, d) => d.Nickname = s.Nickname, OperationTypes.Any, s => s.Nickname == default, d => d.Nickname = default);
+                Map((s, d) => d.OpenStatus = s.OpenStatusSid, OperationTypes.Any, s => s.OpenStatusSid == default, d => d.OpenStatus = default);
+                Map((s, d) => d.IsOwned = s.IsOwned, OperationTypes.Any, s => s.IsOwned == default, d => d.IsOwned = default);
+                Map((s, d) => d.MaskedNumber = s.MaskedNumber, OperationTypes.Any, s => s.MaskedNumber == default, d => d.MaskedNumber = default);
+                Map((s, d) => d.ProductCategory = s.ProductCategorySid, OperationTypes.Any, s => s.ProductCategorySid == default, d => d.ProductCategory = default);
+                Map((s, d) => d.ProductName = s.ProductName, OperationTypes.Any, s => s.ProductName == default, d => d.ProductName = default);
                 EntityToModelCosmosMapperCtor();
             }
 
             partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Account s)
-                => s.Id == default
-                && s.CreationDate == default
-                && s.DisplayName == default
-                && s.Nickname == default
-                && s.OpenStatusSid == default
-                && s.IsOwned == default
-                && s.MaskedNumber == default
-                && s.ProductCategorySid == default
-                && s.ProductName == default;
         }
 
         /// <summary>
@@ -99,31 +87,19 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public ModelToEntityCosmosMapper()
             {
-                Map((s, d) => d.Id = (string?)s.Id);
-                Map((s, d) => d.CreationDate = (DateTime)s.CreationDate);
-                Map((s, d) => d.DisplayName = (string?)s.DisplayName);
-                Map((s, d) => d.Nickname = (string?)s.Nickname);
-                Map((s, d) => d.OpenStatusSid = (string?)s.OpenStatus);
-                Map((s, d) => d.IsOwned = (bool)s.IsOwned);
-                Map((s, d) => d.MaskedNumber = (string?)s.MaskedNumber);
-                Map((s, d) => d.ProductCategorySid = (string?)s.ProductCategory);
-                Map((s, d) => d.ProductName = (string?)s.ProductName);
+                Map((s, d) => d.Id = (string?)s.Id, OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+                Map((s, d) => d.CreationDate = (DateTime)s.CreationDate, OperationTypes.Any, s => s.CreationDate == default, d => d.CreationDate = default);
+                Map((s, d) => d.DisplayName = (string?)s.DisplayName, OperationTypes.Any, s => s.DisplayName == default, d => d.DisplayName = default);
+                Map((s, d) => d.Nickname = (string?)s.Nickname, OperationTypes.Any, s => s.Nickname == default, d => d.Nickname = default);
+                Map((s, d) => d.OpenStatusSid = (string?)s.OpenStatus, OperationTypes.Any, s => s.OpenStatus == default, d => d.OpenStatusSid = default);
+                Map((s, d) => d.IsOwned = (bool)s.IsOwned, OperationTypes.Any, s => s.IsOwned == default, d => d.IsOwned = default);
+                Map((s, d) => d.MaskedNumber = (string?)s.MaskedNumber, OperationTypes.Any, s => s.MaskedNumber == default, d => d.MaskedNumber = default);
+                Map((s, d) => d.ProductCategorySid = (string?)s.ProductCategory, OperationTypes.Any, s => s.ProductCategory == default, d => d.ProductCategorySid = default);
+                Map((s, d) => d.ProductName = (string?)s.ProductName, OperationTypes.Any, s => s.ProductName == default, d => d.ProductName = default);
                 ModelToEntityCosmosMapperCtor();
             }
 
             partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.Account s)
-                => s.Id == default
-                && s.CreationDate == default
-                && s.DisplayName == default
-                && s.Nickname == default
-                && s.OpenStatus == default
-                && s.IsOwned == default
-                && s.MaskedNumber == default
-                && s.ProductCategory == default
-                && s.ProductName == default;
         }
     }
 }

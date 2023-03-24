@@ -79,15 +79,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void {{Name}}ToModelEfMapperCtor(); // Enables the constructor to be extended.
-    {{#each EntityFrameworkMapperIsDestinationProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityName}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{DataMapperPropertyName}} == default{{#if @last}};{{/if}}
-    {{/each}}
-        {{#if HasEntityFrameworkChangeLogProperty}}
+    {{#if HasEntityFrameworkChangeLogProperty}}
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
@@ -95,7 +87,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-        {{/if}}
+    {{/if}}
         }
 
         /// <summary>
@@ -115,15 +107,7 @@ namespace {{Root.NamespaceBusiness}}.Data
             }
 
             partial void ModelTo{{Name}}EfMapperCtor(); // Enables the constructor to be extended.
-    {{#each EntityFrameworkMapperIsSourceProperties}}
-      {{#if @first}}
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial({{Parent.EntityFrameworkModel}} s)
-      {{/if}}
-                {{#if @first}}=> {{else}}&& {{/if}}s.{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}} == default{{#if @last}};{{/if}}
-    {{/each}}
-        {{#if HasEntityFrameworkChangeLogProperty}}
+    {{#if HasEntityFrameworkChangeLogProperty}}
 
             /// <inheritdoc/>
             protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
@@ -131,7 +115,7 @@ namespace {{Root.NamespaceBusiness}}.Data
                 .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
                 .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
                 .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-        {{/if}}
+    {{/if}}
         }
     {{/unless}}
   {{/ifeq}}

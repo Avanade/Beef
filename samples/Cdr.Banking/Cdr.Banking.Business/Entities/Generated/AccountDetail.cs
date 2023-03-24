@@ -38,7 +38,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="SpecificAccountUType"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("specificAccountUType")]
-        public string? SpecificAccountUTypeSid { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value); }
+        public string? SpecificAccountUTypeSid { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value, propertyName: nameof(SpecificAccountUType)); }
 
         /// <summary>
         /// Gets or sets the Specific Account U Type (see <see cref="RefDataNamespace.AccountUType"/>).

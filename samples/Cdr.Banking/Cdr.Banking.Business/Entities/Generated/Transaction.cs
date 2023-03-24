@@ -49,7 +49,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="Type"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("type")]
-        public string? TypeSid { get => _typeSid; set => SetValue(ref _typeSid, value); }
+        public string? TypeSid { get => _typeSid; set => SetValue(ref _typeSid, value, propertyName: nameof(Type)); }
 
         /// <summary>
         /// Gets or sets the Type (see <see cref="RefDataNamespace.TransactionType"/>).
@@ -62,7 +62,7 @@ namespace Cdr.Banking.Business.Entities
         /// Gets or sets the <see cref="Status"/> using the underlying Serialization Identifier (SID).
         /// </summary>
         [JsonPropertyName("status")]
-        public string? StatusSid { get => _statusSid; set => SetValue(ref _statusSid, value); }
+        public string? StatusSid { get => _statusSid; set => SetValue(ref _statusSid, value, propertyName: nameof(Status)); }
 
         /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.TransactionStatus"/>).

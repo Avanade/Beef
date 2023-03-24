@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v5.2.0
+- *Enhancement:* The Manager-layer `Clean.CleanUp` is now only performed where explicitly configured; within `CodeGeneration`, `Entity`(s) and/or `Operation`(s) YAML. Cleaning is a feature that is generally infrequently used and is best excluded unless needed.
+- *Enhancement:* Code-generation console logging updated to output the generated endpoints to provide an audit of the generated API surface.
+- *Fixed:* The `CoreEx.Mapping.Mapper` within `CoreEx v2.6.0` resolved initializing nullable destination properties during a `Flatten`; however, this needed additional mapping configuration generated to enable. The generated mapping code was updated to enable, whilst also simplifing generated output, further enabling opportunities to override methods where required.
+- *Fixed:* Entity code generation output updated to assign correct property name (`INotifyPropertyChanged`) for all reference data properties.
+
 ## v5.1.2
 - *Fixed:* The `CodeGenConfig.WarnWhereDeprecated` was checking some incorrectly cased property names.
 - *Fixed:* The `AgentTester<TEntryPoint>` has been updated to allow a parameterless `CreateWaf`, as well as exposing the internal `Parent` property. 

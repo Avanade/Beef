@@ -23,17 +23,12 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EntityToModelHttpAgentMapper()
             {
-                Map((s, d) => d.Name = s.Name);
-                Map((s, d) => d.PostCode = s.PostCode);
+                Map((s, d) => d.Name = s.Name, OperationTypes.Any, s => s.Name == default, d => d.Name = default);
+                Map((s, d) => d.PostCode = s.PostCode, OperationTypes.Any, s => s.PostCode == default, d => d.PostCode = default);
                 EntityToModelHttpAgentMapperCtor();
             }
 
             partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(PlaceInfo s)
-                => s.Name == default
-                && s.PostCode == default;
         }
 
         /// <summary>
@@ -46,17 +41,12 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public ModelToEntityHttpAgentMapper()
             {
-                Map((s, d) => d.Name = (string?)s.Name);
-                Map((s, d) => d.PostCode = (string?)s.PostCode);
+                Map((s, d) => d.Name = (string?)s.Name, OperationTypes.Any, s => s.Name == default, d => d.Name = default);
+                Map((s, d) => d.PostCode = (string?)s.PostCode, OperationTypes.Any, s => s.PostCode == default, d => d.PostCode = default);
                 ModelToEntityHttpAgentMapperCtor();
             }
 
             partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(Model.PlaceInfo s)
-                => s.Name == default
-                && s.PostCode == default;
         }
     }
 }

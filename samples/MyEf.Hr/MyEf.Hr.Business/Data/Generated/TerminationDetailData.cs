@@ -23,17 +23,12 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public EntityToModelEfMapper()
             {
-                Map((s, d) => d.TerminationDate = s.Date);
-                Map((s, d) => d.TerminationReasonCode = s.ReasonSid);
+                Map((s, d) => d.TerminationDate = s.Date, OperationTypes.Any, s => s.Date == default, d => d.TerminationDate = default);
+                Map((s, d) => d.TerminationReasonCode = s.ReasonSid, OperationTypes.Any, s => s.ReasonSid == default, d => d.TerminationReasonCode = default);
                 EntityToModelEfMapperCtor();
             }
 
             partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(TerminationDetail s)
-                => s.Date == default
-                && s.ReasonSid == default;
         }
 
         /// <summary>
@@ -46,17 +41,12 @@ namespace MyEf.Hr.Business.Data
             /// </summary>
             public ModelToEntityEfMapper()
             {
-                Map((s, d) => d.Date = (DateTime)s.TerminationDate);
-                Map((s, d) => d.ReasonSid = (string?)s.TerminationReasonCode);
+                Map((s, d) => d.Date = (DateTime)s.TerminationDate, OperationTypes.Any, s => s.TerminationDate == default, d => d.Date = default);
+                Map((s, d) => d.ReasonSid = (string?)s.TerminationReasonCode, OperationTypes.Any, s => s.TerminationReasonCode == default, d => d.ReasonSid = default);
                 ModelToEntityEfMapperCtor();
             }
 
             partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
-
-            /// <inheritdoc/>
-            public override bool IsSourceInitial(EfModel.Employee s)
-                => s.TerminationDate == default
-                && s.TerminationReasonCode == default;
         }
     }
 }
