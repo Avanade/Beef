@@ -1,4 +1,4 @@
-# `Beef.Database.Core`
+# Beef.Database.Core
 
 The `Beef.Database.Core` tool is a console application provided to automate the management of a relational database as part of the end-to-end development process. 
 
