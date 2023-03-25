@@ -67,12 +67,12 @@ To orchestrate the code generation, in terms of the [Templates](#Templates) to b
 The entity-driven gen-many code generation is enabled by an **Entity** configuration file that is responsible for defining the characteristics used by the code-gen tooling. The hierarchy is as follows:
 
 ```
-└── CodeGeneration
-  └── Entity(s)
-    └── Property(s)
-    └── Const(s)
-    └── Operation(s)
-      └── Parameter(s)
+CodeGeneration
+└── Entity(s)
+  └── Property(s)
+  └── Const(s)
+  └── Operation(s)
+    └── Parameter(s)
 ```
 
 Configuration details for each of the above are as follows:
@@ -98,19 +98,19 @@ There are two additional configuration files that share the same schema:
 The database-driven code generation is enabled by a **Database** configuration file that is responsible for defining the characteristics used by the code-gen tooling. The hierarcy is as follows:
 
 ```
-└── CodeGeneration
-  └── Query(s)
-    └── QueryJoin(s)
-      └── QueryJoinOn(s)
-    └── QueryWhere(s)
-    └── QueryOrder(s)
-  └── Table(s)
-    └── StoredProcedure(s)
-      └── Parameter(s)
-      └── Where(s)
-      └── OrderBy(s)
-      └── Execute(s)
-    └── Relationship(s)
+CodeGeneration
+└── Query(s)
+  └── QueryJoin(s)
+    └── QueryJoinOn(s)
+  └── QueryWhere(s)
+  └── QueryOrder(s)
+└── Table(s)
+  └── StoredProcedure(s)
+    └── Parameter(s)
+    └── Where(s)
+    └── OrderBy(s)
+    └── Execute(s)
+  └── Relationship(s)
 ```
 
 Configuration details for each of the above are as follows:
@@ -129,9 +129,9 @@ Configuration details for each of the above are as follows:
 - Relationship (EF) - [YAML/JSON](../../docs/Database-Relationship-Config.md)
 
 
-The Database configuration supported filenames are, in the order in which they are searched by the code generator: `database.beef.yaml`, `database.beef.json`, `database.beef.xml`, `{Company}.{AppName}.Database.xml`.
+The Database configuration supported filenames are, in the order in which they are searched by the code generator: `database.beef-5.yaml` and `database.beef-5.json`.
 
-The Database configuration is defined by a schema, YAML/JSON-based [database.beef.json](../../tools/Beef.CodeGen.Core/Schema/database.beef.json). The schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
+The Database configuration is defined by a schema, YAML/JSON-based [database.beef-5.json](../../tools/Beef.CodeGen.Core/Schema/database.beef-5.json). The schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
 Finally, this is not intended as an all purpose database schema generation capability. It is expected that the tables pre-exist within the database. The database schema/table catalog information is queried from the database directly during code generation, to be additive to the configuration, to minimise the need to replicate (duplicate) column configuration and require on-going synchronization.
 
@@ -151,10 +151,10 @@ The following commands are available for the console application (the enablement
 
 Command | Description
 -|-
-`Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.xml`](./Scripts/EntityWebApiCoreAgent.yaml) script.
-`RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.xml`](./Scripts/RefDataCoreCrud.yaml) script.
-`Database` | Performs code generation using the _database_ configuration and [`Database.xml`](../Beef.Database.SqlServer/Scripts/Database.yaml) script.
-`DataModel` | Performs code generation using the _data model_ configuration and [`DataModelOnly.xml`](./Scripts/DataModelOnly.yaml) script.
+`Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.yaml`](./Scripts/EntityWebApiCoreAgent.yaml) script.
+`RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.yaml`](./Scripts/RefDataCoreCrud.yaml) script.
+`Database` | Performs code generation using the _database_ configuration and [`Database.yaml`](../Beef.Database.SqlServer/Scripts/Database.yaml) script.
+`DataModel` | Performs code generation using the _data model_ configuration and [`DataModelOnly.yaml`](./Scripts/DataModelOnly.yaml) script.
 `All` | Performs all of the above (where each is supported as per set up).
 
 Additionally, there are a number of command line options that can be used.
@@ -201,9 +201,9 @@ public class Program
 
 To run the console application, simply specify the required command; e.g:
 ```
-dotnet run entity      -- Default filename: Company.AppName.xml
-dotnet run refdata     -- Default filename: Company.RefData.xml
-dotnet run datamodel   -- Default filename: Company.AppName.DataModel.xml
+dotnet run entity      -- Default filename: entity.beef-5.yaml
+dotnet run refdata     -- Default filename: refdata.beef-5.yaml
+dotnet run datamodel   -- Default filename: datamodel.beef-5.yaml
 dotnet run all         -- All of the above (that are supported)
 
 -- Override the configuration filename.
@@ -222,7 +222,7 @@ One or more of the following options exist to enable personalization.
 
 Option | Description
 -|-
-[Config](#Config) | There is currently _no_ means to extend the underlying configuration .NET types directly. However, as all the configuration types inherit from [`ConfigBase`](./Config/ConfigBase.cs) the `ExtraProperties` hash table is populated with any additional configurations during the deserialization process. These values can then be referenced direcly within the Templates as required. To perform further changes to the configuration at runtime an [`IConfigEditor`](./Config/IConfigEditor.cs) can be added and then referenced from within the corresponding `Scripts` file; it will then be invoked prior to the code generation enabling further changes to occur. The `ConfigBase.CustomProperties` hash table is further provided to enable additional properties to be set and referenced in a consistent manner.
+[Config](#Config) | There is currently _no_ means to extend the underlying configuration .NET types directly. However, as all the configuration types inherit from [`ConfigBase`](https://github.com/Avanade/OnRamp/blob/main/src/OnRamp/Config/ConfigBaseT.cs) the `ExtraProperties` hash table is populated with any additional configurations during the deserialization process. These values can then be referenced direcly within the Templates as required. To perform further changes to the configuration at runtime an [`IConfigEditor`](https://github.com/Avanade/OnRamp/blob/main/src/OnRamp/Config/IConfigEditor.cs) can be added and then referenced from within the corresponding `Scripts` file; it will then be invoked prior to the code generation enabling further changes to occur. The `ConfigBase.CustomProperties` hash table is further provided to enable additional properties to be set and referenced in a consistent manner.
 [Templates](#Templates) | Add new [Handlebars](https://handlebarsjs.com/guide/) file, as an embedded resource, to the `Templates` folder (add where not pre-existing) within the project. Where overriding use the same name as that provided out-of-the-box; otherwise, ensure the `Template` is referenced by the `Script`.
 [Scripts](#Scripts) | Add new `Scripts` YAML file, as an embedded resource, to the `Scripts` folder (add where not pre-existing) within the project. Use the `Inherits` attribute where still wanting to execute the out-of-the-box code-generation.
 
@@ -245,6 +245,6 @@ Finally the [`Program.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Program.cs) wi
 return CodeGenConsoleWrapper
     .Create("Beef", "Demo")
     .Supports(entity: true, refData: true, dataModel: true)
-    .EntityScript("TestScript.xml")   // <- Overrides the Script name.
+    .EntityScript("TestScript.yaml")   // <- Overrides the Script name.
     .RunAsync(args);
 ```
