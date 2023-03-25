@@ -107,7 +107,7 @@ For more information see: [code-generation](../../tools/Beef.CodeGen.Core/README
 
 The `Company.AppName.Database` project contains the following:
 - [`database.beef-5.yaml`](./content/Company.AppName.Database/database.beef-5.yaml) - the basic `Person` and `Gender` Entity Framework or Stored Procedure examples are pre-configured; these can either be extended or replaced.
-- [`RefData.xml`](./content/Company.AppName.Database/Data/RefData.yaml) - the example `Gender` data has been preconfigured; these can either be extended or replaced.
+- [`RefData.yaml`](./content/Company.AppName.Database/Data/RefData.yaml) - the example `Gender` data has been preconfigured; these can either be extended or replaced.
 - [`Company.AppName.Database/Migrations`](./content/Company.AppName.Database/Migrations) - the example scripts for creating the requite tables for `Person` and `Gender`; these can either be extended or replaced.
 
 To perform the data generation, first navigate to the directory where the above files reside, then execute the following:
@@ -122,7 +122,7 @@ For more information see: [data-generation](../../tools/Beef.Database.Core/READM
 
 ## Samples
 
-See the following examples for end-to-end usage:
+See the following samples for end-to-end usage:
 - [SQL Server Entity Framework sample](../../docs/Sample-SqlServer-EF-GettingStarted.md)
 - [SQL Server Stored Procedure sample](../../docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
 - [Cosmos sample](../../docs/Sample-Cosmos-GettingStarted.md)
