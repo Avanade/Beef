@@ -159,7 +159,7 @@ The `PerformanceReview` entity and operations configuration is required as follo
       { name: Reviewer },
       { name: Notes },
       { name: ETag },
-      { name: ChangeLog, type: ChangeLog, isEntity: true }
+      { name: ChangeLog, type: ChangeLog }
     ],
     operations: [
       # Operations
