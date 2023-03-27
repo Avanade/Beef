@@ -10,7 +10,7 @@ _Note:_ Any time that command line execution is requested, this should be perfor
 
 ## Entity relationship diagram
 
-The following provides a visual (ERD) for the database tables that will be created. A relationship label of _refers_ indicates a reference data relationship. The _(via JSON)_ implies that the relating entity references via a JSON data column (_not_ a referenced database table). 
+The following provides a visual (ERD) for the database tables that will be created. A relationship label of _refers_ indicates a reference data relationship. The `has-JSON` indicates that the relating entity references via a JSON data column (_not_ a referenced database table). 
 
 ``` mermaid
 erDiagram
@@ -122,7 +122,7 @@ To support the capabilities of the tables above the following Reference Data tab
 - `Hr.RelationshipType`
 - `Hr.USState`
 
-At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `creatref` option specified. No further changes will be needed for these tables.
+At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `refdata` option specified. No further changes will be needed for these tables.
 
 ```
 dotnet run script refdata Hr Gender
@@ -156,11 +156,11 @@ Hr:
 
 To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `efModel: true` attribute. 
 
-Remove all existing configuration from `database.beef.yaml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
+Remove all existing configuration from `database.beef-5.yaml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
 
 ``` yaml
 # Configuring the code-generation global settings
-# - Schema defines the default for al tables unless explicitly defined.
+# - Schema defines the default for all tables unless explicitly defined.
 # - EfModel indicates that an Entity Framework model should be generated for all tables unless specified otherwise.
 # 
 schema: Hr
@@ -247,6 +247,6 @@ This should create migrations script files with names similar as follows (as wel
 
 ## Conclusion
 
-At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter (TVP). 
+At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite event outbox enqueue/dequeue capabilities. 
 
 Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.

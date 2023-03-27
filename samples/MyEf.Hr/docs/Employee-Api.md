@@ -66,14 +66,13 @@ First up, the entities need to be defined (configured) within the `entity.beef-5
 - `Address` - this represents the employees' address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
 - `EmergencyContact` - this represents the collection of emergency contacts for an employee. 
 
-Replace the existing `entity.beef.yaml` with the following. The comments included are intended to describe the usage and why certain attributes have been specified.
+Replace the existing `entity.beef-5.yaml` with the following. The comments included are intended to describe the usage and why certain attributes have been specified.
 
 ``` yaml
 # Configuring the code-generation global settings
 # - RefDataText generates a corresponding reference data text property for '$text=true' output.
-# - WebApiAutoLocation indicate to set the HTTP response location for a create.
 # - WebApiRoutrePrefix will prefix/prepend all route Entity and Operation routes with specified value.
-# - DatabaseSchema defaults the database schema name.
+# - WebApiAutoLocation indicates to automatically set the HTTP response location for a create.
 # - EventSubjectRoot specifies the root for the event subject.
 # - EventSourceRoot specifies the root for the event source.
 # - EventSourceKind will be a relative path URI.
@@ -82,7 +81,6 @@ Replace the existing `entity.beef.yaml` with the following. The comments include
 refDataText: true
 webApiRoutePrefix: ''
 webApiAutoLocation: true
-databaseSchema: Hr
 eventSubjectRoot: MyEf
 eventSourceRoot: MyEf/Hr
 eventSourceKind: Relative

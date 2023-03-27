@@ -1,5 +1,5 @@
 # Configuring the code-generation global settings
-# - Schema defines the default for al tables unless explicitly defined.
+# - Schema defines the default for all tables unless explicitly defined.
 # - Outbox indicates whether events will publish using the outbox pattern and therefore the event outbox artefacts are required.
 # - EfModel indicates that an Entity Framework model should be generated for all tables unless specified otherwise.
 # 

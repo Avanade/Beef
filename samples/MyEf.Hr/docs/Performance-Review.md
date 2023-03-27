@@ -78,7 +78,7 @@ Now that the Reference Data table exists it will need to be populated. Append th
 For the performance review, Entity Framework will be used exclusively to support the full CRUD capabilities. Append the following after the other reference data tables within the `database.beef-5.yaml`.
 
 ``` yaml
-- { name: PerformanceOutcome, efModel: true }
+- name: PerformanceOutcome
 ```
 
 Add the additional relationship to the `Employee` table by replacing existing configuration.
@@ -206,7 +206,7 @@ public partial class PerformanceReviewData
 {
     partial void PerformanceReviewDataCtor()
     {
-        _getByEmployeeIdOnQuery = (q_, employeeId) => q_.Where(x => x.EmployeeId == employeeId).OrderByDescending(x => x.Date);
+        _getByEmployeeIdOnQuery = (q, employeeId) => q.Where(x => x.EmployeeId == employeeId).OrderByDescending(x => x.Date);
     }
 }
 ```

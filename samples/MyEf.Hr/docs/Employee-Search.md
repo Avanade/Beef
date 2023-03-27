@@ -28,7 +28,7 @@ Endpoint | Description
 
 ## Data repository
 
-During the initial database set up process the `Employee` table (with a subset of columns) was enabled via code-generation leveraging an Entity Framework model class. This will be used to perform the query operations so that we can leverage .NET's LINQ-style query filtering and sorting.
+During the initial database set up process the `Employee` table was enabled via code-generation leveraging an Entity Framework model class. This will be used to perform the query operations so that we can leverage .NET's LINQ-style query filtering and sorting.
 
 <br/>
 
@@ -63,8 +63,8 @@ The requisite `GetByArgs` operation needs to be added to the `Employee` entity c
       # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
       # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
       # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
-      # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
       # - EntityFrameworkModel needs to be specified as it can not be inferred from the entity itself. 
+      # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
       { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee,
         parameters: [
           { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }

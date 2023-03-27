@@ -14,7 +14,7 @@ The employee termination will only terminate an existing employee under certain 
 
 ## Data repository
 
-No additional data repository effort is required as the intent is to reuse what already exists; specifically the `Update` stored procedure that already exposes the termination related columns.
+No additional data repository effort is required as the intent is to reuse what already exists; specifically the `Employee` table already exposes the termination related columns.
 
 <br/>
 

@@ -1,5 +1,4 @@
 webapiRoutePrefix: ref
-databaseSchema: Hr
 entities:
 - { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
 - { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
