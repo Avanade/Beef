@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.2.1
+- *Fixed:* Upgraded `DbEx` to `v2.3.4`; this included fix to assembly management/probing that required minor internal change to enable correctly within `SqlServerMigration` and `MySqlMigration`.
+
 ## v5.2.0
 - *Enhancement:* The Manager-layer `Clean.CleanUp` is now only performed where explicitly configured; within `CodeGeneration`, `Entity`(s) and/or `Operation`(s) YAML. Cleaning is a feature that is generally infrequently used and is best excluded unless needed.
 - *Enhancement:* Code-generation console logging updated to output the generated endpoints to provide an audit of the generated API surface.

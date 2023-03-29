@@ -81,7 +81,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.2.0"
+        "value": "5.2.1"
       },
       "replaces": "BeefVersion"
     },

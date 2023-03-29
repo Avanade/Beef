@@ -22,10 +22,8 @@ namespace Beef.Database.MySql
 
             // Add in the beef schema stuff where requested.
             if (args.BeefSchema)
-            {
-                if (!args.Assemblies.Contains(typeof(MySqlMigration).Assembly))
-                    args.Assemblies.Add(typeof(MySqlMigration).Assembly);
-            }
+                args.AddAssemblyAfter(typeof(DbEx.MySql.Migration.MySqlMigration).Assembly, typeof(MySqlMigration).Assembly);
+
         }
 
         /// <summary>

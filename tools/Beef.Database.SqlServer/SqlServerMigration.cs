@@ -26,8 +26,7 @@ namespace Beef.Database.SqlServer
                 if (!args.SchemaOrder.Contains("dbo"))
                     args.SchemaOrder.Insert(0, "dbo");
 
-                if (!args.Assemblies.Contains(typeof(SqlServerMigration).Assembly))
-                    args.Assemblies.Add(typeof(SqlServerMigration).Assembly);
+                args.AddAssemblyAfter(typeof(DbEx.SqlServer.Migration.SqlServerMigration).Assembly, typeof(SqlServerMigration).Assembly);
             }
         }
 
