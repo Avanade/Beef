@@ -39,6 +39,11 @@ namespace Beef.Test.NUnit
         private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername! ?? throw new InvalidOperationException($"{nameof(DefaultUsername)} must not be null.") };
         internal static readonly Dictionary<Type, Type> _webApiAgentArgsTypes = new Dictionary<Type, Type>() { { typeof(IWebApiAgentArgs), typeof(WebApiAgentArgs) } };
 
+        /// <summary>
+        /// Static constructor; override the default JSON Serializer.
+        /// </summary>
+        static TestSetUp() => CoreEx.Json.JsonSerializer.Default = new CoreEx.Newtonsoft.Json.JsonSerializer();
+
         #region Setup
 
         /// <summary>

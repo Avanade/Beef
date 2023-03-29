@@ -16,9 +16,6 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PostalInfoTest : UsingAgentTesterServer<Startup>
     {
-        [OneTimeSetUp]
-        public void OneTimeSetUp() => CoreEx.Json.JsonSerializer.Default = new CoreEx.Newtonsoft.Json.JsonSerializer();
-
         [Test, TestSetUp(needsSetUp: false)]
         public void B110_GetPostCodes_NotFound()
         {
