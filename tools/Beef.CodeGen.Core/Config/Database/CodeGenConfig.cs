@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using DbEx.Schema;
+using DbEx.DbSchema;
+using DbEx;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -506,8 +507,8 @@ namespace Beef.CodeGen.Config.Database
             var cs = CodeGenArgs?.ConnectionString ?? throw new CodeGenException("Connection string must be specified via an environment variable or as a command-line option.");
 
             var sw = Stopwatch.StartNew();
-            using var db = new DbEx.Database<SqlConnection>(() => new SqlConnection(cs));
-            DbTables = await db.SelectSchemaAsync().ConfigureAwait(false);
+            using var db = new CoreEx.Database.SqlServer.SqlServerDatabase(() => new SqlConnection(cs));
+            DbTables = await db.SelectSchemaAsync(new DbEx.SqlServer.SqlServerSchemaConfig("X")).ConfigureAwait(false);
 
             sw.Stop();
             CodeGenArgs?.Logger?.Log(LogLevel.Information, $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");

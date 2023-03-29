@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.Diagnostics;
+using DbEx;
 using DbEx.Migration;
-using DbEx.Migration.SqlServer;
+using DbEx.SqlServer.Migration;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using OnRamp.Console;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Beef.Database.Core
@@ -15,7 +16,7 @@ namespace Beef.Database.Core
     /// <summary>
     /// Represents the database executor.
     /// </summary>
-    public class DatabaseExecutor : SqlServerMigrator
+    public class DatabaseExecutor : SqlServerMigration
     {
         private readonly DatabaseExecutorArgs _args;
         private readonly bool _codeGen = false;
@@ -26,7 +27,7 @@ namespace Beef.Database.Core
         /// <param name="args">The <see cref="DatabaseExecutorArgs"/>.</param>
         /// <returns>The return code; zero equals success.</returns>
         public static async Task<int> RunAsync(DatabaseExecutorArgs args)
-        { 
+        {
             if (args.UseBeefDbo && !args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
                 args.Assemblies.Insert(0, typeof(DatabaseConsole).Assembly);
 
@@ -36,23 +37,23 @@ namespace Beef.Database.Core
         /// <summary>
         /// Private constructor.
         /// </summary>
-        private DatabaseExecutor(DatabaseExecutorArgs args) : base(args.ConnectionString!, ConvertMigrationCommand(args.Command, args.SupportedCommands), args.Logger ?? new ConsoleLogger(), args.Assemblies.ToArray())
+        private DatabaseExecutor(DatabaseExecutorArgs args) : base(new MigrationArgs(ConvertMigrationCommand(args.Command, args.SupportedCommands), args.ConnectionString) { Logger = args.Logger ?? new ConsoleLogger() }.AddAssembly(args.Assemblies.ToArray()))  //args.ConnectionString!, ConvertMigrationCommand(args.Command, args.SupportedCommands), args.Logger ?? new ConsoleLogger(), args.Assemblies.ToArray())
         {
             _args = args;
             if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
                 _codeGen = true;
 
-            ParserArgs.RefDataColumnDefaults.TryAdd("IsActive", _ => true);
-            ParserArgs.RefDataColumnDefaults.TryAdd("SortOrder", i => i);
+            Args.DataParserArgs.RefDataColumnDefaults.TryAdd("IsActive", _ => true);
+            Args.DataParserArgs.RefDataColumnDefaults.TryAdd("SortOrder", i => i);
         }
 
         /// <inheritdoc/>
-        public override async Task<bool> MigrateAsync()
+        public override async Task<bool> MigrateAsync(CancellationToken cancellationToken = default)
         {
             if (_args.Command.HasFlag(DatabaseExecutorCommand.Execute))
             {
                 if (_args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Execute))
-                    return await ExecuteSqlStatementsAsync(_args.ExecuteStatements?.ToArray() ?? Array.Empty<string>()).ConfigureAwait(false);
+                    return await ExecuteSqlStatementsAsync(_args.ExecuteStatements?.ToArray() ?? Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
                 else
                 {
                     Logger?.LogInformation(string.Empty);
@@ -64,7 +65,7 @@ namespace Beef.Database.Core
             if (_args.Command.HasFlag(DatabaseExecutorCommand.Script))
             {
                 if (_args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Script))
-                    return await CreateScriptAsync(_args.ScriptName, _args.ScriptArguments).ConfigureAwait(false);
+                    return await CreateScriptAsync(_args.ScriptName, _args.ScriptArguments, cancellationToken).ConfigureAwait(false);
                 else
                 {
                     Logger?.LogInformation(string.Empty);
@@ -73,7 +74,7 @@ namespace Beef.Database.Core
                 }
             }
 
-            return await base.MigrateAsync().ConfigureAwait(false);
+            return await base.MigrateAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -84,7 +85,7 @@ namespace Beef.Database.Core
 
             CodeGenStatistics stats = null!;
 
-            return await CommandExecuteAsync("DATABASE CODEGEN: Code-gen database objects...", async () =>
+            return await CommandExecuteAsync("DATABASE CODEGEN: Code-gen database objects...", async _ =>
             {
                 var cga = new OnRamp.CodeGeneratorArgs();
                 cga.CopyFrom(_args);
@@ -112,7 +113,7 @@ namespace Beef.Database.Core
                     _args.Logger?.LogError(string.Empty);
                     return false;
                 }
-            }, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}").ConfigureAwait(false);
+            }, () => $", Files: Unchanged = {stats.NotChangedCount}, Updated = {stats.UpdatedCount}, Created = {stats.CreatedCount}, TotalLines = {stats.LinesOfCodeCount}", CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>

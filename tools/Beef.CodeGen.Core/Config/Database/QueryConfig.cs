@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using DbEx.Schema;
+using DbEx.DbSchema;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
@@ -489,7 +489,7 @@ queries:
         /// </summary>
         private void UpdateViewMetadata()
         {
-            var dt = new DbTableSchema(ViewSchema!, ViewName!) { IsAView = true };
+            var dt = new DbTableSchema(new DbEx.SqlServer.SqlServerSchemaConfig("X"), ViewSchema!, ViewName!) { IsAView = true };
             foreach (var c in SelectedColumns)
             {
                 var dc = new DbColumnSchema(dt, c.NameAlias!, c.DbColumn!.Type);

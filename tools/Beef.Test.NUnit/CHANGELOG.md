@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.9
+- Updated internal `CoreEx.Newtonsoft` and `UnitTestEx.NUnit` internal references. This resulted in the need to remove `int.ToGuid()` and `string.ToLongString()` extension methods from _Beef_ as these are duplicated within `UnitTestEx`; a compile error will occur if there is no `using System;` namespace statement in the code file, this is now required to reference correctly.
+
 ## v4.2.8
 - *Issue [200](https://github.com/Avanade/Beef/issues/200):* Added `reloadOnChange` parameter to `AgentTester.ConfigurationBuilder<TStartup>`; defaults to `true` to keep current behaviour. 
 

@@ -282,7 +282,7 @@ namespace My.Hr.Test.Apis
                 LastName = "Smith",
                 Gender = "F",
                 Birthday = new DateTime(1955, 10, 28),
-                StartDate = DateTime.Today,
+                StartDate = Cleaner.Clean(DateTime.Today, DateTimeTransform.DateOnly),
                 PhoneNo = "(456) 789 0123",
                 Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", State = "WA", PostCode = "98101" },
                 EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
