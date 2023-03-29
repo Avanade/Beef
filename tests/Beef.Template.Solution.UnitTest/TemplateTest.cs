@@ -94,7 +94,7 @@ namespace Beef.Template.Solution.UnitTest
             Assert.GreaterOrEqual(0, ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} -configuration 'Debug' -IncludeSymbols -IncludeSource").exitCode, "nuget publish");
 
             // Uninstall any previous beef templates (failure is ok here)
-            ExecuteCommand("dotnet", "new -u beef.template.solution");
+            ExecuteCommand("dotnet", "new uninstall beef.template.solution");
 
             // Determine the "actual" version to publish so we are explicit.
             var pf = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish"), "Beef.Template.Solution.*.nupkg").FirstOrDefault();
@@ -102,7 +102,7 @@ namespace Beef.Template.Solution.UnitTest
 
             // Install the Beef template solution from local package.
             // dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new -i beef.template.solution::{new FileInfo(pf).Name[23..^6]} --nuget-source {nugets}").exitCode, "install beef.template.solution");
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new install beef.template.solution::{new FileInfo(pf).Name[23..^6]} --nuget-source {nugets}").exitCode, "install beef.template.solution");
         }
 
         [Test]
