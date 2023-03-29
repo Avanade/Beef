@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.Diagnostics;
 using DbEx;
 using DbEx.Migration;
 using DbEx.SqlServer.Migration;
@@ -28,7 +27,7 @@ namespace Beef.Database.Core
         /// <param name="args">The <see cref="DatabaseExecutorArgs"/>.</param>
         /// <returns>The return code; zero equals success.</returns>
         public static async Task<int> RunAsync(DatabaseExecutorArgs args)
-        { 
+        {
             if (args.UseBeefDbo && !args.Assemblies.Contains(typeof(DatabaseConsole).Assembly))
                 args.Assemblies.Insert(0, typeof(DatabaseConsole).Assembly);
 

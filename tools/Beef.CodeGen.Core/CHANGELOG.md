@@ -3,7 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v4.2.20
-- *Fixed:* Upgraded `DbEx` from version `1.0.5` to `2.3.3` (latest).
+- *Fixed:* Upgraded `DbEx` from version `1.0.5` to `2.3.4` (latest, no longer constrained to older version).
 
 ## v4.2.19
 - *Issue [193](https://github.com/Avanade/Beef/issues/193):* The `OmitEntityBase` option is now correctly actioned during the code-generation of entities.

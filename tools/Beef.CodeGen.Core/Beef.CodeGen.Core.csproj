@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.2.20-preview2</Version>
+    <Version>4.2.20</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -158,7 +158,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbEx.SqlServer" Version="2.3.3" />
+    <PackageReference Include="DbEx.SqlServer" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@ using Beef.Test.NUnit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using System;
 using System.Net;
 
 namespace Beef.Demo.Test

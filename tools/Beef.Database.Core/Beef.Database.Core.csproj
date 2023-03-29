@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>4.2.7-preview2</Version>
+    <Version>4.2.7</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DbEx.SqlServer" Version="2.3.3" />
+    <PackageReference Include="DbEx.SqlServer" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup>

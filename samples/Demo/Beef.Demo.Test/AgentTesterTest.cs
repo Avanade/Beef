@@ -3,6 +3,7 @@ using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using NUnit.Framework;
+using System;
 using System.Net;
 
 namespace Beef.Demo.Test

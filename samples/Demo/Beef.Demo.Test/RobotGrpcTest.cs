@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Beef.Demo.Api;
+using System;
 
 namespace Beef.Demo.Test
 {
