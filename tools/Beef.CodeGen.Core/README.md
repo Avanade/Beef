@@ -79,7 +79,7 @@ Configuration details for each of the above are as follows:
 - `CodeGeneration` - [YAML/JSON](../../docs/Entity-CodeGeneration-Config.md)
 - `Entity` - [YAML/JSON](../../docs/Entity-Entity-Config.md)
 - `Property` - [YAML/JSON](../../docs/Entity-Property-Config.md)
-- `Const` - [YAML/JSON](../../docs/Entity-Const-Config.md) or [XML]
+- `Const` - [YAML/JSON](../../docs/Entity-Const-Config.md)
 - `Operation` - [YAML/JSON](../../docs/Entity-Operation-Config.md)
 - `Parameter` - [YAML/JSON](../../docs/Entity-Parameter-Config.md)
 
