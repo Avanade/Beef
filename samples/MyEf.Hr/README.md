@@ -65,7 +65,7 @@ Endpoint | Description
 
 This solution should be created using the solution [template](../../templates/Beef.Template.Solution/README.md) capability, following the getting started [guide](../../docs/Sample-SqlServer-EF-GettingStarted.md).
 
-The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is _highly recommended_ that the `My.Hr` naming convention below is used.
+The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is _highly recommended_ that the `MyEf.Hr` naming convention below is used.
 
 ```
 dotnet new install beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
