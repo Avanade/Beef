@@ -74,7 +74,7 @@ cd MyEf.Hr
 dotnet new beef --company MyEf --appname Hr --datasource SqlServer
 ```
 
-The following solution structure will have been generated. Open `My.Hr.sln` in Visual Studio.
+The following solution structure will have been generated. Open `MyEf.Hr.sln` in Visual Studio.
 
 ```
 └── MyEf.Hr               # Solution that references all underlying projects
