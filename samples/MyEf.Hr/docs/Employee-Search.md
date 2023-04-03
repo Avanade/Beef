@@ -92,7 +92,7 @@ For query operations generally we do not implement using the custom `*OnImplemen
 
 Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
 
-Add the following code to the top of the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created. The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of `IgnoreAutoIncludes` to avoid the cost of loading related data that is not needed for this query. 
+Add the following code to the top of the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created. The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of [`IgnoreAutoIncludes`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.ignoreautoincludes) (a standard Entity Framework capability) to avoid the cost of loading related data that is not needed for this query. 
 
 ``` csharp
 partial void EmployeeDataCtor()
