@@ -88,7 +88,7 @@ This logic must be implemented by the developer in a non-generated `partial` cla
 
 This new `EmployeeData.cs` (non-generated) logic will need to be extended to support the new `GetByArgs`. 
 
-For query operations generally we do not implement using the custom `*OnImplementation` approach; as the primary code, with the exception of the actual search criteria can be generated successfully. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
+For query operations generally we do not implement using the custom `*OnImplementation` approach; as the primary code, with the exception of the actual search criteria can be generated successfully. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is passed, or needs to be applied, as _Beef_ will apply this automatically.
 
 Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
 
