@@ -138,19 +138,19 @@ parameters: [
         public string? Validator { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
-        /// </summary>
-        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
-            Description = "Defaults to `IValidatorEx<{Type}>` where the `{Type}` is `Type`.")]
-        public string? IValidator { get; set; }
-
-        /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
         /// </summary>
         [JsonProperty("validatorCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Manager", Title = "The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).")]
         public string? ValidatorCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `Validation` framework. 
+        /// </summary>
+        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+            Description = "Defaults to `Operation.ValidationFramework`.")]
+        public string? ValidationFramework { get; set; }
 
         /// <summary>
         /// Indicates whether a <see cref="ValidationException"/> should be thrown when the parameter value has its default value (null, zero, etc).
@@ -296,10 +296,10 @@ parameters: [
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !DotNet.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
-            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidatorEx<{Type}>" : null);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverter = PropertyConfig.ReformatDataConverter(DataConverter, Type, RefDataType, null).DataConverter;
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
+            ValidationFramework = DefaultWhereNull(ValidationFramework, () => Parent!.ValidationFramework);
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
             if (Type!.StartsWith("^"))
@@ -318,7 +318,7 @@ parameters: [
                 _ => null
             };
 
-            CodeGenConfig.WarnWhereDeprecated(Root!, this, "dataConverterIsGeneric");
+            CodeGenConfig.WarnWhereDeprecated(Root!, this, "dataConverterIsGeneric", "ivalidator");
 
             return Task.CompletedTask;
         }

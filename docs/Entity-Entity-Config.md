@@ -175,6 +175,7 @@ Property | Description
 **`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `identifierGenerator` | Indicates whether the `IIdentifierGenerator` should be used to generate the `Id` property where the operation types (`Operation.Type`) is `Create`.
 `managerCleanUp` | Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.<br/>&dagger; This can be overridden within the `CodeGeneration` and `Operation`(s).
+`validationFramework` | The `Validation` framework to use for the entity-based validation. Valid options are: `CoreEx`, `FluentValidation`.<br/>&dagger; Defaults to `CodeGeneration.ValidationFramework`. This can be overridden within the `Operation`(s) and `Parameter`(s).
 
 <br/>
 

@@ -1,6 +1,7 @@
 ﻿using Beef.Demo.Common.Agents;
 using CoreEx.Database;
 using CoreEx.Events;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using AzCosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Api
@@ -41,7 +42,8 @@ namespace Beef.Demo.Api
                     .AddReferenceDataContentWebApi()
                     .AddRequestCache()
                     .AddValidationTextProvider()
-                    .AddValidators<PersonManager>();
+                    .AddValidators<PersonManager>()
+                    .AddFluentValidators<PersonManager>();
 
             // Add the data sources as singletons for dependency injection requirements.
             //services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))

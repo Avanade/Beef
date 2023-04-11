@@ -731,6 +731,14 @@ entities:
             Description = "This can be overridden within the `CodeGeneration` and `Operation`(s).")]
         public bool? ManagerCleanUp { get; set; }
 
+        /// <summary>
+        /// Gets or sets the `Validation` framework. 
+        /// </summary>
+        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+            Description = "Defaults to `CodeGeneration.ValidationFramework`. This can be overridden within the `Operation`(s) and `Parameter`(s).")]
+        public string? ValidationFramework { get; set; }
+
         #endregion
 
         #region WebApi
@@ -1356,6 +1364,7 @@ entities:
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => Parent!.ManagerCleanUp);
+            ValidationFramework = DefaultWhereNull(ValidationFramework, () => Parent!.ValidationFramework);
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => Parent!.WebApiAutoLocation);

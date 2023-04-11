@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.3.0
+- *Enhancement:* Added new code-generation configuration property `ValidationFramework` that supports either `CoreEx` (default) or `FluentValidation` (uses the `CoreEx.FluentValidation` interop wrapping capabilities) to allow entity validation to be performed using either framework. Supports mix-and-matching where required. The `CoreEx.Validation` framework is still leveraged for `IsMandatory` and `ValidatorCode` logic where specified.
+
 ## v5.2.1
 - *Fixed:* Upgraded `DbEx` to `v2.3.4`; this included fix to assembly management/probing that required minor internal change to enable correctly within `SqlServerMigration` and `MySqlMigration`.
 

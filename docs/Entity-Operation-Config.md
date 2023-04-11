@@ -122,6 +122,7 @@ Property | Description
 **`managerCustom`** | Indicates whether the `Manager` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `managerTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer.
 **`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Defaults to the `Entity.Validator` where not specified explicitly (where `Operation.Type` options `Create` or `Update`).
+`validationFramework` | The `Validation` framework to use for the entity-based validation. Valid options are: `CoreEx`, `FluentValidation`.<br/>&dagger; Defaults to `Entity.ValidationFramework`. This can be overridden within the `Parameter`(s).
 `managerOperationType` | The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer. Valid options are: `Create`, `Read`, `Update`, `Delete`, `Unspecified`.<br/>&dagger; The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.
 `managerCleanUp` | Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.<br/>&dagger; This can be overridden within the `CodeGeneration` and `Entity`.
 
