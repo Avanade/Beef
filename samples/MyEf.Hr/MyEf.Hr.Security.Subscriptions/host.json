@@ -1,0 +1,24 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
+    },
+    "logLevel": {
+      "CoreEx.Azure.ServiceBus.ServiceBusSubscriber": "Information"
+    }
+  },
+  "extensions": {
+    "serviceBus": {
+      "prefetchCount": 0,
+      "messageHandlerOptions": {
+        "autoComplete": false,
+        "maxConcurrentCalls": 1,
+        "maxAutoRenewDuration": "00:05:00"
+      }
+    }
+  }
+}

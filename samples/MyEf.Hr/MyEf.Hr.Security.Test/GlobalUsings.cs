@@ -1,0 +1,10 @@
+global using NUnit.Framework;
+global using CoreEx.Events;
+global using Microsoft.Azure.WebJobs.ServiceBus;
+global using Moq;
+global using MyEf.Hr.Common.Entities;
+global using MyEf.Hr.Security.Subscriptions;
+global using NUnit.Framework.Internal;
+global using System.Net;
+global using UnitTestEx.Expectations;
+global using UnitTestEx.NUnit;

@@ -138,7 +138,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5BA9A863-C
 		samples\MyEf.Hr\docs\Employee-Search.md = samples\MyEf.Hr\docs\Employee-Search.md
 		samples\MyEf.Hr\docs\Employee-Terminate.md = samples\MyEf.Hr\docs\Employee-Terminate.md
 		samples\MyEf.Hr\docs\Employee-Test.md = samples\MyEf.Hr\docs\Employee-Test.md
+		samples\MyEf.Hr\docs\Event-Driven-Architecture.png = samples\MyEf.Hr\docs\Event-Driven-Architecture.png
 		samples\MyEf.Hr\docs\Performance-Review.md = samples\MyEf.Hr\docs\Performance-Review.md
+		samples\MyEf.Hr\docs\Service-Bus-Publish.md = samples\MyEf.Hr\docs\Service-Bus-Publish.md
+		samples\MyEf.Hr\docs\Service-Bus-Subscribe.md = samples\MyEf.Hr\docs\Service-Bus-Subscribe.md
+		samples\MyEf.Hr\docs\Transactional-Outbox.md = samples\MyEf.Hr\docs\Transactional-Outbox.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{FDBFD331-A9EB-42BF-B501-8398A04955A7}"
@@ -189,6 +193,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{6739CF
 		docs\images\Logo64x64.png = docs\images\Logo64x64.png
 		docs\images\LogoPill.png = docs\images\LogoPill.png
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{D9DF805A-DD48-4036-B383-F1BC895C317C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyEf.Hr.Security.Subscriptions", "samples\MyEf.Hr\MyEf.Hr.Security.Subscriptions\MyEf.Hr.Security.Subscriptions.csproj", "{EB2AD65F-BE16-4334-BFBE-719A88D118D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyEf.Hr.Security.Test", "samples\MyEf.Hr\MyEf.Hr.Security.Test\MyEf.Hr.Security.Test.csproj", "{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -320,6 +330,14 @@ Global
 		{8799923D-ECBA-4FAF-84F0-30E7F9C0E3E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8799923D-ECBA-4FAF-84F0-30E7F9C0E3E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8799923D-ECBA-4FAF-84F0-30E7F9C0E3E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB2AD65F-BE16-4334-BFBE-719A88D118D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB2AD65F-BE16-4334-BFBE-719A88D118D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB2AD65F-BE16-4334-BFBE-719A88D118D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB2AD65F-BE16-4334-BFBE-719A88D118D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -371,6 +389,9 @@ Global
 		{4EE60769-8A32-4B61-B54B-3CEE0C11E93F} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
 		{5BA9A863-C057-46D5-8139-6353ACCCAA0A} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
 		{6739CF51-CAB1-4DD9-A98B-6E1EDED5BFE1} = {FDBFD331-A9EB-42BF-B501-8398A04955A7}
+		{D9DF805A-DD48-4036-B383-F1BC895C317C} = {5FC1E59C-A8C9-4CD7-9DAB-344E877BE8EC}
+		{EB2AD65F-BE16-4334-BFBE-719A88D118D7} = {D9DF805A-DD48-4036-B383-F1BC895C317C}
+		{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257} = {D9DF805A-DD48-4036-B383-F1BC895C317C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42D71086-61E6-4D31-B4B8-BFC8CC471428}

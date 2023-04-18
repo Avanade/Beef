@@ -1,4 +1,4 @@
-﻿# My.Hr APIs
+﻿# My.Hr
 
 The purpose of this sample is to demonstrate the usage of _Beef_ (and [_CoreEx_](https://github.com/Avanade/CoreEx) runtime) within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
 

@@ -8,6 +8,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Data.SqlClient;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
+global using System;
 global using System.Net;
 global using System.Reflection;
 global using MyEf.Hr.Business;
