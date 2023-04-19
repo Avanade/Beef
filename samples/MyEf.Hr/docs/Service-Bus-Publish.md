@@ -110,7 +110,7 @@ public string StorageConnectionString => GetRequiredValue<string>("ConnectionStr
 
 <br/>
 
-The corresponding [`appsettings.json`](../MyEf.Hr.Api/appsettings.json) also needs to be updated to provide the requisite configuration; replace the existing JSON with the following. The '*' within denotes that the configuration setting are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `HrSettings` properties.
+The corresponding [`appsettings.json`](../MyEf.Hr.Api/appsettings.json) also needs to be updated to provide the requisite configuration; replace the existing JSON with the following. The '*' within denotes that the configuration settings are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `HrSettings` properties.
 
 Setting | Description
 -|-

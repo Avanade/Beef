@@ -10,7 +10,7 @@ public class EmployeeTerminatedSubscriberTest
         var actionsMock = new Mock<ServiceBusMessageActions>();
         var message = test.CreateServiceBusMessage(new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = null! });
 
-        test.ServiceBusTrigger<SubscribingFunction>()
+        test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Value is required")
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertSuccess();
@@ -26,7 +26,7 @@ public class EmployeeTerminatedSubscriberTest
         var actionsMock = new Mock<ServiceBusMessageActions>();
         var message = test.CreateServiceBusMessage(new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee() });
 
-        test.ServiceBusTrigger<SubscribingFunction>()
+        test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("A data validation error occurred")
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertSuccess();
@@ -48,7 +48,7 @@ public class EmployeeTerminatedSubscriberTest
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
         test.ReplaceHttpClientFactory(mcf)
-            .ServiceBusTrigger<SubscribingFunction>()
+            .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("email bob@email.com not found", "[Source: Subscriber, Handling: CompleteWithWarning]")
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertSuccess();
@@ -71,7 +71,7 @@ public class EmployeeTerminatedSubscriberTest
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
         test.ReplaceHttpClientFactory(mcf)
-            .ServiceBusTrigger<SubscribingFunction>()
+            .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Retry - Service Bus message", "[AuthenticationError]")
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertException<EventSubscriberException>();
@@ -98,7 +98,7 @@ public class EmployeeTerminatedSubscriberTest
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
         test.ReplaceHttpClientFactory(mcf)
-            .ServiceBusTrigger<SubscribingFunction>()
+            .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Retry - Service Bus message", "[TransientError]")
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertException<EventSubscriberException>();
@@ -121,7 +121,7 @@ public class EmployeeTerminatedSubscriberTest
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
         test.ReplaceHttpClientFactory(mcf)
-            .ServiceBusTrigger<SubscribingFunction>()
+            .ServiceBusTrigger<SecuritySubscriberFunction>()
             .Run(f => f.RunAsync(message, actionsMock.Object))
             .AssertSuccess();
 

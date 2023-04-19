@@ -1,8 +1,8 @@
 ﻿namespace MyEf.Hr.Security.Subscriptions;
 
-public class OktaHttpClient : TypedHttpClientCore<OktaHttpClient>
+public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
 {
-    public OktaHttpClient(HttpClient client, SecuritySettings settings, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null, ILogger<TypedHttpClientCore<OktaHttpClient>>? logger = null) 
+    public OktaHttpClient(HttpClient client, SecuritySettings settings, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null, ILogger<OktaHttpClient>? logger = null) 
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
