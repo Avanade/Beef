@@ -1,4 +1,6 @@
-﻿namespace MyEf.Hr.Security.Test.Subscribers;
+﻿using UnitTestEx.Expectations;
+
+namespace MyEf.Hr.Security.Test.Subscribers;
 
 [TestFixture]
 public class EmployeeTerminatedSubscriberTest
@@ -108,7 +110,7 @@ public class EmployeeTerminatedSubscriberTest
     }
 
     [Test]
-    public void Success_Complete()
+    public void SuccessDeactivated_Complete()
     {
         var mcf = MockHttpClientFactory.Create();
         var mc = mcf.CreateClient("OktaApi", "https://test-okta/");
@@ -122,6 +124,29 @@ public class EmployeeTerminatedSubscriberTest
 
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
+            .AssertSuccess();
+
+        actionsMock.Verify(m => m.CompleteMessageAsync(message, default), Times.Once);
+        actionsMock.VerifyNoOtherCalls();
+        mcf.VerifyAll();
+    }
+
+    [Test]
+    public void SuccessAlreadyDeactivated_Complete()
+    {
+        var mcf = MockHttpClientFactory.Create();
+        var mc = mcf.CreateClient("OktaApi", "https://test-okta/");
+        mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.WithJson(new [] { new { id = "00ub0oNGTSWTBKOLGLNR", status = "DEACTIVATED" } });
+
+        using var test = FunctionTester.Create<Startup>();
+        var actionsMock = new Mock<ServiceBusMessageActions>();
+        var message = test.CreateServiceBusMessage(
+            new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
+
+        test.ReplaceHttpClientFactory(mcf)
+            .ServiceBusTrigger<SecuritySubscriberFunction>()
+            .ExpectLogContains("warn: Employee 00000001-0000-0000-0000-000000000000 with email bob@email.com has User status of DEACTIVATED and is therefore unable to be deactivated.")
             .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 

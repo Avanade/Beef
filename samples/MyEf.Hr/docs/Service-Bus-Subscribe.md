@@ -8,15 +8,15 @@ This article contains an end-to-end walkthrough to build the requisite Azure Fun
 
 ## Security domain
 
-A new _Security_ domain _should_ be implemented within a new >NET Solution, independent of the _Hr_ domain. It is conceivable that this new domain could contain its own APIs and data repository, etc.
+A new _Security_ domain _should_ be implemented within a new .NET Solution, independent of the _Hr_ domain. It is conceivable that this new domain could contain its own APIs and data repository, etc. Maybe even leverage _Beef_ ;-)
 
-However, for the purposes of this sample, a new domain will not be implemented. The requisite functionality will be developed within the existing `MyEf.Hr` solution, with a new `MyEf.Hr.Security` namespace for basic separation and simplicity. (_Disclaimer:_ obviously, this is not the recommended approach where implementing for proper).
+However, for the purposes of this sample, a new domain will not be implemented. The requisite functionality will be developed within the existing `MyEf.Hr` solution, within a new `MyEf.Hr.Security` namespace for basic separation and simplicity. (_Disclaimer:_ obviously, this is not the recommended approach where implementing proper).
 
 <br/>
 
 ## Azure function
 
-It is intended that the _Security_ domain subscribing capabilities are also hosted in Azure, as such the architectural decision has been made to develop these leveraging an [Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview).
+It is intended that the _Security_ domain subscribing capabilities are also hosted in Azure, as such the architectural decision has been made to develop leveraging an [Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview).
 
 This will enable the subscriber function to essentially run in the background, and we will also be able to leverage the [Azure Service Bus trigger](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus-trigger) to invoke the requisite logic per event/message received.
 
@@ -26,20 +26,20 @@ It is assumed for the purposes of this sample that the developer has at least so
 
 ## Generic subscribing
 
-The [`CoreEx.Events`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) capabilities enables messaging subsystem agnostic event/messaging subscribing functionality; of interest are the following.
+The [`CoreEx.Events`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) capabilities enables messaging subsystem agnostic subscribing functionality; of interest are the following.
 
 Class | Description
 -|-
 [`EventSubscriberBase`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventSubscriberBase.cs) | Provides the messaging platform host agnostic base functionality, such as the [`IErrorHandling`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/IErrorHandling.cs) configuration, being the corresponding [`ErrorHandling`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/ErrorHandling.cs) action per error type. Also encapsulates the underlying message to `EventData` deserialization and associated error handling.
-[`EventSubscriberOrchestrator`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/EventSubscriberOrchestrator.cs) | Enables none or more subscribers ([`IEventSubscriber`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/IEventSubscriber.cs)) to be added, which are dynamically invoked at runtime when their [`EventSubscriberAttribute`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/subscribing/EventSubscriberAttribute.cs) configuration matches the received `EventData` message content. For more information see [orchestrated subscribing](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events#orchestrated-subscribing).
+[`EventSubscriberOrchestrator`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/EventSubscriberOrchestrator.cs) | Enables none or more subscribers ([`IEventSubscriber`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/IEventSubscriber.cs)) to be added, which are dynamically invoked at runtime when their [`EventSubscriberAttribute`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/subscribing/EventSubscriberAttribute.cs) configuration matches the received `EventData` message content. For more information see _CoreEx_ [orchestrated subscribing](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events#orchestrated-subscribing).
 
 <br/>
 
 ## Service Bus subscribing
 
-The [`CoreEx.Azure.ServiceBus`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Azure/ServiceBus) capabilities will be leveraged to manage the underlying processing once triggered. This has the advantage of enabling standardized, and tested, functionality to further industrailize event/messaging subscription services.
+The [`CoreEx.Azure.ServiceBus`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Azure/ServiceBus) capabilities will be leveraged to manage the underlying processing once triggered. This has the advantage of enabling standardized, consistent, and tested, functionality to further industrailize event/messaging subscription services.
 
-There are two Azure Service Bus subscribing capabilities that both inherit from the `EventSubscriberBase`. These each also leverage the [`ServiceBusSubscriberInvoker`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Azure/ServiceBus/ServiceBusSubscriberInvoker.cs) that ensures consistency of logging, exception handling, associated [`ServiceBusMessageActions`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebus.servicebusmessageactions) management to perform the corresponding `CompleteMessageAsync` or `DeadLetterMessageAsync`, and finally message bubbling to enable retries where the error is considered transient in nature.
+There are two Azure Service Bus subscribing capabilities that both inherit from the aforementioned `EventSubscriberBase`. These each also leverage the [`ServiceBusSubscriberInvoker`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Azure/ServiceBus/ServiceBusSubscriberInvoker.cs) that ensures consistency of logging, exception handling, associated [`ServiceBusMessageActions`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebus.servicebusmessageactions) management to perform the corresponding `CompleteMessageAsync` or `DeadLetterMessageAsync`, and finally message bubbling to enable retries where the error is considered transient in nature.
 
 Class | Description
 -|-
@@ -54,7 +54,7 @@ This sample will leverage the `ServiceBusOrchestratedSubscriber` to subscribe to
 
 For the most part, where multiple domains exists, then [topics and subscriptions](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions) should be leveraged; as each consuming domain can process _their_ own subscription (or subscriptions) independently of others. Additionally, the subscriptions capability enables [filters](https://learn.microsoft.com/en-us/azure/service-bus-messaging/topic-filters) thats can be used to select specific messages in advance of invoking the function code.
 
-This sample, has used a basic queue for simplicity.
+This sample has used a basic queue for simplicity.
 
 <br/>
 
@@ -79,7 +79,7 @@ Update project dependencies as follows.
 
 1. Add the `CoreEx.Azure` and `CoreEx.Validation` NuGet packages as dependencies.
 2. Update the `Microsoft.Azure.WebJobs.Extensions.ServiceBus` NuGet package dependency to latest `5.x.x` version.
-3. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains).
+3. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
 
 <br/>
 
@@ -126,7 +126,7 @@ Create a new `GlobalUsings.cs` file, then copy in the contents from [`GlobalUsin
 
 [Dependency Injection](https://learn.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection) needs to be added to the Project as this is not enabled by default. To enable, create a new `Startup.cs` file, then copy in the contents from [`Startup`](../MyEf.Hr.Security.Subscriptions/Startup.cs) replacing existing. For the most part the required `CoreEx` services are being registered.
 
-The Service Bus Publishing requires the following additional services registered.
+The Service Bus subscribing requires the following additional services registered.
 
 Service | Description
 -|-
@@ -154,7 +154,7 @@ The aforementioned services registration code of interest is as follows.
 
 ## Security subscriber function
 
-This represents the Azure Service Bus trigger subscription entry point; i.e. what is the registered function logic to be executed by the Azure Function runtime fabric. This requires the use of Dependency Injection to access the registered `ServiceBusOrchestratedSubscriber` to orchestrate the underlying subscriber (which is still to be developed). 
+This represents the Azure Service Bus trigger subscription entry point; i.e. what is the registered function logic to be executed by the Azure Function runtime fabric. This requires the use of Dependency Injection to access the registered `ServiceBusOrchestratedSubscriber` to orchestrate the underlying subscribers. 
 
 The function method signature must include the [ServiceBusTrigger](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebustriggerattribute) attribute to specify the queue or topic/subscription related properties, sessions support, as well as the Service Bus connection string name. Finally, for the `ServiceBusOrchestratedSubscriber` to function correctly the `ServiceBusReceivedMessage` and `ServiceBusMessageActions` parameters must be specified and passed into the `ServiceBusOrchestratedSubscriber.ReceiveAsync`. Note: do _not_ under any circumstances use `AutoCompleteMessages` as completion is managed internally.
 
@@ -210,13 +210,13 @@ public class SecuritySettings : SettingsBase
 
 <br/>
 
-Create a new `appsettings.json` file, then copy in the following contents. The '*' within denotes that the configuration settings are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `SecuritySettings` properties.
+Create a new corresponding `appsettings.json` file, then copy in the following contents. The '*' within denotes that the configuration settings are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `SecuritySettings` properties.
 
 Setting | Description
 -|-
 `OktaHttpClient:BaseUri` | The base [`Uri`](https://learn.microsoft.com/en-us/dotnet/api/system.uri) for the external OKTA API.
-`OktaHttpClient:HttpRetryCount` | Specifies the number of times the HTTP request should be retried when a transient error occurs.
-`OktaHttpClient:HttpTimeoutSeconds` | Specifies the maximum number of seconds for the HTTP request to complete before timing out. 
+`OktaHttpClient:HttpRetryCount`* | Specifies the number of times the HTTP request should be retried when a transient error occurs.
+`OktaHttpClient:HttpTimeoutSeconds`* | Specifies the maximum number of seconds for the HTTP request to complete before timing out. 
 
 ``` json
 {
@@ -234,14 +234,14 @@ Setting | Description
 
 The external OKTA API must be accessed using an [`HttpClient`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient). Create a new `OktaHttpClient.cs` file, then copy in the following contents. This inherits from the _CoreEx_ [`TypedHttpClientBase<TSelf>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Http/TypedHttpClientBaseT.cs) that encapsulates an underlying `HttpClient` and adds extended fluent-style method-chaining capabilities and supporting `SendAsync` logic.
 
-The advantage of a typed client such as this, is that it can encapsulate all of the appropriate behavior, making it easier to understand and test. The constructor is using the injected `SecuritySettings` to set the underlying `HttpClient.BaseAddress`. Additionally, other `DefaultOptions` can be set to ensure consistent behaviour of the underlying request/response; these can be overridden per request where applicable.
+The advantage of a typed client such as this, is that it can encapsulate all of the appropriate behavior, making it easier to understand and test. The constructor is using the injected `SecuritySettings` to set the underlying `HttpClient.BaseAddress`. Additionally, other `DefaultOptions` can be set to ensure consistent behaviour of the underlying request/response; these can also be overridden per request where applicable.
 
-For the purposes of _deactivating_ the following OKTA capabilities are exposed:
+For the purposes of _deactivating a user_ the following OKTA capabilities are exposed:
 
 Method | Description
 -|-
-`GetIdentifier` | The underlying OKTA identifier is not persisted as part of the `Employee` data, only the related `Email`. This method will perform a search on the email and return the corresponding identifier where found, and where in a status that enables deactivation. See OKTA [search documentation](https://developer.okta.com/docs/reference/api/users/#list-users-with-search).
-`DeactivateUser` | Deactivates the user by using the passed OKTA identifier. See OKTA [search documentation](https://developer.okta.com/docs/reference/api/users/#deactivate-user)
+`GetIdentifier` | The underlying OKTA identifier is not persisted as part of the `Employee` data, only the related `Email`. This method will perform a search on the email and return the corresponding identifier where found. Also checks that the user is in a status that allows deactivation. See OKTA [search user API documentation](https://developer.okta.com/docs/reference/api/users/#list-users-with-search).
+`DeactivateUser` | Deactivates the user by using the passed OKTA identifier. See OKTA [deactivate user API documentation](https://developer.okta.com/docs/reference/api/users/#deactivate-user)
 
 
 ``` csharp
@@ -253,7 +253,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.WithRetry().EnsureOK().EnsureSuccess().ThrowKnownException();
+        DefaultOptions.WithRetry().EnsureOK().ThrowKnownException();
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// </summary>
     public async Task<string?> GetIdentifier(string email)
     {
-        var response = await EnsureOK().GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
+        var response = await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
         var user = response.Value.SingleOrDefault();
 
         return user?.Status?.ToUpperInvariant() switch
@@ -276,7 +276,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// </summary>
     public async Task DeactivateUser(string identifier)
     {
-        var response = await EnsureOK().EnsureNoContent().PostAsync($"/api/v1/users/{identifier}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
+        var response = await PostAsync($"/api/v1/users/{identifier}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
         response.ThrowOnError();
     }
 

@@ -6,39 +6,45 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.WithRetry().EnsureOK().EnsureSuccess().ThrowKnownException();
+        DefaultOptions.WithRetry().EnsureOK().ThrowKnownException();
     }
 
     /// <summary>
     /// Gets the identifier for the email (see <see href="https://developer.okta.com/docs/reference/api/users/#list-users-with-search"/>).
     /// </summary>
-    public async Task<string?> GetIdentifier(string email)
+    public async Task<OktaUser?> GetUser(string email)
     {
-        var response = await EnsureOK().GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
-        var user = response.Value.SingleOrDefault();
-
-        return user?.Status?.ToUpperInvariant() switch
-        {
-            "STAGED" or "PROVISIONED" or "ACTIVE" or "RECOVERY" or "LOCKED_OUT" or "PASSWORD_EXPIRED" or "SUSPENDED" => user?.Id,
-            _ => null
-        };
+        var response = await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
+        return response.Value.SingleOrDefault();
     }
 
     /// <summary>
     /// Deactivates the specified user (<see href="https://developer.okta.com/docs/reference/api/users/#deactivate-user"/>)
     /// </summary>
-    public async Task DeactivateUser(string identifier)
+    public async Task DeactivateUser(string id)
     {
-        var response = await EnsureOK().EnsureNoContent().PostAsync($"/api/v1/users/{identifier}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
+        var response = await EnsureNoContent().PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
         response.ThrowOnError();
     }
 
     /// <summary>
     /// The basic OKTA user properties (see <see href="https://developer.okta.com/docs/reference/api/users/#user-object"/>)
     /// </summary>
-    private class OktaUser
+    public class OktaUser
     {
+        /// <summary>
+        /// Gets or sets the user identifier.
+        /// </summary>
         public string? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets user status.
+        /// </summary>
         public string? Status { get; set; }
+
+        /// <summary>
+        /// Indicates whether the use can be deactivated.
+        /// </summary>
+        public bool IsDeactivatable => new string[] { "STAGED", "PROVISIONED", "ACTIVE", "RECOVERY", "LOCKED_OUT", "PASSWORD_EXPIRED", "SUSPENDED" }.Contains(Status?.ToUpperInvariant());
     }
 }

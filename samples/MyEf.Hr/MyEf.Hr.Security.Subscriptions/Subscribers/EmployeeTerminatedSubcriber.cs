@@ -9,10 +9,12 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
         .HasProperty(x => x.Termination, p => p.Mandatory());
 
     private readonly OktaHttpClient _okta;
+    private readonly ILogger _logger;
 
-    public EmployeeTerminatedSubcriber(OktaHttpClient okta)
+    public EmployeeTerminatedSubcriber(OktaHttpClient okta, ILogger<EmployeeTerminatedSubcriber> logger)
     {
         _okta = okta ?? throw new ArgumentNullException(nameof(okta));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         ValueValidator = _employeeValidator;
     }
 
@@ -22,7 +24,14 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override async Task ReceiveAsync(EventData<Employee> @event, CancellationToken cancellationToken)
     {
-        var identifer = await _okta.GetIdentifier(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} not found in OKTA.");
-        await _okta.DeactivateUser(identifer).ConfigureAwait(false);
+        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} not found in OKTA.");
+
+        if (!user.IsDeactivatable)
+        {
+            _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status);
+            return;
+        }
+
+        await _okta.DeactivateUser(user.Id!).ConfigureAwait(false);
     }
 }
