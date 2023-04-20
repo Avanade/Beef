@@ -32,19 +32,8 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// </summary>
     public class OktaUser
     {
-        /// <summary>
-        /// Gets or sets the user identifier.
-        /// </summary>
         public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets user status.
-        /// </summary>
         public string? Status { get; set; }
-
-        /// <summary>
-        /// Indicates whether the use can be deactivated.
-        /// </summary>
         public bool IsDeactivatable => new string[] { "STAGED", "PROVISIONED", "ACTIVE", "RECOVERY", "LOCKED_OUT", "PASSWORD_EXPIRED", "SUSPENDED" }.Contains(Status?.ToUpperInvariant());
     }
 }
