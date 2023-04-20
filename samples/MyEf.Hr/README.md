@@ -111,7 +111,7 @@ As described earlier, this sample will walk through the implementation in a numb
 
 The implementation so far has created the API capabilities to perform operations on the data as originally defined in the [scope](#Scope). This section can be [skipped](#Conclusion) where the related Event-driven architecture capabilities are not required.
 
-However, to further support the goals of an [Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) (EDA) both the publishing and subscribing of events is required, and will be largely enabled leveraging the [CoreEx.Events](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) capabilities.
+However, to further support the goals of an [Event-driven architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) (EDA) both the publishing and subscribing of events is required, and will be largely enabled leveraging the [CoreEx.Events](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) capabilities.
 
 <br/>
 
