@@ -8,8 +8,8 @@
     <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.Azure" Version="2.8.0" />
-    <PackageReference Include="CoreEx.Validation" Version="2.8.0" />
+    <PackageReference Include="CoreEx.Azure" Version="2.9.0" />
+    <PackageReference Include="CoreEx.Validation" Version="2.9.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.9.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.3" />

@@ -38,6 +38,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="text">The Text.</param>
         /// <returns>The <see cref="TransactionCollection"/></returns>
         [HttpGet("{accountId}/transactions")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.TransactionCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetTransactions([FromRoute] string? accountId, [FromQuery(Name="oldest-time")] DateTime? fromDate = default, [FromQuery(Name="newest-time")] DateTime? toDate = default, [FromQuery(Name="min-amount")] decimal? minAmount = default, [FromQuery(Name="max-amount")] decimal? maxAmount = default, [FromQuery(Name="text")] string? text = default)

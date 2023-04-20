@@ -87,6 +87,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         /// <returns>The <see cref="RobotCollection"/></returns>
         [HttpGet("")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs([FromQuery(Name="model-no")] string? modelNo = default, [FromQuery(Name="serial-no")] string? serialNo = default, [FromQuery(Name="power-sources")] List<string>? powerSources = default)

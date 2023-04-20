@@ -74,7 +74,8 @@ namespace My.Hr.Api
                 if (File.Exists(xmlFile))
                     options.IncludeXmlComments(xmlFile);
 
-                options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
+                options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
+                options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
             });
         }
 

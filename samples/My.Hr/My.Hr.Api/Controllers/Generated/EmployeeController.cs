@@ -90,6 +90,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
         /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
         [HttpGet("")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, DateTime? startFrom = default, DateTime? startTo = default, [FromQuery(Name="includeTerminated")] bool? isIncludeTerminated = default)

@@ -114,6 +114,7 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("all")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetAll() =>
@@ -138,6 +139,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
@@ -155,6 +157,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonDetailCollection"/></returns>
         [HttpGet("argsdetail")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
@@ -280,6 +283,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="orderBy">The Order By.</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
         [HttpGet("args")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default, Common.Entities.OrderBy? orderBy = default)
