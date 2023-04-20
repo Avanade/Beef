@@ -107,7 +107,7 @@ As described earlier, this sample will walk through the implementation in a numb
 
 <br/>
 
-## Event-driven architecture implementation
+## Event driven architecture implementation
 
 The implementation so far has created the API capabilities to perform operations on the data as originally defined in the [scope](#Scope). This section can be [skipped](#Conclusion) where the related Event-driven architecture capabilities are not required.
 

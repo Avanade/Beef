@@ -38,7 +38,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-    <PackageReference Include="UnitTestEx.NUnit" Version="2.2.0" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +52,12 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <Pack>true</Pack>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.unittest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
 </Project>

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="UnitTestEx.NUnit" Version="2.2.0" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="2.2.1" />
     <PackageReference Include="CoreEx" Version="2.8.0" />
   </ItemGroup>
 

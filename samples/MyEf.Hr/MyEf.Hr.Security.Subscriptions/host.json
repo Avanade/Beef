@@ -13,6 +13,13 @@
   },
   "extensions": {
     "serviceBus": {
+      "clientRetryOptions": {
+        "mode": "exponential",
+        "tryTimeout": "00:05:00",
+        "delay": "00:00:30.00",
+        "maxDelay": "00:03:00",
+        "maxRetries": 3
+      },
       "prefetchCount": 0,
       "messageHandlerOptions": {
         "autoComplete": false,

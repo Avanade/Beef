@@ -306,4 +306,4 @@ Review and execute the tests and ensure they all pass as expected.
 
 At this stage we now have added and tested the performance review capabilities. All the desired functional requirements have now been implemented.
 
-Next we will [wrap up](./../README.md#Conclusion) the sample - we are done!
+Next we will consider the addition of [Event-driven architecture](./../README.md#Event-driven-architecture-implementation) capabilities.

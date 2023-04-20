@@ -1,7 +1,7 @@
 ﻿namespace MyEf.Hr.Security.Test;
 
 [TestFixture]
-public class SubscribingFunctionTest
+public class SecuritySubscriberFunctionTest
 {
     [Test]
     public void InvalidMessage_DeadLetter()
@@ -12,7 +12,7 @@ public class SubscribingFunctionTest
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("[EventDataDeserialization]")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.DeadLetterMessageAsync(message, It.IsAny<string>(), It.IsAny<string>(), default), Times.Once);
@@ -27,7 +27,7 @@ public class SubscribingFunctionTest
         var message = test.CreateServiceBusMessage(new EventData { Subject = "myef.hr.employee", Action = "updated", Source = new Uri("test", UriKind.Relative) });
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.CompleteMessageAsync(message, default), Times.Once);

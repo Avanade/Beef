@@ -8,7 +8,7 @@ To further support the [transactional outbox pattern](https://microservices.io/p
 
 This is achieved by dequeuing a set of events from the database, again within the context of a database transaction, and forwarding the events/messages to the messaging subsystem. On successful completion, the database transaction can be committed; otherwise, on error the dequeue should be rolled back, and the forwarding re-attempted.
 
-This _message relay_ process will result in at least once publishing semantics; i.e. where there was an error and retry the same events/messages may be sent again. It is the responsibility of the end subscriber to handle multiple events/messages; being the requirement for duplicate checking. The [`EventData.Id`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventDataBase.cs) by default is unique and should be used for this purpose.
+This _message relay_ process will result in at least once publishing semantics; i.e. where there was an error and retry the same events/messages may be sent again. It is the responsibility of the end subscriber to handle multiple events/messages; being the requirement for [duplicate](https://learn.microsoft.com/en-us/azure/service-bus-messaging/duplicate-detection) checking. The [`EventData.Id`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventDataBase.cs) by default is unique and should be used for this purpose.
 
 To achieve in-order publishing the _message relay_ process should execute as a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern); i.e. only a single (synchronized) process can execute to guarantee in-order sequencing. Within an event-driven architecture the order in which the events/messages are generated is critical, and as such this order _must_ be maintained (at least from a publishing perspective).
 
@@ -148,6 +148,16 @@ Setting | Description
 
 There are no specific provisions for the unit testing of the Service Bus Publishing as it requires a dependent messaging subsystem, being Azure Service Bus.
 
+However, to minimize any impact to the other existing unit tests the `EventOutboxHostedService` should be disabled. To disable, add a new `appsettings.unittest.json` file to `MyEf.Hr.Api` project with the following contents. Go to the file properties and set _Copy to Output Directory_ to _Copy if newer_. 
+
+``` json
+{
+  "EventOutboxHostedService": {
+    "Enabled": false
+  }
+}
+```
+
 <br/>
 
 ## Localized testing
@@ -163,4 +173,4 @@ To achieve a basic test within a developers machine then the API host should be 
 
 At this stage we now have our events being published to Azure Service Bus. This essentially concludes the `Hr` domain functionality, with respect to enabling the requisite APIs and publishing of corresponding events (where applicable).
 
-Next we will create a new domain (being `Security`) that will perform a [Service Bus Subscribe](./Service-Bus-Subscribe.md) of the _Termination_ related events and proxy [Okta]() (as our identity solution) automatically _Deactivating_ the Employee's account.
+Next we will create a new _Security_ domain that will perform a [Service Bus Subscribe](./Service-Bus-Subscribe.md) of the _Termination_ related events and proxy [Okta](https://www.okta.com/) (as the fictitious company's identity solution) automatically _Deactivating_ the Employee's account.

@@ -12,7 +12,7 @@ public class EmployeeTerminatedSubscriberTest
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Value is required")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.DeadLetterMessageAsync(message, It.IsAny<string>(), It.IsAny<string>(), default), Times.Once);
@@ -28,7 +28,7 @@ public class EmployeeTerminatedSubscriberTest
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("A data validation error occurred")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.DeadLetterMessageAsync(message, It.IsAny<string>(), It.IsAny<string>(), default), Times.Once);
@@ -50,7 +50,7 @@ public class EmployeeTerminatedSubscriberTest
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("email bob@email.com not found", "[Source: Subscriber, Handling: CompleteWithWarning]")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.CompleteMessageAsync(message, default), Times.Once);
@@ -73,7 +73,7 @@ public class EmployeeTerminatedSubscriberTest
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Retry - Service Bus message", "[AuthenticationError]")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertException<EventSubscriberException>();
 
         actionsMock.VerifyNoOtherCalls();
@@ -100,7 +100,7 @@ public class EmployeeTerminatedSubscriberTest
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("Retry - Service Bus message", "[TransientError]")
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertException<EventSubscriberException>();
 
         actionsMock.VerifyNoOtherCalls();
@@ -122,7 +122,7 @@ public class EmployeeTerminatedSubscriberTest
 
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
-            .Run(f => f.RunAsync(message, actionsMock.Object))
+            .Run(f => f.RunAsync(message, actionsMock.Object, default))
             .AssertSuccess();
 
         actionsMock.Verify(m => m.CompleteMessageAsync(message, default), Times.Once);

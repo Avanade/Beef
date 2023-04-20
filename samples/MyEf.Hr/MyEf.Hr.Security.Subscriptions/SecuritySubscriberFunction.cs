@@ -9,6 +9,6 @@ public class SecuritySubscriberFunction
     [Singleton(Mode = SingletonMode.Function)]
     [FunctionName(nameof(SecuritySubscriberFunction))]
     [ExponentialBackoffRetry(3, "00:02:00", "00:30:00")]
-    public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions)
-        => _subscriber.ReceiveAsync(message, messageActions);
+    public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions, CancellationToken cancellationToken)
+        => _subscriber.ReceiveAsync(message, messageActions, cancellationToken);
 }
