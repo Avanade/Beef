@@ -14,7 +14,7 @@ using System.Data;
 namespace MyEf.Hr.Business.Data
 {
     /// <summary>
-    /// Provides the <see cref="EventSendData"/> <see cref="IDatabase">database</see> <i>outbox enqueue</i> <see cref="EventOutboxEnqueueBase.SendAsync(EventSendData[])"/>. 
+    /// Provides the <see cref="EventSendData"/> <see cref="IDatabase">database</see> <i>outbox enqueue</i> <see cref="SendAsync(EventSendData[])"/>. 
     /// </summary>
     public sealed class EventOutboxEnqueue : EventOutboxEnqueueBase
     {

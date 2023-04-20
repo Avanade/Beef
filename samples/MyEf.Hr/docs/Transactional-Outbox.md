@@ -27,7 +27,7 @@ The following are the key generated Outbox enqueue artefacts; performing the tra
 Type | Name | Description
 -|-|-
 Stored procedure | [spEventOutboxEnqueue](../MyEf.Hr.Database/Schema/Outbox/Stored%20Procedures/Generated/spEventOutboxEnqueue.sql) | The stored procedure used to _enqueue_ zero or more events into the database.
-Used-defined table type | [udtEventOutboxList](../MyEf.Hr.Database/Schema/Outbox/Types/User-defined%20table%20types/Generated/udtEventOutboxList.sql) | The type used during _enqueue_ as the events collection being passed. By design this is the database representation (column from/to property) of the _CoreEx_ .NET [EventData](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) class.
+Used-defined table type | [udtEventOutboxList](../MyEf.Hr.Database/Schema/Outbox/Types/User-Defined%20Table%20Types/Generated/udtEventOutboxList.sql) | The type used during _enqueue_ as the events collection being passed. By design this is the database representation (column from/to property) of the _CoreEx_ .NET [EventData](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) class.
 Class | [EventOutboxEnqueue](../MyEf.Hr.Business/Data/Generated/EventOutboxEnqueue.cs) | Provides the [`IEventSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventSender.cs) implementation (inheriting from [EventOutboxEnqueueBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxEnqueueBase.cs)) to perform the _enqueue_ using the `spEventOutboxEnqueue` stored procedure.
 
 <br/>
@@ -66,7 +66,7 @@ public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataSv
 
 The set up of the event publishing is managed using Dependency Injection (DI) configuration within the API [`Startup`](../MyEf.Hr.Api/Startup.cs) class.
 
-When the overall solution was created using the _Beef_ template, the eventing-based DI configuration placeholder code would have been similar to the following. The use of the `AddNullEventPublisher` will register the [`NullEventPublisher`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/NullEventPublisher.cs) which simply swallows/discards on send; i.e. does nothing.
+When the overall solution was created using the _Beef_ template, the eventing-based DI configuration placeholder code would have been similar to the following. The use of the `AddNullEventPublisher()` will register the [`NullEventPublisher`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/NullEventPublisher.cs) which simply swallows/discards on send; i.e. does nothing.
 
 ``` csharp
 // Add event publishing services.
@@ -124,9 +124,17 @@ Therefore, _no_ events will be sent to any external eventing/messaging system du
 
 To achieve a basic test within a developers machine then the API should be executed directly. By leveraging the [Swagger](https://swagger.io/) endpoint, or using a tool such as [Postman](https://www.postman.com/), an applicable POST/PUT/DELETE operation should be invoked which will result in the selected data update and corresponding event persisted to the database.
 
-To verify, use a database tool, such as [Azure Data Studio](https://learn.microsoft.com/en-us/sql/azure-data-studio/what-is-azure-data-studio) to query the `Outbox.EventOutbox` and `Outbox.EventOutboxData` tables.
+To verify, use a database tool, such as [Azure Data Studio](https://learn.microsoft.com/en-us/sql/azure-data-studio/what-is-azure-data-studio) to query the `Outbox.EventOutbox` and `Outbox.EventOutboxData` tables. The `Outbox.EventOutbox` manages the enqueue and dequeue state via the `EnqueuedDate` and `DequeueDate` columns. Where the `DequeueDate` column is `null` then the event is considered queued and ready for dequeue.
 
-The `Outbox.EventOutbox` manages the enqueue and dequeue state via the `EnqueuedDate` and `DequeueDate` columns. Where the `DequeueDate` column is `null` then the event is considered queued and ready for dequeue.
+To perform a localized test perform a POST to the `/employees/00000001-0000-0000-0000-000000000000/terminate` endpoint; this should be passed the following JSON body.
+
+``` json
+{
+  "date": "2023-04-20T17:47:31.898Z",
+  "reason": "RE"
+}
+```
+
 
 <br/>
 
