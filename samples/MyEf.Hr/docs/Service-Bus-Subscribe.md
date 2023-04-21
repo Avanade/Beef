@@ -173,8 +173,8 @@ public class SecuritySubscriberFunction
 
     [Singleton(Mode = SingletonMode.Function)]
     [FunctionName(nameof(SecuritySubscriberFunction))]
-    public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions)
-        => _subscriber.ReceiveAsync(message, messageActions);
+    public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions, CancellationToken cancellationToken)
+        => _subscriber.ReceiveAsync(message, messageActions, cancellationToken);
 }
 ```
 
@@ -212,7 +212,7 @@ public class SecuritySettings : SettingsBase
 
 <br/>
 
-Create a new corresponding `appsettings.json` file, then copy in the following contents. The '*' within denotes that the configuration settings are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `SecuritySettings` properties.
+Create a new corresponding `appsettings.json` file, then copy in the following contents. Update the file properties; set _Build Action_ to _Content_, and _Copy to Output Directory_ to _Copy if newer_. The '*' within denotes that the configuration settings are accessed internally by _CoreEx_ at runtime and therefore do not need to be specifically defined as `SecuritySettings` properties.
 
 Setting | Description
 -|-
