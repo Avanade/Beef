@@ -148,7 +148,7 @@ Setting | Description
 
 There are no specific provisions for the unit testing of the Service Bus Publishing as it requires a dependent messaging subsystem, being Azure Service Bus.
 
-However, to minimize any impact to the other existing unit tests the `EventOutboxHostedService` should be disabled. To disable, add a new `appsettings.unittest.json` file to `MyEf.Hr.Api` project with the following contents. Go to the file properties and set _Copy to Output Directory_ to _Copy if newer_. 
+However, to minimize any impact to the other existing unit tests the `EventOutboxHostedService` should be disabled. To disable, add a new `appsettings.unittest.json` file to `MyEf.Hr.Test` project with the following contents. Go to the file properties and set _Copy to Output Directory_ to _Copy if newer_. 
 
 ``` json
 {
