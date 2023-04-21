@@ -77,7 +77,7 @@ services.AddScoped<IServiceBusSender, ServiceBusSender>();
 // Add transactional event outbox dequeue hosted service (_must_ be explicit with the IServiceBusSender as he IEventSender).
 services.AddSqlServerEventOutboxHostedService(sp =>
 {
-    return new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), p.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>());
+    return new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>());
 });
 ```
 
@@ -86,6 +86,7 @@ The latest `CoreEx.Azure` NuGet [package](https://www.nuget.org/packages/CoreEx.
 ``` csharp
 using CoreEx.Azure.ServiceBus;
 using CoreEx.Azure.Storage;
+using CoreEx.Database;
 using CoreEx.Hosting;
 using Az = Azure.Messaging.ServiceBus;
 ```
