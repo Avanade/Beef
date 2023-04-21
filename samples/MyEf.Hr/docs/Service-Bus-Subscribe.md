@@ -354,9 +354,9 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
 ## Unit testing
 
-There is generally no specific provision for the unit testing of Azure Functions, and related Azure Service Bus trigger, as it requires a dependent messaging subsystem, being Azure Service Bus. Also, at time of writing, there is not a standard means of hosting the Azure Function in process to verify; especially where the likes of Dependency Injection (DI) is being leveraged.
+There is generally no specific provision for the unit testing of Azure Functions, and related Azure Service Bus trigger, as it requires a dependent messaging subsystem, being Azure Service Bus. Also, at time of writing, there is not a standard means of hosting the Azure Function in process to verify in a unit testing context; especially where the likes of Dependency Injection (DI) is being leveraged.
 
-However, given the complexity of logic that typically resides within there should be _string_ desire to verfiy via unit tests. To enable Avanade has created _UnitTestEx_ which supports the unit testing of [Service Bus-trigger Azure Functions](https://github.com/Avanade/unittestex#service-bus-trigger-azure-function). This capability assumes that Dependency Injection (DI) is being leveraged, and will create the underlying host and enable a `ServiceBusReceivedMessage` to be sent simulating the Azure Function runtime capability.
+However, given the complexity of logic that typically resides within there should be _strong_ desire to verfiy via unit tests. To enable Avanade has created _UnitTestEx_ which supports the unit testing of [Service Bus-trigger Azure Functions](https://github.com/Avanade/unittestex#service-bus-trigger-azure-function). This capability assumes that Dependency Injection (DI) is being leveraged, and will create the underlying host and enable a `ServiceBusReceivedMessage` to be sent simulating the Azure Function runtime capability.
 
 As the implemented subscriber is invoking OKTA, _UnitTestEx_ also easily enables the [mocking of HTTP requests/responses](https://github.com/Avanade/unittestex#http-client-mocking) to verify both success and failure scenarios.
 
