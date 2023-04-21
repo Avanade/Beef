@@ -79,7 +79,8 @@ Update project dependencies as follows.
 
 1. Add the `CoreEx.Azure` and `CoreEx.Validation` NuGet packages as dependencies.
 2. Update the `Microsoft.Azure.WebJobs.Extensions.ServiceBus` NuGet package dependency to latest `5.x.x` version.
-3. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
+3. Add the `Microsoft.Azure.Functions.Extensions` NuGet package as a dependency to enable Dependency Injection (DI) within Azure Functions. 
+4. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
 
 <br/>
 
