@@ -412,6 +412,29 @@ To achieve a basic test within a developers machine then the Function should be 
 
 _Note:_ that without an _actual_ OKTA development account the OKTA endpoints cannot be consumed directly; i.e. they will always fail. For now, this is good enough to prove potential connectivity.
 
+Where running locally ensure that the Azure Storage Emulator [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite) is installed and running; otherwise, errors will occur as the `SingletonAttribute` added to the function requires access to storage to enable.
+
+As Cloud Events are used as the serialization format, any events added manually will need to be in this format, example as follows:
+
+``` json
+{
+  "specversion": "1.0",
+  "id": "49d1b3f2-44f3-4ff2-9d75-847662a233e3",
+  "time": "2023-04-21T17:16:57.4014016Z",
+  "type": "myef.hr.common.entities.employee",
+  "source": "test",
+  "subject": "myef.hr.employee",
+  "action": "terminated",
+  "correlationid": "49d1b3f2-44f3-4ff2-9d75-847662a233e3",
+  "datacontenttype": "application/json",
+  "data": {
+    "id": "00000001-0000-0000-0000-000000000000",
+    "email": "bob@email.com",
+    "termination": {}
+  }
+}
+```
+
 <br/>
 
 ## End-to-end integration testing
