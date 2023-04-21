@@ -113,6 +113,7 @@ Open the `MyEf.Hr.Security.Subscriptions` project XML file and add the following
 ``` xml
 <!-- Following needed as per: https://github.com/Azure/azure-functions-core-tools/issues/2872 -->
 <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+<Nullable>enable</Nullable>
 ```
 
 <br/>
@@ -271,7 +272,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// </summary>
     public async Task DeactivateUser(string id)
     {
-        var response = await EnsureNoContent().PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
+        var response = await PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
         response.ThrowOnError();
     }
 
