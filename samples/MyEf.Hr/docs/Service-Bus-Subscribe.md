@@ -1,6 +1,6 @@
 # Step 9 - Service Bus Subscribe
 
-At a high-level this represents the subscribing of events/messages from Azure Service Bus to meet the stated requirements of when an Employee is _terminated_ the Employee's User Account will be automatically _deactivated_ within OKTA.
+At a high-level this represents the subscribing of events/messages from Azure Service Bus to meet the stated requirements of when an Employee is _terminated_ that the Employee's User Account will be automatically _deactivated_ within OKTA.
 
 This article contains an end-to-end walkthrough to build the requisite Azure Function.
 
