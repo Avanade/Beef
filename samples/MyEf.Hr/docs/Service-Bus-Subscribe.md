@@ -60,12 +60,11 @@ This sample has used a basic queue for simplicity.
 
 ## Create Azure Function project
 
-From Visual Studio, add a new Project named `MyEf.Hr.Security.Subscriptions` (within the existing `MyEf.Hr` solution) leveraging the _Azure Functions_ project template. On the additional information page of the wizard, enter the following, then _Create_.
+From Visual Studio, add a new Project named `MyEf.Hr.Security.Subscriptions` (within the existing `MyEf.Hr` solution) leveraging the _Azure Functions_ project template. On the additional information page of the wizard, enter the following, then _Create_ for the new `SecuritySubscriberFunction` function.
 
 Property | Value
 -|-
 Functions worker | `.NET 6.0 (Long Term Support)`
-Function | `SecuritySubscriberFunction`
 Connection string setting name | `ServiceBusConnectionString`
 Queue name | `%ServiceBusQueueName%`
 
