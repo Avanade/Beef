@@ -72,13 +72,14 @@ public class Startup
 #endif
         // Add the event publishing; this will need to be updated from the logger publisher to the actual as appropriate.
         services.AddEventDataFormatter()
-                .AddLoggerEventPublisher();
+                .AddNullEventPublisher();
 
         // Add additional services.
         services.AddControllers();
         services.AddHealthChecks();
         services.AddHttpClient();
 
+        // Add the swagger capabilities.
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Company.AppName API", Version = "v1" });

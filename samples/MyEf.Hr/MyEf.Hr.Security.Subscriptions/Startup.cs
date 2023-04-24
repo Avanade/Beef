@@ -4,7 +4,9 @@ namespace MyEf.Hr.Security.Subscriptions;
 
 public class Startup : FunctionsStartup
 {
-    public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder) => builder.ConfigurationBuilder.AddEnvironmentVariables("Hr_");
+    public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder) => builder.ConfigurationBuilder
+        .AddJsonFile(Path.Combine(builder.GetContext().ApplicationRootPath ?? "", "appsettings.json"), optional: true)
+        .AddEnvironmentVariables("Hr_");
 
     public override void Configure(IFunctionsHostBuilder builder)
     {

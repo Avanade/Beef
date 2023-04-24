@@ -27,11 +27,8 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
         var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} not found in OKTA.");
 
         if (!user.IsDeactivatable)
-        {
             _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status);
-            return;
-        }
-
-        await _okta.DeactivateUser(user.Id!).ConfigureAwait(false);
+        else
+            await _okta.DeactivateUser(user.Id!).ConfigureAwait(false);
     }
 }

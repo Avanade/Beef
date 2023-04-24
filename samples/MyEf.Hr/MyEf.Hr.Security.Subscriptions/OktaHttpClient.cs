@@ -6,7 +6,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.WithRetry().EnsureOK().ThrowKnownException();
+        DefaultOptions.WithRetry().EnsureSuccess().ThrowKnownException();
     }
 
     /// <summary>
@@ -21,11 +21,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// <summary>
     /// Deactivates the specified user (<see href="https://developer.okta.com/docs/reference/api/users/#deactivate-user"/>)
     /// </summary>
-    public async Task DeactivateUser(string id)
-    {
-        var response = await EnsureNoContent().PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false);
-        response.ThrowOnError();
-    }
+    public Task DeactivateUser(string id) => PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true");
 
     /// <summary>
     /// The basic OKTA user properties (see <see href="https://developer.okta.com/docs/reference/api/users/#user-object"/>)
