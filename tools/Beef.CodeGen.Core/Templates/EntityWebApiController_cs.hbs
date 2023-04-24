@@ -69,6 +69,9 @@ namespace {{Root.NamespaceApi}}.Controllers
         [{{{WebApiAuthorize}}}]
   {{/ifval}}
         [{{WebApiMethod}}("{{WebApiRoute}}")]
+  {{#if Paging}}
+        [Paging]
+  {{/if}}
   {{#if HasValue}}
         [AcceptsBody(typeof(Common.Entities.{{ValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
   {{/if}}

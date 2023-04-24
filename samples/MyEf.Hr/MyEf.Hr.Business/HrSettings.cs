@@ -19,6 +19,16 @@
         /// <summary>
         /// Gets the database connection string.
         /// </summary>
-        public string DatabaseConnectionString => GetValue<string>("ConnectionStrings__Database");
+        public string DatabaseConnectionString => GetRequiredValue<string>("ConnectionStrings__Database");
+
+        /// <summary>
+        /// Gets the Azure service bus connection string.
+        /// </summary>
+        public string ServiceBusConnectionString => GetRequiredValue<string>("ConnectionStrings__ServiceBus");
+
+        /// <summary>
+        /// Gets the Azure storage connection string.
+        /// </summary>
+        public string StorageConnectionString => GetRequiredValue<string>("ConnectionStrings__Storage");
     }
 }

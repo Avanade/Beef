@@ -72,8 +72,8 @@ Provides the _Manager-layer_ configuration.
 Property | Description
 -|-
 **`validator`** | The name of the .NET `Type` that will perform the validation.
-`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits.<br/>&dagger; Defaults to `IValidatorEx<{Type}>` where the `{Type}` is `Type`.
 `validatorCode` | The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
+`validationFramework` | The `Validation` framework to use for the entity-based validation. Valid options are: `CoreEx`, `FluentValidation`.<br/>&dagger; Defaults to `Operation.ValidationFramework`.
 `isMandatory` | Indicates whether a `ValidationException` should be thrown when the parameter value has its default value (null, zero, etc).
 `layerPassing` | The option that determines the layers in which the parameter is passed. Valid options are: `All`, `ToManagerSet`, `ToManagerCollSet`.<br/>&dagger; Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, `ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. Where using the `PrimaryKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.
 

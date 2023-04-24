@@ -158,7 +158,7 @@ entities:
   }
 
   # CosmosDb
-- { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot,
+- { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validationFramework: FluentValidation, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot,
     properties: [
       { name: Id, text: '{{Robot}} identifier', type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter{T}', grpcFieldNo: 1 },
       { name: ModelNo, text: Model number, type: string, grpcFieldNo: 2 },
@@ -176,7 +176,7 @@ entities:
       { name: Delete, type: Delete, primaryKey: true, webApiRoute: '{id}', grpc: true },
       { name: GetByArgs, type: GetColl, paging: true, grpc: true,
         parameters: [
-          { name: Args, type: RobotArgs, validator: RobotArgsValidator }
+          { name: Args, type: RobotArgs, validator: RobotArgsValidator, validationFramework: CoreEx }
         ]
       },
       { name: RaisePowerSourceChange, text: 'Raises a {{Robot.PowerSource}} change event', type: Custom, webApiRoute: '{id}/powerSource/{powerSource}', webApiStatus: Accepted, primaryKey: true, managerCustom: true, excludeData: true, excludeIData: true, excludeDataSvc: true, excludeIDataSvc: true,

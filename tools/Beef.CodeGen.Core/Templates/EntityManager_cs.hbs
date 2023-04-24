@@ -109,12 +109,12 @@ namespace {{Root.NamespaceBusiness}}
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-            await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{Validator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+            await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}nameof({{ArgumentName}}){{/ifne}}){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
       {{/each}}
     {{else}}
             await MultiValidator.Create()
       {{#each ValidateParameters}}
-                .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}.Entity().With<{{Validator}}>(){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+                .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
       {{#if ManagerExtensions}}
         {{#unless SingleValidateParameters}}

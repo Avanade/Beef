@@ -90,6 +90,7 @@ namespace My.Hr.Api.Controllers
         [HttpGet()]
         [Route("ref")]
         [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
     }
 }

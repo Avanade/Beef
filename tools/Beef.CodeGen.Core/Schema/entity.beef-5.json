@@ -91,6 +91,15 @@
           "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
           "description": "This can be overridden within the 'Entity'(s) and 'Operation'(s)."
         },
+        "validationFramework": {
+          "type": "string",
+          "title": "The 'Validation' framework to use for the entity-based validation.",
+          "description": "Defaults to 'CoreEx' (literal). This can be overridden within the 'Entity'(s), 'Operation'(s) and 'Parameter'(s).",
+          "enum": [
+            "CoreEx",
+            "FluentValidation"
+          ]
+        },
         "databaseName": {
           "type": "string",
           "title": "The .NET database interface name (used where 'Operation.AutoImplement' is 'Database').",
@@ -745,6 +754,15 @@
           "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
           "description": "This can be overridden within the 'CodeGeneration' and 'Operation'(s)."
         },
+        "validationFramework": {
+          "type": "string",
+          "title": "The 'Validation' framework to use for the entity-based validation.",
+          "description": "Defaults to 'CodeGeneration.ValidationFramework'. This can be overridden within the 'Operation'(s) and 'Parameter'(s).",
+          "enum": [
+            "CoreEx",
+            "FluentValidation"
+          ]
+        },
         "webApiRoutePrefix": {
           "type": "string",
           "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
@@ -1361,6 +1379,15 @@
           "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
           "description": "Defaults to the 'Entity.Validator' where not specified explicitly (where 'Operation.Type' options 'Create' or 'Update')."
         },
+        "validationFramework": {
+          "type": "string",
+          "title": "The 'Validation' framework to use for the entity-based validation.",
+          "description": "Defaults to 'Entity.ValidationFramework'. This can be overridden within the 'Parameter'(s).",
+          "enum": [
+            "CoreEx",
+            "FluentValidation"
+          ]
+        },
         "managerOperationType": {
           "type": "string",
           "title": "The 'ExecutionContext.OperationType' (CRUD denotation) defined at the 'Manager'-layer.",
@@ -1607,14 +1634,18 @@
           "type": "string",
           "title": "The name of the .NET 'Type' that will perform the validation."
         },
-        "iValidator": {
-          "type": "string",
-          "title": "The name of the .NET Interface that the 'Validator' implements/inherits.",
-          "description": "Defaults to 'IValidatorEx<{Type}>' where the '{Type}' is 'Type'."
-        },
         "validatorCode": {
           "type": "string",
           "title": "The fluent-style method-chaining C# validator code to append to 'IsMandatory' and 'Validator' (where specified)."
+        },
+        "validationFramework": {
+          "type": "string",
+          "title": "The 'Validation' framework to use for the entity-based validation.",
+          "description": "Defaults to 'Operation.ValidationFramework'.",
+          "enum": [
+            "CoreEx",
+            "FluentValidation"
+          ]
         },
         "isMandatory": {
           "type": "boolean",

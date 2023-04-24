@@ -1,6 +1,8 @@
 ﻿using Beef.Demo.Common.Agents;
 using CoreEx.Database;
 using CoreEx.Events;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using AzCosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Api
@@ -41,7 +43,8 @@ namespace Beef.Demo.Api
                     .AddReferenceDataContentWebApi()
                     .AddRequestCache()
                     .AddValidationTextProvider()
-                    .AddValidators<PersonManager>();
+                    .AddValidators<PersonManager>()
+                    .AddFluentValidators<PersonManager>();
 
             // Add the data sources as singletons for dependency injection requirements.
             //services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
@@ -131,7 +134,8 @@ namespace Beef.Demo.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
 
-                c.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
+                c.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
+                c.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
             });
 
             //services.AddSwaggerGenNewtonsoftSupport();

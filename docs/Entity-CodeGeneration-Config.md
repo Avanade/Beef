@@ -101,6 +101,7 @@ Provides the _Manager-layer_ configuration.
 Property | Description
 -|-
 `managerCleanUp` | Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.<br/>&dagger; This can be overridden within the `Entity`(s) and `Operation`(s).
+`validationFramework` | The `Validation` framework to use for the entity-based validation. Valid options are: `CoreEx`, `FluentValidation`.<br/>&dagger; Defaults to `CoreEx` (literal). This can be overridden within the `Entity`(s), `Operation`(s) and `Parameter`(s).
 
 <br/>
 

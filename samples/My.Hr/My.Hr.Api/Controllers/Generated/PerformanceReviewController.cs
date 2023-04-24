@@ -43,6 +43,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
         [HttpGet("employees/{employeeId}/reviews")]
+        [Paging]
         [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> GetByEmployeeId(Guid employeeId) =>

@@ -334,6 +334,14 @@ operations: [
         public string? Validator { get; set; }
 
         /// <summary>
+        /// Gets or sets the `Validation` framework. 
+        /// </summary>
+        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+            Description = "Defaults to `Entity.ValidationFramework`. This can be overridden within the `Parameter`(s).")]
+        public string? ValidationFramework { get; set; }
+
+        /// <summary>
         /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.
         /// </summary>
         [JsonProperty("managerOperationType", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -1029,6 +1037,7 @@ operations: [
                 _ => HasReturnValue ? "NoContent" : "null"
             });
 
+            ValidationFramework = DefaultWhereNull(ValidationFramework, () => Parent!.ValidationFramework);
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => Parent!.ManagerCleanUp);
             ManagerOperationType = DefaultWhereNull(ManagerOperationType, () => Type switch
             {

@@ -10,6 +10,7 @@ global using CoreEx.Entities;
 global using CoreEx.Entities.Extended;
 global using CoreEx.EntityFrameworkCore;
 global using CoreEx.Events;
+global using CoreEx.FluentValidation;
 global using CoreEx.Http;
 global using CoreEx.Invokers;
 global using CoreEx.Json;

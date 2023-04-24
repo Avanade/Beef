@@ -1,4 +1,4 @@
-﻿# MyEf.Hr APIs
+﻿# MyEf.Hr
 
 The purpose of this sample is to demonstrate the usage of _Beef_ (and [_CoreEx_](https://github.com/Avanade/CoreEx) runtime) within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging _only_ Entity Framework (EF).
 
@@ -97,12 +97,51 @@ Also, any files that start with `Person` (being the demonstration entity) should
 ## Implementation steps
 
 As described earlier, this sample will walk through the implementation in a number of logical steps:
+
 1. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
 2. [Employee API](./docs/Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
 3. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
 4. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.
 5. [Employee Terminate](./docs/Employee-Terminate.md) - adds the `Employee` termination capability and tests.
 6. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
+
+<br/>
+
+## Event driven architecture implementation
+
+The implementation so far has created the API capabilities to perform operations on the data as originally defined in the [scope](#Scope). This section can be [skipped](#Conclusion) where the related Event-driven architecture capabilities are not required.
+
+However, to further support the goals of an [Event-driven architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) (EDA) both the publishing and subscribing of events is required, and will be largely enabled leveraging the [CoreEx.Events](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events) capabilities.
+
+<br/>
+
+### Conceptual architecture
+
+The _Conceptual Architecture_ for the solution including eventing/messaging is as follows:
+
+![Architecture](./docs/Event-Driven-Architecture.png "Architecture")
+
+The _Architecture_ is composed of the following components:
+- **API** - represents the _HR_ domain API-endpoint;
+- **SQL** - represents the _HR_ domain data and outbox repository;
+- **Relay** - represents the _HR_ domain Azure Service Bus publishing relay;
+- **Subscriber** - represents the _Security_ domain Azure Service Bus subscriber;
+- **OKTA** - represents the external [OKTA](https://developer.okta.com/docs/reference/) Identity Management API-endpoints (for Employee User Accounts).
+- **Event-stream** - represents the Azure Service Bus capabilities.
+
+The _data-flow_ represented is related to an Employee Termination; in that an Employee's User Account will be automatically _deactivated_ within OKTA as a result of their _termination_.
+
+The _HR_ and _Security_ domains are completely decoupled from each other; in that there is no run-time dependency between them - they only communicate via messages in near-realtime as enabled by the _event-stream_.
+
+<br/>
+
+### Additional implementation steps
+
+This _EDA_ sample will walk through the implementation in a number of logical steps (these describe the integration of the _CoreEx_ capabilities to enable) to achieve the end-to-end Employee's User Account deactivation:
+
+7. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database
+8. [Service Bus Publish](./docs/Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
+9. [Service Bus Subscribe](./docs/Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
 
 <br/>
 

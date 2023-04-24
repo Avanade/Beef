@@ -167,6 +167,14 @@ entities:
             Description = "This can be overridden within the `Entity`(s) and `Operation`(s).")]
         public bool? ManagerCleanUp { get; set; }
 
+        /// <summary>
+        /// Gets or sets the `Validation` framework. 
+        /// </summary>
+        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+            Description = "Defaults to `CoreEx` (literal). This can be overridden within the `Entity`(s), `Operation`(s) and `Parameter`(s).")]
+        public string? ValidationFramework { get; set; }
+
         #endregion
 
         #region Data
@@ -535,6 +543,7 @@ entities:
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => false);
+            ValidationFramework = DefaultWhereNull(ValidationFramework, () => "CoreEx");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);
             EventSourceKind = DefaultWhereNull(EventSourceKind, () => "None");
             EventSubjectSeparator = DefaultWhereNull(EventSubjectSeparator, () => ".");
@@ -571,9 +580,9 @@ entities:
             {
                 foreach (var o in e.Operations!)
                 {
-                    foreach (var p in o.Parameters!.Where(x => x.IValidator != null))
+                    foreach (var p in o.Parameters!.Where(x => x.Validator != null))
                     {
-                        var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator };
+                        var pc = new ParameterConfig { Name = p.Validator, Type = p.Validator, ValidationFramework = p.ValidationFramework };
                         if (!Validators.Any(x => x.Type == pc.Type))
                             Validators.Add(pc);
                     }

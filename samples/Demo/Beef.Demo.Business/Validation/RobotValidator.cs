@@ -1,19 +1,15 @@
-﻿namespace Beef.Demo.Business.Validation
+﻿using FluentValidation;
+
+namespace Beef.Demo.Business.Validation
 {
-    /// <summary>
-    /// Represents a <see cref="Robot"/> validator.
-    /// </summary>
-    public class RobotValidator : Validator<Robot>
+    public class RobotValidator : AbstractValidator<Robot>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotValidator"/>.
-        /// </summary>
         public RobotValidator()
         {
-            Property(x => x.ModelNo).Mandatory().Common(CommonValidators.Text);
-            Property(x => x.SerialNo).Mandatory().Common(CommonValidators.Text);
-            Property(x => x.EyeColor).IsValid();
-            Property(x => x.PowerSource).IsValid();
+            RuleFor(x => x.ModelNo).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.SerialNo).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.EyeColor).IsValid();
+            RuleFor(x => x.PowerSource).IsValid();
         }
     }
 }

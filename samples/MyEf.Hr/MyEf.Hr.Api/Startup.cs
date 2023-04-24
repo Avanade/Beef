@@ -1,5 +1,9 @@
-﻿using CoreEx.Database;
+﻿using CoreEx.Azure.ServiceBus;
+using CoreEx.Azure.Storage;
+using CoreEx.Database;
 using CoreEx.Events;
+using CoreEx.Hosting;
+using Az = Azure.Messaging.ServiceBus;
 
 namespace MyEf.Hr.Api
 {
@@ -47,14 +51,22 @@ namespace MyEf.Hr.Api
                     .AddGeneratedDataServices();
 
             // Add event publishing services.
-            services.AddNullEventPublisher();
+            services.AddEventDataFormatter();
+            services.AddCloudEventSerializer();
+            services.AddEventPublisher();
 
-            // Add transactional event outbox services.
-            services.AddScoped<IEventSender>(sp =>
+            // Add transactional event outbox enqueue services.
+            services.AddScoped<IEventSender, EventOutboxEnqueue>();
+
+            // Add transactional event outbox dequeue dependencies.
+            services.AddSingleton(sp => new Az.ServiceBusClient(sp.GetRequiredService<HrSettings>().ServiceBusConnectionString));
+            services.AddSingleton<IServiceSynchronizer>(sp => new BlobLeaseSynchronizer(new Azure.Storage.Blobs.BlobContainerClient(sp.GetRequiredService<HrSettings>().StorageConnectionString, "event-synchronizer")));
+            services.AddScoped<IServiceBusSender, ServiceBusSender>();
+
+            // Add transactional event outbox dequeue hosted service (_must_ be explicit with the IServiceBusSender as the IEventSender).
+            services.AddSqlServerEventOutboxHostedService(sp =>
             {
-                var eoe = new EventOutboxEnqueue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<ILogger<EventOutboxEnqueue>>());
-                //eoe.SetPrimaryEventSender(/* the primary sender instance; i.e. service bus */); // This is optional.
-                return eoe;
+                return new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>());
             });
 
             // Add entity mapping services using assembly probing.
@@ -74,7 +86,8 @@ namespace MyEf.Hr.Api
                 if (File.Exists(xmlFile))
                     options.IncludeXmlComments(xmlFile);
 
-                options.OperationFilter<CoreEx.WebApis.AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribue where body parameter not explicitly defined.
+                options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
+                options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
             });
         }
 

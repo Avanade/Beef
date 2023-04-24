@@ -1,0 +1,31 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
+    },
+    "logLevel": {
+      "CoreEx.Azure.ServiceBus.ServiceBusSubscriber": "Information"
+    }
+  },
+  "extensions": {
+    "serviceBus": {
+      "clientRetryOptions": {
+        "mode": "exponential",
+        "tryTimeout": "00:05:00",
+        "delay": "00:00:30.00",
+        "maxDelay": "00:03:00",
+        "maxRetries": 3
+      },
+      "prefetchCount": 0,
+      "messageHandlerOptions": {
+        "autoComplete": false,
+        "maxConcurrentCalls": 1,
+        "maxAutoRenewDuration": "00:05:00"
+      }
+    }
+  }
+}
