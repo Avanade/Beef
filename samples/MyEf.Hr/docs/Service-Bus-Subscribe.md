@@ -283,6 +283,8 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
 }
 ```
 
+<br/>
+
 ## Employee terminated subscriber
 
 As discussed earlier a subscriber must implement [`IEventSubscriber`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/IEventSubscriber.cs). To further enable the [`SubscriberBase`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/SubscriberBase.cs) and [`SubscriberBase<TValue>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/SubscriberBaseT.cs) abstract base classes enable the requisite functionality. These provide overridable [`IErrorHandling`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/IErrorHandling.cs) configuration, being the corresponding [`ErrorHandling`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/Subscribing/ErrorHandling.cs) action per error type so that specific error handling can be defined per subscriber where needed explicitly.
