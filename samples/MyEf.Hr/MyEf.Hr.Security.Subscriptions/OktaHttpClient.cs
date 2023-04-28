@@ -15,7 +15,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     public async Task<OktaUser?> GetUser(string email)
     {
         var response = await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
-        return response.Value.SingleOrDefault();
+        return response.Value.Count == 1 ? response.Value[0] : null;
     }
 
     /// <summary>

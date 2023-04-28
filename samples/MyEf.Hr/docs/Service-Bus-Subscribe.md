@@ -87,7 +87,7 @@ Update project dependencies as follows.
 
 Open the `host.json` file and replace with the contents from [`host.json`](../MyEf.Hr.Security.Subscriptions/host.json). 
 
-The [configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus) within will ensure that only a single message can be processed at a time, and also configures the basic retry policy.
+The [configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus) within will ensure that _only_ a _single_ message can be processed at a time, and that there is also _no_ automatic completion of messages.
 
 <br/>
 
@@ -96,11 +96,15 @@ The [configuration](https://learn.microsoft.com/en-us/azure/azure-functions/func
 Open the `local.settings.json` file and replace `Values` JSON with the following.
 
 ``` json
+{
+  "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "ServiceBusConnectionString": "get-your-secret-and-paste-here",
     "ServiceBusQueueName": "event-stream"
+  }
+}
 ```
 
 <br/>
@@ -218,6 +222,8 @@ Setting | Description
 `OktaHttpClient:BaseUri` | The base [`Uri`](https://learn.microsoft.com/en-us/dotnet/api/system.uri) for the external OKTA API.
 `OktaHttpClient:HttpRetryCount`* | Specifies the number of times the HTTP request should be retried when a transient error occurs.
 `OktaHttpClient:HttpTimeoutSeconds`* | Specifies the maximum number of seconds for the HTTP request to complete before timing out. 
+`ServiceBusOrchestratedSubscriber.AbandonOnTransient`* | Indicates that the message should be explicitly abandoned where transient error occurs.
+`ServiceBusOrchestratedSubscriber.RetryDelay`* | The timespan to delay (multiplied by delivery count) after each transient error is encountered; continues to lock message.
 
 ``` json
 {
@@ -225,6 +231,10 @@ Setting | Description
     "BaseUri": "https://dev-1234.okta.com",
     "HttpRetryCount": 2,
     "HttpTimeoutSeconds": 120
+  },
+  "ServiceBusOrchestratedSubscriber": {
+    "AbandonOnTransient": true,
+    "RetryDelay": "00:00:30"
   }
 }
 ```
@@ -263,7 +273,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     public async Task<OktaUser?> GetUser(string email)
     {
         var response = await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
-        return response.Value.SingleOrDefault();
+        return response.Value.Count == 1 ? response.Value[0] : null;
     }
 
     /// <summary>
@@ -335,7 +345,7 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override async Task ReceiveAsync(EventData<Employee> @event, CancellationToken cancellationToken)
     {
-        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} not found in OKTA.");
+        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} either not found, or multiple exist, within OKTA.");
 
         if (!user.IsDeactivatable)
             _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status);
