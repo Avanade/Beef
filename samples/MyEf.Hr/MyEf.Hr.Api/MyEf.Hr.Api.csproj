@@ -5,7 +5,7 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.Azure" Version="2.9.0" />
+    <PackageReference Include="CoreEx.Azure" Version="2.10.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
   </ItemGroup>

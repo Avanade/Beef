@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.3.1
+- *Fixed:* Upgraded `CoreEx` and `UnitTestEx` to latest packages to include all related fixes.
+
 ## v5.3.0
 - *Enhancement:* Added new code-generation configuration property `ValidationFramework` that supports either `CoreEx` (default) or `FluentValidation` (uses the `CoreEx.FluentValidation` interop wrapping capabilities) to allow entity validation to be performed using either framework. Supports mix-and-matching where required. The `CoreEx.Validation` framework is still leveraged for `IsMandatory` and `ValidatorCode` logic where specified.
 - *[Issue 208](https://github.com/Avanade/Beef/issues/208): `ReferenceDataController.GetNamed` now excluded from Swagger output as results in superfluous types/models.

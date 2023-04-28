@@ -24,7 +24,7 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override async Task ReceiveAsync(EventData<Employee> @event, CancellationToken cancellationToken)
     {
-        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} not found in OKTA.");
+        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} either not found, or multiple exist, within OKTA.");
 
         if (!user.IsDeactivatable)
             _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status);
