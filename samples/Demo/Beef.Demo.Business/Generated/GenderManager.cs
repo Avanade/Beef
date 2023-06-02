@@ -52,7 +52,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             return await _dataService.UpdateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Update);
     }

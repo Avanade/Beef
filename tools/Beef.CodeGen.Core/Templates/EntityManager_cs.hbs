@@ -83,27 +83,27 @@ namespace {{Root.NamespaceBusiness}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#if IdentifierGenerator}}
-            value{{#ifeq ../../EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
+            value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
       {{/if}}
     {{/each}}
   {{/ifeq}}
   {{#each Parameters}}
     {{#ifeq LayerPassing 'ToManagerSet'}}
-            value{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.{{Name}} = {{ArgumentName}};
+            value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = {{ArgumentName}};
     {{/ifeq}}
     {{#ifeq LayerPassing 'ToManagerCollSet'}}
-            value{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}.ForEach(__item => __item.{{Name}} = {{ArgumentName}});
+            value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.ForEach(__item => __item.{{Name}} = {{ArgumentName}});
     {{/ifeq}}
   {{/each}}
   {{#if ManagerCustom}}
-            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
+            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
-            Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}});
+            Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}});
     {{/ifne}}
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
-            await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.EnsureValue(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
+            await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
 
       {{/unless}}
     {{/if}}

@@ -53,7 +53,7 @@ namespace My.Hr.Business
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             await value.Validate().Entity().With<EmployeeValidator>().ValidateAsync(true).ConfigureAwait(false);
             return await _dataService.UpdateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Update);

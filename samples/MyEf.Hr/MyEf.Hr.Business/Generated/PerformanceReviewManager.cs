@@ -53,7 +53,7 @@ namespace MyEf.Hr.Business
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().EmployeeId = employeeId;
+            value.Required().EmployeeId = employeeId;
             await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
             return await _dataService.CreateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Create);
@@ -66,7 +66,7 @@ namespace MyEf.Hr.Business
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
             return await _dataService.UpdateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Update);

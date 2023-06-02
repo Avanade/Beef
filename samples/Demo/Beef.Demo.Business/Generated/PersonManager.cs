@@ -166,7 +166,7 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
+            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
 
@@ -244,7 +244,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
 
@@ -267,7 +267,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
 
@@ -469,7 +469,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
 
@@ -548,7 +548,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(value.EnsureValue());
+            Cleaner.CleanUp(value.Required());
             await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
 
             await MultiValidator.Create()
@@ -667,7 +667,7 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
+            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
 
@@ -690,7 +690,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
 

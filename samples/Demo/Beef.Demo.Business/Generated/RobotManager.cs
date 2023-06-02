@@ -51,7 +51,7 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
+            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
@@ -65,7 +65,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             Cleaner.CleanUp(value);
             await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
             return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));

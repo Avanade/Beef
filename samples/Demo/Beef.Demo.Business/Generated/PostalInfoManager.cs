@@ -52,7 +52,7 @@ namespace Beef.Demo.Business
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
         public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(value.EnsureValue(), country, state, city);
+            Cleaner.CleanUp(value.Required(), country, state, city);
             await MultiValidator.Create()
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
@@ -72,7 +72,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
         public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            Cleaner.CleanUp(value.EnsureValue(), country, state, city);
+            Cleaner.CleanUp(value.Required(), country, state, city);
             await MultiValidator.Create()
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())

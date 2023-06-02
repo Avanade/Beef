@@ -62,7 +62,7 @@ namespace Beef.Demo.Business
         /// <returns>The updated <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            value.EnsureValue().Id = id;
+            value.Required().Id = id;
             await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
             return await _dataService.UpdateAsync(value).ConfigureAwait(false);
         }, InvokerArgs.Update);
