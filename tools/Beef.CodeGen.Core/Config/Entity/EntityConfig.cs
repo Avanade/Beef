@@ -117,6 +117,14 @@ entities:
             Description = "Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.")]
         public bool? IsInitialOverride { get; set; }
 
+        /// <summary>
+        /// Indicates whether to use Results.
+        /// </summary>
+        [JsonProperty("withResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Key", Title = "Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).",
+            Description = "Defaults to `CodeGeneration.WithResult`. This can be overridden within the Operation`(s).")]
+        public bool? WithResult { get; set; }
+
         #endregion
 
         #region RefData
@@ -1344,6 +1352,7 @@ entities:
             FileName = DefaultWhereNull(FileName, () => Name);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
+            WithResult = DefaultWhereNull(WithResult, () => Parent!.WithResult);
             ConstType = DefaultWhereNull(ConstType, () => "string");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
@@ -1679,9 +1688,6 @@ entities:
             // Manager constructors.
             if (RequiresDataSvc)
                 ManagerCtorParameters.Add(new ParameterConfig { Name = "DataService", Type = $"I{Name}DataSvc", Text = $"{{{{I{Name}DataSvc}}}}" });
-
-            if (AuthRole != null || Operations!.Any(x => x.AuthRole != null || x.AuthPermission != null))
-                ManagerCtorParameters.Add(new ParameterConfig { Name = "ExecutionContext", Type = "CoreEx.ExecutionContext", Text = "{{CoreEx.ExecutionContext}}" });
 
             AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
 

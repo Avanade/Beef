@@ -21,7 +21,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="data">The <see cref="IPostalInfoData"/>.</param>
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher events)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); PostalInfoDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); PostalInfoDataSvcCtor(); }
 
         partial void PostalInfoDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -44,9 +44,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
         public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create");
-            return __result;
+            var r = await _data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create");
+            return r;
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
         public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
-            return __result;
+            var r = await _data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
+            return r;
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>

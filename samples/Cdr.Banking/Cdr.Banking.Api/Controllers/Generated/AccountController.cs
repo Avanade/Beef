@@ -23,7 +23,7 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IAccountManager"/>.</param>
         public AccountController(WebApi webApi, IAccountManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); AccountControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); AccountControllerCtor(); }
 
         partial void AccountControllerCtor(); // Enables additional functionality to be added to the constructor.
 

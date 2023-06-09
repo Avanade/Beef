@@ -26,7 +26,7 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
     /// <summary>
     /// Add further validation logic.
     /// </summary>
-    protected override async Task OnValidateAsync(ValidationContext<PerformanceReview> context, CancellationToken cancellationToken)
+    protected override async Task<Result> OnValidateAsync(ValidationContext<PerformanceReview> context, CancellationToken cancellationToken)
     {
         if (!context.HasError(x => x.EmployeeId))
         {
@@ -35,12 +35,12 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
             {
                 var prv = await _performanceReviewManager.GetAsync(context.Value.Id).ConfigureAwait(false);
                 if (prv == null)
-                    throw new NotFoundException();
+                    return Result.NotFoundError();
 
                 if (context.Value.EmployeeId != prv.EmployeeId)
                 {
                     context.AddError(x => x.EmployeeId, ValidatorStrings.ImmutableFormat);
-                    return;
+                    return Result.Success;
                 }
             }
 
@@ -59,5 +59,7 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
                 }
             }
         }
+
+        return Result.Success;
     }
 }

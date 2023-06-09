@@ -23,7 +23,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
         public RobotController(WebApi webApi, IRobotManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); RobotControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); RobotControllerCtor(); }
 
         partial void RobotControllerCtor(); // Enables additional functionality to be added to the constructor.
 

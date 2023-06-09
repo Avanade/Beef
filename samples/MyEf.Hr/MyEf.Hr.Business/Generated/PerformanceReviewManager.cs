@@ -19,7 +19,7 @@ namespace MyEf.Hr.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IPerformanceReviewDataSvc"/>.</param>
         public PerformanceReviewManager(IPerformanceReviewDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); PerformanceReviewManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); PerformanceReviewManagerCtor(); }
 
         partial void PerformanceReviewManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -28,10 +28,10 @@ namespace MyEf.Hr.Business
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReview?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .ThenAsAsync(() => _dataService.GetAsync(id));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -40,9 +40,10 @@ namespace MyEf.Hr.Business
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            return await _dataService.GetByEmployeeIdAsync(employeeId, paging).ConfigureAwait(false);
+            return Result.Go().Requires(employeeId)
+                         .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -51,11 +52,11 @@ namespace MyEf.Hr.Business
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().EmployeeId = employeeId;
-            await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.CreateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required().Requires(employeeId).Then(v => v.EmployeeId = employeeId)
+                         .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
+                         .ThenAsAsync(v => _dataService.CreateAsync(value));
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -64,21 +65,21 @@ namespace MyEf.Hr.Business
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().Id = id;
-            await value.Validate().Entity().With<PerformanceReviewValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                         .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
+                         .ThenAsAsync(v => _dataService.UpdateAsync(value));
         }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .ThenAsync(() => _dataService.DeleteAsync(id));
         }, InvokerArgs.Delete);
     }
 }

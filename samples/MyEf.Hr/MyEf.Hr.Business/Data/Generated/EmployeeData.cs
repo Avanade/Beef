@@ -20,7 +20,7 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         public EmployeeData(IEfDb ef)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); EmployeeDataCtor(); }
+            { _ef = ef.ThrowIfNull(); EmployeeDataCtor(); }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -29,9 +29,9 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id)
+        public Task<Result<Employee?>> GetAsync(Guid id)
         {
-            return _ef.GetAsync<Employee, EfModel.Employee>(id);
+            return _ef.GetWithResultAsync<Employee, EfModel.Employee>(id);
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value)
+        public Task<Result<Employee>> CreateAsync(Employee value)
         {
-            return _ef.CreateAsync<Employee, EfModel.Employee>(value ?? throw new ArgumentNullException(nameof(value)));
+            return _ef.CreateWithResultAsync<Employee, EfModel.Employee>(value);
         }
 
         /// <summary>
@@ -49,18 +49,18 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value)
+        public Task<Result<Employee>> UpdateAsync(Employee value)
         {
-            return _ef.UpdateAsync<Employee, EfModel.Employee>(value ?? throw new ArgumentNullException(nameof(value)));
+            return _ef.UpdateWithResultAsync<Employee, EfModel.Employee>(value);
         }
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id)
+        public Task<Result> DeleteAsync(Guid id)
         {
-            return _ef.DeleteAsync<Employee, EfModel.Employee>(id);
+            return _ef.DeleteWithResultAsync<Employee, EfModel.Employee>(id);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace MyEf.Hr.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
+        public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
         {
-            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
+            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id);
+        public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => TerminateOnImplementationAsync(value, id);
 
         /// <summary>
         /// Provides the <see cref="Employee"/> to Entity Framework <see cref="EfModel.Employee"/> mapping.

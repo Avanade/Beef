@@ -23,7 +23,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public RobotDataSvc(IRobotData data, IEventPublisher events, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); RobotDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); RobotDataSvcCtor(); }
 
         partial void RobotDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -41,9 +41,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/robots/{__result.Id}", UriKind.Relative), $"Demo.Robot", "Create");
-            return _cache.SetValue(__result);
+            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create");
+            return _cache.SetValue(r);
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/robots/{__result.Id}", UriKind.Relative), $"Demo.Robot", "Update");
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Update");
+            return _cache.SetValue(r);
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>

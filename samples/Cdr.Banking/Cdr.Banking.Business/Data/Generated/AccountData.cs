@@ -20,7 +20,7 @@ namespace Cdr.Banking.Business.Data
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmos"/>.</param>
         public AccountData(ICosmos cosmos)
-            { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); AccountDataCtor(); }
+            { _cosmos = cosmos.ThrowIfNull(); AccountDataCtor(); }
 
         partial void AccountDataCtor(); // Enables additional functionality to be added to the constructor.
 

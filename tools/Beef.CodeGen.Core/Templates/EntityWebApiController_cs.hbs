@@ -33,12 +33,12 @@ namespace {{Root.NamespaceApi}}.Controllers
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         {{lower WebApiCtor}} {{Name}}Controller({{#each WebApiCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-{{#ifle WebApiCtorParameters.Count 2}}
-            { {{#each WebApiCtorParameters}}{{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}})); {{/each}}{{Name}}ControllerCtor(); }
+{{#ifle WebApiCtorParameters.Count 5}}
+            { {{#each WebApiCtorParameters}}{{PrivateName}} = {{ArgumentName}}.ThrowIfNull(); {{/each}}{{Name}}ControllerCtor(); }
 {{else}}
         {
   {{#each WebApiCtorParameters}}
-            {{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}}));
+            {{PrivateName}} = {{ArgumentName}}.ThrowIfNull();
   {{/each}}
             {{Name}}ControllerCtor();
         }

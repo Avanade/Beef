@@ -24,7 +24,7 @@ namespace My.Hr.Business.Data
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher events)
-            { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); EmployeeDataCtor(); }
+            { _db = db.ThrowIfNull(); _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); EmployeeDataCtor(); }
 
         partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -42,9 +42,9 @@ namespace My.Hr.Business.Data
         /// <returns>The created <see cref="Employee"/>.</returns>
         public Task<Employee> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await CreateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)));
-            _events.PublishValueEvent(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Created");
-            return __result;
+            var r = await CreateOnImplementationAsync(value);
+            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created");
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace My.Hr.Business.Data
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await UpdateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)));
-            _events.PublishValueEvent(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated");
-            return __result;
+            var r = await UpdateOnImplementationAsync(value);
+            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated");
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace My.Hr.Business.Data
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await TerminateOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)), id);
-            _events.PublishValueEvent(__result, new Uri($"my/hr/employee/{__result.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated");
-            return __result;
+            var r = await TerminateOnImplementationAsync(value, id);
+            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated");
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>

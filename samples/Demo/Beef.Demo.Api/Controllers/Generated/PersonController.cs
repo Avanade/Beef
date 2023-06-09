@@ -26,12 +26,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="manager">The <see cref="IPersonManager"/>.</param>
         /// <param name="personManager">The <see cref="IPersonManager"/>.</param>
         public PersonController(WebApi webApi, IPersonManager manager, IPersonManager personManager)
-        {
-            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
-            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
-            _personManager = personManager ?? throw new ArgumentNullException(nameof(personManager));
-            PersonControllerCtor();
-        }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); _personManager = personManager.ThrowIfNull(); PersonControllerCtor(); }
 
         partial void PersonControllerCtor(); // Enables additional functionality to be added to the constructor.
 

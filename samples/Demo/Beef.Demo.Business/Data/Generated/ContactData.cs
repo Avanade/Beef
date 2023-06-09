@@ -22,7 +22,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         public ContactData(IEfDb ef, IEventPublisher events)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); ContactDataCtor(); }
+            { _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); ContactDataCtor(); }
 
         partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -52,9 +52,9 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="Contact"/>.</returns>
         public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.CreateAsync<Contact, EfModel.Contact>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Create");
-            return __result;
+            var r = await _ef.CreateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Create");
+            return r;
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.UpdateAsync<Contact, EfModel.Contact>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/contact/{__result.Id}", UriKind.Relative), $"Demo.Contact", "Update");
-            return __result;
+            var r = await _ef.UpdateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Update");
+            return r;
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>

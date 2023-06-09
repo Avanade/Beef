@@ -20,7 +20,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="cosmos">The <see cref="DemoCosmosDb"/>.</param>
         public RobotData(DemoCosmosDb cosmos)
-            { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); RobotDataCtor(); }
+            { _cosmos = cosmos.ThrowIfNull(); RobotDataCtor(); }
 
         partial void RobotDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -41,7 +41,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value)
         {
-            return _cosmos.Items.CreateAsync(value ?? throw new ArgumentNullException(nameof(value)));
+            return _cosmos.Items.CreateAsync(value);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value)
         {
-            return _cosmos.Items.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value)));
+            return _cosmos.Items.UpdateAsync(value);
         }
 
         /// <summary>

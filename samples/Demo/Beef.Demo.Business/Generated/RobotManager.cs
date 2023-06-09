@@ -23,12 +23,7 @@ namespace Beef.Demo.Business
         /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
         /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
         public RobotManager(IRobotDataSvc dataService, IEventPublisher eventPublisher, IIdentifierGenerator identifierGenerator)
-        {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
-            _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
-            _identifierGenerator = identifierGenerator ?? throw new ArgumentNullException(nameof(identifierGenerator));
-            RobotManagerCtor();
-        }
+            { _dataService = dataService.ThrowIfNull(); _eventPublisher = eventPublisher.ThrowIfNull(); _identifierGenerator = identifierGenerator.ThrowIfNull(); RobotManagerCtor(); }
 
         partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 

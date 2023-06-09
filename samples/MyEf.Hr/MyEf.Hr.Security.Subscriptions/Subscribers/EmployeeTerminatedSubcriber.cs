@@ -24,8 +24,8 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override ErrorHandling NotFoundHandling => ErrorHandling.CompleteWithWarning;
 
-    public override async Task<Result> ReceiveAsync(EventData<Employee> @event, EventSubscriberArgs args, CancellationToken cancellationToken) 
-        => await Result.GoAsync(_okta.GetUserAsync(@event.Value.Id, @event.Value.Email!))
+    public override Task<Result> ReceiveAsync(EventData<Employee> @event, EventSubscriberArgs args, CancellationToken cancellationToken) 
+        => Result.GoAsync(_okta.GetUserAsync(@event.Value.Id, @event.Value.Email!))
             .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
-            .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!)).ConfigureAwait(false);
+            .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
 }

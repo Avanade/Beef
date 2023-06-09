@@ -24,7 +24,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 
   {{#each DataSvcAutoOperations}}
     {{#if DataSvcExtensions}}
-        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task>? {{PrivateName}}OnAfterAsync;
+        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnAfterAsync;
     {{/if}}
   {{/each}}
 
@@ -38,12 +38,12 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
         {{lower DataSvcCtor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-{{#ifle DataSvcCtorParameters.Count 3}}
-            { {{#each DataSvcCtorParameters}}{{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+{{#ifle DataSvcCtorParameters.Count 5}}
+            { {{#each DataSvcCtorParameters}}{{PrivateName}} = {{ArgumentName}}.ThrowIfNull(); {{/each}}{{Name}}DataSvcCtor(); }
 {{else}}
         {
   {{#each DataSvcCtorParameters}}
-            {{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}}));
+            {{PrivateName}} = {{ArgumentName}}.ThrowIfNull();
   {{/each}}
             {{Name}}DataSvcCtor();
         }
@@ -64,49 +64,76 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{#unless DataSvcInvoker}}{{#unless DataSvcCustom}}{{#unless DataSvcSingleLine}}async {{/unless}}{{/unless}}{{/unless}}{{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}){{#if DataSvcCustom}}{{#if DataSvcInvoker}} => DataSvcInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}cancellationToken => {{/if}}{{else}}{{#if DataSvcInvoker}}_{{/if}}{{/if}}{{#if DataSvcInvoker}}_{{/if}} => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#if Root.CancellationToken}}{{#ifne DataParameters.Count 0}}, {{/ifne}}cancellationToken{{/if}}){{#if DataSvcTransaction}}, new InvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new InvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}{{#if DataSvcInvoker}}){{/if}};{{else}}{{#if DataSvcInvoker}} => DataSvcInvoker.Current.InvokeAsync(this, {{#unless DataSvcSingleLine}}async {{/unless}}{{#if Root.CancellationToken}}cancellationToken =>{{else}}_ =>{{/if}}{{/if}}{{/if}}{{#if DataSvcSingleLine}}{{#unless DataSvcInvoker}}{{#unless DataSvcCustom}} =>{{/unless}}{{/unless}} {{#ifeq Type 'Get'}}{{#if SupportsCaching}}_cache.GetOrAddAsync({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}, () => {{/if}}{{/ifeq}}{{#unless DataSvcCustom}}_data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#ifeq Type 'Get'}}{{#if SupportsCaching}}){{/if}}{{/ifeq}}{{#if DataSvcInvoker}}){{/if}};{{/unless}}{{/if}}
+        {{set-value 'HasResultCode' false}}public {{#unless DataSvcInvoker}}{{#unless DataSvcCustom}}{{#unless DataSvcSingleLine}}{{#unless WithResult}}async {{/unless}}{{/unless}}{{/unless}}{{/unless}}{{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}){{#if DataSvcCustom}}{{#if DataSvcInvoker}} => DataSvcInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}cancellationToken => {{/if}}{{else}}{{#if DataSvcInvoker}}_{{/if}}{{/if}}{{#if DataSvcInvoker}}_{{/if}} => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#if Root.CancellationToken}}{{#ifne DataParameters.Count 0}}, {{/ifne}}cancellationToken{{/if}}){{#if DataSvcTransaction}}, new InvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new InvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}{{#if DataSvcInvoker}}){{/if}};{{else}}{{#if DataSvcInvoker}} => DataSvcInvoker.Current.InvokeAsync(this, {{#unless DataSvcSingleLine}}{{#unless WithResult}}async {{/unless}}{{/unless}}{{#if Root.CancellationToken}}cancellationToken =>{{else}}_ =>{{/if}}{{/if}}{{/if}}{{#if DataSvcSingleLine}}{{#unless DataSvcInvoker}}{{#unless DataSvcCustom}} =>{{/unless}}{{/unless}} {{#ifeq Type 'Get'}}{{#if SupportsCaching}}{{#if WithResult}}Result.Go().CacheGetOrAddAsync(_cache, {{else}}_cache.GetOrAddAsync({{/if}}{{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}, () => {{/if}}{{/ifeq}}{{#unless DataSvcCustom}}_data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#ifeq Type 'Get'}}{{#if SupportsCaching}}){{/if}}{{/ifeq}}{{#if DataSvcInvoker}}){{/if}};{{/unless}}{{/if}}
   {{#unless DataSvcCustom}}
   {{#unless DataSvcSingleLine}}
         {
-    {{#if SupportsCaching}}
-      {{#ifeq Type 'Get'}}
+    {{#if WithResult}}
+      {{#if SupportsCaching}}
+        {{#ifeq Type 'Get'}}
+            {{set-value 'HasResultCode' true}}return Result.Go().CacheGetOrAddAsync(_cache, {{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}, () => _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}))
+        {{/ifeq}}
+        {{#ifeq Type 'Delete'}}
+            {{set-value 'HasResultCode' true}}return Result.Go(_cache.Remove<{{Parent.Name}}>({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}))
+        {{/ifeq}}
+      {{/if}}
+      {{#unless IsGetWithCache}}
+            {{#if HasResultCode}}             .ThenAsAsync(_ => {{else}}return Result.GoAsync({{/if}}_data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}})){{#unless DataSvcExtensions}}{{#unless DataSvcWillEventPublish}}{{#if SupportsCaching}}{{#ifeq Type 'Delete'}};{{/ifeq}}{{else}};{{/if}}{{/unless}}{{/unless}}
+      {{/unless}}
+      {{#if DataSvcExtensions}}
+                         .ThenAsync({{#if HasReturnValue}}r{{else}}(){{/if}} => {{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{#ifne ValueLessDataParamaters 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}cancellationToken{{/if}}) ?? Result.SuccessTask){{#unless DataSvcWillEventPublish}}{{#if SupportsCaching}}{{#ifeq Type 'Delete' 'Get'}};{{/ifeq}}{{else}};{{/if}}{{/unless}}
+      {{/if}}
+    {{else}}
+      {{#if SupportsCaching}}
+        {{#ifeq Type 'Get'}}
             if (_cache.TryGetValue({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}, out {{OperationReturnType}} __val))
                 return __val;
 
-      {{/ifeq}}
-      {{#ifeq Type 'Delete'}}
+        {{/ifeq}}
+        {{#ifeq Type 'Delete'}}
             _cache.Remove<{{Parent.Name}}>({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}});
-      {{/ifeq}}
-    {{/if}}
-            {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
-    {{#if DataSvcExtensions}}
-            await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{#ifne ValueLessDataParamaters 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}cancellationToken{{/if}})).ConfigureAwait(false);
+        {{/ifeq}}
+      {{/if}}
+            {{#if HasReturnValue}}var r = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value ?? throw new ArgumentNullException(nameof(value)){{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}).ConfigureAwait(false);
+      {{#if DataSvcExtensions}}
+            await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{#ifne ValueLessDataParamaters 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}cancellationToken{{/if}})).ConfigureAwait(false);
+      {{/if}}
     {{/if}}
     {{#ifeq EventPublish 'DataSvc'}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
-            _events.Publish{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}");
+            {{#if Parent.WithResult}}             .Then({{#if Parent.HasReturnValue}}r{{else}}(){{/if}} => {{/if}}_events.Publish{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"){{#if Parent.WithResult}}){{#if Parent.SupportsCaching}}{{#ifeq Parent.Type 'Delete'}};{{/ifeq}}{{else}};{{/if}}{{else}};{{/if}}
         {{/each}}
       {{else}}
         {{#ifeq Events.Count 0}}
         {{else}}
-            _events.Publish(
+            {{#if WithResult}}             .Then({{#if HasReturnValue}}r{{else}}(){{/if}} => {{/if}}_events.Publish(
           {{#each Events}}
-                _events.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"){{#if @last}});{{else}},{{/if}}
+                {{#if Parent.WithResult}}             {{/if}}_events.Create{{#ifval Value}}Value{{/ifval}}Event({{#ifval Value}}{{Value}}, {{/ifval}}{{#ifval Source}}new Uri($"{{Source}}", UriKind.{{../../Root.EventSourceKind}}), {{/ifval}}$"{{Subject}}", "{{Action}}"){{#if @last}}){{#if Parent.WithResult}}){{#if Parent.SupportsCaching}}{{#ifeq Parent.Type 'Delete'}};{{/ifeq}}{{else}};{{/if}}{{else}};{{/if}}{{else}},{{/if}}
             {{#if @last}}
+              {{#unless Parent.WithResult}}
 
+              {{/unless}}   
             {{/if}}
           {{/each}}
         {{/ifeq}}
       {{/ifeq}}
     {{/ifeq}}
-    {{#if SupportsCaching}}
-      {{#ifne Type 'Delete'}}
-            return _cache.SetValue(__result);
-      {{/ifne}}
-    {{else}}   
-      {{#if HasReturnValue}}
-            return __result;
+    {{#if WithResult}}
+      {{#if SupportsCaching}}
+        {{#ifne Type 'Delete' 'Get'}}
+                         .Then(r => _cache.SetValue(r));
+        {{/ifne}}
+      {{/if}}
+    {{else}}
+      {{#if SupportsCaching}}
+        {{#ifne Type 'Delete'}}
+            return _cache.SetValue(r);
+        {{/ifne}}
+      {{else}}   
+        {{#if HasReturnValue}}
+            return r;
+        {{/if}}
       {{/if}}
     {{/if}}
         }{{#if DataSvcInvoker}}{{#if DataSvcTransaction}}, new InvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'DataSvc'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'DataSvc'}}, new InvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/if}}

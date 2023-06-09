@@ -23,21 +23,23 @@
         /// <summary>
         /// Terminates an existing employee by updating their termination columns.
         /// </summary>
-        private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
+        private Task<Result<Employee>> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
         {
             // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-            var curr = await GetAsync(id).ConfigureAwait(false);
-            if (curr == null)
-                throw new NotFoundException();
+            return Result.GoAsync(GetAsync(id)).ThenAsAsync(async curr =>
+            {
+                if (curr == null)
+                    return Result.NotFoundError();
 
-            if (curr.Termination != null)
-                throw new ValidationException("An Employee can not be terminated more than once.");
+                if (curr.Termination != null)
+                    return Result.ValidationError("An Employee can not be terminated more than once.");
 
-            if (value.Date < curr.StartDate)
-                throw new ValidationException("An Employee can not be terminated prior to their start date.");
+                if (value.Date < curr.StartDate)
+                    return Result.ValidationError("An Employee can not be terminated prior to their start date.");
 
-            curr.Termination = value;
-            return await UpdateAsync(curr).ConfigureAwait(false);
+                curr.Termination = value;
+                return await UpdateAsync(curr).ConfigureAwait(false);
+            });
         }
     }
 }

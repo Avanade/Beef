@@ -19,7 +19,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
         public ContactManager(IContactDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ContactManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); ContactManagerCtor(); }
 
         partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 

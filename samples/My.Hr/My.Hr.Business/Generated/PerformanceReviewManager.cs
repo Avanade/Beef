@@ -19,7 +19,7 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IPerformanceReviewDataSvc"/>.</param>
         public PerformanceReviewManager(IPerformanceReviewDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); PerformanceReviewManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); PerformanceReviewManagerCtor(); }
 
         partial void PerformanceReviewManagerCtor(); // Enables additional functionality to be added to the constructor.
 

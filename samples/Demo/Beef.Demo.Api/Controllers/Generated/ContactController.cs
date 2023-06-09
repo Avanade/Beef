@@ -26,12 +26,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="manager">The <see cref="IContactManager"/>.</param>
         /// <param name="config">The <see cref="Microsoft.Extensions.Configuration.IConfiguration"/>.</param>
         public ContactController(WebApi webApi, IContactManager manager, Microsoft.Extensions.Configuration.IConfiguration config)
-        {
-            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
-            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            ContactControllerCtor();
-        }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); _config = config.ThrowIfNull(); ContactControllerCtor(); }
 
         partial void ContactControllerCtor(); // Enables additional functionality to be added to the constructor.
 

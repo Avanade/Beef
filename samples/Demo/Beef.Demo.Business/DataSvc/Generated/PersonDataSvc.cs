@@ -50,7 +50,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public PersonDataSvc(IPersonData data, IEventPublisher events, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); PersonDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); PersonDataSvcCtor(); }
 
         partial void PersonDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -61,10 +61,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/person/{__result.Id}", UriKind.Relative), $"Demo.Person", "Create");
-            return _cache.SetValue(__result);
+            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Create");
+            return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -96,9 +96,9 @@ namespace Beef.Demo.Business.DataSvc
             if (_cache.TryGetValue(id, out Person? __val))
                 return __val;
 
-            var __result = await _data.GetExAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.GetExAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/person/{__result.Id}", UriKind.Relative), $"Demo.Person", "Update");
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
+            return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -120,10 +120,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithRollbackAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateWithRollbackAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/person/{__result.Id}", UriKind.Relative), $"Demo.Person", "Update");
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateWithRollbackAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
+            return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -133,9 +133,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
-            var __result = await _data.GetAllAsync(paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(__result, paging)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetAllAsync(paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(r, paging)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -144,9 +144,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetAll2Async()
         {
-            var __result = await _data.GetAll2Async().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetAll2Async().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -157,9 +157,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -170,9 +170,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public async Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            var __result = await _data.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -183,13 +183,13 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(__result, fromId, toId)).ConfigureAwait(false);
+            var r = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(r, fromId, toId)).ConfigureAwait(false);
             _events.Publish(
-                _events.CreateValueEvent(__result, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{fromId}", "MergeFrom"),
-                _events.CreateValueEvent(__result, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{toId}", "MergeTo"));
+                _events.CreateValueEvent(r, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{fromId}", "MergeFrom"),
+                _events.CreateValueEvent(r, new Uri($"/person/", UriKind.Relative), $"Demo.Person.{toId}", "MergeTo"));
 
-            return __result;
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -208,9 +208,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public async Task<MapCoordinates> MapAsync(MapArgs? args)
         {
-            var __result = await _data.MapAsync(args).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(__result, args)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.MapAsync(args).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -222,9 +222,9 @@ namespace Beef.Demo.Business.DataSvc
             if (_cache.TryGetValue(new CompositeKey(), out Person? __val))
                 return __val;
 
-            var __result = await _data.GetNoArgsAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.GetNoArgsAsync().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -237,9 +237,9 @@ namespace Beef.Demo.Business.DataSvc
             if (_cache.TryGetValue(id, out PersonDetail? __val))
                 return __val;
 
-            var __result = await _data.GetDetailAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.GetDetailAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -249,10 +249,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateDetailAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/person/{__result.Id}", UriKind.Relative), $"Demo.Person", "Update");
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateDetailAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
+            return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -269,9 +269,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public async Task<Person?> GetNullAsync(string? name, List<string>? names)
         {
-            var __result = await _data.GetNullAsync(name, names).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(__result, name, names)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetNullAsync(name, names).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(r, name, names)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -289,9 +289,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public async Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
-            var __result = await _data.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -310,9 +310,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="string"/>.</returns>
         public async Task<string?> InvokeApiViaAgentAsync(Guid id)
         {
-            var __result = await _data.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return __result;
+            var r = await _data.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return r;
         }
 
         /// <summary>
@@ -331,9 +331,9 @@ namespace Beef.Demo.Business.DataSvc
             if (_cache.TryGetValue(id, out Person? __val))
                 return __val;
 
-            var __result = await _data.GetWithEfAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.GetWithEfAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -343,9 +343,9 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Person"/>.</returns>
         public async Task<Person> CreateWithEfAsync(Person value)
         {
-            var __result = await _data.CreateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.CreateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -355,10 +355,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var __result = await _data.UpdateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"/person/{__result.Id}", UriKind.Relative), $"Demo.Person", "Update");
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
+            return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="httpAgent">The <see cref="ZippoAgent"/>.</param>
         public PostalInfoData(ZippoAgent httpAgent)
-            { _httpAgent = httpAgent ?? throw new ArgumentNullException(nameof(httpAgent)); PostalInfoDataCtor(); }
+            { _httpAgent = httpAgent.ThrowIfNull(); PostalInfoDataCtor(); }
 
         partial void PostalInfoDataCtor(); // Enables additional functionality to be added to the constructor.
 

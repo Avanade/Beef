@@ -22,7 +22,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IPerformanceReviewManager"/>.</param>
         public PerformanceReviewController(WebApi webApi, IPerformanceReviewManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); PerformanceReviewControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); PerformanceReviewControllerCtor(); }
 
         partial void PerformanceReviewControllerCtor(); // Enables additional functionality to be added to the constructor.
 

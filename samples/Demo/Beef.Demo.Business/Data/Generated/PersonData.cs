@@ -70,13 +70,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="logger">The <see cref="Microsoft.Extensions.Logging.ILogger{PersonData}"/>.</param>
         /// <param name="personAgent">The <see cref="Common.Agents.IPersonAgent"/>.</param>
         public PersonData(IDatabase db, IEfDb ef, Microsoft.Extensions.Logging.ILogger<PersonData> logger, Common.Agents.IPersonAgent personAgent)
-        {
-            _db = db ?? throw new ArgumentNullException(nameof(db));
-            _ef = ef ?? throw new ArgumentNullException(nameof(ef));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _personAgent = personAgent ?? throw new ArgumentNullException(nameof(personAgent));
-            PersonDataCtor();
-        }
+            { _db = db.ThrowIfNull(); _ef = ef.ThrowIfNull(); _logger = logger.ThrowIfNull(); _personAgent = personAgent.ThrowIfNull(); PersonDataCtor(); }
 
         partial void PersonDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -88,9 +82,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person> CreateAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_createOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonCreate]").CreateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonCreate]").CreateAsync(DbMapper.Default, value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _createOnException });
 
         /// <summary>
@@ -122,9 +116,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person?> GetExAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getExOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonGetEx]").GetAsync(DbMapper.Default, id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonGetEx]").GetAsync(DbMapper.Default, id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getExOnException });
 
         /// <summary>
@@ -134,7 +128,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value)
         {
-            return _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value)));
+            return _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value);
         }
 
         /// <summary>
@@ -145,9 +139,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person> UpdateWithRollbackAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_updateWithRollbackOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
 
         /// <summary>
@@ -158,9 +152,9 @@ namespace Beef.Demo.Business.Data
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getAllOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAllOnQuery?.Invoke(p)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAllOnQuery?.Invoke(p)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getAllOnException });
 
         /// <summary>
@@ -170,9 +164,9 @@ namespace Beef.Demo.Business.Data
         public Task<PersonCollectionResult> GetAll2Async() => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getAll2OnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAll2OnQuery?.Invoke(p)).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAll2OnQuery?.Invoke(p)).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getAll2OnException });
 
         /// <summary>
@@ -184,9 +178,9 @@ namespace Beef.Demo.Business.Data
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getByArgsOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
-            var __result = await _db.StoredProcedure("[Demo].[spPersonGetByArgs]").Query(DbMapper.Default, p => _getByArgsOnQuery?.Invoke(p, args)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(__result, args)).ConfigureAwait(false);
-            return __result;
+            var r = await _db.StoredProcedure("[Demo].[spPersonGetByArgs]").Query(DbMapper.Default, p => _getByArgsOnQuery?.Invoke(p, args)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getByArgsOnException });
 
         /// <summary>
@@ -235,7 +229,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => UpdateDetailOnImplementationAsync(value ?? throw new ArgumentNullException(nameof(value)));
+        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => UpdateDetailOnImplementationAsync(value);
 
         /// <summary>
         /// Get Null.
@@ -254,9 +248,9 @@ namespace Beef.Demo.Business.Data
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getByArgsWithEfOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
-            var __result = await _ef.Query<Person, EfModel.Person>(q => _getByArgsWithEfOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(__result, args)).ConfigureAwait(false);
-            return __result;
+            var r = await _ef.Query<Person, EfModel.Person>(q => _getByArgsWithEfOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getByArgsWithEfOnException });
 
         /// <summary>
@@ -279,9 +273,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person?> GetWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_getWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _ef.GetAsync<Person, EfModel.Person>(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return __result;
+            var r = await _ef.GetAsync<Person, EfModel.Person>(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _getWithEfOnException });
 
         /// <summary>
@@ -292,9 +286,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person> CreateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_createWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _ef.CreateAsync<Person, EfModel.Person>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _ef.CreateAsync<Person, EfModel.Person>(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _createWithEfOnException });
 
         /// <summary>
@@ -305,9 +299,9 @@ namespace Beef.Demo.Business.Data
         public Task<Person> UpdateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
             await Invoker.InvokeAsync(_updateWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _ef.UpdateAsync<Person, EfModel.Person>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return __result;
+            var r = await _ef.UpdateAsync<Person, EfModel.Person>(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return r;
         }, new InvokerArgs { ExceptionHandler = _updateWithEfOnException });
 
         /// <summary>

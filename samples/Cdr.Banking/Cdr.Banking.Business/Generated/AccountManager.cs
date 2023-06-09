@@ -19,7 +19,7 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IAccountDataSvc"/>.</param>
         public AccountManager(IAccountDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); AccountManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); AccountManagerCtor(); }
 
         partial void AccountManagerCtor(); // Enables additional functionality to be added to the constructor.
 

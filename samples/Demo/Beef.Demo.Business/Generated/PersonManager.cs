@@ -155,7 +155,7 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
         /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
         public PersonManager(IPersonDataSvc dataService, IIdentifierGenerator identifierGenerator)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); _identifierGenerator = identifierGenerator ?? throw new ArgumentNullException(nameof(identifierGenerator)); PersonManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); _identifierGenerator = identifierGenerator.ThrowIfNull(); PersonManagerCtor(); }
 
         partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -169,16 +169,15 @@ namespace Beef.Demo.Business
             value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _createOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_createOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.CreateAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -189,10 +188,9 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(id.Validate(nameof(id)).Mandatory())
-                .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _deleteOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_deleteOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
@@ -224,16 +222,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(id.Validate(nameof(id)).Mandatory())
-                .Additional((__mv) => _getExOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _getExOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getExOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _dataService.GetExAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetExAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -247,16 +244,15 @@ namespace Beef.Demo.Business
             value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_updateOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.UpdateAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -270,16 +266,15 @@ namespace Beef.Demo.Business
             value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _updateWithRollbackOnValidate?.Invoke(__mv, value, id))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_updateWithRollbackOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -290,15 +285,14 @@ namespace Beef.Demo.Business
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_getAllOnPreValidateAsync?.Invoke(paging)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _getAllOnValidate?.Invoke(__mv, paging))
+                .Additional(mv => _getAllOnValidate?.Invoke(mv, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getAllOnBeforeAsync?.Invoke(paging)).ConfigureAwait(false);
-            var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(__result, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(r, paging)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -308,15 +302,14 @@ namespace Beef.Demo.Business
         public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_getAll2OnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _getAll2OnValidate?.Invoke(__mv))
+                .Additional(mv => _getAll2OnValidate?.Invoke(mv))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getAll2OnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetAll2Async().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -329,16 +322,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
-                .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
+                .Additional(mv => _getByArgsOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -351,16 +343,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
-                .Additional((__mv) => _getDetailByArgsOnValidate?.Invoke(__mv, args, paging))
+                .Additional(mv => _getDetailByArgsOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getDetailByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -373,17 +364,16 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(fromId, toId);
             await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(fromId.Validate(nameof(fromId)).Mandatory())
                 .Add(toId.Validate(nameof(toId)).Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
-                .Additional((__mv) => _mergeOnValidate?.Invoke(__mv, fromId, toId))
+                .Additional(mv => _mergeOnValidate?.Invoke(mv, fromId, toId))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_mergeOnBeforeAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
-            var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(__result, fromId, toId)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(r, fromId, toId)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -392,9 +382,8 @@ namespace Beef.Demo.Business
         public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_markOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _markOnValidate?.Invoke(__mv))
+                .Additional(mv => _markOnValidate?.Invoke(mv))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_markOnBeforeAsync?.Invoke()).ConfigureAwait(false);
@@ -411,15 +400,14 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_mapOnPreValidateAsync?.Invoke(args)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
+                .Additional(mv => _mapOnValidate?.Invoke(mv, args))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_mapOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
-            var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(__result, args)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.MapAsync(args).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -429,15 +417,14 @@ namespace Beef.Demo.Business
         public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_getNoArgsOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _getNoArgsOnValidate?.Invoke(__mv))
+                .Additional(mv => _getNoArgsOnValidate?.Invoke(mv))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getNoArgsOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -449,16 +436,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(id.Validate(nameof(id)).Mandatory())
-                .Additional((__mv) => _getDetailOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _getDetailOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getDetailOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -472,16 +458,15 @@ namespace Beef.Demo.Business
             value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonDetailValidator>())
-                .Additional((__mv) => _updateDetailOnValidate?.Invoke(__mv, value, id))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonDetailValidator>())
+                .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_updateDetailOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -500,15 +485,14 @@ namespace Beef.Demo.Business
         public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_dataSvcCustomOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _dataSvcCustomOnValidate?.Invoke(__mv))
+                .Additional(mv => _dataSvcCustomOnValidate?.Invoke(mv))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_dataSvcCustomOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_dataSvcCustomOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
+            await Invoker.InvokeAsync(_dataSvcCustomOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Unspecified);
 
         /// <summary>
@@ -530,15 +514,14 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(name, names);
             await Invoker.InvokeAsync(_getNullOnPreValidateAsync?.Invoke(name, names)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name, names))
+                .Additional(mv => _getNullOnValidate?.Invoke(mv, name, names))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getNullOnBeforeAsync?.Invoke(name, names)).ConfigureAwait(false);
-            var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(__result, name, names)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(r, name, names)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Unspecified);
 
         /// <summary>
@@ -550,16 +533,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(value.Required());
             await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _eventPublishNoSendOnValidate?.Invoke(__mv, value))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _eventPublishNoSendOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_eventPublishNoSendOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_eventPublishNoSendOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_eventPublishNoSendOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -572,16 +554,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
-                .Additional((__mv) => _getByArgsWithEfOnValidate?.Invoke(__mv, args, paging))
+                .Additional(mv => _getByArgsWithEfOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getByArgsWithEfOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(__result, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -590,9 +571,8 @@ namespace Beef.Demo.Business
         public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
             await Invoker.InvokeAsync(_throwErrorOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _throwErrorOnValidate?.Invoke(__mv))
+                .Additional(mv => _throwErrorOnValidate?.Invoke(mv))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_throwErrorOnBeforeAsync?.Invoke()).ConfigureAwait(false);
@@ -609,15 +589,14 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Additional((__mv) => _invokeApiViaAgentOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _invokeApiViaAgentOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_invokeApiViaAgentOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Unspecified);
 
         /// <summary>
@@ -628,10 +607,9 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(addresses);
             await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(addresses.Validate(nameof(addresses)).Entity().With<AddressCollectionValidator>())
-                .Additional((__mv) => _paramCollOnValidate?.Invoke(__mv, addresses))
+                .Additional(mv => _paramCollOnValidate?.Invoke(mv, addresses))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_paramCollOnBeforeAsync?.Invoke(addresses)).ConfigureAwait(false);
@@ -648,16 +626,15 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(id.Validate(nameof(id)).Mandatory())
-                .Additional((__mv) => _getWithEfOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _getWithEfOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_getWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -670,16 +647,15 @@ namespace Beef.Demo.Business
             value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _createWithEfOnValidate?.Invoke(__mv, value))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _createWithEfOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_createWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(__result)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -693,16 +669,15 @@ namespace Beef.Demo.Business
             value.Required().Id = id;
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Entity().With<PersonValidator>())
-                .Additional((__mv) => _updateWithEfOnValidate?.Invoke(__mv, value, id))
+                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_updateWithEfOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(__result, id)).ConfigureAwait(false);
-            return Cleaner.Clean(__result);
+            var r = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
+            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+            return Cleaner.Clean(r);
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -713,10 +688,9 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-
             await MultiValidator.Create()
                 .Add(id.Validate(nameof(id)).Mandatory())
-                .Additional((__mv) => _deleteWithEfOnValidate?.Invoke(__mv, id))
+                .Additional(mv => _deleteWithEfOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
             await Invoker.InvokeAsync(_deleteWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);

@@ -19,7 +19,7 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>
         public TransactionManager(ITransactionDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TransactionManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); TransactionManagerCtor(); }
 
         partial void TransactionManagerCtor(); // Enables additional functionality to be added to the constructor.
 

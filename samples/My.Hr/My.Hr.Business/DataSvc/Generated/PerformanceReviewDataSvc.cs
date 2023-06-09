@@ -21,7 +21,7 @@ namespace My.Hr.Business.DataSvc
         /// <param name="data">The <see cref="IPerformanceReviewData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public PerformanceReviewDataSvc(IPerformanceReviewData data, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); PerformanceReviewDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); PerformanceReviewDataSvcCtor(); }
 
         partial void PerformanceReviewDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -47,8 +47,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public async Task<PerformanceReview> CreateAsync(PerformanceReview value)
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public async Task<PerformanceReview> UpdateAsync(PerformanceReview value)
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>

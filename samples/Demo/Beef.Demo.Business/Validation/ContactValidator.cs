@@ -15,12 +15,12 @@
             Property(x => x.Communications).Dictionary(item: DictionaryRuleItem.Create(_commsKey, _commsValue));
         }
 
-        protected override Task OnValidateAsync(ValidationContext<Contact> context, CancellationToken cancellationToken)
+        protected override Task<Result> OnValidateAsync(ValidationContext<Contact> context, CancellationToken cancellationToken)
         {
             if (context.Value.Communications != null && context.Value.Communications.Count(x => x.Value?.IsPreferred == true) > 1)
                 context.AddError(x => x.Communications, "Only one of the Communications can be set as Preferred.");
 
-            return Task.CompletedTask;
+            return Task.FromResult(Result.Success);
         }
     }
 }

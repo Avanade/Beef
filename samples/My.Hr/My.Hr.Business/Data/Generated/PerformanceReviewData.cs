@@ -22,7 +22,7 @@ namespace My.Hr.Business.Data
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         public PerformanceReviewData(IEfDb ef, IEventPublisher events)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _events = events ?? throw new ArgumentNullException(nameof(events)); PerformanceReviewDataCtor(); }
+            { _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -54,9 +54,9 @@ namespace My.Hr.Business.Data
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
-            return __result;
+            var r = await _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"my/hr/performancereview/{r.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created");
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace My.Hr.Business.Data
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, async _ => 
         {
-            var __result = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"my/hr/performancereview/{__result.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
-            return __result;
+            var r = await _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value).ConfigureAwait(false);
+            _events.PublishValueEvent(r, new Uri($"my/hr/performancereview/{r.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated");
+            return r;
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>

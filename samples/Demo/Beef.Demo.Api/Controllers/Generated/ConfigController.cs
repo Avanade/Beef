@@ -23,7 +23,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IConfigManager"/>.</param>
         public ConfigController(WebApi webApi, IConfigManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); ConfigControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); ConfigControllerCtor(); }
 
         partial void ConfigControllerCtor(); // Enables additional functionality to be added to the constructor.
 

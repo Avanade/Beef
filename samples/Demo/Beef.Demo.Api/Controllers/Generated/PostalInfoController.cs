@@ -23,7 +23,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IPostalInfoManager"/>.</param>
         public PostalInfoController(WebApi webApi, IPostalInfoManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); PostalInfoControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); PostalInfoControllerCtor(); }
 
         partial void PostalInfoControllerCtor(); // Enables additional functionality to be added to the constructor.
 

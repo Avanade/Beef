@@ -44,7 +44,7 @@ public class EmployeeValidator : Validator<Employee>
     /// <summary>
     /// Add further validation logic non-property bound.
     /// </summary>
-    protected override async Task OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
+    protected override async Task<Result> OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
     {
         // Ensure that the termination data is always null on an update; unless already terminated then it can no longer be updated.
         switch (ExecutionContext.OperationType)
@@ -56,14 +56,16 @@ public class EmployeeValidator : Validator<Employee>
             case OperationType.Update:
                 var existing = await _employeeDataSvc.GetAsync(context.Value.Id).ConfigureAwait(false);
                 if (existing == null)
-                    throw new NotFoundException();
+                    return Result.NotFoundError();
 
                 if (existing.Termination != null)
-                    throw new ValidationException("Once an Employee has been Terminated the data can no longer be updated.");
+                    return Result.ValidationError("Once an Employee has been Terminated the data can no longer be updated.");
 
                 context.Value.Termination = null;
                 break;
         }
+
+        return Result.Success;
     }
 
     /// <summary>
@@ -74,9 +76,11 @@ public class EmployeeValidator : Validator<Employee>
         // Unable to use inheritance DI for a Common Validator so the ExecutionContext.GetService will get/create the instance in the same manner.
         var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
         if (existing == null)
-            throw new NotFoundException();
+            return Result.NotFoundError();
 
         if (existing.StartDate <= CoreEx.ExecutionContext.Current.Timestamp)
-            throw new ValidationException("An employee cannot be deleted after they have started their employment.");
+            return Result.ValidationError("An employee cannot be deleted after they have started their employment.");
+
+        return Result.Success;
     }));
 }

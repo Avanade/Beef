@@ -23,7 +23,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public PerformanceReviewDataSvc(IPerformanceReviewData data, IEventPublisher events, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); PerformanceReviewDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); PerformanceReviewDataSvcCtor(); }
 
         partial void PerformanceReviewDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -32,7 +32,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
+        public Task<Result<PerformanceReview?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -40,18 +40,18 @@ namespace MyEf.Hr.Business.DataSvc
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
+        public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"myef/hr/performancereview/{__result.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Created");
-            return _cache.SetValue(__result);
+            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Created"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -59,22 +59,22 @@ namespace MyEf.Hr.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, new Uri($"myef/hr/performancereview/{__result.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Updated");
-            return _cache.SetValue(__result);
+            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Updated"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            _cache.Remove<PerformanceReview>(id);
-            await _data.DeleteAsync(id).ConfigureAwait(false);
-            _events.PublishValueEvent(new PerformanceReview { Id = id }, new Uri($"myef/hr/performancereview/{id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Deleted");
+            return Result.Go(_cache.Remove<PerformanceReview>(id))
+                         .ThenAsAsync(_ => _data.DeleteAsync(id))
+                         .Then(() => _events.PublishValueEvent(new PerformanceReview { Id = id }, new Uri($"myef/hr/performancereview/{id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Deleted"));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
     }
 }

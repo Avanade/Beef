@@ -26,26 +26,28 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
     /// <summary>
     /// Add further validation logic.
     /// </summary>
-    protected override async Task OnValidateAsync(ValidationContext<PerformanceReview> context, CancellationToken cancellationToken)
+    protected override async Task<Result> OnValidateAsync(ValidationContext<PerformanceReview> context, CancellationToken cancellationToken)
     {
-        if (!context.HasError(x => x.EmployeeId))
+        // Exit where the EmployeeId is not valid.
+        if (context.HasError(x => x.EmployeeId))
+            return Result.Success;
+
+        // Ensure that the EmployeeId, on Update, has not been changed as it is immutable.
+        if (ExecutionContext.OperationType == OperationType.Update)
         {
-            // Ensure that the EmployeeId has not be changed as it is immutable.
-            if (ExecutionContext.OperationType == OperationType.Update)
-            {
-                var prv = await _performanceReviewManager.GetAsync(context.Value.Id).ConfigureAwait(false);
-                if (prv == null)
-                    throw new NotFoundException();
+            var prr = await Result.GoAsync(_performanceReviewManager.GetAsync(context.Value.Id))
+                                  .When(v => v is null, _ => Result.NotFoundError()).ConfigureAwait(false);
 
-                if (context.Value.EmployeeId != prv.EmployeeId)
-                {
-                    context.AddError(x => x.EmployeeId, ValidatorStrings.ImmutableFormat);
-                    return;
-                }
-            }
+            if (prr.IsFailure)
+                return prr.AsResult();
 
-            // Check that the referenced Employee exists, and the review data is within the bounds of their employment.
-            var ev = await _employeeManager.GetAsync(context.Value.EmployeeId).ConfigureAwait(false);
+            if (context.Value.EmployeeId != prr.Value.EmployeeId)
+                return Result.Done(() => context.AddError(x => x.EmployeeId, ValidatorStrings.ImmutableFormat));
+        }
+
+        // Check that the referenced Employee exists, and the review data is within the bounds of their employment.
+        return await Result.GoAsync(_employeeManager.GetAsync(context.Value.EmployeeId)).Then(ev =>
+        {
             if (ev == null)
                 context.AddError(x => x.EmployeeId, ValidatorStrings.ExistsFormat);
             else
@@ -58,6 +60,6 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
                         context.AddError(x => x.Date, "{0} must not be after the Employee has terminated.");
                 }
             }
-        }
+        }).AsResult().ConfigureAwait(false);
     }
 }

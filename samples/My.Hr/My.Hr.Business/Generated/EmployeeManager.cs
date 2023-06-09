@@ -19,7 +19,7 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IEmployeeDataSvc"/>.</param>
         public EmployeeManager(IEmployeeDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); EmployeeManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); EmployeeManagerCtor(); }
 
         partial void EmployeeManagerCtor(); // Enables additional functionality to be added to the constructor.
 

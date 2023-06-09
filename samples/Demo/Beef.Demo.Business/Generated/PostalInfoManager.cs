@@ -19,7 +19,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IPostalInfoDataSvc"/>.</param>
         public PostalInfoManager(IPostalInfoDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); PostalInfoManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); PostalInfoManagerCtor(); }
 
         partial void PostalInfoManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -57,6 +57,7 @@ namespace Beef.Demo.Business
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
                 .Add(city.Validate(nameof(city)).Mandatory())
+                .Add(value.Validate(nameof(value)).Mandatory())
                 .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.CreatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
@@ -77,6 +78,7 @@ namespace Beef.Demo.Business
                 .Add(country.Validate(nameof(country)).Mandatory().IsValid())
                 .Add(state.Validate(nameof(state)).Mandatory())
                 .Add(city.Validate(nameof(city)).Mandatory())
+                .Add(value.Validate(nameof(value)).Mandatory())
                 .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));

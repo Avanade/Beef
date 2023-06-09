@@ -21,7 +21,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="data">The <see cref="IAccountData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public AccountDataSvc(IAccountData data, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); AccountDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); AccountDataSvcCtor(); }
 
         partial void AccountDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 

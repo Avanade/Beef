@@ -225,7 +225,7 @@ public class EmployeeValidatorTest
     public void B110_CanDelete_NotFound()
     {
         var eds = new Mock<IEmployeeDataSvc>();
-        eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
+        eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee?)null!);
 
         using var test = ValidationTester.Create();
 

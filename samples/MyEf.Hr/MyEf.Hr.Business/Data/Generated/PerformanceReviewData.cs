@@ -20,7 +20,7 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         public PerformanceReviewData(IEfDb ef)
-            { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); PerformanceReviewDataCtor(); }
+            { _ef = ef.ThrowIfNull(); PerformanceReviewDataCtor(); }
 
         partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -29,9 +29,9 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id)
+        public Task<Result<PerformanceReview?>> GetAsync(Guid id)
         {
-            return _ef.GetAsync<PerformanceReview, EfModel.PerformanceReview>(id);
+            return _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
         }
 
         /// <summary>
@@ -40,9 +40,9 @@ namespace MyEf.Hr.Business.Data
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
+        public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
         {
-            return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
+            return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> CreateAsync(PerformanceReview value)
+        public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
         {
-            return _ef.CreateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value)));
+            return _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
         }
 
         /// <summary>
@@ -60,18 +60,18 @@ namespace MyEf.Hr.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<PerformanceReview> UpdateAsync(PerformanceReview value)
+        public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
         {
-            return _ef.UpdateAsync<PerformanceReview, EfModel.PerformanceReview>(value ?? throw new ArgumentNullException(nameof(value)));
+            return _ef.UpdateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
         }
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task DeleteAsync(Guid id)
+        public Task<Result> DeleteAsync(Guid id)
         {
-            return _ef.DeleteAsync<PerformanceReview, EfModel.PerformanceReview>(id);
+            return _ef.DeleteWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
         }
 
         /// <summary>

@@ -21,7 +21,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="data">The <see cref="IContactData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public ContactDataSvc(IContactData data, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); ContactDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); ContactDataSvcCtor(); }
 
         partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -45,8 +45,8 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Contact"/>.</returns>
         public async Task<Contact> CreateAsync(Contact value)
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Contact"/>.</returns>
         public async Task<Contact> UpdateAsync(Contact value)
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="data">The <see cref="ITransactionData"/>.</param>
         public TransactionDataSvc(ITransactionData data)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); TransactionDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); TransactionDataSvcCtor(); }
 
         partial void TransactionDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 

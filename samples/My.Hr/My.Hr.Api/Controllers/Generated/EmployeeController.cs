@@ -23,7 +23,7 @@ namespace My.Hr.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IEmployeeManager"/>.</param>
         public EmployeeController(WebApi webApi, IEmployeeManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); EmployeeControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); EmployeeControllerCtor(); }
 
         partial void EmployeeControllerCtor(); // Enables additional functionality to be added to the constructor.
 

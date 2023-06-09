@@ -21,7 +21,7 @@ namespace My.Hr.Business.DataSvc
         /// <param name="data">The <see cref="IEmployeeData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public EmployeeDataSvc(IEmployeeData data, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); EmployeeDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); EmployeeDataSvcCtor(); }
 
         partial void EmployeeDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -39,8 +39,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The created <see cref="Employee"/>.</returns>
         public async Task<Employee> CreateAsync(Employee value)
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public async Task<Employee> UpdateAsync(Employee value)
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public async Task<Employee> TerminateAsync(TerminationDetail value, Guid id)
         {
-            var __result = await _data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
-            return _cache.SetValue(__result);
+            var r = await _data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
+            return _cache.SetValue(r);
         }
     }
 }

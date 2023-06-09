@@ -14,6 +14,7 @@ global using CoreEx.Mapping;
 global using CoreEx.Mapping.Converters;
 global using CoreEx.RefData;
 global using CoreEx.RefData.Extended;
+global using CoreEx.Results;
 global using CoreEx.Validation;
 global using CoreEx.Validation.Rules;
 global using Microsoft.Data.SqlClient;
