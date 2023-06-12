@@ -44,7 +44,7 @@ public class EmployeeValidator : Validator<Employee>
     /// <summary>
     /// Add further validation logic non-property bound.
     /// </summary>
-    protected override async Task<Result> OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
+    protected override Task<Result> OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
     {
         // Ensure that the termination data is always null on an update; unless already terminated then it can no longer be updated.
         switch (ExecutionContext.OperationType)
@@ -54,33 +54,25 @@ public class EmployeeValidator : Validator<Employee>
                 break;
 
             case OperationType.Update:
-                var existing = await _employeeDataSvc.GetAsync(context.Value.Id).ConfigureAwait(false);
-                if (existing == null)
-                    return Result.NotFoundError();
-
-                if (existing.Termination != null)
-                    return Result.ValidationError("Once an Employee has been Terminated the data can no longer be updated.");
-
-                context.Value.Termination = null;
-                break;
+                return Result.GoAsync(_employeeDataSvc.GetAsync(context.Value.Id))
+                    .When(existing => existing is null, _ => Result.NotFoundError())
+                    .When(existing => existing!.Termination is not null, _ => Result.ValidationError("Once an Employee has been Terminated the data can no longer be updated."))
+                    .ThenAs(_ => context.Value.Termination = null)
+                    .AsResult();
         }
 
-        return Result.Success;
+        return Result.SuccessTask;
     }
 
     /// <summary>
     /// Validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
     /// </summary>
-    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, _) =>
+    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync((context, _) =>
     {
         // Unable to use inheritance DI for a Common Validator so the ExecutionContext.GetService will get/create the instance in the same manner.
-        var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
-        if (existing == null)
-            return Result.NotFoundError();
-
-        if (existing.StartDate <= CoreEx.ExecutionContext.Current.Timestamp)
-            return Result.ValidationError("An employee cannot be deleted after they have started their employment.");
-
-        return Result.Success;
+        return Result.GoAsync(CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value))
+            .When(existing => existing is null, _ => Result.NotFoundError())
+            .When(existing => existing!.StartDate <= CoreEx.ExecutionContext.Current.Timestamp, _ => Result.ValidationError("An employee cannot be deleted after they have started their employment."))
+            .AsResult();
     }));
 }

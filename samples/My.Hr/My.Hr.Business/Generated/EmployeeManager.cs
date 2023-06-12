@@ -28,10 +28,10 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Employee?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .ThenAsAsync(() => _dataService.GetAsync(id));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -39,10 +39,11 @@ namespace My.Hr.Business
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Employee>> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await value.Validate().Mandatory().Entity().With<EmployeeValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.CreateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required()
+                         .ValidateAsync(v => v.Entity().With<EmployeeValidator>())
+                         .ThenAsAsync(v => _dataService.CreateAsync(value));
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -51,21 +52,22 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Employee>> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().Id = id;
-            await value.Validate().Entity().With<EmployeeValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                         .ValidateAsync(v => v.Entity().With<EmployeeValidator>())
+                         .ThenAsAsync(v => _dataService.UpdateAsync(value));
         }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).ValidateAsync(true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .ValidatesAsync(id, v => v.Common(EmployeeValidator.CanDelete))
+                         .ThenAsync(() => _dataService.DeleteAsync(id));
         }, InvokerArgs.Delete);
 
         /// <summary>
@@ -74,10 +76,11 @@ namespace My.Hr.Business
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await args.Validate(nameof(args)).Entity().With<EmployeeArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
+            return Result.Go()
+                         .ValidatesAsync(args, v => v.Entity().With<EmployeeArgsValidator>())
+                         .ThenAsAsync(() => _dataService.GetByArgsAsync(args, paging));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -86,10 +89,11 @@ namespace My.Hr.Business
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await value.Validate().Mandatory().Entity().With<TerminationDetailValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.TerminateAsync(value, id).ConfigureAwait(false);
+            return Result.Go(value).Required()
+                         .ValidateAsync(v => v.Entity().With<TerminationDetailValidator>())
+                         .ThenAsAsync(v => _dataService.TerminateAsync(value, id));
         }, InvokerArgs.Update);
     }
 }

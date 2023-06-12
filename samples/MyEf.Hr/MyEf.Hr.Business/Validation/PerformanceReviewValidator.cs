@@ -46,17 +46,17 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
         }
 
         // Check that the referenced Employee exists, and the review data is within the bounds of their employment.
-        return await Result.GoAsync(_employeeManager.GetAsync(context.Value.EmployeeId)).Then(ev =>
+        return await Result.GoAsync(_employeeManager.GetAsync(context.Value.EmployeeId)).Then(e =>
         {
-            if (ev == null)
+            if (e == null)
                 context.AddError(x => x.EmployeeId, ValidatorStrings.ExistsFormat);
             else
             {
                 if (!context.HasError(x => x.Date))
                 {
-                    if (context.Value.Date < ev.StartDate)
+                    if (context.Value.Date < e.StartDate)
                         context.AddError(x => x.Date, "{0} must not be prior to the Employee starting.");
-                    else if (ev.Termination != null && context.Value.Date > ev.Termination.Date)
+                    else if (e.Termination != null && context.Value.Date > e.Termination.Date)
                         context.AddError(x => x.Date, "{0} must not be after the Employee has terminated.");
                 }
             }

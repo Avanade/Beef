@@ -33,18 +33,17 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Employee?> GetAsync(Guid id) => GetOnImplementationAsync(id);
+        public Task<Result<Employee?>> GetAsync(Guid id) => GetOnImplementationAsync(id);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Employee> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+        public Task<Result<Employee>> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
         {
-            var r = await CreateOnImplementationAsync(value);
-            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created");
-            return r;
+            return Result.Go(value).ThenAsync(v => CreateOnImplementationAsync(v))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -52,21 +51,20 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+        public Task<Result<Employee>> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
         {
-            var r = await UpdateOnImplementationAsync(value);
-            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated");
-            return r;
+            return Result.Go(value).ThenAsync(v => UpdateOnImplementationAsync(v))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+        public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
         {
-            await _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteAsync(DbMapper.Default, id).ConfigureAwait(false);
-            _events.PublishValueEvent(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted");
+            return Result.Go().ThenAsync(() => _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteWithResultAsync(DbMapper.Default, id))
+                         .Then(() => _events.PublishValueEvent(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>
@@ -75,9 +73,9 @@ namespace My.Hr.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
+        public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
         {
-            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
+            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
         }
 
         /// <summary>
@@ -86,11 +84,10 @@ namespace My.Hr.Business.Data
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+        public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
         {
-            var r = await TerminateOnImplementationAsync(value, id);
-            _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated");
-            return r;
+            return Result.Go(value).ThenAsAsync(v => TerminateOnImplementationAsync(v, id))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<PerformanceReview?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
+        public Task<Result<PerformanceReview?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -38,17 +38,17 @@ namespace My.Hr.Business.DataSvc
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<PerformanceReviewCollectionResult> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
+        public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public async Task<PerformanceReview> CreateAsync(PerformanceReview value)
+        public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
         {
-            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(r);
+            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _cache.SetValue(r));
         }
 
         /// <summary>
@@ -56,20 +56,20 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public async Task<PerformanceReview> UpdateAsync(PerformanceReview value)
+        public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
         {
-            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            return _cache.SetValue(r);
+            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _cache.SetValue(r));
         }
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public async Task DeleteAsync(Guid id)
+        public Task<Result> DeleteAsync(Guid id)
         {
-            _cache.Remove<PerformanceReview>(id);
-            await _data.DeleteAsync(id).ConfigureAwait(false);
+            return Result.Go(_cache.Remove<PerformanceReview>(id))
+                         .ThenAsAsync(_ => _data.DeleteAsync(id));
         }
     }
 }

@@ -17,27 +17,27 @@ namespace My.Hr.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        Task<Employee?> GetAsync(Guid id);
+        Task<Result<Employee?>> GetAsync(Guid id);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        Task<Employee> CreateAsync(Employee value);
+        Task<Result<Employee>> CreateAsync(Employee value);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        Task<Employee> UpdateAsync(Employee value);
+        Task<Result<Employee>> UpdateAsync(Employee value);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        Task DeleteAsync(Guid id);
+        Task<Result> DeleteAsync(Guid id);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -45,7 +45,7 @@ namespace My.Hr.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        Task<EmployeeBaseCollectionResult> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging);
+        Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging);
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
@@ -53,7 +53,7 @@ namespace My.Hr.Business.DataSvc
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        Task<Employee> TerminateAsync(TerminationDetail value, Guid id);
+        Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id);
     }
 }
 

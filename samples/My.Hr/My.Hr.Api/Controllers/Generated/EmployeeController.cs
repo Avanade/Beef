@@ -36,7 +36,7 @@ namespace My.Hr.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
-            _webApi.GetAsync<Employee?>(Request, p => _manager.GetAsync(id));
+            _webApi.GetWithResultAsync<Employee?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -46,7 +46,7 @@ namespace My.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/employees/{r.Id}", UriKind.Relative));
+            _webApi.PostWithResultAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/employees/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -57,7 +57,7 @@ namespace My.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Employee))]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
-            _webApi.PutAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
+            _webApi.PutWithResultAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="Employee"/>.
@@ -68,7 +68,7 @@ namespace My.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Employee), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
-            _webApi.PatchAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
+            _webApi.PatchWithResultAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
@@ -77,7 +77,7 @@ namespace My.Hr.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> Delete(Guid id) =>
-            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
+            _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -96,7 +96,7 @@ namespace My.Hr.Api.Controllers
         public Task<IActionResult> GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default, DateTime? startFrom = default, DateTime? startTo = default, [FromQuery(Name="includeTerminated")] bool? isIncludeTerminated = default)
         {
             var args = new EmployeeArgs { FirstName = firstName, LastName = lastName, GendersSids = genders, StartFrom = startFrom, StartTo = startTo, IsIncludeTerminated = isIncludeTerminated };
-            return _webApi.GetAsync<EmployeeBaseCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetWithResultAsync<EmployeeBaseCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace My.Hr.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.TerminationDetail))]
         [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Terminate(Guid id) =>
-            _webApi.PostAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), operationType: CoreEx.OperationType.Update);
+            _webApi.PostWithResultAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), operationType: CoreEx.OperationType.Update);
     }
 }
 

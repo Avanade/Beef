@@ -19,6 +19,7 @@ eventSourceKind: Relative
 eventTransaction: true
 eventPublish: Data
 databaseSchema: Hr
+withResult: true
 entities:
   # Creating an Employee base with only the subset of fields that we want returned from the GetByArgs.
   # - As we will be returning more than one we need the Collection and CollectionResult.
