@@ -18,21 +18,21 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
+        Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        Task<AccountDetail?> GetDetailAsync(string? accountId);
+        Task<Result<AccountDetail?>> GetDetailAsync(string? accountId);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        Task<Balance?> GetBalanceAsync(string? accountId);
+        Task<Result<Balance?>> GetBalanceAsync(string? accountId);
     }
 }
 

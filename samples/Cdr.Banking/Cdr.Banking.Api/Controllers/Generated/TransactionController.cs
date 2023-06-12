@@ -44,7 +44,7 @@ namespace Cdr.Banking.Api.Controllers
         public Task<IActionResult> GetTransactions([FromRoute] string? accountId, [FromQuery(Name="oldest-time")] DateTime? fromDate = default, [FromQuery(Name="newest-time")] DateTime? toDate = default, [FromQuery(Name="min-amount")] decimal? minAmount = default, [FromQuery(Name="max-amount")] decimal? maxAmount = default, [FromQuery(Name="text")] string? text = default)
         {
             var args = new TransactionArgs { FromDate = fromDate, ToDate = toDate, MinAmount = minAmount, MaxAmount = maxAmount, Text = text };
-            return _webApi.GetAsync<TransactionCollectionResult>(Request, p => _manager.GetTransactionsAsync(accountId, args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetWithResultAsync<TransactionCollectionResult>(Request, p => _manager.GetTransactionsAsync(accountId, args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
     }
 }

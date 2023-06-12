@@ -30,14 +30,13 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await MultiValidator.Create()
-                .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
-                .Add(args.Validate(nameof(args)).Entity().With<TransactionArgsValidator>())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            return await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
+            return Result.Go().Requires(accountId)
+                         .ValidateAsync(() => MultiValidator.Create()
+                             .Add(accountId.Validate().Common(Validators.AccountId))
+                             .Add(args.Validate().Entity().With<TransactionArgsValidator>()))
+                         .ThenAsAsync(() => _dataService.GetTransactionsAsync(accountId, args, paging));
         }, InvokerArgs.Read);
     }
 }

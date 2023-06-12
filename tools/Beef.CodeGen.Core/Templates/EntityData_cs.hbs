@@ -146,9 +146,17 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{/ifeq}}
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
-            {{#if DataExtensions}}var r = await{{else}}return{{/if}} {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}.ConfigureAwait(false){{/if}};
+          {{#if DataSingleLine}}
+            return {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
+          {{else}}
+            {{#if DataExtensions}}{{#if WithResult}}             .ThenAsAsync(() =>{{else}}var r = await{{/if}}{{else}}return{{#if WithResult}} Result.Go({{#if HasValue}}value{{/if}}){{/if}}{{/if}} {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}{{#unless WithResult}}.ConfigureAwait(false){{/unless}}{{/if}}{{#if WithResult}}){{else}};{{/if}}
+          {{/if}}
         {{else}}
-            {{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}{{#unless DataSingleLine}}await {{/unless}}{{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#unless DataSingleLine}}.ConfigureAwait(false){{/unless}};
+          {{#if DataSingleLine}}
+            return {{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+          {{else}}
+            {{#if WithResult}}{{#if DataExtensions}}             {{else}}return Result.Go({{#if HasValue}}value{{/if}}){{/if}}.Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v => {{else}}() => {{/if}}{{else}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}await {{/if}}{{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#if WithResult}}){{else}}.ConfigureAwait(false);{{/if}}
+          {{/if}}
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'OData'}}

@@ -29,10 +29,11 @@ namespace Cdr.Banking.Business
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await args.Validate(nameof(args)).Entity().With<AccountArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false);
+            return Result.Go()
+                         .ValidatesAsync(args, v => v.Entity().With<AccountArgsValidator>())
+                         .ThenAsAsync(() => _dataService.GetAccountsAsync(args, paging));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -40,10 +41,10 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetDetailAsync(accountId).ConfigureAwait(false);
+            return Result.Go().Requires(accountId)
+                         .ThenAsAsync(() => _dataService.GetDetailAsync(accountId));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -51,10 +52,10 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await accountId.Validate(nameof(accountId)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false);
+            return Result.Go().Requires(accountId)
+                         .ThenAsAsync(() => _dataService.GetBalanceAsync(accountId));
         }, InvokerArgs.Read);
     }
 }

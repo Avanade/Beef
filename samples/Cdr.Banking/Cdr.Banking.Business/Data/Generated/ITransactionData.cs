@@ -19,7 +19,7 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
+        Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
     }
 }
 

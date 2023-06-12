@@ -41,7 +41,7 @@ namespace Cdr.Banking.Api.Controllers
         public Task<IActionResult> GetAccounts([FromQuery(Name="product-category")] string? productCategory = default, [FromQuery(Name="open-status")] string? openStatus = default, [FromQuery(Name="is-owned")] bool? isOwned = default)
         {
             var args = new AccountArgs { ProductCategorySid = productCategory, OpenStatusSid = openStatus, IsOwned = isOwned };
-            return _webApi.GetAsync<AccountCollectionResult>(Request, p => _manager.GetAccountsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetWithResultAsync<AccountCollectionResult>(Request, p => _manager.GetAccountsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetDetail(string? accountId) =>
-            _webApi.GetAsync<AccountDetail?>(Request, p => _manager.GetDetailAsync(accountId));
+            _webApi.GetWithResultAsync<AccountDetail?>(Request, p => _manager.GetDetailAsync(accountId));
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
@@ -64,7 +64,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetBalance(string? accountId) =>
-            _webApi.GetAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));
+            _webApi.GetWithResultAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));
     }
 }
 

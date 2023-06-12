@@ -31,21 +31,21 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => _data.GetAccountsAsync(args, paging);
+        public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => _data.GetAccountsAsync(args, paging);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId) => _cache.GetOrAddAsync(accountId, () => _data.GetDetailAsync(accountId));
+        public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetDetailAsync(accountId));
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => _cache.GetOrAddAsync(accountId, () => _data.GetBalanceAsync(accountId));
+        public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetBalanceAsync(accountId));
     }
 }
 

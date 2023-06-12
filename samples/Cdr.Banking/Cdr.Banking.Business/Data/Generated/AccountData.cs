@@ -30,9 +30,9 @@ namespace Cdr.Banking.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<AccountCollectionResult, AccountCollection>();
+            return _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<AccountCollectionResult, AccountCollection>();
         }
 
         /// <summary>
@@ -40,9 +40,9 @@ namespace Cdr.Banking.Business.Data
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId)
         {
-            return _cosmos.AccountDetails.GetAsync(accountId);
+            return _cosmos.AccountDetails.GetWithResultAsync(accountId);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Cdr.Banking.Business.Data
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Balance?> GetBalanceAsync(string? accountId) => GetBalanceOnImplementationAsync(accountId);
+        public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => GetBalanceOnImplementationAsync(accountId);
 
         /// <summary>
         /// Provides the <see cref="Account"/> to Entity Framework <see cref="Model.Account"/> mapping.

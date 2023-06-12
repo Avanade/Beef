@@ -38,20 +38,15 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Gets the balance for the specified account.
         /// </summary>
-        private Task<Balance?> GetBalanceOnImplementationAsync(string? accountId)
+        private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId)
         {
-            // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
-            var val = (from a in _cosmos.Accounts.Query().AsQueryable()
-                       where a.Id == accountId
-                       select new { a.Id, a.Balance }).AsEnumerable().SingleOrDefault();
-
-            if (val == null)
-                return Task.FromResult<Balance?>(null);
-
-            // Map the Model.Balance to Balance and return.
-            var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(val.Balance)!;
-            bal.Id = val.Id;
-            return Task.FromResult<Balance?>(bal);
+            // Use the 'Account' model and select for the specified id to access the balance property.
+            return Result.GoAsync(_cosmos.Accounts.ModelQuery(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
+                .WhenAs(a => a is not null, a =>
+                {
+                    var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(a!.Balance);
+                    return bal.Adjust(b => b.Id = a.Id);
+                });
         }
     }
 }
