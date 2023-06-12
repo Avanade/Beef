@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Cdr.Banking.Business
+﻿namespace Cdr.Banking.Business
 {
     /// <summary>
     /// Extended <see cref="Beef.ExecutionContext"/> that stores the list of <see cref="Accounts"/> that a user has access to.

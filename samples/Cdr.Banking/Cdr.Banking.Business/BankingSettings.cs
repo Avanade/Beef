@@ -1,7 +1,4 @@
-﻿using CoreEx.Configuration;
-using Microsoft.Extensions.Configuration;
-
-namespace Cdr.Banking.Business
+﻿namespace Cdr.Banking.Business
 {
     /// <summary>
     /// Provides the <see cref="IConfiguration"/> settings.

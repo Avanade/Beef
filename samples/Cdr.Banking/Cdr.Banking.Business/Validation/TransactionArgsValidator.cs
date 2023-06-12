@@ -1,8 +1,4 @@
-﻿using Cdr.Banking.Business.Entities;
-using CoreEx.Validation;
-using System;
-
-namespace Cdr.Banking.Business.Validation
+﻿namespace Cdr.Banking.Business.Validation
 {
     /// <summary>
     /// Represents a <see cref="TransactionArgs"/> validator.
