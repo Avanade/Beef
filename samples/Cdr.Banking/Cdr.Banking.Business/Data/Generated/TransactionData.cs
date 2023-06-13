@@ -32,9 +32,7 @@ namespace Cdr.Banking.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
-        {
-            return _cosmos.Transactions.Query(new Mac.PartitionKey(accountId), q => _getTransactionsOnQuery?.Invoke(q, accountId, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<TransactionCollectionResult, TransactionCollection>();
-        }
+            => _cosmos.Transactions.Query(new Mac.PartitionKey(accountId), q => _getTransactionsOnQuery?.Invoke(q, accountId, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<TransactionCollectionResult, TransactionCollection>();
 
         /// <summary>
         /// Provides the <see cref="Transaction"/> to Entity Framework <see cref="Model.Transaction"/> mapping.

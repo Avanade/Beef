@@ -30,10 +30,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public async Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-        {
-            return (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).Value;
-        }
+        public async Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
+            => (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -43,10 +41,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public async Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-        {
-            return (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
-        }
+        public async Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
+            => (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -56,10 +52,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public async Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-        {
-            return (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).Value;
-        }
+        public async Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
+            => (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
 
         /// <summary>
         /// Deletes the specified <see cref="PostalInfo"/>.
@@ -67,10 +61,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        public async Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-        {
-            await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false);
-        }
+        public async Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
+            => (await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
 
         /// <summary>
         /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.

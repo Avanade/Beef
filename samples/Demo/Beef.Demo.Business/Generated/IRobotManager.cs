@@ -17,14 +17,14 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        Task<Robot?> GetAsync(Guid id);
+        Task<Result<Robot?>> GetAsync(Guid id);
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        Task<Robot> CreateAsync(Robot value);
+        Task<Result<Robot>> CreateAsync(Robot value);
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
@@ -32,13 +32,13 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        Task<Robot> UpdateAsync(Robot value, Guid id);
+        Task<Result<Robot>> UpdateAsync(Robot value, Guid id);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        Task DeleteAsync(Guid id);
+        Task<Result> DeleteAsync(Guid id);
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -46,14 +46,14 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging);
+        Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging);
 
         /// <summary>
         /// Raises a <see cref="Robot.PowerSource"/> change event.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source.</param>
-        Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource);
+        Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource);
     }
 }
 

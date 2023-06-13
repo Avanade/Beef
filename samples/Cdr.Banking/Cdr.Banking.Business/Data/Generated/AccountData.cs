@@ -31,9 +31,7 @@ namespace Cdr.Banking.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
-        {
-            return _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<AccountCollectionResult, AccountCollection>();
-        }
+            => _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<AccountCollectionResult, AccountCollection>();
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
@@ -41,9 +39,7 @@ namespace Cdr.Banking.Business.Data
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId)
-        {
-            return _cosmos.AccountDetails.GetWithResultAsync(accountId);
-        }
+            => _cosmos.AccountDetails.GetWithResultAsync(accountId);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.

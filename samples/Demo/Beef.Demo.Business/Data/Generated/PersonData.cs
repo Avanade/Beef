@@ -104,9 +104,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetAsync(Guid id)
-        {
-            return _db.StoredProcedure("[Demo].[spPersonGet]").GetAsync(DbMapper.Default, id);
-        }
+            => _db.StoredProcedure("[Demo].[spPersonGet]").GetAsync(DbMapper.Default, id);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.
@@ -127,9 +125,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value)
-        {
-            return _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value);
-        }
+            => _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.

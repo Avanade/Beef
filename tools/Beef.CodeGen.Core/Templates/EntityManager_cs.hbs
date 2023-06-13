@@ -86,8 +86,8 @@ namespace {{Root.NamespaceBusiness}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#if IdentifierGenerator}}
-        {{#if WithResult}}
-                         .ThenAsync(async v => v.{{Name}} await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
+        {{#if Parent.WithResult}}
+                         .ThenAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
         {{else}}
             value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
         {{/if}}

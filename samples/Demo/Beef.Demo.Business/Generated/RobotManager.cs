@@ -32,11 +32,11 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
+            return Result.Go().Requires(id)
+                         .Then(() => Cleaner.CleanUp(id))
+                         .ThenAsAsync(() => _dataService.GetAsync(id));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -44,12 +44,13 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
-            Cleaner.CleanUp(value);
-            await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
+            return Result.Go(value).Required()
+                         .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
+                         .Then(v => Cleaner.CleanUp(v))
+                         .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()))
+                         .ThenAsAsync(v => _dataService.CreateAsync(value));
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -58,23 +59,23 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().Id = id;
-            Cleaner.CleanUp(value);
-            await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
+            return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                         .Then(v => Cleaner.CleanUp(v))
+                         .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()))
+                         .ThenAsAsync(v => _dataService.UpdateAsync(value));
         }, InvokerArgs.Update);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .Then(() => Cleaner.CleanUp(id))
+                         .ThenAsync(() => _dataService.DeleteAsync(id));
         }, InvokerArgs.Delete);
 
         /// <summary>
@@ -83,11 +84,12 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<RobotArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
+            return Result.Go()
+                         .Then(() => Cleaner.CleanUp(args))
+                         .ValidatesAsync(args, v => v.Entity().With<RobotArgsValidator>())
+                         .ThenAsAsync(() => _dataService.GetByArgsAsync(args, paging));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -95,9 +97,10 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source.</param>
-        public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);
+            return Result.Go()
+                         .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));
         }, InvokerArgs.Unspecified);
     }
 }

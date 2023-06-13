@@ -1429,7 +1429,16 @@ operations: [
             if (string.IsNullOrEmpty(HttpAgentModel) && new string[] { "Create", "Update", "Patch" }.Contains(Type))
                 throw new CodeGenException(this, nameof(HttpAgentModel), $"Type '{Type}' requires a {nameof(HttpAgentModel)} to be specified.");
 
-            var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}");
+            var sb = new StringBuilder();
+            if (CompareValue(WithResult, true))
+                sb.Append("(await ");
+            else if (HttpAgentReturnModel == null)
+                sb.Append("await ");
+            else
+                sb.Append("(await ");
+
+            sb.Append(DataArgs!.Name);
+
             if (!string.IsNullOrEmpty(Parent.HttpAgentCode))
                 sb.Append($".{Parent.HttpAgentCode}");
 
@@ -1456,13 +1465,13 @@ operations: [
 
             sb.Append($"{(HttpAgentRoute != null && HttpAgentRoute.Contains('{') ? "$" : "")}\"{HttpAgentRoute}\"");
             if (ValueType != null)
-                sb.Append(", value");
+                sb.Append($", {(CompareValue(WithResult, true) && !DataSingleLine ? "v" : "value")}");
 
             sb.Append(").ConfigureAwait(false)");
-            if (HttpAgentReturnModel == null)
-                sb.Append(';');
-            else
-                sb.Append(").Value;");
+            if (CompareValue(WithResult, true))
+                sb.Append(").ToResult()");
+            else if (HttpAgentReturnModel != null)
+                sb.Append(").Value");
 
             HttpAgentSendStatement = sb.ToString();
         }

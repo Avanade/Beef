@@ -29,39 +29,31 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id)
-        {
-            return _cosmos.Items.GetAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
-        }
+        public Task<Result<Robot?>> GetAsync(Guid id)
+            => _cosmos.Items.GetWithResultAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value)
-        {
-            return _cosmos.Items.CreateAsync(value);
-        }
+        public Task<Result<Robot>> CreateAsync(Robot value)
+            => _cosmos.Items.CreateWithResultAsync(value);
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value)
-        {
-            return _cosmos.Items.UpdateAsync(value);
-        }
+        public Task<Result<Robot>> UpdateAsync(Robot value)
+            => _cosmos.Items.UpdateWithResultAsync(value);
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id)
-        {
-            return _cosmos.Items.DeleteAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
-        }
+        public Task<Result> DeleteAsync(Guid id)
+            => _cosmos.Items.DeleteWithResultAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -69,10 +61,8 @@ namespace Beef.Demo.Business.Data
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
-        {
-            return _cosmos.Items.Query(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<RobotCollectionResult, RobotCollection>();
-        }
+        public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
+            => _cosmos.Items.Query(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<RobotCollectionResult, RobotCollection>();
 
         /// <summary>
         /// Provides the <see cref="Robot"/> to Entity Framework <see cref="Model.Robot"/> mapping.

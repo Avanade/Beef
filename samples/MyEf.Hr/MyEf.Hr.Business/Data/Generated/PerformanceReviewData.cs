@@ -30,9 +30,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
         public Task<Result<PerformanceReview?>> GetAsync(Guid id)
-        {
-            return _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
-        }
+            => _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -41,9 +39,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
         public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
-        {
-            return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
-        }
+            => _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.
@@ -51,9 +47,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
-        {
-            return _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
-        }
+            => _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
 
         /// <summary>
         /// Updates an existing <see cref="PerformanceReview"/>.
@@ -61,18 +55,14 @@ namespace MyEf.Hr.Business.Data
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
-        {
-            return _ef.UpdateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
-        }
+            => _ef.UpdateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
 
         /// <summary>
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         public Task<Result> DeleteAsync(Guid id)
-        {
-            return _ef.DeleteWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
-        }
+            => _ef.DeleteWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
 
         /// <summary>
         /// Provides the <see cref="PerformanceReview"/> to Entity Framework <see cref="EfModel.PerformanceReview"/> mapping.

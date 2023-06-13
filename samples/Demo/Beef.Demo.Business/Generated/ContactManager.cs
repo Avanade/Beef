@@ -39,7 +39,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
         public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
+            await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
             return await _dataService.GetAsync(id).ConfigureAwait(false);
         }, InvokerArgs.Read);
 
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
+            await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
             await _dataService.DeleteAsync(id).ConfigureAwait(false);
         }, InvokerArgs.Delete);
 

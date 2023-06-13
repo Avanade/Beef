@@ -1,5 +1,4 @@
 cosmosName: ICosmos
-withResult: true
 entities:
   # Account as per the defined schema, including corresponding collection/result.
   # API route prefixed defined.

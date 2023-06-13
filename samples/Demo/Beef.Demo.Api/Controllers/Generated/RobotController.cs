@@ -36,7 +36,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
-            _webApi.GetAsync<Robot?>(Request, p => _manager.GetAsync(id));
+            _webApi.GetWithResultAsync<Robot?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
@@ -46,7 +46,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Robot))]
         [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Robot, Robot>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
+            _webApi.PostWithResultAsync<Robot, Robot>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/robots/{r.Id}", UriKind.Relative));
 
         /// <summary>
         /// Updates an existing <see cref="Robot"/>.
@@ -57,7 +57,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Robot))]
         [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
-            _webApi.PutAsync<Robot, Robot>(Request, p => _manager.UpdateAsync(p.Value!, id));
+            _webApi.PutWithResultAsync<Robot, Robot>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Patches an existing <see cref="Robot"/>.
@@ -68,7 +68,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Robot), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Patch(Guid id) =>
-            _webApi.PatchAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
+            _webApi.PatchWithResultAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
@@ -77,7 +77,7 @@ namespace Beef.Demo.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> Delete(Guid id) =>
-            _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
+            _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
 
         /// <summary>
         /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
@@ -93,7 +93,7 @@ namespace Beef.Demo.Api.Controllers
         public Task<IActionResult> GetByArgs([FromQuery(Name="model-no")] string? modelNo = default, [FromQuery(Name="serial-no")] string? serialNo = default, [FromQuery(Name="power-sources")] List<string>? powerSources = default)
         {
             var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo, PowerSourcesSids = powerSources };
-            return _webApi.GetAsync<RobotCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+            return _webApi.GetWithResultAsync<RobotCollectionResult>(Request, p => _manager.GetByArgsAsync(args, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Beef.Demo.Api.Controllers
         [HttpPost("{id}/powerSource/{powerSource}")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public Task<IActionResult> RaisePowerSourceChange(Guid id, string? powerSource) =>
-            _webApi.PostAsync(Request, p => _manager.RaisePowerSourceChangeAsync(id, powerSource), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Unspecified);
+            _webApi.PostWithResultAsync(Request, p => _manager.RaisePowerSourceChangeAsync(id, powerSource), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Unspecified);
     }
 }
 

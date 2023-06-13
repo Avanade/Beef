@@ -31,9 +31,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
-        {
-            return _ef.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
-        }
+            => _ef.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
 
         /// <summary>
         /// Gets the specified <see cref="Contact"/>.
@@ -41,9 +39,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
         public Task<Contact?> GetAsync(Guid id)
-        {
-            return _ef.GetAsync<Contact, EfModel.Contact>(id);
-        }
+            => _ef.GetAsync<Contact, EfModel.Contact>(id);
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.

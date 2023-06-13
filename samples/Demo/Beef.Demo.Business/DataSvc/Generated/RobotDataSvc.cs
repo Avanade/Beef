@@ -32,18 +32,18 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
+        public Task<Result<Robot?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create");
-            return _cache.SetValue(r);
+            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -51,22 +51,22 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Robot>> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Update");
-            return _cache.SetValue(r);
+            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Update"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            _cache.Remove<Robot>(id);
-            await _data.DeleteAsync(id).ConfigureAwait(false);
-            _events.PublishValueEvent(new Robot { Id = id }, new Uri($"/robots/{id}", UriKind.Relative), $"Demo.Robot", "Delete");
+            return Result.Go(_cache.Remove<Robot>(id))
+                         .ThenAsAsync(_ => _data.DeleteAsync(id))
+                         .Then(() => _events.PublishValueEvent(new Robot { Id = id }, new Uri($"/robots/{id}", UriKind.Relative), $"Demo.Robot", "Delete"));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => _data.GetByArgsAsync(args, paging);
+        public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => _data.GetByArgsAsync(args, paging);
     }
 }
 

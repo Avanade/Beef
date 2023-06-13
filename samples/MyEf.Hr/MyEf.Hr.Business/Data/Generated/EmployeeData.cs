@@ -30,9 +30,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         public Task<Result<Employee?>> GetAsync(Guid id)
-        {
-            return _ef.GetWithResultAsync<Employee, EfModel.Employee>(id);
-        }
+            => _ef.GetWithResultAsync<Employee, EfModel.Employee>(id);
 
         /// <summary>
         /// Creates a new <see cref="Employee"/>.
@@ -40,9 +38,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> CreateAsync(Employee value)
-        {
-            return _ef.CreateWithResultAsync<Employee, EfModel.Employee>(value);
-        }
+            => _ef.CreateWithResultAsync<Employee, EfModel.Employee>(value);
 
         /// <summary>
         /// Updates an existing <see cref="Employee"/>.
@@ -50,18 +46,14 @@ namespace MyEf.Hr.Business.Data
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> UpdateAsync(Employee value)
-        {
-            return _ef.UpdateWithResultAsync<Employee, EfModel.Employee>(value);
-        }
+            => _ef.UpdateWithResultAsync<Employee, EfModel.Employee>(value);
 
         /// <summary>
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
         public Task<Result> DeleteAsync(Guid id)
-        {
-            return _ef.DeleteWithResultAsync<Employee, EfModel.Employee>(id);
-        }
+            => _ef.DeleteWithResultAsync<Employee, EfModel.Employee>(id);
 
         /// <summary>
         /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
@@ -70,9 +62,7 @@ namespace MyEf.Hr.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
         public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
-        {
-            return _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
-        }
+            => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
 
         /// <summary>
         /// Terminates an existing <see cref="Employee"/>.

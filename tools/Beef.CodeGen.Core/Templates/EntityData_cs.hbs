@@ -95,8 +95,10 @@ namespace {{Root.NamespaceBusiness}}.Data
     {{#if DataNoneSingleLine}}
         public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => {{#if DataInvoker}}DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}cancellationToken{{else}}_{{/if}} => {{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#if DataInvoker}}, new InvokerArgs { {{#if DataExtensions}}ExceptionHandler = {{PrivateName}}OnException{{/if}}{{#if DataTransaction}}{{#if DataExtension}}, {{/if}}IncludeTransactionScope = true{{/if}}{{#ifeq EventPublish 'Data'}}{{#ifor DataExtensions DataTransaction}}, {{/ifor}}EventPublisher = _events{{/ifeq}} }{{/if}}{{#if DataInvoker}}){{/if}};
     {{else}}
-        public {{#ifeq AutoImplement 'HttpAgent'}}{{#unless DataInvoker}}{{#unless WithResult}}async {{/unless}}{{/unless}}{{/ifeq}}{{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}){{#if DataInvoker}} => DataInvoker.Current.InvokeAsync(this, {{#unless DataSingleLine}}{{#unless WithResult}}async {{/unless}}{{/unless}}{{#if Root.CancellationToken}}cancellationToken{{else}}_{{/if}} => {{/if}}
+        public {{#ifeq AutoImplement 'HttpAgent'}}{{#unless DataInvoker}}async {{/unless}}{{/ifeq}}{{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}){{#if DataInvoker}} => DataInvoker.Current.InvokeAsync(this, {{#unless DataSingleLine}}{{#unless WithResult}}async {{/unless}}{{/unless}}{{#if Root.CancellationToken}}cancellationToken{{else}}_{{/if}} => {{/if}}
+      {{#unless DataSingleLine}}
         {
+      {{/unless}}
       {{#ifeq AutoImplement 'OData'}}
             var __dataArgs = ODataArgs.Create(_mapper{{#if Paging}}, r.Paging!{{/if}}{{#ifval ODataCollectionName}}, "{{ODataCollectionName}}"{{/ifval}});
       {{/ifeq}}
@@ -111,19 +113,19 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{#if WithResult}}
             {{#if DataExtensions}}             .ThenAsAsync(() =>{{else}}return Result.Go{{/if}}{{#if HasValue}}(value).Then{{#if HasResultTypeChange}}As{{/if}}Async(v => {{else}}Async({{/if}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}})){{#if DataSingleLine}};{{/if}}
         {{else}}
-            {{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}{{#unless DataSingleLine}}await {{/unless}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            {{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#if DataSingleLine}}{{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}{{/ifor}}{{#unless DataSingleLine}}await {{/unless}}{{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
         {{/if}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'Database'}}
         {{#ifeq Type 'GetColl'}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").Query({{DataEntityMapper}}.Default, p => {{PrivateName}}OnQuery?.Invoke(p{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}})){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
+            => {{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").Query({{DataEntityMapper}}.Default, p => {{PrivateName}}OnQuery?.Invoke(p{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}})){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
           {{else}}
             {{#if DataExtensions}}{{#if WithResult}}             .ThenAsAsync(() =>{{else}}var r = await{{/if}}{{else}}return{{#if WithResult}} Result.Go({{#if HasValue}}value{{/if}}){{/if}}{{/if}} {{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").Query({{DataEntityMapper}}.Default, p => {{PrivateName}}OnQuery?.Invoke(p{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}})){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}{{#unless WithResult}}.ConfigureAwait(false){{/unless}}{{/if}}{{#if WithResult}}){{else}};{{/if}}
           {{/if}}
         {{else}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{DataEntityMapper}}.Default{{#if HasValue}}, value{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}, {{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{else}}, {{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            => {{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{DataEntityMapper}}.Default{{#if HasValue}}, value{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}, {{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{else}}, {{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
           {{else}}
             {{#if WithResult}}{{#if DataExtensions}}             {{else}}return Result.Go({{#if HasValue}}value{{/if}}){{/if}}.Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v => {{else}}() => {{/if}}{{else}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}await {{/if}}{{DataArgs.Name}}.StoredProcedure("{{FullyQualifiedStoredProcedureName}}").{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{DataEntityMapper}}.Default{{#if HasValue}}, value{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}, {{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{else}}, {{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#if WithResult}}){{else}}.ConfigureAwait(false);{{/if}}
           {{/if}}
@@ -132,13 +134,13 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq AutoImplement 'EntityFramework'}}
         {{#ifeq Type 'GetColl'}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
+            => {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
           {{else}}
             {{#if DataExtensions}}{{#if WithResult}}             .ThenAsAsync(() =>{{else}}var r = await{{/if}}{{else}}return{{#if WithResult}} Result.Go({{#if HasValue}}value{{/if}}){{/if}}{{/if}} {{DataArgs.Name}}.Query<{{BaseReturnType}}, {{EntityFrameworkModel}}>(q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}{{#unless WithResult}}.ConfigureAwait(false){{/unless}}{{/if}}{{#if WithResult}}){{else}};{{/if}}
           {{/if}}
         {{else}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{EntityFrameworkModel}}>({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            => {{DataArgs.Name}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{EntityFrameworkModel}}>({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
           {{else}}
             {{#if WithResult}}{{#if DataExtensions}}             {{else}}return Result.Go({{#if HasValue}}value{{/if}}){{/if}}.Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v => {{else}}() => {{/if}}{{else}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}await {{/if}}{{DataArgs.Name}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async<{{#ifeq BaseReturnType 'void'}}{{Parent.EntityName}}{{else}}{{BaseReturnType}}{{/ifeq}}, {{EntityFrameworkModel}}>({{#if HasValue}}{{#if WithResult}}v{{else}}value{{/if}}{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#ifne Parent.ValueLessDataParameters.Count 1}}CompositeKey.Create({{/ifne}}{{/if}}{{ParameterConverted}}{{#if @last}}{{#ifne Parent.ValueLessDataParameters.Count 1}}){{/ifne}}{{else}}), {{/if}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#if WithResult}}){{else}}.ConfigureAwait(false);{{/if}}
           {{/if}}
@@ -147,13 +149,13 @@ namespace {{Root.NamespaceBusiness}}.Data
       {{#ifeq AutoImplement 'Cosmos'}}
         {{#ifeq Type 'GetColl'}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
+            => {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}});
           {{else}}
             {{#if DataExtensions}}{{#if WithResult}}             .ThenAsAsync(() =>{{else}}var r = await{{/if}}{{else}}return{{#if WithResult}} Result.Go({{#if HasValue}}value{{/if}}){{/if}}{{/if}} {{DataArgs.Name}}.{{CosmosContainerId}}.Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}, {{/ifval}}q => {{PrivateName}}OnQuery?.Invoke(q{{#each CoreDataParameters}}, {{{ArgumentName}}}{{/each}}) ?? q){{#if Paging}}.WithPaging({{PagingParameter.ArgumentName}}){{/if}}.SelectResult{{#if WithResult}}WithResult{{/if}}Async<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection>({{#if Root.CancellationToken}}cancellationToken{{/if}}){{#if DataExtensions}}{{#unless WithResult}}.ConfigureAwait(false){{/unless}}{{/if}}{{#if WithResult}}){{else}};{{/if}}
           {{/if}}
         {{else}}
           {{#if DataSingleLine}}
-            return {{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            => {{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
           {{else}}
             {{#if WithResult}}{{#if DataExtensions}}             {{else}}return Result.Go({{#if HasValue}}value{{/if}}){{/if}}.Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v => {{else}}() => {{/if}}{{else}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}var r = {{/if}}{{else}}{{#ifor DataSingleLine HasReturnValue}}return {{/ifor}}{{/ifor}}await {{/if}}{{DataArgs.Name}}.{{CosmosContainerId}}.{{Type}}{{#if WithResult}}WithResult{{/if}}Async({{#if HasValue}}value{{#ifne ValueLessDataParameters.Count 0}}, {{/ifne}}{{/if}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ParameterConverted}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}){{#if WithResult}}){{else}}.ConfigureAwait(false);{{/if}}
           {{/if}}
@@ -167,8 +169,17 @@ namespace {{Root.NamespaceBusiness}}.Data
         {{/ifeq}}
       {{/ifeq}}
       {{#ifeq AutoImplement 'HttpAgent'}}
-            {{#unless DataExtensions}}{{#if HasDataEvents}}{{#if HasReturnValue}}var {{/if}}{{/if}}{{/unless}}{{#ifor DataExtensions HasDataEvents}}{{#if HasReturnValue}}r = {{/if}}{{else}}{{#if DataSingleLine}}{{#if HasReturnValue}}return {{/if}}{{/if}}{{/ifor}}{{HttpAgentSendStatement}}
-      {{/ifeq}}
+        {{#if DataSingleLine}}
+            {{#if WithResult}}=> {{else}}{{#if HasReturnValue}}return {{/if}}{{/if}}{{HttpAgentSendStatement}};
+        {{else}}
+          {{#if Withresult}}
+            {{#unless DataExtensions}}
+            return Result.Go({{#if HasValue}}value{{/if}})
+            {{/unless}}
+          {{/if}}
+                         {{#if WithResult}}.Then{{#if HasResultTypeChange}}As{{/if}}Async(async {{#if HasValue}}v{{else}}(){{/if}} => {{else}}{{#if HasReturnValue}}var r = {{/if}}{{/if}}{{HttpAgentSendStatement}}{{#if WithResult}}){{#unless DataExtensions}}{{#ifne EventPublish 'Data'}};{{/ifne}}{{/unless}}{{else}};{{/if}}
+        {{/if}}  
+    {{/ifeq}}
       {{#if DataExtensions}}
         {{#if WithResult}}
                          .ThenAsync({{#if HasReturnValue}}r{{else}}(){{/if}} => {{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each CoreDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{ArgumentName}}{{/each}}) ?? Result.SuccessTask){{#ifne EventPublish 'Data'}};{{/ifne}}
@@ -217,7 +228,9 @@ namespace {{Root.NamespaceBusiness}}.Data
             {{/if}}
           {{/ifne}}
         {{/if}}
+        {{#unless DataSingleLine}}
         }{{#if DataInvoker}}{{#if DataTransaction}}, new InvokerArgs { IncludeTransactionScope = true{{#ifeq EventPublish 'Data'}}, EventPublisher = _events{{/ifeq}} }{{else}}{{#ifeq EventPublish 'Data'}}, new InvokerArgs { EventPublisher = _events }{{/ifeq}}{{/if}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/if}}
+        {{/unless}}
       {{/if}}
     {{/if}}
   {{/each}}

@@ -32,9 +32,7 @@ namespace My.Hr.Business.Data
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
         public Task<Result<PerformanceReview?>> GetAsync(Guid id)
-        {
-            return _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
-        }
+            => _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
 
         /// <summary>
         /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
@@ -43,9 +41,7 @@ namespace My.Hr.Business.Data
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
         public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
-        {
-            return _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
-        }
+            => _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
 
         /// <summary>
         /// Creates a new <see cref="PerformanceReview"/>.

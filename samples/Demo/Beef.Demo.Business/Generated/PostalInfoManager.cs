@@ -30,16 +30,12 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(country, state, city);
-            await MultiValidator.Create()
-                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
-                .Add(state.Validate(nameof(state)).Mandatory())
-                .Add(city.Validate(nameof(city)).Mandatory())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            return Cleaner.Clean(await _dataService.GetPostCodesAsync(country, state, city).ConfigureAwait(false));
+            return Result.Go().Requires(country).Requires(state).Requires(city)
+                         .Then(() => Cleaner.CleanUp(country, state, city))
+                         .ValidatesAsync(country, v => v.IsValid())
+                         .ThenAsAsync(() => _dataService.GetPostCodesAsync(country, state, city));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -50,17 +46,12 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(value.Required(), country, state, city);
-            await MultiValidator.Create()
-                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
-                .Add(state.Validate(nameof(state)).Mandatory())
-                .Add(city.Validate(nameof(city)).Mandatory())
-                .Add(value.Validate(nameof(value)).Mandatory())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            return Cleaner.Clean(await _dataService.CreatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
+            return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
+                         .Then(v => Cleaner.CleanUp(v, country, state, city))
+                         .ValidatesAsync(country, v => v.IsValid())
+                         .ThenAsAsync(v => _dataService.CreatePostCodesAsync(value, country, state, city));
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -71,17 +62,12 @@ namespace Beef.Demo.Business
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(value.Required(), country, state, city);
-            await MultiValidator.Create()
-                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
-                .Add(state.Validate(nameof(state)).Mandatory())
-                .Add(city.Validate(nameof(city)).Mandatory())
-                .Add(value.Validate(nameof(value)).Mandatory())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            return Cleaner.Clean(await _dataService.UpdatePostCodesAsync(value, country, state, city).ConfigureAwait(false));
+            return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
+                         .Then(v => Cleaner.CleanUp(v, country, state, city))
+                         .ValidatesAsync(country, v => v.IsValid())
+                         .ThenAsAsync(v => _dataService.UpdatePostCodesAsync(value, country, state, city));
         }, InvokerArgs.Update);
 
         /// <summary>
@@ -90,16 +76,12 @@ namespace Beef.Demo.Business
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        public Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            Cleaner.CleanUp(country, state, city);
-            await MultiValidator.Create()
-                .Add(country.Validate(nameof(country)).Mandatory().IsValid())
-                .Add(state.Validate(nameof(state)).Mandatory())
-                .Add(city.Validate(nameof(city)).Mandatory())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await _dataService.DeletePostCodesAsync(country, state, city).ConfigureAwait(false);
+            return Result.Go().Requires(country).Requires(state).Requires(city)
+                         .Then(() => Cleaner.CleanUp(country, state, city))
+                         .ValidatesAsync(country, v => v.IsValid())
+                         .ThenAsync(() => _dataService.DeletePostCodesAsync(country, state, city));
         }, InvokerArgs.Delete);
     }
 }

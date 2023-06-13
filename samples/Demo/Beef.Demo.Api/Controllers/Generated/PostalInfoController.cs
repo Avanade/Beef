@@ -38,7 +38,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> GetPostCodes(string? country, string? state, string? city) =>
-            _webApi.GetAsync<PostalInfo?>(Request, p => _manager.GetPostCodesAsync(country, state, city));
+            _webApi.GetWithResultAsync<PostalInfo?>(Request, p => _manager.GetPostCodesAsync(country, state, city));
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -51,7 +51,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.PostalInfo))]
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.Created)]
         public Task<IActionResult> CreatePostCodes(string? country, string? state, string? city) =>
-            _webApi.PostAsync<PostalInfo, PostalInfo>(Request, p => _manager.CreatePostCodesAsync(p.Value!, country, state, city), statusCode: HttpStatusCode.Created);
+            _webApi.PostWithResultAsync<PostalInfo, PostalInfo>(Request, p => _manager.CreatePostCodesAsync(p.Value!, country, state, city), statusCode: HttpStatusCode.Created);
 
         /// <summary>
         /// Updates an existing <see cref="PostalInfo"/>.
@@ -64,7 +64,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.PostalInfo))]
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> UpdatePostCodes(string? country, string? state, string? city) =>
-            _webApi.PutAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
+            _webApi.PutWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
         /// <summary>
         /// Patches an existing <see cref="PostalInfo"/>.
@@ -77,7 +77,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.PostalInfo), HttpConsts.MergePatchMediaTypeName)]
         [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
         public Task<IActionResult> PatchPostCodes(string? country, string? state, string? city) =>
-            _webApi.PatchAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
+            _webApi.PatchWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
         /// <summary>
         /// Deletes the specified <see cref="PostalInfo"/>.
@@ -88,7 +88,7 @@ namespace Beef.Demo.Api.Controllers
         [HttpDelete("{country}/{state}/{city}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public Task<IActionResult> DeletePostCodes(string? country, string? state, string? city) =>
-            _webApi.DeleteAsync(Request, p => _manager.DeletePostCodesAsync(country, state, city));
+            _webApi.DeleteWithResultAsync(Request, p => _manager.DeletePostCodesAsync(country, state, city));
     }
 }
 

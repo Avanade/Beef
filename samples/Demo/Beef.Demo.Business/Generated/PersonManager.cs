@@ -170,7 +170,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _createOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -189,7 +189,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .Additional(mv => _deleteOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -207,7 +207,7 @@ namespace Beef.Demo.Business
         {
             Cleaner.CleanUp(id);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .ValidateAsync(true).ConfigureAwait(false);
 
             return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
@@ -223,7 +223,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .Additional(mv => _getExOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -245,7 +245,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -267,7 +267,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -323,7 +323,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
+                .Add(args.Validate().Entity().With<PersonArgsValidator>())
                 .Additional(mv => _getByArgsOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -344,7 +344,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
+                .Add(args.Validate().Entity().With<PersonArgsValidator>())
                 .Additional(mv => _getDetailByArgsOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -365,8 +365,8 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(fromId, toId);
             await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(fromId.Validate(nameof(fromId)).Mandatory())
-                .Add(toId.Validate(nameof(toId)).Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
+                .Add(fromId.Validate().Mandatory())
+                .Add(toId.Validate().Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
                 .Additional(mv => _mergeOnValidate?.Invoke(mv, fromId, toId))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -437,7 +437,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .Additional(mv => _getDetailOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -459,7 +459,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonDetailValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonDetailValidator>())
                 .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -534,7 +534,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value.Required());
             await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _eventPublishNoSendOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -555,7 +555,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(args);
             await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(args.Validate(nameof(args)).Entity().With<PersonArgsValidator>())
+                .Add(args.Validate().Entity().With<PersonArgsValidator>())
                 .Additional(mv => _getByArgsWithEfOnValidate?.Invoke(mv, args, paging))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -608,7 +608,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(addresses);
             await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(addresses.Validate(nameof(addresses)).Entity().With<AddressCollectionValidator>())
+                .Add(addresses.Validate().Entity().With<AddressCollectionValidator>())
                 .Additional(mv => _paramCollOnValidate?.Invoke(mv, addresses))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -627,7 +627,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .Additional(mv => _getWithEfOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -648,7 +648,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _createWithEfOnValidate?.Invoke(mv, value))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -670,7 +670,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(value);
             await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(value.Validate(nameof(value)).Mandatory().Entity().With<PersonValidator>())
+                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
                 .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 
@@ -689,7 +689,7 @@ namespace Beef.Demo.Business
             Cleaner.CleanUp(id);
             await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
             await MultiValidator.Create()
-                .Add(id.Validate(nameof(id)).Mandatory())
+                .Add(id.Validate().Mandatory())
                 .Additional(mv => _deleteWithEfOnValidate?.Invoke(mv, id))
                 .ValidateAsync(true).ConfigureAwait(false);
 

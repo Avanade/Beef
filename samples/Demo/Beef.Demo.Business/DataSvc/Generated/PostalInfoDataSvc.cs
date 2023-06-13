@@ -32,7 +32,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<PostalInfo?> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
+        public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
 
         /// <summary>
         /// Creates a new <see cref="PostalInfo"/>.
@@ -42,11 +42,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var r = await _data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
-            _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create");
-            return r;
+            return Result.GoAsync(_data.CreatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create"));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -57,11 +56,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
         /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<PostalInfo> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var r = await _data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city).ConfigureAwait(false);
-            _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update");
-            return r;
+            return Result.GoAsync(_data.UpdatePostCodesAsync(value ?? throw new ArgumentNullException(nameof(value)), country, state, city))
+                         .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update"));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -70,10 +68,10 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="country">The Country.</param>
         /// <param name="state">The State.</param>
         /// <param name="city">The City.</param>
-        public Task DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            await _data.DeletePostCodesAsync(country, state, city).ConfigureAwait(false);
-            _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete");
+            return Result.GoAsync(_data.DeletePostCodesAsync(country, state, city))
+                         .Then(() => _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete"));
         }, new InvokerArgs { EventPublisher = _events });
     }
 }
