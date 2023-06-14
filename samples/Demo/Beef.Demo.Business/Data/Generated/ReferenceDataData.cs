@@ -30,18 +30,18 @@ namespace Beef.Demo.Business.Data
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.CountryCollection> CountryGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadAsync("CountryId"), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.CountryCollection>> CountryGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadWithResultAsync("CountryId"), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadAsync("USStateId"), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadWithResultAsync("USStateId"), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
+        public Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
             => DataInvoker.Current.InvokeAsync(this, _ => 
             {
-                return _db.ReferenceData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender, Guid>("[Ref].[spGenderGetAll]").LoadAsync("GenderId", additionalProperties: (dr, item) =>
+                return _db.ReferenceData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender, Guid>("[Ref].[spGenderGetAll]").LoadWithResultAsync("GenderId", additionalProperties: (dr, item) =>
                 {
                     item.AlternateName = dr.GetValue<string>("AlternateName");
                     item.TripCode = dr.GetValue<string>("TripCode");
@@ -50,23 +50,23 @@ namespace Beef.Demo.Business.Data
             }, InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryAsync<RefDataNamespace.EyeColorCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryWithResultAsync<RefDataNamespace.EyeColorCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryAsync<RefDataNamespace.PowerSourceCollection>());
+        public Task<Result<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.PowerSourceCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
+        public Task<Result<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync()
             => DataInvoker.Current.InvokeAsync(this, _ => CompanyGetAll_OnImplementationAsync());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.StatusCollection> StatusGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.StatusCollection>> StatusGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryWithResultAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.CommunicationTypeCollection> CommunicationTypeGetAllAsync()
+        public Task<Result<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync()
             => DataInvoker.Current.InvokeAsync(this, _ => CommunicationTypeGetAll_OnImplementationAsync());
 
         /// <summary>

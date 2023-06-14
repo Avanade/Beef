@@ -23,10 +23,10 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => type switch
+        public Task<Result<IReferenceDataCollection>> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => type switch
         {
 {{#each RefDataEntities}}
-            Type _ when type == typeof({{RefDataQualifiedEntityName}}) => await _data.{{Name}}GetAllAsync({{#if Root.CancellationToken}}cancellationToken{{/if}}).ConfigureAwait(false),
+            Type _ when type == typeof({{RefDataQualifiedEntityName}}) => Result.GoAsync(_data.{{Name}}GetAllAsync({{#if Root.CancellationToken}}cancellationToken{{/if}})).ThenAs(v => (IReferenceDataCollection)v),
 {{/each}}
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };

@@ -17,7 +17,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// </summary>
         /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        Task<IReferenceDataCollection> GetAsync(Type type);
+        Task<Result<IReferenceDataCollection>> GetAsync(Type type);
     }
 }
 

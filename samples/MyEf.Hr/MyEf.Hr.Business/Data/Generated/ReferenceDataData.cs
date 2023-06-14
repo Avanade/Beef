@@ -24,24 +24,24 @@ namespace MyEf.Hr.Business.Data
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Gender, EfModel.Gender>().SelectQueryAsync<RefDataNamespace.GenderCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.Gender, EfModel.Gender>().SelectQueryWithResultAsync<RefDataNamespace.GenderCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>().SelectQueryAsync<RefDataNamespace.TerminationReasonCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.TerminationReasonCollection>> TerminationReasonGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.TerminationReason, EfModel.TerminationReason>().SelectQueryWithResultAsync<RefDataNamespace.TerminationReasonCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>().SelectQueryAsync<RefDataNamespace.RelationshipTypeCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.RelationshipTypeCollection>> RelationshipTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.RelationshipType, EfModel.RelationshipType>().SelectQueryWithResultAsync<RefDataNamespace.RelationshipTypeCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.USState, EfModel.USState>().SelectQueryAsync<RefDataNamespace.USStateCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.USState, EfModel.USState>().SelectQueryWithResultAsync<RefDataNamespace.USStateCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>().SelectQueryAsync<RefDataNamespace.PerformanceOutcomeCollection>(), InvokerArgs.TransactionSuppress);
+        public Task<Result<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ =>_ef.Query<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>().SelectQueryWithResultAsync<RefDataNamespace.PerformanceOutcomeCollection>(), InvokerArgs.TransactionSuppress);
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.Gender"/> to Entity Framework <see cref="EfModel.Gender"/> mapping.

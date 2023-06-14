@@ -132,7 +132,7 @@ entities:
         /// </summary>
         [JsonProperty("withResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Entity", Title = "Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).",
-            Description = "Defaults to `false`. This can be overridden within the `Entity`(s) and/or `Operation`(s).")]
+            Description = "Defaults to `true`. This can be overridden within the `Entity`(s) and/or `Operation`(s).")]
         public bool? WithResult { get; set; }
 
         #endregion
@@ -550,7 +550,7 @@ entities:
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
-            WithResult = DefaultWhereNull(WithResult, () => false);
+            WithResult = DefaultWhereNull(WithResult, () => true);
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => false);
             ValidationFramework = DefaultWhereNull(ValidationFramework, () => "CoreEx");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);

@@ -19,7 +19,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
         public GenderManager(IGenderDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); GenderManagerCtor(); }
+            { _dataService = dataService.ThrowIfNull(); GenderManagerCtor(); }
 
         partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -28,10 +28,10 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Gender?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAsync(id).ConfigureAwait(false);
+            return Result.Go().Requires(id)
+                         .ThenAsAsync(() => _dataService.GetAsync(id));
         }, InvokerArgs.Read);
 
         /// <summary>
@@ -39,9 +39,10 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Gender>> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            return await _dataService.CreateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required()
+                         .ThenAsAsync(v => _dataService.CreateAsync(value));
         }, InvokerArgs.Create);
 
         /// <summary>
@@ -50,10 +51,10 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
         {
-            value.Required().Id = id;
-            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
+            return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                         .ThenAsAsync(v => _dataService.UpdateAsync(value));
         }, InvokerArgs.Update);
     }
 }

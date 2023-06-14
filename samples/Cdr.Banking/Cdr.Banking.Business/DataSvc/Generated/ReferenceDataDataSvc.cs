@@ -23,14 +23,14 @@ namespace Cdr.Banking.Business.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type) => type switch
+        public Task<Result<IReferenceDataCollection>> GetAsync(Type type) => type switch
         {
-            Type _ when type == typeof(RefDataNamespace.OpenStatus) => await _data.OpenStatusGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.ProductCategory) => await _data.ProductCategoryGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.AccountUType) => await _data.AccountUTypeGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.MaturityInstructions) => await _data.MaturityInstructionsGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.TransactionType) => await _data.TransactionTypeGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.TransactionStatus) => await _data.TransactionStatusGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.OpenStatus) => Result.GoAsync(_data.OpenStatusGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.ProductCategory) => Result.GoAsync(_data.ProductCategoryGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.AccountUType) => Result.GoAsync(_data.AccountUTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.MaturityInstructions) => Result.GoAsync(_data.MaturityInstructionsGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.TransactionType) => Result.GoAsync(_data.TransactionTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.TransactionStatus) => Result.GoAsync(_data.TransactionStatusGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };
     }

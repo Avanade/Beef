@@ -23,7 +23,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="events">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
         public GenderDataSvc(IGenderData data, IEventPublisher events, IRequestCache cache)
-            { _data = data ?? throw new ArgumentNullException(nameof(data)); _events = events ?? throw new ArgumentNullException(nameof(events)); _cache = cache ?? throw new ArgumentNullException(nameof(cache)); GenderDataSvcCtor(); }
+            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); GenderDataSvcCtor(); }
 
         partial void GenderDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -32,18 +32,18 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
+        public Task<Result<Gender?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, $"Demo.Gender", "Create");
-            return _cache.SetValue(__result);
+            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
 
         /// <summary>
@@ -51,11 +51,11 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+        public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            var __result = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
-            _events.PublishValueEvent(__result, $"Demo.Gender", "Update");
-            return _cache.SetValue(__result);
+            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+                         .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
+                         .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
     }
 }

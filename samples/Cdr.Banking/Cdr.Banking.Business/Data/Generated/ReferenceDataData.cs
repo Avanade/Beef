@@ -24,28 +24,28 @@ namespace Cdr.Banking.Business.Data
         partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.OpenStatus, Model.OpenStatus>("RefData").Query().SelectQueryAsync<RefDataNamespace.OpenStatusCollection>());
+        public Task<Result<RefDataNamespace.OpenStatusCollection>> OpenStatusGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.OpenStatus, Model.OpenStatus>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.OpenStatusCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.ProductCategory, Model.ProductCategory>("RefData").Query().SelectQueryAsync<RefDataNamespace.ProductCategoryCollection>());
+        public Task<Result<RefDataNamespace.ProductCategoryCollection>> ProductCategoryGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.ProductCategory, Model.ProductCategory>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.ProductCategoryCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.AccountUType, Model.AccountUType>("RefData").Query().SelectQueryAsync<RefDataNamespace.AccountUTypeCollection>());
+        public Task<Result<RefDataNamespace.AccountUTypeCollection>> AccountUTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.AccountUType, Model.AccountUType>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.AccountUTypeCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>("RefData").Query().SelectQueryAsync<RefDataNamespace.MaturityInstructionsCollection>());
+        public Task<Result<RefDataNamespace.MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.MaturityInstructionsCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionType, Model.TransactionType>("RefData").Query().SelectQueryAsync<RefDataNamespace.TransactionTypeCollection>());
+        public Task<Result<RefDataNamespace.TransactionTypeCollection>> TransactionTypeGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionType, Model.TransactionType>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.TransactionTypeCollection>());
 
         /// <inheritdoc/>
-        public Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
-            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionStatus, Model.TransactionStatus>("RefData").Query().SelectQueryAsync<RefDataNamespace.TransactionStatusCollection>());
+        public Task<Result<RefDataNamespace.TransactionStatusCollection>> TransactionStatusGetAllAsync()
+            => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.TransactionStatus, Model.TransactionStatus>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.TransactionStatusCollection>());
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.OpenStatus"/> to Entity Framework <see cref="Model.OpenStatus"/> mapping.

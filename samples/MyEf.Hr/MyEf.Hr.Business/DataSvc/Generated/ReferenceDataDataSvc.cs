@@ -23,13 +23,13 @@ namespace MyEf.Hr.Business.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type) => type switch
+        public Task<Result<IReferenceDataCollection>> GetAsync(Type type) => type switch
         {
-            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.TerminationReason) => await _data.TerminationReasonGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.RelationshipType) => await _data.RelationshipTypeGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => await _data.PerformanceOutcomeGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Gender) => Result.GoAsync(_data.GenderGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.TerminationReason) => Result.GoAsync(_data.TerminationReasonGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.RelationshipType) => Result.GoAsync(_data.RelationshipTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.USState) => Result.GoAsync(_data.USStateGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => Result.GoAsync(_data.PerformanceOutcomeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };
     }

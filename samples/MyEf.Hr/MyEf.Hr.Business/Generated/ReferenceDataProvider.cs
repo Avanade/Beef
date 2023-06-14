@@ -33,7 +33,7 @@ namespace MyEf.Hr.Business
         };
 
         /// <inheritdoc/>
-        public Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);
+        public Task<Result<IReferenceDataCollection>> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);
     }
 }
 

@@ -24,7 +24,7 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="webApi">The <see cref="WebApi"/>.</param>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>
         public GenderController(ReferenceDataContentWebApi webApi, IGenderManager manager)
-            { _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi)); _manager = manager ?? throw new ArgumentNullException(nameof(manager)); GenderControllerCtor(); }
+            { _webApi = webApi.ThrowIfNull(); _manager = manager.ThrowIfNull(); GenderControllerCtor(); }
 
         partial void GenderControllerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public Task<IActionResult> Get(Guid id) =>
-            _webApi.GetAsync<Gender?>(Request, p => _manager.GetAsync(id));
+            _webApi.GetWithResultAsync<Gender?>(Request, p => _manager.GetAsync(id));
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
@@ -47,7 +47,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Gender))]
         [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.Created)]
         public Task<IActionResult> Create() =>
-            _webApi.PostAsync<Gender, Gender>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
+            _webApi.PostWithResultAsync<Gender, Gender>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -58,7 +58,7 @@ namespace Beef.Demo.Api.Controllers
         [AcceptsBody(typeof(Common.Entities.Gender))]
         [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
         public Task<IActionResult> Update(Guid id) =>
-            _webApi.PutAsync<Gender, Gender>(Request, p => _manager.UpdateAsync(p.Value!, id));
+            _webApi.PutWithResultAsync<Gender, Gender>(Request, p => _manager.UpdateAsync(p.Value!, id));
     }
 }
 

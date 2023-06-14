@@ -16,49 +16,49 @@ namespace Beef.Demo.Business.Data
         /// Gets all the <see cref="RefDataNamespace.Country"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CountryCollection"/>.</returns>
-        Task<RefDataNamespace.CountryCollection> CountryGetAllAsync();
+        Task<Result<RefDataNamespace.CountryCollection>> CountryGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.USState"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
-        Task<RefDataNamespace.USStateCollection> USStateGetAllAsync();
+        Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
-        Task<RefDataNamespace.GenderCollection> GenderGetAllAsync();
+        Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.EyeColor"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
-        Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync();
+        Task<Result<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.PowerSource"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
-        Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync();
+        Task<Result<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Company"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
-        Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync();
+        Task<Result<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Status"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.StatusCollection"/>.</returns>
-        Task<RefDataNamespace.StatusCollection> StatusGetAllAsync();
+        Task<Result<RefDataNamespace.StatusCollection>> StatusGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.CommunicationType"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CommunicationTypeCollection"/>.</returns>
-        Task<RefDataNamespace.CommunicationTypeCollection> CommunicationTypeGetAllAsync();
+        Task<Result<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync();
     }
 }
 

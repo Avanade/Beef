@@ -19,7 +19,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         public GenderData(IDatabase db)
-            { _db = db ?? throw new ArgumentNullException(nameof(db)); GenderDataCtor(); }
+            { _db = db.ThrowIfNull(); GenderDataCtor(); }
 
         partial void GenderDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -28,30 +28,24 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id)
-        {
-            return _db.StoredProcedure("[Ref].[spGenderGet]").GetAsync(DbMapper.Default, id);
-        }
+        public Task<Result<Gender?>> GetAsync(Guid id)
+            => _db.StoredProcedure("[Ref].[spGenderGet]").GetWithResultAsync(DbMapper.Default, id);
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value)
-        {
-            return _db.StoredProcedure("[Ref].[spGenderCreate]").CreateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value)));
-        }
+        public Task<Result<Gender>> CreateAsync(Gender value)
+            => _db.StoredProcedure("[Ref].[spGenderCreate]").CreateWithResultAsync(DbMapper.Default, value);
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value)
-        {
-            return _db.StoredProcedure("[Ref].[spGenderUpdate]").UpdateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value)));
-        }
+        public Task<Result<Gender>> UpdateAsync(Gender value)
+            => _db.StoredProcedure("[Ref].[spGenderUpdate]").UpdateWithResultAsync(DbMapper.Default, value);
 
         /// <summary>
         /// Provides the <see cref="Gender"/> property and database column mapping.

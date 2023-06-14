@@ -16,31 +16,31 @@ namespace MyEf.Hr.Business.Data
         /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
-        Task<RefDataNamespace.GenderCollection> GenderGetAllAsync();
+        Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.TerminationReason"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.TerminationReasonCollection"/>.</returns>
-        Task<RefDataNamespace.TerminationReasonCollection> TerminationReasonGetAllAsync();
+        Task<Result<RefDataNamespace.TerminationReasonCollection>> TerminationReasonGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.RelationshipType"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.RelationshipTypeCollection"/>.</returns>
-        Task<RefDataNamespace.RelationshipTypeCollection> RelationshipTypeGetAllAsync();
+        Task<Result<RefDataNamespace.RelationshipTypeCollection>> RelationshipTypeGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.USState"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
-        Task<RefDataNamespace.USStateCollection> USStateGetAllAsync();
+        Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.PerformanceOutcome"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
-        Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync();
+        Task<Result<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync();
     }
 }
 

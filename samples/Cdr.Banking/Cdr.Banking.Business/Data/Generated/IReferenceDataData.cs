@@ -16,37 +16,37 @@ namespace Cdr.Banking.Business.Data
         /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
-        Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync();
+        Task<Result<RefDataNamespace.OpenStatusCollection>> OpenStatusGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
-        Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync();
+        Task<Result<RefDataNamespace.ProductCategoryCollection>> ProductCategoryGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.AccountUType"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
-        Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync();
+        Task<Result<RefDataNamespace.AccountUTypeCollection>> AccountUTypeGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
-        Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync();
+        Task<Result<RefDataNamespace.MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.TransactionType"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
-        Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync();
+        Task<Result<RefDataNamespace.TransactionTypeCollection>> TransactionTypeGetAllAsync();
 
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> items.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
-        Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync();
+        Task<Result<RefDataNamespace.TransactionStatusCollection>> TransactionStatusGetAllAsync();
     }
 }
 

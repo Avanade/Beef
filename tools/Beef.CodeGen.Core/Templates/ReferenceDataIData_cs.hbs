@@ -23,7 +23,7 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
   {{/if}}
         /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
-        Task<{{RefDataQualifiedEntityCollectionName}}> {{Name}}GetAllAsync({{#if Root.CancellationToken}}CancellationToken cancellationToken = default{{/if}});
+        Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellationToken}}CancellationToken cancellationToken = default{{/if}});
 {{/each}}
     }
 }

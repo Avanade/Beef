@@ -20,7 +20,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
 {{/if}}
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        Task<IReferenceDataCollection> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}});
+        Task<Result<IReferenceDataCollection>> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}});
     }
 }
 

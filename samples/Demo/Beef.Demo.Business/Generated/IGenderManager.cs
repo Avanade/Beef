@@ -17,14 +17,14 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        Task<Gender?> GetAsync(Guid id);
+        Task<Result<Gender?>> GetAsync(Guid id);
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        Task<Gender> CreateAsync(Gender value);
+        Task<Result<Gender>> CreateAsync(Gender value);
 
         /// <summary>
         /// Updates an existing <see cref="Gender"/>.
@@ -32,7 +32,7 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        Task<Gender> UpdateAsync(Gender value, Guid id);
+        Task<Result<Gender>> UpdateAsync(Gender value, Guid id);
     }
 }
 

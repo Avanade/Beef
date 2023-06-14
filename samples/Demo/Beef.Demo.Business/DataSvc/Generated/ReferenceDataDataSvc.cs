@@ -23,16 +23,16 @@ namespace Beef.Demo.Business.DataSvc
         partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <inheritdoc/>
-        public async Task<IReferenceDataCollection> GetAsync(Type type) => type switch
+        public Task<Result<IReferenceDataCollection>> GetAsync(Type type) => type switch
         {
-            Type _ when type == typeof(RefDataNamespace.Country) => await _data.CountryGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.USState) => await _data.USStateGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.Gender) => await _data.GenderGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.EyeColor) => await _data.EyeColorGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.PowerSource) => await _data.PowerSourceGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.Company) => await _data.CompanyGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.Status) => await _data.StatusGetAllAsync().ConfigureAwait(false),
-            Type _ when type == typeof(RefDataNamespace.CommunicationType) => await _data.CommunicationTypeGetAllAsync().ConfigureAwait(false),
+            Type _ when type == typeof(RefDataNamespace.Country) => Result.GoAsync(_data.CountryGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.USState) => Result.GoAsync(_data.USStateGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.Gender) => Result.GoAsync(_data.GenderGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.EyeColor) => Result.GoAsync(_data.EyeColorGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.PowerSource) => Result.GoAsync(_data.PowerSourceGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.Company) => Result.GoAsync(_data.CompanyGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.Status) => Result.GoAsync(_data.StatusGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+            Type _ when type == typeof(RefDataNamespace.CommunicationType) => Result.GoAsync(_data.CommunicationTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
             _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
         };
     }
