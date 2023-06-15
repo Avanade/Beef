@@ -49,7 +49,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Created"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
@@ -61,7 +61,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Updated"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });

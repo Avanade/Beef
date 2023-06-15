@@ -39,7 +39,7 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The created <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> CreateAsync(Employee value)
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _cache.SetValue(r));
         }
 
@@ -50,7 +50,7 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> UpdateAsync(Employee value)
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _cache.SetValue(r));
         }
 
@@ -80,7 +80,7 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id)
         {
-            return Result.GoAsync(_data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id))
+            return Result.GoAsync(_data.TerminateAsync(value, id))
                          .Then(r => _cache.SetValue(r));
         }
     }

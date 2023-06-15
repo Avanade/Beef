@@ -61,7 +61,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.CreateAsync(value).ConfigureAwait(false);
             await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
             _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Create");
             return _cache.SetValue(r);
@@ -108,7 +108,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.UpdateAsync(value).ConfigureAwait(false);
             _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
             return _cache.SetValue(r);
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
@@ -120,7 +120,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithRollbackAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var r = await _data.UpdateWithRollbackAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.UpdateWithRollbackAsync(value).ConfigureAwait(false);
             await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
             _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
             return _cache.SetValue(r);
@@ -249,7 +249,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var r = await _data.UpdateDetailAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.UpdateDetailAsync(value).ConfigureAwait(false);
             await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
             _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
             return _cache.SetValue(r);
@@ -343,7 +343,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Person"/>.</returns>
         public async Task<Person> CreateWithEfAsync(Person value)
         {
-            var r = await _data.CreateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.CreateWithEfAsync(value).ConfigureAwait(false);
             await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
             return _cache.SetValue(r);
         }
@@ -355,7 +355,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
         {
-            var r = await _data.UpdateWithEfAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.UpdateWithEfAsync(value).ConfigureAwait(false);
             await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
             _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
             return _cache.SetValue(r);

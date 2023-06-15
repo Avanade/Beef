@@ -45,7 +45,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Contact"/>.</returns>
         public async Task<Contact> CreateAsync(Contact value)
         {
-            var r = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.CreateAsync(value).ConfigureAwait(false);
             return _cache.SetValue(r);
         }
 
@@ -56,7 +56,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Contact"/>.</returns>
         public async Task<Contact> UpdateAsync(Contact value)
         {
-            var r = await _data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
+            var r = await _data.UpdateAsync(value).ConfigureAwait(false);
             return _cache.SetValue(r);
         }
 

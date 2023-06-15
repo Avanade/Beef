@@ -41,7 +41,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <returns>The created <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> CreateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Created"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
@@ -53,7 +53,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> UpdateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Updated"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
@@ -85,7 +85,7 @@ namespace MyEf.Hr.Business.DataSvc
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id))
+            return Result.GoAsync(_data.TerminateAsync(value, id))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Terminated"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });

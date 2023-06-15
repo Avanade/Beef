@@ -41,7 +41,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
@@ -53,7 +53,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Result<Robot>> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Update"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });

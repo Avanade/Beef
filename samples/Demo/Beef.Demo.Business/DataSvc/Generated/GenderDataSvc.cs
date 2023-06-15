@@ -41,7 +41,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });
@@ -53,7 +53,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
                          .Then(r => _cache.SetValue(r));
         }, new InvokerArgs { EventPublisher = _events });

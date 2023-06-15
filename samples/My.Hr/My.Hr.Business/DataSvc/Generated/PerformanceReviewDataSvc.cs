@@ -47,7 +47,7 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
         {
-            return Result.GoAsync(_data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.CreateAsync(value))
                          .Then(r => _cache.SetValue(r));
         }
 
@@ -58,7 +58,7 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
         public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
         {
-            return Result.GoAsync(_data.UpdateAsync(value ?? throw new ArgumentNullException(nameof(value))))
+            return Result.GoAsync(_data.UpdateAsync(value))
                          .Then(r => _cache.SetValue(r));
         }
 
