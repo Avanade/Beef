@@ -1,6 +1,4 @@
-﻿using CoreEx.Results;
-
-namespace MyEf.Hr.Security.Subscriptions;
+﻿namespace MyEf.Hr.Security.Subscriptions;
 
 public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
 {

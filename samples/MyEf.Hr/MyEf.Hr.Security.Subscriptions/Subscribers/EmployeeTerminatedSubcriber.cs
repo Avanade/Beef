@@ -1,6 +1,4 @@
-﻿using CoreEx.Results;
-
-namespace MyEf.Hr.Security.Subscriptions.Subscribers;
+﻿namespace MyEf.Hr.Security.Subscriptions.Subscribers;
 
 [EventSubscriber("MyEf.Hr.Employee", "Terminated")]
 public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>

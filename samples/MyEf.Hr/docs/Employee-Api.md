@@ -185,13 +185,21 @@ dotnet run entity
 
 <br/>
 
+### Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](to-do-add-link) for more detail on purpose and usage. 
+
+The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+<br/>
+
 ### Validation
 
 The final component that must be implemented by the developer is the validation logic. _CoreEx_ provides a rich, integrated, [validation framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) to simplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity - as Deep Throat said to Mulder in the [X-Files](https://en.wikipedia.org/wiki/The_X-Files), "trust no one"!
 
 To encourage reuse, _CoreEx_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `MyEf.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
-``` csharp
+```
 namespace MyEf.Hr.Business.Validation;
 
 /// <summary>
@@ -216,7 +224,7 @@ public static class CommonValidators
 }
 ```
 
-The entity code-gen configuration references a `EmployeeValidator` that needs to be implemented. Within the `MyEf.Hr.Business/Validation` folder create `EmployeeValidator.cs` and implement as follows.
+The entity code-gen configuration references a `EmployeeValidator` that needs to be implemented. Within the `MyEf.Hr.Business/Validation` folder create an `EmployeeValidator.cs` and implement as follows.
 
 ``` csharp
 namespace MyEf.Hr.Business.Validation;
@@ -265,7 +273,7 @@ public class EmployeeValidator : Validator<Employee>
     /// <summary>
     /// Add further validation logic non-property bound.
     /// </summary>
-    protected override async Task OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
+    protected override Task<Result> OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
     {
         // Ensure that the termination data is always null on an update; unless already terminated then it can no longer be updated.
         switch (ExecutionContext.OperationType)
@@ -275,30 +283,26 @@ public class EmployeeValidator : Validator<Employee>
                 break;
 
             case OperationType.Update:
-                var existing = await _employeeDataSvc.GetAsync(context.Value.Id).ConfigureAwait(false);
-                if (existing == null)
-                    throw new NotFoundException();
-
-                if (existing.Termination != null)
-                    throw new ValidationException("Once an Employee has been Terminated the data can no longer be updated.");
-
-                context.Value.Termination = null;
-                break;
+                return Result.GoAsync(_employeeDataSvc.GetAsync(context.Value.Id))
+                    .When(existing => existing is null, _ => Result.NotFoundError())
+                    .When(existing => existing!.Termination is not null, _ => Result.ValidationError("Once an Employee has been Terminated the data can no longer be updated."))
+                    .ThenAs(_ => context.Value.Termination = null)
+                    .AsResult();
         }
+
+        return Result.SuccessTask;
     }
 
     /// <summary>
-    /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
+    /// Validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
     /// </summary>
-    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, _) =>
+    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync((context, _) =>
     {
         // Unable to use inheritance DI for a Common Validator so the ExecutionContext.GetService will get/create the instance in the same manner.
-        var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
-        if (existing == null)
-            throw new NotFoundException();
-
-        if (existing.StartDate <= CoreEx.ExecutionContext.Current.Timestamp)
-            throw new ValidationException("An employee cannot be deleted after they have started their employment.");
+        return Result.GoAsync(CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value))
+            .When(existing => existing is null, _ => Result.NotFoundError())
+            .When(existing => existing!.StartDate <= CoreEx.ExecutionContext.Current.Timestamp, _ => Result.ValidationError("An employee cannot be deleted after they have started their employment."))
+            .AsResult();
     }));
 }
 ```
