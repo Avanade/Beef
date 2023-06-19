@@ -5,75 +5,49 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.DataSvc
+namespace Beef.Demo.Business.DataSvc;
+
+/// <summary>
+/// Provides the <see cref="PostalInfo"/> data repository services.
+/// </summary>
+public partial class PostalInfoDataSvc : IPostalInfoDataSvc
 {
+    private readonly IPostalInfoData _data;
+    private readonly IEventPublisher _events;
+
     /// <summary>
-    /// Provides the <see cref="PostalInfo"/> data repository services.
+    /// Initializes a new instance of the <see cref="PostalInfoDataSvc"/> class.
     /// </summary>
-    public partial class PostalInfoDataSvc : IPostalInfoDataSvc
+    /// <param name="data">The <see cref="IPostalInfoData"/>.</param>
+    /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+    public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher events)
+        { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); PostalInfoDataSvcCtor(); }
+
+    partial void PostalInfoDataSvcCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
+
+    /// <inheritdoc/>
+    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
     {
-        private readonly IPostalInfoData _data;
-        private readonly IEventPublisher _events;
+        return Result.GoAsync(_data.CreatePostCodesAsync(value, country, state, city))
+                     .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create"));
+    }, new InvokerArgs { EventPublisher = _events });
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PostalInfoDataSvc"/> class.
-        /// </summary>
-        /// <param name="data">The <see cref="IPostalInfoData"/>.</param>
-        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-        public PostalInfoDataSvc(IPostalInfoData data, IEventPublisher events)
-            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); PostalInfoDataSvcCtor(); }
+    /// <inheritdoc/>
+    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.GoAsync(_data.UpdatePostCodesAsync(value, country, state, city))
+                     .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update"));
+    }, new InvokerArgs { EventPublisher = _events });
 
-        partial void PostalInfoDataSvcCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
-
-        /// <summary>
-        /// Creates a new <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.GoAsync(_data.CreatePostCodesAsync(value, country, state, city))
-                         .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create"));
-        }, new InvokerArgs { EventPublisher = _events });
-
-        /// <summary>
-        /// Updates an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.GoAsync(_data.UpdatePostCodesAsync(value, country, state, city))
-                         .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update"));
-        }, new InvokerArgs { EventPublisher = _events });
-
-        /// <summary>
-        /// Deletes the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.GoAsync(_data.DeletePostCodesAsync(country, state, city))
-                         .Then(() => _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete"));
-        }, new InvokerArgs { EventPublisher = _events });
-    }
+    /// <inheritdoc/>
+    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.GoAsync(_data.DeletePostCodesAsync(country, state, city))
+                     .Then(() => _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete"));
+    }, new InvokerArgs { EventPublisher = _events });
 }
 
 #pragma warning restore

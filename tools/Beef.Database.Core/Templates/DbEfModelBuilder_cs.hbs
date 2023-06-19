@@ -6,29 +6,22 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.EntityFrameworkCore;
-using System;
+namespace {{Root.NamespaceBusiness}}.Data.EfModel;
 
-namespace {{Root.NamespaceBusiness}}.Data.EfModel
+/// <summary>
+/// Represents extension methods for the <see cref="ModelBuilder"/>.
+/// </summary>
+public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Represents extension methods for the <see cref="ModelBuilder"/>.
+    /// Adds all the generated models to the <see cref="ModelBuilder"/>.
     /// </summary>
-    public static class ModelBuilderExtensions
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
+    public static void AddGeneratedModels(this ModelBuilder modelBuilder)
     {
-        /// <summary>
-        /// Adds all the generated models to the <see cref="ModelBuilder"/>.
-        /// </summary>
-        /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
-        public static void AddGeneratedModels(this ModelBuilder modelBuilder)
-        {
-            if (modelBuilder == null)
-                throw new ArgumentNullException(nameof(modelBuilder));
-
 {{#each EFModels}}
-            {{EfModelName}}.AddToModel(modelBuilder);
+        {{EfModelName}}.AddToModel(modelBuilder{{#if @first}}.ThrowIfNull(){{/if}});
 {{/each}}
-        }
     }
 }
 

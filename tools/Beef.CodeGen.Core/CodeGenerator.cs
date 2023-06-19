@@ -33,7 +33,7 @@ namespace Beef.CodeGen
                     {
                         foreach (var o in e.Operations!.Where(x => !x.ExcludeWebApi.HasValue || !x.ExcludeWebApi.Value))
                         {
-                            list.Add(($"{e.Name}.{o.Name}", o.AgentWebApiRoute, o.WebApiMethod![4..], o.WebApiStatus!, o.WebApiAuthorize ?? e.WebApiAuthorize));
+                            list.Add(($"{e.Name}.{o.Name}", o.AgentWebApiRoute, o.WebApiMethod![4..], o.WebApiStatus!, o.WebApiAuthorize ?? e.WebApiAuthorize ?? "<NoAuth>"));
                         }
                     }
 

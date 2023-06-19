@@ -13,6 +13,6 @@
         /// <summary>
         /// Gets the list of account (identifiers) that the user has access/permission to.
         /// </summary>
-        public List<string> Accounts { get; } = new List<string>();
+        public List<string> Accounts { get; } = new();
     }
 }

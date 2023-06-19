@@ -5,32 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.EntityFrameworkCore;
-using System;
+namespace Beef.Demo.Business.Data.EfModel;
 
-namespace Beef.Demo.Business.Data.EfModel
+/// <summary>
+/// Represents extension methods for the <see cref="ModelBuilder"/>.
+/// </summary>
+public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Represents extension methods for the <see cref="ModelBuilder"/>.
+    /// Adds all the generated models to the <see cref="ModelBuilder"/>.
     /// </summary>
-    public static class ModelBuilderExtensions
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
+    public static void AddGeneratedModels(this ModelBuilder modelBuilder)
     {
-        /// <summary>
-        /// Adds all the generated models to the <see cref="ModelBuilder"/>.
-        /// </summary>
-        /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
-        public static void AddGeneratedModels(this ModelBuilder modelBuilder)
-        {
-            if (modelBuilder == null)
-                throw new ArgumentNullException(nameof(modelBuilder));
-
-            Table.AddToModel(modelBuilder);
-            Gender.AddToModel(modelBuilder);
-            EyeColor.AddToModel(modelBuilder);
-            Status.AddToModel(modelBuilder);
-            Person.AddToModel(modelBuilder);
-            Contact.AddToModel(modelBuilder);
-        }
+        Table.AddToModel(modelBuilder.ThrowIfNull());
+        Gender.AddToModel(modelBuilder);
+        EyeColor.AddToModel(modelBuilder);
+        Status.AddToModel(modelBuilder);
+        Person.AddToModel(modelBuilder);
+        Contact.AddToModel(modelBuilder);
     }
 }
 

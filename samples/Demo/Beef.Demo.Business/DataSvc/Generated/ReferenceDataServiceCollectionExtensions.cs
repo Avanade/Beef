@@ -5,23 +5,22 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>DataSvc</b>-layer services.
+/// </summary>
+public static partial class ReferenceDataServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>DataSvc</b>-layer services.
+    /// Adds the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static partial class ReferenceDataServiceCollectionsExtension
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGeneratedReferenceDataDataSvcServices(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds the generated <b>DataSvc</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedReferenceDataDataSvcServices(this IServiceCollection services)
-        {
-            return services.AddScoped<IReferenceDataDataSvc, ReferenceDataDataSvc>()
-                           .AddScoped<IGenderDataSvc, GenderDataSvc>();
-        }
+        return services.AddScoped<IReferenceDataDataSvc, ReferenceDataDataSvc>()
+                       .AddScoped<IGenderDataSvc, GenderDataSvc>();
     }
 }
 

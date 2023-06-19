@@ -5,108 +5,82 @@
 #nullable enable
 #pragma warning disable
 
-namespace My.Hr.Business.Data
+namespace My.Hr.Business.Data;
+
+/// <summary>
+/// Provides the <see cref="Employee"/> data access.
+/// </summary>
+public partial class EmployeeData : IEmployeeData
 {
+    private readonly IDatabase _db;
+    private readonly IEfDb _ef;
+    private readonly IEventPublisher _events;
+    private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
+
     /// <summary>
-    /// Provides the <see cref="Employee"/> data access.
+    /// Initializes a new instance of the <see cref="EmployeeData"/> class.
     /// </summary>
-    public partial class EmployeeData : IEmployeeData
+    /// <param name="db">The <see cref="IDatabase"/>.</param>
+    /// <param name="ef">The <see cref="IEfDb"/>.</param>
+    /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+    public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher events)
+        { _db = db.ThrowIfNull(); _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); EmployeeDataCtor(); }
+
+    partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<Employee?>> GetAsync(Guid id) => GetOnImplementationAsync(id);
+
+    /// <inheritdoc/>
+    public Task<Result<Employee>> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
     {
-        private readonly IDatabase _db;
-        private readonly IEfDb _ef;
-        private readonly IEventPublisher _events;
-        private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
+        return Result.Go(value).ThenAsync(v => CreateOnImplementationAsync(v))
+                     .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
+    }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
+    /// <inheritdoc/>
+    public Task<Result<Employee>> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
+    {
+        return Result.Go(value).ThenAsync(v => UpdateOnImplementationAsync(v))
+                     .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
+    }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <inheritdoc/>
+    public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
+    {
+        return Result.Go().ThenAsync(() => _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteWithResultAsync(DbMapper.Default, id))
+                     .Then(() => _events.PublishValueEvent(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
+    }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <inheritdoc/>
+    public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
+        => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
+
+    /// <inheritdoc/>
+    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
+    {
+        return Result.Go(value).ThenAsAsync(v => TerminateOnImplementationAsync(v, id))
+                     .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
+    }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <summary>
+    /// Provides the <see cref="Employee"/> property and database column mapping.
+    /// </summary>
+    public partial class DbMapper : DatabaseMapper<Employee, DbMapper>
+    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmployeeData"/> class.
+        /// Initializes a new instance of the <see cref="DbMapper"/> class.
         /// </summary>
-        /// <param name="db">The <see cref="IDatabase"/>.</param>
-        /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-        public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher events)
-            { _db = db.ThrowIfNull(); _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); EmployeeDataCtor(); }
-
-        partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="Employee"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        public Task<Result<Employee?>> GetAsync(Guid id) => GetOnImplementationAsync(id);
-
-        /// <summary>
-        /// Creates a new <see cref="Employee"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <returns>The created <see cref="Employee"/>.</returns>
-        public Task<Result<Employee>> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
+        public DbMapper()
         {
-            return Result.Go(value).ThenAsync(v => CreateOnImplementationAsync(v))
-                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
-        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
-
-        /// <summary>
-        /// Updates an existing <see cref="Employee"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Result<Employee>> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
-        {
-            return Result.Go(value).ThenAsync(v => UpdateOnImplementationAsync(v))
-                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
-        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
-
-        /// <summary>
-        /// Deletes the specified <see cref="Employee"/>.
-        /// </summary>
-        /// <param name="id">The Id.</param>
-        public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
-        {
-            return Result.Go().ThenAsync(() => _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteWithResultAsync(DbMapper.Default, id))
-                         .Then(() => _events.PublishValueEvent(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
-        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
-
-        /// <summary>
-        /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.EmployeeArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
-        public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
-            => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
-
-        /// <summary>
-        /// Terminates an existing <see cref="Employee"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="TerminationDetail"/>.</param>
-        /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <returns>The updated <see cref="Employee"/>.</returns>
-        public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
-        {
-            return Result.Go(value).ThenAsAsync(v => TerminateOnImplementationAsync(v, id))
-                         .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));
-        }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
-
-        /// <summary>
-        /// Provides the <see cref="Employee"/> property and database column mapping.
-        /// </summary>
-        public partial class DbMapper : DatabaseMapper<Employee, DbMapper>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbMapper"/> class.
-            /// </summary>
-            public DbMapper()
-            {
-                InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
-                Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
-                Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-                Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
-                DbMapperCtor();
-            }
-            
-            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+            InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
+            Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
+            Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
+            Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
+            DbMapperCtor();
         }
+            
+        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
     }
 }
 

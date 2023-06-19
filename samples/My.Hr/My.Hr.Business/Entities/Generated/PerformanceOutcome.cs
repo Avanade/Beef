@@ -5,44 +5,43 @@
 #nullable enable
 #pragma warning disable
 
-namespace My.Hr.Business.Entities
+namespace My.Hr.Business.Entities;
+
+/// <summary>
+/// Represents the Performance Outcome entity.
+/// </summary>
+public partial class PerformanceOutcome : ReferenceDataBaseEx<Guid, PerformanceOutcome>
 {
     /// <summary>
-    /// Represents the Performance Outcome entity.
+    /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="PerformanceOutcome"/>.
     /// </summary>
-    public partial class PerformanceOutcome : ReferenceDataBaseEx<Guid, PerformanceOutcome>
-    {
-        /// <summary>
-        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="PerformanceOutcome"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
-        /// <returns>The corresponding <see cref="PerformanceOutcome"/>.</returns>
-        public static implicit operator PerformanceOutcome?(Guid id) => ConvertFromId(id);
-
-        /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="PerformanceOutcome"/>.
-        /// </summary>
-        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
-        /// <returns>The corresponding <see cref="PerformanceOutcome"/>.</returns>
-        public static implicit operator PerformanceOutcome?(string? code) => ConvertFromCode(code);
-    }
+    /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+    /// <returns>The corresponding <see cref="PerformanceOutcome"/>.</returns>
+    public static implicit operator PerformanceOutcome?(Guid id) => ConvertFromId(id);
 
     /// <summary>
-    /// Represents the <see cref="PerformanceOutcome"/> collection.
+    /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="PerformanceOutcome"/>.
     /// </summary>
-    public partial class PerformanceOutcomeCollection : ReferenceDataCollectionBase<Guid, PerformanceOutcome, PerformanceOutcomeCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class.
-        /// </summary>
-        public PerformanceOutcomeCollection() { }
+    /// <param name="code">The <see cref="IReferenceData.Code">.</param>
+    /// <returns>The corresponding <see cref="PerformanceOutcome"/>.</returns>
+    public static implicit operator PerformanceOutcome?(string? code) => ConvertFromCode(code);
+}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public PerformanceOutcomeCollection(IEnumerable<PerformanceOutcome> items) => AddRange(items);
-    }
+/// <summary>
+/// Represents the <see cref="PerformanceOutcome"/> collection.
+/// </summary>
+public partial class PerformanceOutcomeCollection : ReferenceDataCollectionBase<Guid, PerformanceOutcome, PerformanceOutcomeCollection>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class.
+    /// </summary>
+    public PerformanceOutcomeCollection() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PerformanceOutcomeCollection"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public PerformanceOutcomeCollection(IEnumerable<PerformanceOutcome> items) => AddRange(items);
 }
 
 #pragma warning restore

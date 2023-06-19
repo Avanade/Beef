@@ -5,21 +5,20 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>Manager</b>-layer services.
+/// </summary>
+public static partial class ReferenceDataServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>Manager</b>-layer services.
+    /// Adds the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static partial class ReferenceDataServiceCollectionsExtension
-    {
-        /// <summary>
-        /// Adds the generated <b>Manager</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
-            => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>();
-    }
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
+        => services.AddScoped<IReferenceDataProvider, ReferenceDataProvider>();
 }
 
 #pragma warning restore

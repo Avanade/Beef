@@ -24,31 +24,6 @@ using RefDataNamespace = {{Root.RefDataCommonNamespace}};
 namespace {{Root.NamespaceCommon}}.Agents
 {
     /// <summary>
-    /// Defines the {{{EntityNameSeeComments}}} HTTP agent.
-    /// </summary>
-    public partial interface I{{Name}}Agent
-    {
-{{#each WebApiAgentOperations}}
-  {{#unless @first}}
-
-  {{/unless}}
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
-  {{#ifeq Type 'Patch'}}
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-  {{/ifeq}}
-  {{#each Parameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
-  {{/each}}
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-{{/each}}
-    }
-
-    /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} HTTP agent.
     /// </summary>
     public partial class {{Name}}Agent : TypedHttpClientBase<{{Name}}Agent>, I{{Name}}Agent
@@ -65,18 +40,7 @@ namespace {{Root.NamespaceCommon}}.Agents
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 {{#each WebApiAgentOperations}}
 
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
-  {{#ifeq Type 'Patch'}}
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-  {{/ifeq}}
-  {{#each Parameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
-  {{/each}}
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}value, {{/if}}requestOptions: requestOptions{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
 {{/each}}

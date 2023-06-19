@@ -5,61 +5,60 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.Entities
+namespace Cdr.Banking.Business.Entities;
+
+/// <summary>
+/// Represents the Term Deposit Account entity.
+/// </summary>
+public partial class TermDepositAccount : EntityBase
 {
+    private DateTime _lodgementDate;
+    private DateTime _maturityDate;
+    private decimal _maturityAmount;
+    private string? _maturityCurrency;
+    private string? _maturityInstructionsSid;
+
     /// <summary>
-    /// Represents the Term Deposit Account entity.
+    /// Gets or sets the Lodgement Date.
     /// </summary>
-    public partial class TermDepositAccount : EntityBase
+    public DateTime LodgementDate { get => _lodgementDate; set => SetValue(ref _lodgementDate, value, transform: DateTimeTransform.DateOnly); }
+
+    /// <summary>
+    /// Gets or sets the Maturity Date.
+    /// </summary>
+    public DateTime MaturityDate { get => _maturityDate; set => SetValue(ref _maturityDate, value, transform: DateTimeTransform.DateOnly); }
+
+    /// <summary>
+    /// Gets or sets the Maturity Amount.
+    /// </summary>
+    public decimal MaturityAmount { get => _maturityAmount; set => SetValue(ref _maturityAmount, value); }
+
+    /// <summary>
+    /// Gets or sets the Maturity Currency.
+    /// </summary>
+    public string? MaturityCurrency { get => _maturityCurrency; set => SetValue(ref _maturityCurrency, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="MaturityInstructions"/> using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("maturityInstructions")]
+    public string? MaturityInstructionsSid { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value, propertyName: nameof(MaturityInstructions)); }
+
+    /// <summary>
+    /// Gets or sets the Maturity Instructions (see <see cref="RefDataNamespace.MaturityInstructions"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public RefDataNamespace.MaturityInstructions? MaturityInstructions { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private DateTime _lodgementDate;
-        private DateTime _maturityDate;
-        private decimal _maturityAmount;
-        private string? _maturityCurrency;
-        private string? _maturityInstructionsSid;
-
-        /// <summary>
-        /// Gets or sets the Lodgement Date.
-        /// </summary>
-        public DateTime LodgementDate { get => _lodgementDate; set => SetValue(ref _lodgementDate, value, transform: DateTimeTransform.DateOnly); }
-
-        /// <summary>
-        /// Gets or sets the Maturity Date.
-        /// </summary>
-        public DateTime MaturityDate { get => _maturityDate; set => SetValue(ref _maturityDate, value, transform: DateTimeTransform.DateOnly); }
-
-        /// <summary>
-        /// Gets or sets the Maturity Amount.
-        /// </summary>
-        public decimal MaturityAmount { get => _maturityAmount; set => SetValue(ref _maturityAmount, value); }
-
-        /// <summary>
-        /// Gets or sets the Maturity Currency.
-        /// </summary>
-        public string? MaturityCurrency { get => _maturityCurrency; set => SetValue(ref _maturityCurrency, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="MaturityInstructions"/> using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("maturityInstructions")]
-        public string? MaturityInstructionsSid { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value, propertyName: nameof(MaturityInstructions)); }
-
-        /// <summary>
-        /// Gets or sets the Maturity Instructions (see <see cref="RefDataNamespace.MaturityInstructions"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public RefDataNamespace.MaturityInstructions? MaturityInstructions { get => _maturityInstructionsSid; set => SetValue(ref _maturityInstructionsSid, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(LodgementDate), LodgementDate, v => LodgementDate = v);
-            yield return CreateProperty(nameof(MaturityDate), MaturityDate, v => MaturityDate = v);
-            yield return CreateProperty(nameof(MaturityAmount), MaturityAmount, v => MaturityAmount = v);
-            yield return CreateProperty(nameof(MaturityCurrency), MaturityCurrency, v => MaturityCurrency = v);
-            yield return CreateProperty(nameof(MaturityInstructionsSid), MaturityInstructionsSid, v => MaturityInstructionsSid = v);
-        }
+        yield return CreateProperty(nameof(LodgementDate), LodgementDate, v => LodgementDate = v);
+        yield return CreateProperty(nameof(MaturityDate), MaturityDate, v => MaturityDate = v);
+        yield return CreateProperty(nameof(MaturityAmount), MaturityAmount, v => MaturityAmount = v);
+        yield return CreateProperty(nameof(MaturityCurrency), MaturityCurrency, v => MaturityCurrency = v);
+        yield return CreateProperty(nameof(MaturityInstructionsSid), MaturityInstructionsSid, v => MaturityInstructionsSid = v);
     }
 }
 

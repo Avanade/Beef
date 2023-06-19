@@ -1,6 +1,5 @@
 ﻿configType: Beef.CodeGen.Config.Entity.CodeGenConfig, Beef.CodeGen.Core
 generators:
-- { type: 'Beef.CodeGen.Generators.EntityCodeGenerator, Beef.CodeGen.Core', template: 'Entity_cs', file: '{{Name}}.cs', directory: '{{Root.PathCommon}}/Entities/Generated', EntityScope: 'Common', text: 'EntityCodeGenerator: Common/Entities' }
 - { type: 'Beef.CodeGen.Generators.EntityCodeGenerator, Beef.CodeGen.Core', template: 'Entity_cs', file: '{{Name}}.cs', directory: '{{Root.PathBusiness}}/Entities/Generated', EntityScope: 'Business', text: 'EntityCodeGenerator: Business/Entities' }
 - { type: 'Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs', file: '{{Name}}.cs', directory: '{{Root.PathCommon}}/Entities/Generated', EntityScope: 'Common', text: 'EntityOmitBaseCodeGenerator: Common/Entities' }
 - { type: 'Beef.CodeGen.Generators.EntityOmitBaseCodeGenerator, Beef.CodeGen.Core', template: 'Model_cs', file: '{{Name}}.cs', directory: '{{Root.PathCommon}}/Entities/Generated', EntityScope: 'Business', text: 'EntityOmitBaseCodeGenerator: Business/Entities' }

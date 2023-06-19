@@ -5,48 +5,34 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.DataSvc
+namespace Cdr.Banking.Business.DataSvc;
+
+/// <summary>
+/// Provides the <see cref="Account"/> data repository services.
+/// </summary>
+public partial class AccountDataSvc : IAccountDataSvc
 {
+    private readonly IAccountData _data;
+    private readonly IRequestCache _cache;
+
     /// <summary>
-    /// Provides the <see cref="Account"/> data repository services.
+    /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
     /// </summary>
-    public partial class AccountDataSvc : IAccountDataSvc
-    {
-        private readonly IAccountData _data;
-        private readonly IRequestCache _cache;
+    /// <param name="data">The <see cref="IAccountData"/>.</param>
+    /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+    public AccountDataSvc(IAccountData data, IRequestCache cache)
+        { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); AccountDataSvcCtor(); }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
-        /// </summary>
-        /// <param name="data">The <see cref="IAccountData"/>.</param>
-        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public AccountDataSvc(IAccountData data, IRequestCache cache)
-            { _data = data.ThrowIfNull(); _cache = cache.ThrowIfNull(); AccountDataSvcCtor(); }
+    partial void AccountDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
-        partial void AccountDataSvcCtor(); // Enables additional functionality to be added to the constructor.
+    /// <inheritdoc/>
+    public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => _data.GetAccountsAsync(args, paging);
 
-        /// <summary>
-        /// Get all accounts.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => _data.GetAccountsAsync(args, paging);
+    /// <inheritdoc/>
+    public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetDetailAsync(accountId));
 
-        /// <summary>
-        /// Get <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetDetailAsync(accountId));
-
-        /// <summary>
-        /// Get <see cref="Account"/> <see cref="Balance"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetBalanceAsync(accountId));
-    }
+    /// <inheritdoc/>
+    public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetBalanceAsync(accountId));
 }
 
 #pragma warning restore

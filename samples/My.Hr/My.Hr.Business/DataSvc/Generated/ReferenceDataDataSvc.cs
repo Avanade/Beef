@@ -5,34 +5,33 @@
 #nullable enable
 #pragma warning disable
 
-namespace My.Hr.Business.DataSvc
+namespace My.Hr.Business.DataSvc;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> data services.
+/// </summary>
+public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
 {
+    private readonly IReferenceDataData _data;
+
     /// <summary>
-    /// Provides the <b>ReferenceData</b> data services.
+    /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
     /// </summary>
-    public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
+    /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
+    public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
+
+    partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
+
+    /// <inheritdoc/>
+    public Task<Result<IReferenceDataCollection>> GetAsync(Type type) => type switch
     {
-        private readonly IReferenceDataData _data;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
-        /// </summary>
-        /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
-        public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
-
-        partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
-
-        /// <inheritdoc/>
-        public Task<Result<IReferenceDataCollection>> GetAsync(Type type) => type switch
-        {
-            Type _ when type == typeof(RefDataNamespace.Gender) => Result.GoAsync(_data.GenderGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
-            Type _ when type == typeof(RefDataNamespace.TerminationReason) => Result.GoAsync(_data.TerminationReasonGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
-            Type _ when type == typeof(RefDataNamespace.RelationshipType) => Result.GoAsync(_data.RelationshipTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
-            Type _ when type == typeof(RefDataNamespace.USState) => Result.GoAsync(_data.USStateGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
-            Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => Result.GoAsync(_data.PerformanceOutcomeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
-            _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
-        };
-    }
+        Type _ when type == typeof(RefDataNamespace.Gender) => Result.GoAsync(_data.GenderGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+        Type _ when type == typeof(RefDataNamespace.TerminationReason) => Result.GoAsync(_data.TerminationReasonGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+        Type _ when type == typeof(RefDataNamespace.RelationshipType) => Result.GoAsync(_data.RelationshipTypeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+        Type _ when type == typeof(RefDataNamespace.USState) => Result.GoAsync(_data.USStateGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+        Type _ when type == typeof(RefDataNamespace.PerformanceOutcome) => Result.GoAsync(_data.PerformanceOutcomeGetAllAsync()).ThenAs(v => (IReferenceDataCollection)v),
+        _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
+    };
 }
 
 #pragma warning restore

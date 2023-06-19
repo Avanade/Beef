@@ -7,138 +7,134 @@
 
 using CommonRefDataNamespace = Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Api.Controllers
+namespace Beef.Demo.Api.Controllers;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> Web API functionality.
+/// </summary>
+[AllowAnonymous]
+public partial class ReferenceDataController : ControllerBase
 {
-    /// <summary>
-    /// Provides the <b>ReferenceData</b> Web API functionality.
+    private readonly ReferenceDataContentWebApi _webApi;
+    private readonly ReferenceDataOrchestrator _orchestrator;
+
+    public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
+        { _webApi = webApi.ThrowIfNull(); _orchestrator = orchestrator.ThrowIfNull(); }
+
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data items that match the specified criteria.
     /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.Country collection.</returns>
     [AllowAnonymous]
-    public partial class ReferenceDataController : ControllerBase
-    {
-        private readonly ReferenceDataContentWebApi _webApi;
-        private readonly ReferenceDataOrchestrator _orchestrator;
+    [HttpGet()]
+    [Route("api/v1/demo/ref/countries")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Country>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> CountryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Country>(codes, text, p.RequestOptions.IncludeInactive));
 
-        public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
-        {
-            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
-            _orchestrator = orchestrator ?? throw new ArgumentNullException(nameof(orchestrator));
-        }
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.USState collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/usStates")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.Country collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/countries")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Country>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> CountryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Country>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.Gender collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/genders")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.USState collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/usStates")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.EyeColor collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/eyeColors")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> EyeColorGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.EyeColor>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.Gender collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/genders")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.PowerSource collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/powerSources")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> PowerSourceGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PowerSource>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.EyeColor collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/eyeColors")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> EyeColorGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.EyeColor>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.Company collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/companies")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Company>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> CompanyGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Company>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.PowerSource collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/powerSources")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> PowerSourceGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PowerSource>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.Status"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.Status collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/statuses")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Status>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> StatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Status>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.Company collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/companies")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Company>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> CompanyGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Company>(codes, text, p.RequestOptions.IncludeInactive));
+    /// <summary> 
+    /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> reference data items that match the specified criteria.
+    /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A RefDataNamespace.CommunicationType collection.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref/communicationTypes")]
+    [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.CommunicationType>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> CommunicationTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.CommunicationType>(codes, text, p.RequestOptions.IncludeInactive));
 
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Status"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.Status collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/statuses")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Status>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> StatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Status>(codes, text, p.RequestOptions.IncludeInactive));
-
-        /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A RefDataNamespace.CommunicationType collection.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref/communicationTypes")]
-        [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.CommunicationType>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> CommunicationTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.CommunicationType>(codes, text, p.RequestOptions.IncludeInactive));
-
-        /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
-        [AllowAnonymous]
-        [HttpGet()]
-        [Route("api/v1/demo/ref")]
-        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
-    }
+    /// <summary>
+    /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+    /// </summary>
+    /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+    [AllowAnonymous]
+    [HttpGet()]
+    [Route("api/v1/demo/ref")]
+    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
 }
 
 #pragma warning restore

@@ -5,99 +5,93 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace My.Hr.Business.Data.EfModel
+namespace My.Hr.Business.Data.EfModel;
+
+/// <summary>
+/// Represents the Entity Framework (EF) model for database object '[Hr].[Employee]'.
+/// </summary>
+public partial class Employee
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object '[Hr].[Employee]'.
+    /// Gets or sets the 'EmployeeId' column value.
     /// </summary>
-    public partial class Employee
+    public Guid EmployeeId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'Email' column value.
+    /// </summary>
+    public string? Email { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'FirstName' column value.
+    /// </summary>
+    public string? FirstName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'LastName' column value.
+    /// </summary>
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'GenderCode' column value.
+    /// </summary>
+    public string? GenderCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'Birthday' column value.
+    /// </summary>
+    public DateTime? Birthday { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'StartDate' column value.
+    /// </summary>
+    public DateTime? StartDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'TerminationDate' column value.
+    /// </summary>
+    public DateTime? TerminationDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'TerminationReasonCode' column value.
+    /// </summary>
+    public string? TerminationReasonCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 'PhoneNo' column value.
+    /// </summary>
+    public string? PhoneNo { get; set; }
+
+    /// <summary>
+    /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
+    /// </summary>
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
+    public static void AddToModel(ModelBuilder modelBuilder)
     {
-        /// <summary>
-        /// Gets or sets the 'EmployeeId' column value.
-        /// </summary>
-        public Guid EmployeeId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'Email' column value.
-        /// </summary>
-        public string? Email { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'FirstName' column value.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'LastName' column value.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'GenderCode' column value.
-        /// </summary>
-        public string? GenderCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'Birthday' column value.
-        /// </summary>
-        public DateTime? Birthday { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'StartDate' column value.
-        /// </summary>
-        public DateTime? StartDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'TerminationDate' column value.
-        /// </summary>
-        public DateTime? TerminationDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'TerminationReasonCode' column value.
-        /// </summary>
-        public string? TerminationReasonCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'PhoneNo' column value.
-        /// </summary>
-        public string? PhoneNo { get; set; }
-
-        /// <summary>
-        /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
-        /// </summary>
-        /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
-        public static void AddToModel(ModelBuilder modelBuilder)
+        modelBuilder.ThrowIfNull().Entity<Employee>(entity =>
         {
-            if (modelBuilder == null)
-                throw new ArgumentNullException(nameof(modelBuilder));
-
-            modelBuilder.Entity<Employee>(entity =>
-            {
-                entity.ToTable("Employee", "Hr");
-                entity.HasKey(nameof(EmployeeId));
-                entity.Property(p => p.EmployeeId).HasColumnName("EmployeeId").HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property(p => p.Email).HasColumnName("Email").HasColumnType("NVARCHAR(250)");
-                entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(100)");
-                entity.Property(p => p.GenderCode).HasColumnName("GenderCode").HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.Birthday).HasColumnName("Birthday").HasColumnType("DATE");
-                entity.Property(p => p.StartDate).HasColumnName("StartDate").HasColumnType("DATE");
-                entity.Property(p => p.TerminationDate).HasColumnName("TerminationDate").HasColumnType("DATE");
-                entity.Property(p => p.TerminationReasonCode).HasColumnName("TerminationReasonCode").HasColumnType("NVARCHAR(50)");
-                entity.Property(p => p.PhoneNo).HasColumnName("PhoneNo").HasColumnType("NVARCHAR(50)");
-                AddToModel(entity);
-            });
-        }
-        
-        /// <summary>
-        /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
-        /// </summary>
-        static partial void AddToModel(EntityTypeBuilder<Employee> entity);
+            entity.ToTable("Employee", "Hr");
+            entity.HasKey(nameof(EmployeeId));
+            entity.Property(p => p.EmployeeId).HasColumnName("EmployeeId").HasColumnType("UNIQUEIDENTIFIER");
+            entity.Property(p => p.Email).HasColumnName("Email").HasColumnType("NVARCHAR(250)");
+            entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(100)");
+            entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(100)");
+            entity.Property(p => p.GenderCode).HasColumnName("GenderCode").HasColumnType("NVARCHAR(50)");
+            entity.Property(p => p.Birthday).HasColumnName("Birthday").HasColumnType("DATE");
+            entity.Property(p => p.StartDate).HasColumnName("StartDate").HasColumnType("DATE");
+            entity.Property(p => p.TerminationDate).HasColumnName("TerminationDate").HasColumnType("DATE");
+            entity.Property(p => p.TerminationReasonCode).HasColumnName("TerminationReasonCode").HasColumnType("NVARCHAR(50)");
+            entity.Property(p => p.PhoneNo).HasColumnName("PhoneNo").HasColumnType("NVARCHAR(50)");
+            AddToModel(entity);
+        });
     }
+        
+    /// <summary>
+    /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
+    /// </summary>
+    static partial void AddToModel(EntityTypeBuilder<Employee> entity);
 }
 
 #pragma warning restore

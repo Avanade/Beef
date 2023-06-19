@@ -19,6 +19,10 @@
     <EmbeddedResource Include="Scripts\**\*" />
     <EmbeddedResource Include="Templates\**\*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="Templates\EntityIWebApiAgent_cs.hbs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OnRamp" Version="1.0.7" />

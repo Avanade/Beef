@@ -5,44 +5,43 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Eye Color entity.
+/// </summary>
+public partial class EyeColor : ReferenceDataBaseEx<Guid, EyeColor>
 {
     /// <summary>
-    /// Represents the Eye Color entity.
+    /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="EyeColor"/>.
     /// </summary>
-    public partial class EyeColor : ReferenceDataBaseEx<Guid, EyeColor>
-    {
-        /// <summary>
-        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="EyeColor"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
-        /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
-        public static implicit operator EyeColor?(Guid id) => ConvertFromId(id);
-
-        /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="EyeColor"/>.
-        /// </summary>
-        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
-        /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
-        public static implicit operator EyeColor?(string? code) => ConvertFromCode(code);
-    }
+    /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+    /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
+    public static implicit operator EyeColor?(Guid id) => ConvertFromId(id);
 
     /// <summary>
-    /// Represents the <see cref="EyeColor"/> collection.
+    /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="EyeColor"/>.
     /// </summary>
-    public partial class EyeColorCollection : ReferenceDataCollectionBase<Guid, EyeColor, EyeColorCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EyeColorCollection"/> class.
-        /// </summary>
-        public EyeColorCollection() { }
+    /// <param name="code">The <see cref="IReferenceData.Code">.</param>
+    /// <returns>The corresponding <see cref="EyeColor"/>.</returns>
+    public static implicit operator EyeColor?(string? code) => ConvertFromCode(code);
+}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EyeColorCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public EyeColorCollection(IEnumerable<EyeColor> items) => AddRange(items);
-    }
+/// <summary>
+/// Represents the <see cref="EyeColor"/> collection.
+/// </summary>
+public partial class EyeColorCollection : ReferenceDataCollectionBase<Guid, EyeColor, EyeColorCollection>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EyeColorCollection"/> class.
+    /// </summary>
+    public EyeColorCollection() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EyeColorCollection"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public EyeColorCollection(IEnumerable<EyeColor> items) => AddRange(items);
 }
 
 #pragma warning restore

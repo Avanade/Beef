@@ -5,699 +5,585 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <see cref="Person"/> business functionality.
+/// </summary>
+public partial class PersonManager : IPersonManager
 {
+    private readonly IPersonDataSvc _dataService;
+    private readonly IIdentifierGenerator _identifierGenerator;
+
+    #region Extensions
+
+    private Func<Person, Task>? _createOnPreValidateAsync;
+    private Action<MultiValidator, Person>? _createOnValidate;
+    private Func<Person, Task>? _createOnBeforeAsync;
+    private Func<Person, Task>? _createOnAfterAsync;
+
+    private Func<Guid, Task>? _deleteOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _deleteOnValidate;
+    private Func<Guid, Task>? _deleteOnBeforeAsync;
+    private Func<Guid, Task>? _deleteOnAfterAsync;
+
+    private Func<Guid, Task>? _getExOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _getExOnValidate;
+    private Func<Guid, Task>? _getExOnBeforeAsync;
+    private Func<Person?, Guid, Task>? _getExOnAfterAsync;
+
+    private Func<Person, Guid, Task>? _updateOnPreValidateAsync;
+    private Action<MultiValidator, Person, Guid>? _updateOnValidate;
+    private Func<Person, Guid, Task>? _updateOnBeforeAsync;
+    private Func<Person, Guid, Task>? _updateOnAfterAsync;
+
+    private Func<Person, Guid, Task>? _updateWithRollbackOnPreValidateAsync;
+    private Action<MultiValidator, Person, Guid>? _updateWithRollbackOnValidate;
+    private Func<Person, Guid, Task>? _updateWithRollbackOnBeforeAsync;
+    private Func<Person, Guid, Task>? _updateWithRollbackOnAfterAsync;
+
+    private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
+    private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
+    private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
+    private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
+
+    private Func<Task>? _getAll2OnPreValidateAsync;
+    private Action<MultiValidator>? _getAll2OnValidate;
+    private Func<Task>? _getAll2OnBeforeAsync;
+    private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
+
+    private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
+    private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsOnValidate;
+    private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
+    private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
+
+    private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnPreValidateAsync;
+    private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getDetailByArgsOnValidate;
+    private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnBeforeAsync;
+    private Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
+
+    private Func<Guid, Guid, Task>? _mergeOnPreValidateAsync;
+    private Action<MultiValidator, Guid, Guid>? _mergeOnValidate;
+    private Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
+    private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
+
+    private Func<Task>? _markOnPreValidateAsync;
+    private Action<MultiValidator>? _markOnValidate;
+    private Func<Task>? _markOnBeforeAsync;
+    private Func<Task>? _markOnAfterAsync;
+
+    private Func<MapArgs?, Task>? _mapOnPreValidateAsync;
+    private Action<MultiValidator, MapArgs?>? _mapOnValidate;
+    private Func<MapArgs?, Task>? _mapOnBeforeAsync;
+    private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+
+    private Func<Task>? _getNoArgsOnPreValidateAsync;
+    private Action<MultiValidator>? _getNoArgsOnValidate;
+    private Func<Task>? _getNoArgsOnBeforeAsync;
+    private Func<Person?, Task>? _getNoArgsOnAfterAsync;
+
+    private Func<Guid, Task>? _getDetailOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _getDetailOnValidate;
+    private Func<Guid, Task>? _getDetailOnBeforeAsync;
+    private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
+
+    private Func<PersonDetail, Guid, Task>? _updateDetailOnPreValidateAsync;
+    private Action<MultiValidator, PersonDetail, Guid>? _updateDetailOnValidate;
+    private Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
+    private Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
+
+    private Func<Task>? _dataSvcCustomOnPreValidateAsync;
+    private Action<MultiValidator>? _dataSvcCustomOnValidate;
+    private Func<Task>? _dataSvcCustomOnBeforeAsync;
+    private Func<int, Task>? _dataSvcCustomOnAfterAsync;
+
+    private Func<string?, List<string>?, Task>? _getNullOnPreValidateAsync;
+    private Action<MultiValidator, string?, List<string>?>? _getNullOnValidate;
+    private Func<string?, List<string>?, Task>? _getNullOnBeforeAsync;
+    private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
+
+    private Func<Person, Task>? _eventPublishNoSendOnPreValidateAsync;
+    private Action<MultiValidator, Person>? _eventPublishNoSendOnValidate;
+    private Func<Person, Task>? _eventPublishNoSendOnBeforeAsync;
+    private Func<Person, Task>? _eventPublishNoSendOnAfterAsync;
+
+    private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
+    private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
+    private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
+    private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
+
+    private Func<Task>? _throwErrorOnPreValidateAsync;
+    private Action<MultiValidator>? _throwErrorOnValidate;
+    private Func<Task>? _throwErrorOnBeforeAsync;
+    private Func<Task>? _throwErrorOnAfterAsync;
+
+    private Func<Guid, Task>? _invokeApiViaAgentOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _invokeApiViaAgentOnValidate;
+    private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
+    private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+
+    private Func<AddressCollection?, Task>? _paramCollOnPreValidateAsync;
+    private Action<MultiValidator, AddressCollection?>? _paramCollOnValidate;
+    private Func<AddressCollection?, Task>? _paramCollOnBeforeAsync;
+    private Func<AddressCollection?, Task>? _paramCollOnAfterAsync;
+
+    private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _getWithEfOnValidate;
+    private Func<Guid, Task>? _getWithEfOnBeforeAsync;
+    private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
+
+    private Func<Person, Task>? _createWithEfOnPreValidateAsync;
+    private Action<MultiValidator, Person>? _createWithEfOnValidate;
+    private Func<Person, Task>? _createWithEfOnBeforeAsync;
+    private Func<Person, Task>? _createWithEfOnAfterAsync;
+
+    private Func<Person, Guid, Task>? _updateWithEfOnPreValidateAsync;
+    private Action<MultiValidator, Person, Guid>? _updateWithEfOnValidate;
+    private Func<Person, Guid, Task>? _updateWithEfOnBeforeAsync;
+    private Func<Person, Guid, Task>? _updateWithEfOnAfterAsync;
+
+    private Func<Guid, Task>? _deleteWithEfOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _deleteWithEfOnValidate;
+    private Func<Guid, Task>? _deleteWithEfOnBeforeAsync;
+    private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
+
+    #endregion
+
     /// <summary>
-    /// Provides the <see cref="Person"/> business functionality.
+    /// Initializes a new instance of the <see cref="PersonManager"/> class.
     /// </summary>
-    public partial class PersonManager : IPersonManager
+    /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
+    /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
+    public PersonManager(IPersonDataSvc dataService, IIdentifierGenerator identifierGenerator)
+        { _dataService = dataService.ThrowIfNull(); _identifierGenerator = identifierGenerator.ThrowIfNull(); PersonManagerCtor(); }
+
+    partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
     {
-        private readonly IPersonDataSvc _dataService;
-        private readonly IIdentifierGenerator _identifierGenerator;
-
-        #region Extensions
-
-        private Func<Person, Task>? _createOnPreValidateAsync;
-        private Action<MultiValidator, Person>? _createOnValidate;
-        private Func<Person, Task>? _createOnBeforeAsync;
-        private Func<Person, Task>? _createOnAfterAsync;
-
-        private Func<Guid, Task>? _deleteOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _deleteOnValidate;
-        private Func<Guid, Task>? _deleteOnBeforeAsync;
-        private Func<Guid, Task>? _deleteOnAfterAsync;
-
-        private Func<Guid, Task>? _getExOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _getExOnValidate;
-        private Func<Guid, Task>? _getExOnBeforeAsync;
-        private Func<Person?, Guid, Task>? _getExOnAfterAsync;
-
-        private Func<Person, Guid, Task>? _updateOnPreValidateAsync;
-        private Action<MultiValidator, Person, Guid>? _updateOnValidate;
-        private Func<Person, Guid, Task>? _updateOnBeforeAsync;
-        private Func<Person, Guid, Task>? _updateOnAfterAsync;
-
-        private Func<Person, Guid, Task>? _updateWithRollbackOnPreValidateAsync;
-        private Action<MultiValidator, Person, Guid>? _updateWithRollbackOnValidate;
-        private Func<Person, Guid, Task>? _updateWithRollbackOnBeforeAsync;
-        private Func<Person, Guid, Task>? _updateWithRollbackOnAfterAsync;
-
-        private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
-        private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
-        private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
-        private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
-
-        private Func<Task>? _getAll2OnPreValidateAsync;
-        private Action<MultiValidator>? _getAll2OnValidate;
-        private Func<Task>? _getAll2OnBeforeAsync;
-        private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
-
-        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
-        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsOnValidate;
-        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
-        private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
-
-        private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnPreValidateAsync;
-        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getDetailByArgsOnValidate;
-        private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnBeforeAsync;
-        private Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
-
-        private Func<Guid, Guid, Task>? _mergeOnPreValidateAsync;
-        private Action<MultiValidator, Guid, Guid>? _mergeOnValidate;
-        private Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
-        private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
-
-        private Func<Task>? _markOnPreValidateAsync;
-        private Action<MultiValidator>? _markOnValidate;
-        private Func<Task>? _markOnBeforeAsync;
-        private Func<Task>? _markOnAfterAsync;
-
-        private Func<MapArgs?, Task>? _mapOnPreValidateAsync;
-        private Action<MultiValidator, MapArgs?>? _mapOnValidate;
-        private Func<MapArgs?, Task>? _mapOnBeforeAsync;
-        private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
-
-        private Func<Task>? _getNoArgsOnPreValidateAsync;
-        private Action<MultiValidator>? _getNoArgsOnValidate;
-        private Func<Task>? _getNoArgsOnBeforeAsync;
-        private Func<Person?, Task>? _getNoArgsOnAfterAsync;
-
-        private Func<Guid, Task>? _getDetailOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _getDetailOnValidate;
-        private Func<Guid, Task>? _getDetailOnBeforeAsync;
-        private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
-
-        private Func<PersonDetail, Guid, Task>? _updateDetailOnPreValidateAsync;
-        private Action<MultiValidator, PersonDetail, Guid>? _updateDetailOnValidate;
-        private Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
-        private Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
-
-        private Func<Task>? _dataSvcCustomOnPreValidateAsync;
-        private Action<MultiValidator>? _dataSvcCustomOnValidate;
-        private Func<Task>? _dataSvcCustomOnBeforeAsync;
-        private Func<int, Task>? _dataSvcCustomOnAfterAsync;
-
-        private Func<string?, List<string>?, Task>? _getNullOnPreValidateAsync;
-        private Action<MultiValidator, string?, List<string>?>? _getNullOnValidate;
-        private Func<string?, List<string>?, Task>? _getNullOnBeforeAsync;
-        private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
-
-        private Func<Person, Task>? _eventPublishNoSendOnPreValidateAsync;
-        private Action<MultiValidator, Person>? _eventPublishNoSendOnValidate;
-        private Func<Person, Task>? _eventPublishNoSendOnBeforeAsync;
-        private Func<Person, Task>? _eventPublishNoSendOnAfterAsync;
-
-        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
-        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
-        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
-        private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
-
-        private Func<Task>? _throwErrorOnPreValidateAsync;
-        private Action<MultiValidator>? _throwErrorOnValidate;
-        private Func<Task>? _throwErrorOnBeforeAsync;
-        private Func<Task>? _throwErrorOnAfterAsync;
-
-        private Func<Guid, Task>? _invokeApiViaAgentOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _invokeApiViaAgentOnValidate;
-        private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
-        private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
-
-        private Func<AddressCollection?, Task>? _paramCollOnPreValidateAsync;
-        private Action<MultiValidator, AddressCollection?>? _paramCollOnValidate;
-        private Func<AddressCollection?, Task>? _paramCollOnBeforeAsync;
-        private Func<AddressCollection?, Task>? _paramCollOnAfterAsync;
-
-        private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _getWithEfOnValidate;
-        private Func<Guid, Task>? _getWithEfOnBeforeAsync;
-        private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
-
-        private Func<Person, Task>? _createWithEfOnPreValidateAsync;
-        private Action<MultiValidator, Person>? _createWithEfOnValidate;
-        private Func<Person, Task>? _createWithEfOnBeforeAsync;
-        private Func<Person, Task>? _createWithEfOnAfterAsync;
-
-        private Func<Person, Guid, Task>? _updateWithEfOnPreValidateAsync;
-        private Action<MultiValidator, Person, Guid>? _updateWithEfOnValidate;
-        private Func<Person, Guid, Task>? _updateWithEfOnBeforeAsync;
-        private Func<Person, Guid, Task>? _updateWithEfOnAfterAsync;
-
-        private Func<Guid, Task>? _deleteWithEfOnPreValidateAsync;
-        private Action<MultiValidator, Guid>? _deleteWithEfOnValidate;
-        private Func<Guid, Task>? _deleteWithEfOnBeforeAsync;
-        private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
-
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonManager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
-        public PersonManager(IPersonDataSvc dataService, IIdentifierGenerator identifierGenerator)
-            { _dataService = dataService.ThrowIfNull(); _identifierGenerator = identifierGenerator.ThrowIfNull(); PersonManagerCtor(); }
-
-        partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <returns>The created <see cref="Person"/>.</returns>
-        public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _createOnValidate?.Invoke(mv, value))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_createOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var r = await _dataService.CreateAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Create);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .Additional(mv => _deleteOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_deleteOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_deleteOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
-        }, InvokerArgs.Delete);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> GetExAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .Additional(mv => _getExOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getExOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var r = await _dataService.GetExAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="Person"/>.</returns>
-        public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = id;
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_updateOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var r = await _dataService.UpdateAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="Person"/>.</returns>
-        public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = id;
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_updateWithRollbackOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var r = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_getAllOnPreValidateAsync?.Invoke(paging)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _getAllOnValidate?.Invoke(mv, paging))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getAllOnBeforeAsync?.Invoke(paging)).ConfigureAwait(false);
-            var r = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(r, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_getAll2OnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _getAll2OnValidate?.Invoke(mv))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getAll2OnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var r = await _dataService.GetAll2Async().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(args);
-            await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(args.Validate().Entity().With<PersonArgsValidator>())
-                .Additional(mv => _getByArgsOnValidate?.Invoke(mv, args, paging))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var r = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
-        public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(args);
-            await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(args.Validate().Entity().With<PersonArgsValidator>())
-                .Additional(mv => _getDetailByArgsOnValidate?.Invoke(mv, args, paging))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getDetailByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var r = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Merge first <see cref="Person"/> into second.
-        /// </summary>
-        /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
-        /// <param name="toId">The to <see cref="Person"/> identifier.</param>
-        /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person> MergeAsync(Guid fromId, Guid toId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(fromId, toId);
-            await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(fromId.Validate().Mandatory())
-                .Add(toId.Validate().Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
-                .Additional(mv => _mergeOnValidate?.Invoke(mv, fromId, toId))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_mergeOnBeforeAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
-            var r = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(r, fromId, toId)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Mark <see cref="Person"/>.
-        /// </summary>
-        public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_markOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _markOnValidate?.Invoke(mv))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_markOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            await _dataService.MarkAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_markOnAfterAsync?.Invoke()).ConfigureAwait(false);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
-        /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        public Task<MapCoordinates> MapAsync(MapArgs? args) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(args);
-            await Invoker.InvokeAsync(_mapOnPreValidateAsync?.Invoke(args)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _mapOnValidate?.Invoke(mv, args))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_mapOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
-            var r = await _dataService.MapAsync(args).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Get no arguments.
-        /// </summary>
-        /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_getNoArgsOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _getNoArgsOnValidate?.Invoke(mv))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getNoArgsOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var r = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Gets the specified <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-        public Task<PersonDetail?> GetDetailAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .Additional(mv => _getDetailOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getDetailOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var r = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Updates an existing <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = id;
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonDetailValidator>())
-                .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_updateDetailOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var r = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Actually validating the FromBody parameter generation.
-        /// </summary>
-        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-        public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await AddOnImplementationAsync(person).ConfigureAwait(false);
-        }, InvokerArgs.Unspecified);
-
-        /// <summary>
-        /// Validate a DataSvc Custom generation.
-        /// </summary>
-        /// <returns>A resultant <see cref="int"/>.</returns>
-        public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_dataSvcCustomOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _dataSvcCustomOnValidate?.Invoke(mv))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_dataSvcCustomOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            var r = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_dataSvcCustomOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Unspecified);
-
-        /// <summary>
-        /// Validate a Manager Custom generation.
-        /// </summary>
-        /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> ManagerCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Get Null.
-        /// </summary>
-        /// <param name="name">The Name.</param>
-        /// <param name="names">The Names.</param>
-        /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(name, names);
-            await Invoker.InvokeAsync(_getNullOnPreValidateAsync?.Invoke(name, names)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _getNullOnValidate?.Invoke(mv, name, names))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getNullOnBeforeAsync?.Invoke(name, names)).ConfigureAwait(false);
-            var r = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(r, name, names)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Unspecified);
-
-        /// <summary>
-        /// Validate when an Event is published but not sent.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <returns>The updated <see cref="Person"/>.</returns>
-        public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(value.Required());
-            await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _eventPublishNoSendOnValidate?.Invoke(mv, value))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_eventPublishNoSendOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var r = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_eventPublishNoSendOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
-        public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(args);
-            await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(args.Validate().Entity().With<PersonArgsValidator>())
-                .Additional(mv => _getByArgsWithEfOnValidate?.Invoke(mv, args, paging))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getByArgsWithEfOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
-            var r = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Throw Error.
-        /// </summary>
-        public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await Invoker.InvokeAsync(_throwErrorOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _throwErrorOnValidate?.Invoke(mv))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_throwErrorOnBeforeAsync?.Invoke()).ConfigureAwait(false);
-            await _dataService.ThrowErrorAsync().ConfigureAwait(false);
-            await Invoker.InvokeAsync(_throwErrorOnAfterAsync?.Invoke()).ConfigureAwait(false);
-        }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified });
-
-        /// <summary>
-        /// Invoke Api Via Agent.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Additional(mv => _invokeApiViaAgentOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_invokeApiViaAgentOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var r = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Unspecified);
-
-        /// <summary>
-        /// Param Coll.
-        /// </summary>
-        /// <param name="addresses">The Addresses.</param>
-        public Task ParamCollAsync(AddressCollection? addresses) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(addresses);
-            await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(addresses.Validate().Entity().With<AddressCollectionValidator>())
-                .Additional(mv => _paramCollOnValidate?.Invoke(mv, addresses))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_paramCollOnBeforeAsync?.Invoke(addresses)).ConfigureAwait(false);
-            await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_paramCollOnAfterAsync?.Invoke(addresses)).ConfigureAwait(false);
-        }, InvokerArgs.Unspecified);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> where found.</returns>
-        public Task<Person?> GetWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .Additional(mv => _getWithEfOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_getWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            var r = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <returns>The created <see cref="Person"/>.</returns>
-        public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _createWithEfOnValidate?.Invoke(mv, value))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_createWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
-            var r = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Create);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="Person"/>.</returns>
-        public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.Required().Id = id;
-            Cleaner.CleanUp(value);
-            await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
-                .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_updateWithEfOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
-            var r = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
-            return Cleaner.Clean(r);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public Task DeleteWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
-            await MultiValidator.Create()
-                .Add(id.Validate().Mandatory())
-                .Additional(mv => _deleteWithEfOnValidate?.Invoke(mv, id))
-                .ValidateAsync(true).ConfigureAwait(false);
-
-            await Invoker.InvokeAsync(_deleteWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
-            await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
-            await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
-        }, InvokerArgs.Delete);
-    }
+        value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _createOnValidate?.Invoke(mv, value))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_createOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
+        var r = await _dataService.CreateAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Create);
+
+    /// <inheritdoc/>
+    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _deleteOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_deleteOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        await _dataService.DeleteAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_deleteOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
+    }, InvokerArgs.Delete);
+
+    /// <inheritdoc/>
+    public Task<Person?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person?> GetExAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _getExOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getExOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        var r = await _dataService.GetExAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getExOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        value.Required().Id = id;
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_updateOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
+        var r = await _dataService.UpdateAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_updateOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        value.Required().Id = id;
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_updateWithRollbackOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
+        var r = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_getAllOnPreValidateAsync?.Invoke(paging)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _getAllOnValidate?.Invoke(mv, paging))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getAllOnBeforeAsync?.Invoke(paging)).ConfigureAwait(false);
+        var r = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getAllOnAfterAsync?.Invoke(r, paging)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_getAll2OnPreValidateAsync?.Invoke()).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _getAll2OnValidate?.Invoke(mv))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getAll2OnBeforeAsync?.Invoke()).ConfigureAwait(false);
+        var r = await _dataService.GetAll2Async().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getAll2OnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(args);
+        await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Additional(mv => _getByArgsOnValidate?.Invoke(mv, args, paging))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        var r = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(args);
+        await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Additional(mv => _getDetailByArgsOnValidate?.Invoke(mv, args, paging))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getDetailByArgsOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        var r = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getDetailByArgsOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person> MergeAsync(Guid fromId, Guid toId) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(fromId, toId);
+        await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(fromId.Validate().Mandatory())
+            .Add(toId.Validate().Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
+            .Additional(mv => _mergeOnValidate?.Invoke(mv, fromId, toId))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_mergeOnBeforeAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
+        var r = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(r, fromId, toId)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_markOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _markOnValidate?.Invoke(mv))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_markOnBeforeAsync?.Invoke()).ConfigureAwait(false);
+        await _dataService.MarkAsync().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_markOnAfterAsync?.Invoke()).ConfigureAwait(false);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task<MapCoordinates> MapAsync(MapArgs? args) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(args);
+        await Invoker.InvokeAsync(_mapOnPreValidateAsync?.Invoke(args)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _mapOnValidate?.Invoke(mv, args))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_mapOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
+        var r = await _dataService.MapAsync(args).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_mapOnAfterAsync?.Invoke(r, args)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_getNoArgsOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _getNoArgsOnValidate?.Invoke(mv))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getNoArgsOnBeforeAsync?.Invoke()).ConfigureAwait(false);
+        var r = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getNoArgsOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<PersonDetail?> GetDetailAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _getDetailOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getDetailOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        var r = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        value.Required().Id = id;
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonDetailValidator>())
+            .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_updateDetailOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
+        var r = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await AddOnImplementationAsync(person).ConfigureAwait(false);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_dataSvcCustomOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _dataSvcCustomOnValidate?.Invoke(mv))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_dataSvcCustomOnBeforeAsync?.Invoke()).ConfigureAwait(false);
+        var r = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_dataSvcCustomOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<Person?> ManagerCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(name, names);
+        await Invoker.InvokeAsync(_getNullOnPreValidateAsync?.Invoke(name, names)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _getNullOnValidate?.Invoke(mv, name, names))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getNullOnBeforeAsync?.Invoke(name, names)).ConfigureAwait(false);
+        var r = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getNullOnAfterAsync?.Invoke(r, name, names)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(value.Required());
+        await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _eventPublishNoSendOnValidate?.Invoke(mv, value))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_eventPublishNoSendOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
+        var r = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_eventPublishNoSendOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(args);
+        await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Additional(mv => _getByArgsWithEfOnValidate?.Invoke(mv, args, paging))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getByArgsWithEfOnBeforeAsync?.Invoke(args, paging)).ConfigureAwait(false);
+        var r = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getByArgsWithEfOnAfterAsync?.Invoke(r, args, paging)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        await Invoker.InvokeAsync(_throwErrorOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _throwErrorOnValidate?.Invoke(mv))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_throwErrorOnBeforeAsync?.Invoke()).ConfigureAwait(false);
+        await _dataService.ThrowErrorAsync().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_throwErrorOnAfterAsync?.Invoke()).ConfigureAwait(false);
+    }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified });
+
+    /// <inheritdoc/>
+    public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Additional(mv => _invokeApiViaAgentOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_invokeApiViaAgentOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        var r = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task ParamCollAsync(AddressCollection? addresses) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(addresses);
+        await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(addresses.Validate().Entity().With<AddressCollectionValidator>())
+            .Additional(mv => _paramCollOnValidate?.Invoke(mv, addresses))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_paramCollOnBeforeAsync?.Invoke(addresses)).ConfigureAwait(false);
+        await _dataService.ParamCollAsync(addresses).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_paramCollOnAfterAsync?.Invoke(addresses)).ConfigureAwait(false);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<Person?> GetWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _getWithEfOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        var r = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _createWithEfOnValidate?.Invoke(mv, value))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_createWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
+        var r = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_createWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Create);
+
+    /// <inheritdoc/>
+    public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        value.Required().Id = id;
+        Cleaner.CleanUp(value);
+        await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_updateWithEfOnBeforeAsync?.Invoke(value, id)).ConfigureAwait(false);
+        var r = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Update);
+
+    /// <inheritdoc/>
+    public Task DeleteWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _deleteWithEfOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_deleteWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
+    }, InvokerArgs.Delete);
 }
 
 #pragma warning restore

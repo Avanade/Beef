@@ -5,136 +5,135 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Robot entity.
+/// </summary>
+public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLogEx
+{
+    private Guid _id;
+    private string? _modelNo;
+    private string? _serialNo;
+    private string? _eyeColorSid;
+    private string? _powerSourceSid;
+    private string? _etag;
+    private ChangeLogEx? _changeLog;
+
+    /// <summary>
+    /// Gets or sets the <see cref="Robot"/> identifier.
+    /// </summary>
+    public Guid Id { get => _id; set => SetValue(ref _id, value); }
+
+    /// <summary>
+    /// Gets or sets the Model number.
+    /// </summary>
+    public string? ModelNo { get => _modelNo; set => SetValue(ref _modelNo, value); }
+
+    /// <summary>
+    /// Gets or sets the Unique serial number.
+    /// </summary>
+    public string? SerialNo { get => _serialNo; set => SetValue(ref _serialNo, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="EyeColor"/> using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("eyeColor")]
+    public string? EyeColorSid { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value, propertyName: nameof(EyeColor)); }
+
+    /// <summary>
+    /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+    /// </summary>
+    public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
+
+    /// <summary>
+    /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public RefDataNamespace.EyeColor? EyeColor { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="PowerSource"/> using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("powerSource")]
+    public string? PowerSourceSid { get => _powerSourceSid; set => SetValue(ref _powerSourceSid, value, propertyName: nameof(PowerSource)); }
+
+    /// <summary>
+    /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
+    /// </summary>
+    public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid);
+
+    /// <summary>
+    /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public RefDataNamespace.PowerSource? PowerSource { get => _powerSourceSid; set => SetValue(ref _powerSourceSid, value); }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonPropertyName("etag")]
+    public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
+
+    /// <summary>
+    /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
+    /// </summary>
+    public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
+    {
+        yield return CreateProperty(nameof(Id), Id, v => Id = v);
+        yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
+        yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
+        yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
+        yield return CreateProperty(nameof(PowerSourceSid), PowerSourceSid, v => PowerSourceSid = v);
+        yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
+        yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
+    }
+}
+
+/// <summary>
+/// Represents the <see cref="Robot"/> collection.
+/// </summary>
+public partial class RobotCollection : EntityBaseCollection<Robot, RobotCollection>
 {
     /// <summary>
-    /// Represents the Robot entity.
+    /// Initializes a new instance of the <see cref="RobotCollection"/> class.
     /// </summary>
-    public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLogEx
-    {
-        private Guid _id;
-        private string? _modelNo;
-        private string? _serialNo;
-        private string? _eyeColorSid;
-        private string? _powerSourceSid;
-        private string? _etag;
-        private ChangeLogEx? _changeLog;
-
-        /// <summary>
-        /// Gets or sets the <see cref="Robot"/> identifier.
-        /// </summary>
-        public Guid Id { get => _id; set => SetValue(ref _id, value); }
-
-        /// <summary>
-        /// Gets or sets the Model number.
-        /// </summary>
-        public string? ModelNo { get => _modelNo; set => SetValue(ref _modelNo, value); }
-
-        /// <summary>
-        /// Gets or sets the Unique serial number.
-        /// </summary>
-        public string? SerialNo { get => _serialNo; set => SetValue(ref _serialNo, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="EyeColor"/> using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("eyeColor")]
-        public string? EyeColorSid { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value, propertyName: nameof(EyeColor)); }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
-        /// </summary>
-        public string? EyeColorText => RefDataNamespace.EyeColor.GetRefDataText(_eyeColorSid);
-
-        /// <summary>
-        /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public RefDataNamespace.EyeColor? EyeColor { get => _eyeColorSid; set => SetValue(ref _eyeColorSid, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="PowerSource"/> using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("powerSource")]
-        public string? PowerSourceSid { get => _powerSourceSid; set => SetValue(ref _powerSourceSid, value, propertyName: nameof(PowerSource)); }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
-        /// </summary>
-        public string? PowerSourceText => RefDataNamespace.PowerSource.GetRefDataText(_powerSourceSid);
-
-        /// <summary>
-        /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public RefDataNamespace.PowerSource? PowerSource { get => _powerSourceSid; set => SetValue(ref _powerSourceSid, value); }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonPropertyName("etag")]
-        public string? ETag { get => _etag; set => SetValue(ref _etag, value); }
-
-        /// <summary>
-        /// Gets or sets the Change Log (see <see cref="CoreEx.Entities.ChangeLog"/>).
-        /// </summary>
-        public ChangeLogEx? ChangeLog { get => _changeLog; set => SetValue(ref _changeLog, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Id), Id, v => Id = v);
-            yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
-            yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
-            yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
-            yield return CreateProperty(nameof(PowerSourceSid), PowerSourceSid, v => PowerSourceSid = v);
-            yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
-            yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
-        }
-    }
+    public RobotCollection() { }
 
     /// <summary>
-    /// Represents the <see cref="Robot"/> collection.
+    /// Initializes a new instance of the <see cref="RobotCollection"/> class with <paramref name="items"/> to add.
     /// </summary>
-    public partial class RobotCollection : EntityBaseCollection<Robot, RobotCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollection"/> class.
-        /// </summary>
-        public RobotCollection() { }
+    /// <param name="items">The items to add.</param>
+    public RobotCollection(IEnumerable<Robot> items) => AddRange(items);
+}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public RobotCollection(IEnumerable<Robot> items) => AddRange(items);
-    }
-
+/// <summary>
+/// Represents the <see cref="Robot"/> collection result.
+/// </summary>
+public class RobotCollectionResult : EntityCollectionResult<RobotCollection, Robot, RobotCollectionResult>
+{
     /// <summary>
-    /// Represents the <see cref="Robot"/> collection result.
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class.
     /// </summary>
-    public class RobotCollectionResult : EntityCollectionResult<RobotCollection, Robot, RobotCollectionResult>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class.
-        /// </summary>
-        public RobotCollectionResult() { }
+    public RobotCollectionResult() { }
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+    public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
 }
 
 #pragma warning restore

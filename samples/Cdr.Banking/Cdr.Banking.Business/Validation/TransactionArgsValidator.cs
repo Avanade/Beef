@@ -1,25 +1,24 @@
-﻿namespace Cdr.Banking.Business.Validation
+﻿namespace Cdr.Banking.Business.Validation;
+
+/// <summary>
+/// Represents a <see cref="TransactionArgs"/> validator.
+/// </summary>
+public class TransactionArgsValidator : Validator<TransactionArgs>
 {
     /// <summary>
-    /// Represents a <see cref="TransactionArgs"/> validator.
+    /// Initializes a new instance of the <see cref="TransactionArgsValidator"/>.
     /// </summary>
-    public class TransactionArgsValidator : Validator<TransactionArgs>
+    public TransactionArgsValidator()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionArgsValidator"/>.
-        /// </summary>
-        public TransactionArgsValidator()
-        {
-            // Default FromDate where not provided, as 90 days less than ToDate; where no ToDate then assume today (now). Make sure FromDate is not greater than ToDate.
-            Property(x => x.FromDate)
-                .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : DateTime.UtcNow).AddDays(-90))
-                .CompareProperty(CompareOperator.LessThanEqual, y => y.ToDate).DependsOn(y => y.ToDate);
+        // Default FromDate where not provided, as 90 days less than ToDate; where no ToDate then assume today (now). Make sure FromDate is not greater than ToDate.
+        Property(x => x.FromDate)
+            .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : CoreEx.ExecutionContext.SystemTime.UtcNow).AddDays(-90))
+            .CompareProperty(CompareOperator.LessThanEqual, y => y.ToDate).DependsOn(y => y.ToDate);
 
-            // Make sure MinAmount is not greater than MaxAmount.
-            Property(x => x.MinAmount).CompareProperty(CompareOperator.LessThanEqual, y => y.MaxAmount).DependsOn(y => y.MaxAmount);
+        // Make sure MinAmount is not greater than MaxAmount.
+        Property(x => x.MinAmount).CompareProperty(CompareOperator.LessThanEqual, y => y.MaxAmount).DependsOn(y => y.MaxAmount);
 
-            // Make sure the Text does not include the '*' wildcard character.
-            Property(x => x.Text).Wildcard(CoreEx.Wildcards.Wildcard.None);
-        }
+        // Make sure the Text does not include the '*' wildcard character.
+        Property(x => x.Text).Wildcard(CoreEx.Wildcards.Wildcard.None);
     }
 }

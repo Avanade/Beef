@@ -29,164 +29,164 @@ using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 
 {{/if}}
 {{! ===== Class ===== }}
-namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}};
+
+/// <summary>
+/// Represents the {{{Text}}} entity.
+/// </summary>
+public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
 {
-    /// <summary>
-    /// Represents the {{{Text}}} entity.
-    /// </summary>
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
-    {
 {{! ===== Constants ===== }}
 {{#each Consts}}
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
-        public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
+    /// <summary>
+    /// {{{SummaryText}}}
+    /// </summary>
+    public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
 
 {{/each}}
 {{! ===== Privates ===== }}
 {{#each PrivateProperties}}
-        private {{{PrivateType}}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
+    private {{{PrivateType}}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
 {{/each}}
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}
   {{#ifval RefDataType}}
 
-        /// <summary>
-        /// {{{SummaryRefDataSid}}}
-        /// </summary>
+    /// <summary>
+    /// {{{SummaryRefDataSid}}}
+    /// </summary>
     {{#if SerializationIgnore}}
-        [JsonIgnore]
+    [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
+    [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
-        [JsonPropertyName("{{JsonName}}")]
+    [JsonPropertyName("{{JsonName}}")]
           {{#if SerializationAlwaysInclude}}
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
           {{/if}}
         {{/ifeq}}
       {{else}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{ArgumentName}}{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}}")]
+    [JsonProperty("{{ArgumentName}}{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}}")]
         {{else}}
-        [JsonPropertyName("{{ArgumentName}}")]
+    [JsonPropertyName("{{ArgumentName}}")]
         {{/ifeq}}
       {{/ifval}}
       {{#ifeq Parent.JsonSerializer 'SystemText'}}
         {{#if SerializationAlwaysInclude}}
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         {{/if}}
       {{/ifeq}}
     {{/if}}
     {{#ifval DisplayName}}
-        [System.ComponentModel.DataAnnotations.Display(Name="{{DisplayName}}")]
+    [System.ComponentModel.DataAnnotations.Display(Name="{{DisplayName}}")]
     {{/ifval}}
     {{#if Parent.OmitEntityBase}}
-        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+    public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
     {{else}}
-        public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}, propertyName: nameof({{Name}})); }
+    public {{{PrivateType}}} {{PropertyName}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable: true{{/if}}, propertyName: nameof({{Name}})); }
     {{/if}}
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
         {{#ifeq RefDataText 'Optional' 'Always'}}
 
-        /// <summary>
-        /// {{{SummaryRefDataText}}}
-        /// </summary>
+    /// <summary>
+    /// {{{SummaryRefDataText}}}
+    /// </summary>
         {{#ifval JsonName}}
           {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}Text")]
+    [JsonProperty("{{JsonName}}Text")]
           {{else}}
-        [JsonPropertyName("{{JsonName}}Text")]
+    [JsonPropertyName("{{JsonName}}Text")]
           {{/ifeq}}
         {{/ifval}}
-        public string? {{RefDataTextName}} => {{#ifeq RefDataText 'Optional'}}{{{Type}}}.GetRefDataText({{PropertyPrivateName}}){{else}}{{Name}}?.Text{{/ifeq}};
+    public string? {{RefDataTextName}} => {{#ifeq RefDataText 'Optional'}}{{{Type}}}.GetRefDataText({{PropertyPrivateName}}){{else}}{{Name}}?.Text{{/ifeq}};
         {{/ifeq}}
       {{/unless}}
     {{/unless}}
 
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
+    /// <summary>
+    /// {{{SummaryText}}}
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
     {{#ifval DisplayName}}
-        [Display(Name="{{DisplayName}}")]
+    [Display(Name="{{DisplayName}}")]
     {{/ifval}}
     {{#ifval Annotation1}}
-        {{Annotation1}}
+    {{Annotation1}}
     {{/ifval}}
     {{#ifval Annotation2}}
-        {{Annotation2}}
+    {{Annotation2}}
     {{/ifval}}
     {{#ifval Annotation3}}
-        {{Annotation3}}
+    {{Annotation3}}
     {{/ifval}}
     {{#if RefDataList}}
       {{#if Parent.OmitEntityBase}}
-        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
+    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
       {{else}}
-        public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}, propertyName: nameof({{Name}})); }
+    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}, propertyName: nameof({{Name}})); }
       {{/if}}   
     {{else}}
       {{#if Parent.OmitEntityBase}}
-        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+    public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
       {{else}}
-        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable = true{{/if}}); }
+    public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#if Immutable}}, immutable = true{{/if}}); }
       {{/if}}
     {{/if}}
   {{else}}
 
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
+    /// <summary>
+    /// {{{SummaryText}}}
+    /// </summary>
     {{#if SerializationIgnore}}
-        [JsonIgnore]
+    [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
+    [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
-        [JsonPropertyName("{{JsonName}}")]
+    [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{/ifval}}
       {{#ifeq Parent.JsonSerializer 'SystemText'}}
         {{#if SerializationAlwaysInclude}}
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         {{/if}}
       {{else}}
         {{#ifnull JsonName}}
           {{#if SerializationAlwaysInclude}}
-        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+    [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
           {{/if}}
         {{/ifnull}}
       {{/ifeq}}
     {{/if}}
     {{#ifval DisplayName}}
-        [Display(Name="{{DisplayName}}")]
+    [Display(Name="{{DisplayName}}")]
     {{/ifval}}
     {{#ifval Annotation1}}
-        {{Annotation1}}
+    {{Annotation1}}
     {{/ifval}}
     {{#ifval Annotation2}}
-        {{Annotation2}}
+    {{Annotation2}}
     {{/ifval}}
     {{#ifval Annotation3}}
-        {{Annotation3}}
+    {{Annotation3}}
     {{/ifval}}
     {{#if RefDataMapping}}
-        public {{{PropertyType}}} {{Name}}
-        {
-            get => GetMapping<{{{PropertyType}}}>(nameof({{Name}}));
-            set { var _{{PropertyPrivateName}} = {{Name}}; SetValue(ref _{{PropertyPrivateName}}, value); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
-        }
+    public {{{PropertyType}}} {{Name}}
+    {
+        get => GetMapping<{{{PropertyType}}}>(nameof({{Name}}));
+        set { var _{{PropertyPrivateName}} = {{Name}}; SetValue(ref _{{PropertyPrivateName}}, value); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
+    }
     {{else}}
       {{#if Parent.OmitEntityBase}}
-        public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
+    public {{{PropertyType}}} {{Name}} { get => {{PropertyPrivateName}}; set => {{PropertyPrivateName}} = value; }
       {{else}}
-        public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{#ifne StringCasing 'UseDefault'}}, casing: StringCase.{{StringCasing}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}{{#if Immutable}}, immutable: true{{/if}}); }
+    public {{{PropertyType}}} {{Name}} { get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}}; set => SetValue(ref {{PropertyPrivateName}}, value{{#ifeq Type 'string'}}{{#ifne StringTrim 'UseDefault'}}, trim: StringTrim.{{StringTrim}}{{/ifne}}{{#ifne StringTransform 'UseDefault'}}, transform: StringTransform.{{StringTransform}}{{/ifne}}{{#ifne StringCasing 'UseDefault'}}, casing: StringCase.{{StringCasing}}{{/ifne}}{{/ifeq}}{{#ifeq Type 'DateTime'}}{{#ifne DateTimeTransform 'UseDefault'}}, transform: DateTimeTransform.{{DateTimeTransform}}{{/ifne}}{{/ifeq}}{{#if Immutable}}, immutable: true{{/if}}); }
       {{/if}}
     {{/if}}
   {{/ifval}}
@@ -196,20 +196,20 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
   {{#unless RefDataType}}
     {{#ifne PrimaryKeyProperties.Count 0}}
 
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The <see cref="CompositeKey"/>.</returns>
+    /// <summary>
+    /// Creates the primary <see cref="CompositeKey"/>.
+    /// </summary>
+    /// <returns>The <see cref="CompositeKey"/>.</returns>
     {{#each PrimaryKeyProperties}}
-        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+    /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
-        public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+    public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
-        /// </summary>
-        [JsonIgnore]
-        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+    /// <summary>
+    /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+    /// </summary>
+    [JsonIgnore]
+    public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
     {{/ifne}}
   {{/unless}}
 {{/unless}}
@@ -217,20 +217,20 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
 {{#unless RefDataType}}
   {{#ifne PartitionKeyProperties.Count 0}}
 
-        /// <summary>
-        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
-        /// </summary>
-        /// <returns>The Partition Key.</returns>
+    /// <summary>
+    /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+    /// </summary>
+    /// <returns>The Partition Key.</returns>
   {{#each PartitionKeyProperties}}
-        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+    /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
+    public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
 
-        /// <summary>
-        /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
-        /// </summary>
-        [JsonIgnore]
-        public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+    /// <summary>
+    /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+    /// </summary>
+    [JsonIgnore]
+    public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
   {{/ifne}}
 {{/unless}}
 {{! ===== GetPropertyValues ===== }}
@@ -247,18 +247,18 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
     {{else}}
 
     {{/ifval}}
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
+    {
     {{#if ExtendedInherits}}
-            foreach (var pv in base.GetPropertyValues())
-                yield return pv;
+        foreach (var pv in base.GetPropertyValues())
+            yield return pv;
 
     {{/if}}
     {{#each CoreProperties}}
-            yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v);
+        yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v);
     {{/each}}
-        }
+    }
   {{/ifne}}
 {{/unless}}
 {{! ===== Operator ===== }}
@@ -272,73 +272,72 @@ namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{
         {{/ifne}}
       {{/ifne}}
       {{#ifne RefDataType 'string'}}
-        /// <summary>
-        /// An implicit cast from an <see cref="IIdentifier.Id"> to {{{EntityNameSeeComments}}}.
-        /// </summary>
-        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
-        /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        public static implicit operator {{{EntityName}}}?({{RefDataType}} id) => ConvertFromId(id);
+    /// <summary>
+    /// An implicit cast from an <see cref="IIdentifier.Id"> to {{{EntityNameSeeComments}}}.
+    /// </summary>
+    /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+    /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
+    public static implicit operator {{{EntityName}}}?({{RefDataType}} id) => ConvertFromId(id);
       {{/ifne}}
 
-        /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to {{{EntityNameSeeComments}}}.
-        /// </summary>
-        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
-        /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
+    /// <summary>
+    /// An implicit cast from a <see cref="IReferenceData.Code"> to {{{EntityNameSeeComments}}}.
+    /// </summary>
+    /// <param name="code">The <see cref="IReferenceData.Code">.</param>
+    /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
+    public static implicit operator {{{EntityName}}}?(string? code) => ConvertFromCode(code);
   {{/unless}}
 {{/ifval}}
-    }
+}
 {{! ===== Collection ===== }}
 {{#if Collection}}
 
+/// <summary>
+/// Represents the {{{EntityNameSeeComments}}} collection.
+/// </summary>
+public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
+{
     /// <summary>
-    /// Represents the {{{EntityNameSeeComments}}} collection.
+    /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class.
     /// </summary>
-    public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
-    {
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class.
-        /// </summary>
-        public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
+    public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
   {{#ifne CollectionType 'Dictionary' 'Overridden'}}
 
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
   {{/ifne}}
-    }
+}
 {{/if}}
 {{! ===== CollectionResult ===== }}
 {{#if CollectionResult}}
 
+/// <summary>
+/// Represents the {{{EntityNameSeeComments}}} collection result.
+/// </summary>
+public class {{{EntityCollectionResultName}}} : {{{EntityCollectionResultInherits}}}
+{
     /// <summary>
-    /// Represents the {{{EntityNameSeeComments}}} collection result.
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
     /// </summary>
-    public class {{{EntityCollectionResultName}}} : {{{EntityCollectionResultInherits}}}
-    {
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
-        /// </summary>
-        public {{{EntityCollectionResultName}}}() { }
+    public {{{EntityCollectionResultName}}}() { }
         
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
-{{/if}}
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+    public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
 }
+{{/if}}
 
 #pragma warning restore
 #nullable restore

@@ -5,20 +5,19 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.DataSvc
+namespace Cdr.Banking.Business.DataSvc;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> data services.
+/// </summary>
+public partial interface IReferenceDataDataSvc
 {
     /// <summary>
-    /// Provides the <b>ReferenceData</b> data services.
+    /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="IReferenceData"/> <see cref="Type"/>.
     /// </summary>
-    public partial interface IReferenceDataDataSvc
-    {
-        /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="IReferenceData"/> <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
-        /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        Task<Result<IReferenceDataCollection>> GetAsync(Type type);
-    }
+    /// <param name="type">The <see cref="IReferenceData"/> <see cref="Type"/>.</param>
+    /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
+    Task<Result<IReferenceDataCollection>> GetAsync(Type type);
 }
 
 #pragma warning restore

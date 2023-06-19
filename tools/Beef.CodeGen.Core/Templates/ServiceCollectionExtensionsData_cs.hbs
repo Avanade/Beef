@@ -5,27 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>Data</b>-layer services.
+/// </summary>
+public static partial class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>Data</b>-layer services.
+    /// Adds the generated <b>Data</b>-layer services.
     /// </summary>
-    public static partial class {{#if IsRefData}}ReferenceData{{/if}}ServiceCollectionsExtension
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGenerated{{#if IsRefData}}ReferenceData{{/if}}DataServices(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds the generated <b>Data</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGenerated{{#if IsRefData}}ReferenceData{{/if}}DataServices(this IServiceCollection services)
-        {
 {{#if IsRefData}}
-            return services.AddScoped<IReferenceDataData, ReferenceDataData>(){{#ifeq IDataEntities.Count 0}};{{/ifeq}}
+        return services.AddScoped<IReferenceDataData, ReferenceDataData>(){{#ifeq IDataEntities.Count 0}};{{/ifeq}}
 {{/if}}
 {{#each IDataEntities}}
-            {{#if @first}}{{#if Root.IsRefData}}               {{else}}return services{{/if}}{{else}}               {{/if}}.AddScoped<I{{Name}}Data{{#if GenericWithT}}<T>{{/if}}, {{Name}}Data{{#if GenericWithT}}<T>{{/if}}>(){{#if @last}};{{/if}}
+        {{#if @first}}{{#if Root.IsRefData}}               {{else}}return services{{/if}}{{else}}               {{/if}}.AddScoped<I{{Name}}Data{{#if GenericWithT}}<T>{{/if}}, {{Name}}Data{{#if GenericWithT}}<T>{{/if}}>(){{#if @last}};{{/if}}
 {{/each}}
-        }
     }
 }
 

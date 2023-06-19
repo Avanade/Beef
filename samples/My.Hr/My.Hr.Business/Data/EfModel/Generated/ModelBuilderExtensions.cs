@@ -5,33 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-using Microsoft.EntityFrameworkCore;
-using System;
+namespace My.Hr.Business.Data.EfModel;
 
-namespace My.Hr.Business.Data.EfModel
+/// <summary>
+/// Represents extension methods for the <see cref="ModelBuilder"/>.
+/// </summary>
+public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Represents extension methods for the <see cref="ModelBuilder"/>.
+    /// Adds all the generated models to the <see cref="ModelBuilder"/>.
     /// </summary>
-    public static class ModelBuilderExtensions
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
+    public static void AddGeneratedModels(this ModelBuilder modelBuilder)
     {
-        /// <summary>
-        /// Adds all the generated models to the <see cref="ModelBuilder"/>.
-        /// </summary>
-        /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
-        public static void AddGeneratedModels(this ModelBuilder modelBuilder)
-        {
-            if (modelBuilder == null)
-                throw new ArgumentNullException(nameof(modelBuilder));
-
-            Gender.AddToModel(modelBuilder);
-            TerminationReason.AddToModel(modelBuilder);
-            RelationshipType.AddToModel(modelBuilder);
-            USState.AddToModel(modelBuilder);
-            Employee.AddToModel(modelBuilder);
-            PerformanceReview.AddToModel(modelBuilder);
-            PerformanceOutcome.AddToModel(modelBuilder);
-        }
+        Gender.AddToModel(modelBuilder.ThrowIfNull());
+        TerminationReason.AddToModel(modelBuilder);
+        RelationshipType.AddToModel(modelBuilder);
+        USState.AddToModel(modelBuilder);
+        Employee.AddToModel(modelBuilder);
+        PerformanceReview.AddToModel(modelBuilder);
+        PerformanceOutcome.AddToModel(modelBuilder);
     }
 }
 

@@ -5,25 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>DataSvc</b>-layer services.
+/// </summary>
+public static partial class ServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>DataSvc</b>-layer services.
+    /// Adds the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static partial class ServiceCollectionsExtension
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds the generated <b>DataSvc</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
-        {
-            return services.AddScoped<IPersonDataSvc, PersonDataSvc>()
-                           .AddScoped<IRobotDataSvc, RobotDataSvc>()
-                           .AddScoped<IContactDataSvc, ContactDataSvc>()
-                           .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>();
-        }
+        return services.AddScoped<IPersonDataSvc, PersonDataSvc>()
+                       .AddScoped<IRobotDataSvc, RobotDataSvc>()
+                       .AddScoped<IContactDataSvc, ContactDataSvc>()
+                       .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>();
     }
 }
 

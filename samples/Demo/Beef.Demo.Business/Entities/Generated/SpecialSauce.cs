@@ -5,25 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Special Sauce entity.
+/// </summary>
+public partial class SpecialSauce : EntityBase
 {
+    private string? _ingredient;
+
     /// <summary>
-    /// Represents the Special Sauce entity.
+    /// Gets or sets the Ingredient.
     /// </summary>
-    public partial class SpecialSauce : EntityBase
+    public string? Ingredient { get => _ingredient; set => SetValue(ref _ingredient, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _ingredient;
-
-        /// <summary>
-        /// Gets or sets the Ingredient.
-        /// </summary>
-        public string? Ingredient { get => _ingredient; set => SetValue(ref _ingredient, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v);
-        }
+        yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v);
     }
 }
 

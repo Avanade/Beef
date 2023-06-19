@@ -5,22 +5,21 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business
+namespace Cdr.Banking.Business;
+
+/// <summary>
+/// Defines the <see cref="Transaction"/> business functionality.
+/// </summary>
+public partial interface ITransactionManager
 {
     /// <summary>
-    /// Defines the <see cref="Transaction"/> business functionality.
+    /// Get transaction for account.
     /// </summary>
-    public partial interface ITransactionManager
-    {
-        /// <summary>
-        /// Get transaction for account.
-        /// </summary>
-        /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
-    }
+    /// <param name="accountId">The Account Id.</param>
+    /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
+    Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
 }
 
 #pragma warning restore

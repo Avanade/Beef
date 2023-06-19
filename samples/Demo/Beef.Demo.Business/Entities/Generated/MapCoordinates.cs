@@ -5,32 +5,31 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Map Coordinates entity.
+/// </summary>
+public partial class MapCoordinates : EntityBase
 {
+    private decimal _latitude;
+    private decimal _longitude;
+
     /// <summary>
-    /// Represents the Map Coordinates entity.
+    /// Gets or sets the Latitude.
     /// </summary>
-    public partial class MapCoordinates : EntityBase
+    public decimal Latitude { get => _latitude; set => SetValue(ref _latitude, value); }
+
+    /// <summary>
+    /// Gets or sets the Longitude.
+    /// </summary>
+    public decimal Longitude { get => _longitude; set => SetValue(ref _longitude, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private decimal _latitude;
-        private decimal _longitude;
-
-        /// <summary>
-        /// Gets or sets the Latitude.
-        /// </summary>
-        public decimal Latitude { get => _latitude; set => SetValue(ref _latitude, value); }
-
-        /// <summary>
-        /// Gets or sets the Longitude.
-        /// </summary>
-        public decimal Longitude { get => _longitude; set => SetValue(ref _longitude, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Latitude), Latitude, v => Latitude = v);
-            yield return CreateProperty(nameof(Longitude), Longitude, v => Longitude = v);
-        }
+        yield return CreateProperty(nameof(Latitude), Latitude, v => Latitude = v);
+        yield return CreateProperty(nameof(Longitude), Longitude, v => Longitude = v);
     }
 }
 

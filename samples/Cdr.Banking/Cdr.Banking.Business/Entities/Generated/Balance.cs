@@ -5,70 +5,69 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.Entities
+namespace Cdr.Banking.Business.Entities;
+
+/// <summary>
+/// Represents the Balance entity.
+/// </summary>
+public partial class Balance : EntityBase, IIdentifier<string>
 {
+    private string? _id;
+    private decimal _currentBalance;
+    private decimal _availableBalance;
+    private decimal _creditLimit;
+    private decimal _amortisedLimit;
+    private string? _currency;
+    private BalancePurseCollection? _purses;
+
     /// <summary>
-    /// Represents the Balance entity.
+    /// Gets or sets the <see cref="Account"/> identifier.
     /// </summary>
-    public partial class Balance : EntityBase, IIdentifier<string>
+    [JsonPropertyName("accountId")]
+    public string? Id { get => _id; set => SetValue(ref _id, value); }
+
+    /// <summary>
+    /// Gets or sets the Current Balance.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public decimal CurrentBalance { get => _currentBalance; set => SetValue(ref _currentBalance, value); }
+
+    /// <summary>
+    /// Gets or sets the Available Balance.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public decimal AvailableBalance { get => _availableBalance; set => SetValue(ref _availableBalance, value); }
+
+    /// <summary>
+    /// Gets or sets the Credit Limit.
+    /// </summary>
+    public decimal CreditLimit { get => _creditLimit; set => SetValue(ref _creditLimit, value); }
+
+    /// <summary>
+    /// Gets or sets the Amortised Limit.
+    /// </summary>
+    public decimal AmortisedLimit { get => _amortisedLimit; set => SetValue(ref _amortisedLimit, value); }
+
+    /// <summary>
+    /// Gets or sets the Currency.
+    /// </summary>
+    public string? Currency { get => _currency; set => SetValue(ref _currency, value); }
+
+    /// <summary>
+    /// Gets or sets the Purses.
+    /// </summary>
+    public BalancePurseCollection? Purses { get => _purses; set => SetValue(ref _purses, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _id;
-        private decimal _currentBalance;
-        private decimal _availableBalance;
-        private decimal _creditLimit;
-        private decimal _amortisedLimit;
-        private string? _currency;
-        private BalancePurseCollection? _purses;
-
-        /// <summary>
-        /// Gets or sets the <see cref="Account"/> identifier.
-        /// </summary>
-        [JsonPropertyName("accountId")]
-        public string? Id { get => _id; set => SetValue(ref _id, value); }
-
-        /// <summary>
-        /// Gets or sets the Current Balance.
-        /// </summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public decimal CurrentBalance { get => _currentBalance; set => SetValue(ref _currentBalance, value); }
-
-        /// <summary>
-        /// Gets or sets the Available Balance.
-        /// </summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public decimal AvailableBalance { get => _availableBalance; set => SetValue(ref _availableBalance, value); }
-
-        /// <summary>
-        /// Gets or sets the Credit Limit.
-        /// </summary>
-        public decimal CreditLimit { get => _creditLimit; set => SetValue(ref _creditLimit, value); }
-
-        /// <summary>
-        /// Gets or sets the Amortised Limit.
-        /// </summary>
-        public decimal AmortisedLimit { get => _amortisedLimit; set => SetValue(ref _amortisedLimit, value); }
-
-        /// <summary>
-        /// Gets or sets the Currency.
-        /// </summary>
-        public string? Currency { get => _currency; set => SetValue(ref _currency, value); }
-
-        /// <summary>
-        /// Gets or sets the Purses.
-        /// </summary>
-        public BalancePurseCollection? Purses { get => _purses; set => SetValue(ref _purses, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Id), Id, v => Id = v);
-            yield return CreateProperty(nameof(CurrentBalance), CurrentBalance, v => CurrentBalance = v);
-            yield return CreateProperty(nameof(AvailableBalance), AvailableBalance, v => AvailableBalance = v);
-            yield return CreateProperty(nameof(CreditLimit), CreditLimit, v => CreditLimit = v);
-            yield return CreateProperty(nameof(AmortisedLimit), AmortisedLimit, v => AmortisedLimit = v);
-            yield return CreateProperty(nameof(Currency), Currency, v => Currency = v);
-            yield return CreateProperty(nameof(Purses), Purses, v => Purses = v);
-        }
+        yield return CreateProperty(nameof(Id), Id, v => Id = v);
+        yield return CreateProperty(nameof(CurrentBalance), CurrentBalance, v => CurrentBalance = v);
+        yield return CreateProperty(nameof(AvailableBalance), AvailableBalance, v => AvailableBalance = v);
+        yield return CreateProperty(nameof(CreditLimit), CreditLimit, v => CreditLimit = v);
+        yield return CreateProperty(nameof(AmortisedLimit), AmortisedLimit, v => AmortisedLimit = v);
+        yield return CreateProperty(nameof(Currency), Currency, v => Currency = v);
+        yield return CreateProperty(nameof(Purses), Purses, v => Purses = v);
     }
 }
 

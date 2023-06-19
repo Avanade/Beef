@@ -21,40 +21,6 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Account"/> HTTP agent.
-    /// </summary>
-    public partial interface IAccountAgent
-    {
-        /// <summary>
-        /// Get all accounts.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<AccountDetail?>> GetDetailAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get <see cref="Account"/> <see cref="Balance"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Balance?>> GetBalanceAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <see cref="Account"/> HTTP agent.
     /// </summary>
     public partial class AccountAgent : TypedHttpClientBase<AccountAgent>, IAccountAgent
@@ -70,34 +36,15 @@ namespace Cdr.Banking.Common.Agents
         public AccountAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<AccountAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Get all accounts.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<AccountCollectionResult>("api/v1/banking/accounts", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<AccountArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Get <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<AccountDetail?>> GetDetailAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<AccountDetail?>("api/v1/banking/accounts/{accountId}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Get <see cref="Account"/> <see cref="Balance"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Balance?>> GetBalanceAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Balance?>("api/v1/banking/accounts/{accountId}/balance", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
     }

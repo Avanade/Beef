@@ -5,27 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-namespace {{Root.NamespaceBusiness}}.Data
+namespace {{Root.NamespaceBusiness}}.Data;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> data access.
+/// </summary>
+public partial interface IReferenceDataData
 {
-    /// <summary>
-    /// Provides the <b>ReferenceData</b> data access.
-    /// </summary>
-    public partial interface IReferenceDataData
-    {
 {{#each RefDataEntities}}
   {{#unless @first}}
 
   {{/unless}}
-        /// <summary>
-        /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
-        /// </summary>
+    /// <summary>
+    /// Gets all the {{see-comments RefDataQualifiedEntityName}} items.
+    /// </summary>
   {{#if Root.CancellationToken}}
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
   {{/if}}
-        /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
-        Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellationToken}}CancellationToken cancellationToken = default{{/if}});
+    /// <returns>The {{see-comments RefDataQualifiedEntityCollectionName}}.</returns>
+    Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellationToken}}CancellationToken cancellationToken = default{{/if}});
 {{/each}}
-    }
 }
 
 #pragma warning restore

@@ -5,106 +5,80 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data
+namespace Beef.Demo.Business.Data;
+
+/// <summary>
+/// Provides the <see cref="PostalInfo"/> data access.
+/// </summary>
+public partial class PostalInfoData : IPostalInfoData
 {
+    private readonly ZippoAgent _httpAgent;
+
     /// <summary>
-    /// Provides the <see cref="PostalInfo"/> data access.
+    /// Initializes a new instance of the <see cref="PostalInfoData"/> class.
     /// </summary>
-    public partial class PostalInfoData : IPostalInfoData
+    /// <param name="httpAgent">The <see cref="ZippoAgent"/>.</param>
+    public PostalInfoData(ZippoAgent httpAgent)
+        { _httpAgent = httpAgent.ThrowIfNull(); PostalInfoDataCtor(); }
+
+    partial void PostalInfoDataCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public async Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
+        => (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
+
+    /// <inheritdoc/>
+    public async Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
+        => (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
+
+    /// <inheritdoc/>
+    public async Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
+        => (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
+
+    /// <inheritdoc/>
+    public async Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
+        => (await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
+
+    /// <summary>
+    /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.
+    /// </summary>
+    public partial class EntityToModelHttpAgentMapper : Mapper<PostalInfo, Model.PostalInfo>
     {
-        private readonly ZippoAgent _httpAgent;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="PostalInfoData"/> class.
+        /// Initializes a new instance of the <see cref="EntityToModelHttpAgentMapper"/> class.
         /// </summary>
-        /// <param name="httpAgent">The <see cref="ZippoAgent"/>.</param>
-        public PostalInfoData(ZippoAgent httpAgent)
-            { _httpAgent = httpAgent.ThrowIfNull(); PostalInfoDataCtor(); }
-
-        partial void PostalInfoDataCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-        public async Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-            => (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
-
-        /// <summary>
-        /// Creates a new <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The created <see cref="PostalInfo"/>.</returns>
-        public async Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-            => (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
-
-        /// <summary>
-        /// Updates an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-        public async Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-            => (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
-
-        /// <summary>
-        /// Deletes the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        public async Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-            => (await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
-
-        /// <summary>
-        /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.
-        /// </summary>
-        public partial class EntityToModelHttpAgentMapper : Mapper<PostalInfo, Model.PostalInfo>
+        public EntityToModelHttpAgentMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="EntityToModelHttpAgentMapper"/> class.
-            /// </summary>
-            public EntityToModelHttpAgentMapper()
-            {
-                Map((s, d) => d.Country = s.CountrySid, OperationTypes.Any, s => s.CountrySid == default, d => d.Country = default);
-                Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
-                Map((s, d) => d.State = s.State, OperationTypes.Any, s => s.State == default, d => d.State = default);
-                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
-                Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
-                EntityToModelHttpAgentMapperCtor();
-            }
-
-            partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
+            Map((s, d) => d.Country = s.CountrySid, OperationTypes.Any, s => s.CountrySid == default, d => d.Country = default);
+            Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
+            Map((s, d) => d.State = s.State, OperationTypes.Any, s => s.State == default, d => d.State = default);
+            Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
+            Map((s, d) => d.ETag = s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+            EntityToModelHttpAgentMapperCtor();
         }
 
-        /// <summary>
-        /// Provides the Entity Framework <see cref="Model.PostalInfo"/> to <see cref="PostalInfo"/> mapping.
-        /// </summary>
-        public partial class ModelToEntityHttpAgentMapper : Mapper<Model.PostalInfo, PostalInfo>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelToEntityHttpAgentMapper"/> class.
-            /// </summary>
-            public ModelToEntityHttpAgentMapper()
-            {
-                Map((s, d) => d.CountrySid = (string?)s.Country, OperationTypes.Any, s => s.Country == default, d => d.CountrySid = default);
-                Map((s, d) => d.City = (string?)s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
-                Map((s, d) => d.State = (string?)s.State, OperationTypes.Any, s => s.State == default, d => d.State = default);
-                Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
-                Map((s, d) => d.ETag = (string?)s.ETag, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
-                ModelToEntityHttpAgentMapperCtor();
-            }
+        partial void EntityToModelHttpAgentMapperCtor(); // Enables the constructor to be extended.
+    }
 
-            partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
+    /// <summary>
+    /// Provides the Entity Framework <see cref="Model.PostalInfo"/> to <see cref="PostalInfo"/> mapping.
+    /// </summary>
+    public partial class ModelToEntityHttpAgentMapper : Mapper<Model.PostalInfo, PostalInfo>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelToEntityHttpAgentMapper"/> class.
+        /// </summary>
+        public ModelToEntityHttpAgentMapper()
+        {
+            Map((s, d) => d.CountrySid = (string?)s.Country!, OperationTypes.Any, s => s.Country == default, d => d.CountrySid = default);
+            Map((s, d) => d.City = (string?)s.City!, OperationTypes.Any, s => s.City == default, d => d.City = default);
+            Map((s, d) => d.State = (string?)s.State!, OperationTypes.Any, s => s.State == default, d => d.State = default);
+            Map((o, s, d) => d.Places = o.Map(s.Places, d.Places), OperationTypes.Any, s => s.Places == default, d => d.Places = default);
+            Map((s, d) => d.ETag = (string?)s.ETag!, OperationTypes.Any, s => s.ETag == default, d => d.ETag = default);
+            ModelToEntityHttpAgentMapperCtor();
         }
+
+        partial void ModelToEntityHttpAgentMapperCtor(); // Enables the constructor to be extended.
     }
 }
 

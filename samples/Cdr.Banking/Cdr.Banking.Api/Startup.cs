@@ -69,8 +69,7 @@ namespace Cdr.Banking.Api
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app)
         {
             // Handle any unhandled exceptions.
             app.UseWebApiExceptionHandler();

@@ -5,83 +5,60 @@
 #nullable enable
 #pragma warning disable
 
-namespace My.Hr.Business
+namespace My.Hr.Business;
+
+/// <summary>
+/// Provides the <see cref="PerformanceReview"/> business functionality.
+/// </summary>
+public partial class PerformanceReviewManager : IPerformanceReviewManager
 {
+    private readonly IPerformanceReviewDataSvc _dataService;
+
     /// <summary>
-    /// Provides the <see cref="PerformanceReview"/> business functionality.
+    /// Initializes a new instance of the <see cref="PerformanceReviewManager"/> class.
     /// </summary>
-    public partial class PerformanceReviewManager : IPerformanceReviewManager
+    /// <param name="dataService">The <see cref="IPerformanceReviewDataSvc"/>.</param>
+    public PerformanceReviewManager(IPerformanceReviewDataSvc dataService)
+        { _dataService = dataService.ThrowIfNull(); PerformanceReviewManagerCtor(); }
+
+    partial void PerformanceReviewManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReview?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
     {
-        private readonly IPerformanceReviewDataSvc _dataService;
+        return Result.Go().Requires(id)
+                     .ThenAsAsync(() => _dataService.GetAsync(id));
+    }, InvokerArgs.Read);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceReviewManager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IPerformanceReviewDataSvc"/>.</param>
-        public PerformanceReviewManager(IPerformanceReviewDataSvc dataService)
-            { _dataService = dataService.ThrowIfNull(); PerformanceReviewManagerCtor(); }
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.Go()
+                     .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
+    }, InvokerArgs.Read);
 
-        partial void PerformanceReviewManagerCtor(); // Enables additional functionality to be added to the constructor.
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.Go(value).Required().Then(v => v.EmployeeId = employeeId)
+                     .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
+                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+    }, InvokerArgs.Create);
 
-        /// <summary>
-        /// Gets the specified <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        public Task<Result<PerformanceReview?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.Go().Requires(id)
-                         .ThenAsAsync(() => _dataService.GetAsync(id));
-        }, InvokerArgs.Read);
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                     .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
+                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+    }, InvokerArgs.Update);
 
-        /// <summary>
-        /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="PerformanceReviewCollectionResult"/>.</returns>
-        public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.Go()
-                         .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Creates a new <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PerformanceReview"/>.</param>
-        /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
-        /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.Go(value).Required().Then(v => v.EmployeeId = employeeId)
-                         .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
-                         .ThenAsAsync(v => _dataService.CreateAsync(value));
-        }, InvokerArgs.Create);
-
-        /// <summary>
-        /// Updates an existing <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PerformanceReview"/>.</param>
-        /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
-                         .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>())
-                         .ThenAsAsync(v => _dataService.UpdateAsync(value));
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Deletes the specified <see cref="PerformanceReview"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.Go().Requires(id)
-                         .ThenAsync(() => _dataService.DeleteAsync(id));
-        }, InvokerArgs.Delete);
-    }
+    /// <inheritdoc/>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.Go().Requires(id)
+                     .ThenAsync(() => _dataService.DeleteAsync(id));
+    }, InvokerArgs.Delete);
 }
 
 #pragma warning restore

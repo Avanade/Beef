@@ -5,164 +5,163 @@
 #nullable enable
 #pragma warning disable
 
-namespace {{Root.NamespaceBusiness}}.Data
+namespace {{Root.NamespaceBusiness}}.Data;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> data access.
+/// </summary>
+public partial class ReferenceDataData : IReferenceDataData
 {
-    /// <summary>
-    /// Provides the <b>ReferenceData</b> data access.
-    /// </summary>
-    public partial class ReferenceDataData : IReferenceDataData
-    {
 {{#each RefData.DataCtorParameters}}
-        private readonly {{Type}} {{PrivateName}};
+    private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
   {{/if}}
 {{/each}}
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
-        /// </summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
+    /// </summary>
 {{#each RefData.DataCtorParameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+    /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = {{ArgumentName}} ?? throw new ArgumentNullException(nameof({{ArgumentName}})); {{/each}}ReferenceDataDataCtor(); }
+    public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+        { {{#each RefData.DataCtorParameters}}{{PrivateName}} = {{ArgumentName}}.ThrowIfNull(); {{/each}}ReferenceDataDataCtor(); }
 
-        partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
+    partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.
 
 {{#each RefDataEntities}}
   {{#unless @first}}
 
   {{/unless}}
-        /// <inheritdoc/>
-        public Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellatioToken}}CancellationToken cancellationToken = default{{/if}})
+    /// <inheritdoc/>
+    public Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellatioToken}}CancellationToken cancellationToken = default{{/if}})
   {{#ifeq AutoImplement 'Database'}}
-            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id"), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
+        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id"), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
+        {
+            return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id", additionalProperties: (dr, item) =>
             {
-                return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id", additionalProperties: (dr, item) =>
-                {
       {{#each CoreProperties}}
-                    item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{RefDataGetValueType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
+                item.{{DataMapperPropertyName}} = {{#ifval RefDataConverterCode}}{{{RefDataConverterCode}}}{{/ifval}}dr.GetValue<{{{RefDataGetValueType}}}>("{{#ifval DataName}}{{DataName}}{{else}}{{Name}}{{/ifval}}"){{#ifval RefDataConverterCode}}){{/ifval}};
       {{/each}}
-                }{{#if Root.CancellationToken}}, ct{{/if}});
-            }, InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+            }{{#if Root.CancellationToken}}, ct{{/if}});
+        }, InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
     {{/ifne}}
   {{/ifeq}}
   {{#ifeq AutoImplement 'EntityFramework'}}
-            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} =>{{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
-            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
-            => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{Name}}GetAll_OnImplementationAsync({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{Name}}GetAll_OnImplementationAsync({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
 {{/each}}
 {{#each RefDataEntities}}
   {{#ifeq AutoImplement 'EntityFramework'}}
     {{#unless EntityFrameworkCustomMapper}}
 
+    /// <summary>
+    /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments EntityFrameworkModel}}} mapping.
+    /// </summary>
+    public partial class {{Name}}ToModelEfMapper : Mapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>
+    {
         /// <summary>
-        /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments EntityFrameworkModel}}} mapping.
+        /// Initializes a new instance of the <see cref="{{Name}}ToModelEfMapper"/> class.
         /// </summary>
-        public partial class {{Name}}ToModelEfMapper : Mapper<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>
+        public {{Name}}ToModelEfMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="{{Name}}ToModelEfMapper"/> class.
-            /// </summary>
-            public {{Name}}ToModelEfMapper()
-            {
     {{#each EntityFrameworkMapperProperties}}
-                {{EntityFrameworkDataMapperToModelCode}}
+            {{EntityFrameworkDataMapperToModelCode}}
     {{/each}}
-                {{Name}}ToModelEfMapperCtor();
-            }
-
-            partial void {{Name}}ToModelEfMapperCtor(); // Enables the constructor to be extended.
-    {{#if HasEntityFrameworkChangeLogProperty}}
-
-            /// <inheritdoc/>
-            protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
-                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
-                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
-                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
-                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
-    {{/if}}
+            {{Name}}ToModelEfMapperCtor();
         }
 
-        /// <summary>
-        /// Provides the Entity Framework {{{see-comments EntityFrameworkModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
-        /// </summary>
-        public partial class ModelTo{{Name}}EfMapper : Mapper<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
-            /// </summary>
-            public ModelTo{{Name}}EfMapper()
-            {
-    {{#each EntityFrameworkMapperProperties}}
-                {{EntityFrameworkDataMapperFromModelCode}}
-    {{/each}}
-                ModelTo{{Name}}EfMapperCtor();
-            }
-
-            partial void ModelTo{{Name}}EfMapperCtor(); // Enables the constructor to be extended.
+        partial void {{Name}}ToModelEfMapperCtor(); // Enables the constructor to be extended.
     {{#if HasEntityFrameworkChangeLogProperty}}
 
-            /// <inheritdoc/>
-            protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
-                .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
-                .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
-                .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
-                .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+        /// <inheritdoc/>
+        protected override void OnRegister(Mapper<{{EntityName}}, {{EntityFrameworkModel}}> mapper) => mapper.Owner.Register(new Mapper<ChangeLogEx, {{EntityFrameworkModel}}>()
+            .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+            .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+            .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+            .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
     {{/if}}
+    }
+
+    /// <summary>
+    /// Provides the Entity Framework {{{see-comments EntityFrameworkModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
+    /// </summary>
+    public partial class ModelTo{{Name}}EfMapper : Mapper<{{EntityFrameworkModel}}, {{RefDataQualifiedEntityName}}>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
+        /// </summary>
+        public ModelTo{{Name}}EfMapper()
+        {
+    {{#each EntityFrameworkMapperProperties}}
+            {{EntityFrameworkDataMapperFromModelCode}}
+    {{/each}}
+            ModelTo{{Name}}EfMapperCtor();
         }
+
+        partial void ModelTo{{Name}}EfMapperCtor(); // Enables the constructor to be extended.
+    {{#if HasEntityFrameworkChangeLogProperty}}
+
+        /// <inheritdoc/>
+        protected override void OnRegister(Mapper<{{EntityFrameworkModel}}, {{EntityName}}> mapper) => mapper.Owner.Register(new Mapper<{{EntityFrameworkModel}}, ChangeLogEx>()
+            .Map((s, d) => d.CreatedBy = s.CreatedBy, OperationTypes.AnyExceptUpdate)
+            .Map((s, d) => d.CreatedDate = s.CreatedDate, OperationTypes.AnyExceptUpdate)
+            .Map((s, d) => d.UpdatedBy = s.UpdatedBy, OperationTypes.AnyExceptCreate)
+            .Map((s, d) => d.UpdatedDate = s.UpdatedDate, OperationTypes.AnyExceptCreate));
+    {{/if}}
+    }
     {{/unless}}
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
     {{#unless CosmosCustomMapper}}
 
+    /// <summary>
+    /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments CosmosModel}}} mapping.
+    /// </summary>
+    public partial class {{Name}}ToModelCosmosMapper : Mapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>
+    {
         /// <summary>
-        /// Provides the {{see-comments RefDataQualifiedEntityName}} to Entity Framework {{{see-comments CosmosModel}}} mapping.
+        /// Initializes a new instance of the <see cref="{{Name}}ToModelCosmosMapper"/> class.
         /// </summary>
-        public partial class {{Name}}ToModelCosmosMapper : Mapper<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>
+        public {{Name}}ToModelCosmosMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="{{Name}}ToModelCosmosMapper"/> class.
-            /// </summary>
-            public {{Name}}ToModelCosmosMapper()
-            {
     {{#each CosmosMapperProperties}}
-                {{CosmosDataMapperToModelCode}}
+            {{CosmosDataMapperToModelCode}}
     {{/each}}
-                {{Name}}ToModelCosmosMapperCtor();
-            }
-
-            partial void {{Name}}ToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+            {{Name}}ToModelCosmosMapperCtor();
         }
 
-        /// <summary>
-        /// Provides the Entity Framework {{{see-comments CosmosModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
-        /// </summary>
-        public partial class ModelTo{{Name}}CosmosMapper : Mapper<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
-            /// </summary>
-            public ModelTo{{Name}}CosmosMapper()
-            {
-    {{#each CosmosMapperProperties}}
-                {{CosmosDataMapperFromModelCode}}
-    {{/each}}
-                ModelTo{{Name}}CosmosMapperCtor();
-            }
+        partial void {{Name}}ToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+    }
 
-            partial void ModelTo{{Name}}CosmosMapperCtor(); // Enables the constructor to be extended.
+    /// <summary>
+    /// Provides the Entity Framework {{{see-comments CosmosModel}}} to {{see-comments RefDataQualifiedEntityName}} mapping.
+    /// </summary>
+    public partial class ModelTo{{Name}}CosmosMapper : Mapper<{{CosmosModel}}, {{RefDataQualifiedEntityName}}>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+        /// </summary>
+        public ModelTo{{Name}}CosmosMapper()
+        {
+    {{#each CosmosMapperProperties}}
+            {{CosmosDataMapperFromModelCode}}
+    {{/each}}
+            ModelTo{{Name}}CosmosMapperCtor();
         }
+
+        partial void ModelTo{{Name}}CosmosMapperCtor(); // Enables the constructor to be extended.
+    }
     {{/unless}}
   {{/ifeq}}
 {{/each}}
-    }
 }
 
 #pragma warning restore

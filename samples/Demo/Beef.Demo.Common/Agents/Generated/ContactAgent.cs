@@ -21,77 +21,6 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Contact"/> HTTP agent.
-    /// </summary>
-    public partial interface IContactAgent
-    {
-        /// <summary>
-        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<ContactCollectionResult>> GetAllAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Contact?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Creates a new <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Contact>> CreateAsync(Contact value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Contact>> UpdateAsync(Contact value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Patches an existing <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Contact"/>.</param>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Contact>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Raise Event.
-        /// </summary>
-        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> RaiseEventAsync(bool throwError, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <see cref="Contact"/> HTTP agent.
     /// </summary>
     public partial class ContactAgent : TypedHttpClientBase<ContactAgent>, IContactAgent
@@ -107,75 +36,31 @@ namespace Beef.Demo.Common.Agents
         public ContactAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ContactAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<ContactCollectionResult>> GetAllAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<ContactCollectionResult>("api/v1/contacts", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Contact?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Contact?>("api/v1/contacts/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Creates a new <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Contact>> CreateAsync(Contact value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<Contact, Contact>("api/v1/contacts", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Contact>> UpdateAsync(Contact value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<Contact, Contact>("api/v1/contacts/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Patches an existing <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Contact"/>.</param>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Contact>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<Contact>("api/v1/contacts/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Deletes the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => DeleteAsync("api/v1/contacts/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Raise Event.
-        /// </summary>
-        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> RaiseEventAsync(bool throwError, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/contacts/raise", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<bool>("throwError", throwError)), cancellationToken: cancellationToken);
     }

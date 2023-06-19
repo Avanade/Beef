@@ -5,33 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.DataSvc
+namespace Cdr.Banking.Business.DataSvc;
+
+/// <summary>
+/// Provides the <see cref="Transaction"/> data repository services.
+/// </summary>
+public partial class TransactionDataSvc : ITransactionDataSvc
 {
+    private readonly ITransactionData _data;
+
     /// <summary>
-    /// Provides the <see cref="Transaction"/> data repository services.
+    /// Initializes a new instance of the <see cref="TransactionDataSvc"/> class.
     /// </summary>
-    public partial class TransactionDataSvc : ITransactionDataSvc
-    {
-        private readonly ITransactionData _data;
+    /// <param name="data">The <see cref="ITransactionData"/>.</param>
+    public TransactionDataSvc(ITransactionData data)
+        { _data = data.ThrowIfNull(); TransactionDataSvcCtor(); }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionDataSvc"/> class.
-        /// </summary>
-        /// <param name="data">The <see cref="ITransactionData"/>.</param>
-        public TransactionDataSvc(ITransactionData data)
-            { _data = data.ThrowIfNull(); TransactionDataSvcCtor(); }
+    partial void TransactionDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
-        partial void TransactionDataSvcCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Get transaction for account.
-        /// </summary>
-        /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => _data.GetTransactionsAsync(accountId, args, paging);
-    }
+    /// <inheritdoc/>
+    public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => _data.GetTransactionsAsync(accountId, args, paging);
 }
 
 #pragma warning restore

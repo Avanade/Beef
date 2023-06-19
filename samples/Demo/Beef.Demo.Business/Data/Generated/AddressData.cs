@@ -5,67 +5,66 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data
+namespace Beef.Demo.Business.Data;
+
+/// <summary>
+/// Provides the <see cref="Address"/> data access.
+/// </summary>
+public partial class AddressData
 {
+
     /// <summary>
-    /// Provides the <see cref="Address"/> data access.
+    /// Provides the <see cref="Address"/> property and database column mapping.
     /// </summary>
-    public partial class AddressData
+    public partial class DbMapper : DatabaseMapper<Address, DbMapper>
     {
-
         /// <summary>
-        /// Provides the <see cref="Address"/> property and database column mapping.
+        /// Initializes a new instance of the <see cref="DbMapper"/> class.
         /// </summary>
-        public partial class DbMapper : DatabaseMapper<Address, DbMapper>
+        public DbMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbMapper"/> class.
-            /// </summary>
-            public DbMapper()
-            {
-                Property(s => s.Street);
-                Property(s => s.City);
-                DbMapperCtor();
-            }
+            Property(s => s.Street);
+            Property(s => s.City);
+            DbMapperCtor();
+        }
             
-            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
-        }
+        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+    }
 
+    /// <summary>
+    /// Provides the <see cref="Address"/> to Entity Framework <see cref="EfModel.Person"/> mapping.
+    /// </summary>
+    public partial class EntityToModelEfMapper : Mapper<Address, EfModel.Person>
+    {
         /// <summary>
-        /// Provides the <see cref="Address"/> to Entity Framework <see cref="EfModel.Person"/> mapping.
+        /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
         /// </summary>
-        public partial class EntityToModelEfMapper : Mapper<Address, EfModel.Person>
+        public EntityToModelEfMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="EntityToModelEfMapper"/> class.
-            /// </summary>
-            public EntityToModelEfMapper()
-            {
-                Map((s, d) => d.Street = s.Street, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
-                Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
-                EntityToModelEfMapperCtor();
-            }
-
-            partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+            Map((s, d) => d.Street = s.Street, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
+            Map((s, d) => d.City = s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
+            EntityToModelEfMapperCtor();
         }
 
+        partial void EntityToModelEfMapperCtor(); // Enables the constructor to be extended.
+    }
+
+    /// <summary>
+    /// Provides the Entity Framework <see cref="EfModel.Person"/> to <see cref="Address"/> mapping.
+    /// </summary>
+    public partial class ModelToEntityEfMapper : Mapper<EfModel.Person, Address>
+    {
         /// <summary>
-        /// Provides the Entity Framework <see cref="EfModel.Person"/> to <see cref="Address"/> mapping.
+        /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
         /// </summary>
-        public partial class ModelToEntityEfMapper : Mapper<EfModel.Person, Address>
+        public ModelToEntityEfMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelToEntityEfMapper"/> class.
-            /// </summary>
-            public ModelToEntityEfMapper()
-            {
-                Map((s, d) => d.Street = (string?)s.Street, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
-                Map((s, d) => d.City = (string?)s.City, OperationTypes.Any, s => s.City == default, d => d.City = default);
-                ModelToEntityEfMapperCtor();
-            }
-
-            partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
+            Map((s, d) => d.Street = (string?)s.Street!, OperationTypes.Any, s => s.Street == default, d => d.Street = default);
+            Map((s, d) => d.City = (string?)s.City!, OperationTypes.Any, s => s.City == default, d => d.City = default);
+            ModelToEntityEfMapperCtor();
         }
+
+        partial void ModelToEntityEfMapperCtor(); // Enables the constructor to be extended.
     }
 }
 

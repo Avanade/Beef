@@ -7,57 +7,53 @@
 
 using CommonRefDataNamespace = {{Root.Company}}.{{Root.AppName}}.Common.Entities;
 
-namespace {{Root.NamespaceApi}}.Controllers
+namespace {{Root.NamespaceApi}}.Controllers;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> Web API functionality.
+/// </summary>
+{{#ifval WebApiAuthorize}}
+[{{{WebApiAuthorize}}}]
+{{/ifval}}
+public partial class ReferenceDataController : ControllerBase
 {
-    /// <summary>
-    /// Provides the <b>ReferenceData</b> Web API functionality.
+    private readonly ReferenceDataContentWebApi _webApi;
+    private readonly ReferenceDataOrchestrator _orchestrator;
+
+    public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
+        { _webApi = webApi.ThrowIfNull(); _orchestrator = orchestrator.ThrowIfNull(); }
+
+{{#each RefDataEntities}}
+    /// <summary> 
+    /// Gets all of the {{see-comments RefDataQualifiedEntityName}} reference data items that match the specified criteria.
     /// </summary>
+    /// <param name="codes">The reference data code list.</param>
+    /// <param name="text">The reference data text (including wildcards).</param>
+    /// <returns>A {{RefDataQualifiedEntityName}} collection.</returns>
+  {{#ifval WebApiAuthorize}}
+    [{{{WebApiAuthorize}}}]
+  {{/ifval}}
+    [HttpGet()]
+  {{#ifval WebApiRoutePrefix}}
+    [Route("{{WebApiRoutePrefix}}")]
+  {{/ifval}}
+    [ProducesResponseType(typeof(IEnumerable<Common{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
+    public Task<IActionResult> {{Name}}GetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
+        => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<{{RefDataQualifiedEntityName}}>(codes, text, p.RequestOptions.IncludeInactive));
+
+{{/each}}
+    /// <summary>
+    /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Root.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+    /// </summary>
+    /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
 {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
 {{/ifval}}
-    public partial class ReferenceDataController : ControllerBase
-    {
-        private readonly ReferenceDataContentWebApi _webApi;
-        private readonly ReferenceDataOrchestrator _orchestrator;
-
-        public ReferenceDataController(ReferenceDataContentWebApi webApi, ReferenceDataOrchestrator orchestrator)
-        {
-            _webApi = webApi ?? throw new ArgumentNullException(nameof(webApi));
-            _orchestrator = orchestrator ?? throw new ArgumentNullException(nameof(orchestrator));
-        }
-
-{{#each RefDataEntities}}
-        /// <summary> 
-        /// Gets all of the {{see-comments RefDataQualifiedEntityName}} reference data items that match the specified criteria.
-        /// </summary>
-        /// <param name="codes">The reference data code list.</param>
-        /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A {{RefDataQualifiedEntityName}} collection.</returns>
-  {{#ifval WebApiAuthorize}}
-        [{{{WebApiAuthorize}}}]
-  {{/ifval}}
-        [HttpGet()]
-  {{#ifval WebApiRoutePrefix}}
-        [Route("{{WebApiRoutePrefix}}")]
-  {{/ifval}}
-        [ProducesResponseType(typeof(IEnumerable<Common{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> {{Name}}GetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
-            => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<{{RefDataQualifiedEntityName}}>(codes, text, p.RequestOptions.IncludeInactive));
-
-{{/each}}
-        /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Root.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
-{{#ifval WebApiAuthorize}}
-        [{{{WebApiAuthorize}}}]
-{{/ifval}}
-        [HttpGet()]
-        [Route("{{RefDataWebApiRoute}}")]
-        [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
-    }
+    [HttpGet()]
+    [Route("{{RefDataWebApiRoute}}")]
+    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
 }
 
 #pragma warning restore

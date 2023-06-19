@@ -37,7 +37,7 @@ Assumptions are as follows:
 
 For the purposes of this sample, [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/) has been chosen as the data store.
 
-As the operations are read-only, the data store would be (should be) optimised for these required read activitiies. In this instance the assumption is that the Cosmos DB store would be a near real-time replica from the _system of record_. There would be an on-going process to synchronise the Cosmos DB data with the latest infomation, using the likes of [event steaming](../../src/Beef.Events/README.md) for example.
+As the operations are read-only, the data store would be (should be) optimised for these required read activitiies. In this instance the assumption is that the Cosmos DB store would be a near real-time replica from the _system of record_. There would be an on-going process to synchronise the Cosmos DB data with the latest infomation, using the likes of [event steaming](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx/Events#readme) for example.
 
 The following [Containers](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) will be used:
 - **`RefData`** - All Reference Data types and their corresponding items. No partitioning will be used, as there is limited benefit in partitioning per reference data type given the limited volume within, and the limited access given largely cached in memory.
@@ -80,9 +80,9 @@ Also, any files that started with `Person` (being the demonstration entity) were
 ## Code generation
 
 The following code-generation files require configuration:
-- [`entity.beef.yaml`](./Cdr.Banking.CodeGen/entity.beef.yaml) - this describes the entities, their properties and operations, to fulfil the aforementioned CDR Banking API endpoint and schema requirements.
-- [`refdata.beef.yaml`](./Cdr.Banking.CodeGen/refdata.beef.yaml) - this describes the reference data entities, their properties, and corresponding get all (read) operation. These are defined seperately as different code-generation templates are used.
-- [`datamodel.beef.yaml`](./Cdr.Banking.CodeGen/datamodel.beef.yaml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a _basic model_ class is generated. 
+- [`entity.beef.yaml`](./Cdr.Banking.CodeGen/entity.beef-5.yaml) - this describes the entities, their properties and operations, to fulfil the aforementioned CDR Banking API endpoint and schema requirements.
+- [`refdata.beef.yaml`](./Cdr.Banking.CodeGen/refdata.beef-5.yaml) - this describes the reference data entities, their properties, and corresponding get all (read) operation. These are defined seperately as different code-generation templates are used.
+- [`datamodel.beef.yaml`](./Cdr.Banking.CodeGen/datamodel.beef-5.yaml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a _basic model_ class is generated. 
 
 Each of the files have comments added within to aid the reader as to purpose of the configuration. Otherwise, see the related entity-driven code-generation [documentation](../../tools/Beef.CodeGen.Core/README.md) for more information.
 
@@ -105,7 +105,7 @@ To demonstrate the authentication and authorisation the following is required:
 
 ### Execution Context
 
-A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _Beef_ [`ExecutionContext`](../../src/Beef.Abstractions/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
+A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _CoreEx_ [`ExecutionContext`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
 
 ``` csharp
 /// <summary>
@@ -121,7 +121,7 @@ public class ExecutionContext : Beef.ExecutionContext
     /// <summary>
     /// Gets the list of account (identifiers) that the user has access/permission to.
     /// </summary>
-    public List<string> Accounts { get; } = new List<string>();
+    public List<string> Accounts { get; } = new();
 }
 ```
 
@@ -144,27 +144,31 @@ Within the `Configure` method the User to Accounts mapping is performed. As stat
 // Add execution context set up to the pipeline.
 app.UseExecutionContext((hc, ec) =>
 {
+    // TODO: This would be replaced with appropriate OAuth integration, etc... - this is purely for illustrative purposes only.
     if (!hc.Request.Headers.TryGetValue("cdr-user", out var username) || username.Count != 1)
-        throw new Beef.AuthorizationException();
+        throw new AuthenticationException();
 
-    var mec = (ExecutionContext)ec;
+    var bec = (Business.ExecutionContext)ec;
+    bec.Timestamp = SystemTime.Get().UtcNow;
 
     switch (username[0])
     {
         case "jessica":
-            mec.Accounts.AddRange(new string[] { "12345678", "34567890", "45678901" });
+            bec.Accounts.AddRange(new string[] { "12345678", "34567890", "45678901" });
             break;
 
         case "jenny":
-            mec.Accounts.Add("23456789");
+            bec.Accounts.Add("23456789");
             break;
 
         case "jason":
             break;
 
         default:
-            throw new Beef.AuthorizationException();
+            throw new AuthenticationException();
     }
+
+    return Task.CompletedTask;
 });
 ```
 
@@ -219,11 +223,8 @@ In this case, we are setting this using the code-generation for the operation. T
 As stated in the above YAML comments, a common [validator](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) will be used to perform the authorization logic. The static [`Validators.AccountId`](./Cdr.Banking.Business/Validation/Validators.cs) is used to perform the validation.
 
 ``` csharp
-public static CommonValidator<string?> AccountId => CommonValidator.Create<string?>(v => v.Custom(ctx =>
-{
-    if (ctx.Value == null || !ExecutionContext.Current.Accounts.Contains(ctx.Value))
-        throw new AuthorizationException();
-}));
+    public static CommonValidator<string?> AccountId => CommonValidator.Create<string?>(v => v.Custom(ctx 
+        => Result.Go().When(() => ctx.Value == null || !ExecutionContext.Current.Accounts.Contains(ctx.Value), () => Result.AuthorizationError())));
 ```
 
 <br/>
@@ -274,21 +275,15 @@ The underlying logic queries the `Account` container for the specified `accountI
 /// <summary>
 /// Gets the balance for the specified account.
 /// </summary>
-private Task<Balance?> GetBalanceOnImplementationAsync(string? accountId)
+private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId)
 {
-    // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
-    var args = _accountMapper.CreateArgs("Account");
-    var val = (from a in CosmosDb.Default.Container(args).AsQueryable()
-                where a.Id == accountId
-                select new { a.Id, a.Balance }).SelectSingleOrDefault();
-
-    if (val == null)
-        return Task.FromResult<Balance?>(null);
-
-    // Map the Model.Balance to Balance and return.
-    var bal = _balanceMapper.MapToSrce(val.Balance)!;
-    bal.Id = val.Id;
-    return Task.FromResult<Balance?>(bal);
+    // Use the 'Account' model and select for the specified id to access the balance property.
+    return Result.GoAsync(_cosmos.Accounts.ModelQuery(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
+        .WhenAs(a => a is not null, a =>
+        {
+            var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(a!.Balance);
+            return bal.Adjust(b => b.Id = a.Id);
+        });
 }
 ```
 
@@ -374,14 +369,14 @@ public class TransactionArgsValidator : Validator<TransactionArgs>
     {
         // Default FromDate where not provided, as 90 days less than ToDate; where no ToDate then assume today (now). Make sure FromDate is not greater than ToDate.
         Property(x => x.FromDate)
-            .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : DateTime.Now).AddDays(-90))
+            .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : Business.ExecutionContext.Current.Timestamp).AddDays(-90))
             .CompareProperty(CompareOperator.LessThanEqual, y => y.ToDate).DependsOn(y => y.ToDate);
 
         // Make sure MinAmount is not greater than MaxAmount.
         Property(x => x.MinAmount).CompareProperty(CompareOperator.LessThanEqual, y => y.MaxAmount).DependsOn(y => y.MaxAmount);
 
         // Make sure the Text does not include the '*' wildcard character.
-        Property(x => x.Text).Wildcard(Beef.Wildcard.None);
+        Property(x => x.Text).Wildcard(CoreEx.Wildcards.Wildcard.None);
     }
 }
 ```
@@ -418,9 +413,13 @@ Of note, within the [`FixtureSetup.cs`](./Cdr.Banking.Test/FixtureSetup.cs) the 
 
 ``` csharp
 // TODO: Passing the username as an http header for all requests; this would be replaced with OAuth integration, etc.
-AgentTester.RegisterBeforeRequest(r => r.Headers.Add("cdr-user", Beef.ExecutionContext.Current.Username));
+TestSetUp.Default.OnBeforeHttpRequestMessageSendAsync = (req, userName, _) =>
+{
+    req.Headers.Add("cdr-user", userName);
+    return Task.CompletedTask;
+};
 
 // Set "page" and "page-size" as the supported paging query string parameters as defined by the CDR specification.
-WebApiPagingArgsArg.PagingArgsPageQueryStringName = "page";
-WebApiPagingArgsArg.PagingArgsSizeQueryStringName = "page-size";
+CoreEx.Http.HttpConsts.PagingArgsPageQueryStringName = "page";
+CoreEx.Http.HttpConsts.PagingArgsSizeQueryStringName = "page-size";
 ```

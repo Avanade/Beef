@@ -34,7 +34,7 @@ public class EmployeeValidator : Validator<Employee>
         Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
         Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
         Property(x => x.Gender).Mandatory().IsValid();
-        Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => CoreEx.ExecutionContext.Current.Timestamp.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
+        Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => CoreEx.ExecutionContext.SystemTime.UtcNow.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
         Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
         Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
         Property(x => x.Address).Entity(_addressValidator);

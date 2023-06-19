@@ -6,90 +6,94 @@
 #nullable enable
 #pragma warning disable
 
-namespace {{Root.NamespaceBusiness}}
+namespace {{Root.NamespaceBusiness}};
+
+/// <summary>
+/// Provides the {{{EntityNameSeeComments}}} business functionality.
+/// </summary>
+public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Manager{{#if GenericWithT}}<T>{{/if}}
 {
-    /// <summary>
-    /// Provides the {{{EntityNameSeeComments}}} business functionality.
-    /// </summary>
-    public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Manager{{#if GenericWithT}}<T>{{/if}}
-    {
 {{#each ManagerCtorParameters}}
-        private readonly {{Type}} {{PrivateName}};
+    private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
   {{/if}}
 {{/each}}
 {{#if HasManagerExtensions}}
-        #region Extensions
+    #region Extensions
 
   {{#each ManagerAutoOperations}}
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
-        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnPreValidateAsync;
-        private Action<MultiValidator{{#each Parameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnValidate;
+    private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnPreValidateAsync;
+    private Action<MultiValidator{{#each Parameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnValidate;
       {{/unless}}
-        private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnBeforeAsync;
-        private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnAfterAsync;
+    private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnBeforeAsync;
+    private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}{{#if Root.CancellationToken}}CancellationToken, {{/if}}Task{{#if WithResult}}<Result>{{/if}}>? {{PrivateName}}OnAfterAsync;
 
     {{/if}}
   {{/each}}
-        #endregion
+    #endregion
 
 {{/if}}
-        /// <summary>
-        /// Initializes a new instance of the <see cref="{{Name}}Manager"/> class.
-        /// </summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="{{Name}}Manager"/> class.
+    /// </summary>
 {{#each ManagerCtorParameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+    /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower ManagerCtor}} {{Name}}Manager({{#each ManagerCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+    {{lower ManagerCtor}} {{Name}}Manager({{#each ManagerCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
 {{#ifle ManagerCtorParameters.Count 5}}
-            { {{#each ManagerCtorParameters}}{{PrivateName}} = {{ArgumentName}}.ThrowIfNull(); {{/each}}{{Name}}ManagerCtor(); }
+        { {{#each ManagerCtorParameters}}{{PrivateName}} = {{ArgumentName}}.ThrowIfNull(); {{/each}}{{Name}}ManagerCtor(); }
 {{else}}
-        {
+    {
   {{#each ManagerCtorParameters}}
-            {{PrivateName}} = {{ArgumentName}}.ThrowIfNull();
+        {{PrivateName}} = {{ArgumentName}}.ThrowIfNull();
   {{/each}}
-            {{Name}}ManagerCtor();
-        }
+        {{Name}}ManagerCtor();
+    }
 {{/ifle}}
 
-        partial void {{Name}}ManagerCtor(); // Enables additional functionality to be added to the constructor.
+    partial void {{Name}}ManagerCtor(); // Enables additional functionality to be added to the constructor.
 
 {{#each ManagerOperations}}
   {{#unless @first}}
 
   {{/unless}} 
-        /// <summary>
-        /// {{{SummaryText}}}
-        /// </summary>
-  {{#each Parameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
-  {{/each}}
-  {{#if Root.CancellationToken}}
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+  {{#if ExcludeIManager}}
+    /// <summary>
+    /// {{{SummaryText}}}
+    /// </summary>
+    {{#each Parameters}}
+    /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+    {{/each}}
+    {{#if Root.CancellationToken}}
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    {{/if}}
+    {{#if HasReturnValue}}
+    /// <returns>{{{ReturnText}}}</returns>
+    {{/if}}
+  {{else}}
+    /// <inheritdoc/>
   {{/if}}
-  {{#if HasReturnValue}}
-        /// <returns>{{{ReturnText}}}</returns>
-  {{/if}}
-        {{set-value 'HasResultCode' false}}public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => ManagerInvoker.Current.InvokeAsync(this, {{#unless WithResult}}async {{/unless}}{{#if Root.CancellationToken}}ct{{else}}_{{/if}} =>
-        {
+    {{set-value 'HasResultCode' false}}public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => ManagerInvoker.Current.InvokeAsync(this, {{#unless WithResult}}async {{/unless}}{{#if Root.CancellationToken}}ct{{else}}_{{/if}} =>
+    {
   {{#if WithResult}}
-            return Result.Go{{#if HasValue}}(value){{#if ValueParameter.IsMandatory}}.Required(){{/if}}{{else}}(){{/if}}{{#each ValueLessMandatoryParameters}}.Requires({{ArgumentName}}){{/each}}{{#ifeq ManagerPassingParameters.Count 1}}{{#each ManagerPassingParameters}}.Then(v => v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}}){{/each}}{{/ifeq}}
+        return Result.Go{{#if HasValue}}(value){{#if ValueParameter.IsMandatory}}.Required(){{/if}}{{else}}(){{/if}}{{#each ValueLessMandatoryParameters}}.Requires({{ArgumentName}}){{/each}}{{#ifeq ManagerPassingParameters.Count 1}}{{#each ManagerPassingParameters}}.Then(v => v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}}){{/each}}{{/ifeq}}
   {{/if}}
   {{#ifval AuthRole}}
-            {{#if WithResult}}             .UserIsInRole("{{AuthRole}}"){{else}}ExecutionContext.Current.UserIsInRole("{{AuthRole}}").ThrowOnError();{{/if}}
+        {{#if WithResult}}             .UserIsInRole("{{AuthRole}}"){{else}}ExecutionContext.Current.UserIsInRole("{{AuthRole}}").ThrowOnError();{{/if}}
   {{/ifval}}
   {{#ifval AuthPermission}}
-            {{#if WithResult}}             .UserIsAuthorized("{{AuthPermission}}"){{else}}ExecutionContext.Current.UserIsAuthorized("{{AuthPermission}}").ThrowOnError();{{/if}}
+        {{#if WithResult}}             .UserIsAuthorized("{{AuthPermission}}"){{else}}ExecutionContext.Current.UserIsAuthorized("{{AuthPermission}}").ThrowOnError();{{/if}}
   {{/ifval}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#if IdentifierGenerator}}
         {{#if Parent.WithResult}}
-                         .ThenAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
+                     .ThenAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
         {{else}}
-            value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
+        value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
         {{/if}}
       {{/if}}
     {{/each}}
@@ -97,10 +101,10 @@ namespace {{Root.NamespaceBusiness}}
   {{#unless WithResult}}
     {{#each ManagerPassingParameters}}
       {{#ifeq LayerPassing 'ToManagerSet'}}
-            value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = {{ArgumentName}};
+        value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = {{ArgumentName}};
       {{/ifeq}}
       {{#ifeq LayerPassing 'ToManagerCollSet'}}
-            value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.ForEach(i => i.{{Name}} = {{ArgumentName}});
+        value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.ForEach(i => i.{{Name}} = {{ArgumentName}});
       {{/ifeq}}
     {{/each}}
   {{else}}
@@ -108,105 +112,104 @@ namespace {{Root.NamespaceBusiness}}
     {{else}}
       {{#each ManagerPassingParameters}}
         {{#if @first}}
-                         .Then(v =>
-                         {
+                     .Then(v =>
+                     {
         {{/if}}
-                             v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}};
+                         v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}};
         {{#if @last}}
-                         })
+                     })
         {{/if}}
       {{/each}}    
     {{/ifeq}}
   {{/unless}}
   {{#if ManagerCustom}}
     {{#if WithResult}}
-                         .Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}));
+                     .Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}));
     {{else}}
-            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
+        {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await {{Name}}OnImplementationAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
     {{/if}}
   {{else}}
     {{#ifne CleanerParameters.Count 0}}
       {{#if WithResult}}
-                         .Then({{#if HasValue}}v{{else}}(){{/if}} => Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}))
+                     .Then({{#if HasValue}}v{{else}}(){{/if}} => Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}))
       {{else}}
-            Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}});
+        Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}});
       {{/if}}
     {{/ifne}}
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
         {{#if WithResult}}
-                         .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}))
+                     .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}))
         {{else}}
-            await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
+        await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
         {{/if}}
       {{/unless}}
     {{/if}}
     {{#if WithResult}}
       {{#if SingleValidatorParameters}}
         {{#each ValidatorParameters}}
-                         .Validate{{#if IsValueArg}}Async({{else}}sAsync({{ArgumentName}}, {{/if}}v => v{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+                     .Validate{{#if IsValueArg}}Async({{else}}sAsync({{ArgumentName}}, {{/if}}v => v{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
         {{/each}}
       {{else}}
-                         .ValidateAsync({{#if HasValue}}v{{else}}(){{/if}} => MultiValidator.Create()
+                     .ValidateAsync({{#if HasValue}}v{{else}}(){{/if}} => MultiValidator.Create()
         {{#each ValidatorParameters}}
-                             .Add({{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}.Validate(){{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}){{#if @last}}{{#unless Parent.ManagerExtensions}}){{/unless}}{{/if}}
+                         .Add({{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}.Validate(){{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}){{#if @last}}{{#unless Parent.ManagerExtensions}}){{/unless}}{{/if}}
         {{/each}}
         {{#if ManagerExtensions}}
-                             .Additional(mv => {{PrivateName}}OnValidate?.Invoke(mv{{#each Parameters}}, {{ArgumentName}}{{/each}})))
+                         .Additional(mv => {{PrivateName}}OnValidate?.Invoke(mv{{#each Parameters}}, {{ArgumentName}}{{/each}})))
         {{/if}}
       {{/if}}
     {{else}}
       {{#if SingleValidateParameters}}
         {{#each ValidateParameters}}
-            await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}{{/ifne}}){{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+        await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}{{/ifne}}){{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
         {{/each}}
       {{else}}
-            await MultiValidator.Create()
+        await MultiValidator.Create()
         {{#each ValidateParameters}}
-                .Add({{ArgumentName}}.Validate(){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+            .Add({{ArgumentName}}.Validate(){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
         {{/each}}
         {{#if ManagerExtensions}}
           {{#unless SingleValidateParameters}}
-                .Additional(mv => {{PrivateName}}OnValidate?.Invoke(mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
+            .Additional(mv => {{PrivateName}}OnValidate?.Invoke(mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
           {{/unless}}
         {{/if}}
-                .ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+            .ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
 
       {{/if}}
     {{/if}}
     {{#if ManagerExtensions}}
       {{#if WithResult}}
-                         .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}) ?? Result.SuccessTask)
-                         .Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}))
-                         .ThenAsync({{#if HasReturnValue}}r{{else}}(){{/if}} => {{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}}) ?? Result.SuccessTask){{#if HasReturnValue}}{{#unless ManagerCleanup}};{{/unless}}{{else}};{{/if}}
+                     .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}) ?? Result.SuccessTask)
+                     .Then{{#if HasResultTypeChange}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}))
+                     .ThenAsync({{#if HasReturnValue}}r{{else}}(){{/if}} => {{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}}) ?? Result.SuccessTask){{#if HasReturnValue}}{{#unless ManagerCleanup}};{{/unless}}{{else}};{{/if}}
        {{#if HasReturnValue}}
          {{#if ManagerCleanup}}
-                         .Then(r => Cleaner.Clean(r));
+                     .Then(r => Cleaner.Clean(r));
          {{/if}}
        {{/if}}
       {{else}}
-            await Invoker.InvokeAsync({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
-            {{#if HasReturnValue}}var r = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false);
-            await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}})).ConfigureAwait(false);
+        await Invoker.InvokeAsync({{PrivateName}}OnBeforeAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
+        {{#if HasReturnValue}}var r = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne DataParameters.Count 0}}, {{/ifne}}ct{{/if}}).ConfigureAwait(false);
+        await Invoker.InvokeAsync({{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{ifne ValueLessParameters.Count 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}ct{{/if}})).ConfigureAwait(false);
         {{#if HasReturnValue}}
-            return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}r{{#if ManagerCleanUp}}){{/if}};
+        return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}r{{#if ManagerCleanUp}}){{/if}};
         {{/if}}
       {{/if}}
     {{else}}
       {{#if WithResult}}
-                         .Then{{#if HasReturnValue}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}));
+                     .Then{{#if HasReturnValue}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}));
       {{else}}
-            {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
+        {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
       {{/if}}
     {{/if}}
   {{/if}}
   {{#if ManagerTransaction}}
-        }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+    }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{else}}
-        }, InvokerArgs.{{ManagerOperationType}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+    }, InvokerArgs.{{ManagerOperationType}}{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/if}}
 {{/each}}
-    }
 }
 
 #pragma warning restore

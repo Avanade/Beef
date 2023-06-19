@@ -5,35 +5,34 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.DataSvc
+namespace Cdr.Banking.Business.DataSvc;
+
+/// <summary>
+/// Defines the <see cref="Account"/> data repository services.
+/// </summary>
+public partial interface IAccountDataSvc
 {
     /// <summary>
-    /// Defines the <see cref="Account"/> data repository services.
+    /// Get all accounts.
     /// </summary>
-    public partial interface IAccountDataSvc
-    {
-        /// <summary>
-        /// Get all accounts.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
-        Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
+    /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
+    Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
 
-        /// <summary>
-        /// Get <see cref="AccountDetail"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        Task<Result<AccountDetail?>> GetDetailAsync(string? accountId);
+    /// <summary>
+    /// Get <see cref="AccountDetail"/>.
+    /// </summary>
+    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+    /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
+    Task<Result<AccountDetail?>> GetDetailAsync(string? accountId);
 
-        /// <summary>
-        /// Get <see cref="Account"/> <see cref="Balance"/>.
-        /// </summary>
-        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        Task<Result<Balance?>> GetBalanceAsync(string? accountId);
-    }
+    /// <summary>
+    /// Get <see cref="Account"/> <see cref="Balance"/>.
+    /// </summary>
+    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+    /// <returns>The selected <see cref="Balance"/> where found.</returns>
+    Task<Result<Balance?>> GetBalanceAsync(string? accountId);
 }
 
 #pragma warning restore

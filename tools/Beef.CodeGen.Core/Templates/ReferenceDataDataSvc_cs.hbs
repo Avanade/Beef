@@ -5,32 +5,31 @@
 #nullable enable
 #pragma warning disable
 
-namespace {{Root.NamespaceBusiness}}.DataSvc
+namespace {{Root.NamespaceBusiness}}.DataSvc;
+
+/// <summary>
+/// Provides the <b>ReferenceData</b> data services.
+/// </summary>
+public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
 {
+    private readonly IReferenceDataData _data;
+
     /// <summary>
-    /// Provides the <b>ReferenceData</b> data services.
+    /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
     /// </summary>
-    public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
+    /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
+    public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
+
+    partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
+
+    /// <inheritdoc/>
+    public Task<Result<IReferenceDataCollection>> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => type switch
     {
-        private readonly IReferenceDataData _data;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
-        /// </summary>
-        /// <param name="data">The <see cref="IReferenceDataData"/>.</param>
-        public ReferenceDataDataSvc(IReferenceDataData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ReferenceDataDataSvcCtor(); }
-
-        partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
-
-        /// <inheritdoc/>
-        public Task<Result<IReferenceDataCollection>> GetAsync(Type type{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => type switch
-        {
 {{#each RefDataEntities}}
-            Type _ when type == typeof({{RefDataQualifiedEntityName}}) => Result.GoAsync(_data.{{Name}}GetAllAsync({{#if Root.CancellationToken}}cancellationToken{{/if}})).ThenAs(v => (IReferenceDataCollection)v),
+        Type _ when type == typeof({{RefDataQualifiedEntityName}}) => Result.GoAsync(_data.{{Name}}GetAllAsync({{#if Root.CancellationToken}}cancellationToken{{/if}})).ThenAs(v => (IReferenceDataCollection)v),
 {{/each}}
-            _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
-        };
-    }
+        _ => throw new InvalidOperationException($"Type {type.FullName} is not a known {nameof(IReferenceData)}.")
+    };
 }
 
 #pragma warning restore

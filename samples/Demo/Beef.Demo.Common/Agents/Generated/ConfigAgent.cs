@@ -21,20 +21,6 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <b>Config</b> HTTP agent.
-    /// </summary>
-    public partial interface IConfigAgent
-    {
-        /// <summary>
-        /// Get Env Vars.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <b>Config</b> HTTP agent.
     /// </summary>
     public partial class ConfigAgent : TypedHttpClientBase<ConfigAgent>, IConfigAgent
@@ -50,12 +36,7 @@ namespace Beef.Demo.Common.Agents
         public ConfigAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ConfigAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Get Env Vars.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions, cancellationToken: cancellationToken);
     }

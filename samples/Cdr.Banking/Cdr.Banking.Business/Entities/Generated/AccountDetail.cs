@@ -5,71 +5,70 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.Entities
+namespace Cdr.Banking.Business.Entities;
+
+/// <summary>
+/// Represents the <see cref="Account"/> Detail entity.
+/// </summary>
+public partial class AccountDetail : Account
 {
+    private string? _bsb;
+    private string? _accountNumber;
+    private string? _bundleName;
+    private string? _specificAccountUTypeSid;
+    private TermDepositAccount? _termDeposit;
+    private CreditCardAccount? _creditCard;
+
     /// <summary>
-    /// Represents the <see cref="Account"/> Detail entity.
+    /// Gets or sets the Bsb.
     /// </summary>
-    public partial class AccountDetail : Account
+    public string? Bsb { get => _bsb; set => SetValue(ref _bsb, value); }
+
+    /// <summary>
+    /// Gets or sets the Account Number.
+    /// </summary>
+    public string? AccountNumber { get => _accountNumber; set => SetValue(ref _accountNumber, value); }
+
+    /// <summary>
+    /// Gets or sets the Bundle Name.
+    /// </summary>
+    public string? BundleName { get => _bundleName; set => SetValue(ref _bundleName, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="SpecificAccountUType"/> using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("specificAccountUType")]
+    public string? SpecificAccountUTypeSid { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value, propertyName: nameof(SpecificAccountUType)); }
+
+    /// <summary>
+    /// Gets or sets the Specific Account U Type (see <see cref="RefDataNamespace.AccountUType"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public RefDataNamespace.AccountUType? SpecificAccountUType { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value); }
+
+    /// <summary>
+    /// Gets or sets the Term Deposit (see <see cref="Business.Entities.TermDepositAccount"/>).
+    /// </summary>
+    public TermDepositAccount? TermDeposit { get => _termDeposit; set => SetValue(ref _termDeposit, value); }
+
+    /// <summary>
+    /// Gets or sets the Credit Card (see <see cref="Business.Entities.CreditCardAccount"/>).
+    /// </summary>
+    public CreditCardAccount? CreditCard { get => _creditCard; set => SetValue(ref _creditCard, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _bsb;
-        private string? _accountNumber;
-        private string? _bundleName;
-        private string? _specificAccountUTypeSid;
-        private TermDepositAccount? _termDeposit;
-        private CreditCardAccount? _creditCard;
+        foreach (var pv in base.GetPropertyValues())
+            yield return pv;
 
-        /// <summary>
-        /// Gets or sets the Bsb.
-        /// </summary>
-        public string? Bsb { get => _bsb; set => SetValue(ref _bsb, value); }
-
-        /// <summary>
-        /// Gets or sets the Account Number.
-        /// </summary>
-        public string? AccountNumber { get => _accountNumber; set => SetValue(ref _accountNumber, value); }
-
-        /// <summary>
-        /// Gets or sets the Bundle Name.
-        /// </summary>
-        public string? BundleName { get => _bundleName; set => SetValue(ref _bundleName, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="SpecificAccountUType"/> using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("specificAccountUType")]
-        public string? SpecificAccountUTypeSid { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value, propertyName: nameof(SpecificAccountUType)); }
-
-        /// <summary>
-        /// Gets or sets the Specific Account U Type (see <see cref="RefDataNamespace.AccountUType"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public RefDataNamespace.AccountUType? SpecificAccountUType { get => _specificAccountUTypeSid; set => SetValue(ref _specificAccountUTypeSid, value); }
-
-        /// <summary>
-        /// Gets or sets the Term Deposit (see <see cref="Business.Entities.TermDepositAccount"/>).
-        /// </summary>
-        public TermDepositAccount? TermDeposit { get => _termDeposit; set => SetValue(ref _termDeposit, value); }
-
-        /// <summary>
-        /// Gets or sets the Credit Card (see <see cref="Business.Entities.CreditCardAccount"/>).
-        /// </summary>
-        public CreditCardAccount? CreditCard { get => _creditCard; set => SetValue(ref _creditCard, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            foreach (var pv in base.GetPropertyValues())
-                yield return pv;
-
-            yield return CreateProperty(nameof(Bsb), Bsb, v => Bsb = v);
-            yield return CreateProperty(nameof(AccountNumber), AccountNumber, v => AccountNumber = v);
-            yield return CreateProperty(nameof(BundleName), BundleName, v => BundleName = v);
-            yield return CreateProperty(nameof(SpecificAccountUTypeSid), SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
-            yield return CreateProperty(nameof(TermDeposit), TermDeposit, v => TermDeposit = v);
-            yield return CreateProperty(nameof(CreditCard), CreditCard, v => CreditCard = v);
-        }
+        yield return CreateProperty(nameof(Bsb), Bsb, v => Bsb = v);
+        yield return CreateProperty(nameof(AccountNumber), AccountNumber, v => AccountNumber = v);
+        yield return CreateProperty(nameof(BundleName), BundleName, v => BundleName = v);
+        yield return CreateProperty(nameof(SpecificAccountUTypeSid), SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
+        yield return CreateProperty(nameof(TermDeposit), TermDeposit, v => TermDeposit = v);
+        yield return CreateProperty(nameof(CreditCard), CreditCard, v => CreditCard = v);
     }
 }
 

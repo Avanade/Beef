@@ -21,23 +21,6 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Transaction"/> HTTP agent.
-    /// </summary>
-    public partial interface ITransactionAgent
-    {
-        /// <summary>
-        /// Get transaction for account.
-        /// </summary>
-        /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <see cref="Transaction"/> HTTP agent.
     /// </summary>
     public partial class TransactionAgent : TypedHttpClientBase<TransactionAgent>, ITransactionAgent
@@ -53,15 +36,7 @@ namespace Cdr.Banking.Common.Agents
         public TransactionAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<TransactionAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Get transaction for account.
-        /// </summary>
-        /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="Entities.TransactionArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<TransactionCollectionResult>("api/v1/banking/accounts/{accountId}/transactions", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId), new HttpArg<TransactionArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
     }

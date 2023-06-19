@@ -20,7 +20,7 @@
             if (context.Value.Communications != null && context.Value.Communications.Count(x => x.Value?.IsPreferred == true) > 1)
                 context.AddError(x => x.Communications, "Only one of the Communications can be set as Preferred.");
 
-            return Task.FromResult(Result.Success);
+            return Result.SuccessTask;
         }
     }
 }

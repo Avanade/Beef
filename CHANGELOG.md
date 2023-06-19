@@ -3,9 +3,10 @@
 Represents the **NuGet** versions.
 
 ## v5.4.0
-- *Enhancement:* Upgraded `CoreEx` to `v3` to leverage the `Result` and `Result<T>` railway-oriented programming capabilities to minimize the number of thrown exceptions (of the non-exceptional variety), and to improve the development and debugging experience.
+- *Enhancement:* Upgraded `CoreEx` to `v3` to leverage the `Result` and `Result<T>` railway-oriented programming capabilities to minimize the number of thrown exceptions (of the non-exceptional variety), to improve performance and, the development and debugging experience.
   - A number of the underlying code-generation templates have been modified to support `v3` changes/fixes; as such all code-generation should be re-run. Note that by default the generated code will leverage `Result` and `Result<T>`; for backwards compatibility set `withResult: false` at top of `entity.beef-5.yaml`.
   - Also, note that `v3` may introduce some breaking changes that will need manual remediation. The validation `OnValidateAsync` and  `CustomRule` _must_ now return a `Result`. Where using, consider leveraging the `Result.XxxError` to return known errors versus throwing the related exception.
+- *Enhancement:* Code-generation API log output will state `<NoAuth>` explicitly where no authorization has been specified using the corresponding `webApiAuthorize` YAML configuration.
 
 ## v5.3.1
 - *Fixed:* Upgraded `CoreEx` and `UnitTestEx` to latest packages to include all related fixes.

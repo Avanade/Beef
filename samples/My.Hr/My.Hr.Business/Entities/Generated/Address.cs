@@ -5,66 +5,65 @@
 #nullable enable
 #pragma warning disable
 
-namespace My.Hr.Business.Entities
+namespace My.Hr.Business.Entities;
+
+/// <summary>
+/// Represents the Address entity.
+/// </summary>
+public partial class Address : EntityBase
 {
+    private string? _street1;
+    private string? _street2;
+    private string? _city;
+    private string? _stateSid;
+    private string? _postCode;
+
     /// <summary>
-    /// Represents the Address entity.
+    /// Gets or sets the Street1.
     /// </summary>
-    public partial class Address : EntityBase
+    public string? Street1 { get => _street1; set => SetValue(ref _street1, value); }
+
+    /// <summary>
+    /// Gets or sets the Street2.
+    /// </summary>
+    public string? Street2 { get => _street2; set => SetValue(ref _street2, value); }
+
+    /// <summary>
+    /// Gets or sets the City.
+    /// </summary>
+    public string? City { get => _city; set => SetValue(ref _city, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="State"/> using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("state")]
+    public string? StateSid { get => _stateSid; set => SetValue(ref _stateSid, value, propertyName: nameof(State)); }
+
+    /// <summary>
+    /// Gets the corresponding <see cref="State"/> text (read-only where selected).
+    /// </summary>
+    public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid);
+
+    /// <summary>
+    /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public RefDataNamespace.USState? State { get => _stateSid; set => SetValue(ref _stateSid, value); }
+
+    /// <summary>
+    /// Gets or sets the Post Code.
+    /// </summary>
+    public string? PostCode { get => _postCode; set => SetValue(ref _postCode, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _street1;
-        private string? _street2;
-        private string? _city;
-        private string? _stateSid;
-        private string? _postCode;
-
-        /// <summary>
-        /// Gets or sets the Street1.
-        /// </summary>
-        public string? Street1 { get => _street1; set => SetValue(ref _street1, value); }
-
-        /// <summary>
-        /// Gets or sets the Street2.
-        /// </summary>
-        public string? Street2 { get => _street2; set => SetValue(ref _street2, value); }
-
-        /// <summary>
-        /// Gets or sets the City.
-        /// </summary>
-        public string? City { get => _city; set => SetValue(ref _city, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="State"/> using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("state")]
-        public string? StateSid { get => _stateSid; set => SetValue(ref _stateSid, value, propertyName: nameof(State)); }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="State"/> text (read-only where selected).
-        /// </summary>
-        public string? StateText => RefDataNamespace.USState.GetRefDataText(_stateSid);
-
-        /// <summary>
-        /// Gets or sets the State (see <see cref="RefDataNamespace.USState"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public RefDataNamespace.USState? State { get => _stateSid; set => SetValue(ref _stateSid, value); }
-
-        /// <summary>
-        /// Gets or sets the Post Code.
-        /// </summary>
-        public string? PostCode { get => _postCode; set => SetValue(ref _postCode, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Street1), Street1, v => Street1 = v);
-            yield return CreateProperty(nameof(Street2), Street2, v => Street2 = v);
-            yield return CreateProperty(nameof(City), City, v => City = v);
-            yield return CreateProperty(nameof(StateSid), StateSid, v => StateSid = v);
-            yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
-        }
+        yield return CreateProperty(nameof(Street1), Street1, v => Street1 = v);
+        yield return CreateProperty(nameof(Street2), Street2, v => Street2 = v);
+        yield return CreateProperty(nameof(City), City, v => City = v);
+        yield return CreateProperty(nameof(StateSid), StateSid, v => StateSid = v);
+        yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
     }
 }
 

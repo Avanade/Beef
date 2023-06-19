@@ -5,59 +5,46 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.DataSvc
+namespace Beef.Demo.Business.DataSvc;
+
+/// <summary>
+/// Provides the <see cref="Gender"/> data repository services.
+/// </summary>
+public partial class GenderDataSvc : IGenderDataSvc
 {
+    private readonly IGenderData _data;
+    private readonly IEventPublisher _events;
+    private readonly IRequestCache _cache;
+
     /// <summary>
-    /// Provides the <see cref="Gender"/> data repository services.
+    /// Initializes a new instance of the <see cref="GenderDataSvc"/> class.
     /// </summary>
-    public partial class GenderDataSvc : IGenderDataSvc
+    /// <param name="data">The <see cref="IGenderData"/>.</param>
+    /// <param name="events">The <see cref="IEventPublisher"/>.</param>
+    /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+    public GenderDataSvc(IGenderData data, IEventPublisher events, IRequestCache cache)
+        { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); GenderDataSvcCtor(); }
+
+    partial void GenderDataSvcCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<Gender?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
+
+    /// <inheritdoc/>
+    public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
     {
-        private readonly IGenderData _data;
-        private readonly IEventPublisher _events;
-        private readonly IRequestCache _cache;
+        return Result.GoAsync(_data.CreateAsync(value))
+                     .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
+                     .Then(r => _cache.SetValue(r));
+    }, new InvokerArgs { EventPublisher = _events });
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GenderDataSvc"/> class.
-        /// </summary>
-        /// <param name="data">The <see cref="IGenderData"/>.</param>
-        /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public GenderDataSvc(IGenderData data, IEventPublisher events, IRequestCache cache)
-            { _data = data.ThrowIfNull(); _events = events.ThrowIfNull(); _cache = cache.ThrowIfNull(); GenderDataSvcCtor(); }
-
-        partial void GenderDataSvcCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Result<Gender?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
-
-        /// <summary>
-        /// Creates a new <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.GoAsync(_data.CreateAsync(value))
-                         .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
-                         .Then(r => _cache.SetValue(r));
-        }, new InvokerArgs { EventPublisher = _events });
-
-        /// <summary>
-        /// Updates an existing <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
-        {
-            return Result.GoAsync(_data.UpdateAsync(value))
-                         .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
-                         .Then(r => _cache.SetValue(r));
-        }, new InvokerArgs { EventPublisher = _events });
-    }
+    /// <inheritdoc/>
+    public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    {
+        return Result.GoAsync(_data.UpdateAsync(value))
+                     .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
+                     .Then(r => _cache.SetValue(r));
+    }, new InvokerArgs { EventPublisher = _events });
 }
 
 #pragma warning restore

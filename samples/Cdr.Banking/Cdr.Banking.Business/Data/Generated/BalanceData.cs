@@ -5,57 +5,56 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.Data
+namespace Cdr.Banking.Business.Data;
+
+/// <summary>
+/// Provides the <see cref="Balance"/> data access.
+/// </summary>
+public partial class BalanceData
 {
+
     /// <summary>
-    /// Provides the <see cref="Balance"/> data access.
+    /// Provides the <see cref="Balance"/> to Entity Framework <see cref="Model.Balance"/> mapping.
     /// </summary>
-    public partial class BalanceData
+    public partial class EntityToModelCosmosMapper : Mapper<Balance, Model.Balance>
     {
-
         /// <summary>
-        /// Provides the <see cref="Balance"/> to Entity Framework <see cref="Model.Balance"/> mapping.
+        /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
         /// </summary>
-        public partial class EntityToModelCosmosMapper : Mapper<Balance, Model.Balance>
+        public EntityToModelCosmosMapper()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="EntityToModelCosmosMapper"/> class.
-            /// </summary>
-            public EntityToModelCosmosMapper()
-            {
-                Map((s, d) => d.CurrentBalance = s.CurrentBalance, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
-                Map((s, d) => d.AvailableBalance = s.AvailableBalance, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
-                Map((s, d) => d.CreditLimit = s.CreditLimit, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
-                Map((s, d) => d.AmortisedLimit = s.AmortisedLimit, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
-                Map((s, d) => d.Currency = s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
-                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
-                EntityToModelCosmosMapperCtor();
-            }
-
-            partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+            Map((s, d) => d.CurrentBalance = s.CurrentBalance, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
+            Map((s, d) => d.AvailableBalance = s.AvailableBalance, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
+            Map((s, d) => d.CreditLimit = s.CreditLimit, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
+            Map((s, d) => d.AmortisedLimit = s.AmortisedLimit, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
+            Map((s, d) => d.Currency = s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+            Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
+            EntityToModelCosmosMapperCtor();
         }
 
-        /// <summary>
-        /// Provides the Entity Framework <see cref="Model.Balance"/> to <see cref="Balance"/> mapping.
-        /// </summary>
-        public partial class ModelToEntityCosmosMapper : Mapper<Model.Balance, Balance>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
-            /// </summary>
-            public ModelToEntityCosmosMapper()
-            {
-                Map((s, d) => d.CurrentBalance = (decimal)s.CurrentBalance, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
-                Map((s, d) => d.AvailableBalance = (decimal)s.AvailableBalance, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
-                Map((s, d) => d.CreditLimit = (decimal)s.CreditLimit, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
-                Map((s, d) => d.AmortisedLimit = (decimal)s.AmortisedLimit, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
-                Map((s, d) => d.Currency = (string?)s.Currency, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
-                Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
-                ModelToEntityCosmosMapperCtor();
-            }
+        partial void EntityToModelCosmosMapperCtor(); // Enables the constructor to be extended.
+    }
 
-            partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
+    /// <summary>
+    /// Provides the Entity Framework <see cref="Model.Balance"/> to <see cref="Balance"/> mapping.
+    /// </summary>
+    public partial class ModelToEntityCosmosMapper : Mapper<Model.Balance, Balance>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelToEntityCosmosMapper"/> class.
+        /// </summary>
+        public ModelToEntityCosmosMapper()
+        {
+            Map((s, d) => d.CurrentBalance = (decimal)s.CurrentBalance!, OperationTypes.Any, s => s.CurrentBalance == default, d => d.CurrentBalance = default);
+            Map((s, d) => d.AvailableBalance = (decimal)s.AvailableBalance!, OperationTypes.Any, s => s.AvailableBalance == default, d => d.AvailableBalance = default);
+            Map((s, d) => d.CreditLimit = (decimal)s.CreditLimit!, OperationTypes.Any, s => s.CreditLimit == default, d => d.CreditLimit = default);
+            Map((s, d) => d.AmortisedLimit = (decimal)s.AmortisedLimit!, OperationTypes.Any, s => s.AmortisedLimit == default, d => d.AmortisedLimit = default);
+            Map((s, d) => d.Currency = (string?)s.Currency!, OperationTypes.Any, s => s.Currency == default, d => d.Currency = default);
+            Map((o, s, d) => d.Purses = o.Map(s.Purses, d.Purses), OperationTypes.Any, s => s.Purses == default, d => d.Purses = default);
+            ModelToEntityCosmosMapperCtor();
         }
+
+        partial void ModelToEntityCosmosMapperCtor(); // Enables the constructor to be extended.
     }
 }
 

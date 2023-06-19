@@ -5,60 +5,59 @@
 #nullable enable
 #pragma warning disable
 
-namespace Cdr.Banking.Business.Entities
+namespace Cdr.Banking.Business.Entities;
+
+/// <summary>
+/// Represents the <see cref="Account"/> arguments entity.
+/// </summary>
+public partial class TransactionArgs : EntityBase
 {
+    private DateTime? _fromDate;
+    private DateTime? _toDate;
+    private decimal? _minAmount;
+    private decimal? _maxAmount;
+    private string? _text;
+
     /// <summary>
-    /// Represents the <see cref="Account"/> arguments entity.
+    /// Gets or sets the From (oldest time).
     /// </summary>
-    public partial class TransactionArgs : EntityBase
+    [JsonPropertyName("oldest-time")]
+    [Display(Name="Oldest time")]
+    public DateTime? FromDate { get => _fromDate; set => SetValue(ref _fromDate, value); }
+
+    /// <summary>
+    /// Gets or sets the To (newest time).
+    /// </summary>
+    [JsonPropertyName("newest-time")]
+    [Display(Name="Newest time")]
+    public DateTime? ToDate { get => _toDate; set => SetValue(ref _toDate, value); }
+
+    /// <summary>
+    /// Gets or sets the Min Amount.
+    /// </summary>
+    [JsonPropertyName("min-amount")]
+    public decimal? MinAmount { get => _minAmount; set => SetValue(ref _minAmount, value); }
+
+    /// <summary>
+    /// Gets or sets the Max Amount.
+    /// </summary>
+    [JsonPropertyName("max-amount")]
+    public decimal? MaxAmount { get => _maxAmount; set => SetValue(ref _maxAmount, value); }
+
+    /// <summary>
+    /// Gets or sets the Text.
+    /// </summary>
+    [JsonPropertyName("text")]
+    public string? Text { get => _text; set => SetValue(ref _text, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private DateTime? _fromDate;
-        private DateTime? _toDate;
-        private decimal? _minAmount;
-        private decimal? _maxAmount;
-        private string? _text;
-
-        /// <summary>
-        /// Gets or sets the From (oldest time).
-        /// </summary>
-        [JsonPropertyName("oldest-time")]
-        [Display(Name="Oldest time")]
-        public DateTime? FromDate { get => _fromDate; set => SetValue(ref _fromDate, value); }
-
-        /// <summary>
-        /// Gets or sets the To (newest time).
-        /// </summary>
-        [JsonPropertyName("newest-time")]
-        [Display(Name="Newest time")]
-        public DateTime? ToDate { get => _toDate; set => SetValue(ref _toDate, value); }
-
-        /// <summary>
-        /// Gets or sets the Min Amount.
-        /// </summary>
-        [JsonPropertyName("min-amount")]
-        public decimal? MinAmount { get => _minAmount; set => SetValue(ref _minAmount, value); }
-
-        /// <summary>
-        /// Gets or sets the Max Amount.
-        /// </summary>
-        [JsonPropertyName("max-amount")]
-        public decimal? MaxAmount { get => _maxAmount; set => SetValue(ref _maxAmount, value); }
-
-        /// <summary>
-        /// Gets or sets the Text.
-        /// </summary>
-        [JsonPropertyName("text")]
-        public string? Text { get => _text; set => SetValue(ref _text, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(FromDate), FromDate, v => FromDate = v);
-            yield return CreateProperty(nameof(ToDate), ToDate, v => ToDate = v);
-            yield return CreateProperty(nameof(MinAmount), MinAmount, v => MinAmount = v);
-            yield return CreateProperty(nameof(MaxAmount), MaxAmount, v => MaxAmount = v);
-            yield return CreateProperty(nameof(Text), Text, v => Text = v);
-        }
+        yield return CreateProperty(nameof(FromDate), FromDate, v => FromDate = v);
+        yield return CreateProperty(nameof(ToDate), ToDate, v => ToDate = v);
+        yield return CreateProperty(nameof(MinAmount), MinAmount, v => MinAmount = v);
+        yield return CreateProperty(nameof(MaxAmount), MaxAmount, v => MaxAmount = v);
+        yield return CreateProperty(nameof(Text), Text, v => Text = v);
     }
 }
 

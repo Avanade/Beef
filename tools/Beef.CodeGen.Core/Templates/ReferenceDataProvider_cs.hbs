@@ -5,34 +5,33 @@
 #nullable enable
 #pragma warning disable
 
-namespace {{Root.NamespaceBusiness}}
+namespace {{Root.NamespaceBusiness}};
+
+/// <summary>
+/// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
+/// </summary>
+public partial class ReferenceDataProvider : IReferenceDataProvider
 {
-    /// <summary>
-    /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
-    /// </summary>
-    public partial class ReferenceDataProvider : IReferenceDataProvider
-    {
-        private readonly IReferenceDataDataSvc _dataService;
+    private readonly IReferenceDataDataSvc _dataService;
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
-        public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ReferenceDataProviderCtor(); }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
+    /// </summary>
+    /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
+    public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = dataService.ThrowIfNull(); ReferenceDataProviderCtor(); }
 
-        partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
+    partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
 
-        /// <inheritdoc/>
-        public Type[] Types => new Type[] 
-        {
+    /// <inheritdoc/>
+    public Type[] Types => new Type[] 
+    {
 {{#each RefDataEntities}}
-            typeof({{RefDataQualifiedEntityName}}){{#unless @last}},{{/unless}}
+        typeof({{RefDataQualifiedEntityName}}){{#unless @last}},{{/unless}}
 {{/each}}
-        };
+    };
 
-        /// <inheritdoc/>
-        public Task<Result<IReferenceDataCollection>> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type{{#if Root.CancellationToken}}, cancellationToken{{/if}});
-    }
+    /// <inheritdoc/>
+    public Task<Result<IReferenceDataCollection>> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type{{#if Root.CancellationToken}}, cancellationToken{{/if}});
 }
 
 #pragma warning restore
