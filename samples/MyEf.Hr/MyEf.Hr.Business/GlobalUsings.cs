@@ -3,6 +3,7 @@ global using CoreEx.Caching;
 global using CoreEx.Configuration;
 global using CoreEx.Database;
 global using CoreEx.Database.SqlServer;
+global using CoreEx.Database.SqlServer.Outbox;
 global using CoreEx.Entities;
 global using CoreEx.Entities.Extended;
 global using CoreEx.EntityFrameworkCore;

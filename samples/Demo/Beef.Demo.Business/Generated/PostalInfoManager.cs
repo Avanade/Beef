@@ -24,38 +24,38 @@ public partial class PostalInfoManager : IPostalInfoManager
     partial void PostalInfoManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid())
+                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetPostCodesAsync(country, state, city));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid())
+                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.CreatePostCodesAsync(value, country, state, city));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid())
+                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdatePostCodesAsync(value, country, state, city));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid())
+                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
                      .ThenAsync(() => _dataService.DeletePostCodesAsync(country, state, city));
     }, InvokerArgs.Delete);
 }

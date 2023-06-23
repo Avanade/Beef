@@ -21,7 +21,7 @@ public partial class ConfigManager : IConfigManager
     partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
     {
         return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
     }, InvokerArgs.Unspecified);

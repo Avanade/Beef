@@ -3,7 +3,7 @@ global using CoreEx.Entities;
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
-global using CoreEx.WebApis;
+global using CoreEx.AspNetCore.WebApis;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Data.SqlClient;

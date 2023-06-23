@@ -28,7 +28,7 @@ public partial class RobotManager : IRobotManager
     partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go().Requires(id)
                      .Then(() => Cleaner.CleanUp(id))
@@ -36,26 +36,26 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required()
                      .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
                      .Then(v => Cleaner.CleanUp(v))
-                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()))
+                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.CreateAsync(value));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .Then(v => Cleaner.CleanUp(v))
-                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()))
+                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdateAsync(value));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go().Requires(id)
                      .Then(() => Cleaner.CleanUp(id))
@@ -63,16 +63,16 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Delete);
 
     /// <inheritdoc/>
-    public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go()
                      .Then(() => Cleaner.CleanUp(args))
-                     .ValidatesAsync(args, v => v.Entity().With<RobotArgsValidator>())
+                     .ValidatesAsync(args, v => v.Entity().With<RobotArgsValidator>(), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetByArgsAsync(args, paging));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go()
                      .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));

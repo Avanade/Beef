@@ -13,6 +13,7 @@ global using CoreEx.Database.Mapping;
 #endif
 #if (implement_database || implement_sqlserver)
 global using CoreEx.Database.SqlServer;
+global using CoreEx.Database.SqlServer.Outbox;
 #endif
 #if (implement_mysql)
 global using CoreEx.Database.MySql;
@@ -31,6 +32,7 @@ global using CoreEx.Mapping;
 global using CoreEx.Mapping.Converters;
 global using CoreEx.RefData;
 global using CoreEx.RefData.Extended;
+global using CoreEx.Results;
 global using CoreEx.Validation;
 global using CoreEx.Validation.Rules;
 #if (implement_cosmos)

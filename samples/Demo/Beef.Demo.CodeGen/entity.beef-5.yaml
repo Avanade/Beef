@@ -9,6 +9,7 @@ cosmosName: DemoCosmosDb
 appBasedAgentArgs: true
 managerCleanUp: true
 withResult: false
+preprocessorDirectives: true
 entities:
 - { name: Person, text: Person, collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
     properties: [

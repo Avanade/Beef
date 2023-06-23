@@ -1,15 +1,14 @@
-﻿namespace My.Hr.Business.Data
+﻿namespace My.Hr.Business.Data;
+
+/// <summary>
+/// Represents the <b>My.Hr</b> database using Entity Framework.
+/// </summary>
+public class HrEfDb : EfDb<HrEfDbContext>
 {
     /// <summary>
-    /// Represents the <b>My.Hr</b> database using Entity Framework.
+    /// Initializes a new instance of the <see cref="HrEfDb"/> class.
     /// </summary>
-    public class HrEfDb : EfDb<HrEfDbContext>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HrEfDb"/> class.
-        /// </summary>
-        /// <param name="dbContext">The entity framework database context.</param>
-        /// <param name="mapper">The <see cref="IMapper"/>.</param>
-        public HrEfDb(HrEfDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
-    }
+    /// <param name="dbContext">The entity framework database context.</param>
+    /// <param name="mapper">The <see cref="IMapper"/>.</param>
+    public HrEfDb(HrEfDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
 }

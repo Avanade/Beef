@@ -24,21 +24,21 @@ public partial class GenderManager : IGenderManager
     partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<Gender?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Gender?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go().Requires(id)
                      .ThenAsAsync(() => _dataService.GetAsync(id));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Gender>> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Gender>> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required()
                      .ThenAsAsync(v => _dataService.CreateAsync(value));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .ThenAsAsync(v => _dataService.UpdateAsync(value));

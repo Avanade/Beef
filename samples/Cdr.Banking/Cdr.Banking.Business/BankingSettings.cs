@@ -1,29 +1,28 @@
-﻿namespace Cdr.Banking.Business
+﻿namespace Cdr.Banking.Business;
+
+/// <summary>
+/// Provides the <see cref="IConfiguration"/> settings.
+/// </summary>
+public class BankingSettings : SettingsBase
 {
     /// <summary>
-    /// Provides the <see cref="IConfiguration"/> settings.
+    /// Gets the setting prefixes in order of precedence.
     /// </summary>
-    public class BankingSettings : SettingsBase
-    {
-        /// <summary>
-        /// Gets the setting prefixes in order of precedence.
-        /// </summary>
-        public static string[] Prefixes { get; } = { "Banking/", "Common/" };
+    public static string[] Prefixes { get; } = { "Banking/", "Common/" };
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BankingSettings"/> class.
-        /// </summary>
-        /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
-        public BankingSettings(IConfiguration configuration) : base(configuration, Prefixes) { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BankingSettings"/> class.
+    /// </summary>
+    /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+    public BankingSettings(IConfiguration configuration) : base(configuration, Prefixes) { }
 
-        /// <summary>
-        /// Gets the CosmosDB connection string.
-        /// </summary>
-        public string CosmosConnectionString => GetRequiredValue<string>();
+    /// <summary>
+    /// Gets the CosmosDB connection string.
+    /// </summary>
+    public string CosmosConnectionString => GetRequiredValue<string>();
 
-        /// <summary>
-        /// Gets the CosmosDB database identifier.
-        /// </summary>
-        public string CosmosDatabaseId => GetRequiredValue<string>();
-    }
+    /// <summary>
+    /// Gets the CosmosDB database identifier.
+    /// </summary>
+    public string CosmosDatabaseId => GetRequiredValue<string>();
 }

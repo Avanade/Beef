@@ -27,13 +27,13 @@ public class AppNameEfDbContext : DbContext, IEfDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        // Uses the DB connection management from the database class - ensures DB connection pooling and required DB session context setting.
+        // Uses the DB connection management from the database class to ensure the likes of DB connection pooling.
         if (!optionsBuilder.IsConfigured)
 #if (implement_sqlserver)
             optionsBuilder.UseSqlServer(BaseDatabase.GetConnection());
 #endif
 #if (implement_mysql)
-            optionsBuilder.UseMySQL(BaseDatabase.GetConnection());
+            optionsBuilder.UseMySql(BaseDatabase.GetConnection(), ServerVersion.Create(new Version(8, 0, 33), Pomelo.EntityFrameworkCore.MySql.Infrastructure.ServerType.MySql));
 #endif
     }
 

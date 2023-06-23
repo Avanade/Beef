@@ -31,31 +31,31 @@ public partial class ReferenceDataData : IReferenceDataData
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CountryCollection>> CountryGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadWithResultAsync("CountryId"), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, ct => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadWithResultAsync("CountryId"), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadWithResultAsync("USStateId"), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, ct => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadWithResultAsync("USStateId"), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => 
+        => DataInvoker.Current.InvokeAsync(this, ct => 
         {
             return _db.ReferenceData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender, Guid>("[Ref].[spGenderGetAll]").LoadWithResultAsync("GenderId", additionalProperties: (dr, item) =>
             {
                 item.AlternateName = dr.GetValue<string>("AlternateName");
                 item.TripCode = dr.GetValue<string>("TripCode");
                 item.Country = ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ToSource.Convert(dr.GetValue<Guid?>("CountryId"));
-            });
+            }, cancellationToken: ct);
         }, InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryWithResultAsync<RefDataNamespace.EyeColorCollection>(), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryWithResultAsync<RefDataNamespace.EyeColorCollection>(ct), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.PowerSourceCollection>());
+        => DataInvoker.Current.InvokeAsync(this, ct => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.PowerSourceCollection>(ct));
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync()
@@ -63,7 +63,7 @@ public partial class ReferenceDataData : IReferenceDataData
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.StatusCollection>> StatusGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => _ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryWithResultAsync<RefDataNamespace.StatusCollection>(), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryWithResultAsync<RefDataNamespace.StatusCollection>(ct), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync()

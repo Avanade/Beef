@@ -3,11 +3,9 @@ global using CoreEx.Entities;
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
-global using CoreEx.WebApis;
+global using CoreEx.AspNetCore.WebApis;
 global using Microsoft.AspNetCore.Mvc;
-#if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
-#endif
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
 global using System.Net;

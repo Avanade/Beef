@@ -1,17 +1,16 @@
-﻿namespace Cdr.Banking.Business.Validation
+﻿namespace Cdr.Banking.Business.Validation;
+
+/// <summary>
+/// Represents a <see cref="AccountArgs"/> validator.
+/// </summary>
+public class AccountArgsValidator : Validator<AccountArgs>
 {
     /// <summary>
-    /// Represents a <see cref="AccountArgs"/> validator.
+    /// Initializes a new instance of the <see cref="AccountArgsValidator"/>.
     /// </summary>
-    public class AccountArgsValidator : Validator<AccountArgs>
+    public AccountArgsValidator()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountArgsValidator"/>.
-        /// </summary>
-        public AccountArgsValidator()
-        {
-            Property(x => x.OpenStatus).IsValid();
-            Property(x => x.ProductCategory).IsValid();
-        }
+        Property(x => x.OpenStatus).IsValid();
+        Property(x => x.ProductCategory).IsValid();
     }
 }
