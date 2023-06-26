@@ -33,6 +33,16 @@ There is a generated class per [`Entity`](./Entity-Entity-Config.md) named `{Ent
 
 <br/>
 
+## Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
+
+The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+This is implemented by default; however, can be disabled by setting the `useResult` attribute to `false` within the code-generation configuration.
+
+<br/>
+
 ### Code-generated
 
 An end-to-end code-generated processing pipeline generally consists of:
@@ -50,7 +60,7 @@ _&dagger; Note:_ To minimize the generated code the extension opportunities are 
 The following demonstrates the generated code (a snippet from the sample [`PersonData`](../samples/Demo/Beef.Demo.Business/Data/Generated/ContactData.cs)) that invokes a stored procedure that does not include `DataExtensions`:
 
 ``` csharp
-public Task<Person?> GetAsync(Guid id)
+public Task<Result<Person?> GetAsync(Guid id)
 {
     return _db.StoredProcedure("[Demo].[spPersonGet]").GetAsync(DbMapper.Default, id);
 }

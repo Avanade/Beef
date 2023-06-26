@@ -14,6 +14,16 @@ There is a generated class per [`Entity`](./Entity-Entity-Config.md) named `{Ent
 
 <br/>
 
+## Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
+
+The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+This is implemented by default; however, can be disabled by setting the `useResult` attribute to `false` within the code-generation configuration.
+
+<br/>
+
 ### Code-generated
  
 An end-to-end code-generated processing pipeline generally consists of:
@@ -36,9 +46,22 @@ _&dagger; Note:_ To minimize the generated code the extension opportunities are 
 The following demonstrates the generated code (a snippet from the sample [`RobotManager`](../samples/Demo/Beef.Demo.Business/Generated/RobotManager.cs)) that does not include `ManagerExtensions`:
 
 ``` csharp
+public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+{
+    return Result.Go(value).Required()
+                 .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
+                 .Then(v => Cleaner.CleanUp(v))
+                 .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
+                 .ThenAsAsync(v => _dataService.CreateAsync(value));
+}, InvokerArgs.Create);
+```
+
+The non-`Result` based version would be similar to:
+
+``` csharp
 public Task<Robot> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
 {
-    value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
+    value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
     Cleaner.CleanUp(value);
     await value.Validate().Entity().With<RobotValidator>().ValidateAsync(true).ConfigureAwait(false);
     return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
@@ -50,7 +73,7 @@ The following demonstrates the generated code (a snippet from the sample [`Perso
 ``` csharp
 public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
 {
-    value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
+    value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
     Cleaner.CleanUp(value);
     await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
 
@@ -79,6 +102,16 @@ Step | Description
 `OnImplementation` | Invocation of a named `XxxOnImplementaionAsync` method that must be implemented in a non-generated partial class.
 
 The following demonstrates the generated code:
+
+``` csharp
+public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+{
+    return Result.Go()
+                 .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));
+}, InvokerArgs.Unspecified);
+```
+
+The non-`Result` based version would be similar to:
 
 ``` csharp
 public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async _ =>

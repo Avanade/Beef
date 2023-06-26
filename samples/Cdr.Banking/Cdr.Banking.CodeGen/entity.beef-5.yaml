@@ -153,7 +153,7 @@ entities:
       # 
       { name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/transactions', paging: true, cosmosPartitionKey: accountId,
         parameters: [
-          # Note usage of ValidatorFluent which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check.
+          # Note usage of ValidatorCode which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check.
           { name: AccountId, validatorCode: Common(Validators.AccountId), webApiFrom: FromRoute, isMandatory: true },
           { name: Args, type: TransactionArgs, validator: TransactionArgsValidator }
         ]

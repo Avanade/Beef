@@ -108,15 +108,12 @@ To demonstrate the authentication and authorisation the following is required:
 A custom [`ExecutionContext`](./Cdr.Banking.Business/ExecutionContext.cs) that inherits from the _CoreEx_ [`ExecutionContext`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/ExecutionContext.cs) is required. An `Accounts` property is added to contain the list of permissable Accounts.
 
 ``` csharp
-/// <summary>
-/// Extended <see cref="Beef.ExecutionContext"/> that stores the list of <see cref="Accounts"/> that a user has access to.
-/// </summary>
-public class ExecutionContext : Beef.ExecutionContext
+public class ExecutionContext : CoreEx.ExecutionContext
 {
     /// <summary>
     /// Gets the current <see cref="ExecutionContext"/> instance.
     /// </summary>
-    public static new ExecutionContext Current => (ExecutionContext)Beef.ExecutionContext.Current;
+    public static new ExecutionContext Current => (ExecutionContext)CoreEx.ExecutionContext.Current;
 
     /// <summary>
     /// Gets the list of account (identifiers) that the user has access/permission to.
@@ -134,8 +131,8 @@ The `ExecutionContext` is required to be configured for each and every request, 
 Firstly, the custom `ExecutionContext` instantiation must be registered within the `ConfigureServices` method.
 
 ``` csharp
-// Add the core beef services (including the customized ExecutionContext).
-services.AddBeefExecutionContext(() => new Business.ExecutionContext())
+// Add the core services (including the customized ExecutionContext).
+services.AddExecutionContext(_ => new Business.ExecutionContext())
 ```
 
 Within the `Configure` method the User to Accounts mapping is performed. As stated previously in the earlier assumptions, the likes of an OAuth token would have previously been validated, then would either contain the list of Accounts, or these would be loaded from an appropriate data store into the `ExecutionContext`.
@@ -176,19 +173,23 @@ app.UseExecutionContext((hc, ec) =>
 
 ### Account-wide filtering
 
-To ensure consistent filtering for all CRUD (Query, Get, Create, Update and Delete) operations an authorization filter can be applied within the [`CosmosDb.cs`](./Cdr.Banking.Business/Data/CosmosDb.cs). This class inherits from the [`CosmosDbBase`](../../src/Beef.Data.Cosmos/CosmosDbBase.cs). The `SetAuthorizeFilter` can be used to define a filter to be applied to all operations that occur against the specified `Model` and `Container`.
+To ensure consistent filtering for all CRUD (Query, Get, Create, Update and Delete) operations an authorization filter can be applied within the [`CosmosDb.cs`](./Cdr.Banking.Business/Data/CosmosDb.cs). This class inherits from the [`CoreEx.Cosmos.CosmosDb`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Cosmos/CosmosDb.cs). The `UseAuthorizeFilter` can be used to define a filter to be applied to all operations that occur against the specified `Model` and `Container`.
 
 By defining holistically, it allows the capability to be added or maintained independent of its individual usage. Whereby minimising on-going change and potential errors where not implemented consistently through-out the code base.
 
 In this case, the filter will ensure that only Accounts that have been defined for the User can be accessed. 
 
 ``` csharp
-public class CosmosDb : CosmosDbBase
+public class CosmosDb : CoreEx.Cosmos.CosmosDb, ICosmos
 {
-    public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CosmosDb"/> class.
+    /// </summary>
+    public CosmosDb(Mac.Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : base(database, mapper, invoker)
     {
-        // Apply an authorization filter to all operations to ensure only the valid data is available based on the users context - only allow access to Accounts within list defined on ExecutionContext.
-        SetAuthorizeFilter<Model.Account>("Account", (q) => ((IQueryable<Model.Account>)q).Where(am => ExcutionContext.Current.Accounts.Contains(am.Id!)));
+        // Apply an authorization filter to all operations to ensure only the valid data is available based on the users context; i.e. only allow access to Accounts within list defined on ExecutionContext.
+        UseAuthorizeFilter<Model.Account>("Account", (q) => ((IQueryable<Model.Account>)q).Where(x => ExecutionContext.Current.Accounts.Contains(x.Id!)));
+        UseAuthorizeFilter<Model.Account>("Transaction", (q) => ((IQueryable<Model.Transaction>)q).Where(x => ExecutionContext.Current.Accounts.Contains(x.AccountId!)));
     }
 }
 ```
@@ -213,7 +214,7 @@ In this case, we are setting this using the code-generation for the operation. T
 # 
 { name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/ransactions', paging: true, cosmosPartitionKey: accountId,
   parameters: [
-    # Note usage of ValidatorFluent which will inject the code as-is into the validation logic; beinga common validator 'Validators.Account' that will perform the authorization check.
+    # Note usage of ValidatorCode which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check.
     { name: AccountId, type: string, validatorCode: Common(Validators.AccountId), webApiFrom: romRoute, isMandatory: true },
     { name: Args, type: TransactionArgs, validator: TransactionArgsValidator }
   ]
@@ -240,17 +241,15 @@ Where possible the _Beef_ "out-of-the-box" data access is leveraged via the code
 The `Account` filtering as required by `/banking/accounts` uses the [`AccountArgs`](./Cdr.Banking.Common/Entities/Generated/AccountArgs.cs) entity to provide the possible selection criteria. The filtering then uses the standard `LINQ` filtering capabilities offered by the Cosmos DB SDK. The `GetAccountsOnQuery` method within the non-generated [`AccountData.cs`](./Cdr.Banking.Business/Data/AccountData.cs) partial class contains the filtering logic. 
 
 ``` csharp
-/// <summary>
-/// Perform the query filering for the GetAccounts.
-/// </summary>
-private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args, CosmosDbArgs dbArgs)
+private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> query, AccountArgs? args)
 {
+    var q = query.OrderBy(x => x.Id).AsQueryable();
     if (args == null || args.IsInitial)
-        return query;
+        return q;
 
-    // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
-    var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args!.OpenStatus!.Code);
-    q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args.ProductCategory!.Code);
+    // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by CoreEx.
+    q = q.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
+    q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
 
     // With checking IsOwned a simple false check cannot be performed with Cosmos; assume "not IsDefined" is equivalent to false also. 
     if (args!.IsOwned == null)
@@ -272,9 +271,6 @@ The `Account` balance as required is implemented in a fully customised manner. T
 The underlying logic queries the `Account` container for the specified `accountId` and returns the corresponding `Balance`.
 
 ``` csharp
-/// <summary>
-/// Gets the balance for the specified account.
-/// </summary>
 private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId)
 {
     // Use the 'Account' model and select for the specified id to access the balance property.
@@ -294,10 +290,7 @@ private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId
 The `Transaction` filtering as required by `/banking/accounts/\{accountId\}/transactions` uses the [`TransactionArgs`](./Cdr.Banking.Common/Entities/Generated/TransactionArgs.cs) entity to provide the possible selection criteria. The filtering then uses the standard `LINQ` filtering capabilities offered by the Cosmos DB [SDK](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos?view=azure-dotnet). The `GetTransactionsOnQuery` method within the non-generated [`TransactionData.cs`](./Cdr.Banking.Business/Data/TransactionData.cs) partial class contains the filtering logic. 
 
 ``` csharp
-/// <summary>
-/// Perform the query filering for the GetTransactions.
-/// </summary>
-private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args, CosmosDbArgs? __)
+private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Transaction> query, string? _, TransactionArgs? args)
 {
     if (args == null || args.IsInitial)
         return query.OrderByDescending(x => x.TransactionDateTime);
@@ -394,10 +387,9 @@ However, the CDR specification specifies that the paging is to be supported usin
 These are not supported out-of-the-box and support must be added. This is performed within the API [`Startup.cs`](./Cdr.Banking.Api/Startup.cs). The following is added to the `Startup` method.
 
 ``` csharp
-// Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification; and default the page size to 25 from config.
-WebApiQueryString.PagingArgsPageQueryStringNames.Add("page");
-WebApiQueryString.PagingArgsTakeQueryStringNames.Add("page-size");
-PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+// Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification.
+HttpConsts.PagingArgsPageQueryStringNames.Add("page");
+HttpConsts.PagingArgsTakeQueryStringNames.Add("page-size");
 ```
 
 </br>

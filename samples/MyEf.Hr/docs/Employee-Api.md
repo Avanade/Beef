@@ -185,14 +185,6 @@ dotnet run entity
 
 <br/>
 
-### Railway-oriented programming
-
-_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](to-do-add-link) for more detail on purpose and usage. 
-
-The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
-
-<br/>
-
 ### Validation
 
 The final component that must be implemented by the developer is the validation logic. _CoreEx_ provides a rich, integrated, [validation framework](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Validation) to simplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity - as Deep Throat said to Mulder in the [X-Files](https://en.wikipedia.org/wiki/The_X-Files), "trust no one"!

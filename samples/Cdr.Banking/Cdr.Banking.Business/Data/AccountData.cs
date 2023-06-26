@@ -21,7 +21,7 @@ public partial class AccountData
         if (args == null || args.IsInitial)
             return q;
 
-        // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
+        // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by CoreEx.
         q = q.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
         q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
 
