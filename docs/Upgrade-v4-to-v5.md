@@ -32,6 +32,18 @@ The `entityScope` property has been _deprecated_ in 5.x as `Autonomous` is now t
 
 <br/>
 
+### Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
+
+The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+Also, note that this may introduce some breaking changes that will need manual remediation. The validation `OnValidateAsync` and  `CustomRule` _must_ now return a `Result`. Where using, consider leveraging the `Result.XxxError` to return known errors versus throwing the related exception.
+
+This is implemented by default; however, can be disabled by setting the `useResult` attribute to `false` within the code-generation configuration.
+
+<br/>
+
 ### JSON serialization
 
 Previously, _Beef_ leveraged _Newtonsoft_ exclusively for JSON serialization. _CoreEx_ is [JSON serializer](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Json/README.md) implementation agnostic; however, `System.Text.Json` is considered the preferred (default).

@@ -146,6 +146,14 @@ operations: [
             Description = "Overrides the `Name` to be used for private usage. By default reformatted from `Name`; e.g. `GetByArgs` as `_getByArgs`.")]
         public string? PrivateName { get; set; }
 
+        /// <summary>
+        /// Indicates whether to use Results.
+        /// </summary>
+        [JsonProperty("withResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Key", Title = "Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).",
+            Description = "Defaults to `Entity.WilhResult`.")]
+        public bool? WithResult { get; set; }
+
         #endregion
 
         #region Data
@@ -645,9 +653,24 @@ operations: [
         public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
 
         /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection filtered for validation that have either a Validator or ValidatorCode specified (exclude IsMandatory only).
+        /// </summary>
+        public List<ParameterConfig> ValidatorParameters => Parameters!.Where(x => x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection filtered where mandatory and without value.
+        /// </summary>
+        public List<ParameterConfig> ValueLessMandatoryParameters => ValueLessParameters!.Where(x => CompareValue(x.IsMandatory, true)).ToList();
+
+        /// <summary>
         /// Indicates whether there is only a single parameter to be validated.
         /// </summary>
         public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count <= 1;
+
+        /// <summary>
+        /// Indicates whether there is only a single parameter to be validated.
+        /// </summary>
+        public bool SingleValidatorParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidatorParameters.Count <= 1;
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
@@ -668,6 +691,11 @@ operations: [
         /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
         /// </summary>
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs && IsTrue(x.Parent!.ManagerCleanUp)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection for those parameters marked as ToManager*.
+        /// </summary>
+        public List<ParameterConfig>? ManagerPassingParameters => Parameters!.Where(x => x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase)).ToList();
 
         /// <summary>
         /// Gets the parameter that is <see cref="ParameterConfig.IsPagingArgs"/>.
@@ -762,7 +790,7 @@ operations: [
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/>.
         /// </summary>
-        public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
+        public string OperationTaskReturnType => HasReturnValue ? $"Task<{(IsTrue(WithResult) ? "Result<" : "")}{OperationReturnType}{(IsTrue(WithResult) ? ">" : "")}>" : $"Task{(IsTrue(WithResult) ? "<Result>" : "")}";
 
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
@@ -813,6 +841,11 @@ operations: [
         /// Indicates whether there is a value operation.
         /// </summary>
         public bool HasValue => Parameters!.Any(x => x.IsValueArg);
+
+        /// <summary>
+        /// Gets the value <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? ValueParameter => Parameters!.FirstOrDefault(x => x.IsValueArg);
 
         /// <summary>
         /// Indicates whether the operation supports caching.
@@ -895,11 +928,22 @@ operations: [
         public int EnsureValueCount => _ensureValueCount++;
 
         /// <summary>
+        /// Indicates whether the operation is a 'Get' with caching.
+        /// </summary>
+        public bool IsGetWithCache => Type == "Get" && SupportsCaching;
+
+        /// <summary>
         /// Indicates whether the DataSvc operation invocation can occur on a single line.
         /// </summary>
-        public bool DataSvcSingleLine => (Type == "GetColl" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"))
-            || (Type == "Get" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"))
-            || (Type == "Custom" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !CompareValue(EventPublish, "DataSvc"));
+        public bool DataSvcSingleLine => (Type == "GetColl" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !DataSvcWillEventPublish)
+            || (Type == "Get" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !DataSvcWillEventPublish)
+            || (Type == "Custom" && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !DataSvcWillEventPublish)
+            || (new string[] { "Create", "Update", "Delete" }.Contains(Type) && !SupportsCaching! && CompareNullOrValue(DataSvcExtensions, false) && CompareNullOrValue(DataSvcTransaction, false) && !DataSvcWillEventPublish);
+
+        /// <summary>
+        /// Indicates whether the DataSvc operation invocation will result in an event publish.
+        /// </summary>
+        public bool DataSvcWillEventPublish => CompareValue(EventPublish, "DataSvc") && Events.Count > 0;
 
         /// <summary>
         /// Indicates whether the Data operation invocation can occur on a single line.
@@ -910,6 +954,16 @@ operations: [
         /// Indicates whether the Data operation where auto implement is none then invocation can occur on a single line.
         /// </summary>
         public bool DataNoneSingleLine => AutoImplement == "None" && CompareNullOrValue(DataExtensions, false) && !CompareValue(EventPublish, "Data");
+
+        /// <summary>
+        /// Used exclusively by the code templates to track whether "Result" (railway-oriented programming) code has been output, etc.
+        /// </summary>
+        public bool HasResultCode { get; set; }
+
+        /// <summary>
+        /// Indicates whether the result will need to change the type as a result of the operation.
+        /// </summary>
+        public bool HasResultTypeChange => (HasValue && HasReturnValue && ValueType != ReturnType) || (HasValue && !HasReturnValue) || (!HasValue && HasReturnValue);
 
         /// <summary>
         /// <inheritdoc/>
@@ -991,11 +1045,13 @@ operations: [
             WebApiReturnText = Type == "GetColl" ? StringConverter.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
+            AuthRole = DefaultWhereNull(AuthRole, () => Parent!.AuthRole);
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             if (Type == "Custom")
                 AutoImplement = "None";
 
+            WithResult = DefaultWhereNull(WithResult, () => Parent!.WithResult);
             ManagerExtensions = DefaultWhereNull(ManagerExtensions, () => Parent!.ManagerExtensions);
             DataExtensions = DefaultWhereNull(DataExtensions, () => Parent!.DataExtensions);
             if (AutoImplement == "None")
@@ -1055,8 +1111,8 @@ operations: [
 
             EventFormatKey = Type switch
             {
-                "Create" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
-                "Update" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{__result.{x.Name}}}"))}",
+                "Create" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{r.{x.Name}}}"))}",
+                "Update" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{r.{x.Name}}}"))}",
                 "Delete" => $"{string.Join(", ", Parent!.Properties!.Where(p => p.PrimaryKey.HasValue && p.PrimaryKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}",
                 _ => null
             };
@@ -1152,7 +1208,7 @@ operations: [
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
             if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = true, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
 
             if (PrimaryKey.HasValue && PrimaryKey.Value)
             {
@@ -1162,7 +1218,7 @@ operations: [
                     if (Parameters.Any(x => x.Name == pc.Name))
                         continue;
 
-                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
+                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type) || (Type == "Update" && CompareValue(WithResult, true)), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
             }
 
@@ -1205,7 +1261,7 @@ operations: [
                     ed.Source = EventSourceUri.Replace("{$key}", EventFormatKey);
 
                 if (HasReturnValue)
-                    ed.Value = "__result";
+                    ed.Value = "r";
                 else if (Type == "Delete" && (PrimaryKey == true || IsCoreParametersSameAsPrimaryKey))
                 {
                     var sb = new StringBuilder();
@@ -1373,7 +1429,16 @@ operations: [
             if (string.IsNullOrEmpty(HttpAgentModel) && new string[] { "Create", "Update", "Patch" }.Contains(Type))
                 throw new CodeGenException(this, nameof(HttpAgentModel), $"Type '{Type}' requires a {nameof(HttpAgentModel)} to be specified.");
 
-            var sb = new StringBuilder($"{(HttpAgentReturnModel == null ? "" : "(")}await {DataArgs!.Name}");
+            var sb = new StringBuilder();
+            if (CompareValue(WithResult, true))
+                sb.Append("(await ");
+            else if (HttpAgentReturnModel == null)
+                sb.Append("await ");
+            else
+                sb.Append("(await ");
+
+            sb.Append(DataArgs!.Name);
+
             if (!string.IsNullOrEmpty(Parent.HttpAgentCode))
                 sb.Append($".{Parent.HttpAgentCode}");
 
@@ -1400,13 +1465,13 @@ operations: [
 
             sb.Append($"{(HttpAgentRoute != null && HttpAgentRoute.Contains('{') ? "$" : "")}\"{HttpAgentRoute}\"");
             if (ValueType != null)
-                sb.Append(", value");
+                sb.Append($", {(CompareValue(WithResult, true) && !DataSingleLine ? "v" : "value")}");
 
             sb.Append(").ConfigureAwait(false)");
-            if (HttpAgentReturnModel == null)
-                sb.Append(';');
-            else
-                sb.Append(").Value;");
+            if (CompareValue(WithResult, true))
+                sb.Append(").ToResult()");
+            else if (HttpAgentReturnModel != null)
+                sb.Append(").Value");
 
             HttpAgentSendStatement = sb.ToString();
         }
@@ -1417,6 +1482,9 @@ operations: [
         private string CreateControllerOperationWebApiMethod()
         {
             var sb = new StringBuilder(WebApiMethod![4..]);
+            if (CompareValue(WithResult, true))
+                sb.Append("WithResult");
+
             sb.Append("Async");
 
             if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))

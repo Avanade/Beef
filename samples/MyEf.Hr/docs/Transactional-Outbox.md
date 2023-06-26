@@ -52,11 +52,11 @@ The following is a code snippet from the [EmployeeDataSvc](../MyEf.Hr.Business/D
 - The [`DataSvcInvoker`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Invokers/DataSvcInvoker.cs) is ultimately responsible for orchestrating (see [InvokerBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Invokers/InvokerBase.cs)) the database transaction and corresponding send/enqueue given the [`InvokerArgs`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Invokers/InvokerArgs.cs) configuration. This is controlled by the `{ IncludeTransactionScope = true, EventPublisher = _events })` properties.
 
 ``` csharp
-public Task<Employee> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
 {
-    var __result = await _data.TerminateAsync(value ?? throw new ArgumentNullException(nameof(value)), id).ConfigureAwait(false);
-    _events.PublishValueEvent(__result, new Uri($"myef/hr/employee/{__result.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Terminated");
-    return _cache.SetValue(__result);
+    return Result.GoAsync(_data.TerminateAsync(value, id))
+                 .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", riKind.Relative), $"MyEf.Hr.Employee", "Terminated"))
+                 .Then(r => _cache.SetValue(r));
 }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 ``` 
 

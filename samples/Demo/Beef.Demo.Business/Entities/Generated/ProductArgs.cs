@@ -5,32 +5,31 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the <see cref="Product"/> arguments entity.
+/// </summary>
+public partial class ProductArgs : EntityBase
 {
+    private string? _name;
+    private string? _description;
+
     /// <summary>
-    /// Represents the <see cref="Product"/> arguments entity.
+    /// Gets or sets the Name.
     /// </summary>
-    public partial class ProductArgs : EntityBase
+    public string? Name { get => _name; set => SetValue(ref _name, value); }
+
+    /// <summary>
+    /// Gets or sets the Description.
+    /// </summary>
+    public string? Description { get => _description; set => SetValue(ref _description, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _name;
-        private string? _description;
-
-        /// <summary>
-        /// Gets or sets the Name.
-        /// </summary>
-        public string? Name { get => _name; set => SetValue(ref _name, value); }
-
-        /// <summary>
-        /// Gets or sets the Description.
-        /// </summary>
-        public string? Description { get => _description; set => SetValue(ref _description, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Name), Name, v => Name = v);
-            yield return CreateProperty(nameof(Description), Description, v => Description = v);
-        }
+        yield return CreateProperty(nameof(Name), Name, v => Name = v);
+        yield return CreateProperty(nameof(Description), Description, v => Description = v);
     }
 }
 

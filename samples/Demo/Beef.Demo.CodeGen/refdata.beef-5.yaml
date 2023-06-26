@@ -5,6 +5,7 @@ refDataDataCtorParams: [ 'IMapper^Mapper' ]
 webApiAuthorize: AllowAnonymous
 appBasedAgentArgs: true
 cosmosName: DemoCosmosDb
+preprocessorDirectives: true
 entities:
   # A Get/Create/Update/Delete are not required unless specific CRUD operations are required.
 - { name: Country, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/countries, autoImplement: Database, databaseSchema: Ref }

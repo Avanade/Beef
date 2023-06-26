@@ -87,6 +87,10 @@
             "SnakeKebabToPascalCase"
           ]
         },
+        "preprocessorDirectives": {
+          "type": "boolean",
+          "title": "Indicates whether to use preprocessor directives in the generated output."
+        },
         "efModel": {
           "type": "boolean",
           "title": "Indicates whether an 'Entity Framework' .NET (C#) model is to be generated for all tables.",

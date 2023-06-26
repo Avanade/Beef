@@ -21,293 +21,6 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Person"/> HTTP agent.
-    /// </summary>
-    public partial interface IPersonAgent
-    {
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> CreateAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person?>> GetExAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> UpdateAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Patches an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonCollectionResult>> GetAllAsync(PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonCollectionResult>> GetAll2Async(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonCollectionResult>> GetByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonDetailCollectionResult>> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Merge first <see cref="Person"/> into second.
-        /// </summary>
-        /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
-        /// <param name="toId">The to <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> MergeAsync(Guid fromId, Guid toId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Mark <see cref="Person"/>.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> MarkAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<MapCoordinates>> MapAsync(MapArgs? args, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get no arguments.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person?>> GetNoArgsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the specified <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonDetail?>> GetDetailAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Patches an existing <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PersonDetail"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonDetail>> PatchDetailAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Actually validating the FromBody parameter generation.
-        /// </summary>
-        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get Null.
-        /// </summary>
-        /// <param name="name">The Name.</param>
-        /// <param name="names">The Names.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person?>> GetNullAsync(string? name, List<string>? names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Validate when an Event is published but not sent.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> EventPublishNoSendAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PersonCollectionResult>> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Throw Error.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> ThrowErrorAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Invoke Api Via Agent.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<string?>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Param Coll.
-        /// </summary>
-        /// <param name="addresses">The Addresses.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> ParamCollAsync(AddressCollection? addresses, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person?>> GetWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> CreateWithEfAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> UpdateWithEfAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> DeleteWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Patches an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Person>> PatchWithEfAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <see cref="Person"/> HTTP agent.
     /// </summary>
     public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgent
@@ -323,314 +36,123 @@ namespace Beef.Demo.Common.Agents
         public PersonAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<PersonAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> CreateAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<Person, Person>("api/v1/persons", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => DeleteAsync("api/v1/persons/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Person?>("api/v1/persons/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person?>> GetExAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Person?>("api/v1/persons/ex/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> UpdateAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<Person, Person>("api/v1/persons/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<Person, Person>("api/v1/persons/withRollback/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Patches an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<Person>("api/v1/persons/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonCollectionResult>> GetAllAsync(PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonCollectionResult>("api/v1/persons/all", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonCollectionResult>> GetAll2Async(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonCollectionResult>("api/v1/persons/allnopaging", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonCollectionResult>> GetByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonCollectionResult>("api/v1/persons", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonDetailCollectionResult>> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonDetailCollectionResult>("api/v1/persons/argsdetail", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Merge first <see cref="Person"/> into second.
-        /// </summary>
-        /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
-        /// <param name="toId">The to <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> MergeAsync(Guid fromId, Guid toId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<Person>("api/v1/persons/merge", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("fromId", fromId), new HttpArg<Guid>("toId", toId)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Mark <see cref="Person"/>.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> MarkAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/mark", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.MapArgs"/>).</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<MapCoordinates>> MapAsync(MapArgs? args, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<MapCoordinates>("api/v1/persons/map", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<MapArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Get no arguments.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person?>> GetNoArgsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Person?>("api/v1/persons/noargsforme", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the specified <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonDetail?>> GetDetailAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonDetail?>("api/v1/persons/{id}/detail", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<PersonDetail, PersonDetail>("api/v1/persons/{id}/detail", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Patches an existing <see cref="PersonDetail"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PersonDetail"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonDetail>> PatchDetailAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Actually validating the FromBody parameter generation.
-        /// </summary>
-        /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Person>("person", person, HttpArgType.FromBody)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Get Null.
-        /// </summary>
-        /// <param name="name">The Name.</param>
-        /// <param name="names">The Names.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person?>> GetNullAsync(string? name, List<string>? names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Person?>("api/v1/persons/null", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("name", name), new HttpArg<List<string>?>("names", names)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Validate when an Event is published but not sent.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> EventPublishNoSendAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<Person, Person>("api/v1/persons/publishnosend", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.PersonArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PersonCollectionResult>> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PersonCollectionResult>("api/v1/persons/args", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Throw Error.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> ThrowErrorAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/error", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Invoke Api Via Agent.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<string?>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<string?>("api/v1/persons/invokeApi", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Param Coll.
-        /// </summary>
-        /// <param name="addresses">The Addresses.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> ParamCollAsync(AddressCollection? addresses, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/paramcoll", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<AddressCollection?>("addresses", addresses, HttpArgType.FromBody)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Gets the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person?>> GetWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Person?>("api/v1/persons/ef/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Creates a new <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> CreateWithEfAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<Person, Person>("api/v1/persons/ef", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> UpdateWithEfAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<Person, Person>("api/v1/persons/ef/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Deletes the specified <see cref="Person"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> DeleteWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => DeleteAsync("api/v1/persons/ef/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Patches an existing <see cref="Person"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="Person"/>.</param>
-        /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<Person>> PatchWithEfAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
     }

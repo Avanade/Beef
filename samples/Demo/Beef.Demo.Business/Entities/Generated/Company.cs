@@ -5,63 +5,62 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Company entity.
+/// </summary>
+public partial class Company : ReferenceDataBaseEx<Guid, Company>
+{
+
+    /// <summary>
+    /// Gets or sets the External Code.
+    /// </summary>
+    public string? ExternalCode
+    {
+        get => GetMapping<string?>(nameof(ExternalCode));
+        set { var __externalCode = ExternalCode; SetValue(ref __externalCode, value); SetMapping(nameof(ExternalCode), __externalCode!); }
+    }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
+    {
+        foreach (var pv in base.GetPropertyValues())
+            yield return pv;
+
+        yield return CreateProperty(nameof(ExternalCode), ExternalCode, v => ExternalCode = v);
+    }
+
+    /// <summary>
+    /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="Company"/>.
+    /// </summary>
+    /// <param name="id">The <see cref="IIdentifier.Id">.</param>
+    /// <returns>The corresponding <see cref="Company"/>.</returns>
+    public static implicit operator Company?(Guid id) => ConvertFromId(id);
+
+    /// <summary>
+    /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="Company"/>.
+    /// </summary>
+    /// <param name="code">The <see cref="IReferenceData.Code">.</param>
+    /// <returns>The corresponding <see cref="Company"/>.</returns>
+    public static implicit operator Company?(string? code) => ConvertFromCode(code);
+}
+
+/// <summary>
+/// Represents the <see cref="Company"/> collection.
+/// </summary>
+public partial class CompanyCollection : ReferenceDataCollectionBase<Guid, Company, CompanyCollection>
 {
     /// <summary>
-    /// Represents the Company entity.
+    /// Initializes a new instance of the <see cref="CompanyCollection"/> class.
     /// </summary>
-    public partial class Company : ReferenceDataBaseEx<Guid, Company>
-    {
-
-        /// <summary>
-        /// Gets or sets the External Code.
-        /// </summary>
-        public string? ExternalCode
-        {
-            get => GetMapping<string?>(nameof(ExternalCode));
-            set { var __externalCode = ExternalCode; SetValue(ref __externalCode, value); SetMapping(nameof(ExternalCode), __externalCode!); }
-        }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            foreach (var pv in base.GetPropertyValues())
-                yield return pv;
-
-            yield return CreateProperty(nameof(ExternalCode), ExternalCode, v => ExternalCode = v);
-        }
-
-        /// <summary>
-        /// An implicit cast from an <see cref="IIdentifier.Id"> to <see cref="Company"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="IIdentifier.Id">.</param>
-        /// <returns>The corresponding <see cref="Company"/>.</returns>
-        public static implicit operator Company?(Guid id) => ConvertFromId(id);
-
-        /// <summary>
-        /// An implicit cast from a <see cref="IReferenceData.Code"> to <see cref="Company"/>.
-        /// </summary>
-        /// <param name="code">The <see cref="IReferenceData.Code">.</param>
-        /// <returns>The corresponding <see cref="Company"/>.</returns>
-        public static implicit operator Company?(string? code) => ConvertFromCode(code);
-    }
+    public CompanyCollection() { }
 
     /// <summary>
-    /// Represents the <see cref="Company"/> collection.
+    /// Initializes a new instance of the <see cref="CompanyCollection"/> class with <paramref name="items"/> to add.
     /// </summary>
-    public partial class CompanyCollection : ReferenceDataCollectionBase<Guid, Company, CompanyCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CompanyCollection"/> class.
-        /// </summary>
-        public CompanyCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CompanyCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public CompanyCollection(IEnumerable<Company> items) => AddRange(items);
-    }
+    /// <param name="items">The items to add.</param>
+    public CompanyCollection(IEnumerable<Company> items) => AddRange(items);
 }
 
 #pragma warning restore

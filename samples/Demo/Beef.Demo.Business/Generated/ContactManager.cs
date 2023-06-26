@@ -5,87 +5,64 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <see cref="Contact"/> business functionality.
+/// </summary>
+public partial class ContactManager : IContactManager
 {
+    private readonly IContactDataSvc _dataService;
+
     /// <summary>
-    /// Provides the <see cref="Contact"/> business functionality.
+    /// Initializes a new instance of the <see cref="ContactManager"/> class.
     /// </summary>
-    public partial class ContactManager : IContactManager
+    /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
+    public ContactManager(IContactDataSvc dataService)
+        { _dataService = dataService.ThrowIfNull(); ContactManagerCtor(); }
+
+    partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
     {
-        private readonly IContactDataSvc _dataService;
+        return await _dataService.GetAllAsync().ConfigureAwait(false);
+    }, InvokerArgs.Read);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContactManager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
-        public ContactManager(IContactDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ContactManagerCtor(); }
+    /// <inheritdoc/>
+    public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    {
+        await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
+        return await _dataService.GetAsync(id).ConfigureAwait(false);
+    }, InvokerArgs.Read);
 
-        partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
+    /// <inheritdoc/>
+    public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    {
+        await value.Validate().Mandatory().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
+        return await _dataService.CreateAsync(value).ConfigureAwait(false);
+    }, InvokerArgs.Create);
 
-        /// <summary>
-        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-        public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            return await _dataService.GetAllAsync().ConfigureAwait(false);
-        }, InvokerArgs.Read);
+    /// <inheritdoc/>
+    public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    {
+        value.Required().Id = id;
+        await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
+        return await _dataService.UpdateAsync(value).ConfigureAwait(false);
+    }, InvokerArgs.Update);
 
-        /// <summary>
-        /// Gets the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAsync(id).ConfigureAwait(false);
-        }, InvokerArgs.Read);
+    /// <inheritdoc/>
+    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    {
+        await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
+        await _dataService.DeleteAsync(id).ConfigureAwait(false);
+    }, InvokerArgs.Delete);
 
-        /// <summary>
-        /// Creates a new <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <returns>The created <see cref="Contact"/>.</returns>
-        public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await value.Validate().Mandatory().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.CreateAsync(value).ConfigureAwait(false);
-        }, InvokerArgs.Create);
-
-        /// <summary>
-        /// Updates an existing <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The updated <see cref="Contact"/>.</returns>
-        public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.EnsureValue().Id = id;
-            await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Contact"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, InvokerArgs.Delete);
-
-        /// <summary>
-        /// Raise Event.
-        /// </summary>
-        /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-        public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
-        }, InvokerArgs.Unspecified);
-    }
+    /// <inheritdoc/>
+    public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    {
+        await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
+    }, InvokerArgs.Unspecified);
 }
 
 #pragma warning restore

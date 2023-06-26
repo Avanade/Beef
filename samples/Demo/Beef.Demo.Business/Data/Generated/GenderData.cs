@@ -5,78 +5,59 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data
+namespace Beef.Demo.Business.Data;
+
+/// <summary>
+/// Provides the <see cref="Gender"/> data access.
+/// </summary>
+public partial class GenderData : IGenderData
 {
+    private readonly IDatabase _db;
+
     /// <summary>
-    /// Provides the <see cref="Gender"/> data access.
+    /// Initializes a new instance of the <see cref="GenderData"/> class.
     /// </summary>
-    public partial class GenderData : IGenderData
+    /// <param name="db">The <see cref="IDatabase"/>.</param>
+    public GenderData(IDatabase db)
+        { _db = db.ThrowIfNull(); GenderDataCtor(); }
+
+    partial void GenderDataCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<Gender?>> GetAsync(Guid id)
+        => _db.StoredProcedure("[Ref].[spGenderGet]").GetWithResultAsync(DbMapper.Default, id);
+
+    /// <inheritdoc/>
+    public Task<Result<Gender>> CreateAsync(Gender value)
+        => _db.StoredProcedure("[Ref].[spGenderCreate]").CreateWithResultAsync(DbMapper.Default, value);
+
+    /// <inheritdoc/>
+    public Task<Result<Gender>> UpdateAsync(Gender value)
+        => _db.StoredProcedure("[Ref].[spGenderUpdate]").UpdateWithResultAsync(DbMapper.Default, value);
+
+    /// <summary>
+    /// Provides the <see cref="Gender"/> property and database column mapping.
+    /// </summary>
+    public partial class DbMapper : DatabaseMapper<Gender, DbMapper>
     {
-        private readonly IDatabase _db;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="GenderData"/> class.
+        /// Initializes a new instance of the <see cref="DbMapper"/> class.
         /// </summary>
-        /// <param name="db">The <see cref="IDatabase"/>.</param>
-        public GenderData(IDatabase db)
-            { _db = db ?? throw new ArgumentNullException(nameof(db)); GenderDataCtor(); }
-
-        partial void GenderDataCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id)
+        public DbMapper()
         {
-            return _db.StoredProcedure("[Ref].[spGenderGet]").GetAsync(DbMapper.Default, id);
+            Property(s => s.Id, "GenderId").SetPrimaryKey(true);
+            Property(s => s.Code);
+            Property(s => s.Text);
+            Property(s => s.IsActive);
+            Property(s => s.SortOrder);
+            Property(s => s.AlternateName);
+            Property(s => s.TripCode);
+            Property(s => s.Country, "CountryId").SetConverter(ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default);
+            Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
+            DbMapperCtor();
         }
-
-        /// <summary>
-        /// Creates a new <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value)
-        {
-            return _db.StoredProcedure("[Ref].[spGenderCreate]").CreateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value)));
-        }
-
-        /// <summary>
-        /// Updates an existing <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value)
-        {
-            return _db.StoredProcedure("[Ref].[spGenderUpdate]").UpdateAsync(DbMapper.Default, value ?? throw new ArgumentNullException(nameof(value)));
-        }
-
-        /// <summary>
-        /// Provides the <see cref="Gender"/> property and database column mapping.
-        /// </summary>
-        public partial class DbMapper : DatabaseMapper<Gender, DbMapper>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbMapper"/> class.
-            /// </summary>
-            public DbMapper()
-            {
-                Property(s => s.Id, "GenderId").SetPrimaryKey(true);
-                Property(s => s.Code);
-                Property(s => s.Text);
-                Property(s => s.IsActive);
-                Property(s => s.SortOrder);
-                Property(s => s.AlternateName);
-                Property(s => s.TripCode);
-                Property(s => s.Country, "CountryId").SetConverter(ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default);
-                Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-                DbMapperCtor();
-            }
             
-            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
-        }
+        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
     }
 }
 

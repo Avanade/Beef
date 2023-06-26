@@ -5,26 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>Manager</b>-layer services.
+/// </summary>
+public static partial class ServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>Manager</b>-layer services.
+    /// Adds the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static partial class ServiceCollectionsExtension
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGeneratedManagerServices(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds the generated <b>Manager</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedManagerServices(this IServiceCollection services)
-        {
-            return services.AddScoped<IPersonManager, PersonManager>()
-                           .AddScoped<IRobotManager, RobotManager>()
-                           .AddScoped<IContactManager, ContactManager>()
-                           .AddScoped<IConfigManager, ConfigManager>()
-                           .AddScoped<IPostalInfoManager, PostalInfoManager>();
-        }
+        return services.AddScoped<IPersonManager, PersonManager>()
+                       .AddScoped<IRobotManager, RobotManager>()
+                       .AddScoped<IContactManager, ContactManager>()
+                       .AddScoped<IConfigManager, ConfigManager>()
+                       .AddScoped<IPostalInfoManager, PostalInfoManager>();
     }
 }
 

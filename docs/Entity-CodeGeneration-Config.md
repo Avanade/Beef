@@ -22,6 +22,7 @@ The `CodeGeneration` object supports a number of properties that control the gen
 
 Category | Description
 -|-
+[`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`RefData`](#RefData) | Provides the _Reference Data_ configuration.
 [`Entity`](#Entity) | Provides the _Entity class_ configuration.
 [`Events`](#Events) | Provides the _Events_ configuration.
@@ -39,6 +40,16 @@ Category | Description
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 The properties with a bold name are those that are more typically used (considered more important).
+
+<br/>
+
+## DotNet
+Provides the _.NET_ configuration.
+
+Property | Description
+-|-
+`withResult` | Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).<br/>&dagger; Defaults to `true`. This can be overridden within the `Entity`(s) and/or `Operation`(s).
+`preprocessorDirectives` | Indicates whether to use preprocessor directives in the generated output.
 
 <br/>
 

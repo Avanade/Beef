@@ -7,6 +7,7 @@ global using CoreEx.Configuration;
 global using CoreEx.Http;
 global using CoreEx.Json;
 global using CoreEx.RefData;
+global using CoreEx.Results;
 global using CoreEx.Validation;
 global using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 global using Microsoft.Azure.WebJobs;

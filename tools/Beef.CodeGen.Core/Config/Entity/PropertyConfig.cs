@@ -611,7 +611,7 @@ properties: [
         /// </summary>
         public string? EntityFrameworkDataMapperFromModelCode => EntityFrameworkMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"
@@ -633,7 +633,7 @@ properties: [
         /// </summary>
         public string? CosmosDataMapperFromModelCode => CosmosMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"
@@ -655,7 +655,7 @@ properties: [
         /// </summary>
         public string? HttpAgentDataMapperFromModelCode => HttpAgentMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"
@@ -664,7 +664,7 @@ properties: [
         /// <summary>
         /// Gets the WebAPI parameter type.
         /// </summary>
-        public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? Type! : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
+        public string WebApiParameterType => PrivateType;
 
         /// <summary>
         /// Indicates whether the property is to be set using the identifier generator on create.

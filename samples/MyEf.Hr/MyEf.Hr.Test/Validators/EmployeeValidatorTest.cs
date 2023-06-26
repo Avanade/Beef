@@ -65,7 +65,7 @@ public class EmployeeValidatorTest
             FirstName = 'x'.ToLongString(),
             LastName = 'x'.ToLongString(),
             Gender = "X",
-            Birthday = DateTime.Now.AddYears(10),
+            Birthday = DateTime.Now.AddYears(-17),
             StartDate = new DateTime(1996, 12, 31),
             PhoneNo = "(425) 333 4444"
         };
@@ -216,8 +216,8 @@ public class EmployeeValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
-            .ExpectException().Type<CoreEx.ValidationException>("Once an Employee has been Terminated the data can no longer be updated.")
-            .OperationType(CoreEx.OperationType.Update)
+            .ExpectException().Type<ValidationException>("Once an Employee has been Terminated the data can no longer be updated.")
+            .OperationType(OperationType.Update)
             .Run<EmployeeValidator, Employee>(e);
     }
 
@@ -225,13 +225,13 @@ public class EmployeeValidatorTest
     public void B110_CanDelete_NotFound()
     {
         var eds = new Mock<IEmployeeDataSvc>();
-        eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
+        eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee?)null!);
 
         using var test = ValidationTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
-            .ExpectException().Type<CoreEx.NotFoundException>()
+            .ExpectException().Type<NotFoundException>()
             .Run(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
     }
 
@@ -245,7 +245,7 @@ public class EmployeeValidatorTest
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
-            .ExpectException().Type<CoreEx.ValidationException>("An employee cannot be deleted after they have started their employment.")
+            .ExpectException().Type<ValidationException>("An employee cannot be deleted after they have started their employment.")
             .Run(() => EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()).Result);
     }
 }

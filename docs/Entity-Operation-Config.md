@@ -73,6 +73,7 @@ Property | Description
 `returnTypeNullable` | Indicates whether the `ReturnType` is nullable for the operation.<br/>&dagger; This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.
 `returnText` | The text for use in comments to describe the `ReturnType`.<br/>&dagger; A default will be created where not specified. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private usage. By default reformatted from `Name`; e.g. `GetByArgs` as `_getByArgs`.
+`withResult` | Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).<br/>&dagger; Defaults to `Entity.WilhResult`.
 
 <br/>
 

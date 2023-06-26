@@ -20,7 +20,7 @@ To support the goals of an [Event-driven architecture](https://en.wikipedia.org/
 
 An [`EventData`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) publish is invoked where the eventing infrastructure has been included (configured) during [code-generation](./tools/Beef.CodeGen.Core). The [`IEventPublisher`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventPublisher.cs) implementation is responsible for orchestraing the publishing and sending of the event message(s). 
 
-_Note:_ This is _always_ performed directly after the primary operation logic such that the _event_ is only published where successful. This is **not** transactional so if the event publish fails there is no automatic rollback capabilitity. The implementor will need to decide the corrective action for this type of failure; i.e. outbox pattern.
+_Note:_ This is _always_ performed directly after the primary operation logic such that the _event_ is only published where successful. This is may not be transactional (depends on implementation) so if the event publish fails there may be no automatic rollback capabilitity. The implementor will need to decide the corrective action for this type of failure; i.e. consider the transaction outbox pattern.
 
 <br/>
 
@@ -31,6 +31,18 @@ This layer is generally code-generated and provides options to provide a fully c
 The [`Operation`](./Entity-Operation-Config.md) element within the `entity.beef-5.yaml` configuration primarily drives the output
 
 There is a generated class per [`Entity`](./Entity-Entity-Config.md) named `{Entity}DataSvc`. There is also a corresonding interface named `I{Entity}DataSvc` generated so the likes of test mocking etc. can be employed. For example, if the entity is named `Person`, there will be corresponding `PersonDataSvc` and `IPersonDataSvc` classes.
+
+<br/>
+
+## Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
+
+The [`Result`]() and [`Result<T>`]() have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+This is implemented by default; however, can be disabled by setting the `useResult` attribute to `false` within the code-generation configuration.
+
+<br/>
 
 ### Code-generated
  
@@ -51,9 +63,24 @@ The following demonstrates the generated code (a snippet from the sample [`Robot
 
 ``` csharp
 // A Get operation.
+public Task<Result<Robot?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
+
+// A Create operation.
+public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+{
+    return Result.GoAsync(_data.CreateAsync(value))
+                 .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create"))
+                 .Then(r => _cache.SetValue(r));
+}, new InvokerArgs { EventPublisher = _events });
+```
+
+The non-`Result` based version would be similar to:
+
+``` csharp
+// A Get operation.
 public Task<Robot?> GetAsync(Guid id) => _cache.GetOrAddAsync(id, () => _data.GetAsync(id));
 
-// An Create operation.
+// A Create operation.
 public Task<Robot> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
 {
     var __result = await _data.CreateAsync(value ?? throw new ArgumentNullException(nameof(value))).ConfigureAwait(false);
@@ -98,6 +125,12 @@ Step | Description
 `OnImplementation` | Invocation of a named `XxxOnImplementaionAsync` method that must be implemented in a non-generated partial class.
 
 The following demonstrates the generated code:
+
+``` csharp
+public Task<Result<int>> DataSvcCustomAsync() => DataSvcCustomOnImplementationAsync();
+```
+
+The non-`Result` based version would be similar to:
 
 ``` csharp
 public Task<int> DataSvcCustomAsync() => DataSvcCustomOnImplementationAsync();

@@ -321,6 +321,22 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(v.Id));
         }
 
+        [Test]
+        public void F150_Update_Default_Value()
+        {
+            Agent<RobotAgent, Robot>()
+                .Run(a => a.UpdateAsync(null!, 1.ToGuid()))
+                .Assert(HttpStatusCode.BadRequest, "Invalid request: content was not provided, contained invalid JSON, or was incorrectly formatted: Value is mandatory.");
+        }
+
+        [Test]
+        public void F160_Update_Default_Identifier()
+        {
+            Agent<RobotAgent, Robot>()
+                .ExpectErrors(new ApiError("id", "Identifier is required."))
+                .Run(a => a.UpdateAsync(new Robot(), Guid.Empty));
+        }
+
         #endregion
 
         #region Delete

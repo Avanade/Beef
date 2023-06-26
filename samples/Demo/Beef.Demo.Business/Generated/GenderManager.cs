@@ -5,57 +5,44 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <see cref="Gender"/> business functionality.
+/// </summary>
+public partial class GenderManager : IGenderManager
 {
+    private readonly IGenderDataSvc _dataService;
+
     /// <summary>
-    /// Provides the <see cref="Gender"/> business functionality.
+    /// Initializes a new instance of the <see cref="GenderManager"/> class.
     /// </summary>
-    public partial class GenderManager : IGenderManager
+    /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
+    public GenderManager(IGenderDataSvc dataService)
+        { _dataService = dataService.ThrowIfNull(); GenderManagerCtor(); }
+
+    partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<Gender?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
-        private readonly IGenderDataSvc _dataService;
+        return Result.Go().Requires(id)
+                     .ThenAsAsync(() => _dataService.GetAsync(id));
+    }, InvokerArgs.Read);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GenderManager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
-        public GenderManager(IGenderDataSvc dataService)
-            { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); GenderManagerCtor(); }
+    /// <inheritdoc/>
+    public Task<Result<Gender>> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go(value).Required()
+                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+    }, InvokerArgs.Create);
 
-        partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Gets the specified <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        public Task<Gender?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return await _dataService.GetAsync(id).ConfigureAwait(false);
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Creates a new <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>The created <see cref="Gender"/>.</returns>
-        public Task<Gender> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            return await _dataService.CreateAsync(value).ConfigureAwait(false);
-        }, InvokerArgs.Create);
-
-        /// <summary>
-        /// Updates an existing <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The updated <see cref="Gender"/>.</returns>
-        public Task<Gender> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.EnsureValue().Id = id;
-            return await _dataService.UpdateAsync(value).ConfigureAwait(false);
-        }, InvokerArgs.Update);
-    }
+    /// <inheritdoc/>
+    public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+    }, InvokerArgs.Update);
 }
 
 #pragma warning restore

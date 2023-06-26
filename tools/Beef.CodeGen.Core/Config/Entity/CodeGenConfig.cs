@@ -24,6 +24,7 @@ eventSubjectRoot: My
 eventActionFormat: PastTense
 entities:
 ```")]
+    [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CodeGenCategory("RefData", Title = "Provides the _Reference Data_ configuration.")]
     [CodeGenCategory("Entity", Title = "Provides the _Entity class_ configuration.")]
     [CodeGenCategory("Events", Title = "Provides the _Events_ configuration.")]
@@ -41,6 +42,25 @@ entities:
     [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigRootBase<CodeGenConfig>
     {
+        #region DotNet
+
+        /// <summary>
+        /// Indicates whether to use Results.
+        /// </summary>
+        [JsonProperty("withResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("DotNet", Title = "Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).",
+            Description = "Defaults to `true`. This can be overridden within the `Entity`(s) and/or `Operation`(s).")]
+        public bool? WithResult { get; set; }
+
+        /// <summary>
+        /// Indicates whether to use preprocessor directives in the generated output.
+        /// </summary>
+        [JsonProperty("preprocessorDirectives", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("DotNet", Title = "Indicates whether to use preprocessor directives in the generated output.")]
+        public bool? PreprocessorDirectives { get; set; }
+
+        #endregion
+
         #region RefData
 
         /// <summary>
@@ -542,6 +562,8 @@ entities:
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
+            WithResult = DefaultWhereNull(WithResult, () => true);
+            PreprocessorDirectives = DefaultWhereNull(PreprocessorDirectives, () => false);
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => false);
             ValidationFramework = DefaultWhereNull(ValidationFramework, () => "CoreEx");
             WebApiAutoLocation = DefaultWhereNull(WebApiAutoLocation, () => false);

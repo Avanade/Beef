@@ -209,26 +209,26 @@ public partial class EmployeeData
     /// <summary>
     /// Executes the 'Get' stored procedure passing the identifier and returns the result.
     /// </summary>
-    private Task<Employee?> GetOnImplementationAsync(Guid id) =>
+    private Task<Result<Employee?>> GetOnImplementationAsync(Guid id) =>
         ExecuteStatementAsync(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default[x => x.Id], id));
 
     /// <summary>
     /// Executes the 'Create' stored procedure and returns the result.
     /// </summary>
-    private Task<Employee> CreateOnImplementationAsync(Employee value) =>
+    private Task<Result<Employee>> CreateOnImplementationAsync(Employee value) =>
         ExecuteStatementAsync("[Hr].[spEmployeeCreate]", value, CoreEx.Mapping.OperationTypes.Create);
 
     /// <summary>
     /// Executes the 'Update' stored procedure and returns the result.
     /// </summary>
-    private Task<Employee> UpdateOnImplementationAsync(Employee value) =>
+    private Task<Result<Employee>> UpdateOnImplementationAsync(Employee value) =>
         ExecuteStatementAsync("[Hr].[spEmployeeUpdate]", value, CoreEx.Mapping.OperationTypes.Update);
 
     /// <summary>
     /// Executes the stored procedure, passing Employee parameters, and the EmergencyContacts as a table-valued parameter (TVP), the operation type to aid mapping, 
     /// and requests for the result to be reselected.
     /// </summary>
-    private Task<Employee> ExecuteStatementAsync(string storedProcedureName, Employee value, CoreEx.Mapping.OperationTypes operationType)
+    private Task<Result<Employee>> ExecuteStatementAsync(string storedProcedureName, Employee value, CoreEx.Mapping.OperationTypes operationType)
     {
         var sp = _db.StoredProcedure(storedProcedureName)
                     .Params(p => DbMapper.Default.MapToDb(value, p, operationType))
@@ -241,18 +241,17 @@ public partial class EmployeeData
     /// <summary>
     /// Executes the underlying stored procedure and processes the result (used by Get, Create and Update).
     /// </summary>
-    private static async Task<Employee?> ExecuteStatementAsync(DatabaseCommand db)
+    private static Task<Result<Employee?>> ExecuteStatementAsync(DatabaseCommand db)
     {
         Employee? employee = null;
 
         // Execute the generated stored procedure, selecting (querying) two sets of data:
         // 1. The selected Employee (single row), the row is not mandatory, and stop (do not goto second set) where null. Use the underlying DbMapper to map between columns and .NET Type.
         // 2. Zero or more EmergencyContact rows. Use EmergencyContactData.DbMapper to map between columns and .NET Type. Update the Employee with result.
-        await db.SelectMultiSetAsync(
-            new MultiSetSingleArgs<Employee>(DbMapper.Default, r => employee = r, isMandatory: false, stopOnNull: true),
-            new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r)).ConfigureAwait(false);
-
-        return employee;
+        return Result.GoAsync(db.SelectMultiSetWithResultAsync(
+                new MultiSetSingleArgs<Employee>(DbMapper.Default, r => employee = r, isMandatory: false, stopOnNull: true),
+                new MultiSetCollArgs<EmergencyContactCollection, EmergencyContact>(EmergencyContactData.DbMapper.Default, r => employee!.EmergencyContacts = r)))
+            .ThenAs(() => employee);
     }
 }
 ```
@@ -346,7 +345,7 @@ public class EmployeeValidator : Validator<Employee>
     /// <summary>
     /// Add further validation logic non-property bound.
     /// </summary>
-    protected override async Task OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
+    protected override Task<Result> OnValidateAsync(ValidationContext<Employee> context, CancellationToken cancellationToken)
     {
         // Ensure that the termination data is always null on an update; unless already terminated then it can no longer be updated.
         switch (ExecutionContext.OperationType)
@@ -356,30 +355,26 @@ public class EmployeeValidator : Validator<Employee>
                 break;
 
             case OperationType.Update:
-                var existing = await _employeeDataSvc.GetAsync(context.Value.Id).ConfigureAwait(false);
-                if (existing == null)
-                    throw new NotFoundException();
-
-                if (existing.Termination != null)
-                    throw new ValidationException("Once an Employee has been Terminated the data can no longer be updated.");
-
-                context.Value.Termination = null;
-                break;
+                return Result.GoAsync(_employeeDataSvc.GetAsync(context.Value.Id))
+                    .When(existing => existing is null, _ => Result.NotFoundError())
+                    .When(existing => existing!.Termination is not null, _ => Result.ValidationError("Once an Employee has been Terminated the data can no longer be updated."))
+                    .ThenAs(_ => context.Value.Termination = null)
+                    .AsResult();
         }
+
+        return Result.SuccessTask;
     }
 
     /// <summary>
-    /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
+    /// Validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
     /// </summary>
-    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync(async (context, _) =>
+    public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync((context, _) =>
     {
         // Unable to use inheritance DI for a Common Validator so the ExecutionContext.GetService will get/create the instance in the same manner.
-        var existing = await CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value).ConfigureAwait(false);
-        if (existing == null)
-            throw new NotFoundException();
-
-        if (existing.StartDate <= CoreEx.ExecutionContext.Current.Timestamp)
-            throw new ValidationException("An employee cannot be deleted after they have started their employment.");
+        return Result.GoAsync(CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value))
+            .When(existing => existing is null, _ => Result.NotFoundError())
+            .When(existing => existing!.StartDate <= CoreEx.ExecutionContext.Current.Timestamp, _ => Result.ValidationError("An employee cannot be deleted after they have started their employment."))
+            .AsResult();
     }));
 }
 ```

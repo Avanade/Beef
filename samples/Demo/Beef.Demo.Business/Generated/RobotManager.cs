@@ -5,106 +5,78 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <see cref="Robot"/> business functionality.
+/// </summary>
+public partial class RobotManager : IRobotManager
 {
+    private readonly IRobotDataSvc _dataService;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly IIdentifierGenerator _identifierGenerator;
+
     /// <summary>
-    /// Provides the <see cref="Robot"/> business functionality.
+    /// Initializes a new instance of the <see cref="RobotManager"/> class.
     /// </summary>
-    public partial class RobotManager : IRobotManager
+    /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
+    /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
+    /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
+    public RobotManager(IRobotDataSvc dataService, IEventPublisher eventPublisher, IIdentifierGenerator identifierGenerator)
+        { _dataService = dataService.ThrowIfNull(); _eventPublisher = eventPublisher.ThrowIfNull(); _identifierGenerator = identifierGenerator.ThrowIfNull(); RobotManagerCtor(); }
+
+    partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
     {
-        private readonly IRobotDataSvc _dataService;
-        private readonly IEventPublisher _eventPublisher;
-        private readonly IIdentifierGenerator _identifierGenerator;
+        return Result.Go().Requires(id)
+                     .Then(() => Cleaner.CleanUp(id))
+                     .ThenAsAsync(() => _dataService.GetAsync(id));
+    }, InvokerArgs.Read);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotManager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
-        /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
-        /// <param name="identifierGenerator">The <see cref="IIdentifierGenerator"/>.</param>
-        public RobotManager(IRobotDataSvc dataService, IEventPublisher eventPublisher, IIdentifierGenerator identifierGenerator)
-        {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
-            _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
-            _identifierGenerator = identifierGenerator ?? throw new ArgumentNullException(nameof(identifierGenerator));
-            RobotManagerCtor();
-        }
+    /// <inheritdoc/>
+    public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go(value).Required()
+                     .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
+                     .Then(v => Cleaner.CleanUp(v))
+                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
+                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+    }, InvokerArgs.Create);
 
-        partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
+    /// <inheritdoc/>
+    public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+                     .Then(v => Cleaner.CleanUp(v))
+                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
+                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+    }, InvokerArgs.Update);
 
-        /// <summary>
-        /// Gets the specified <see cref="Robot"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-        }, InvokerArgs.Read);
+    /// <inheritdoc/>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go().Requires(id)
+                     .Then(() => Cleaner.CleanUp(id))
+                     .ThenAsync(() => _dataService.DeleteAsync(id));
+    }, InvokerArgs.Delete);
 
-        /// <summary>
-        /// Creates a new <see cref="Robot"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.EnsureValue().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false);
-            Cleaner.CleanUp(value);
-            await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-        }, InvokerArgs.Create);
+    /// <inheritdoc/>
+    public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go()
+                     .Then(() => Cleaner.CleanUp(args))
+                     .ValidatesAsync(args, v => v.Entity().With<RobotArgsValidator>(), cancellationToken: ct)
+                     .ThenAsAsync(() => _dataService.GetByArgsAsync(args, paging));
+    }, InvokerArgs.Read);
 
-        /// <summary>
-        /// Updates an existing <see cref="Robot"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            value.EnsureValue().Id = id;
-            Cleaner.CleanUp(value);
-            await value.Validate().Interop(() => FluentValidator.Create<RobotValidator>().Wrap()).ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-        }, InvokerArgs.Update);
-
-        /// <summary>
-        /// Deletes the specified <see cref="Robot"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(id);
-            await id.Validate(nameof(id)).Mandatory().ValidateAsync(true).ConfigureAwait(false);
-            await _dataService.DeleteAsync(id).ConfigureAwait(false);
-        }, InvokerArgs.Delete);
-
-        /// <summary>
-        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.RobotArgs"/>).</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            Cleaner.CleanUp(args);
-            await args.Validate(nameof(args)).Entity().With<RobotArgsValidator>().ValidateAsync(true).ConfigureAwait(false);
-            return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-        }, InvokerArgs.Read);
-
-        /// <summary>
-        /// Raises a <see cref="Robot.PowerSource"/> change event.
-        /// </summary>
-        /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <param name="powerSource">The Power Source.</param>
-        public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);
-        }, InvokerArgs.Unspecified);
-    }
+    /// <inheritdoc/>
+    public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    {
+        return Result.Go()
+                     .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));
+    }, InvokerArgs.Unspecified);
 }
 
 #pragma warning restore

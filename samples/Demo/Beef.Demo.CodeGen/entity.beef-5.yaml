@@ -8,6 +8,8 @@ eventSourceKind: Relative
 cosmosName: DemoCosmosDb
 appBasedAgentArgs: true
 managerCleanUp: true
+withResult: false
+preprocessorDirectives: true
 entities:
 - { name: Person, text: Person, collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
     properties: [
@@ -158,7 +160,7 @@ entities:
   }
 
   # CosmosDb
-- { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validationFramework: FluentValidation, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot,
+- { name: Robot, grpc: true, text: Robot, collection: true, collectionResult: true, validationFramework: FluentValidation, validator: RobotValidator, refDataText: true, identifierGenerator: true, webApiRoutePrefix: api/v1/robots, managerCtorParams: [ IEventPublisher ], eventSource: '/robots/{$key}', autoImplement: Cosmos, cosmosContainerId: Items, cosmosModel: Model.Robot, withResult: true,
     properties: [
       { name: Id, text: '{{Robot}} identifier', type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter{T}', grpcFieldNo: 1 },
       { name: ModelNo, text: Model number, type: string, grpcFieldNo: 2 },
@@ -237,7 +239,7 @@ entities:
     ]
   }
 
-- { name: PostalInfo, dataModel: true, autoImplement: HttpAgent, webApiRoutePrefix: api/v1/postal, httpAgentName: ZippoAgent, httpAgentModel: Model.PostalInfo, httpAgentCode: WithRetry(), webApiConcurrency: true, webApiGetOperation: GetPostCodes,
+- { name: PostalInfo, dataModel: true, autoImplement: HttpAgent, webApiRoutePrefix: api/v1/postal, httpAgentName: ZippoAgent, httpAgentModel: Model.PostalInfo, httpAgentCode: WithRetry(), webApiConcurrency: true, webApiGetOperation: GetPostCodes, withResult: true,
     properties: [
       { name: Country, type: ^Country, jsonDataModelName: country abbreviation },
       { name: City, jsonDataModelName: place name },

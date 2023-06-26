@@ -1,9 +1,9 @@
 ﻿global using CoreEx;
+global using CoreEx.AspNetCore.WebApis;
 global using CoreEx.Entities;
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
-global using CoreEx.WebApis;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Data.SqlClient;
 global using Microsoft.Extensions.Caching.Memory;

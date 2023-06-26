@@ -5,25 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Provides the generated <b>Data</b>-layer services.
+/// </summary>
+public static partial class ServiceCollectionsExtension
 {
     /// <summary>
-    /// Provides the generated <b>Data</b>-layer services.
+    /// Adds the generated <b>Data</b>-layer services.
     /// </summary>
-    public static partial class ServiceCollectionsExtension
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds the generated <b>Data</b>-layer services.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
-        {
-            return services.AddScoped<IPersonData, PersonData>()
-                           .AddScoped<IRobotData, RobotData>()
-                           .AddScoped<IContactData, ContactData>()
-                           .AddScoped<IPostalInfoData, PostalInfoData>();
-        }
+        return services.AddScoped<IPersonData, PersonData>()
+                       .AddScoped<IRobotData, RobotData>()
+                       .AddScoped<IContactData, ContactData>()
+                       .AddScoped<IPostalInfoData, PostalInfoData>();
     }
 }
 

@@ -5,54 +5,53 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the <see cref="Person"/> arguments entity.
+/// </summary>
+public partial class PersonArgs : EntityBase
 {
+    private string? _firstName;
+    private string? _lastName;
+    private List<string?>? _gendersSids;
+    private Common.Entities.OrderBy? _orderBy;
+
     /// <summary>
-    /// Represents the <see cref="Person"/> arguments entity.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class PersonArgs : EntityBase
+    public string? FirstName { get => _firstName; set => SetValue(ref _firstName, value); }
+
+    /// <summary>
+    /// Gets or sets the Last Name.
+    /// </summary>
+    public string? LastName { get => _lastName; set => SetValue(ref _lastName, value); }
+
+    /// <summary>
+    /// Gets or sets the <see cref="Genders"/> list using the underlying Serialization Identifier (SID).
+    /// </summary>
+    [JsonPropertyName("genders")]
+    public List<string?>? GendersSids { get => _gendersSids; set => SetValue(ref _gendersSids, value, propertyName: nameof(Genders)); }
+
+    /// <summary>
+    /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [JsonIgnore]
+    public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList(), propertyName: nameof(Genders)); }
+
+    /// <summary>
+    /// Gets or sets the Order By.
+    /// </summary>
+    public Common.Entities.OrderBy? OrderBy { get => _orderBy; set => SetValue(ref _orderBy, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private string? _firstName;
-        private string? _lastName;
-        private List<string?>? _gendersSids;
-        private Common.Entities.OrderBy? _orderBy;
-
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get => _firstName; set => SetValue(ref _firstName, value); }
-
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get => _lastName; set => SetValue(ref _lastName, value); }
-
-        /// <summary>
-        /// Gets or sets the <see cref="Genders"/> list using the underlying Serialization Identifier (SID).
-        /// </summary>
-        [JsonPropertyName("genders")]
-        public List<string?>? GendersSids { get => _gendersSids; set => SetValue(ref _gendersSids, value, propertyName: nameof(Genders)); }
-
-        /// <summary>
-        /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [JsonIgnore]
-        public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList(), propertyName: nameof(Genders)); }
-
-        /// <summary>
-        /// Gets or sets the Order By.
-        /// </summary>
-        public Common.Entities.OrderBy? OrderBy { get => _orderBy; set => SetValue(ref _orderBy, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
-            yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
-            yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
-            yield return CreateProperty(nameof(OrderBy), OrderBy, v => OrderBy = v);
-        }
+        yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
+        yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
+        yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
+        yield return CreateProperty(nameof(OrderBy), OrderBy, v => OrderBy = v);
     }
 }
 

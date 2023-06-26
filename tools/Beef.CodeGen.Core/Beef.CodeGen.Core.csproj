@@ -19,10 +19,15 @@
     <EmbeddedResource Include="Scripts\**\*" />
     <EmbeddedResource Include="Templates\**\*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="Templates\EntityIWebApiAgent_cs.hbs" />
+    <None Remove="Templates\ReferenceDataIWebApiAgent_cs.hbs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OnRamp" Version="1.0.7" />
-    <PackageReference Include="DbEx" Version="2.3.4" />
+    <PackageReference Include="DbEx" Version="2.3.5" />
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />

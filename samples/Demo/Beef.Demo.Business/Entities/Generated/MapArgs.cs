@@ -5,25 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Mapping arguments entity.
+/// </summary>
+public partial class MapArgs : EntityBase
 {
+    private MapCoordinates? _coordinates;
+
     /// <summary>
-    /// Represents the Mapping arguments entity.
+    /// Gets or sets the Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).
     /// </summary>
-    public partial class MapArgs : EntityBase
+    public MapCoordinates? Coordinates { get => _coordinates; set => SetValue(ref _coordinates, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        private MapCoordinates? _coordinates;
-
-        /// <summary>
-        /// Gets or sets the Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).
-        /// </summary>
-        public MapCoordinates? Coordinates { get => _coordinates; set => SetValue(ref _coordinates, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Coordinates), Coordinates, v => Coordinates = v);
-        }
+        yield return CreateProperty(nameof(Coordinates), Coordinates, v => Coordinates = v);
     }
 }
 

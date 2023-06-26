@@ -164,6 +164,13 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
 
+        /// <summary>
+        /// Indicates whether to use preprocessor directives in the generated output.
+        /// </summary>
+        [JsonProperty("preprocessorDirectives", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("DotNet", Title = "Indicates whether to use preprocessor directives in the generated output.")]
+        public bool? PreprocessorDirectives { get; set; }
+
         #endregion
 
         #region EntityFramework
@@ -396,6 +403,7 @@ namespace Beef.CodeGen.Config.Database
             OutboxDequeueStoredProcedure = DefaultWhereNull(OutboxDequeueStoredProcedure, () => $"sp{OutboxTable}Dequeue");
 
             AutoDotNetRename = DefaultWhereNull(AutoDotNetRename, () => "SnakeKebabToPascalCase");
+            PreprocessorDirectives = DefaultWhereNull(PreprocessorDirectives, () => false);
 
             Queries = await PrepareCollectionAsync(Queries).ConfigureAwait(false);
             Tables = await PrepareCollectionAsync(Tables).ConfigureAwait(false);

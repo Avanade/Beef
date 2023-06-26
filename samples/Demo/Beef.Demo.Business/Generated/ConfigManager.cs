@@ -5,30 +5,26 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <b>Config</b> business functionality.
+/// </summary>
+public partial class ConfigManager : IConfigManager
 {
     /// <summary>
-    /// Provides the <b>Config</b> business functionality.
+    /// Initializes a new instance of the <see cref="ConfigManager"/> class.
     /// </summary>
-    public partial class ConfigManager : IConfigManager
+    public ConfigManager()
+        { ConfigManagerCtor(); }
+
+    partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigManager"/> class.
-        /// </summary>
-        public ConfigManager()
-            { ConfigManagerCtor(); }
-
-        partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
-
-        /// <summary>
-        /// Get Env Vars.
-        /// </summary>
-        /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async _ =>
-        {
-            return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
-        }, InvokerArgs.Unspecified);
-    }
+        return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
+    }, InvokerArgs.Unspecified);
 }
 
 #pragma warning restore

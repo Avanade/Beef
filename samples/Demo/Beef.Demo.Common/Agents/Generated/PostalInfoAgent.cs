@@ -21,71 +21,6 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="PostalInfo"/> HTTP agent.
-    /// </summary>
-    public partial interface IPostalInfoAgent
-    {
-        /// <summary>
-        /// Gets the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Creates a new <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Updates an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Patches an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Deletes the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult> DeletePostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
-
-    /// <summary>
     /// Provides the <see cref="PostalInfo"/> HTTP agent.
     /// </summary>
     public partial class PostalInfoAgent : TypedHttpClientBase<PostalInfoAgent>, IPostalInfoAgent
@@ -101,67 +36,23 @@ namespace Beef.Demo.Common.Agents
         public PostalInfoAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<PostalInfoAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Gets the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Creates a new <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Updates an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PutAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Patches an existing <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
-        /// <param name="value">The <see cref="string"/> that contains the patch content for the <see cref="PostalInfo"/>.</param>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
 
-        /// <summary>
-        /// Deletes the specified <see cref="PostalInfo"/>.
-        /// </summary>
-        /// <param name="country">The Country.</param>
-        /// <param name="state">The State.</param>
-        /// <param name="city">The City.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult> DeletePostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => DeleteAsync("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
     }

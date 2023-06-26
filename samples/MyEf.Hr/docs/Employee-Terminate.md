@@ -53,27 +53,29 @@ The existing `EmployeeData.cs` logic will need to be extended to support the new
 
 This is an instance where there is some validation logic that has been added to this data component versus in the related validator. The primary reason for this is efficiency, as we need to do a `Get` to then `Update`, so to minimize chattiness and keep this logic together it is all implemented here.
 
-Add the following code to the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously.
+Add the following code to the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously. Also, of note is the use of the `Result` type (railway-oriented programming) to enable, including the usage of the `Result.ValidationError` versus throwing a `ValidationException` (ultimately results in the same outcome).
 
 ``` csharp
 /// <summary>
 /// Terminates an existing employee by updating their termination columns.
 /// </summary>
-private async Task<Employee> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
+private Task<Result<Employee>> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
 {
     // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-    var curr = await GetAsync(id).ConfigureAwait(false);
-    if (curr == null)
-        throw new NotFoundException();
+    return Result.GoAsync(GetAsync(id)).ThenAsAsync(async curr =>
+    {
+        if (curr == null)
+            return Result.NotFoundError();
 
-    if (curr.Termination != null)
-        throw new ValidationException("An Employee can not be terminated more than once.");
+        if (curr.Termination != null)
+            return Result.ValidationError("An Employee can not be terminated more than once.");
 
-    if (value.Date < curr.StartDate)
-        throw new ValidationException("An Employee can not be terminated prior to their start date.");
+        if (value.Date < curr.StartDate)
+            return Result.ValidationError("An Employee can not be terminated prior to their start date.");
 
-    curr.Termination = value;
-    return await UpdateAsync(curr).ConfigureAwait(false);
+        curr.Termination = value;
+        return await UpdateAsync(curr).ConfigureAwait(false);
+    });
 }
 ```
 

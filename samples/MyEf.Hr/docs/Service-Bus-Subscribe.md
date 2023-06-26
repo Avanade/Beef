@@ -243,7 +243,7 @@ Setting | Description
 
 ## OKTA Http Client
 
-The external OKTA API must be accessed using an [`HttpClient`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient). Create a new `OktaHttpClient.cs` file, then copy in the following contents. This inherits from the _CoreEx_ [`TypedHttpClientBase<TSelf>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Http/TypedHttpClientBaseT.cs) that encapsulates an underlying `HttpClient` and adds extended fluent-style method-chaining capabilities and supporting `SendAsync` logic.
+The external OKTA API must be accessed using an [`HttpClient`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient). Create a new `OktaHttpClient.cs` file, then copy in the following contents. This inherits from the _CoreEx_ [`TypedHttpClientBase<TSelf>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Http/TypedHttpClientBaseT.cs) that encapsulates an underlying `HttpClient` and adds extended fluent-style method-chaining capabilities and supporting `SendAsync` logic. Also, of note is the usage of `Result` which will enable simplified chaining and error handling.
 
 The advantage of a typed client such as this, is that it can encapsulate all of the appropriate behavior, making it easier to understand and test. The constructor is using the injected `SecuritySettings` to set the underlying `HttpClient.BaseAddress`. Additionally, other `DefaultOptions` can be set to ensure consistent behaviour of the underlying request/response; these can also be overridden per request where applicable.
 
@@ -270,16 +270,19 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// <summary>
     /// Gets the identifier for the email (see <see href="https://developer.okta.com/docs/reference/api/users/#list-users-with-search"/>).
     /// </summary>
-    public async Task<OktaUser?> GetUser(string email)
-    {
-        var response = await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false);
-        return response.Value.Count == 1 ? response.Value[0] : null;
-    }
+    public async Task<Result<OktaUser>> GetUserAsync(Guid id, string email) 
+        => Result.GoFrom(await GetAsync<List<OktaUser>>($"/api/v1/users?search=profile.email eq \"{email}\"").ConfigureAwait(false))
+            .ThenAs(coll => coll.Count switch 
+            {
+                0 => Result.NotFoundError($"Employee {id} with email {email} not found within OKTA."),
+                1 => Result.Ok(coll[0]),
+                _ => Result.NotFoundError($"Employee {id} with email {email} has multiple entries within OKTA.")
+            });
 
     /// <summary>
     /// Deactivates the specified user (<see href="https://developer.okta.com/docs/reference/api/users/#deactivate-user"/>)
     /// </summary>
-    public Task DeactivateUser(string id) => PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true");
+    public async Task<Result> DeactivateUserAsync(string id) => Result.GoFrom(await PostAsync($"/api/v1/users/{id}/lifecycle/deactivate?sendEmail=true").ConfigureAwait(false));
 
     /// <summary>
     /// The basic OKTA user properties (see <see href="https://developer.okta.com/docs/reference/api/users/#user-object"/>)
@@ -343,15 +346,10 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override ErrorHandling NotFoundHandling => ErrorHandling.CompleteWithWarning;
 
-    public override async Task ReceiveAsync(EventData<Employee> @event, CancellationToken cancellationToken)
-    {
-        var user = await _okta.GetUser(@event.Value.Email!).ConfigureAwait(false) ?? throw new NotFoundException($"Employee {@event.Value.Id} with email {@event.Value.Email} either not found, or multiple exist, within OKTA.");
-
-        if (!user.IsDeactivatable)
-            _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status);
-        else
-            await _okta.DeactivateUser(user.Id!).ConfigureAwait(false);
-    }
+    public override Task<Result> ReceiveAsync(EventData<Employee> @event, EventSubscriberArgs args, CancellationToken cancellationToken) 
+        => Result.GoAsync(_okta.GetUserAsync(@event.Value.Id, @event.Value.Email!))
+            .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
+            .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
 }
 ```
 

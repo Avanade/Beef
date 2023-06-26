@@ -5,50 +5,49 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the Place Info entity.
+/// </summary>
+public partial class PlaceInfo : EntityBase
+{
+    private string? _name;
+    private string? _postCode;
+
+    /// <summary>
+    /// Gets or sets the Name.
+    /// </summary>
+    public string? Name { get => _name; set => SetValue(ref _name, value); }
+
+    /// <summary>
+    /// Gets or sets the Post Code.
+    /// </summary>
+    public string? PostCode { get => _postCode; set => SetValue(ref _postCode, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
+    {
+        yield return CreateProperty(nameof(Name), Name, v => Name = v);
+        yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
+    }
+}
+
+/// <summary>
+/// Represents the <see cref="PlaceInfo"/> collection.
+/// </summary>
+public partial class PlaceInfoCollection : EntityBaseCollection<PlaceInfo, PlaceInfoCollection>
 {
     /// <summary>
-    /// Represents the Place Info entity.
+    /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class.
     /// </summary>
-    public partial class PlaceInfo : EntityBase
-    {
-        private string? _name;
-        private string? _postCode;
-
-        /// <summary>
-        /// Gets or sets the Name.
-        /// </summary>
-        public string? Name { get => _name; set => SetValue(ref _name, value); }
-
-        /// <summary>
-        /// Gets or sets the Post Code.
-        /// </summary>
-        public string? PostCode { get => _postCode; set => SetValue(ref _postCode, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            yield return CreateProperty(nameof(Name), Name, v => Name = v);
-            yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
-        }
-    }
+    public PlaceInfoCollection() { }
 
     /// <summary>
-    /// Represents the <see cref="PlaceInfo"/> collection.
+    /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class with <paramref name="items"/> to add.
     /// </summary>
-    public partial class PlaceInfoCollection : EntityBaseCollection<PlaceInfo, PlaceInfoCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class.
-        /// </summary>
-        public PlaceInfoCollection() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlaceInfoCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public PlaceInfoCollection(IEnumerable<PlaceInfo> items) => AddRange(items);
-    }
+    /// <param name="items">The items to add.</param>
+    public PlaceInfoCollection(IEnumerable<PlaceInfo> items) => AddRange(items);
 }
 
 #pragma warning restore

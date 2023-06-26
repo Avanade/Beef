@@ -5,70 +5,69 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Entities
+namespace Beef.Demo.Business.Entities;
+
+/// <summary>
+/// Represents the <see cref="Person"/> detail entity.
+/// </summary>
+public partial class PersonDetail : Person
+{
+    private WorkHistoryCollection? _history;
+
+    /// <summary>
+    /// Gets or sets the History.
+    /// </summary>
+    public WorkHistoryCollection? History { get => _history; set => SetValue(ref _history, value); }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<IPropertyValue> GetPropertyValues()
+    {
+        foreach (var pv in base.GetPropertyValues())
+            yield return pv;
+
+        yield return CreateProperty(nameof(History), History, v => History = v);
+    }
+}
+
+/// <summary>
+/// Represents the <see cref="PersonDetail"/> collection.
+/// </summary>
+public partial class PersonDetailCollection : EntityBaseCollection<PersonDetail, PersonDetailCollection>
 {
     /// <summary>
-    /// Represents the <see cref="Person"/> detail entity.
+    /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class.
     /// </summary>
-    public partial class PersonDetail : Person
-    {
-        private WorkHistoryCollection? _history;
-
-        /// <summary>
-        /// Gets or sets the History.
-        /// </summary>
-        public WorkHistoryCollection? History { get => _history; set => SetValue(ref _history, value); }
-
-        /// <inheritdoc/>
-        protected override IEnumerable<IPropertyValue> GetPropertyValues()
-        {
-            foreach (var pv in base.GetPropertyValues())
-                yield return pv;
-
-            yield return CreateProperty(nameof(History), History, v => History = v);
-        }
-    }
+    public PersonDetailCollection() { }
 
     /// <summary>
-    /// Represents the <see cref="PersonDetail"/> collection.
+    /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with <paramref name="items"/> to add.
     /// </summary>
-    public partial class PersonDetailCollection : EntityBaseCollection<PersonDetail, PersonDetailCollection>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class.
-        /// </summary>
-        public PersonDetailCollection() { }
+    /// <param name="items">The items to add.</param>
+    public PersonDetailCollection(IEnumerable<PersonDetail> items) => AddRange(items);
+}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        public PersonDetailCollection(IEnumerable<PersonDetail> items) => AddRange(items);
-    }
-
+/// <summary>
+/// Represents the <see cref="PersonDetail"/> collection result.
+/// </summary>
+public class PersonDetailCollectionResult : EntityCollectionResult<PersonDetailCollection, PersonDetail, PersonDetailCollectionResult>
+{
     /// <summary>
-    /// Represents the <see cref="PersonDetail"/> collection result.
+    /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class.
     /// </summary>
-    public class PersonDetailCollectionResult : EntityCollectionResult<PersonDetailCollection, PersonDetail, PersonDetailCollectionResult>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class.
-        /// </summary>
-        public PersonDetailCollectionResult() { }
+    public PersonDetailCollectionResult() { }
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PersonDetailCollectionResult(PagingArgs? paging) : base(paging) { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public PersonDetailCollectionResult(PagingArgs? paging) : base(paging) { }
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
-        public PersonDetailCollectionResult(IEnumerable<PersonDetail> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The optional <see cref="PagingArgs"/>.</param>
+    public PersonDetailCollectionResult(IEnumerable<PersonDetail> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
 }
 
 #pragma warning restore

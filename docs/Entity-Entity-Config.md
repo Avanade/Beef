@@ -64,6 +64,7 @@ Property | Description
 `argumentName` | The overriding argument name.<br/>&dagger; Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
 `constType` | The Const .NET Type option. Valid options are: `int`, `long`, `Guid`, `string`.<br/>&dagger; The .NET Type to be used for the `const` values. Defaults to `string`.
 `isInitialOverride` | Indicates whether to override the `IInitial.IsInitial` property.<br/>&dagger; Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.
+`withResult` | Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).<br/>&dagger; Defaults to `CodeGeneration.WithResult`. This can be overridden within the Operation`(s).
 
 <br/>
 

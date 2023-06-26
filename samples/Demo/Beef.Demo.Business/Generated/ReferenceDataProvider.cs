@@ -5,39 +5,38 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business
+namespace Beef.Demo.Business;
+
+/// <summary>
+/// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
+/// </summary>
+public partial class ReferenceDataProvider : IReferenceDataProvider
 {
-    /// <summary>
-    /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
-    /// </summary>
-    public partial class ReferenceDataProvider : IReferenceDataProvider
-    {
-        private readonly IReferenceDataDataSvc _dataService;
+    private readonly IReferenceDataDataSvc _dataService;
         
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
-        public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ReferenceDataProviderCtor(); }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
+    /// </summary>
+    /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
+    public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = dataService.ThrowIfNull(); ReferenceDataProviderCtor(); }
 
-        partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
+    partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
 
-        /// <inheritdoc/>
-        public Type[] Types => new Type[] 
-        {
-            typeof(RefDataNamespace.Country),
-            typeof(RefDataNamespace.USState),
-            typeof(RefDataNamespace.Gender),
-            typeof(RefDataNamespace.EyeColor),
-            typeof(RefDataNamespace.PowerSource),
-            typeof(RefDataNamespace.Company),
-            typeof(RefDataNamespace.Status),
-            typeof(RefDataNamespace.CommunicationType)
-        };
+    /// <inheritdoc/>
+    public Type[] Types => new Type[] 
+    {
+        typeof(RefDataNamespace.Country),
+        typeof(RefDataNamespace.USState),
+        typeof(RefDataNamespace.Gender),
+        typeof(RefDataNamespace.EyeColor),
+        typeof(RefDataNamespace.PowerSource),
+        typeof(RefDataNamespace.Company),
+        typeof(RefDataNamespace.Status),
+        typeof(RefDataNamespace.CommunicationType)
+    };
 
-        /// <inheritdoc/>
-        public Task<IReferenceDataCollection> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);
-    }
+    /// <inheritdoc/>
+    public Task<Result<IReferenceDataCollection>> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);
 }
 
 #pragma warning restore

@@ -5,8 +5,8 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CoreEx.AspNetCore" Version="CoreExVersion" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Business\Company.AppName.Business.csproj" />
