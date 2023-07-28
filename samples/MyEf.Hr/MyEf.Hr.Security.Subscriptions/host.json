@@ -8,18 +8,12 @@
       }
     },
     "logLevel": {
-      "CoreEx.Azure.ServiceBus.ServiceBusSubscriber": "Information"
+      "default": "Warning",
+      "CoreEx": "Information"
     }
   },
   "extensions": {
     "serviceBus": {
-      "clientRetryOptions": {
-        "mode": "exponential",
-        "tryTimeout": "00:01:00",
-        "delay": "00:00:00.80",
-        "maxDelay": "00:01:00",
-        "maxRetries": 3
-      },
       "prefetchCount": 0,
       "messageHandlerOptions": {
         "autoComplete": false,

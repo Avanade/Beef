@@ -29,21 +29,21 @@ public partial class EmployeeData : IEmployeeData
     public Task<Result<Employee?>> GetAsync(Guid id) => GetOnImplementationAsync(id);
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result<Employee>> CreateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go(value).ThenAsync(v => CreateOnImplementationAsync(v))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Created"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result<Employee>> UpdateAsync(Employee value) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go(value).ThenAsync(v => UpdateOnImplementationAsync(v))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Updated"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go().ThenAsync(() => _db.StoredProcedure("[Hr].[spEmployeeDelete]").DeleteWithResultAsync(DbMapper.Default, id))
                      .Then(() => _events.PublishValueEvent(new Employee { Id = id }, new Uri($"my/hr/employee/{id}", UriKind.Relative), $"My.Hr.Employee", "Deleted"));
@@ -54,7 +54,7 @@ public partial class EmployeeData : IEmployeeData
         => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go(value).ThenAsAsync(v => TerminateOnImplementationAsync(v, id))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/employee/{r.Id}", UriKind.Relative), $"My.Hr.Employee", "Terminated"));

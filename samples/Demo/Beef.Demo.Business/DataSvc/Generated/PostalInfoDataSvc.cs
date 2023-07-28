@@ -29,21 +29,21 @@ public partial class PostalInfoDataSvc : IPostalInfoDataSvc
     public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => _data.GetPostCodesAsync(country, state, city);
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.CreatePostCodesAsync(value, country, state, city))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Create"));
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.UpdatePostCodesAsync(value, country, state, city))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Update"));
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.DeletePostCodesAsync(country, state, city))
                      .Then(() => _events.PublishValueEvent(new { Country = country, State = state, City = city }, new Uri($"/postalinfo/", UriKind.Relative), $"Demo.PostalInfo", "Delete"));

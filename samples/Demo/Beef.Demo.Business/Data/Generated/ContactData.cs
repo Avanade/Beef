@@ -35,7 +35,7 @@ public partial class ContactData : IContactData
         => _ef.GetAsync<Contact, EfModel.Contact>(id);
 
     /// <inheritdoc/>
-    public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         var r = await _ef.CreateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
         _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Create");
@@ -43,7 +43,7 @@ public partial class ContactData : IContactData
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         var r = await _ef.UpdateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
         _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Update");
@@ -51,14 +51,14 @@ public partial class ContactData : IContactData
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await _ef.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
         _events.PublishValueEvent(new Contact { Id = id }, new Uri($"/contact/{id}", UriKind.Relative), $"Demo.Contact", "Delete");
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task RaiseEventAsync(bool throwError) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task RaiseEventAsync(bool throwError) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await RaiseEventOnImplementationAsync(throwError);
     }, new InvokerArgs { EventPublisher = _events });

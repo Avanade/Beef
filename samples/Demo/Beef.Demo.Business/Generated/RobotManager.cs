@@ -28,7 +28,7 @@ public partial class RobotManager : IRobotManager
     partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Robot?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .Then(() => Cleaner.CleanUp(id))
@@ -36,7 +36,7 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required()
                      .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
@@ -46,7 +46,7 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .Then(v => Cleaner.CleanUp(v))
@@ -55,7 +55,7 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .Then(() => Cleaner.CleanUp(id))
@@ -63,7 +63,7 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Delete);
 
     /// <inheritdoc/>
-    public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
                      .Then(() => Cleaner.CleanUp(args))
@@ -72,7 +72,7 @@ public partial class RobotManager : IRobotManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
                      .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));

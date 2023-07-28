@@ -32,21 +32,21 @@ public partial class PerformanceReviewData : IPerformanceReviewData
         => _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go(value).ThenAsync(v => _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(v))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/performancereview/{r.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Created"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go(value).ThenAsync(v => _ef.UpdateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(v))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"my/hr/performancereview/{r.Id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Updated"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, _ => 
+    public Task<Result> DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, (_, __) => 
     {
         return Result.Go().ThenAsync(() => _ef.DeleteWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id))
                      .Then(() => _events.PublishValueEvent(new PerformanceReview { Id = id }, new Uri($"my/hr/performancereview/{id}", UriKind.Relative), $"My.Hr.PerformanceReview", "Deleted"));

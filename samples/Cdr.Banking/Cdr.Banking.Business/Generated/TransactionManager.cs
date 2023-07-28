@@ -21,7 +21,7 @@ public partial class TransactionManager : ITransactionManager
     partial void TransactionManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(accountId)
                      .ValidateAsync(() => MultiValidator.Create()

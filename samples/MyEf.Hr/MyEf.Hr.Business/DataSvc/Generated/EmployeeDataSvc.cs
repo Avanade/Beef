@@ -28,7 +28,7 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     public Task<Result<Employee?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> CreateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Employee>> CreateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Created"))
@@ -36,7 +36,7 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> UpdateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Employee>> UpdateAsync(Employee value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Updated"))
@@ -44,7 +44,7 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.Go(_cache.Remove<Employee>(id))
                      .ThenAsAsync(_ => _data.DeleteAsync(id))
@@ -55,7 +55,7 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => _data.GetByArgsAsync(args, paging);
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.TerminateAsync(value, id))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Terminated"))

@@ -31,15 +31,15 @@ public partial class ReferenceDataData : IReferenceDataData
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CountryCollection>> CountryGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadWithResultAsync("CountryId"), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => _db.ReferenceData<RefDataNamespace.CountryCollection, RefDataNamespace.Country, Guid>("[Ref].[spCountryGetAll]").LoadWithResultAsync("CountryId"), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.USStateCollection>> USStateGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadWithResultAsync("USStateId"), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => _db.ReferenceData<RefDataNamespace.USStateCollection, RefDataNamespace.USState, Guid>("[Ref].[spUSStateGetAll]").LoadWithResultAsync("USStateId"), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => 
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => 
         {
             return _db.ReferenceData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender, Guid>("[Ref].[spGenderGetAll]").LoadWithResultAsync("GenderId", additionalProperties: (dr, item) =>
             {
@@ -51,23 +51,23 @@ public partial class ReferenceDataData : IReferenceDataData
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryWithResultAsync<RefDataNamespace.EyeColorCollection>(ct), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => _ef.Query<RefDataNamespace.EyeColor, EfModel.EyeColor>().SelectQueryWithResultAsync<RefDataNamespace.EyeColorCollection>(ct), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.PowerSourceCollection>(ct));
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => _cosmos.ValueContainer<RefDataNamespace.PowerSource, Model.PowerSource>("RefData").Query().SelectQueryWithResultAsync<RefDataNamespace.PowerSourceCollection>(ct));
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => CompanyGetAll_OnImplementationAsync());
+        => DataInvoker.Current.InvokeAsync(this, (_, __) => CompanyGetAll_OnImplementationAsync());
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.StatusCollection>> StatusGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, ct => _ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryWithResultAsync<RefDataNamespace.StatusCollection>(ct), InvokerArgs.TransactionSuppress);
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => _ef.Query<RefDataNamespace.Status, EfModel.Status>().SelectQueryWithResultAsync<RefDataNamespace.StatusCollection>(ct), InvokerArgs.TransactionSuppress);
 
     /// <inheritdoc/>
     public Task<Result<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync()
-        => DataInvoker.Current.InvokeAsync(this, _ => CommunicationTypeGetAll_OnImplementationAsync());
+        => DataInvoker.Current.InvokeAsync(this, (_, __) => CommunicationTypeGetAll_OnImplementationAsync());
 
     /// <summary>
     /// Provides the <see cref="RefDataNamespace.EyeColor"/> to Entity Framework <see cref="EfModel.EyeColor"/> mapping.
