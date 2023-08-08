@@ -31,7 +31,7 @@ public partial class PerformanceReviewDataSvc : IPerformanceReviewDataSvc
     public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => _data.GetByEmployeeIdAsync(employeeId, paging);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Created"))
@@ -39,7 +39,7 @@ public partial class PerformanceReviewDataSvc : IPerformanceReviewDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/performancereview/{r.Id}", UriKind.Relative), $"MyEf.Hr.PerformanceReview", "Updated"))
@@ -47,7 +47,7 @@ public partial class PerformanceReviewDataSvc : IPerformanceReviewDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.Go(_cache.Remove<PerformanceReview>(id))
                      .ThenAsAsync(_ => _data.DeleteAsync(id))

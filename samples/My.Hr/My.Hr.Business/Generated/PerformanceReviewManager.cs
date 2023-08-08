@@ -21,21 +21,21 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     partial void PerformanceReviewManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PerformanceReview?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .ThenAsAsync(() => _dataService.GetAsync(id));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
                      .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Then(v => v.EmployeeId = employeeId)
                      .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
@@ -43,7 +43,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
@@ -51,7 +51,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .ThenAsync(() => _dataService.DeleteAsync(id));

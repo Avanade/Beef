@@ -78,7 +78,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
   {{else}}
     /// <inheritdoc/>
   {{/if}}
-    {{set-value 'HasResultCode' false}}public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => ManagerInvoker.Current.InvokeAsync(this, {{#unless WithResult}}async {{/unless}}ct =>
+    {{set-value 'HasResultCode' false}}public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => ManagerInvoker.Current.InvokeAsync(this, {{#unless WithResult}}async {{/unless}}(_, ct) =>
     {
   {{#if WithResult}}
         return Result.Go{{#if HasValue}}(value){{#if ValueParameter.IsMandatory}}.Required(){{/if}}{{else}}(){{/if}}{{#each ValueLessMandatoryParameters}}.Requires({{ArgumentName}}){{/each}}{{#ifeq ManagerPassingParameters.Count 1}}{{#each ManagerPassingParameters}}.Then(v => v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}}){{/each}}{{/ifeq}}

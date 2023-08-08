@@ -21,14 +21,14 @@ public partial class EmployeeManager : IEmployeeManager
     partial void EmployeeManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<Employee?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Employee?>> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .ThenAsAsync(() => _dataService.GetAsync(id));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Employee>> CreateAsync(Employee value) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required()
                      .ValidateAsync(v => v.Entity().With<EmployeeValidator>(), cancellationToken: ct)
@@ -36,7 +36,7 @@ public partial class EmployeeManager : IEmployeeManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Employee>> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .ValidateAsync(v => v.Entity().With<EmployeeValidator>(), cancellationToken: ct)
@@ -44,7 +44,7 @@ public partial class EmployeeManager : IEmployeeManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result> DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(id)
                      .ValidatesAsync(id, v => v.Common(EmployeeValidator.CanDelete), cancellationToken: ct)
@@ -52,7 +52,7 @@ public partial class EmployeeManager : IEmployeeManager
     }, InvokerArgs.Delete);
 
     /// <inheritdoc/>
-    public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
                      .ValidatesAsync(args, v => v.Entity().With<EmployeeArgsValidator>(), cancellationToken: ct)
@@ -60,7 +60,7 @@ public partial class EmployeeManager : IEmployeeManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required()
                      .ValidateAsync(v => v.Entity().With<TerminationDetailValidator>(), cancellationToken: ct)

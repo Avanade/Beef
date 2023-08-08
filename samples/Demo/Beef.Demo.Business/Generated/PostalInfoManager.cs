@@ -24,7 +24,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     partial void PostalInfoManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))
@@ -33,7 +33,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
@@ -42,7 +42,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
@@ -51,7 +51,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))

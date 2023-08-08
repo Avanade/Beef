@@ -55,7 +55,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     partial void PersonDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Person> CreateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<Person> CreateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.CreateAsync(value).ConfigureAwait(false);
         await Invoker.InvokeAsync(_createOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
@@ -64,7 +64,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         _cache.Remove<Person>(id);
         await _data.DeleteAsync(id).ConfigureAwait(false);
@@ -87,7 +87,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public Task<Person> UpdateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<Person> UpdateAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.UpdateAsync(value).ConfigureAwait(false);
         _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
@@ -95,7 +95,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithRollbackAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<Person> UpdateWithRollbackAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.UpdateWithRollbackAsync(value).ConfigureAwait(false);
         await Invoker.InvokeAsync(_updateWithRollbackOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
@@ -136,7 +136,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public Task<Person> MergeAsync(Guid fromId, Guid toId) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<Person> MergeAsync(Guid fromId, Guid toId) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
         await Invoker.InvokeAsync(_mergeOnAfterAsync?.Invoke(r, fromId, toId)).ConfigureAwait(false);
@@ -148,7 +148,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task MarkAsync() => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task MarkAsync() => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         await _data.MarkAsync().ConfigureAwait(false);
         await Invoker.InvokeAsync(_markOnAfterAsync?.Invoke()).ConfigureAwait(false);
@@ -185,7 +185,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.UpdateDetailAsync(value).ConfigureAwait(false);
         await Invoker.InvokeAsync(_updateDetailOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
@@ -253,7 +253,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithEfAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task<Person> UpdateWithEfAsync(Person value) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         var r = await _data.UpdateWithEfAsync(value).ConfigureAwait(false);
         await Invoker.InvokeAsync(_updateWithEfOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
@@ -262,7 +262,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task DeleteWithEfAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async _ =>
+    public Task DeleteWithEfAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, async (_, __) =>
     {
         _cache.Remove<Person>(id);
         await _data.DeleteWithEfAsync(id).ConfigureAwait(false);

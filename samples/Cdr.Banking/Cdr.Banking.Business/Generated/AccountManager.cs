@@ -21,7 +21,7 @@ public partial class AccountManager : IAccountManager
     partial void AccountManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
                      .ValidatesAsync(args, v => v.Entity().With<AccountArgsValidator>(), cancellationToken: ct)
@@ -29,14 +29,14 @@ public partial class AccountManager : IAccountManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(accountId)
                      .ThenAsAsync(() => _dataService.GetDetailAsync(accountId));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, ct =>
+    public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(accountId)
                      .ThenAsAsync(() => _dataService.GetBalanceAsync(accountId));

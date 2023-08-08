@@ -160,7 +160,7 @@ public partial class PersonManager : IPersonManager
     partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> CreateAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
         Cleaner.CleanUp(value);
@@ -177,7 +177,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
@@ -192,7 +192,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Delete);
 
     /// <inheritdoc/>
-    public Task<Person?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await MultiValidator.Create()
@@ -203,7 +203,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person?> GetExAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> GetExAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
@@ -219,7 +219,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> UpdateAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
         Cleaner.CleanUp(value);
@@ -236,7 +236,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> UpdateWithRollbackAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
         Cleaner.CleanUp(value);
@@ -253,7 +253,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_getAllOnPreValidateAsync?.Invoke(paging)).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -267,7 +267,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonCollectionResult> GetAll2Async() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_getAll2OnPreValidateAsync?.Invoke()).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -281,7 +281,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
@@ -297,7 +297,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
@@ -313,7 +313,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person> MergeAsync(Guid fromId, Guid toId) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> MergeAsync(Guid fromId, Guid toId) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(fromId, toId);
         await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
@@ -330,7 +330,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task MarkAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_markOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -343,7 +343,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<MapCoordinates> MapAsync(MapArgs? args) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<MapCoordinates> MapAsync(MapArgs? args) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_mapOnPreValidateAsync?.Invoke(args)).ConfigureAwait(false);
@@ -358,7 +358,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> GetNoArgsAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_getNoArgsOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -372,7 +372,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<PersonDetail?> GetDetailAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonDetail?> GetDetailAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
@@ -388,7 +388,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
         Cleaner.CleanUp(value);
@@ -405,13 +405,13 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task AddAsync(Person person) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await AddOnImplementationAsync(person).ConfigureAwait(false);
     }, InvokerArgs.Unspecified);
 
     /// <inheritdoc/>
-    public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<int> DataSvcCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_dataSvcCustomOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -425,13 +425,13 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Unspecified);
 
     /// <inheritdoc/>
-    public Task<Person?> ManagerCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> ManagerCustomAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(name, names);
         await Invoker.InvokeAsync(_getNullOnPreValidateAsync?.Invoke(name, names)).ConfigureAwait(false);
@@ -446,7 +446,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Unspecified);
 
     /// <inheritdoc/>
-    public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> EventPublishNoSendAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(value.Required());
         await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
@@ -462,7 +462,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
@@ -478,7 +478,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task ThrowErrorAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await Invoker.InvokeAsync(_throwErrorOnPreValidateAsync?.Invoke()).ConfigureAwait(false);
         await MultiValidator.Create()
@@ -491,7 +491,7 @@ public partial class PersonManager : IPersonManager
     }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified });
 
     /// <inheritdoc/>
-    public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
@@ -506,7 +506,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Unspecified);
 
     /// <inheritdoc/>
-    public Task ParamCollAsync(AddressCollection? addresses) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task ParamCollAsync(AddressCollection? addresses) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(addresses);
         await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
@@ -521,7 +521,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Unspecified);
 
     /// <inheritdoc/>
-    public Task<Person?> GetWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person?> GetWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
@@ -537,7 +537,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> CreateWithEfAsync(Person value) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Person>().ConfigureAwait(false);
         Cleaner.CleanUp(value);
@@ -554,7 +554,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Person> UpdateWithEfAsync(Person value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
         Cleaner.CleanUp(value);
@@ -571,7 +571,7 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task DeleteWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task DeleteWithEfAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);

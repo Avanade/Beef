@@ -38,7 +38,7 @@ public partial class ReferenceDataData : IReferenceDataData
     /// <inheritdoc/>
     public Task<Result<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync({{#if Root.CancellatioToken}}CancellationToken cancellationToken = default{{/if}})
   {{#ifeq AutoImplement 'Database'}}
-        => DataInvoker.Current.InvokeAsync(this, ct => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id"), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => {{#ifeq CoreProperties.Count 0}}{{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id"), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});{{/ifeq}}
     {{#ifne CoreProperties.Count 0}}
         {
             return {{DatabaseDataParameter.PrivateName}}.ReferenceData<{{RefDataQualifiedEntityCollectionName}}, {{RefDataQualifiedEntityName}}, {{RefDataType}}>("{{RefDataFullyQualifiedStoredProcedureName}}").LoadWithResultAsync("{{Name}}Id", additionalProperties: (dr, item) =>
@@ -51,13 +51,13 @@ public partial class ReferenceDataData : IReferenceDataData
     {{/ifne}}
   {{/ifeq}}
   {{#ifeq AutoImplement 'EntityFramework'}}
-        => DataInvoker.Current.InvokeAsync(this, ct => {{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>(ct), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => {{EntityFrameworkDataParameter.PrivateName}}.Query<{{RefDataQualifiedEntityName}}, {{EntityFrameworkModel}}>().SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>(ct), InvokerArgs.TransactionSuppress{{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'Cosmos'}}
-        => DataInvoker.Current.InvokeAsync(this, ct => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>(ct){{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, (_, ct) => {{CosmosDataParameter.PrivateName}}.{{#if cosmosValueContainer}}Value{{/if}}Container<{{RefDataQualifiedEntityName}}, {{CosmosModel}}>("{{CosmosContainerId}}").Query({{#ifval CosmosPartitionKeyCode}}{{CosmosPartitionKeyCode}}{{/ifval}}).SelectQueryWithResultAsync<{{RefDataQualifiedEntityCollectionName}}>(ct){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
   {{#ifeq AutoImplement 'None'}}
-        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}ct{{else}}_{{/if}} => {{Name}}GetAll_OnImplementationAsync({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
+        => DataInvoker.Current.InvokeAsync(this, {{#if Root.CancellationToken}}(_, ct){{else}}(_, __){{/if}} => {{Name}}GetAll_OnImplementationAsync({{#if Root.CancellationToken}}ct{{/if}}){{#if Root.CancellationToken}}, cancellationToken{{/if}});
   {{/ifeq}}
 {{/each}}
 {{#each RefDataEntities}}

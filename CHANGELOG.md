@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.5.0
+- *Fixed:* Upgraded `CoreEx` to `v3.3.0` to include all related fixes and improvements related to distributed tracing. 
+- *Fixes:* Code-generation templates updated to support any breaking changes related to `InvokerBase`.
+
 ## v5.4.0
 - *Enhancement:* Upgraded `CoreEx` to `v3.0.0` which resulted in a number of breaking changed that will require manual remediation:
   - The `CoreEx.WebApis` capabilities have been moved to the new `CoreEx.AspNetCore.WebApis` namespace; within a new seperate project/package `CoreEx.AspNetCore`. This package will need to be referenced where required, and the namespace updated accordingly.

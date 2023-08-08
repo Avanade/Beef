@@ -31,7 +31,7 @@ public partial class RobotDataSvc : IRobotDataSvc
     public Task<Result<Robot?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Create"))
@@ -39,7 +39,7 @@ public partial class RobotDataSvc : IRobotDataSvc
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<Robot>> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Robot>> UpdateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"/robots/{r.Id}", UriKind.Relative), $"Demo.Robot", "Update"))
@@ -47,7 +47,7 @@ public partial class RobotDataSvc : IRobotDataSvc
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.Go(_cache.Remove<Robot>(id))
                      .ThenAsAsync(_ => _data.DeleteAsync(id))

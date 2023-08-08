@@ -24,27 +24,27 @@ public partial class ContactManager : IContactManager
     partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         return await _dataService.GetAllAsync().ConfigureAwait(false);
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
         return await _dataService.GetAsync(id).ConfigureAwait(false);
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await value.Validate().Mandatory().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
         return await _dataService.CreateAsync(value).ConfigureAwait(false);
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
-    public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
         await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
@@ -52,14 +52,14 @@ public partial class ContactManager : IContactManager
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
         await _dataService.DeleteAsync(id).ConfigureAwait(false);
     }, InvokerArgs.Delete);
 
     /// <inheritdoc/>
-    public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async ct =>
+    public Task RaiseEventAsync(bool throwError) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         await _dataService.RaiseEventAsync(throwError).ConfigureAwait(false);
     }, InvokerArgs.Unspecified);

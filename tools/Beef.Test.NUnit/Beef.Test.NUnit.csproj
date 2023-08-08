@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="UnitTestEx.NUnit" Version="3.0.0" />
-    <PackageReference Include="CoreEx" Version="3.0.0" />
+    <PackageReference Include="CoreEx" Version="3.3.0" />
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />

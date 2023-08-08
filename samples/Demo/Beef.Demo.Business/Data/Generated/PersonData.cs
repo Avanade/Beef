@@ -75,7 +75,7 @@ public partial class PersonData : IPersonData
     partial void PersonDataCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Person> CreateAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person> CreateAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_createOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonCreate]").CreateAsync(DbMapper.Default, value).ConfigureAwait(false);
@@ -84,7 +84,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _createOnException });
 
     /// <inheritdoc/>
-    public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_deleteOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
         await _db.StoredProcedure("[Demo].[spPersonDelete]").DeleteAsync(DbMapper.Default, id).ConfigureAwait(false);
@@ -96,7 +96,7 @@ public partial class PersonData : IPersonData
         => _db.StoredProcedure("[Demo].[spPersonGet]").GetAsync(DbMapper.Default, id);
 
     /// <inheritdoc/>
-    public Task<Person?> GetExAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person?> GetExAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getExOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonGetEx]").GetAsync(DbMapper.Default, id).ConfigureAwait(false);
@@ -109,7 +109,7 @@ public partial class PersonData : IPersonData
         => _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value);
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithRollbackAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person> UpdateWithRollbackAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_updateWithRollbackOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonUpdate]").UpdateAsync(DbMapper.Default, value).ConfigureAwait(false);
@@ -118,7 +118,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getAllOnBeforeAsync?.Invoke()).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAllOnQuery?.Invoke(p)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
@@ -127,7 +127,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _getAllOnException });
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetAll2Async() => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<PersonCollectionResult> GetAll2Async() => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getAll2OnBeforeAsync?.Invoke()).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonGetAll]").Query(DbMapper.Default, p => _getAll2OnQuery?.Invoke(p)).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
@@ -136,7 +136,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _getAll2OnException });
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getByArgsOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
         var r = await _db.StoredProcedure("[Demo].[spPersonGetByArgs]").Query(DbMapper.Default, p => _getByArgsOnQuery?.Invoke(p, args)).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
@@ -169,7 +169,7 @@ public partial class PersonData : IPersonData
     public Task<Person?> GetNullAsync(string? name, List<string>? names) => GetNullOnImplementationAsync(name, names);
 
     /// <inheritdoc/>
-    public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getByArgsWithEfOnBeforeAsync?.Invoke(args)).ConfigureAwait(false);
         var r = await _ef.Query<Person, EfModel.Person>(q => _getByArgsWithEfOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultAsync<PersonCollectionResult, PersonCollection>().ConfigureAwait(false);
@@ -184,7 +184,7 @@ public partial class PersonData : IPersonData
     public Task<string?> InvokeApiViaAgentAsync(Guid id) => InvokeApiViaAgentOnImplementationAsync(id);
 
     /// <inheritdoc/>
-    public Task<Person?> GetWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person?> GetWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_getWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
         var r = await _ef.GetAsync<Person, EfModel.Person>(id).ConfigureAwait(false);
@@ -193,7 +193,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _getWithEfOnException });
 
     /// <inheritdoc/>
-    public Task<Person> CreateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person> CreateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_createWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
         var r = await _ef.CreateAsync<Person, EfModel.Person>(value).ConfigureAwait(false);
@@ -202,7 +202,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _createWithEfOnException });
 
     /// <inheritdoc/>
-    public Task<Person> UpdateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task<Person> UpdateWithEfAsync(Person value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_updateWithEfOnBeforeAsync?.Invoke(value)).ConfigureAwait(false);
         var r = await _ef.UpdateAsync<Person, EfModel.Person>(value).ConfigureAwait(false);
@@ -211,7 +211,7 @@ public partial class PersonData : IPersonData
     }, new InvokerArgs { ExceptionHandler = _updateWithEfOnException });
 
     /// <inheritdoc/>
-    public Task DeleteWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async _ => 
+    public Task DeleteWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
         await Invoker.InvokeAsync(_deleteWithEfOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
         await _ef.DeleteAsync<Person, EfModel.Person>(id).ConfigureAwait(false);

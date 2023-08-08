@@ -31,7 +31,7 @@ public partial class GenderDataSvc : IGenderDataSvc
     public Task<Result<Gender?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
 
     /// <inheritdoc/>
-    public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Gender>> CreateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
@@ -39,7 +39,7 @@ public partial class GenderDataSvc : IGenderDataSvc
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, _ =>
+    public Task<Result<Gender>> UpdateAsync(Gender value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
