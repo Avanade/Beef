@@ -12,9 +12,11 @@ public class AppNameDb : SqlServerDatabase
     /// <param name="create">The factory to create the <see cref="SqlConnection"/>.</param>
     /// <param name="logger">The optional <see cref="ILogger"/>.</param>
     public AppNameDb(Func<SqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
+#if (implement_database)
 
     /// <inheritdoc/>
     protected override Task OnConnectionOpenAsync(DbConnection connection, CancellationToken cancellationToken) => SetSqlSessionContextAsync(cancellationToken: cancellationToken);
+#endif
 }
 #endif
 #if (implement_mysql)
