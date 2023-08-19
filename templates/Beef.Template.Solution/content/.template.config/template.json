@@ -73,7 +73,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.0.0"
+        "value": "3.1.0"
       },
       "replaces": "UnitTestExVersion"
     },
@@ -81,7 +81,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.5.0"
+        "value": "5.5.1"
       },
       "replaces": "BeefVersion"
     },
