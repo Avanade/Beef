@@ -22,6 +22,11 @@ namespace Beef.Test.NUnit
         public void Dispose() => _parent.Dispose();
 
         /// <summary>
+        /// Gets the parent (owning) <see cref="ApiTester{TEntryPoint}"/>.
+        /// </summary>
+        public ApiTester<TEntryPoint> Parent => _parent;
+
+        /// <summary>
         /// Enables an agent (<see cref="CoreEx.Http.TypedHttpClientBase"/>) to be used to send a <see cref="HttpRequestMessage"/> to the underlying <see cref="TestServer"/>.
         /// </summary>
         /// <typeparam name="TAgent">The <see cref="CoreEx.Http.TypedHttpClientBase"/> <see cref="Type"/>.</typeparam>

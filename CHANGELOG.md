@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v5.5.1
+- *Fixed:* Updated `DbEx` (`v2.3.8`) and `OnRamp` (`v1.0.8`).
+- *Fixed:* Updated `UnitTestEx` (`3.1.0`):
+  - The `ApiTester.SetUp.ExpectedEventsEnabled = true` should be replaced with `ApiTester.UseExpectedEvents()` where an event error occurs during test execution.
+  - Value-based test expectations are updated to support explicit JSON paths, as a result some new errors may be reported (previously ignored in error) - note that JSON paths for arrays should not include the index.
+
 ## v5.5.0
 - *Fixed:* Upgraded `CoreEx` to `v3.3.0` to include all related fixes and improvements related to distributed tracing. 
 - *Fixed:* Code-generation templates updated to support any breaking changes related to `InvokerBase`.

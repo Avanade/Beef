@@ -4,7 +4,6 @@ using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using CoreEx.Abstractions;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Net;
@@ -17,6 +16,12 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class PostalInfoTest : UsingAgentTesterServer<Startup>
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            ApiTester.UseExpectedEvents();
+        }
+
         [Test, TestSetUp]
         public void B110_GetPostCodes_NotFound()
         {

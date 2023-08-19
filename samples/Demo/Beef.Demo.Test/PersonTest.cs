@@ -29,7 +29,7 @@ namespace Beef.Demo.Test
         public void OneTimeSetUp()
         {
             Assert.IsTrue(ApiTester.SetUp.SetUp());
-            ApiTester.SetUp.ExpectedEventsEnabled = true;
+            ApiTester.UseExpectedEvents();
         }
 
         #region Validators
@@ -782,10 +782,12 @@ namespace Beef.Demo.Test
             var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped<ISystemTime>(_ => SystemTime.CreateFixed(st)));
 
             using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+            agentTester.Parent.UseExpectedEvents();
 
             // Get an existing person.
             var p = agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             p.FirstName += "X";
@@ -796,6 +798,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogUpdated("*", st)  // Should be 31-12-1999!
                 .ExpectETag(p.ETag)
                 .ExpectValue((t) => p)
+                .ExpectEvents()
                 .Run(a => a.UpdateAsync(p, 1.ToGuid())).Value;
         }
 

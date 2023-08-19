@@ -190,7 +190,7 @@ public class PersonTest : UsingApiTester<Startup>
         var r = Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }))
-            .AssertJsonFromResource("A270_GetByArgs_RefDataText-Response.json", "etag", "changeLog");
+            .AssertJsonFromResource("A280_GetByArgs_RefDataText-Response.json", "etag", "changeLog");
     }
 
     #endregion
@@ -221,11 +221,15 @@ public class PersonTest : UsingApiTester<Startup>
         // Check the value was created properly.
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (implement_mysql)
+            .ExpectValue(_ => v, "changeLog")
+#else
             .ExpectValue(_ => v)
+#endif
             .Run(a => a.GetAsync(v.Id));
     }
 
-    #endregion
+#endregion
 
     #region Update
 
@@ -310,7 +314,11 @@ public class PersonTest : UsingApiTester<Startup>
         // Check the value was updated properly.
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (implement_mysql)
+            .ExpectValue(_ => v, "changeLog")
+#else
             .ExpectValue(_ => v)
+#endif
             .Run(a => a.GetAsync(id));
     }
 
@@ -397,11 +405,15 @@ public class PersonTest : UsingApiTester<Startup>
         // Check the value was updated properly.
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.OK)
+#if (implement_mysql)
+            .ExpectValue(_ => v, "changeLog")
+#else
             .ExpectValue(_ => v)
+#endif
             .Run(a => a.GetAsync(id));
     }
 
-    #endregion
+#endregion
 
     #region Delete
 

@@ -251,8 +251,8 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectChangeLogCreated()
             .ExpectETag()
             .ExpectIdentifier()
-            .ExpectValue(_ => v)
-            .ExpectEventValue(v, "myef.hr.employee", "created", "Id", "ETag", "ChangeLog")
+            .ExpectValue(_ => v, "emergencyContacts.id")
+            .ExpectEventValue(v, "myef.hr.employee", "created", "value.id", "value.etag", "value.changeLog", "value.emergencyContacts.id")
             .Run(a => a.CreateAsync(v)).Value!;
 
         // Check the value was created properly.
@@ -343,7 +343,7 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectChangeLogUpdated()
             .ExpectETag(v.ETag)
             .ExpectIdentifier()
-            .ExpectValue(_ => v)
+            .ExpectValue(_ => v, "emergencyContacts.id")
             .ExpectEvent($"myef.hr.employee", "updated")
             .Run(a => a.UpdateAsync(v, id)).Value!;
 

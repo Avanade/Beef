@@ -24,7 +24,7 @@ namespace Beef.Demo.Test
         public void OneTimeSetUp()
         {
             ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-            ApiTester.SetUp.ExpectedEventsEnabled = true;
+            ApiTester.UseExpectedEvents();
             Assert.IsTrue(ApiTester.SetUp.SetUp());
 
             _genders = Agent<ReferenceDataAgent, GenderCollection>()
