@@ -356,7 +356,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the path (directory) for the CDC-related (.NET) artefacts.
         /// </summary>
-        [JsonProperty("PathCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("pathCdcPublisher", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
         public string? PathCdcPublisher { get; set; }

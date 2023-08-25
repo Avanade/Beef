@@ -395,7 +395,7 @@ tables:
         public IColumnConfig? ColumnDeletedDate => GetSpecialColumn(ColumnNameDeletedDate);
 
         /// <summary>
-        /// Gets the named special colum.
+        /// Gets the named special column.
         /// </summary>
         private TableColumnConfig? GetSpecialColumn(string? name) => Columns?.Where(x => x.Name == name && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
 
