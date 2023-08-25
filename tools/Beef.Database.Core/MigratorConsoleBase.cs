@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
+using DbEx;
 using McMaster.Extensions.CommandLineUtils;
+using OnRamp;
 using OnRamp.Console;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
 
 namespace Beef.Database
 {
@@ -80,6 +83,19 @@ namespace Beef.Database
                 Args.OutputDirectory = Args.MigrationCommand == DbEx.MigrationCommand.Script
                     ? new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory())
                     : new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
+
+            if (Args.MigrationCommand.HasFlag(MigrationCommand.CodeGen))
+            {
+                var p0 = Args.GetParameter<string>("Param0");
+                if (p0 is not null)
+                {
+                    if (!p0.Equals("yaml", System.StringComparison.InvariantCultureIgnoreCase))
+                        throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command optionally supports a corresponding 'YAML' argument value only; '{p0}' is not supported.");
+
+                    if (Args.MigrationCommand != MigrationCommand.CodeGen)
+                        throw new CodeGenException($"Code-generation for entity 'YAML' can only be used with the explicit usage of the '{nameof(MigrationCommand.CodeGen)}' command; '{Args.MigrationCommand}' is not supported.");
+                }
+            }
 
             return ValidationResult.Success;
         }

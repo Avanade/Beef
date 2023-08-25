@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="CoreEx.Database" Version="3.3.0" />
-    <PackageReference Include="DbEx" Version="2.3.8" />
+    <PackageReference Include="DbEx" Version="2.3.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
+    <None Remove="templates\Entity_yaml.hbs" />
   </ItemGroup>
 
   <ItemGroup>
