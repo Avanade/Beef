@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.2.10
+- *Fixed:* Upgraded internal `CoreEx.Newtonsoft` and `UnitTestEx.NUnit` internal (and related) references. Needed to support `Beef.Database.Core` version `4.2.8` and `Beef.CodeGen.Core` version `4.2.21`.
+
 ## v4.2.9
 - Updated internal `CoreEx.Newtonsoft` and `UnitTestEx.NUnit` internal references. This resulted in the need to remove `int.ToGuid()` and `string.ToLongString()` extension methods from _Beef_ as these are duplicated within `UnitTestEx`; a compile error will occur if there is no `using System;` namespace statement in the code file, this is now required to reference correctly.
 
