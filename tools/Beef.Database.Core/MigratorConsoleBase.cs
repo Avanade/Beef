@@ -8,7 +8,6 @@ using OnRamp.Console;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Threading;
 
 namespace Beef.Database
 {
@@ -90,10 +89,10 @@ namespace Beef.Database
                 if (p0 is not null)
                 {
                     if (!p0.Equals("yaml", System.StringComparison.InvariantCultureIgnoreCase))
-                        throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command optionally supports a corresponding 'YAML' argument value only; '{p0}' is not supported.");
+                        return new ValidationResult($"A '{nameof(MigrationCommand.CodeGen)}' command optionally supports a corresponding 'YAML' argument value only; '{p0}' is not supported.");
 
                     if (Args.MigrationCommand != MigrationCommand.CodeGen)
-                        throw new CodeGenException($"Code-generation for entity 'YAML' can only be used with the explicit usage of the '{nameof(MigrationCommand.CodeGen)}' command; '{Args.MigrationCommand}' is not supported.");
+                        return new ValidationResult($"Code-generation for entity 'yaml' can only be used with the explicit usage of the '{nameof(MigrationCommand.CodeGen)}' command; '{Args.MigrationCommand}' is not supported.");
                 }
             }
 

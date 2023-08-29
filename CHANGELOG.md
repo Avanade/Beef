@@ -3,7 +3,8 @@
 Represents the **NuGet** versions.
 
 ## v5.6.0
-- *Enhancement:* The database code-generation now supports a `yaml` sub-command that will generate the basic _Beef_ entity yaml from the inferred database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. The developer is then responsible for the copy+paste of the required yaml into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. This enhancement by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities.
+- *Enhancement:* The Database code-generation now supports a `yaml` sub-command that will generate the basic _Beef_ Entity YAML by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. The developer is then responsible for the copy+paste of the required yaml into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. This enhancement by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities.
+- *Fixed:* The `excludeData: RequiresMapper` no longer needs to be explicitly set as this is now inferred from the usage of an `autoImplement` for the `entity` YAML configuration.
 
 ## v5.5.1
 - *Fixed:* Updated `DbEx` (`v2.3.8`) and `OnRamp` (`v1.0.8`).

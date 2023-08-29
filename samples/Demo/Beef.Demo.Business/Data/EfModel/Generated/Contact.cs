@@ -55,7 +55,7 @@ public partial class Contact : ILogicallyDeleted
             entity.Property(p => p.FirstName).HasColumnName("FirstName").HasColumnType("NVARCHAR(50)");
             entity.Property(p => p.LastName).HasColumnName("LastName").HasColumnType("NVARCHAR(50)");
             entity.Property(p => p.StatusCode).HasColumnName("StatusCode").HasColumnType("NVARCHAR(50)");
-            entity.Property(p => p.Comms).HasColumnName("Comms").HasColumnType("NVARCHAR(18446744073709551615)");
+            entity.Property(p => p.Comms).HasColumnName("Comms").HasColumnType("NVARCHAR(MAX)");
             entity.Property(p => p.IsDeleted).HasColumnName("IsDeleted").HasColumnType("BIT");
             entity.HasQueryFilter(v => v.IsDeleted != true);
             AddToModel(entity);
