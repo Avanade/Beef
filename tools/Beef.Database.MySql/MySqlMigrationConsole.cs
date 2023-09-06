@@ -56,7 +56,7 @@ namespace Beef.Database.MySql
             new DbEx.MySql.Console.MySqlMigrationConsole(new DbEx.Migration.MigrationArgs { Logger = Logger }).WriteScriptHelp();
             Logger?.LogInformation("{help}", string.Empty);
             Logger?.LogInformation("{help}", "Extended CodeGen command and argument(s):");
-            Logger?.LogInformation("{help}", "  codegen yaml <Table> [<Table>...]   Creates a temporary Beef entity YAML file for the specified table(s).");
+            Logger?.LogInformation("{help}", "  codegen yaml <Table> [<Table>...]   Creates a temporary Beef entity code-gen YAML file for the specified table(s).");
             Logger?.LogInformation("{help}", "                                               - A table name with a prefix ! denotes that no CRUD operations are required.");
             Logger?.LogInformation("{help}", "                                               - A table name with a prefix * denotes that a 'GetByArgs' operation is required.");
             Logger?.LogInformation("{help}", string.Empty);

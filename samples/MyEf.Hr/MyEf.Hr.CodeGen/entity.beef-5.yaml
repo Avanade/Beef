@@ -51,7 +51,7 @@ entities:
 - { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, get: true, create: true, update: true, patch: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee, entityFrameworkMapperBase: EmployeeBaseData,
     properties: [
       { name: Id, text: '{{Employee}} identifier', type: Guid, primaryKey: true, inherited: true, databaseIgnore: true, entityFrameworkMapper: Ignore },
-      { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson, entityFrameworkMapper: Set },
+      { name: Address, type: Address, dataConverter: ObjectToJsonConverter<T>, dataName: AddressJson, entityFrameworkMapper: Set },
       { name: EmergencyContacts, type: EmergencyContactCollection, entityFrameworkMapper: Map },
       { name: ETag },
       { name: ChangeLog, type: ChangeLog }

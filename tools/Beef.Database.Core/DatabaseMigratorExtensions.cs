@@ -122,7 +122,7 @@ namespace Beef.Database
             }
 
             // Begin code-gen tasks.
-            migrator.Logger.LogInformation("{Content}", $"  Generating YAML for tables: {string.Join(", ", data.Tables.Select(x => x.QualifiedName))}");
+            migrator.Logger.LogInformation("{Content}", $"  Generating YAML for table(s): {string.Join(", ", data.Tables.Select(x => x.QualifiedName))}");
             using var sr = StreamLocator.GetTemplateStreamReader(templateFileName, migrator.AdjustArtefactResourceAssemblies(), StreamLocator.HandlebarsExtensions).StreamReader 
                 ?? throw new InvalidOperationException($"Embedded Template resource '{templateFileName}' is required and was not found within the selected assemblies.");
 
@@ -137,8 +137,8 @@ namespace Beef.Database
             migrator.Logger.LogInformation("{Content}", string.Empty);
             migrator.Logger.LogWarning("{Content}", $"Temporary entity file created: {fi.FullName}");
             migrator.Logger.LogInformation("{Content}", string.Empty);
-            migrator.Logger.LogInformation("{Content}", "Copy+paste generated contents into the respective 'entity.beef-5.yaml' and/or 'refdata.beef-5.yaml' files and amend accordingly.");
-            migrator.Logger.LogInformation("{Content}", $"Once complete, it is recommended that the '{tempFileName}' file is deleted as it otherwise not used.");
+            migrator.Logger.LogInformation("{Content}", "Copy and paste generated contents into their respective files and amend accordingly.");
+            migrator.Logger.LogInformation("{Content}", $"Once complete it is recommended that the '{tempFileName}' file is deleted, as it is otherwise not used.");
 
             return (true, string.Empty);
         }
@@ -196,6 +196,12 @@ namespace Beef.Database
             public bool IncludeCrud { get; set; }
 
             public bool IncludeGetByArgs { get; set; }
+
+            public bool IncludeOperation => IncludeCrud || IncludeGetByArgs;
+
+            public string MoustacheDotNetName => "{{" + DotNetName + "}}";
+
+            public bool IsPrimaryKeyAnIdentifier => PrimaryKeyColumns.Count == 1 && PrimaryKeyColumns[0].DotNetName.EndsWith(Config.IdColumnNameSuffix);
         }
     }
 }
