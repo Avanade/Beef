@@ -1424,7 +1424,7 @@ entities:
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
             ExcludeAll = DefaultWhereNull(ExcludeAll, () => Operations!.Count == 0);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
-            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? (AutoImplement == "None" ? "Exclude" : "RequiresMapper") : "Include");
+            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? (AutoImplement == "None" || RefDataType is not null ? "Exclude" : "RequiresMapper") : "Include");
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeIManager = DefaultWhereNull(ExcludeIManager, () => CompareValue(ExcludeAll, true));

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.1
+- *Fixed:* The previous `excludeData: RequiresMapper` fix inadventently resulted in errant mapper code for the reference data code-generation which has been corrected.
+
 ## v5.6.0
 - *Enhancement:* The database code-generation (`Beef.Database.*`) now supports a `yaml` sub-command that will generate the basic _Beef_ Entity YAML, and basic validation logic, by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. The developer is then responsible for the copy and paste of the required yaml and .NET code, into their respective artefacts and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced/used. This enhancement by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities. _Beef_ still enforces a separation between entity and model even where a one-to-one match. Finally, use `dotnet run -- --help` to see all command-line options/capabilities for this.
 - *Fixed:* The `excludeData: RequiresMapper` no longer needs to be explicitly set as this is now inferred from the usage of an `autoImplement` for the `entity` YAML configuration.
