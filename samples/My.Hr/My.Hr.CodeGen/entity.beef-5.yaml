@@ -53,7 +53,7 @@ entities:
 - { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, autoImplement: Database, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper,
     properties: [
       { name: Id, text: '{{Employee}} identifier', type: Guid, primaryKey: true, inherited: true, databaseIgnore: true },
-      { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson },
+      { name: Address, type: Address, dataConverter: ObjectToJsonConverter<T>, dataName: AddressJson },
       { name: EmergencyContacts, type: EmergencyContactCollection, databaseIgnore: true },
       { name: ETag },
       { name: ChangeLog, type: ChangeLog }

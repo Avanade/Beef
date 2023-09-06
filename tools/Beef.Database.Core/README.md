@@ -23,6 +23,30 @@ The respective code-generation _Templates_ are housed as embedded resources with
 
 <br/>
 
+### Generate corresponding entity configuration
+
+The database code-generation supports a `yaml` sub-command that will generate the basic  [entity code-generation](../Beef.CodeGen.Core/README.md) YAML configuration by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. Additionally, an initial C# validator will also be generated for each table.
+
+The developer is then responsible for the copy+paste of the required yaml into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. 
+
+This by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities.
+
+The following provides the help content for the `yaml` sub-command:
+
+```
+codegen yaml <Schema> <Table> [<Table>...]   Creates a temporary Beef entity YAML file for the specified table(s).
+                                             - A table name with a prefix ! denotes that no CRUD operations are required.
+                                             - A table name with a prefix @ denotes that a 'GetByArgs' operation is required.
+```
+
+An example is as follows:
+
+```
+dotnet run codegen yaml Hr Gender *Employee !EmergencyContact TerminationReason
+```
+
+<br/>
+
 ## Samples
 
 The [`My.Hr`](../../samples/My.Hr/My.Hr.Database) and [`MyEf.Hr`](../../samples/MyEf.Hr/MyEf.Hr.Database) samples demonstrate usage.

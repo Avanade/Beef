@@ -17,6 +17,32 @@ The following files were created when the solution was provisioned, these should
 
 <br/>
 
+## Generate corresponding entity configuration
+
+The previous database code-generation supports an additional `yaml` sub-command that will generate the basic entity YAML configuration by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. Additionally, an initial C# validator will also be generated for each table.
+
+The developer is then responsible for the copy+paste of the required yaml into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. 
+
+This helps accelerate the configuration of the entity YAML configuration, and is particularly useful when there are a large number of tables to be configured.
+
+_Note:_ This by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities.
+
+The following provides the help content for the `yaml` sub-command:
+
+```
+codegen yaml <Schema> <Table> [<Table>...]   Creates a temporary Beef entity YAML file for the specified table(s).
+                                             - A table name with a prefix ! denotes that no CRUD operations are required.
+                                             - A table name with a prefix @ denotes that a 'GetByArgs' operation is required.
+```
+
+An example of the database command usage is as follows:
+
+```
+dotnet run codegen yaml Hr Gender *Employee !EmergencyContact TerminationReason
+```
+
+<br/>
+
 ## Reference Data configuration
 
 The `refdata.beef-5.yaml` within `MyEf.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straightforward.

@@ -249,4 +249,4 @@ This should create migrations script files with names similar as follows (as wel
 
 At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite event outbox enqueue/dequeue capabilities. 
 
-Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.
+Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations
