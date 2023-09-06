@@ -143,8 +143,8 @@ entities:
   # - The Validator is specified, which is then used by both the Create and Update operations.
   # - The AutoImplement specifies that operations should be auto-implemented using EntityFramework unless explicitly overridden.
   # - The WebApiRoutePrefix is defined, which is in turn extended by each operation.
-  # - CRUD operations auto implemented via: get, create, update and patch option attributes.
-- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, get: true, create: true, update: true, patch: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee, entityFrameworkMapperBase: EmployeeBaseData,
+  # - CRUD operations auto implemented via: get, create, update and patch option attributes (auto-set).
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, crud: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee, entityFrameworkMapperBase: EmployeeBaseData,
     properties: [
       { name: Id, text: '{{Employee}} identifier', type: Guid, primaryKey: true, inherited: true, databaseIgnore: true, entityFrameworkMapper: Ignore },
       { name: Address, type: Address, dataConverter: 'ObjectToJsonConverter{T}', dataName: AddressJson, entityFrameworkMapper: Set },

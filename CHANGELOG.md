@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.2
+- *Fixed:* Added new `Entity.Crud` code-generation attribute which represents a shorthand for `Create`, `Get` (read), `Update` (includes `Patch`) and `Delete`.
+
 ## v5.6.1
 - *Fixed:* The previous `excludeData: RequiresMapper` fix inadventently resulted in errant mapper code for the reference data code-generation which has been corrected.
 

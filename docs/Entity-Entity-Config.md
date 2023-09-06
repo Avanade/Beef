@@ -121,6 +121,7 @@ Provides the _Operation_ configuration. These primarily provide a shorthand to c
 
 Property | Description
 -|-
+`crud` | Indicates that the key CRUD (`Create`, `Get` (read), `Update` (including `Patch`) and `Delete`) operations will be automatically generated where not otherwise explicitly specified.
 `get` | Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
 `getAll` | Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
 `create` | Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
