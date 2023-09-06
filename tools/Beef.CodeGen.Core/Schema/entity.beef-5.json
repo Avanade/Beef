@@ -472,6 +472,10 @@
           "title": "The base class that a 'CollectionResult' inherits from.",
           "description": "Defaults to 'EntityCollectionResult'."
         },
+        "crud": {
+          "type": "boolean",
+          "title": "Indicates that the key CRUD ('Create', 'Get' (read), 'Update' (including 'Patch') and 'Delete') operations will be automatically generated where not otherwise explicitly specified."
+        },
         "get": {
           "type": "boolean",
           "title": "Indicates that a 'Get' operation will be automatically generated where not otherwise explicitly specified."

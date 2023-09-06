@@ -273,6 +273,13 @@ entities:
         #region Operation
 
         /// <summary>
+        /// Indicates that the key CRUD operatiosn will be automatically generated where not otherwise explicitly specified.
+        /// </summary>
+        [JsonProperty("crud", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Operation", Title = "Indicates that the key CRUD (`Create`, `Get` (read), `Update` (including `Patch`) and `Delete`) operations will be automatically generated where not otherwise explicitly specified.")]
+        public bool? Crud { get; set; }
+
+        /// <summary>
         /// Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("get", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -1539,6 +1546,15 @@ entities:
         private async Task PrepareOperationsAsync()
         {
             Operations ??= new List<OperationConfig>();
+
+            if (CompareValue(Crud, true))
+            {
+                Create = DefaultWhereNull(Create, () => true);
+                Get = DefaultWhereNull(Get, () => true);
+                Update = DefaultWhereNull(Update, () => true);
+                Patch = DefaultWhereNull(Patch, () => true);
+                Delete = DefaultWhereNull(Delete, () => true);
+            }
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !Operations.Any(x => x.Name == "Delete"))
