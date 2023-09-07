@@ -31,7 +31,7 @@ namespace Beef.Demo.Common.Entities
         public string? TripCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the Country.
+        /// Gets or sets the Country code.
         /// </summary>
         public string? Country { get; set; }
     }

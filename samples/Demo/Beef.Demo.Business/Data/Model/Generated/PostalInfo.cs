@@ -13,7 +13,7 @@ namespace Beef.Demo.Business.Data.Model
     public partial class PostalInfo : IETag
     {
         /// <summary>
-        /// Gets or sets the Country.
+        /// Gets or sets the Country code.
         /// </summary>
         [JsonPropertyName("country abbreviation")]
         public string? Country { get; set; }

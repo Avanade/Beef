@@ -24,7 +24,7 @@ namespace Beef.Demo.Common.Entities
         public string? CountryText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Country.
+        /// Gets or sets the Country code.
         /// </summary>
         public string? Country { get; set; }
 

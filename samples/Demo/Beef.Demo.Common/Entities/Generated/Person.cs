@@ -45,7 +45,7 @@ namespace Beef.Demo.Common.Entities
         public string? GenderText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Gender.
+        /// Gets or sets the Gender code.
         /// </summary>
         public string? Gender { get; set; }
 
@@ -55,7 +55,7 @@ namespace Beef.Demo.Common.Entities
         public string? EyeColorText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Eye Color.
+        /// Gets or sets the Eye Color code.
         /// </summary>
         public string? EyeColor { get; set; }
 

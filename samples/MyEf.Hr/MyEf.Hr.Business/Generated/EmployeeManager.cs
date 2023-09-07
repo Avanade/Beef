@@ -62,7 +62,7 @@ public partial class EmployeeManager : IEmployeeManager
     /// <inheritdoc/>
     public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required()
+        return Result.Go(value).Required().Requires(id)
                      .ValidateAsync(v => v.Entity().With<TerminationDetailValidator>(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.TerminateAsync(value, id));
     }, InvokerArgs.Update);

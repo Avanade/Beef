@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Entities
         public string? StatusDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets the Status.
+        /// Gets or sets the Status code.
         /// </summary>
         public string? Status { get; set; }
 

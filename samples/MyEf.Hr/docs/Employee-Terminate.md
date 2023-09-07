@@ -34,7 +34,7 @@ The `Termination` operation needs to be added to the `Employee` entity configura
       # - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers.
       { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
         parameters: [
-          { name: Id, type: Guid, text: '{{Employee}} identifier' }
+          { name: Id, property: Id, isMandatory: true, text: '{{Employee}} identifier' }
         ]
       }
 ```

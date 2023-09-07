@@ -10,7 +10,7 @@ namespace Cdr.Banking.Business.Data.Model
     public partial class Account : IIdentifier<string>
     {
         /// <summary>
-        /// Gets or sets the Id.
+        /// Gets or sets the identifier.
         /// </summary>
         public string? Id { get; set; }
 

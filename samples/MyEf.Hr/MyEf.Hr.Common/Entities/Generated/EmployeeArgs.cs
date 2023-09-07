@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace MyEf.Hr.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Employee"/> search arguments entity.
+    /// Represents the <see cref="Employee"/> Arguments entity.
     /// </summary>
     public partial class EmployeeArgs
     {
@@ -26,7 +26,7 @@ namespace MyEf.Hr.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Genders.
+        /// Gets or sets the Genders code(s).
         /// </summary>
         public List<string?>? Genders { get; set; }
 

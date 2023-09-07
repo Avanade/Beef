@@ -704,7 +704,7 @@ properties: [
 
             DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
             RefDataGetValueType = DeclaredType;
-            ModelText = StringConverter.ToComments(DefaultWhereNull(ModelText, () => Text ?? StringConverter.ToSentenceCase(Name)));
+            ModelText = StringConverter.ToComments(DefaultWhereNull(ModelText, () => Text ?? (Name == "Id" && PrimaryKey == true ? "identifier" : (StringConverter.ToSentenceCase(Name) + (RefDataType is null ? null : " code") + (RefDataList.HasValue && RefDataList.Value ? "(s)" : "")))));
 
             Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
             {
@@ -717,6 +717,9 @@ properties: [
                 var ent = Root!.Entities?.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
                     return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Business.Entities." + Type)})";
+
+                if (Name == "Id" && PrimaryKey == true)
+                    return "{{" + Parent!.Name + "}} identifier";
 
                 return StringConverter.ToSentenceCase(Name);
             }));

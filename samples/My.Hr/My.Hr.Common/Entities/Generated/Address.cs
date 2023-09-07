@@ -36,7 +36,7 @@ namespace My.Hr.Common.Entities
         public string? StateText { get; set; }
 
         /// <summary>
-        /// Gets or sets the State.
+        /// Gets or sets the State code.
         /// </summary>
         public string? State { get; set; }
 

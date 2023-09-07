@@ -16,7 +16,7 @@ public partial class EmergencyContact : EntityBase, IIdentifier<Guid>
     private string? _relationshipSid;
 
     /// <summary>
-    /// Gets or sets the Id.
+    /// Gets or sets the <see cref="EmergencyContact"/> identifier.
     /// </summary>
     public Guid Id { get => _id; set => SetValue(ref _id, value); }
 

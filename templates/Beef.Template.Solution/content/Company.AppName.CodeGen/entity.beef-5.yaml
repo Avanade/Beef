@@ -8,9 +8,9 @@ refDataText: true
 databaseSchema: AppName
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
-- { name: Person, text: Person, collection: true, collectionResult: true, identifierGenerator: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Database,
+- { name: Person, collection: true, collectionResult: true, identifierGenerator: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, autoImplement: Database,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataName: PersonId },
+      { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender, dataName: GenderCode },
@@ -27,7 +27,7 @@ entities:
     ]
   }
 
-- { name: PersonArgs, text: '{{Person}} arguments',
+- { name: PersonArgs,
     properties: [
       { name: FirstName },
       { name: LastName },
@@ -47,13 +47,13 @@ etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a database using EntityFramework.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Person,
     properties: [
 //#if (implement_sqlserver)
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataName: PersonId },
+      { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
 //#endif
 //#if (implement_mysql)
-      { name: Id, text: '{{Person}} identifier', type: int, primaryKey: true, dataName: PersonId },
+      { name: Id, type: int, primaryKey: true, dataName: PersonId },
 //#endif
       { name: FirstName },
       { name: LastName },
@@ -71,7 +71,7 @@ entities:
     ]
   }
 
-- { name: PersonArgs, text: '{{Person}} arguments',
+- { name: PersonArgs,
     properties: [
       { name: FirstName },
       { name: LastName },
@@ -90,9 +90,9 @@ refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a Cosmos DB.
 
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, autoImplement: Cosmos, cosmosContainerId: Persons, cosmosModel: Model.Person,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, crud: true, autoImplement: Cosmos, cosmosContainerId: Persons, cosmosModel: Model.Person,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
+      { name: Id, type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -109,7 +109,7 @@ entities:
     ]
   }
 
-- { name: PersonArgs, text: '{{Person}} arguments',
+- { name: PersonArgs,
     properties: [
       { name: FirstName },
       { name: LastName },
@@ -127,9 +127,9 @@ httpAgentName: XxxAgent
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing an HTTP endpoint.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true, dataModel: true, autoImplement: HttpAgent, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, dataModel: true, autoImplement: HttpAgent, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },
+      { name: Id, type: Guid, primaryKey: true },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -148,9 +148,9 @@ webApiAutoLocation: true
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations with no auto implementation.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, get: true, create: true, update: true, patch: true, delete: true,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true,
     properties: [
-      { name: Id, text: '{{Person}} identifier', type: Guid, primaryKey: true },
+      { name: Id, type: Guid, primaryKey: true },
       { name: FirstName },
       { name: LastName },
       { name: Gender, type: ^Gender },
@@ -167,7 +167,7 @@ entities:
     ]
   }
 
-- { name: PersonArgs, text: '{{Person}} arguments',
+- { name: PersonArgs,
     properties: [
       { name: FirstName },
       { name: LastName },

@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Account"/> arguments entity.
+    /// Represents the <see cref="Transaction"/> Arguments entity.
     /// </summary>
     public partial class TransactionArgs
     {

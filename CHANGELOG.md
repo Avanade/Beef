@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.3
+- *Fixed:* Enhanced the default `Entity.Text` and `Property.Text` code-generation attributes where not specified to be more meaningful/descriptive.
+
 ## v5.6.2
 - *Fixed:* Added new `Entity.Crud` code-generation attribute which represents a shorthand for `Create`, `Get` (read), `Update` (includes `Patch`) and `Delete`.
 

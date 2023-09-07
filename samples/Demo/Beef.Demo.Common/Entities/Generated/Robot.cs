@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Entities
         public string? EyeColorText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Eye Color.
+        /// Gets or sets the Eye Color code.
         /// </summary>
         public string? EyeColor { get; set; }
 
@@ -49,7 +49,7 @@ namespace Beef.Demo.Common.Entities
         public string? PowerSourceText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Power Source.
+        /// Gets or sets the Power Source code.
         /// </summary>
         public string? PowerSource { get; set; }
 

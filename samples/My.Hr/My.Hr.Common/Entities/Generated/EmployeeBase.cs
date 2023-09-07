@@ -41,7 +41,7 @@ namespace My.Hr.Common.Entities
         public string? GenderText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Gender.
+        /// Gets or sets the Gender code.
         /// </summary>
         public string? Gender { get; set; }
 

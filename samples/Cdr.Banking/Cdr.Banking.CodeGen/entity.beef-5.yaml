@@ -10,7 +10,7 @@ entities:
       # Reference as accountId otherwise (ArgumentName and JsonName).
       # It is the PrimaryKey.
       # 
-      { name: Id, argumentName: accountId, jsonName: accountId, text: '{{Account}} identifier', primaryKey: true },
+      { name: Id, argumentName: accountId, jsonName: accountId, primaryKey: true },
       # Creation date should have no time associated; therefore, DateTimeTransform is set to DateOnly.
       # 
       { name: CreationDate, type: DateTime, dateTimeTransform: DateOnly },
@@ -164,7 +164,7 @@ entities:
   # Specifying the arguments for the Transaction.GetTransactions; note usage of the JsonName to override the default query string parameter names.
   # FromDate & ToDate are so named for C# access; however, they are referred to 'Oldest time' and 'Newest time' externally - DisplayName is used for corresponding error message text.
   # 
-- { name: TransactionArgs, text: '{{Account}} arguments',
+- { name: TransactionArgs,
     properties: [
       { name: FromDate, text: From (oldest time), displayName: Oldest time, jsonName: 'oldest-time', type: DateTime, nullable: true },
       { name: ToDate, text: To (newest time), displayName: Newest time, jsonName: 'newest-time', type: DateTime, nullable: true },

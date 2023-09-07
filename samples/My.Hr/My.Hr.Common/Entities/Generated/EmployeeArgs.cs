@@ -26,7 +26,7 @@ namespace My.Hr.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Genders.
+        /// Gets or sets the Genders code(s).
         /// </summary>
         public List<string?>? Genders { get; set; }
 
