@@ -16,7 +16,7 @@ namespace MyEf.Hr.Common.Entities
     public partial class EmergencyContact : IIdentifier<Guid>
     {
         /// <summary>
-        /// Gets or sets the Id.
+        /// Gets or sets the identifier.
         /// </summary>
         public Guid Id { get; set; }
 
@@ -41,7 +41,7 @@ namespace MyEf.Hr.Common.Entities
         public string? RelationshipText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Relationship.
+        /// Gets or sets the Relationship code.
         /// </summary>
         public string? Relationship { get; set; }
     }

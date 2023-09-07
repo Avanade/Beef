@@ -8,7 +8,7 @@
 namespace Beef.Demo.Business.Entities;
 
 /// <summary>
-/// Represents the Contact Comm entity.
+/// Represents the <see cref="Contact"/> Comm entity.
 /// </summary>
 public partial class ContactComm : EntityBase
 {

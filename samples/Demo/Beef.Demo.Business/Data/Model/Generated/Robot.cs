@@ -15,7 +15,7 @@ namespace Beef.Demo.Business.Data.Model
     public partial class Robot : IIdentifier<string>, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the Id.
+        /// Gets or sets the identifier.
         /// </summary>
         public string? Id { get; set; }
 

@@ -26,7 +26,7 @@ namespace MyEf.Hr.Common.Entities
         public string? ReasonText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Reason.
+        /// Gets or sets the Reason code.
         /// </summary>
         public string? Reason { get; set; }
     }

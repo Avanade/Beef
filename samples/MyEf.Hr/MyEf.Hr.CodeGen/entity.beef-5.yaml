@@ -50,7 +50,7 @@ entities:
   # - CRUD operations auto implemented via: get, create, update and patch option attributes (auto-set).
 - { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: employees, crud: true, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Employee, entityFrameworkMapperBase: EmployeeBaseData,
     properties: [
-      { name: Id, text: '{{Employee}} identifier', type: Guid, primaryKey: true, inherited: true, databaseIgnore: true, entityFrameworkMapper: Ignore },
+      { name: Id, type: Guid, primaryKey: true, inherited: true, databaseIgnore: true, entityFrameworkMapper: Ignore },
       { name: Address, type: Address, dataConverter: ObjectToJsonConverter<T>, dataName: AddressJson, entityFrameworkMapper: Set },
       { name: EmergencyContacts, type: EmergencyContactCollection, entityFrameworkMapper: Map },
       { name: ETag },
@@ -88,7 +88,7 @@ entities:
       # - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers.
       { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
         parameters: [
-          { name: Id, type: Guid, text: '{{Employee}} identifier' }
+          { name: Id, property: Id, isMandatory: true, text: '{{Employee}} identifier' }
         ]
       }
     ]
@@ -129,7 +129,7 @@ entities:
   # - Genders will support a list (none or more) reference data values.
   # - StartFrom, StartTo and IncludeTerminated are all Nullable so we can tell whether a value was provided or not.
   # - The IsIncludeTerminated overrides the JsonName to meet the stated requirement name of includeTerminated.
-- { name: EmployeeArgs, text: '{{Employee}} search arguments',
+- { name: EmployeeArgs,
     properties: [
       { name: FirstName },
       { name: LastName },

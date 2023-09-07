@@ -1355,7 +1355,14 @@ entities:
             if (!string.IsNullOrEmpty(RefDataType) && CompareValue(OmitEntityBase, true))
                 throw new CodeGenException(this, nameof(OmitEntityBase), $"An {nameof(OmitEntityBase)} is not allowed where a {nameof(RefDataType)} has been specified.");
 
-            Text = StringConverter.ToComments(DefaultWhereNull(Text, () => StringConverter.ToSentenceCase(Name)));
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
+            {
+                // Replace any 'Args' with 'Arguments'; where more than one word, and first word is an entity as well, then use that as the moustache entity name; i.e. 'PersonAddress' becomes '{{Person}} Address'.
+                var sc = StringConverter.ToSentenceCase(Name)!;
+                var words = sc.Split(' ').Select(x => x.Replace("Args", "Arguments")).ToArray();
+                return words.Length > 1 && Parent!.Entities!.Any(x => x.Name == words[0]) ? string.Join(" ", new string[] { "{{" + words[0] + "}}" }.Concat(words[1..])) : string.Join(" ", words);
+            }));
+
             FileName = DefaultWhereNull(FileName, () => Name);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));

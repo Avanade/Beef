@@ -31,7 +31,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo { get; set; }
 
         /// <summary>
-        /// Gets or sets the Power Sources.
+        /// Gets or sets the Power Sources code(s).
         /// </summary>
         [JsonPropertyName("power-sources")]
         public List<string?>? PowerSources { get; set; }

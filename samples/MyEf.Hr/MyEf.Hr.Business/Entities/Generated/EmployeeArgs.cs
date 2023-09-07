@@ -5,7 +5,7 @@
 namespace MyEf.Hr.Business.Entities;
 
 /// <summary>
-/// Represents the <see cref="Employee"/> search arguments entity.
+/// Represents the <see cref="Employee"/> Arguments entity.
 /// </summary>
 public partial class EmployeeArgs : EntityBase
 {

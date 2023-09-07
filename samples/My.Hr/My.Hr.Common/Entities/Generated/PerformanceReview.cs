@@ -36,7 +36,7 @@ namespace My.Hr.Common.Entities
         public string? OutcomeText { get; set; }
 
         /// <summary>
-        /// Gets or sets the Outcome.
+        /// Gets or sets the Outcome code.
         /// </summary>
         public string? Outcome { get; set; }
 

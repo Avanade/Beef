@@ -5,7 +5,7 @@
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Balance Purse model.
+    /// Represents the <see cref="Balance"/> Purse model.
     /// </summary>
     public partial class BalancePurse
     {
