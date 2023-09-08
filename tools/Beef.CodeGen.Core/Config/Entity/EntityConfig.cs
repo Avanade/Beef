@@ -273,7 +273,7 @@ entities:
         #region Operation
 
         /// <summary>
-        /// Indicates that the key CRUD operatiosn will be automatically generated where not otherwise explicitly specified.
+        /// Indicates that the key CRUD operations will be automatically generated where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("crud", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Operation", Title = "Indicates that the key CRUD (`Create`, `Get` (read), `Update` (including `Patch`) and `Delete`) operations will be automatically generated where not otherwise explicitly specified.")]
@@ -330,8 +330,9 @@ entities:
         /// </summary>
         [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
-            Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). " +
-                          "Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.")]
+            Description = "Defaults to `CodeGeneration.AutoImplement` (where `RefDataType` or `EntityFrameworkModel` or `CosmosModel` or `HttpAgent` is not null; otherwise, `None`. " 
+            + "Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). " 
+            + "Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.")]
         public string? AutoImplement { get; set; }
 
         /// <summary>
@@ -763,7 +764,8 @@ entities:
         /// </summary>
         [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
-            Description = "This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified.")]
+            Description = "This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified. " 
+            + "Where `RefDataType` is specified (indicating Reference Data entity) then this will automatically default to the pluralized `Name` (as lowercase).")]
         public string? WebApiRoutePrefix { get; set; }
 
         /// <summary>
@@ -1167,7 +1169,7 @@ entities:
         public List<OperationConfig>? WebApiAgentOperations => Operations!.Where(x => IsFalse(x.ExcludeWebApiAgent)).ToList();
 
         /// <summary>
-        /// Gets the WebApi Contructor parameters.
+        /// Gets the WebApi Constructor parameters.
         /// </summary>
         public List<ParameterConfig> WebApiCtorParameters { get; } = new List<ParameterConfig>();
 
@@ -1352,6 +1354,7 @@ entities:
         /// </summary>
         protected override async Task PrepareAsync()
         {
+            RefDataType = DefaultWhereNull(RefDataType, () => Parent!.RefDataType);
             if (!string.IsNullOrEmpty(RefDataType) && CompareValue(OmitEntityBase, true))
                 throw new CodeGenException(this, nameof(OmitEntityBase), $"An {nameof(OmitEntityBase)} is not allowed where a {nameof(RefDataType)} has been specified.");
 
@@ -1372,7 +1375,7 @@ entities:
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
             ImplementsAutoInfer = DefaultWhereNull(ImplementsAutoInfer, () => true);
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
-            AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
+            AutoImplement = DefaultWhereNull(AutoImplement, () => RefDataType is not null || EntityFrameworkModel is not null || CosmosModel is not null || ODataModel is not null || HttpAgentModel is not null ? Parent!.AutoImplement : "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
@@ -1399,6 +1402,10 @@ entities:
             RefDataIsActiveDataName = DefaultWhereNull(RefDataIsActiveDataName, () => Root!.RefDataIsActiveDataName);
             RefDataSortOrderDataName = DefaultWhereNull(RefDataSortOrderDataName, () => Root!.RefDataSortOrderDataName);
             RefDataETagDataName = DefaultWhereNull(RefDataETagDataName, () => Root!.RefDataETagDataName == "*" ? (AutoImplement == "EntityFramework" || AutoImplement == "Database" ? $"RowVersion" : "ETag") : Root!.RefDataETagDataName);
+            Collection = DefaultWhereNull(Collection, () => Parent!.RefDataType is not null);
+
+            if (RefDataType is not null)
+                WebApiRoutePrefix = DefaultWhereNull(WebApiRoutePrefix , () => StringConverter.ToPlural(Name).ToLowerInvariant());
 
             if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
@@ -1766,7 +1773,7 @@ entities:
                 await ctor.PrepareAsync(Root!, oc).ConfigureAwait(false);
             }
 
-            // WebAPI contstructors.
+            // WebAPI constructors.
             if (RequiresManager)
                 WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
 

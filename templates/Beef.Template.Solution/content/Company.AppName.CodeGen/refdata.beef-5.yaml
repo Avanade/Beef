@@ -1,29 +1,38 @@
 ﻿webapiRoutePrefix: ref
 //#if (implement_database)
+autoImplement: Database 
+refDataType: Guid
 databaseSchema: AppName
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures.
-  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: Database }
+  - { name: Gender }
 //#endif
 //#if (implement_sqlserver)
+refDataType: Guid
+autoImplement: EntityFramework
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
-  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+  - { name: Gender, entityFrameworkModel: EfModel.Gender }
 //#endif
 //#if (implement_mysql)
+refDataType: int
+autoImplement: EntityFramework
 etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
-  - { name: Gender, refDataType: int, Collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+  - { name: Gender, entityFrameworkModel: EfModel.Gender }
 //#endif
 //#if (implement_cosmos)
 cosmosName: ICosmos
+refDataType: Guid
+autoImplement: Cosmos
 entities:
   # The following is an example read-only reference data Entity accessing Cosmos DB.
-  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.Gender, dataModel: true }
+  - { name: Gender, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.Gender, dataModel: true }
 //#endif
 //#if (implement_httpagent)
+refDataType: Guid
 entities:
   # The following is an example read-only reference data Entity accessing data with no auto implementation.
-  - { name: Gender, refDataType: Guid, Collection: true, webApiRoutePrefix: genders }
+  - { name: Gender }
 //#endif

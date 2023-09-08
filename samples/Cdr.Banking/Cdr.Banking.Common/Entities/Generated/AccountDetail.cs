@@ -31,7 +31,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BundleName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Specific Account U Type.
+        /// Gets or sets the Specific Account U Type code.
         /// </summary>
         public string? SpecificAccountUType { get; set; }
 

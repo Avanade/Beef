@@ -1,10 +1,12 @@
 cosmosName: ICosmos
-refDataWebApiRoute: api/v1/ref
+webApiRoutePrefix: api/v1/ref
+refDataType: Guid
+autoImplement: Cosmos
 entities:
   #
   # Each of the requred reference data entities defined.
   # Use the same Cosmos Container given small volume which helps manage costs.
-- { name: OpenStatus, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/openStatuses, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.OpenStatus, constType: string, dataModel: true,
+- { name: OpenStatus, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.OpenStatus, constType: string, dataModel: true,
     consts: [
       #
       # Constant defined (generated within Entity) to avoid hard-coding of value within any corresponding business logic.
@@ -12,8 +14,8 @@ entities:
     ]
   }
 
-- { name: ProductCategory, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/productCategories, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.ProductCategory, dataModel: true }
-- { name: AccountUType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/accountUTypes, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.AccountUType, dataModel: true }
-- { name: MaturityInstructions, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/maturityInstructions, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.MaturityInstructions, dataModel: true }
-- { name: TransactionType, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/transactionTypes, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.TransactionType, dataModel: true }
-- { name: TransactionStatus, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/ref/transactionStatuses, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.TransactionStatus, dataModel: true }
+- { name: ProductCategory, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.ProductCategory, dataModel: true }
+- { name: AccountUType, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.AccountUType, dataModel: true }
+- { name: MaturityInstructions, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.MaturityInstructions, dataModel: true }
+- { name: TransactionType, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.TransactionType, dataModel: true }
+- { name: TransactionStatus, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.TransactionStatus, dataModel: true }

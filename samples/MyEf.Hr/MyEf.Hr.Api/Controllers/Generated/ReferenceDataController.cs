@@ -41,7 +41,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
     [HttpGet()]
-    [Route("ref/terminationReasons")]
+    [Route("ref/terminationreasons")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> TerminationReasonGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TerminationReason>(codes, text, p.RequestOptions.IncludeInactive));
@@ -53,7 +53,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
     [HttpGet()]
-    [Route("ref/relationshipTypes")]
+    [Route("ref/relationshiptypes")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> RelationshipTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.RelationshipType>(codes, text, p.RequestOptions.IncludeInactive));
@@ -65,7 +65,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.USState collection.</returns>
     [HttpGet()]
-    [Route("ref/usStates")]
+    [Route("ref/usstates")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
@@ -77,7 +77,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
     [HttpGet()]
-    [Route("ref/performanceOutcomes")]
+    [Route("ref/performanceoutcomes")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> PerformanceOutcomeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PerformanceOutcome>(codes, text, p.RequestOptions.IncludeInactive));

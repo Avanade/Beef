@@ -88,6 +88,14 @@ entities:
         public bool? RefDataText { get; set; }
 
         /// <summary>
+        /// Gets or sets the Reference Data identifier Type option.
+        /// </summary>
+        [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
+            Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier. Results in all underlying entities becoming Reference Data.")]
+        public string? RefDataType { get; set; }
+
+        /// <summary>
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
         [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -198,6 +206,15 @@ entities:
         #endregion
 
         #region Data
+
+        /// <summary>
+        /// Gets or sets the data source auto-implementation option. 
+        /// </summary>
+        [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
+            Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). " +
+                          "Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.")]
+        public string? AutoImplement { get; set; }
 
         /// <summary>
         /// Gets or sets the default .NET database interface name used where `Operation.AutoImplement` is `Database`.
@@ -573,6 +590,7 @@ entities:
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             RefDataNamespace = DefaultWhereNull(RefDataNamespace, () => $"{Company}.{AppName}.Business.Entities");
             RefDataCommonNamespace = DefaultWhereNull(RefDataCommonNamespace, () => $"{Company}.{AppName}.Common.Entities");
+            AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DatabaseProvider = DefaultWhereNull(DatabaseProvider, () => "SqlServer");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => DatabaseProvider == "SqlServer" ? "dbo" : "");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");

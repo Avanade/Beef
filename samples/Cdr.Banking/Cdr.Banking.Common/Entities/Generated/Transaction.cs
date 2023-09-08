@@ -32,12 +32,12 @@ namespace Cdr.Banking.Common.Entities
         public bool IsDetailAvailable { get; set; }
 
         /// <summary>
-        /// Gets or sets the Type.
+        /// Gets or sets the Type code.
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the Status.
+        /// Gets or sets the Status code.
         /// </summary>
         public string? Status { get; set; }
 

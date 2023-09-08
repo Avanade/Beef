@@ -21,17 +21,18 @@ The following files were created when the solution was provisioned, these should
 
 The `refdata.beef-5.yaml` within `My.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straightforward.
 
-Each reference data entity is defined, by specifying the name, the Web API route prefix (i.e. its endpoint), that it is to be automatically implemented using Entity Framework, and the name of the corresponding Entity Framework model (which was previously generated from the database; see `My.Hr.Business/Data/EfModel/Generated` folder).
+Each reference data entity is defined, by specifying the name, the type (defaults from root specification), the Web API route prefix (i.e. its endpoint), that it is to be automatically implemented using Entity Framework, and the name of the corresponding Entity Framework model (which was previously generated from the database; see `My.Hr.Business/Data/EfModel/Generated` folder).
 
 Replace the existing YAML with the following.
 
 ``` yaml
 webApiRoutePrefix: ref
+refDataType: Guid
 entities:
-- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
-- { name: TerminationReason, refDataType: Guid, collection: true, webApiRoutePrefix: terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
-- { name: RelationshipType, refDataType: Guid, collection: true, webApiRoutePrefix: relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
-- { name: USState, refDataType: Guid, collection: true, webApiRoutePrefix: usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
+- { name: Gender, webApiRoutePrefix: genders, autoImplement: EntityFramework, entityFrameworkModel: EfModel.Gender }
+- { name: TerminationReason, webApiRoutePrefix: terminationReasons, autoImplement: EntityFramework, entityFrameworkModel: EfModel.TerminationReason }
+- { name: RelationshipType, webApiRoutePrefix: relationshipTypes, autoImplement: EntityFramework, entityFrameworkModel: EfModel.RelationshipType }
+- { name: USState, webApiRoutePrefix: usStates, autoImplement: EntityFramework, entityFrameworkModel: EfModel.USState }
 ```
 
 <br/>
