@@ -29,7 +29,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.OpenStatus collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/openStatuses")]
+    [Route("api/v1/ref/openstatuses")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> OpenStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.OpenStatus>(codes, text, p.RequestOptions.IncludeInactive));
@@ -41,7 +41,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.ProductCategory collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/productCategories")]
+    [Route("api/v1/ref/productcategories")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> ProductCategoryGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.ProductCategory>(codes, text, p.RequestOptions.IncludeInactive));
@@ -53,7 +53,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.AccountUType collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/accountUTypes")]
+    [Route("api/v1/ref/accountutypes")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> AccountUTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.AccountUType>(codes, text, p.RequestOptions.IncludeInactive));
@@ -65,7 +65,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.MaturityInstructions collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/maturityInstructions")]
+    [Route("api/v1/ref/maturityinstructions")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> MaturityInstructionsGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.MaturityInstructions>(codes, text, p.RequestOptions.IncludeInactive));
@@ -77,7 +77,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.TransactionType collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/transactionTypes")]
+    [Route("api/v1/ref/transactiontypes")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> TransactionTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionType>(codes, text, p.RequestOptions.IncludeInactive));
@@ -89,7 +89,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.TransactionStatus collection.</returns>
     [HttpGet()]
-    [Route("api/v1/ref/transactionStatuses")]
+    [Route("api/v1/ref/transactionstatuses")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> TransactionStatusGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TransactionStatus>(codes, text, p.RequestOptions.IncludeInactive));

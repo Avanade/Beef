@@ -16,13 +16,13 @@ namespace Cdr.Banking.Common.Entities
     public partial class AccountArgs
     {
         /// <summary>
-        /// Gets or sets the Product Category.
+        /// Gets or sets the Product Category code.
         /// </summary>
         [JsonPropertyName("product-category")]
         public string? ProductCategory { get; set; }
 
         /// <summary>
-        /// Gets or sets the Open Status.
+        /// Gets or sets the Open Status code.
         /// </summary>
         [JsonPropertyName("open-status")]
         public string? OpenStatus { get; set; }

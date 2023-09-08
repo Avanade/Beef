@@ -37,7 +37,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Nickname { get; set; }
 
         /// <summary>
-        /// Gets or sets the Open Status.
+        /// Gets or sets the Open Status code.
         /// </summary>
         public string? OpenStatus { get; set; }
 
@@ -52,7 +52,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaskedNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the Product Category.
+        /// Gets or sets the Product Category code.
         /// </summary>
         public string? ProductCategory { get; set; }
 

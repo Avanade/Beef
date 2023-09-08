@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.4
+- *Fixed:* Enhanced the default `Entity.RefDataType` behaviour; will default to root `CodeGeneration.RefDataType` (new), where specified to simplify configuration. 
+- *Fixed:* Enhanced the default `Entity.Collection` behaviour; will default to `true,` where `RefDataType` is specified as this is required.
+- *Fixed:* Enhanced the default `Entity.AutoImplement` behaviour; will default to root `CodeGeneration.AutoImplement` (new), where specified to simplify configuration.
+- *Fixed:* Enhanced the default `Entity.WebApiRoutePrefix` behaviour; will default to `Entity.Name` pluralized and lowercase, where `RefDataType` is specified as this is required.
+
 ## v5.6.3
 - *Fixed:* Enhanced the default `Entity.Text` and `Property.Text` code-generation attributes where not specified to be more meaningful/descriptive.
 

@@ -42,7 +42,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.OpenStatusCollection>> OpenStatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.OpenStatusCollection>("api/v1/ref/openStatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.OpenStatusCollection>("api/v1/ref/openstatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.ProductCategory"/> items that match the filter arguments.
@@ -52,7 +52,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.ProductCategoryCollection>> ProductCategoryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.ProductCategoryCollection>("api/v1/ref/productCategories", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.ProductCategoryCollection>("api/v1/ref/productcategories", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.AccountUType"/> items that match the filter arguments.
@@ -62,7 +62,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.AccountUTypeCollection>> AccountUTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.AccountUTypeCollection>("api/v1/ref/accountUTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.AccountUTypeCollection>("api/v1/ref/accountutypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.MaturityInstructions"/> items that match the filter arguments.
@@ -72,7 +72,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.MaturityInstructionsCollection>("api/v1/ref/maturityInstructions", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.MaturityInstructionsCollection>("api/v1/ref/maturityinstructions", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.TransactionType"/> items that match the filter arguments.
@@ -82,7 +82,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.TransactionTypeCollection>> TransactionTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.TransactionTypeCollection>("api/v1/ref/transactionTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.TransactionTypeCollection>("api/v1/ref/transactiontypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.TransactionStatus"/> items that match the filter arguments.
@@ -92,7 +92,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         public Task<HttpResult<RefDataNamespace.TransactionStatusCollection>> TransactionStatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.TransactionStatusCollection>("api/v1/ref/transactionStatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+            GetAsync<RefDataNamespace.TransactionStatusCollection>("api/v1/ref/transactionstatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3

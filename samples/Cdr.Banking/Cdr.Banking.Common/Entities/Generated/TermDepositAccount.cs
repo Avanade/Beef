@@ -36,7 +36,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaturityCurrency { get; set; }
 
         /// <summary>
-        /// Gets or sets the Maturity Instructions.
+        /// Gets or sets the Maturity Instructions code.
         /// </summary>
         public string? MaturityInstructions { get; set; }
     }
