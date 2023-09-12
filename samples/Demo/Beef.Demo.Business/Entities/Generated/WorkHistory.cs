@@ -42,9 +42,9 @@ public partial class WorkHistory : EntityBase, IPrimaryKey
     /// <summary>
     /// Creates the primary <see cref="CompositeKey"/>.
     /// </summary>
-    /// <returns>The <see cref="CompositeKey"/>.</returns>
     /// <param name="name">The <see cref="Name"/>.</param>
-    public static CompositeKey CreatePrimaryKey(string? name) => new CompositeKey(name);
+    /// <returns>The <see cref="CompositeKey"/>.</returns>
+    public static CompositeKey CreatePrimaryKey(string? name) => CompositeKey.Create(name);
 
     /// <summary>
     /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Name"/>).

@@ -110,8 +110,8 @@ public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETa
     /// <summary>
     /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
     /// </summary>
-    /// <returns>The Partition Key.</returns>
     /// <param name="eyeColor">The <see cref="EyeColor"/>.</param>
+    /// <returns>The Partition Key.</returns>
     public static string CreatePartitionKey(string? eyeColorSid) => CompositeKey.Create(eyeColorSid).ToString();
 
     /// <summary>

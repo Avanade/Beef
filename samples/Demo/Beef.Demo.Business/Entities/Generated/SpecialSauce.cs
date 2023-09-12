@@ -10,19 +10,47 @@ namespace Beef.Demo.Business.Entities;
 /// <summary>
 /// Represents the Special Sauce entity.
 /// </summary>
-public partial class SpecialSauce : EntityBase
+public partial class SpecialSauce : EntityBase, IPrimaryKey
 {
-    private string? _ingredient;
+    private string? _key1;
+    private string? _key2;
+    private string? _ingredient = "special herbs and spices";
+
+    /// <summary>
+    /// Gets or sets the Key1.
+    /// </summary>
+    public string? Key1 { get => _key1; set => SetValue(ref _key1, value); }
+
+    /// <summary>
+    /// Gets or sets the Key2.
+    /// </summary>
+    public string? Key2 { get => _key2; set => SetValue(ref _key2, value); }
 
     /// <summary>
     /// Gets or sets the Ingredient.
     /// </summary>
     public string? Ingredient { get => _ingredient; set => SetValue(ref _ingredient, value); }
 
+    /// <summary>
+    /// Creates the primary <see cref="CompositeKey"/>.
+    /// </summary>
+    /// <param name="key1">The <see cref="Key1"/>.</param>
+    /// <param name="key2">The <see cref="Key2"/>.</param>
+    /// <returns>The <see cref="CompositeKey"/>.</returns>
+    public static CompositeKey CreatePrimaryKey(string? key1, string? key2) => CompositeKey.Create(key1, key2);
+
+    /// <summary>
+    /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Key1"/>, <see cref="Key2"/>).
+    /// </summary>
+    [JsonIgnore]
+    public CompositeKey PrimaryKey => CreatePrimaryKey(Key1, Key2);
+
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v);
+        yield return CreateProperty(nameof(Key1), Key1, v => Key1 = v);
+        yield return CreateProperty(nameof(Key2), Key2, v => Key2 = v);
+        yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v, "special herbs and spices");
     }
 }
 

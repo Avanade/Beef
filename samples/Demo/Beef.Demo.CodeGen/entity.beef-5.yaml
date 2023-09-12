@@ -295,6 +295,8 @@ entities:
 
 - { name: SpecialSauce, internalOnly: true,
     properties: [
-      { name: Ingredient }
+      { name: Key1, primaryKey: true },
+      { name: Key2, primaryKey: true },
+      { name: Ingredient, default: '"special herbs and spices"' }
     ]
   }
