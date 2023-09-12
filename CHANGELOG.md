@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.5
+- *Fixed:* Entity was not correctly generated where default value was specified to ensure correct `IsInitial` logic.
+- *Fixed:* Entity was not correctly generated where `RefDataList` was specified; code-gen output improved.
+
 ## v5.6.4
 - *Fixed:* Enhanced the default `Entity.RefDataType` behaviour; will default to root `CodeGeneration.RefDataType` (new), where specified to simplify configuration. 
 - *Fixed:* Enhanced the default `Entity.Collection` behaviour; will default to `true,` where `RefDataType` is specified as this is required.

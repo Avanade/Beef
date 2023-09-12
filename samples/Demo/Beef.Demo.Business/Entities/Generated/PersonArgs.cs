@@ -38,7 +38,7 @@ public partial class PersonArgs : EntityBase
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [JsonIgnore]
-    public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new ReferenceDataCodeList<RefDataNamespace.Gender>(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList(), propertyName: nameof(Genders)); }
+    public ReferenceDataCodeList<RefDataNamespace.Gender>? Genders { get => new(ref _gendersSids); set => SetValue(ref _gendersSids, value?.ToCodeList(), propertyName: nameof(Genders)); }
 
     /// <summary>
     /// Gets or sets the Order By.

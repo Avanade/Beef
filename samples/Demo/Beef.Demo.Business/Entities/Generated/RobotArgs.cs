@@ -39,7 +39,7 @@ public partial class RobotArgs : EntityBase
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [JsonIgnore]
-    public ReferenceDataCodeList<RefDataNamespace.PowerSource>? PowerSources { get => new ReferenceDataCodeList<RefDataNamespace.PowerSource>(ref _powerSourcesSids); set => SetValue(ref _powerSourcesSids, value?.ToCodeList(), propertyName: nameof(PowerSources)); }
+    public ReferenceDataCodeList<RefDataNamespace.PowerSource>? PowerSources { get => new(ref _powerSourcesSids); set => SetValue(ref _powerSourcesSids, value?.ToCodeList(), propertyName: nameof(PowerSources)); }
 
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()

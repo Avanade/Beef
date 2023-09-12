@@ -128,9 +128,9 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     {{/ifval}}
     {{#if RefDataList}}
       {{#if Parent.OmitEntityBase}}
-    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
+    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new(ref {{PropertyPrivateName}}); set => {{PropertyPrivateName}} = value?.ToCodeList(); }
       {{else}}
-    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new ReferenceDataCodeList<{{{Type}}}>(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}, propertyName: nameof({{Name}})); }
+    public ReferenceDataCodeList<{{{Type}}}>? {{Name}} { get => new(ref {{PropertyPrivateName}}); set => SetValue(ref {{PropertyPrivateName}}, value?.ToCodeList(){{#if Immutable}}, immutable = true{{/if}}, propertyName: nameof({{Name}})); }
       {{/if}}   
     {{else}}
       {{#if Parent.OmitEntityBase}}
@@ -201,11 +201,11 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     /// <summary>
     /// Creates the primary <see cref="CompositeKey"/>.
     /// </summary>
-    /// <returns>The <see cref="CompositeKey"/>.</returns>
     {{#each PrimaryKeyProperties}}
     /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
-    public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => new CompositeKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+    /// <returns>The <see cref="CompositeKey"/>.</returns>
+    public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
     /// <summary>
     /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
@@ -222,10 +222,10 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     /// <summary>
     /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
     /// </summary>
-    /// <returns>The Partition Key.</returns>
   {{#each PartitionKeyProperties}}
     /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
+    /// <returns>The Partition Key.</returns>
     public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
 
     /// <summary>
@@ -258,7 +258,7 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
 
     {{/if}}
     {{#each CoreProperties}}
-        yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v);
+        yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v{{#ifval Default}}, {{Default}}{{/ifval}});
     {{/each}}
     }
   {{/ifne}}
