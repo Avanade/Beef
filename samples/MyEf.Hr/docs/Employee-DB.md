@@ -6,8 +6,6 @@ The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`Db
 
 _Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.Database` folder. To see all supported command line options execute `dotnet run -- --help`.
 
-```
-
 <br/>
 
 ## Entity relationship diagram
