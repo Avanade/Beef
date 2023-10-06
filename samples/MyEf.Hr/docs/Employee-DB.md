@@ -4,7 +4,9 @@ This will walk through the process of creating the required tables, and entity f
 
 The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`DbEx`](https://github.com/Avanade/dbex) provide the capabilities that will be leveraged. The underlying [documentation](https://github.com/Avanade/dbex#readme) describes these capabilities and the database approach in greater detail.
 
-_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.Database` folder.
+_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.Database` folder. To see all supported command line options execute `dotnet run -- --help`.
+
+```
 
 <br/>
 

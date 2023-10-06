@@ -4,9 +4,9 @@ This will walk through the process of creating the required APIs, including the 
 
 [`Beef.CodeGen.Core`](../../../tools/Beef.CodeGen.Core/README.md) provides the code-generation capabilities that will be leveraged. The underlying documentation describes these capabilities and the code-gen approach in greater detail.
 
-_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.CodeGen` folder.
+_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.CodeGen` folder. To see all supported command line options execute `dotnet run -- --help`.
 
-<br/>
+<br/> 
 
 ## Clean up existing
 
