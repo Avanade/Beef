@@ -26,7 +26,7 @@ erDiagram
 
 ## Clean up existing migrations
 
-Within the `Migrations` folder there will three entries that were created during the initial solution skeleton creation. These should all be removed. 
+Within the `Migrations` folder there will already be three entries that were created during the initial solution skeleton creation. These should all be removed. 
 
 ```
 └── Migrations
@@ -39,7 +39,7 @@ Within the `Migrations` folder there will three entries that were created during
 
 ## Create HR schema
 
-Create the `Hr` schema using the database tooling. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
+Create the `Hr` schema using the database tooling. The following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
 
 ```
 dotnet run script schema Hr
@@ -48,13 +48,13 @@ dotnet run script schema Hr
 
 ## Create Employee table
 
-Create the migration script for the `Employee` table table within the `Hr` schema following a similar naming convention to ensure it is executed (applied) in the correct order. This following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
+Create the migration script for the `Employee` table within the `Hr` schema, following a similar naming convention, to ensure it is executed (applied) in the correct order. The following command will create the migration script using the pre-defined naming convention and templated T-SQL to aid development.
 
 ```
 dotnet run script create Hr Employee
 ```
 
-For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable. Note that the reference data values use `Code` and no database constraint is added as this relationship (and consistency) is managed by the owning business logic.
+For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable. Note that the reference data values use `Code` and that no coresponding database constraint is added; this relationship (and consistency) is managed by the owning business logic.
 
 ``` SQL
 -- Create table: [Hr].[Employee]
@@ -93,7 +93,7 @@ Use the following command line to generate the migration script to create the `E
 dotnet run script create Hr EmergencyContact
 ```
 
-Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
+Replace the contents with the following. _Note_: the row version and auditing columns have been removed as these are not required as this table is tightly-coupled to `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
 
 ``` SQL
 -- Create table: [Hr].[EmergencyContact]
@@ -249,4 +249,4 @@ This should create migrations script files with names similar as follows (as wel
 
 At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite event outbox enqueue/dequeue capabilities. 
 
-Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations
+Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.

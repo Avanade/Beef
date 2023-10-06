@@ -2,7 +2,7 @@
 
 This will walk through the process of creating the required APIs, including the related business and data access logic.
 
-The [`Beef.CodeGen.Core`](../../../tools/Beef.CodeGen.Core/README.md) provides the code-generation capabilities that will be leveraged. The underlying documentation describes these capabilities and the code-gen approach in greater detail.
+[`Beef.CodeGen.Core`](../../../tools/Beef.CodeGen.Core/README.md) provides the code-generation capabilities that will be leveraged. The underlying documentation describes these capabilities and the code-gen approach in greater detail.
 
 _Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.CodeGen` folder.
 
@@ -19,11 +19,13 @@ The following files were created when the solution was provisioned, these should
 
 ## Generate corresponding entity configuration
 
-The previous database code-generation supports an additional `yaml` sub-command that will generate the basic entity YAML configuration by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. Additionally, an initial C# validator will also be generated for each table.
+This step is optional and is included for informational purposes primarily. 
 
-The developer is then responsible for the copy+paste of the required yaml into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) and further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. 
+The database code-generation supports an additional `yaml` sub-command that will generate the basic entity YAML configuration by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. Additionally, an initial C# validator will also be generated for each table that is CRUD enabled.
 
-This helps accelerate the configuration of the entity YAML configuration, and is particularly useful when there are a large number of tables to be configured.
+The developer is then responsible for the _copy+paste_ of the required YAML into the `entity.beef-5.yaml` and `refdata.beef-5.yaml` file(s) respectively, then further amending as appropriate. After use, the developer should remove the `temp.entity.beef-5.yaml` file as it is otherwise not referenced by the code-generation. 
+
+This helps accelerate the configuration of the entity YAML configuration, and is particularly useful when there are a large number of tables and/or columns to be configured.
 
 _Note:_ This by no means endorses the direct mapping between entity and database model as the developer is still encouraged to reshape the entity to take advantage of object-orientation and resulting JSON capabilities.
 
@@ -32,7 +34,7 @@ The following provides the help content for the `yaml` sub-command:
 ```
 codegen yaml <Schema> <Table> [<Table>...]   Creates a temporary Beef entity YAML file for the specified table(s).
                                              - A table name with a prefix ! denotes that no CRUD operations are required.
-                                             - A table name with a prefix @ denotes that a 'GetByArgs' operation is required.
+                                             - A table name with a prefix * denotes that a 'GetByArgs' operation is required.
 ```
 
 An example of the database command usage is as follows:
@@ -47,7 +49,7 @@ dotnet run codegen yaml Hr Gender *Employee !EmergencyContact TerminationReason
 
 The `refdata.beef-5.yaml` within `MyEf.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straightforward.
 
-Each reference data entity is defined, by specifying the name, the type (defaults from root specification), the Web API route prefix (i.e. its endpoint which defaults where not specified), that it is to be automatically implemented using Entity Framework (which defaults where not specified), and the name of the corresponding Entity Framework model (which was previously generated from the database; see `MyEf.Hr.Business/Data/EfModel/Generated` folder).
+Each reference data entity is defined, by specifying the name, the data type (defaults from root specification), the Web API route prefix (i.e. its endpoint which defaults where not specified), that it is to be automatically implemented using Entity Framework (defaults from root specification), and the name of the corresponding Entity Framework model (which was previously generated from the database; see `MyEf.Hr.Business/Data/EfModel/Generated` folder).
 
 Replace the existing YAML with the following.
 
@@ -91,7 +93,7 @@ First up, the entities need to be defined (configured) within the `entity.beef-5
 - `EmployeeBase` - this represents the base Employee in that it contains the key properties and will be used as the base for searching as a means to minimise the properties that are available outside of the `Employee` CRUD itself.
 - `Employee` - this represents the complete detailed Employee, which inherits from the `EmployeeBase`. All of the key operations for the Employee including the search will be configured/grouped as a logical set here.
 - `TerminationDetail` - this represents an employee's termination (being date and reason). By having as a sub-type this enables additional related data to be more easily added under the single `Employee.Termination` property.
-- `Address` - this represents the employees' address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
+- `Address` - this represents the employee's address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
 - `EmergencyContact` - this represents the collection of emergency contacts for an employee. 
 
 Replace the existing `entity.beef-5.yaml` with the following. The comments included are intended to describe the usage and why certain attributes have been specified.
@@ -128,7 +130,7 @@ entities:
   # - A DateTimeTransform of DateOnly is used to indicate that the DateTime property should only be concerned with the Date component.
   # - EntityFrameworkModel will ensure that the mapper is generated; used by the Employee.Get/Create/Update.
   # - The Termination property EntityFrameworkMapper is set to Ignore as this cannot be automatically generated; custom code will need to be developed to handle; used by the Employee.GetByArgs.
-- { name: EmployeeBase, text: '{{Employee}} base', collection: true, collectionResult: true, excludeData: RequiresMapper, entityFrameworkModel: EfModel.Employee,
+- { name: EmployeeBase, text: '{{Employee}} base', collection: true, collectionResult: true, entityFrameworkModel: EfModel.Employee,
     properties: [
       { name: Id, type: Guid, text: '{{Employee}} identifier', primaryKey: true, dataName: EmployeeId, dataAutoGenerated: true },
       { name: Email, text: 'Unique {{Employee}} Email' },

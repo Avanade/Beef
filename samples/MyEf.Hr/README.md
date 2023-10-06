@@ -147,7 +147,7 @@ The _HR_ and _Security_ domains are completely decoupled from each other; in tha
 
 This _EDA_ sample will walk through the implementation in a number of logical steps (these describe the integration of the _CoreEx_ capabilities to enable) to achieve the end-to-end Employee's User Account deactivation:
 
-7. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database
+7. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database.
 8. [Service Bus Publish](./docs/Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
 9. [Service Bus Subscribe](./docs/Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
 
@@ -155,7 +155,7 @@ This _EDA_ sample will walk through the implementation in a number of logical st
 
 ## Conclusion
 
-The basis of the functional capabilities have been created for our fictitious solution. In the end, the developer should have a reasonable understanding of how to build a relatively complicated back-end (API and database) solution leveraging _Beef_ as the code-generator, and `CoreEx` as the extended runtime.
+The basis of the functional capabilities have been created for our fictitious solution. In the end, the developer should have a reasonable understanding of how to build a relatively complicated back-end (API and database) solution leveraging _Beef_ as the code-generator, and _CoreEx_ as the extended runtime.
 
 The developer should have witnessed that reasonably complicated logic can be built using this _config_ to _code-gen_ to _custom_ approach. Where the _custom_ effort is for the most part focused on the key business value delivery; not the related boilerplate. Plus, with the [_UnitTestEx_](https://github.com/Avanade/UnitTestEx) testing framework, how complex end-to-end intra-domain integration tests can be created to appropriately validate the underlying logic - which can easily be integrated into the developer build-test-release lifecycle.
 
