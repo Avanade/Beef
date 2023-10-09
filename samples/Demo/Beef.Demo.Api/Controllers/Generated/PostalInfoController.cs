@@ -30,7 +30,7 @@ public partial class PostalInfoController : ControllerBase
     /// <summary>
     /// Gets the specified <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
@@ -43,7 +43,7 @@ public partial class PostalInfoController : ControllerBase
     /// <summary>
     /// Creates a new <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The created <see cref="PostalInfo"/>.</returns>
@@ -56,7 +56,7 @@ public partial class PostalInfoController : ControllerBase
     /// <summary>
     /// Updates an existing <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The updated <see cref="PostalInfo"/>.</returns>
@@ -69,7 +69,7 @@ public partial class PostalInfoController : ControllerBase
     /// <summary>
     /// Patches an existing <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The patched <see cref="PostalInfo"/>.</returns>
@@ -82,7 +82,7 @@ public partial class PostalInfoController : ControllerBase
     /// <summary>
     /// Deletes the specified <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     [HttpDelete("{country}/{state}/{city}")]

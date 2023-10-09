@@ -24,6 +24,7 @@ public partial class USState : ReferenceDataBaseEx<Guid, USState>
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="USState"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator USState?(string? code) => ConvertFromCode(code);
 }
 

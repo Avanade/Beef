@@ -24,6 +24,7 @@ public partial class CommunicationType : ReferenceDataBaseEx<int, CommunicationT
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="CommunicationType"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator CommunicationType?(string? code) => ConvertFromCode(code);
 }
 

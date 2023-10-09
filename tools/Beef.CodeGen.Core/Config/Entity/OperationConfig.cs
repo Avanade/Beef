@@ -24,9 +24,9 @@ namespace Beef.CodeGen.Config.Entity
 - **`GetColl`** - indicates a get (read) returning an entity collection.
 - **`Create`** - indicates the creation of an entity.
 - **`Update`** - indicates the updating of an entity.
-- **[`Patch`](./Http-Patch.md)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
+- **[`Patch`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Json/Merge/JsonMergePatch.cs)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
 - **`Delete`** - indicates the deleting of an entity.
-- **`Custom`** - indicates a customised operation where arguments and return value will be explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer.",
+- **`Custom`** - indicates a customized operation where parameters and return value are explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer. This is the default where not specified.",
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 operations: [
@@ -80,7 +80,7 @@ operations: [
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Key", Title = "The type of operation that is to be code-generated.", IsImportant = true,
-            Options = new string[] { "Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom" })]
+            Description = "Defaults to `Custom`.", Options = new string[] { "Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom" })]
         public string? Type { get; set; }
 
         /// <summary>
@@ -417,7 +417,7 @@ operations: [
         [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Events", Title = "The Event Source.",
             Description = "Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
-            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.")]
+            "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. Otherwise, specify the C# string interpolation expression; for example: `person/{r.Id}`.")]
         public string? EventSource { get; set; }
 
         /// <summary>
@@ -895,7 +895,7 @@ operations: [
         /// <summary>
         /// Gets the event source URI.
         /// </summary>
-        public string EventSourceUri => Root!.EventSourceRoot?.ToLowerInvariant() + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource.ToLowerInvariant() : ("/" + EventSource.ToLowerInvariant()));
+        public string EventSourceUri => Root!.EventSourceRoot?.ToLowerInvariant() + (EventSource!.StartsWith('/') || (Root!.EventSourceRoot != null && Root!.EventSourceRoot.EndsWith('/')) ? EventSource : ("/" + EventSource));
 
         /// <summary>
         /// Gets the event format key code.
@@ -970,6 +970,7 @@ operations: [
         /// </summary>
         protected override async Task PrepareAsync()
         {
+            Type = DefaultWhereNull(Type, () => "Custom");
             BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Get" => Parent!.EntityName,
@@ -1107,7 +1108,7 @@ operations: [
             });
 
             EventSource = DefaultWhereNull(EventSource, () => Parent!.EventSource);
-            EventPublish = DefaultWhereNull(EventPublish, () => new string[] { "Create", "Update", "Delete" }.Contains(Type) ? Parent!.EventPublish : "None");
+            EventPublish = DefaultWhereNull(EventPublish, () => new string[] { "Create", "Update", "Delete" }.Contains(Type) || !string.IsNullOrEmpty(EventSubject) ? Parent!.EventPublish : "None");
 
             EventFormatKey = Type switch
             {

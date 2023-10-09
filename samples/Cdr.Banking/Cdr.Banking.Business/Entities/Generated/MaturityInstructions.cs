@@ -21,6 +21,7 @@ public partial class MaturityInstructions : ReferenceDataBaseEx<Guid, MaturityIn
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator MaturityInstructions?(string? code) => ConvertFromCode(code);
 }
 

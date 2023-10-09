@@ -70,7 +70,7 @@ public partial class EmployeeController : ControllerBase
     /// <summary>
     /// Deletes the specified <see cref="Employee"/>.
     /// </summary>
-    /// <param name="id">The Id.</param>
+    /// <param name="id">The <see cref="Employee"/> identifier.</param>
     [HttpDelete("{id}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)

@@ -25,7 +25,7 @@ namespace Cdr.Banking.Common.Agents
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="Entities.AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>

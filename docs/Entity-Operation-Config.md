@@ -8,9 +8,9 @@ The valid `Type` values are as follows:
 - **`GetColl`** - indicates a get (read) returning an entity collection.
 - **`Create`** - indicates the creation of an entity.
 - **`Update`** - indicates the updating of an entity.
-- **[`Patch`](./Http-Patch.md)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
+- **[`Patch`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Json/Merge/JsonMergePatch.cs)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
 - **`Delete`** - indicates the deleting of an entity.
-- **`Custom`** - indicates a customised operation where arguments and return value will be explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer.
+- **`Custom`** - indicates a customized operation where parameters and return value are explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer. This is the default where not specified.
 
 <br/>
 
@@ -64,7 +64,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The unique operation name. [Mandatory]
-**`type`** | The type of operation that is to be code-generated. Valid options are: `Get`, `GetColl`, `Create`, `Update`, `Patch`, `Delete`, `Custom`.
+**`type`** | The type of operation that is to be code-generated. Valid options are: `Get`, `GetColl`, `Create`, `Update`, `Patch`, `Delete`, `Custom`.<br/>&dagger; Defaults to `Custom`.
 `text` | The text for use in comments.<br/>&dagger; The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
 **`primaryKey`** | Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.<br/>&dagger; This simplifies the specification of these properties versus having to declare each specifically.
 **`paging`** | Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.
@@ -93,7 +93,7 @@ Provides the _Events_ configuration.
 Property | Description
 -|-
 **`eventPublish`** | The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation. Valid options are: `None`, `DataSvc`, `Data`.<br/>&dagger; Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
-`eventSource` | The Event Source.<br/>&dagger; Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`.
+`eventSource` | The Event Source.<br/>&dagger; Defaults to `Entity.EventSource`. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. Otherwise, specify the C# string interpolation expression; for example: `person/{r.Id}`.
 `eventSubject` | The event subject template and corresponding event action pair (separated by a colon).<br/>&dagger; The event subject template defaults to `{AppName}.{Entity.Name}`, plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}` (depending on whether `Entity.EventSubjectFormat` is `NameAndKey` or `NameOnly`). The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
 <br/>
