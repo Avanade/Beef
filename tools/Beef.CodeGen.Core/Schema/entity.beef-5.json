@@ -1259,6 +1259,7 @@
         "type": {
           "type": "string",
           "title": "The type of operation that is to be code-generated.",
+          "description": "Defaults to 'Custom'.",
           "enum": [
             "Get",
             "GetColl",
@@ -1483,7 +1484,7 @@
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
-          "description": "Defaults to 'Entity.EventSource'. Note: when used in code-generation the 'CodeGeneration.EventSourceRoot' will be prepended where specified. To include the entity id/key include a '{$key}' placeholder ('Create', 'Update' or 'Delete' operation only); for example: 'person/{$key}'."
+          "description": "Defaults to 'Entity.EventSource'. Note: when used in code-generation the 'CodeGeneration.EventSourceRoot' will be prepended where specified. To include the entity id/key include a '{$key}' placeholder ('Create', 'Update' or 'Delete' operation only); for example: 'person/{$key}'. Otherwise, specify the C# string interpolation expression; for example: 'person/{r.Id}'."
         },
         "eventSubject": {
           "type": "string",
@@ -1641,7 +1642,7 @@
         },
         "nullable": {
           "type": "boolean",
-          "title": "Indicates whether the .NET 'Type should be declared as nullable; e.g. 'int?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'."
+          "title": "Indicates whether the .NET Type should be declared as nullable; e.g. 'int?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'. Where the .NET Type is not considered as an intrinsic type then will default to 'true'."
         },
         "default": {
           "type": "string",
@@ -1723,6 +1724,11 @@
             "FromRoute",
             "FromEntityProperties"
           ]
+        },
+        "webApiText": {
+          "type": "string",
+          "title": "The overriding text for use in the Web API comments.",
+          "description": "By default the 'Text' will be the 'Name' reformatted as sentence casing."
         },
         "grpcType": {
           "type": "string",

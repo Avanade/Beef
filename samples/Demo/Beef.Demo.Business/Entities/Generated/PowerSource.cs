@@ -40,6 +40,7 @@ public partial class PowerSource : ReferenceDataBaseEx<Guid, PowerSource>
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="PowerSource"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator PowerSource?(string? code) => ConvertFromCode(code);
 }
 

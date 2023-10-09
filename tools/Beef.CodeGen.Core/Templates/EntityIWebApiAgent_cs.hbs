@@ -41,7 +41,7 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// <param name="patchOption">The <see cref="HttpPatchOption"/>.</param>
   {{/ifeq}}
   {{#each Parameters}}
-        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+        /// <param name="{{ArgumentName}}">{{{WebApiSummaryText}}}</param>
   {{/each}}
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>

@@ -27,6 +27,7 @@ public partial class OpenStatus : ReferenceDataBaseEx<Guid, OpenStatus>
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="OpenStatus"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator OpenStatus?(string? code) => ConvertFromCode(code);
 }
 

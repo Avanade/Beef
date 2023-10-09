@@ -15,7 +15,7 @@ public partial interface IPostalInfoManager
     /// <summary>
     /// Gets the specified <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
@@ -25,7 +25,7 @@ public partial interface IPostalInfoManager
     /// Creates a new <see cref="PostalInfo"/>.
     /// </summary>
     /// <param name="value">The <see cref="PostalInfo"/>.</param>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The created <see cref="PostalInfo"/>.</returns>
@@ -35,7 +35,7 @@ public partial interface IPostalInfoManager
     /// Updates an existing <see cref="PostalInfo"/>.
     /// </summary>
     /// <param name="value">The <see cref="PostalInfo"/>.</param>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The updated <see cref="PostalInfo"/>.</returns>
@@ -44,7 +44,7 @@ public partial interface IPostalInfoManager
     /// <summary>
     /// Deletes the specified <see cref="PostalInfo"/>.
     /// </summary>
-    /// <param name="country">The Country.</param>
+    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city);

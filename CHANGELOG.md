@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.6
+- *Fixed:* The `Operation.Type` entity code-generation attribute explicitly defaults to `Custom` where not specified.
+- *Fixed:* Reference data entity code-generation adds `NotNullIfNotNullAtrribute` to correct null compiler warnings. The `System.Diagnostics.CodeAnalysis` namespace may need to be added to the `GlobalUsings` to enable.
+- *Fixed:* Improved the default `Parameter.Text` and enabled `Parameter.WebApiText` to override explicity where required.
+
 ## v5.6.5
 - *Fixed:* Entity was not correctly generated where default value was specified to ensure correct `IsInitial` logic.
 - *Fixed:* Entity was not correctly generated where `RefDataList` was specified; code-gen output improved.

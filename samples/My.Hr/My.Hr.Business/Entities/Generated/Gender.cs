@@ -21,6 +21,7 @@ public partial class Gender : ReferenceDataBaseEx<Guid, Gender>
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="Gender"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator Gender?(string? code) => ConvertFromCode(code);
 }
 

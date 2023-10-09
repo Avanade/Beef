@@ -21,6 +21,7 @@ public partial class TransactionStatus : ReferenceDataBaseEx<Guid, TransactionSt
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="TransactionStatus"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator TransactionStatus?(string? code) => ConvertFromCode(code);
 }
 

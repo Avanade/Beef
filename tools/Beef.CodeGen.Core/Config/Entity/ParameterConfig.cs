@@ -68,7 +68,7 @@ parameters: [
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Key", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `int?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
+        [CodeGenProperty("Key", Title = "Indicates whether the .NET Type should be declared as nullable; e.g. `int?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`. Where the .NET Type is not considered as an intrinsic type then will default to `true`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
@@ -193,6 +193,14 @@ parameters: [
             Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
         public string? WebApiFrom { get; set; }
 
+        /// <summary>
+        /// Gets or sets the overriding text for use in comments.
+        /// </summary>
+        [JsonProperty("webApiText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("WebApi", Title = "The overriding text for use in the Web API comments.",
+            Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
+        public string? WebApiText { get; set; }
+
         #endregion
 
         #region Grpc
@@ -222,6 +230,13 @@ parameters: [
         public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
             ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {Text}.")
             : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+
+        /// <summary>
+        /// Gets the formatted WebApi summary text.
+        /// </summary>
+        public string? WebApiSummaryText => IsValueArg && Parent!.Type == "Patch"
+            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {WebApiText}.")
+            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {WebApiText}.");
 
         /// <summary>
         /// Gets the computed declared parameter type.
@@ -280,16 +295,6 @@ parameters: [
             }
 
             RelatedEntity = Root!.Entities!.FirstOrDefault(x => x.Name == Type);
-            Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
-            {
-                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
-
-                if (RelatedEntity != null)
-                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Entities." + Type)})";
-
-                return StringConverter.ToSentenceCase(Name);
-            }));
 
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConverter.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConverter.ToCamelCase(Name) : pc.ArgumentName);
@@ -307,6 +312,44 @@ parameters: [
 
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
+
+            if (string.IsNullOrEmpty(WebApiText))
+                WebApiText = Text;
+
+            Text = StringConverter.ToComments(DefaultWhereNull(Text, () =>
+            {
+                if (!string.IsNullOrEmpty(pc?.Text))
+                    return pc.Text;
+
+                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
+
+                if (RelatedEntity != null)
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments("Entities." + Type)})";
+
+                var relatedPropery = Parent!.Parent!.Properties?.FirstOrDefault(x => x.Name == Name);
+                if (relatedPropery is not null)
+                    return relatedPropery.Text;
+
+                return StringConverter.ToSentenceCase(Name);
+            }));
+
+            WebApiText = DefaultWhereNull(WebApiText, () =>
+            {
+                if (string.IsNullOrEmpty(RefDataType) && !string.IsNullOrEmpty(pc?.Text))
+                    return pc.Text;
+
+                if (IsValueArg || IsPagingArgs || Type == "ChangeLog")
+                    return $"{StringConverter.ToSeeComments(Type)}";
+
+                if (RelatedEntity != null)
+                    return $"{StringConverter.ToSentenceCase(Name)} (see {StringConverter.ToSeeComments(Type)})";
+
+                if (Name == "Id")
+                    return "identifier";
+
+                return StringConverter.ToSentenceCase(Name);
+            });
 
             GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
             GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;

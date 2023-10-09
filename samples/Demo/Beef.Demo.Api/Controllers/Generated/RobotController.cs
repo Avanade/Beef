@@ -100,7 +100,7 @@ public partial class RobotController : ControllerBase
     /// Raises a <see cref="Robot.PowerSource"/> change event.
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
-    /// <param name="powerSource">The Power Source.</param>
+    /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
     [HttpPost("{id}/powerSource/{powerSource}")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     public Task<IActionResult> RaisePowerSourceChange(Guid id, string? powerSource)

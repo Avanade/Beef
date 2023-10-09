@@ -33,7 +33,7 @@ public partial interface IEmployeeDataSvc
     /// <summary>
     /// Deletes the specified <see cref="Employee"/>.
     /// </summary>
-    /// <param name="id">The Id.</param>
+    /// <param name="id">The <see cref="Employee"/> identifier.</param>
     Task<Result> DeleteAsync(Guid id);
 
     /// <summary>

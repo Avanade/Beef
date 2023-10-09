@@ -43,6 +43,7 @@ public partial class Company : ReferenceDataBaseEx<Guid, Company>
     /// </summary>
     /// <param name="code">The <see cref="IReferenceData.Code">.</param>
     /// <returns>The corresponding <see cref="Company"/>.</returns>
+    [return: NotNullIfNotNull(nameof(code))]
     public static implicit operator Company?(string? code) => ConvertFromCode(code);
 }
 

@@ -1827,7 +1827,7 @@ entities:
         }
 
         /// <summary>
-        /// Check for any deprecate properties and error.
+        /// Check for any deprecated properties and error.
         /// </summary>
         private void CheckDeprecatedProperties() => CodeGenConfig.WarnWhereDeprecated(Root!, this,
             ("entityScope", null),
