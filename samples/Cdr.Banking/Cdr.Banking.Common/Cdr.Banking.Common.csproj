@@ -8,6 +8,6 @@
     <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.3.1" />
+    <PackageReference Include="CoreEx" Version="3.4.0" />
   </ItemGroup>
 </Project>
