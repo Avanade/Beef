@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.7
+- *Fixed:* Upgraded `CoreEx` to `v3.4.0` to include all related fixes and improvements; updated template and samples as a result. 
+
 ## v5.6.6
 - *Fixed:* The `Operation.Type` entity code-generation attribute explicitly defaults to `Custom` where not specified.
 - *Fixed:* Reference data entity code-generation adds `NotNullIfNotNullAtrribute` to correct null compiler warnings. The `System.Diagnostics.CodeAnalysis` namespace may need to be added to the `GlobalUsings` to enable.

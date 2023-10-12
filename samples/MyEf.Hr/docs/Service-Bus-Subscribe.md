@@ -150,7 +150,7 @@ The aforementioned services registration code of interest is as follows.
 })
 .AddAzureServiceBusOrchestratedSubscriber((_, o) =>
 {
-    o.EventDataDeserializationErrorHandling = ErrorHandling.ThrowSubscriberException;
+    o.EventDataDeserializationErrorHandling = ErrorHandling.Handle;
 })
 .AddTypedHttpClient<OktaHttpClient>("OktaApi");
 ```
@@ -342,7 +342,7 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
         ValueValidator = _employeeValidator;
     }
 
-    public override ErrorHandling SecurityHandling => ErrorHandling.TransientRetry;
+    public override ErrorHandling SecurityHandling => ErrorHandling.Retry;
 
     public override ErrorHandling NotFoundHandling => ErrorHandling.CompleteWithWarning;
 
