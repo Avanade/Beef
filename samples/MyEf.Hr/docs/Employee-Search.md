@@ -82,7 +82,7 @@ dotnet run entity
 
 ## Data access logic
 
-Within the entity code-gen configuration where auto-implmentation is not possible then the data access logic must be specified explicitly. _Beef_ will still generate the boilerplate/skeleton wrapping logic for the data access to ensure consistency, and will invoke a corresponding `*OnImplementation` method to perform (which the developer is then required to implement).
+Within the entity code-gen configuration where auto-implementation is not possible then the data access logic must be specified explicitly. _Beef_ will still generate the boilerplate/skeleton wrapping logic for the data access to ensure consistency, and will invoke a corresponding `*OnImplementation` method to perform (which the developer is then required to implement).
 
 This logic must be implemented by the developer in a non-generated `partial` class. A new `EmployeeData.cs` must be created within `MyEf.Hr.Business/Data`; do **not** change any files under the `Generated` folder as these will be overridden during the next code-gen execution.
 
