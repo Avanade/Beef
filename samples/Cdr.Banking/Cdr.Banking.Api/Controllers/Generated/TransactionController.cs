@@ -7,7 +7,6 @@ namespace Cdr.Banking.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Transaction"/> Web API functionality.
 /// </summary>
-[Route("api/v1/banking/accounts")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class TransactionController : ControllerBase
 {
@@ -34,7 +33,7 @@ public partial class TransactionController : ControllerBase
     /// <param name="maxAmount">The Max Amount.</param>
     /// <param name="text">The Text.</param>
     /// <returns>The <see cref="TransactionCollection"/></returns>
-    [HttpGet("{accountId}/transactions")]
+    [HttpGet("api/v1/banking/accounts/{accountId}/transactions")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.TransactionCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]

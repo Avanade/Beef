@@ -59,13 +59,11 @@ The requisite `GetByArgs` operation needs to be added to the `Employee` entity c
 
 ``` yaml
       # Search operation
-      # - OperationType is GetColl which indicates that a collection is the expected result.
+      # - Type is GetColl that indicates that a collection is the expected result for the query-based operation.
       # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
-      # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
-      # - AutoImplement of EntityFramework inherited from root.
-      # - EntityFrameworkModel needs to be specified as it can not be inferred from the entity itself. 
-      # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.
-      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase, entityFrameworkModel: EfModel.Employee,
+      # - Paging indicates that paging support is required and to be automatically enabled for the operation.
+      # - Parameter specifies that a single parameter with a type of EmployeeArgs (defined later) is required and that the value should be validated.
+      { name: GetByArgs, type: GetColl, paging: true, returnType: EmployeeBase,
         parameters: [
           { name: Args, type: EmployeeArgs, validator: EmployeeArgsValidator }
         ]
@@ -100,13 +98,13 @@ partial void EmployeeDataCtor()
     // Implement the GetByArgs OnQuery search/filtering logic.
     _getByArgsOnQuery = (q, args) =>
     {
-        _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-        _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-        _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
-        _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
-        _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
+        _ef.WithWildcard(args?.FirstName, w => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
+        _ef.WithWildcard(args?.LastName, w => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
+        _ef.With(args?.Genders, g => q = q.Where(x => g.ToCodeList().Contains(x.GenderCode)));
+        _ef.With(args?.StartFrom, f => q = q.Where(x => x.StartDate >= f));
+        _ef.With(args?.StartTo, t => q = q.Where(x => x.StartDate <= t));
 
-        if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
+        if (args?.IsIncludeTerminated is null || !args.IsIncludeTerminated.Value)
             q = q.Where(x => x.TerminationDate == null);
 
         return q.IgnoreAutoIncludes().OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);

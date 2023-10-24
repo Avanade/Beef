@@ -28,21 +28,6 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
-    {
-        return Result.Go().Requires(employeeId)
-                     .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
-    }, InvokerArgs.Read);
-
-    /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
-    {
-        return Result.Go(value).Required().Requires(employeeId).Then(v => v.EmployeeId = employeeId)
-                     .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.CreateAsync(value));
-    }, InvokerArgs.Create);
-
-    /// <inheritdoc/>
     public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
@@ -56,4 +41,19 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
         return Result.Go().Requires(id)
                      .ThenAsync(() => _dataService.DeleteAsync(id));
     }, InvokerArgs.Delete);
+
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go().Requires(employeeId)
+                     .ThenAsAsync(() => _dataService.GetByEmployeeIdAsync(employeeId, paging));
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go(value).Required().Requires(employeeId).Then(v => v.EmployeeId = employeeId)
+                     .ValidateAsync(v => v.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
+                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+    }, InvokerArgs.Create);
 }

@@ -32,20 +32,20 @@ public partial class PerformanceReviewDataSvc : IPerformanceReviewDataSvc
     public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
     {
         return Result.GoAsync(_data.CreateAsync(value))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }
 
     /// <inheritdoc/>
     public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
     {
         return Result.GoAsync(_data.UpdateAsync(value))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }
 
     /// <inheritdoc/>
     public Task<Result> DeleteAsync(Guid id)
     {
-        return Result.Go(_cache.Remove<PerformanceReview>(id))
-                     .ThenAsAsync(_ => _data.DeleteAsync(id));
+        return Result.Go().CacheRemove<PerformanceReview>(_cache, id)
+                     .ThenAsync(() => _data.DeleteAsync(id));
     }
 }

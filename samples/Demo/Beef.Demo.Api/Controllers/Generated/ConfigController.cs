@@ -10,7 +10,6 @@ namespace Beef.Demo.Api.Controllers;
 /// <summary>
 /// Provides the <b>Config</b> Web API functionality.
 /// </summary>
-[Route("api/v1/envvars")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class ConfigController : ControllerBase
 {
@@ -31,7 +30,7 @@ public partial class ConfigController : ControllerBase
     /// Get Env Vars.
     /// </summary>
     /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-    [HttpPost("")]
+    [HttpPost("api/v1/envvars")]
     [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> GetEnvVars()
