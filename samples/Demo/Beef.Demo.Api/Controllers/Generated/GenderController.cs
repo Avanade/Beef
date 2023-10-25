@@ -11,7 +11,6 @@ namespace Beef.Demo.Api.Controllers;
 /// Provides the <see cref="Gender"/> Web API functionality.
 /// </summary>
 [AllowAnonymous]
-[Route("api/v1/demo/ref/genders")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class GenderController : ControllerBase
 {
@@ -33,7 +32,7 @@ public partial class GenderController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Gender"/> identifier.</param>
     /// <returns>The selected <see cref="Gender"/> where found.</returns>
-    [HttpGet("{id}")]
+    [HttpGet("api/v1/demo/ref/genders/{id}")]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -43,7 +42,7 @@ public partial class GenderController : ControllerBase
     /// Creates a new <see cref="Gender"/>.
     /// </summary>
     /// <returns>The created <see cref="Gender"/>.</returns>
-    [HttpPost("")]
+    [HttpPost("api/v1/demo/ref/genders")]
     [AcceptsBody(typeof(Common.Entities.Gender))]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -54,7 +53,7 @@ public partial class GenderController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Gender"/> identifier.</param>
     /// <returns>The updated <see cref="Gender"/>.</returns>
-    [HttpPut("{id}")]
+    [HttpPut("api/v1/demo/ref/genders/{id}")]
     [AcceptsBody(typeof(Common.Entities.Gender))]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
     public Task<IActionResult> Update(Guid id)

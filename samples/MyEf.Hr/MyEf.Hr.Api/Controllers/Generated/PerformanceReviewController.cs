@@ -35,29 +35,6 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.GetWithResultAsync<PerformanceReview?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
-    /// </summary>
-    /// <param name="employeeId">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
-    [HttpGet("employees/{employeeId}/reviews")]
-    [Paging]
-    [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NoContent)]
-    public Task<IActionResult> GetByEmployeeId(Guid employeeId)
-        => _webApi.GetWithResultAsync<PerformanceReviewCollectionResult>(Request, p => _manager.GetByEmployeeIdAsync(employeeId, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
-
-    /// <summary>
-    /// Creates a new <see cref="PerformanceReview"/>.
-    /// </summary>
-    /// <param name="employeeId">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-    [HttpPost("employees/{employeeId}/reviews")]
-    [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
-    [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.Created)]
-    public Task<IActionResult> Create(Guid employeeId)
-        => _webApi.PostWithResultAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/reviews/{r.Id}", UriKind.Relative));
-
-    /// <summary>
     /// Updates an existing <see cref="PerformanceReview"/>.
     /// </summary>
     /// <param name="id">The <see cref="PerformanceReview"/> identifier.</param>
@@ -87,4 +64,27 @@ public partial class PerformanceReviewController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
+
+    /// <summary>
+    /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
+    /// </summary>
+    /// <param name="employeeId">The <see cref="Employee"/> identifier.</param>
+    /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
+    [HttpGet("employees/{employeeId}/reviews")]
+    [Paging]
+    [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetByEmployeeId(Guid employeeId)
+        => _webApi.GetWithResultAsync<PerformanceReviewCollectionResult>(Request, p => _manager.GetByEmployeeIdAsync(employeeId, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+
+    /// <summary>
+    /// Creates a new <see cref="PerformanceReview"/>.
+    /// </summary>
+    /// <param name="employeeId">The <see cref="Employee"/> identifier.</param>
+    /// <returns>The created <see cref="PerformanceReview"/>.</returns>
+    [HttpPost("employees/{employeeId}/reviews")]
+    [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
+    [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.Created)]
+    public Task<IActionResult> Create(Guid employeeId)
+        => _webApi.PostWithResultAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/reviews/{r.Id}", UriKind.Relative));
 }

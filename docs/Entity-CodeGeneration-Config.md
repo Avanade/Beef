@@ -103,7 +103,7 @@ Property | Description
 -|-
 `webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.<br/>&dagger; This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).
 `webApiAutoLocation` | Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.<br/>&dagger; This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).
-**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller.<br/>&dagger; This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).
+**`webApiRoutePrefix`** | The base (prefix) `URI` prepended to all `Operation.WebApiRoute` values.
 
 <br/>
 

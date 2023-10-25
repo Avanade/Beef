@@ -29,21 +29,21 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     public Task<Result<Employee>> CreateAsync(Employee value)
     {
         return Result.GoAsync(_data.CreateAsync(value))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }
 
     /// <inheritdoc/>
     public Task<Result<Employee>> UpdateAsync(Employee value)
     {
         return Result.GoAsync(_data.UpdateAsync(value))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }
 
     /// <inheritdoc/>
     public Task<Result> DeleteAsync(Guid id)
     {
-        return Result.Go(_cache.Remove<Employee>(id))
-                     .ThenAsAsync(_ => _data.DeleteAsync(id));
+        return Result.Go().CacheRemove<Employee>(_cache, id)
+                     .ThenAsync(() => _data.DeleteAsync(id));
     }
 
     /// <inheritdoc/>
@@ -53,6 +53,6 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id)
     {
         return Result.GoAsync(_data.TerminateAsync(value, id))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }
 }

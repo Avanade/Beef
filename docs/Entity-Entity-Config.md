@@ -121,8 +121,9 @@ Provides the _Operation_ configuration. These primarily provide a shorthand to c
 
 Property | Description
 -|-
-`crud` | Indicates that the key CRUD (`Create`, `Get` (read), `Update` (including `Patch`) and `Delete`) operations will be automatically generated where not otherwise explicitly specified.
+`behavior` | Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete). Additionally, GetByArgs ('B') and GetAll ('A') operations that will be automatically generated where not otherwise explicitly specified.<br/>&dagger; Value may only specifiy one or more of the `CGRUDBA` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). This is shorthand for setting one or more of the following properties: `Get`, `GetByArgs`, `GetAll`, 'Create', `Update`, `Patch` and `Delete`. Where one of these properties is set to either `true` or `false` this will take precedence over the value set for `Behavior`.
 `get` | Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
+`getByArgs` | Indicates that a `GetByArgs` operation will be automatically generated where not otherwise explicitly specified.
 `getAll` | Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
 `create` | Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
 `update` | Indicates that a `Update` operation will be automatically generated where not otherwise explicitly specified.
@@ -156,7 +157,7 @@ Provides the data _Web API_ configuration.
 
 Property | Description
 -|-
-**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller.<br/>&dagger; This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified. Where `RefDataType` is specified (indicating Reference Data entity) then this will automatically default to the pluralized `Name` (as lowercase).
+**`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller.<br/>&dagger; This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified. Where not specified will automatically default to the pluralized `Name` (as lowercase).
 **`webApiAuthorize`** | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.<br/>&dagger; Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.
 `webApiCtor` | The access modifier for the generated Web API `Controller` constructor. Valid options are: `Public`, `Private`, `Protected`.<br/>&dagger; Defaults to `Public`.
 **`webApiCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.

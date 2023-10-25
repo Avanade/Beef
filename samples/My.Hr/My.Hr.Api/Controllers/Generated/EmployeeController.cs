@@ -7,7 +7,6 @@ namespace My.Hr.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Employee"/> Web API functionality.
 /// </summary>
-[Route("employees")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class EmployeeController : ControllerBase
 {
@@ -29,7 +28,7 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The selected <see cref="Employee"/> where found.</returns>
-    [HttpGet("{id}")]
+    [HttpGet("employees/{id}")]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -39,7 +38,7 @@ public partial class EmployeeController : ControllerBase
     /// Creates a new <see cref="Employee"/>.
     /// </summary>
     /// <returns>The created <see cref="Employee"/>.</returns>
-    [HttpPost("")]
+    [HttpPost("employees")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -50,7 +49,7 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The updated <see cref="Employee"/>.</returns>
-    [HttpPut("{id}")]
+    [HttpPut("employees/{id}")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     public Task<IActionResult> Update(Guid id)
@@ -61,7 +60,7 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The patched <see cref="Employee"/>.</returns>
-    [HttpPatch("{id}")]
+    [HttpPatch("employees/{id}")]
     [AcceptsBody(typeof(Common.Entities.Employee), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     public Task<IActionResult> Patch(Guid id)
@@ -71,7 +70,7 @@ public partial class EmployeeController : ControllerBase
     /// Deletes the specified <see cref="Employee"/>.
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    [HttpDelete("{id}")]
+    [HttpDelete("employees/{id}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
@@ -86,7 +85,7 @@ public partial class EmployeeController : ControllerBase
     /// <param name="startTo">The Start To.</param>
     /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
     /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
-    [HttpGet("")]
+    [HttpGet("employees")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -101,7 +100,7 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The updated <see cref="Employee"/>.</returns>
-    [HttpPost("{id}/terminate")]
+    [HttpPost("employees/{id}/terminate")]
     [AcceptsBody(typeof(Common.Entities.TerminationDetail))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     public Task<IActionResult> Terminate(Guid id)

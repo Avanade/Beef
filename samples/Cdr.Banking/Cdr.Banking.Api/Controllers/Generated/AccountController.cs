@@ -7,7 +7,6 @@ namespace Cdr.Banking.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Account"/> Web API functionality.
 /// </summary>
-[Route("api/v1/banking/accounts")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class AccountController : ControllerBase
 {
@@ -31,7 +30,7 @@ public partial class AccountController : ControllerBase
     /// <param name="openStatus">The Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).</param>
     /// <param name="isOwned">Indicates whether Is Owned.</param>
     /// <returns>The <see cref="AccountCollection"/></returns>
-    [HttpGet("")]
+    [HttpGet("api/v1/banking/accounts")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.AccountCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -46,7 +45,7 @@ public partial class AccountController : ControllerBase
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-    [HttpGet("{accountId}")]
+    [HttpGet("api/v1/banking/accounts/{accountId}")]
     [ProducesResponseType(typeof(Common.Entities.AccountDetail), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetDetail(string? accountId)
@@ -57,7 +56,7 @@ public partial class AccountController : ControllerBase
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>The selected <see cref="Balance"/> where found.</returns>
-    [HttpGet("{accountId}/balance")]
+    [HttpGet("api/v1/banking/accounts/{accountId}/balance")]
     [ProducesResponseType(typeof(Common.Entities.Balance), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetBalance(string? accountId)

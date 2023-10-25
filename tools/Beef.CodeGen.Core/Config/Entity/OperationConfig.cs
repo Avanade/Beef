@@ -438,7 +438,8 @@ operations: [
         /// Gets or sets the Web API `RouteAtttribute` to be appended to the `Entity.WebApiRoutePrefix`.
         /// </summary>
         [JsonProperty("webApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "The Web API `RouteAtttribute` to be appended to the `Entity.WebApiRoutePrefix`.", IsImportant = true)]
+        [CodeGenProperty("WebApi", Title = "The Web API `RouteAtttribute` to be appended to the `Entity.WebApiRoutePrefix`.", IsImportant = true,
+            Description = "Where the value is specified with a leading `!` character this indicates that the `Entity.WebApiRoutePrefix` should not be used, and the value should be used as-is (with the `!` removed).")]
         public string? WebApiRoute { get; set; }
 
         /// <summary>
@@ -810,7 +811,7 @@ operations: [
         /// <summary>
         /// Gets tthe agent web api route.
         /// </summary>
-        public string AgentWebApiRoute => (string.IsNullOrEmpty(Parent!.WebApiRoutePrefix) ? WebApiRoute : $"{Parent!.WebApiRoutePrefix}{(string.IsNullOrEmpty(WebApiRoute) || WebApiRoute.StartsWith("/") ? "" : "/")}{WebApiRoute}") ?? "";
+        public string AgentWebApiRoute => WebApiRoute ?? string.Empty;
 
         /// <summary>
         /// Gets the gRPC return type.
@@ -1161,6 +1162,18 @@ operations: [
                 _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
 
+            if (!string.IsNullOrEmpty(WebApiRoute) && WebApiRoute.StartsWith('!'))
+            {
+                WebApiRoute = WebApiRoute[1..];
+                if (WebApiRoute.StartsWith("/"))
+                    WebApiRoute = WebApiRoute[1..];
+            }
+            else
+                WebApiRoute = (string.IsNullOrEmpty(Parent!.WebApiRoutePrefix) ? WebApiRoute : $"{Parent!.WebApiRoutePrefix}{(string.IsNullOrEmpty(WebApiRoute) || WebApiRoute.StartsWith("/") ? "" : "/")}{WebApiRoute}") ?? "";
+
+            if (!string.IsNullOrEmpty(Root!.WebApiRoutePrefix))
+                WebApiRoute = $"{Root!.WebApiRoutePrefix}/{WebApiRoute}";
+
             if (Type == "Patch" || Type == "Update")
             {
                 WebApiGetOperation = DefaultWhereNull(WebApiGetOperation, () => Parent!.WebApiGetOperation ?? Parent!.Operations!.Where(x => x.Type == "Get").FirstOrDefault()?.Name ?? "Get");
@@ -1385,9 +1398,6 @@ operations: [
                         }
                     }
                 }
-
-                if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
-                    WebApiLocation = Parent!.WebApiRoutePrefix + "/" + WebApiLocation;
             }
 
             if (WebApiLocation?.FirstOrDefault() != '/')
@@ -1402,16 +1412,22 @@ operations: [
             if (AutoImplement != "HttpAgent")
                 return;
 
-            if (HttpAgentRoute == null && !string.IsNullOrEmpty(WebApiRoute))
+            HttpAgentRoute = DefaultWhereNull(HttpAgentRoute, () => Type switch
             {
-                if (Type == "Update")
-                    HttpAgentRoute = string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}"));
-                else
-                    HttpAgentRoute = WebApiRoute;
-            }
+                "GetColl" => "",
+                "Custom" => "",
+                "Update" => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}")),
+                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
+            });
 
-            HttpAgentRoute = string.IsNullOrEmpty(Parent!.HttpAgentRoutePrefix) ? HttpAgentRoute : Parent!.HttpAgentRoutePrefix + (string.IsNullOrEmpty(HttpAgentRoute) ? null : "/" + HttpAgentRoute);
-            HttpAgentRoute = DefaultWhereNull(HttpAgentRoute, () => WebApiRoute);
+            if (!string.IsNullOrEmpty(HttpAgentRoute) && HttpAgentRoute.StartsWith('!'))
+            {
+                HttpAgentRoute = HttpAgentRoute[1..];
+                if (HttpAgentRoute.StartsWith("/"))
+                    HttpAgentRoute = HttpAgentRoute[1..];
+            }
+            else
+                HttpAgentRoute = (string.IsNullOrEmpty(Parent!.HttpAgentRoutePrefix) ? HttpAgentRoute : $"{Parent!.HttpAgentRoutePrefix}{(string.IsNullOrEmpty(HttpAgentRoute) || HttpAgentRoute.StartsWith("/") ? "" : "/")}{HttpAgentRoute}") ?? "";
 
             HttpAgentMethod = DefaultWhereNull(HttpAgentMethod, () => WebApiMethod);
             HttpAgentMethod = HttpAgentMethod switch
@@ -1440,7 +1456,7 @@ operations: [
 
             sb.Append(DataArgs!.Name);
 
-            if (!string.IsNullOrEmpty(Parent.HttpAgentCode))
+            if (!string.IsNullOrEmpty(Parent!.HttpAgentCode))
                 sb.Append($".{Parent.HttpAgentCode}");
 
             if (!string.IsNullOrEmpty(HttpAgentCode))

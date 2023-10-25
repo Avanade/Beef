@@ -35,7 +35,7 @@ public partial class GenderDataSvc : IGenderDataSvc
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Create"))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }, new InvokerArgs { EventPublisher = _events });
 
     /// <inheritdoc/>
@@ -43,7 +43,7 @@ public partial class GenderDataSvc : IGenderDataSvc
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, $"Demo.Gender", "Update"))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }, new InvokerArgs { EventPublisher = _events });
 }
 

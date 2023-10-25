@@ -17,6 +17,19 @@ public partial interface IPerformanceReviewDataSvc
     Task<Result<PerformanceReview?>> GetAsync(Guid id);
 
     /// <summary>
+    /// Updates an existing <see cref="PerformanceReview"/>.
+    /// </summary>
+    /// <param name="value">The <see cref="PerformanceReview"/>.</param>
+    /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
+    Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value);
+
+    /// <summary>
+    /// Deletes the specified <see cref="PerformanceReview"/>.
+    /// </summary>
+    /// <param name="id">The <see cref="PerformanceReview"/> identifier.</param>
+    Task<Result> DeleteAsync(Guid id);
+
+    /// <summary>
     /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
     /// </summary>
     /// <param name="employeeId">The <see cref="Employee"/> identifier.</param>
@@ -30,17 +43,4 @@ public partial interface IPerformanceReviewDataSvc
     /// <param name="value">The <see cref="PerformanceReview"/>.</param>
     /// <returns>The created <see cref="PerformanceReview"/>.</returns>
     Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value);
-
-    /// <summary>
-    /// Updates an existing <see cref="PerformanceReview"/>.
-    /// </summary>
-    /// <param name="value">The <see cref="PerformanceReview"/>.</param>
-    /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-    Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value);
-
-    /// <summary>
-    /// Deletes the specified <see cref="PerformanceReview"/>.
-    /// </summary>
-    /// <param name="id">The <see cref="PerformanceReview"/> identifier.</param>
-    Task<Result> DeleteAsync(Guid id);
 }
