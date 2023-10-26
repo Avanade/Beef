@@ -128,7 +128,7 @@ jobs:
 
     - name: Set environment variables
       run: |
-        echo "DO_NOT_USE_APPINSIGHTS=true" >> $GITHUB_ENV
+        echp "APPLICATIONINSIGHTS_CONNECTION_STRING=rubbish-to-see-what-happens" >> $GITHUB_ENV"
         echo "My_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
         echo "MyEf_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
 
@@ -142,5 +142,5 @@ jobs:
 
     - name: Verify 'Samples/MyEf.Hr' testing
       run: |
-       dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
-       dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
