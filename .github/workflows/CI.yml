@@ -43,14 +43,14 @@ jobs:
 
     - name: Restore 'Samples' dependencies
       run: |
-        dotnet restore ./samples/Beef.Demo
+        dotnet restore ./samples/Demo
         dotnet restore ./samples/Cdr.Banking
         dotnet restore ./samples/My.Hr
         dotnet restore ./samples/MyEf.Hr
 
     - name: Build 'Samples' projects
       run: |
-        dotnet build ./samples/Beef.Demo --no-restore
+        dotnet build ./samples/Demo --no-restore
         dotnet build ./samples/Cdr.Banking --no-restore
         dotnet build ./samples/My.Hr --no-restore
         dotnet build ./samples/MyEf.Hr --no-restore
