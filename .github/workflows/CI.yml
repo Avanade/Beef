@@ -41,16 +41,23 @@ jobs:
         dotnet build ./tools/Beef.Database.MySql --no-restore
         dotnet build ./tools/Beef.Test.NUnit --no-restore
 
-    - name: Restore 'Samples' dependencies
+    - name: Restore 'Samples/Demo' dependencies
       run: |
-        dotnet restore ./samples/Demo
-        dotnet restore ./samples/Cdr.Banking
-        dotnet restore ./samples/My.Hr
-        dotnet restore ./samples/MyEf.Hr
+        dotnet restore ./samples/Demo/Beef.Demo.CodeGen
+        dotnet restore ./samples/Demo/Beef.Demo.Database
+        dotnet restore ./samples/Demo/Beef.Demo.Common
+        dotnet restore ./samples/Demo/Beef.Demo.Business
+        dotnet restore ./samples/Demo/Beef.Demo.Api
+        dotnet restore ./samples/Demo/Beef.Demo.Abc.Database
+        dotnet restore ./samples/Demo/Beef.Demo.Test
 
-    - name: Build 'Samples' projects
+
+    - name: Build 'Samples/Demo' projects
       run: |
-        dotnet build ./samples/Demo --no-restore
-        dotnet build ./samples/Cdr.Banking --no-restore
-        dotnet build ./samples/My.Hr --no-restore
-        dotnet build ./samples/MyEf.Hr --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.CodeGen --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Database --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Common --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Business --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Api --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
