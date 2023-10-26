@@ -163,3 +163,22 @@ jobs:
       run: |
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
+
+     # NuGet (local)
+
+    - name: NuGet publish
+      run: |
+        dotnet nuget add source ./packages --name beef
+        dotnet nuget push --source beef ./tools/Beef.CodeGen.Core/bin/Debug/Beef.CodeGen.Core.*.nupkg --skip-duplicate
+        dotnet nuget push --source beef ./tools/Beef.Database.Core/bin/Debug/Beef.Database.Core.*.nupkg --skip-duplicate
+        dotnet nuget push --source beef ./tools/Beef.Database.SqlServer/bin/Debug/Database.SqlServer.*.nupkg --skip-duplicate
+        dotnet nuget push --source beef ./tools/Beef.Database.MySql/bin/Debug/Database.MySql.*.nupkg --skip-duplicate
+        dotnet nuget push --source beef ./tools/Beef.Beef.Test.NUnit/bin/Debug/Beef.Test.NUnit.*.nupkg --skip-duplicate
+
+     # Templates
+
+    - name: Templates/Beef.Template.Solution build and publish
+      run: |
+        dotnet build ./Templates/Beef.Template.Solution
+        dotnet nuget push --source beef ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --skip-duplicate
+
