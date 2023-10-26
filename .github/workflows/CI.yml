@@ -38,7 +38,9 @@ jobs:
             6.0.x
             7.0.x
 
-    - name: Restore 'Tools' dependencies
+    # Tools
+
+    - name: Tools restore
       run: |
         dotnet restore ./tools/Beef.CodeGen.Core
         dotnet restore ./tools/Beef.Database.Core
@@ -46,7 +48,7 @@ jobs:
         dotnet restore ./tools/Beef.Database.MySql
         dotnet restore ./tools/Beef.Test.NUnit
 
-    - name: Build 'Tools' projects
+    - name: Tools build
       run: |
         dotnet build ./tools/Beef.CodeGen.Core --no-restore
         dotnet build ./tools/Beef.Database.Core --no-restore
@@ -54,7 +56,9 @@ jobs:
         dotnet build ./tools/Beef.Database.MySql --no-restore
         dotnet build ./tools/Beef.Test.NUnit --no-restore
 
-    - name: Restore 'Samples/Demo' dependencies
+    # Samples/Demo
+
+    - name: Samples/Demo restore
       run: |
         dotnet restore ./samples/Demo/Beef.Demo.CodeGen
         dotnet restore ./samples/Demo/Beef.Demo.Database
@@ -64,7 +68,7 @@ jobs:
         dotnet restore ./samples/Demo/Beef.Demo.Abc.Database
         dotnet restore ./samples/Demo/Beef.Demo.Test
 
-    - name: Build 'Samples/Demo' projects
+    - name: Samples/Demo build
       run: |
         dotnet build ./samples/Demo/Beef.Demo.CodeGen --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Database --no-restore
@@ -74,7 +78,9 @@ jobs:
         dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
 
-    - name: Restore 'Samples/Cdr.Banking' dependencies
+    # Samples/Cdr.Banking
+
+    - name: Samples/Cdr.Banking restore
       run: |
         dotnet restore ./samples/Cdr.Banking/Cdr.Banking.CodeGen
         dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Common
@@ -82,7 +88,7 @@ jobs:
         dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Api
         dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Test
 
-    - name: Build 'Samples/Cdr.Banking' projects
+    - name: Samples/Cdr.Banking build
       run: |
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.CodeGen --no-restore
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Common --no-restore
@@ -109,6 +115,17 @@ jobs:
         dotnet build ./samples/My.Hr/My.Hr.Business --no-restore
         dotnet build ./samples/My.Hr/My.Hr.Api --no-restore
         dotnet build ./samples/My.Hr/My.Hr.Test --no-restore
+
+    - name: Samples/My.Hr database
+      working-directory: ./samples/My.Hr/My.Hr.Database
+      run: dotnet run all --connection-varname My_Hr_ConnectionStrings__Database --expect-no-changes
+
+    - name: Samples/My.Hr code-gen
+      working-directory: ./samples/My.Hr/My.Hr.CodeGen
+      run: dotnet run all --expect-no-changes
+
+    - name: Samples/My.Hr testing
+      run: dotnet test ./samples/My.Hr/My.Hr.Test --no-build --verbosity normal
 
     # Samples/MyEf.Hr
 
