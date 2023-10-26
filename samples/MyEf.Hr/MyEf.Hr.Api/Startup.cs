@@ -82,10 +82,13 @@ namespace MyEf.Hr.Api
             services.AddHttpClient();
 
             // Add Azure monitor open telemetry.
-            services.AddOpenTelemetry().UseAzureMonitor();
-            services.Configure<AspNetCoreInstrumentationOptions>(options => options.RecordException = true);
-            services.Configure<EntityFrameworkInstrumentationOptions>(options => options.SetDbStatementForText = true);
-            services.ConfigureOpenTelemetryTracerProvider((sp, builder) => builder.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DO_NOT_USE_APPINSIGHTS")))
+            {
+                services.AddOpenTelemetry().UseAzureMonitor();
+                services.Configure<AspNetCoreInstrumentationOptions>(options => options.RecordException = true);
+                services.Configure<EntityFrameworkInstrumentationOptions>(options => options.SetDbStatementForText = true);
+                services.ConfigureOpenTelemetryTracerProvider((sp, builder) => builder.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
+            }
 
             // Add Swagger services.
             services.AddSwaggerGen(options =>
