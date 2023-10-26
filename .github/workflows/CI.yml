@@ -12,8 +12,17 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    services:
+      sql:
+       image: mcr.microsoft.com/mssql/server:2019-latest
+       ports:
+         - 1433:1433
+       env:
+         ACCEPT_EULA: Y
+         SA_PASSWORD: sAPWD23.^0
+       options: --name sqlserver
 
     steps:
     - uses: actions/checkout@v3
@@ -103,6 +112,8 @@ jobs:
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Business
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Api
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Test
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Test
 
     - name: Build 'Samples/MyEf.Hr' projects
       run: |
@@ -112,3 +123,23 @@ jobs:
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Business --no-restore
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Api --no-restore
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Test --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-restore
+
+    - name: Set environment variables
+      run: |
+        echo "My_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
+        echo "MyEf_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
+
+    - name: Verify 'Samples/MyEf.Hr' database
+      working-directory: ./samples/MyEf.Hr/MyEf.Hr.Database
+      run: dotnet run all --connection-varname MyEf_Hr_ConnectionStrings__Database --expect-no-changes
+
+    - name: Verify 'Samples/MyEf.Hr' code-gen
+      working-directory: ./samples/MyEf.Hr/MyEf.Hr.CodeGen
+      run: dotnet run all --expect-no-changes
+
+    - name: Verify 'Samples/MyEf.Hr' testing
+      run: |
+       dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
+       dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
