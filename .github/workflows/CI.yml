@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
 
     services:
       sql:
@@ -25,7 +27,7 @@ jobs:
        options: --name sqlserver
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
   
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -128,7 +130,6 @@ jobs:
 
     - name: Set environment variables
       run: |
-        echo "APPLICATIONINSIGHTS_CONNECTION_STRING=rubbish-to-see-what-happens" >> $GITHUB_ENV
         echo "My_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
         echo "MyEf_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
 
