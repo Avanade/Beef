@@ -25,7 +25,7 @@ jobs:
             6.0.x
             7.0.x
 
-    - name: Restore 'Tools'' dependencies
+    - name: Restore 'Tools' dependencies
       run: |
         dotnet restore ./tools/Beef.CodeGen.Core
         dotnet restore ./tools/Beef.Database.Core
@@ -40,3 +40,17 @@ jobs:
         dotnet build ./tools/Beef.Database.SqlServer --no-restore
         dotnet build ./tools/Beef.Database.MySql --no-restore
         dotnet build ./tools/Beef.Test.NUnit --no-restore
+
+    - name: Restore 'Samples' dependencies
+      run: |
+        dotnet restore ./samples/Beef.Demo
+        dotnet restore ./samples/Cdr.Banking
+        dotnet restore ./samples/My.Hr
+        dotnet restore ./samples/MyEf.Hr
+
+    - name: Build 'Samples' projects
+      run: |
+        dotnet build ./samples/Beef.Demo --no-restore
+        dotnet build ./samples/Cdr.Banking --no-restore
+        dotnet build ./samples/My.Hr --no-restore
+        dotnet build ./samples/MyEf.Hr --no-restore
