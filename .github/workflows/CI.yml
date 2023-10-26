@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+      My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
 
     services:
       sql:
@@ -88,7 +90,9 @@ jobs:
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
 
-    - name: Restore 'Samples/My.Hr' dependencies
+    # Samples/My.Hr
+
+    - name: Samples/My.Hr restore
       run: |
         dotnet restore ./samples/My.Hr/My.Hr.CodeGen
         dotnet restore ./samples/My.Hr/My.Hr.Database
@@ -97,7 +101,7 @@ jobs:
         dotnet restore ./samples/My.Hr/My.Hr.Api
         dotnet restore ./samples/My.Hr/My.Hr.Test
 
-    - name: Build 'Samples/My.Hr' projects
+    - name: Samples/My.Hr build
       run: |
         dotnet build ./samples/My.Hr/My.Hr.CodeGen --no-restore
         dotnet build ./samples/My.Hr/My.Hr.Database --no-restore
@@ -106,7 +110,9 @@ jobs:
         dotnet build ./samples/My.Hr/My.Hr.Api --no-restore
         dotnet build ./samples/My.Hr/My.Hr.Test --no-restore
 
-    - name: Restore 'Samples/MyEf.Hr' dependencies
+    # Samples/MyEf.Hr
+
+    - name: Samples/MyEf.Hr restore
       run: |
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.CodeGen
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Database
@@ -117,7 +123,7 @@ jobs:
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions
         dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Test
 
-    - name: Build 'Samples/MyEf.Hr' projects
+    - name: Samples/MyEf.Hr build
       run: |
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.CodeGen --no-restore
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Database --no-restore
@@ -128,20 +134,15 @@ jobs:
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions --no-restore
         dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-restore
 
-    - name: Set environment variables
-      run: |
-        echo "My_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
-        echo "MyEf_Hr_ConnectionStrings__Database=Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true" >> $GITHUB_ENV
-
-    - name: Verify 'Samples/MyEf.Hr' database
+    - name: Samples/MyEf.Hr database
       working-directory: ./samples/MyEf.Hr/MyEf.Hr.Database
       run: dotnet run all --connection-varname MyEf_Hr_ConnectionStrings__Database --expect-no-changes
 
-    - name: Verify 'Samples/MyEf.Hr' code-gen
+    - name: Samples/MyEf.Hr code-gen
       working-directory: ./samples/MyEf.Hr/MyEf.Hr.CodeGen
       run: dotnet run all --expect-no-changes
 
-    - name: Verify 'Samples/MyEf.Hr' testing
+    - name: Samples/MyEf.Hr testing
       run: |
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
