@@ -78,3 +78,39 @@ jobs:
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Business --no-restore
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
+
+    - name: Restore 'Samples/My.Hr' dependencies
+      run: |
+        dotnet restore ./samples/My.Hr/My.Hr.CodeGen
+        dotnet restore ./samples/My.Hr/My.Hr.Database
+        dotnet restore ./samples/My.Hr/My.Hr.Common
+        dotnet restore ./samples/My.Hr/My.Hr.Business
+        dotnet restore ./samples/My.Hr/My.Hr.Api
+        dotnet restore ./samples/My.Hr/My.Hr.Test
+
+    - name: Build 'Samples/My.Hr' projects
+      run: |
+        dotnet build ./samples/My.Hr/My.Hr.CodeGen --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Database --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Common --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Business --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Api --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Test --no-restore
+
+    - name: Restore 'Samples/MyEf.Hr' dependencies
+      run: |
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.CodeGen
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Database
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Common
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Business
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Api
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Test
+
+    - name: Build 'Samples/MyEf.Hr' projects
+      run: |
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.CodeGen --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Database --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Common --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Business --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Api --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Test --no-restore
