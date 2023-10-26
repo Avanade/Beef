@@ -51,7 +51,6 @@ jobs:
         dotnet restore ./samples/Demo/Beef.Demo.Abc.Database
         dotnet restore ./samples/Demo/Beef.Demo.Test
 
-
     - name: Build 'Samples/Demo' projects
       run: |
         dotnet build ./samples/Demo/Beef.Demo.CodeGen --no-restore
@@ -61,3 +60,21 @@ jobs:
         dotnet build ./samples/Demo/Beef.Demo.Api --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
+
+    - name: Restore 'Samples/Cdr.Banking' dependencies
+      run: |
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.CodeGen
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Database
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Common
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Business
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Api
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Test
+
+    - name: Build 'Samples/Cdr.Banking' projects
+      run: |
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.CodeGen --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Database --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Common --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Business --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
