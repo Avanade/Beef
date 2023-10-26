@@ -17,13 +17,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+  
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        dotnet-version: |
+            6.0.x
+            7.0.x
+
+    - name: Restore 'Tools'' dependencies
+      run: |
+        dotnet restore ./tools/Beef.CodeGen.Core
+        dotnet restore ./tools/Beef.Database.Core
+        dotnet restore ./tools/Beef.Database.SqlServer
+        dotnet restore ./tools/Beef.Database.MySql
+        dotnet restore ./tools/Beef.Test.NUnit
+
+    - name: Build 'Tools' projects
+      run: |
+        dotnet build ./tools/Beef.CodeGen.Core --no-restore
+        dotnet build ./tools/Beef.Database.Core --no-restore
+        dotnet build ./tools/Beef.Database.SqlServer --no-restore
+        dotnet build ./tools/Beef.Database.MySql --no-restore
+        dotnet build ./tools/Beef.Test.NUnit --no-restore
