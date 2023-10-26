@@ -166,19 +166,20 @@ jobs:
 
      # NuGet (local)
 
-    - name: NuGet publish
+    - name: NuGet publish (local)
       run: |
+        mkdir ./packages
         dotnet nuget add source ./packages --name beef
-        dotnet nuget push --source beef ./tools/Beef.CodeGen.Core/bin/Debug/Beef.CodeGen.Core.*.nupkg --skip-duplicate
-        dotnet nuget push --source beef ./tools/Beef.Database.Core/bin/Debug/Beef.Database.Core.*.nupkg --skip-duplicate
-        dotnet nuget push --source beef ./tools/Beef.Database.SqlServer/bin/Debug/Database.SqlServer.*.nupkg --skip-duplicate
-        dotnet nuget push --source beef ./tools/Beef.Database.MySql/bin/Debug/Database.MySql.*.nupkg --skip-duplicate
-        dotnet nuget push --source beef ./tools/Beef.Beef.Test.NUnit/bin/Debug/Beef.Test.NUnit.*.nupkg --skip-duplicate
+        dotnet nuget push ./tools/Beef.CodeGen.Core/bin/Debug/Beef.CodeGen.Core.*.nupkg --source beef --skip-duplicate
+        dotnet nuget push ./tools/Beef.Database.Core/bin/Debug/Beef.Database.Core.*.nupkg --source beef  --skip-duplicate
+        dotnet nuget push ./tools/Beef.Database.SqlServer/bin/Debug/Database.SqlServer.*.nupkg --source beef --skip-duplicate
+        dotnet nuget push ./tools/Beef.Database.MySql/bin/Debug/Database.MySql.*.nupkg --source beef --skip-duplicate
+        dotnet nuget push ./tools/Beef.Beef.Test.NUnit/bin/Debug/Beef.Test.NUnit.*.nupkg --source beef --skip-duplicate
 
      # Templates
 
-    - name: Templates/Beef.Template.Solution build and publish
+    - name: Templates/Beef.Template.Solution build and publish (local)
       run: |
         dotnet build ./Templates/Beef.Template.Solution
-        dotnet nuget push --source beef ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --skip-duplicate
+        dotnet nuget push ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --source beef --skip-duplicate
 
