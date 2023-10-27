@@ -195,7 +195,7 @@ jobs:
         dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
 
     - name: Samples/Cdr.Banking code-gen
-      working-directory: ./Cdr.Banking/Cdr.Banking.CodeGen
+      working-directory: ./samples/Cdr.Banking/Cdr.Banking.CodeGen
       run: dotnet run all --expect-no-changes --no-build
 
     - name: Samples/Cdr.Banking testing
