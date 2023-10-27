@@ -70,6 +70,7 @@ jobs:
         dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
         dotnet new nugetconfig
         dotnet nuget add source ./packages
+        dotnet new install ./templates/Beef.Template.Solution
 
     # Samples/Demo
 
