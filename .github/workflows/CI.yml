@@ -183,7 +183,7 @@ jobs:
     # Template - Sql Server with EF
 
     - name: Template/SqlSever/Ef create
-      run: dotnet new beef --company Foo.Ef --appname Bar --database SqlServer --no-restore --output Foo.Ef.Bar
+      run: dotnet new beef --company Foo.Ef --appname Bar --datasource SqlServer --output Foo.Ef.Bar
 
     - name: Template/SqlServer/Ef database
       working-directory: ./Foo.Ef.Bar/Foo.Ef.Bar.Database
