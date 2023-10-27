@@ -16,6 +16,8 @@ jobs:
 
     env:
       APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+      Beef_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Beef.Demo;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Beef_Cosmos__ConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
@@ -107,6 +109,17 @@ jobs:
         dotnet build ./samples/Demo/Beef.Demo.Api --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
+
+    - name: Samples/Demo database
+      working-directory: ./samples/Demo/Beef.Demo.Database
+      run: dotnet run all --connection-varname Beef_ConnectionStrings__Database --expect-no-changes --no-build
+
+    - name: Samples/Demo code-gen
+      working-directory: ./samples/Demo/Beef.Demo.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/Demo testing
+      run: dotnet test ./samples/Demo/Beef.Demo.Test --no-build
 
     # Samples/My.Hr
 
