@@ -241,6 +241,6 @@ jobs:
       run: dotnet run all
 
     - name: Template/MySQL/Ef test
-      working-directory: ./Foo.My.Bar
+      working-directory: ./Foo.My.Baz
       run: dotnet test 
 
