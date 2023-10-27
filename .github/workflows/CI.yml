@@ -169,17 +169,16 @@ jobs:
     - name: NuGet publish (local)
       run: |
         mkdir ./packages
-        dotnet nuget add source ./packages --name beef
-        dotnet nuget push ./tools/Beef.CodeGen.Core/bin/Debug/Beef.CodeGen.Core.*.nupkg --source beef --skip-duplicate
-        dotnet nuget push ./tools/Beef.Database.Core/bin/Debug/Beef.Database.Core.*.nupkg --source beef  --skip-duplicate
-        dotnet nuget push ./tools/Beef.Database.SqlServer/bin/Debug/Database.SqlServer.*.nupkg --source beef --skip-duplicate
-        dotnet nuget push ./tools/Beef.Database.MySql/bin/Debug/Database.MySql.*.nupkg --source beef --skip-duplicate
-        dotnet nuget push ./tools/Beef.Beef.Test.NUnit/bin/Debug/Beef.Test.NUnit.*.nupkg --source beef --skip-duplicate
+        dotnet pack ./tools/Beef.CodeGen.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
 
      # Templates
 
-    - name: Templates/Beef.Template.Solution build and publish (local)
-      run: |
-        dotnet build ./Templates/Beef.Template.Solution
-        dotnet nuget push ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --source beef --skip-duplicate
+    #- name: Templates/Beef.Template.Solution build and publish (local)
+    #  run: |
+    #    dotnet build ./Templates/Beef.Template.Solution
+    #    dotnet nuget push ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --source beef --skip-duplicate
 
