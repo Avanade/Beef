@@ -17,6 +17,7 @@ jobs:
       APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
 
     services:
       sql:
@@ -178,6 +179,19 @@ jobs:
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
 
+    # Template - Sql Server with EF
 
+    - name: Template/SqlSever/Ef create
+      run: dotnet new beef --company Foo.Ef --appname Bar --database SqlServer --no-restore --output Foo.Ef.Bar
 
+    - name: Template/SqlServer/Ef database
+      working-directory: ./Foo.Ef.Bar/Bar.Database
+      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
 
+    - name: Template/SqlServer/Ef code-gen
+      working-directory: ./Foo.Ef.Bar/Bar.CodeGen
+      run: dotnet run all
+
+    - name: Template/SqlServer/Ef test
+      working-directory: ./Foo.Ef.Bar/Bar.Api
+      run: dotnet test 
