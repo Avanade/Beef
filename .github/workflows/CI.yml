@@ -19,7 +19,7 @@ jobs:
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
-      Baz_ConnectionStrings__Database: Server=localhost; Port=3306; Database=Foo.Baz; Uid=dbuser; Pwd=sAPWD23.^0;
+      Baz_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Baz;Uid=dbuser;Pwd=yourStrong#!Password;
 
     services:
       sql:
@@ -36,7 +36,7 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_ROOT_PASSWORD: sAPWD23.^0
+          MYSQL_ROOT_PASSWORD: yourStrong#!Password
         options: --name mysql
 
     steps:
