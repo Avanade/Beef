@@ -180,5 +180,5 @@ jobs:
 
     - name: Templates/Beef.Template.Solution build and publish (local)
       run: |
-        dotnet build ./Templates/Beef.Template.Solution
-        dotnet pack ./Templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
+        dotnet build ./templates/Beef.Template.Solution
+        dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
