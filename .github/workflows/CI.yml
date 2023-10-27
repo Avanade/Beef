@@ -6,9 +6,11 @@ name: .NET
 on:
   push:
     branches: [ "master" ]
+    paths: [ "tools/**", "templates/**", "samples/**" ]
     
   pull_request:
     branches: [ "master" ]
+    paths: [ "tools/**", "templates/**", "samples/**" ]
 
 jobs:
   build:

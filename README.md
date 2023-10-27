@@ -169,6 +169,10 @@ Assembly | Description | NuGet
 -|-|-
 [`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework (backwards compatibility only). | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
 
+The current build status is as follows:
+
+[![CI](https://github.com/Avanade/CoreEx/workflows/CI/badge.svg)](https://github.com/Avanade/CoreEx/actions)
+
 <br/>
 
 ## Samples
