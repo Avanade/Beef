@@ -164,7 +164,7 @@ jobs:
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
 
-     # NuGet (local)
+    # NuGet public (local)
 
     - name: NuGet publish (local)
       run: |
@@ -174,11 +174,11 @@ jobs:
         dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
+        dotnet nuget add source ./packages 
 
-     # Templates
+    # Templates (build & publish)
 
-    #- name: Templates/Beef.Template.Solution build and publish (local)
-    #  run: |
-    #    dotnet build ./Templates/Beef.Template.Solution
-    #    dotnet nuget push ./Templates/Beef.Template.Solution/bin/Debug/Beef.Template.Solution.*.nupkg --source beef --skip-duplicate
-
+    - name: Templates/Beef.Template.Solution build and publish (local)
+      run: |
+        dotnet build ./Templates/Beef.Template.Solution
+        dotnet pack ./Templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
