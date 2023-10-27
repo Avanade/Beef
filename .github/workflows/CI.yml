@@ -13,21 +13,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Baz_ConnectionStrings__Database: Server=localhost; Port=3306; Database=Foo.Baz; Uid=dbuser; Pwd=sAPWD23.^0;
 
     services:
       sql:
-       image: mcr.microsoft.com/mssql/server:2019-latest
-       ports:
-         - 1433:1433
-       env:
-         ACCEPT_EULA: Y
-         SA_PASSWORD: sAPWD23.^0
-       options: --name sqlserver
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: sAPWD23.^0
+        options: --name sqlserver
+
+      mysql:
+        image: mysql
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: sAPWD23.^0
+        options: --name mysql
 
     steps:
     - uses: actions/checkout@v4
@@ -196,3 +206,38 @@ jobs:
     - name: Template/SqlServer/Ef test
       working-directory: ./Foo.Ef.Bar
       run: dotnet test 
+
+     # Template - Sql Server with Entity Framework
+
+    - name: Template/SqlSever/Sp create
+      run: dotnet new beef --company Foo.Sp --appname Bar --datasource SqlServerProcs --output Foo.Sp.Bar
+
+    - name: Template/SqlServer/Sp database
+      working-directory: ./Foo.Sp.Bar/Foo.Sp.Bar.Database
+      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/SqlServer/Sp code-gen
+      working-directory: ./Foo.Sp.Bar/Foo.Sp.Bar.CodeGen
+      run: dotnet run all
+
+    - name: Template/SqlServer/Sp test
+      working-directory: ./Foo.Sp.Bar
+      run: dotnet test
+
+     # Template - MySQL with Entity Framework
+
+    - name: Template/MySQL/Ef create
+      run: dotnet new beef --company Foo.My --appname Baz --datasource MySQL --output Foo.My.Baz
+
+    - name: Template/MySQL/Ef database
+      working-directory: ./Foo.My.Baz/Foo.My.Baz.Database
+      run: dotnet run dropandall --connection-varname Baz_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/MySQL/Ef code-gen
+      working-directory: ./Foo.My.Baz/Foo.My.Baz.CodeGen
+      run: dotnet run all
+
+    - name: Template/MySQL/Ef test
+      working-directory: ./Foo.My.Bar
+      run: dotnet test 
+
