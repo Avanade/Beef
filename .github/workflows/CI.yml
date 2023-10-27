@@ -20,6 +20,7 @@ jobs:
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Baz_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Baz;Uid=ciuser;Pwd=ciStrong#!Password;AllowUserVariables=true;UseAffectedRows=false;
+      Cdr_CosmosConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
 
     services:
       sql:
@@ -107,24 +108,6 @@ jobs:
         dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
         dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
 
-    # Samples/Cdr.Banking
-
-    - name: Samples/Cdr.Banking restore
-      run: |
-        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.CodeGen
-        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Common
-        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Business
-        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Api
-        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Test
-
-    - name: Samples/Cdr.Banking build
-      run: |
-        dotnet build ./samples/Cdr.Banking/Cdr.Banking.CodeGen --no-restore
-        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Common --no-restore
-        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Business --no-restore
-        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
-        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
-
     # Samples/My.Hr
 
     - name: Samples/My.Hr restore
@@ -154,7 +137,7 @@ jobs:
       run: dotnet run all --expect-no-changes --no-build
 
     - name: Samples/My.Hr testing
-      run: dotnet test ./samples/My.Hr/My.Hr.Test --no-build --verbosity normal
+      run: dotnet test ./samples/My.Hr/My.Hr.Test --no-build
 
     # Samples/MyEf.Hr
 
@@ -190,8 +173,33 @@ jobs:
 
     - name: Samples/MyEf.Hr testing
       run: |
-        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
-        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build
+
+    # Samples/Cdr.Banking
+
+    - name: Samples/Cdr.Banking restore
+      run: |
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.CodeGen
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Common
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Business
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Api
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Test
+
+    - name: Samples/Cdr.Banking build
+      run: |
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.CodeGen --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Common --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Business --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
+
+    - name: Samples/Cdr.Banking code-gen
+      working-directory: ./Cdr.Banking/Cdr.Banking.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/Cdr.Banking testing
+      run: dotnet test ./samples/Cdr.Banking/Cdr.Banking.Test --no-build
 
     # Template - Sql Server with EF
 
