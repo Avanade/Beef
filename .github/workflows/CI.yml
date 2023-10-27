@@ -47,6 +47,7 @@ jobs:
         dotnet restore ./tools/Beef.Database.SqlServer
         dotnet restore ./tools/Beef.Database.MySql
         dotnet restore ./tools/Beef.Test.NUnit
+        dotnet restore ./templates/Beef.Template.Solution
 
     - name: Tools build
       run: |
@@ -55,6 +56,18 @@ jobs:
         dotnet build ./tools/Beef.Database.SqlServer --no-restore
         dotnet build ./tools/Beef.Database.MySql --no-restore
         dotnet build ./tools/Beef.Test.NUnit --no-restore
+        dotnet build ./templates/Beef.Template.Solution --no-restore
+
+    - name: Tools NuGet publish (local)
+      run: |
+        mkdir ./packages
+        dotnet pack ./tools/Beef.CodeGen.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
+        dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
+        dotnet nuget add source ./packages 
 
     # Samples/Demo
 
@@ -118,11 +131,11 @@ jobs:
 
     - name: Samples/My.Hr database
       working-directory: ./samples/My.Hr/My.Hr.Database
-      run: dotnet run all --connection-varname My_Hr_ConnectionStrings__Database --expect-no-changes
+      run: dotnet run all --connection-varname My_Hr_ConnectionStrings__Database --expect-no-changes --no-build
 
     - name: Samples/My.Hr code-gen
       working-directory: ./samples/My.Hr/My.Hr.CodeGen
-      run: dotnet run all --expect-no-changes
+      run: dotnet run all --expect-no-changes --no-build
 
     - name: Samples/My.Hr testing
       run: dotnet test ./samples/My.Hr/My.Hr.Test --no-build --verbosity normal
@@ -153,32 +166,17 @@ jobs:
 
     - name: Samples/MyEf.Hr database
       working-directory: ./samples/MyEf.Hr/MyEf.Hr.Database
-      run: dotnet run all --connection-varname MyEf_Hr_ConnectionStrings__Database --expect-no-changes
+      run: dotnet run all --connection-varname MyEf_Hr_ConnectionStrings__Database --expect-no-changes --no-build
 
     - name: Samples/MyEf.Hr code-gen
       working-directory: ./samples/MyEf.Hr/MyEf.Hr.CodeGen
-      run: dotnet run all --expect-no-changes
+      run: dotnet run all --expect-no-changes --no-build
 
     - name: Samples/MyEf.Hr testing
       run: |
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build --verbosity normal
         dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build --verbosity normal
 
-    # NuGet public (local)
 
-    - name: NuGet publish (local)
-      run: |
-        mkdir ./packages
-        dotnet pack ./tools/Beef.CodeGen.Core --output ./packages --configuration Debug --no-build
-        dotnet pack ./tools/Beef.Database.Core --output ./packages --configuration Debug --no-build
-        dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
-        dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
-        dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
-        dotnet nuget add source ./packages 
 
-    # Templates (build & publish)
 
-    - name: Templates/Beef.Template.Solution build and publish (local)
-      run: |
-        dotnet build ./templates/Beef.Template.Solution
-        dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
