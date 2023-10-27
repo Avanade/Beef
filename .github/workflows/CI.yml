@@ -67,7 +67,8 @@ jobs:
         dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
         dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
-        dotnet nuget add source ./packages 
+        dotnet new nugetconfig
+        dotnet nuget add source ./packages
 
     # Samples/Demo
 
