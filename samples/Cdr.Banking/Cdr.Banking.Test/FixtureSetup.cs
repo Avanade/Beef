@@ -34,20 +34,20 @@ namespace Cdr.Banking.Test
                     {
                         Id = _cosmosDb.Accounts.Container.Id,
                         PartitionKeyPath = "/_partitionKey"
-                    }, 400, cancellationToken: ct).ConfigureAwait(false);
+                    }, cancellationToken: ct).ConfigureAwait(false);
 
                     var tc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
                     {
                         Id = _cosmosDb.Transactions.Container.Id,
                         PartitionKeyPath = "/accountId"
-                    }, 400, cancellationToken: ct).ConfigureAwait(false);
+                    }, cancellationToken: ct).ConfigureAwait(false);
 
                     var rdc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
                     {
                         Id = "RefData",
                         PartitionKeyPath = "/_partitionKey",
                         UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                    }, 400, cancellationToken: ct).ConfigureAwait(false);
+                    }, cancellationToken: ct).ConfigureAwait(false);
 
                     var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
                     await _cosmosDb.Accounts.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
