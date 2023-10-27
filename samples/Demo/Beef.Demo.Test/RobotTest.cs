@@ -42,7 +42,7 @@ namespace Beef.Demo.Test
                     Id = "Items",
                     PartitionKeyPath = "/_partitionKey",
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/serialNo" } } } }
-                }, 400).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Data.yaml");
             await cosmosDb.Items.ImportBatchAsync(jdr, "Robot").ConfigureAwait(false);
@@ -53,7 +53,7 @@ namespace Beef.Demo.Test
                     Id = "RefData",
                     PartitionKeyPath = "/_partitionKey",
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                }, 400).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
             await cosmosDb.ImportValueBatchAsync<Business.Data.Model.PowerSource>("RefData", jdr).ConfigureAwait(false);
