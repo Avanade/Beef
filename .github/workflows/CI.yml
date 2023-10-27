@@ -185,13 +185,13 @@ jobs:
       run: dotnet new beef --company Foo.Ef --appname Bar --database SqlServer --no-restore --output Foo.Ef.Bar
 
     - name: Template/SqlServer/Ef database
-      working-directory: ./Foo.Ef.Bar/Bar.Database
+      working-directory: ./Foo.Ef.Bar/Foo.Ef.Bar.Database
       run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
 
     - name: Template/SqlServer/Ef code-gen
-      working-directory: ./Foo.Ef.Bar/Bar.CodeGen
+      working-directory: ./Foo.Ef.Bar/Foo.Ef.Bar.CodeGen
       run: dotnet run all
 
     - name: Template/SqlServer/Ef test
-      working-directory: ./Foo.Ef.Bar/Bar.Api
+      working-directory: ./Foo.Ef.Bar
       run: dotnet test 
