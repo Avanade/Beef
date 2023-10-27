@@ -17,7 +17,7 @@ jobs:
     env:
       APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
       Beef_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Beef.Demo;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
-      Beef_Cosmos__ConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
+      Beef_Cosmos__Connection: ${{ secrets.COSMOS_CONNECTION_STRING }}
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
