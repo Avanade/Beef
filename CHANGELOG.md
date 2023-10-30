@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.6.9
+- *Fixed:* The `yaml` sub-command generated code updated to leverage the new `Entity.Behavior`, being `behavior: cgupd`, where CRUD capabilities are requested.
+
 ## v5.6.8
 - *Fixed:* `Entity.Crud` deprecated and replaced with new `Entity.Behavior` to enable improved flexibility in specifying which CRUD-style operation(s) are to be implemented: 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete, GetByArgs ('B') and GetAll ('A'). Any combination (or order) can be provided to auto-generate versus specifiying individual properties (which can still be used if applicable). Where `crud: true` was previously specified, this should be replaced with `behavior: cgupd` (note that code-generation will error where not updated).
 - *Fixed:* `Entity.WebApiRoutePrefix` no longer applied to the `Controller` class using the `Route` attribute; now always included as the full path specified within the HTTP method attribute per operation. The `Operation.WebApiRoute` can now be prefixed with a `!` character to indicate that the `Entity.WebApiRoutePrefix` should not be applied; i.e. the supplied value is leveraged as-is. This enables more scenarios for the `Entity.Behavior` above to be used, as often it was the route value that necessitated full operation specification within YAML.
