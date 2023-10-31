@@ -93,7 +93,7 @@ Following represents the high-level mapping between the existing _Beef_ packages
 Existing | New
 -|-
 `Beef.Abstractions` | `CoreEx`
-`Beef.AspNetCore.WebApi` | `CoreEx`
+`Beef.AspNetCore.WebApi` | `CoreEx.AspNetCore`
 `Beef.Core` | `CoreEx`, `CoreEx.Validation`, `CoreEx.Newtonsoft`, `CoreEx.AutoMapper`
 `Beef.Data.Database` | `CoreEx.Database.SqlServer` includes `CoreEx.Database`
 `Beef.Data.Database.Cdc` | `CoreEx.Database.SqlServer`
