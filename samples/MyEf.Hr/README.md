@@ -59,63 +59,23 @@ Endpoint | Description
 `DELETE /reviews/id` | Delete an existing review.
 `GET /employee/id/reviews` | Gets all review(s) for the employee (with paging support).
 
-</br>
-
-## Solution skeleton
-
-This solution should be created using the solution [template](../../templates/Beef.Template.Solution/README.md) capability, following the getting started [guide](../../docs/Sample-SqlServer-EF-GettingStarted.md).
-
-The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is _highly recommended_ that the `MyEf.Hr` naming convention below is used.
-
-```
-dotnet new install beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
-mkdir MyEf.Hr
-cd MyEf.Hr
-dotnet new beef --company MyEf --appname Hr --datasource SqlServer
-```
-
-The following solution structure will have been generated. Open `MyEf.Hr.sln` in Visual Studio.
-
-```
-└── MyEf.Hr               # Solution that references all underlying projects
-  └── Testing
-    └── MyEf.Hr.Test      # Unit and intra-integration tests
-  └── Tools
-    └── MyEf.Hr.CodeGen   # Entity and Reference Data code generation console
-    └── MyEf.Hr.Database  # Database code generation console
-  └── MyEf.Hr.Api         # API end-point and operations
-  └── MyEf.Hr.Business    # Core business logic components
-  └── MyEf.Hr.Common      # Common / shared components
-```
-
-_Note:_ Code generation should **not** be performed before updating the corresponding YAML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
-
-Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the baseline to build up the solution from.
-
-</br>
-
-## Railway-oriented programming
-
-_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
-
-The [`Result`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/Result.cs) and [`Result<T>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/ResultT.cs) have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
-
 <br/>
 
-## Implementation steps
+## Core Implementation steps
 
 As described earlier, this sample will walk through the implementation in a number of logical steps:
 
-1. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
-2. [Employee API](./docs/Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
-3. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
-4. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.
-5. [Employee Terminate](./docs/Employee-Terminate.md) - adds the `Employee` termination capability and tests.
-6. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
+1. [Solution Skeleton](./docs/Solution-Skeleton.md) - start by creating a VS solution from Beef template
+2. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
+3. [Employee API](./docs/Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
+4. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
+5. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.
+6. [Employee Terminate](./docs/Employee-Terminate.md) - adds the `Employee` termination capability and tests.
+7. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
 
 <br/>
 
-## Event driven architecture implementation
+## Event Driven Architecture implementation
 
 The implementation so far has created the API capabilities to perform operations on the data as originally defined in the [scope](#Scope). This section can be [skipped](#Conclusion) where the related Event-driven architecture capabilities are not required.
 
@@ -147,9 +107,9 @@ The _HR_ and _Security_ domains are completely decoupled from each other; in tha
 
 This _EDA_ sample will walk through the implementation in a number of logical steps (these describe the integration of the _CoreEx_ capabilities to enable) to achieve the end-to-end Employee's User Account deactivation:
 
-7. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database.
-8. [Service Bus Publish](./docs/Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
-9. [Service Bus Subscribe](./docs/Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
+8. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database.
+9. [Service Bus Publish](./docs/Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
+10. [Service Bus Subscribe](./docs/Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
 
 <br/>
 

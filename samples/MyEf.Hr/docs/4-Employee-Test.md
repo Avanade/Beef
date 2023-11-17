@@ -1,4 +1,4 @@
-﻿# Step 3 - Employee Test
+﻿# Step 4 - Employee Test
 
 This will walk through the process of creating the required end-to-end intra-domain integration tests to validate the employee CRUD APIs.
 
@@ -8,7 +8,9 @@ This will walk through the process of creating the required end-to-end intra-dom
 
 ## Project structure
 
-The overall `MyEf.Hr.Test` solution was created with the following; the existing `PersonTest.cs`, `PersonValidatorTest.cs` and `A270_GetByArgs_RefDataText-Response.json` file should be removed (deleted).
+When the `MyEf.Hr.Test` solution is created during the solution skeleton generation, the project structure is as detailed below.
+
+For this tutorial, you should delete the `A270_GetByArgs_RefDataText-Response.json` file (and ensure the `PersonTest.cs` and `PersonValidatorTest.cs` files were deleted in the previous steps).
 
 ```
 └── Apis
@@ -27,9 +29,9 @@ The overall `MyEf.Hr.Test` solution was created with the following; the existing
 
 ## Data population
 
-For the end-to-end testing to function data must first be populated into the database; noting that the Reference Data configured and created earlier will be included automatically. Foundationally, the `MyEf.Hr.Database` is leveraged to create and set up the database, as well as populate it with data.
+For the end-to-end testing, data must first be populated into the database; noting that the Reference Data configured and created earlier will be included automatically. (Foundationally, the `MyEf.Hr.Database` is leveraged to create and set up the database, as well as populate it with data.)
 
-For the purposes of testing the APIs implemented so far, a set of employees and related data is required. The YAML defines the schema, table(s) and colums(s) with the required column data values. Replace the existing `Data.yaml` with the following.
+For the purposes of testing the APIs implemented so far, a set of employees and related data is required. The YAML defines the schema, table(s) and colums(s) with the required column data values. Replace the existing `Data/Data.yaml` with the following.
 
 ``` yaml
 Hr:
@@ -48,25 +50,30 @@ Hr:
 
 ## Employee API test
 
-For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../MyEf.Hr.Test/Apis/EmployeeTest.cs) and paste into an equivalent (new) `EmployeeTest.cs`. Comment out the regions `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
+Underneath the Apis folder, create a new class called `EmployeeTest.cs`.  For the purposes of this sample, copy the contents of the sample [`EmployeeTest.cs`](../MyEf.Hr.Test/Apis/EmployeeTest.cs) and replace the contents of the new class.
 
-Review and execute the tests and ensure they all pass as expected.
+Comment out the regions `GetByArgs` and `Terminate` as these capabilities have not been implemented yet.
 
 </br>
 
 ## Employee Validator test
 
-This is more of a pure unit test; in that all data repository access is mocked out. This allows these to executed faster without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
+This is more of a pure unit test; in that all data repository access is mocked out. This allows for faster execution without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
 
-For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
 
-Review and execute the tests and ensure they all pass as expected.
+
+Underneath the Apis folder, create a new class called `EmployeeValidatorTest.cs`.  For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
+
+
 
 </br>
 
-## Conclusion
+## Verify
 
 At this stage we now have a set of functioning and tested employee CRUD-based APIs. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
 
-Next we will implement a new [employee search](./Employee-Search.md) endpoint.
+To verify, build the test project and ensure there are no compilation errors. Utilizing the test explorer, review and execute the EmployeeTest as well as the EmployeeValidatorTest tests and ensure they all pass as expected.
 
+## Next Step
+
+Next we will implement a new [employee search](./5-Employee-Search.md) endpoint.

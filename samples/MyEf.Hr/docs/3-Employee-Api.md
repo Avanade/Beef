@@ -1,25 +1,31 @@
-﻿# Step 2 - Employee API
+﻿# Step 3 - Employee API
 
 This will walk through the process of creating the required APIs, including the related business and data access logic.
 
 [`Beef.CodeGen.Core`](../../../tools/Beef.CodeGen.Core/README.md) provides the code-generation capabilities that will be leveraged. The underlying documentation describes these capabilities and the code-gen approach in greater detail.
 
-_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.CodeGen` folder. To see all supported command line options execute `dotnet run -- --help`.
-
 <br/> 
+
+## Terminal
+
+In preparation for the steps below, utilize the existing terminal/command-prompt (or open new) and switch the base folder directory to `MyEf.Hr.CodeGen`.
+
+<br/>
 
 ## Clean up existing
 
-The following files were created when the solution was provisioned, these should be removed (deleted):
+The following files were created when the solution skeleton was provisioned.  If these files have not yet been removed, delete them now:
 - `MyEf.Hr.Business/Data/PersonData.cs`
 - `MyEf.Hr.Business/Validation/PersonArgsValidator.cs`
 - `MyEf.Hr.Business/Validation/PersonValidator.cs`
+- `MyEf.Hr.Test/Apis/PersonTest.cs`
+- `MyEf.Hr.Test/Validators/PersonValidatorTest.cs`
 
 <br/>
 
 ## Generate corresponding entity configuration
 
-This step is optional and is included for informational purposes primarily. 
+__(This step is optional and is included for informational purposes primarily)__
 
 The database code-generation supports an additional `yaml` sub-command that will generate the basic entity YAML configuration by inferring the database configuration for the specified tables into a temporary `temp.entity.beef-5.yaml` file. Additionally, an initial C# validator will also be generated for each table that is CRUD enabled.
 
@@ -49,9 +55,14 @@ dotnet run codegen yaml Hr Gender *Employee !EmergencyContact TerminationReason
 
 The `refdata.beef-5.yaml` within `MyEf.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straightforward.
 
-Each reference data entity is defined, by specifying the name, the data type (defaults from root specification), the Web API route prefix (i.e. its endpoint which defaults where not specified), that it is to be automatically implemented using Entity Framework (defaults from root specification), and the name of the corresponding Entity Framework model (which was previously generated from the database; see `MyEf.Hr.Business/Data/EfModel/Generated` folder).
+Each reference data entity is defined by specifying:
+* The name
+* The data type (defaults from root specification)
+* The Web API route prefix (i.e. its endpoint which defaults where not specified)
+* Whether to automatically implement using Entity Framework (defaults from root specification)
+* The name of the corresponding Entity Framework model (which was previously generated from the database; see `MyEf.Hr.Business/Data/EfModel/Generated` folder).
 
-Replace the existing YAML with the following.
+In `refdata.beef-5.yaml`, replace the existing with the following.
 
 ``` yaml
 webApiRoutePrefix: ref
@@ -68,7 +79,9 @@ entities:
 
 ## Reference Data code-gen
 
-Once the reference data has been configured the code-generation can be performed. Use the following command line to generate. This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the end-to-end reference data functionality. 
+Once the reference data has been configured the code-generation can be performed.  This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the end-to-end reference data functionality. 
+
+Run the following command line to generate:
 
 ```
 dotnet run refdata
@@ -223,7 +236,7 @@ The final component that must be implemented by the developer is the validation 
 
 To encourage reuse, _CoreEx_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `MyEf.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
-```
+``` csharp
 namespace MyEf.Hr.Business.Validation;
 
 /// <summary>
@@ -333,8 +346,31 @@ public class EmployeeValidator : Validator<Employee>
 
 </br>
 
-## Conclusion
+## Verify
 
-At this stage we now have a compiling and working API including database access logic for the reference data and key employee CRUD activities. 
+At this stage we should now have a compiling and working API including database access logic for the reference data and key employee CRUD activities.
 
-Next we need to perform end-to-end [intra-integration testing](./Employee-Test.md) to ensure it is functioning as expected.
+To verify, build the solution and confirm there are no compilation errors.
+Check the output of code gen tool.  There should have been 25 created files similar to the below output:
+
+```
+MyEf.Hr.CodeGen Complete. [1343ms, Files: Unchanged = 0, Updated = 0, Created = 25, TotalLines = 1393]
+```
+
+and generated within the following project folders:
+
+```
+\MyEf.Hr.Api\Controllers\Generated
+\MyEf.Hr.Business\Data\Generated
+\MyEf.Hr.Business\DataSvc\Generated
+\MyEf.Hr.Business\Entities\Generated
+\MyEf.Hr.Business\Generated
+\MyEf.Hr.Common\Agents\Generated
+\MyEf.Hr.Common\Entities\Generated
+```
+
+
+
+## Next Step
+
+Next we need to perform end-to-end [intra-integration testing](./4-Employee-Test.md) to ensure it is functioning as expected.

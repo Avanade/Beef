@@ -1,4 +1,4 @@
-# Step 8 - Service Bus Publish
+# Step 9 - Service Bus Publish
 
 To further support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) the events need to be dequeued from the database and sent to the final messaging subsystem via a _message relay_ process.
 
@@ -170,8 +170,12 @@ To achieve a basic test within a developers machine then the API host should be 
 
 <br/>
 
-## Conclusion
+## Verify
 
 At this stage we now have our events being published to Azure Service Bus. This essentially concludes the `Hr` domain functionality, with respect to enabling the requisite APIs and publishing of corresponding events (where applicable).
+
+*Verification Steps TBD*
+
+## Next Step
 
 Next we will create a new _Security_ domain that will perform a [Service Bus Subscribe](./Service-Bus-Subscribe.md) of the _Termination_ related events and proxy [Okta](https://www.okta.com/) (as the fictitious company's identity solution) automatically _Deactivating_ the Employee's account.

@@ -1,4 +1,4 @@
-﻿# Step 4 - Employee Search
+﻿# Step 5 - Employee Search
 
 This will walk through the process of creating and testing the employee search capability.
 
@@ -55,7 +55,9 @@ Add the following entity code-gen configuration after all the other existing ent
   }
 ```
 
-The requisite `GetByArgs` operation needs to be added to the `Employee` entity configuration; add the following after the existing `Delete` operation.
+The requisite `GetByArgs` operation needs to be added to the `Employee` entity configuration.
+
+Add the following to the array of operations after the existing `Delete` operation.
 
 ``` yaml
       # Search operation
@@ -72,7 +74,7 @@ The requisite `GetByArgs` operation needs to be added to the `Employee` entity c
       }
 ```
 
-Execute the code-generation using the command line.
+Execute the code-generation using the command line (within `MyEf.Hr.CodeGen` base directory).
 
 ```
 dotnet run entity
@@ -90,27 +92,33 @@ This new `EmployeeData.cs` (non-generated) logic will need to be extended to sup
 
 For query operations generally we do not implement using the custom `*OnImplementation` approach; as the primary code, with the exception of the actual search criteria can be generated successfully. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is passed, or needs to be applied, as _Beef_ will apply this automatically.
 
-Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
+Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).  The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of [`IgnoreAutoIncludes`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.ignoreautoincludes) (a standard Entity Framework capability) to avoid the cost of loading related data that is not needed for this query. 
 
-Add the following code to the top of the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created. The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of [`IgnoreAutoIncludes`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.ignoreautoincludes) (a standard Entity Framework capability) to avoid the cost of loading related data that is not needed for this query. 
+Within the `MyEf.Hr.Business/Data` folder, create `EmployeeData.cs`and implement as follows:
 
 ``` csharp
-partial void EmployeeDataCtor()
+namespace MyEf.Hr.Business.Data
 {
-    // Implement the GetByArgs OnQuery search/filtering logic.
-    _getByArgsOnQuery = (q, args) =>
+    public partial class EmployeeData
     {
-        _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-        _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-        _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
-        _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
-        _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
+        partial void EmployeeDataCtor()
+        {
+            // Implement the GetByArgs OnQuery search/filtering logic.
+            _getByArgsOnQuery = (q, args) =>
+            {
+                _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
+                _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
+                _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
+                _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
+                _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
 
-        if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
-            q = q.Where(x => x.TerminationDate == null);
+                if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
+                    q = q.Where(x => x.TerminationDate == null);
 
-        return q.IgnoreAutoIncludes().OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);
-    };
+                return q.IgnoreAutoIncludes().OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);
+            };
+        }
+    }
 }
 ```
 
@@ -118,7 +126,7 @@ partial void EmployeeDataCtor()
 
 ## Validation
 
-Within the `MyEf.Hr.Business/Validation` folder, create `EmployeeArgsValidator.cs` and implement as follows.
+Within the `MyEf.Hr.Business/Validation` folder, create `EmployeeArgsValidator.cs` and implement as follows:
 
 ``` csharp
 namespace MyEf.Hr.Business.Validation;
@@ -145,14 +153,41 @@ public class EmployeeArgsValidator : Validator<EmployeeArgs>
 
 ## End-to-End testing
 
-For the purposes of this sample un-comment the region `GetByArgs` within `EmployeeTest.cs`. Execute the tests and ensure they all pass as expected.
+Now that we've implemented GetByArgs search functionality, we can re-add the appropriate tests.  Do so by un-commenting the region `GetByArgs` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`.
 
 As extra homework, you should also consider implementing unit testing for the validator.
 
 <br/>
 
-## Conclusion
+## Verify
 
-At this stage we now have added and tested the employee search, in addition to the employee CRUD APIs. 
+At this stage we now have added and tested the employee search, in addition to the employee CRUD APIs.
 
-Next we will implement the [employee termination](./Employee-Terminate.md) endpoint.
+To verify, build the solution and ensure no compilation errors.
+
+Check the output of code gen tool.  There should have been 2 new and 9 updated files similar to the below output:
+
+```
+MyEf.Hr.CodeGen Complete. [1818ms, Files: Unchanged = 16, Updated = 9, Created = 2, TotalLines = 1584]
+```
+
+Within test explorer, run the EmployeeTest set of tests and confirm they all pass.
+
+The following tests were newly added and should pass:
+
+```
+A210_GetByArgs_All
+A220_GetByArgs_All_Paging
+A230_GetByArgs_FirstName
+A240_GetByArgs_LastName
+A250_GetByArgs_LastName_IncludeTerminated
+A260_GetByArgs_Gender
+A270_GetByArgs_Empty
+A280_GetByArgs_FieldSelection
+A290_GetByArgs_RefDataText
+A300_GetByArgs_ArgsError
+```
+
+## Next Step
+
+Next we will implement the [employee termination](./6-Employee-Terminate.md) endpoint.

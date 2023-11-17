@@ -1,4 +1,4 @@
-﻿# Step 5 - Employee Terminate
+﻿# Step 6 - Employee Terminate
 
 This will walk through the process of creating and testing the employee termination capability.
 
@@ -20,7 +20,9 @@ No additional data repository effort is required as the intent is to reuse what 
 
 ## Code generation
 
-The `Termination` operation needs to be added to the `Employee` entity configuration; add the following after the existing `GetByArgs` operation.
+The `Termination` operation needs to be added to the `Employee` entity configuration.
+
+Add the following to the array of operations after the existing `GetByArgs` operation within `entity.beef-5.yaml` (`MyEf.Hr.CodeGen` project).
 
 ``` yaml
       # Terminate operation
@@ -39,7 +41,7 @@ The `Termination` operation needs to be added to the `Employee` entity configura
       }
 ```
 
-Execute the code-generation using the command line.
+Execute the code-generation using the command line (within `MyEf.Hr.CodeGen` base directory).
 
 ```
 dotnet run entity
@@ -53,7 +55,7 @@ The existing `EmployeeData.cs` logic will need to be extended to support the new
 
 This is an instance where there is some validation logic that has been added to this data component versus in the related validator. The primary reason for this is efficiency, as we need to do a `Get` to then `Update`, so to minimize chattiness and keep this logic together it is all implemented here.
 
-Add the following code to the non-generated `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously. Also, of note is the use of the `Result` type (railway-oriented programming) to enable, including the usage of the `Result.ValidationError` versus throwing a `ValidationException` (ultimately results in the same outcome).
+Add the following method to the non-generated partial class `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously. Also, of note is the use of the `Result` type (railway-oriented programming) to enable, including the usage of the `Result.ValidationError` versus throwing a `ValidationException` (ultimately results in the same outcome).
 
 ``` csharp
 /// <summary>
@@ -110,14 +112,35 @@ public class TerminationDetailValidator : Validator<TerminationDetail>
 
 ## End-to-End testing
 
-For the purposes of this sample un-comment the region `Terminate` within `EmployeeTest.cs`. Execute the tests and ensure they all pass as expected.
+Now that we've implemented termination functionality, we can re-add the appropriate tests.  Do so by un-commenting the region `Terminate` within `EmployeeTest.cs`.
 
 As extra homework, you should also consider implementing unit testing for the validator.
 
 <br/>
 
-## Conclusion
+## Verify
 
-At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. 
+At this stage we now have added employee termination and search, in addition to the employee CRUD APIs. 
 
-Next we will implement the employee [performance review](./Performance-Review.md) endpoints.
+To verify, build the solution and ensure no compilation errors.
+
+Check the output of code gen tool.  There should have been 9 updated files similar to the below output:
+
+```
+MyEf.Hr.CodeGen Complete. [1746ms, Files: Unchanged = 18, Updated = 9, Created = 0, TotalLines = 1652]
+```
+
+Within test explorer, run the EmployeeTest set of tests and confirm they all pass.
+
+The following tests were newly added and should pass:
+
+```
+F110_Terminate_NotFound
+F120_Terminate_MoreThanOnce
+F130_Terminate_BeforeStart
+F140_Terminate
+```
+
+## Next Step
+
+Next we will implement the employee [performance review](./7-Performance-Review.md) endpoints.

@@ -1,10 +1,14 @@
-﻿# Step 1 - Employee DB
+﻿# Step 2 - Employee DB
 
 This will walk through the process of creating the required tables, and entity framework capabilities, etc. needed for the `Employee` within a Microsoft SQL Server database. All of this work will occur within the context of the `MyEf.Hr.Database` project.
 
 The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`DbEx`](https://github.com/Avanade/dbex) provide the capabilities that will be leveraged. The underlying [documentation](https://github.com/Avanade/dbex#readme) describes these capabilities and the database approach in greater detail.
 
-_Note:_ Any time that command line execution is requested, this should be performed from the base `MyEf.Hr.Database` folder. To see all supported command line options execute `dotnet run -- --help`.
+## Terminal
+
+The database codegen and DbEx commands will run from a command-line interface.  In preparation for the steps below, open a new terminal/command-prompt and navigate to the `MyEf.Hr.Database` base folder directory
+
+_Note: To see all supported command line options execute `dotnet run -- --help`._
 
 <br/>
 
@@ -137,9 +141,9 @@ dotnet run script refdata Hr USState
 
 Now that the Reference Data tables exist they will need to be populated. It is recommended that where possible that the Production environment values are specified (as these are intended to be deployed to all environments).
 
-These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../MyEf.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder. Finally, remove the `PerformanceOutcome` lines at the end of the file.
+These values (database rows) are specified using YAML. For brevity in this document we will grab the data we need from [`RefData.yaml`](../MyEf.Hr.Database/Data/RefData.yaml).  Take the contents of this file, copy and replace the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.  Finally, remove the `PerformanceOutcome` lines at the end of the file (we are not creating or populating this table for now).
 
-_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically). The `$` prefix for a table indicates a `merge` versus an `insert` (default).
+_Note: The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically). The `$` prefix for a table indicates a `merge` versus an `insert` (default)._
 
 ``` yaml
 Hr:
@@ -147,6 +151,9 @@ Hr:
     - F: Female
     - M: Male
     - N: Not specified
+  - $TerminationReason:
+    - RE: Resigned
+    ...
   ...
 ```
 
@@ -156,7 +163,7 @@ Hr:
 
 To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `efModel: true` attribute. 
 
-Remove all existing configuration from `database.beef-5.yaml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
+Remove all existing configuration from `database.beef-5.yaml` and replace with the contents below. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
 
 ``` yaml
 # Configuring the code-generation global settings
@@ -234,19 +241,44 @@ dotnet run codegen
 dotnet run database
 ```
 
-This should create migrations script files with names similar as follows (as well as a number of other SQL and .NET related artefacts).
-
-```
-└── Migrations
-  └── 20210430-170605-create-01-create-outbox-schema.sql
-  └── 20210430-170605-create-01-create-outbox-eventoutbox-table.sql
-  └── 20210430-170605-create-01-create-outbox-eventoutboxdata-table.sql
-```
-
 <br/>
 
-## Conclusion
+## Verify
 
 At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) for the Event outbox have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite event outbox enqueue/dequeue capabilities. 
 
-Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.
+To verify, confirm you have the below set of sql migration scripts:
+
+```
+└── Migrations
+  └── <date>-<number>-create-hr-schema.sql
+  └── <date>-<number>-create-hr-employee-table.sql
+  └── <date>-<number>-create-hr-emergencycontact-table.sql
+  └── <date>-<number>-create-hr-gender-refdata-table.sql
+  └── <date>-<number>-create-hr-terminationreason-refdata-table.sql
+  └── <date>-<number>-create-hr-relationshiptype-refdata-table.sql
+  └── <date>-<number>-create-hr-usstate-refdata-table.sql
+  └── <date>-<number>-01-create-outbox-schema.sql
+  └── <date>-<number>-02-create-outbox-eventoutbox-table.sql
+  └── <date>-<number>-03-create-outbox-eventoutboxdata-table.sql
+```
+
+Confirm also, the following DB and tables have been created (utilizing a DB tool such as Azure Data Explorer or SSMS):
+```
+└── Local
+  └── Databases
+    └── MyEf.Hr
+      └── Tables
+        └── Hr.EmergencyContact
+        └── Hr.Employee
+        └── Hr.Gender
+        └── Hr.RelationshipType
+        └── Hr.TerminationReason
+        └── Hr.USState
+        └── Outbox.EventOutbox
+        └── Outbox.EventOutboxData
+```
+
+## Next Step
+
+Next, we need to create the [employee API](./3-Employee-Api.md) endpoint to perform the desired CRUD operations.
