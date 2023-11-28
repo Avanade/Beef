@@ -335,6 +335,8 @@ A170_Validate_CreateOK
 A180_Validate_UpdateOK
 ```
 
+<br/>
+
 ## Next Step
 
 Next we will consider the addition of [Event-driven architecture](./../README.md#Event-driven-architecture-implementation) capabilities, starting by implementing

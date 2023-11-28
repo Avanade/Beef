@@ -174,7 +174,7 @@ To achieve a basic test within a developers machine then the API host should be 
 
 At this stage we now have our events being published to Azure Service Bus. This essentially concludes the `Hr` domain functionality, with respect to enabling the requisite APIs and publishing of corresponding events (where applicable).
 
-*Verification Steps TBD*
+<br/>
 
 ## Next Step
 

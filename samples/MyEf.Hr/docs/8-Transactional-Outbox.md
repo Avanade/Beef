@@ -142,7 +142,7 @@ To perform a localized test perform a POST to the `/employees/00000001-0000-0000
 
 At this stage we now have our events being persisted to the Transactional Outbox ready for sending to the final messaging subsystem.
 
-*Verification Steps TBD*
+<br/>
 
 ## Next Step
 

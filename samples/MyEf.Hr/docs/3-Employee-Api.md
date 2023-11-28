@@ -14,7 +14,7 @@ In preparation for the steps below, utilize the existing terminal/command-prompt
 
 ## Clean up existing
 
-The following files were created when the solution skeleton was provisioned.  If these files have not yet been removed, delete them now:
+The following files were created when the solution skeleton was provisioned. If these files have not yet been removed, delete them now:
 - `MyEf.Hr.Business/Data/PersonData.cs`
 - `MyEf.Hr.Business/Validation/PersonArgsValidator.cs`
 - `MyEf.Hr.Business/Validation/PersonValidator.cs`
@@ -79,7 +79,7 @@ entities:
 
 ## Reference Data code-gen
 
-Once the reference data has been configured the code-generation can be performed.  This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the end-to-end reference data functionality. 
+Once the reference data has been configured the code-generation can be performed. This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the end-to-end reference data functionality. 
 
 Run the following command line to generate:
 
@@ -351,7 +351,7 @@ public class EmployeeValidator : Validator<Employee>
 At this stage we should now have a compiling and working API including database access logic for the reference data and key employee CRUD activities.
 
 To verify, build the solution and confirm there are no compilation errors.
-Check the output of code gen tool.  There should have been 25 created files similar to the below output:
+Check the output of code gen tool. There should have been 25 created files similar to the below output:
 
 ```
 MyEf.Hr.CodeGen Complete. [1343ms, Files: Unchanged = 0, Updated = 0, Created = 25, TotalLines = 1393]
@@ -369,7 +369,7 @@ and generated within the following project folders:
 \MyEf.Hr.Common\Entities\Generated
 ```
 
-
+<br/>
 
 ## Next Step
 

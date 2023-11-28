@@ -26,11 +26,20 @@ The following solution structure will have been generated. Execute `.\MyEf.Hr.sl
   └── MyEf.Hr.Business    # Core business logic components
   └── MyEf.Hr.Common      # Common / shared components
 ```
+<br/>
 
 ## Important Notes
 Code generation should **not** be performed before updating the corresponding YAML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
 
 Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the baseline to build up the solution from.
+
+<br/>
+
+## Next Step
+
+Next, we can begin creating the [employee DB](./2-Employee-DB.md) and related database objects required for the sample.<br/>
+
+<br/>
 
 ## Appendix
 

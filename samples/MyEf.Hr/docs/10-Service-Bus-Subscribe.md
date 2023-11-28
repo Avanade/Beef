@@ -449,7 +449,7 @@ Now that all the moving parts have been developed and configured an end-to-end i
 
 The new _Security_ domain that performs a [Service Bus Subscribe](./Service-Bus-Subscribe.md) of the _Termination_ related events and proxies [Okta]() (as our identity solution) automatically _Deactivating_ the Employee's account is complete.
 
-*Verification Steps TBD*
+<br/>
 
 ## Next Step
 

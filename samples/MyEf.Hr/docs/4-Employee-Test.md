@@ -50,7 +50,7 @@ Hr:
 
 ## Employee API test
 
-Underneath the Apis folder, create a new class called `EmployeeTest.cs`.  For the purposes of this sample, copy the contents of the sample [`EmployeeTest.cs`](../MyEf.Hr.Test/Apis/EmployeeTest.cs) and replace the contents of the new class.
+Underneath the Apis folder, create a new class called `EmployeeTest.cs`. For the purposes of this sample, copy the contents of the sample [`EmployeeTest.cs`](../MyEf.Hr.Test/Apis/EmployeeTest.cs) and replace the contents of the new class.
 
 Comment out the regions `GetByArgs` and `Terminate` as these capabilities have not been implemented yet.
 
@@ -62,7 +62,7 @@ This is more of a pure unit test; in that all data repository access is mocked o
 
 
 
-Underneath the Apis folder, create a new class called `EmployeeValidatorTest.cs`.  For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
+Underneath the `Apis` folder, create a new class called `EmployeeValidatorTest.cs`. For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
 
 
 
@@ -73,6 +73,8 @@ Underneath the Apis folder, create a new class called `EmployeeValidatorTest.cs`
 At this stage we now have a set of functioning and tested employee CRUD-based APIs. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
 
 To verify, build the test project and ensure there are no compilation errors. Utilizing the test explorer, review and execute the EmployeeTest as well as the EmployeeValidatorTest tests and ensure they all pass as expected.
+
+<br/>
 
 ## Next Step
 

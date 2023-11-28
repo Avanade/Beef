@@ -92,7 +92,7 @@ This new `EmployeeData.cs` (non-generated) logic will need to be extended to sup
 
 For query operations generally we do not implement using the custom `*OnImplementation` approach; as the primary code, with the exception of the actual search criteria can be generated successfully. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is passed, or needs to be applied, as _Beef_ will apply this automatically.
 
-Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).  The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of [`IgnoreAutoIncludes`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.ignoreautoincludes) (a standard Entity Framework capability) to avoid the cost of loading related data that is not needed for this query. 
+Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`). The `With` methods are enabled by _CoreEx_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards. Also note usage of [`IgnoreAutoIncludes`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.ignoreautoincludes) (a standard Entity Framework capability) to avoid the cost of loading related data that is not needed for this query. 
 
 Within the `MyEf.Hr.Business/Data` folder, create `EmployeeData.cs`and implement as follows:
 
@@ -153,7 +153,7 @@ public class EmployeeArgsValidator : Validator<EmployeeArgs>
 
 ## End-to-End testing
 
-Now that we've implemented GetByArgs search functionality, we can re-add the appropriate tests.  Do so by un-commenting the region `GetByArgs` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`.
+Now that we've implemented GetByArgs search functionality, we can re-add the appropriate tests. Do so by un-commenting the region `GetByArgs` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`.
 
 As extra homework, you should also consider implementing unit testing for the validator.
 
@@ -165,7 +165,7 @@ At this stage we now have added and tested the employee search, in addition to t
 
 To verify, build the solution and ensure no compilation errors.
 
-Check the output of code gen tool.  There should have been 2 new and 9 updated files similar to the below output:
+Check the output of code gen tool. There should have been 2 new and 9 updated files similar to the below output:
 
 ```
 MyEf.Hr.CodeGen Complete. [1818ms, Files: Unchanged = 16, Updated = 9, Created = 2, TotalLines = 1584]
@@ -187,6 +187,8 @@ A280_GetByArgs_FieldSelection
 A290_GetByArgs_RefDataText
 A300_GetByArgs_ArgsError
 ```
+
+<br/>
 
 ## Next Step
 

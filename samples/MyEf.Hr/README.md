@@ -61,17 +61,25 @@ Endpoint | Description
 
 <br/>
 
+## Railway-oriented programming
+
+_CoreEx_ version `3.0.0` introduced [monadic](https://en.wikipedia.org/wiki/Monad_(functional_programming)) error-handling, often referred to as [Railway-oriented programming](https://swlaschin.gitbooks.io/fsharpforfunandprofit/content/posts/recipe-part2.html). This is enabled via the key types of `Result` and `Result<T>`; please review the corresponding [documentation](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/README.md) for more detail on purpose and usage. 
+
+The [`Result`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/Result.cs) and [`Result<T>`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Results/ResultT.cs) have been integrated into the code-generated output and is leveraged within the underlying validation. This is intended to simplify success and failure tracking, avoiding the need, and performance cost, in throwing resulting exceptions. 
+
+<br/>
+
 ## Core Implementation steps
 
 As described earlier, this sample will walk through the implementation in a number of logical steps:
 
-1. [Solution Skeleton](./docs/Solution-Skeleton.md) - start by creating a VS solution from Beef template
-2. [Employee DB](./docs/Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
-3. [Employee API](./docs/Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
-4. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
-5. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.
-6. [Employee Terminate](./docs/Employee-Terminate.md) - adds the `Employee` termination capability and tests.
-7. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
+1. [Solution Skeleton](./docs/1-Solution-Skeleton.md) - start by creating a VS solution from Beef template
+2. [Employee DB](./docs/2-Employee-DB.md) - creates the `Employee` database table and related entity framework capabilities.
+3. [Employee API](./docs/3-Employee-Api.md) - creates the `Employee` entities, API and related data access logic.
+4. [Employee Test](./docs/4-Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
+5. [Employee Search](./docs/5-Employee-Search.md) - adds the `Employee` search capability and tests.
+6. [Employee Terminate](./docs/6-Employee-Terminate.md) - adds the `Employee` termination capability and tests.
+7. [Employee Performance Review](./docs/7-Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
 
 <br/>
 
@@ -107,9 +115,9 @@ The _HR_ and _Security_ domains are completely decoupled from each other; in tha
 
 This _EDA_ sample will walk through the implementation in a number of logical steps (these describe the integration of the _CoreEx_ capabilities to enable) to achieve the end-to-end Employee's User Account deactivation:
 
-8. [Transactional Outbox](./docs/Transactional-Outbox.md) - enqueue events into the database.
-9. [Service Bus Publish](./docs/Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
-10. [Service Bus Subscribe](./docs/Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
+8. [Transactional Outbox](./docs/8-Transactional-Outbox.md) - enqueue events into the database.
+9. [Service Bus Publish](./docs/9-Service-Bus-Publish.md) - dequeue events (relay) from database publishing to Azure Service Bus.
+10. [Service Bus Subscribe](./docs/10-Service-Bus-Subscribe.md) - simulate an additional domain subscribing to an event (from Azure Service Bus).
 
 <br/>
 

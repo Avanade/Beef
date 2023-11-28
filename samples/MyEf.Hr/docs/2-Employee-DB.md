@@ -4,9 +4,11 @@ This will walk through the process of creating the required tables, and entity f
 
 The [`Beef.Database.SqlServer`](../../../tools/Beef.Database.SqlServer) and [`DbEx`](https://github.com/Avanade/dbex) provide the capabilities that will be leveraged. The underlying [documentation](https://github.com/Avanade/dbex#readme) describes these capabilities and the database approach in greater detail.
 
+<br/>
+
 ## Terminal
 
-The database codegen and DbEx commands will run from a command-line interface.  In preparation for the steps below, open a new terminal/command-prompt and navigate to the `MyEf.Hr.Database` base folder directory
+The database codegen and DbEx commands will run from a command-line interface. In preparation for the steps below, open a new terminal/command-prompt and navigate to the `MyEf.Hr.Database` base folder directory
 
 _Note: To see all supported command line options execute `dotnet run -- --help`._
 
@@ -49,6 +51,7 @@ Create the `Hr` schema using the database tooling. The following command will cr
 dotnet run script schema Hr
 ```
 
+<br/>
 
 ## Create Employee table
 
@@ -141,7 +144,7 @@ dotnet run script refdata Hr USState
 
 Now that the Reference Data tables exist they will need to be populated. It is recommended that where possible that the Production environment values are specified (as these are intended to be deployed to all environments).
 
-These values (database rows) are specified using YAML. For brevity in this document we will grab the data we need from [`RefData.yaml`](../MyEf.Hr.Database/Data/RefData.yaml).  Take the contents of this file, copy and replace the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.  Finally, remove the `PerformanceOutcome` lines at the end of the file (we are not creating or populating this table for now).
+These values (database rows) are specified using YAML. For brevity in this document we will grab the data we need from [`RefData.yaml`](../MyEf.Hr.Database/Data/RefData.yaml). Take the contents of this file, copy and replace the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder. Finally, remove the `PerformanceOutcome` lines at the end of the file (we are not creating or populating this table for now).
 
 _Note: The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically). The `$` prefix for a table indicates a `merge` versus an `insert` (default)._
 
@@ -278,6 +281,8 @@ Confirm also, the following DB and tables have been created (utilizing a DB tool
         └── Outbox.EventOutbox
         └── Outbox.EventOutboxData
 ```
+
+<br/>
 
 ## Next Step
 

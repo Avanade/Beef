@@ -112,7 +112,7 @@ public class TerminationDetailValidator : Validator<TerminationDetail>
 
 ## End-to-End testing
 
-Now that we've implemented termination functionality, we can re-add the appropriate tests.  Do so by un-commenting the region `Terminate` within `EmployeeTest.cs`.
+Now that we've implemented termination functionality, we can re-add the appropriate tests. Do so by un-commenting the region `Terminate` within `EmployeeTest.cs`.
 
 As extra homework, you should also consider implementing unit testing for the validator.
 
@@ -124,7 +124,7 @@ At this stage we now have added employee termination and search, in addition to 
 
 To verify, build the solution and ensure no compilation errors.
 
-Check the output of code gen tool.  There should have been 9 updated files similar to the below output:
+Check the output of code gen tool. There should have been 9 updated files similar to the below output:
 
 ```
 MyEf.Hr.CodeGen Complete. [1746ms, Files: Unchanged = 18, Updated = 9, Created = 0, TotalLines = 1652]
@@ -140,6 +140,8 @@ F120_Terminate_MoreThanOnce
 F130_Terminate_BeforeStart
 F140_Terminate
 ```
+
+<br/>
 
 ## Next Step
 
