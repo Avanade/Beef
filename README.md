@@ -21,6 +21,14 @@ The key industralisation goals are:
 
 <br/>
 
+## Demonstration
+
+The following video (includes sound) provides a high-level demonstration of _Beef_ and its capabilities.
+
+https://github.com/Avanade/Beef/assets/12836934/693d4839-dfde-4360-9994-33f8dc10e3a1
+
+<br/>
+
 ## Version 5
 
 > **NOTE:** A new major version of _Beef_, **verison 5**, was released on [26-Jan-2023](https://en.wikipedia.org/wiki/Australia_Day). The samples have been updated accordingly, as has the related documentation. As such, development on the previous [version (v4.x)](https://github.com/Avanade/Beef/tree/version-4) will for the most part halt; only significant issues will now be addressed (for a period of time). The new version is a major refactoring (improvement and simplification) with respect to the underlying runtime primarily, and although effort was made to minimize impacts on upgrading from v4, this was unfortunately unavoidable. Guidance is provided to assist with [upgrading from v4.2.x to v5.x](./docs/Upgrade-v4-to-v5.md) where applicable.

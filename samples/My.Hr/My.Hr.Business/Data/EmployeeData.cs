@@ -7,11 +7,11 @@ public partial class EmployeeData
         // Implement the GetByArgs OnQuery search/filtering logic.
         _getByArgsOnQuery = (q, args) =>
         {
-            _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
-            _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
-            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
-            _ef.With(args?.StartFrom, () => q = q.Where(x => x.StartDate >= args!.StartFrom));
-            _ef.With(args?.StartTo, () => q = q.Where(x => x.StartDate <= args!.StartTo));
+            _ef.WithWildcard(args?.FirstName, w => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
+            _ef.WithWildcard(args?.LastName, w => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
+            _ef.With(args?.Genders, g => q = q.Where(x => g.ToCodeList().Contains(x.GenderCode)));
+            _ef.With(args?.StartFrom, f => q = q.Where(x => x.StartDate >= f));
+            _ef.With(args?.StartTo, t => q = q.Where(x => x.StartDate <= t));
 
             if (args?.IsIncludeTerminated == null || !args.IsIncludeTerminated.Value)
                 q = q.Where(x => x.TerminationDate == null);

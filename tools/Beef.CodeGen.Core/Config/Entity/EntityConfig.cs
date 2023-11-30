@@ -2,6 +2,7 @@
 
 using CoreEx.Caching;
 using CoreEx.Entities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
@@ -273,11 +274,13 @@ entities:
         #region Operation
 
         /// <summary>
-        /// Indicates that the key CRUD operations will be automatically generated where not otherwise explicitly specified.
+        /// Gets or sets the key CRUDBA behaviors (operations) will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("crud", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("Operation", Title = "Indicates that the key CRUD (`Create`, `Get` (read), `Update` (including `Patch`) and `Delete`) operations will be automatically generated where not otherwise explicitly specified.")]
-        public bool? Crud { get; set; }
+        [JsonProperty("behavior", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Operation", Title = "Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete). Additionally, GetByArgs ('B') and GetAll ('A') operations that will be automatically generated where not otherwise explicitly specified.",
+            Description = "Value may only specifiy one or more of the `CGRUDBA` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). " +
+                          "This is shorthand for setting one or more of the following properties: `Get`, `GetByArgs`, `GetAll`, 'Create', `Update`, `Patch` and `Delete`. Where one of these properties is set to either `true` or `false` this will take precedence over the value set for `Behavior`.")]
+        public string? Behavior { get; set; }
 
         /// <summary>
         /// Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
@@ -285,6 +288,13 @@ entities:
         [JsonProperty("get", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("Operation", Title = "Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Get { get; set; }
+
+        /// <summary>
+        /// Indicates that a `GetByArgs` operation will be automatically generated where not otherwise explicitly specified.
+        /// </summary>
+        [JsonProperty("getByArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("Operation", Title = "Indicates that a `GetByArgs` operation will be automatically generated where not otherwise explicitly specified.")]
+        public bool? GetByArgs { get; set; }
 
         /// <summary>
         /// Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
@@ -765,7 +775,7 @@ entities:
         [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
             Description = "This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified. " 
-            + "Where `RefDataType` is specified (indicating Reference Data entity) then this will automatically default to the pluralized `Name` (as lowercase).")]
+            + "Where not specified will automatically default to the pluralized `Name` (as lowercase).")]
         public string? WebApiRoutePrefix { get; set; }
 
         /// <summary>
@@ -1404,10 +1414,9 @@ entities:
             RefDataETagDataName = DefaultWhereNull(RefDataETagDataName, () => Root!.RefDataETagDataName == "*" ? (AutoImplement == "EntityFramework" || AutoImplement == "Database" ? $"RowVersion" : "ETag") : Root!.RefDataETagDataName);
             Collection = DefaultWhereNull(Collection, () => Parent!.RefDataType is not null);
 
-            if (RefDataType is not null)
-                WebApiRoutePrefix = DefaultWhereNull(WebApiRoutePrefix , () => StringConverter.ToPlural(Name).ToLowerInvariant());
+            WebApiRoutePrefix = DefaultWhereNull(WebApiRoutePrefix, () => StringConverter.ToPlural(Name).ToLowerInvariant());
 
-            if (!string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
+            if (RefDataType is not null && !string.IsNullOrEmpty(Parent!.WebApiRoutePrefix))
                 WebApiRoutePrefix = string.IsNullOrEmpty(WebApiRoutePrefix) ? Parent!.WebApiRoutePrefix :
                     $"{(Parent!.WebApiRoutePrefix.EndsWith('/') ? Parent!.WebApiRoutePrefix[..^1] : Parent!.WebApiRoutePrefix)}{(string.IsNullOrEmpty(WebApiRoutePrefix) ? "" : "/")}{(WebApiRoutePrefix.StartsWith('/') ? WebApiRoutePrefix[1..] : WebApiRoutePrefix)}";
 
@@ -1561,13 +1570,24 @@ entities:
         {
             Operations ??= new List<OperationConfig>();
 
-            if (CompareValue(Crud, true))
+            // Enables/supports existing 'crud: true'; will error on deprecation at some point in the future.
+            if (!string.IsNullOrEmpty(Behavior))
             {
-                Create = DefaultWhereNull(Create, () => true);
-                Get = DefaultWhereNull(Get, () => true);
-                Update = DefaultWhereNull(Update, () => true);
-                Patch = DefaultWhereNull(Patch, () => true);
-                Delete = DefaultWhereNull(Delete, () => true);
+                foreach (var c in Behavior.ToLowerInvariant())
+                {
+                    switch (c)
+                    {
+                        case 'c': Create = DefaultWhereNull(Create, () => true); break;
+                        case 'r': Get = DefaultWhereNull(Get, () => true); break;
+                        case 'g': Get = DefaultWhereNull(Get, () => true); break;
+                        case 'u': Update = DefaultWhereNull(Update, () => true); break;
+                        case 'p': Patch = DefaultWhereNull(Patch, () => true); break;
+                        case 'd': Delete = DefaultWhereNull(Delete, () => true); break;
+                        case 'b': GetByArgs = DefaultWhereNull(GetByArgs, () => true); break;
+                        case 'a': GetAll = DefaultWhereNull(GetAll, () => true); break;
+                        default: throw new CodeGenException(this, nameof(Behavior), $"The '{c}' character does not map to a supported underlying behavior (operation) type; valid values are: 'CRGUPDBA' (case-insensitive).");
+                    }
+                }
             }
 
             // Add in selected operations where applicable (in reverse order in which output).
@@ -1581,13 +1601,21 @@ entities:
                 Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true });
 
             if (CompareValue(Create, true) && !Operations.Any(x => x.Name == "Create"))
-                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", PrimaryKey = false, WebApiRoute = "" });
+                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", WebApiRoute = "" });
 
             if (CompareValue(Get, true) && !Operations.Any(x => x.Name == "Get"))
                 Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true });
 
+            if (CompareValue(GetByArgs, true) && !Operations.Any(x => x.Name == "GetByArgs"))
+            {
+                var at = $"{Name}Args";
+                Operations.Insert(0, new OperationConfig { Name = "GetByArgs", Type = "GetColl", Paging = true, WebApiRoute = "", Parameters = new List<ParameterConfig> { new ParameterConfig() { Name = "Args", Type = at, Validator = $"{Name}ArgsValidator" } } });
+                if (!Parent!.Entities!.Any(x => x.Name == at))
+                    Root!.CodeGenArgs?.Logger?.LogWarning("{Warning}", $"Warning: Config [{BuildFullyQualifiedName(nameof(GetByArgs))}] references entity '{at}' that has not been defined; this is needed to complete implementation.");
+            }
+
             if (CompareValue(GetAll, true) && !Operations.Any(x => x.Name == "GetAll"))
-                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", PrimaryKey = false, WebApiRoute = "" });
+                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "" });
 
             // Prepare each operations.
             foreach (var operation in Operations)
@@ -1830,16 +1858,17 @@ entities:
         /// Check for any deprecated properties and error.
         /// </summary>
         private void CheckDeprecatedProperties() => CodeGenConfig.WarnWhereDeprecated(Root!, this,
-            ("entityScope", null),
-            ("entityUsing", null),
-            ("collectionKeyed", " Use the new 'collectionType' property with a value of 'Keyed' to achieve same functionality."),
-            ("refDataStringFormat", null),
-            ("entityFrameworkMapperInheritsFrom", null),
-            ("cosmosMapperInheritsFrom", null),
-            ("odataMapperInheritsFrom", null),
-            ("eventOutbox", null),
-            ("eventSubjectFormat", null),
-            ("eventCasing", null),
-            ("iValidator", null));
+            ("entityScope", null, false),
+            ("entityUsing", null, false),
+            ("collectionKeyed", " Use the new 'collectionType' property with a value of 'Keyed' to achieve same functionality.", true),
+            ("refDataStringFormat", null, false),
+            ("entityFrameworkMapperInheritsFrom", null, false),
+            ("cosmosMapperInheritsFrom", null, false),
+            ("odataMapperInheritsFrom", null, false),
+            ("eventOutbox", null, false),
+            ("eventSubjectFormat", null, false),
+            ("eventCasing", null, false),
+            ("iValidator", null, false),
+            ("crud", " Use the new 'behavior' property with a value of 'crupd' to achieve same functionality.", true));
     }
 }

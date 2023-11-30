@@ -1,0 +1,281 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: [ "tools/**", "templates/**", "samples/**" ]
+    
+  pull_request:
+    branches: [ "master" ]
+    paths: [ "tools/**", "templates/**", "samples/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+      Beef_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Beef.Demo;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Beef_Cosmos__Connection: ${{ secrets.COSMOS_CONNECTION_STRING }}
+      My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
+      Baz_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Baz;Uid=ciuser;Pwd=ciStrong#!Password;AllowUserVariables=true;UseAffectedRows=false;
+      Cdr_CosmosConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
+
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: sAPWD23.^0
+        options: --name sqlserver
+
+      mysql:
+        image: mysql:latest
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: yourStrong#!Password
+          MYSQL_DATABASE: Foo.Baz
+          MYSQL_USER: ciuser
+          MYSQL_PASSWORD: ciStrong#!Password
+        options: --name mysql
+
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+            6.0.x
+            7.0.x
+
+    # Tools
+
+    - name: Tools restore
+      run: |
+        dotnet restore ./tools/Beef.CodeGen.Core
+        dotnet restore ./tools/Beef.Database.Core
+        dotnet restore ./tools/Beef.Database.SqlServer
+        dotnet restore ./tools/Beef.Database.MySql
+        dotnet restore ./tools/Beef.Test.NUnit
+        dotnet restore ./templates/Beef.Template.Solution
+
+    - name: Tools build
+      run: |
+        dotnet build ./tools/Beef.CodeGen.Core --no-restore
+        dotnet build ./tools/Beef.Database.Core --no-restore
+        dotnet build ./tools/Beef.Database.SqlServer --no-restore
+        dotnet build ./tools/Beef.Database.MySql --no-restore
+        dotnet build ./tools/Beef.Test.NUnit --no-restore
+        dotnet build ./templates/Beef.Template.Solution --no-restore
+
+    - name: Tools NuGet publish (local)
+      run: |
+        mkdir ./packages
+        dotnet pack ./tools/Beef.CodeGen.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.Core --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
+        dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
+        dotnet new nugetconfig
+        dotnet nuget add source ./packages
+        dotnet new install ./templates/Beef.Template.Solution
+
+    # Samples/Demo
+
+    - name: Samples/Demo restore
+      run: |
+        dotnet restore ./samples/Demo/Beef.Demo.CodeGen
+        dotnet restore ./samples/Demo/Beef.Demo.Database
+        dotnet restore ./samples/Demo/Beef.Demo.Common
+        dotnet restore ./samples/Demo/Beef.Demo.Business
+        dotnet restore ./samples/Demo/Beef.Demo.Api
+        dotnet restore ./samples/Demo/Beef.Demo.Abc.Database
+        dotnet restore ./samples/Demo/Beef.Demo.Test
+
+    - name: Samples/Demo build
+      run: |
+        dotnet build ./samples/Demo/Beef.Demo.CodeGen --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Database --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Common --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Business --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Api --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Abc.Database --no-restore
+        dotnet build ./samples/Demo/Beef.Demo.Test --no-restore
+
+    - name: Samples/Demo database
+      working-directory: ./samples/Demo/Beef.Demo.Database
+      run: dotnet run all --connection-varname Beef_ConnectionStrings__Database --expect-no-changes --no-build
+
+    - name: Samples/Demo code-gen
+      working-directory: ./samples/Demo/Beef.Demo.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/Demo testing
+      run: dotnet test ./samples/Demo/Beef.Demo.Test --no-build
+
+    # Samples/My.Hr
+
+    - name: Samples/My.Hr restore
+      run: |
+        dotnet restore ./samples/My.Hr/My.Hr.CodeGen
+        dotnet restore ./samples/My.Hr/My.Hr.Database
+        dotnet restore ./samples/My.Hr/My.Hr.Common
+        dotnet restore ./samples/My.Hr/My.Hr.Business
+        dotnet restore ./samples/My.Hr/My.Hr.Api
+        dotnet restore ./samples/My.Hr/My.Hr.Test
+
+    - name: Samples/My.Hr build
+      run: |
+        dotnet build ./samples/My.Hr/My.Hr.CodeGen --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Database --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Common --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Business --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Api --no-restore
+        dotnet build ./samples/My.Hr/My.Hr.Test --no-restore
+
+    - name: Samples/My.Hr database
+      working-directory: ./samples/My.Hr/My.Hr.Database
+      run: dotnet run all --connection-varname My_Hr_ConnectionStrings__Database --expect-no-changes --no-build
+
+    - name: Samples/My.Hr code-gen
+      working-directory: ./samples/My.Hr/My.Hr.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/My.Hr testing
+      run: dotnet test ./samples/My.Hr/My.Hr.Test --no-build
+
+    # Samples/MyEf.Hr
+
+    - name: Samples/MyEf.Hr restore
+      run: |
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.CodeGen
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Database
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Common
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Business
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Api
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Test
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions
+        dotnet restore ./samples/MyEf.Hr/MyEf.Hr.Security.Test
+
+    - name: Samples/MyEf.Hr build
+      run: |
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.CodeGen --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Database --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Common --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Business --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Api --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Test --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Subscriptions --no-restore
+        dotnet build ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-restore
+
+    - name: Samples/MyEf.Hr database
+      working-directory: ./samples/MyEf.Hr/MyEf.Hr.Database
+      run: dotnet run all --connection-varname MyEf_Hr_ConnectionStrings__Database --expect-no-changes --no-build
+
+    - name: Samples/MyEf.Hr code-gen
+      working-directory: ./samples/MyEf.Hr/MyEf.Hr.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/MyEf.Hr testing
+      run: |
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Test --no-build
+        dotnet test ./samples/MyEf.Hr/MyEf.Hr.Security.Test --no-build
+
+    # Samples/Cdr.Banking
+
+    - name: Samples/Cdr.Banking restore
+      run: |
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.CodeGen
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Common
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Business
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Api
+        dotnet restore ./samples/Cdr.Banking/Cdr.Banking.Test
+
+    - name: Samples/Cdr.Banking build
+      run: |
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.CodeGen --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Common --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Business --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Api --no-restore
+        dotnet build ./samples/Cdr.Banking/Cdr.Banking.Test --no-restore
+
+    - name: Samples/Cdr.Banking code-gen
+      working-directory: ./samples/Cdr.Banking/Cdr.Banking.CodeGen
+      run: dotnet run all --expect-no-changes --no-build
+
+    - name: Samples/Cdr.Banking testing
+      run: dotnet test ./samples/Cdr.Banking/Cdr.Banking.Test --no-build
+
+    # Template - Sql Server with EF
+
+    - name: Template/SqlServer/Ef create
+      run: dotnet new beef --company Foo.Ef --appname Bar --datasource SqlServer --output Foo.Ef.Bar
+
+    - name: Template/SqlServer/Ef database
+      working-directory: ./Foo.Ef.Bar/Foo.Ef.Bar.Database
+      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/SqlServer/Ef code-gen
+      working-directory: ./Foo.Ef.Bar/Foo.Ef.Bar.CodeGen
+      run: dotnet run all
+
+    - name: Template/SqlServer/Ef test
+      working-directory: ./Foo.Ef.Bar
+      run: dotnet test 
+
+     # Template - Sql Server with Entity Framework
+
+    - name: Template/SqlServer/Sp create
+      run: dotnet new beef --company Foo.Sp --appname Bar --datasource SqlServerProcs --output Foo.Sp.Bar
+
+    - name: Template/SqlServer/Sp database
+      working-directory: ./Foo.Sp.Bar/Foo.Sp.Bar.Database
+      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/SqlServer/Sp code-gen
+      working-directory: ./Foo.Sp.Bar/Foo.Sp.Bar.CodeGen
+      run: dotnet run all
+
+    - name: Template/SqlServer/Sp test
+      working-directory: ./Foo.Sp.Bar
+      run: dotnet test
+
+     # Template - MySQL with Entity Framework
+
+    - name: Template/MySQL/Ef create
+      run: dotnet new beef --company Foo.My --appname Baz --datasource MySQL --output Foo.My.Baz
+
+    - name: Template/MySQL/Ef database
+      working-directory: ./Foo.My.Baz/Foo.My.Baz.Database
+      run: dotnet run dropandall --connection-varname Baz_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/MySQL/Ef code-gen
+      working-directory: ./Foo.My.Baz/Foo.My.Baz.CodeGen
+      run: dotnet run all
+
+    - name: Template/MySQL/Ef test
+      working-directory: ./Foo.My.Baz
+      run: dotnet test 
+
+     # Template - HttpAgent
+
+    - name: Template/HttpAgent create
+      run: dotnet new beef --company Foo.Ha --appname Bar --datasource HttpAgent --output Foo.Ha.Bar
+
+    - name: Template/HttpAgent code-gen
+      working-directory: ./Foo.Ha.Bar/Foo.Ha.Bar.CodeGen
+      run: dotnet run all
+
+    - name: Template/HttpAgent test
+      working-directory: ./Foo.Ha.Bar
+      run: dotnet test 

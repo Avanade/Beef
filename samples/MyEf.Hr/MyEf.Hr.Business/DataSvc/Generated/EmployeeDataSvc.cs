@@ -32,7 +32,7 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     {
         return Result.GoAsync(_data.CreateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Created"))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
@@ -40,14 +40,14 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     {
         return Result.GoAsync(_data.UpdateAsync(value))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Updated"))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
     public Task<Result> DeleteAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
-        return Result.Go(_cache.Remove<Employee>(id))
-                     .ThenAsAsync(_ => _data.DeleteAsync(id))
+        return Result.Go().CacheRemove<Employee>(_cache, id)
+                     .ThenAsync(() => _data.DeleteAsync(id))
                      .Then(() => _events.PublishValueEvent(new { Id = id }, new Uri($"myef/hr/employee/{id}", UriKind.Relative), $"MyEf.Hr.Employee", "Deleted"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
@@ -59,6 +59,6 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     {
         return Result.GoAsync(_data.TerminateAsync(value, id))
                      .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", UriKind.Relative), $"MyEf.Hr.Employee", "Terminated"))
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 }

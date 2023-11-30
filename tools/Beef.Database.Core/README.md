@@ -36,7 +36,7 @@ The following provides the help content for the `yaml` sub-command:
 ```
 codegen yaml <Schema> <Table> [<Table>...]   Creates a temporary Beef entity YAML file for the specified table(s).
                                              - A table name with a prefix ! denotes that no CRUD operations are required.
-                                             - A table name with a prefix @ denotes that a 'GetByArgs' operation is required.
+                                             - A table name with a prefix * denotes that a 'GetByArgs' operation is required.
 ```
 
 An example is as follows:

@@ -163,7 +163,7 @@ However, to minimize any impact to the other existing unit tests the `EventOutbo
 
 ## Localized testing
 
-To achieve a basic test within a developers machine then the API host should be started. By navigating to the [Swagger](https://swagger.io/) page this will result in the ASP.NET host starting, which in turn will execute the registered `IHosterService`. After a small delay the `EventOutboxHostedService` will begin processing and the following should occur.
+To achieve a basic test within a developers machine then the API host should be started. By navigating to the [Swagger](https://swagger.io/) page this will result in the ASP.NET host starting, which in turn will execute the registered `IHostedService`. After a small delay the `EventOutboxHostedService` will begin processing and the following should occur.
 
 - Database dequeue - the entries previously enqueued within the `Outbox.EventOutbox` will have the `DequeueDate` column updated signalling that the event was dequeued and sent successfully.
 - Service Bus Message - the corresponding events/messages should appear within the Azure Service Bus (queue or topic).

@@ -16,9 +16,6 @@ namespace {{Root.NamespaceApi}}.Controllers;
 {{#ifval WebApiAuthorize}}
 [{{{WebApiAuthorize}}}]
 {{/ifval}}
-{{#ifval WebApiRoutePrefix}}
-[Route("{{WebApiRoutePrefix}}")]
-{{/ifval}}
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class {{Name}}Controller : ControllerBase
 {

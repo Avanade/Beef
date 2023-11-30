@@ -3,6 +3,7 @@
 using CoreEx.Entities.Extended;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Collections.Generic;
@@ -179,8 +180,7 @@ entities:
         /// Gets or sets the <c>RoutePrefixAtttribute</c> for the corresponding entity Web API controller.
         /// </summary>
         [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
-            Description = "This is the base (prefix) `URI` prepended to all entity and underlying `Operation`(s).")]
+        [CodeGenProperty("WebApi", Title = "The base (prefix) `URI` prepended to all `Operation.WebApiRoute` values.", IsImportant = true)]
         public string? WebApiRoutePrefix { get; set; }
 
         #endregion
@@ -265,7 +265,7 @@ entities:
         public string? ODataName { get; set; }
 
         /// <summary>
-        /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpRest`.
+        /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
         [JsonProperty("httpAgentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [CodeGenProperty("HttpAgent", Title = "The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
@@ -611,6 +611,9 @@ entities:
                 RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :
                     $"{(WebApiRoutePrefix.EndsWith('/') ? WebApiRoutePrefix[..^1] : WebApiRoutePrefix)}/{(RefDataWebApiRoute.StartsWith('/') ? RefDataWebApiRoute[1..] : RefDataWebApiRoute)}";
 
+            if (WebApiRoutePrefix is not null && WebApiRoutePrefix.StartsWith("/"))
+                WebApiRoutePrefix = WebApiRoutePrefix[1..];
+
             Entities = await PrepareCollectionAsync(Entities).ConfigureAwait(false);
 
             RefData = new RefDataConfig();
@@ -672,16 +675,21 @@ entities:
         /// <param name="root">The root <see cref="CodeGenConfig"/>.</param>
         /// <param name="config">The <see cref="ConfigBase"/>.</param>
         /// <param name="properties">The list of deprecated properties.</param>
-        internal static void WarnWhereDeprecated(CodeGenConfig root, ConfigBase config, params (string Property, string? Message)[] properties)
+        internal static void WarnWhereDeprecated(CodeGenConfig root, ConfigBase config, params (string Property, string? Message, bool IsError)[] properties)
         {
             if (config.ExtraProperties == null || config.ExtraProperties.Count == 0 || properties.Length == 0)
                 return;
 
             foreach (var xp in config.ExtraProperties)
             {
-                var (Property, Message) = properties!.FirstOrDefault(x => x.Property == xp.Key);
+                var (Property, Message, IsError) = properties!.FirstOrDefault(x => x.Property == xp.Key);
                 if (Property != null)
-                    root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
+                {
+                    if (IsError)
+                        throw new CodeGenException(Property, $"Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and is no longer supported.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
+                    else
+                        root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
+                }
             }
         }
     }

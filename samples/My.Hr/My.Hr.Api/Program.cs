@@ -11,6 +11,6 @@ public static class Program
     /// <param name="args">The startup arguments.</param>
     public static void Main(string[] args) => Host.CreateDefaultBuilder()
         .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-        .ConfigureAppConfiguration(c => c.AddEnvironmentVariables("Hr_").AddCommandLine(args))
+        .ConfigureAppConfiguration(c => c.AddEnvironmentVariables("My_Hr_").AddCommandLine(args))
         .Build().Run();
 }

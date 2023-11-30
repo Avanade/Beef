@@ -8,7 +8,7 @@ refDataText: true
 databaseSchema: AppName
 entities:
   # The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures.
-- { name: Person, collection: true, collectionResult: true, identifierGenerator: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, autoImplement: Database,
+- { name: Person, collection: true, collectionResult: true, identifierGenerator: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd, autoImplement: Database,
     properties: [
       { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
       { name: FirstName },
@@ -48,7 +48,7 @@ etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a database using EntityFramework.
-- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, entityFrameworkModel: EfModel.Person,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd, entityFrameworkModel: EfModel.Person,
     properties: [
 //#if (implement_sqlserver)
       { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
@@ -92,7 +92,7 @@ refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a Cosmos DB.
 
-- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, crud: true, cosmosContainerId: Persons, cosmosModel: Model.Person,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, behavior: crupd, cosmosContainerId: Persons, cosmosModel: Model.Person,
     properties: [
       { name: Id, type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
       { name: FirstName },
@@ -130,7 +130,7 @@ httpAgentName: XxxAgent
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing an HTTP endpoint.
-- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true, dataModel: true, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd, dataModel: true, httpAgentModel: Model.Person, httpAgentRoutePrefix: People,
     properties: [
       { name: Id, type: Guid, primaryKey: true },
       { name: FirstName },
@@ -151,7 +151,7 @@ webApiAutoLocation: true
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations with no auto implementation.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, crud: true,
+- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd,
     properties: [
       { name: Id, type: Guid, primaryKey: true },
       { name: FirstName },

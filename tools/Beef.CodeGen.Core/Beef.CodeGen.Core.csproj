@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="OnRamp" Version="1.0.8" />
-    <PackageReference Include="DbEx" Version="2.3.11" />
+    <PackageReference Include="DbEx" Version="2.3.12" />
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />

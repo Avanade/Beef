@@ -12,6 +12,18 @@ The employee termination will only terminate an existing employee under certain 
 
 <br/>
 
+## Explicit command
+ 
+This functionality could be added to the existing update; however, certains types of updates are better suited to using commands, in this case _terminate_. This explicitly separates this specific functionaly from the more general purpose update previously implemented.
+
+This separation of logic (and potentially underlying data) can allow additional functionality, and/or security, to be applied where applicable at a later stage minimizing impact within the overall solution.
+
+This is essentially an application of the [CQRS pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs).
+
+> CQRS stands for Command and Query Responsibility Segregation, a pattern that separates read and update operations for a data store. Implementing CQRS in your application can maximize its performance, scalability, and security. 
+
+<br/>
+
 ## Data repository
 
 No additional data repository effort is required as the intent is to reuse what already exists; specifically the `Employee` table already exposes the termination related columns.
@@ -27,13 +39,14 @@ Add the following to the array of operations after the existing `GetByArgs` oper
 ``` yaml
       # Terminate operation
       # - Text is specified to override the default for an Update.
-      # - OperationType is Update as it follows a similar pattern.
+      # - Type is Update as it follows a similar operation pattern.
       # - ValueType is overridden with the TerminationDetail to use this instead of the default Employee.
       # - Validator is overridden to use the TerminationDetailValidator.
+      # - WebApiRoute is overridden to be terminate.
       # - WebApiMethod is overriden to use HttpPost (an Update otherwise defaults to an HttpPut).
       # - EventSubject is overridden so that the action component will be Terminated.
-      # - AutoImplement is None as this will be implemented by the developer.
-      # - An additional Id parameter is passed; in this instance we do not use the UniqueKey as we require the value to be passed down all the layers.
+      # - AutoImplement is None as this will be specifically implemented by the developer.
+      # - An additional Id parameter is passed; in this instance we do not use the Operation.PrimaryKey as we require the value to be passed down all the layers.
       { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
         parameters: [
           { name: Id, property: Id, isMandatory: true, text: '{{Employee}} identifier' }
@@ -53,32 +66,22 @@ dotnet run entity
 
 The existing `EmployeeData.cs` logic will need to be extended to support the new `Terminate`. 
 
-This is an instance where there is some validation logic that has been added to this data component versus in the related validator. The primary reason for this is efficiency, as we need to do a `Get` to then `Update`, so to minimize chattiness and keep this logic together it is all implemented here.
+This is an instance where there is some validation logic that has been added to this data component versus in a related validator. The primary reason for this is efficiency, as we need to do a `Get` to then `Update`, so to minimize chattiness and keep this logic together it is all implemented here.
 
 Add the following method to the non-generated partial class `EmployeeData.cs` (`MyEf.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously. Also, of note is the use of the `Result` type (railway-oriented programming) to enable, including the usage of the `Result.ValidationError` versus throwing a `ValidationException` (ultimately results in the same outcome).
 
 ``` csharp
-/// <summary>
-/// Terminates an existing employee by updating their termination columns.
-/// </summary>
-private Task<Result<Employee>> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
-{
-    // Need to pre-query the data to, 1) check they exist, 2) check they are still employed, and 3) update.
-    return Result.GoAsync(GetAsync(id)).ThenAsAsync(async curr =>
-    {
-        if (curr == null)
-            return Result.NotFoundError();
-
-        if (curr.Termination != null)
-            return Result.ValidationError("An Employee can not be terminated more than once.");
-
-        if (value.Date < curr.StartDate)
-            return Result.ValidationError("An Employee can not be terminated prior to their start date.");
-
-        curr.Termination = value;
-        return await UpdateAsync(curr).ConfigureAwait(false);
-    });
-}
+    /// <summary>
+    /// Terminates an existing employee by updating the termination-related columns.
+    /// </summary>
+    /// <remarks>Need to pre-query the data to, 1) check they exist, 2) check they are still employed, 3) not prior to starting, and, then 4) update.</remarks>
+    private Task<Result<Employee>> TerminateOnImplementationAsync(TerminationDetail value, Guid id)
+        => Result.GoAsync(GetAsync(id))
+            .When(e => e is null, _ => Result.NotFoundError())
+            .When(e => e.Termination is not null, _ => Result.ValidationError("An Employee can not be terminated more than once."))
+            .When(e => value.Date < e.StartDate, _ => Result.ValidationError("An Employee can not be terminated prior to their start date."))
+            .Then(e => e.Termination = value)
+            .ThenAsAsync(e => UpdateAsync(e));
 ```
 
 <br/>

@@ -93,7 +93,7 @@ Following represents the high-level mapping between the existing _Beef_ packages
 Existing | New
 -|-
 `Beef.Abstractions` | `CoreEx`
-`Beef.AspNetCore.WebApi` | `CoreEx`
+`Beef.AspNetCore.WebApi` | `CoreEx.AspNetCore`
 `Beef.Core` | `CoreEx`, `CoreEx.Validation`, `CoreEx.Newtonsoft`, `CoreEx.AutoMapper`
 `Beef.Data.Database` | `CoreEx.Database.SqlServer` includes `CoreEx.Database`
 `Beef.Data.Database.Cdc` | `CoreEx.Database.SqlServer`
@@ -104,10 +104,10 @@ Existing | New
 `Beef.Events.EventHubs` | None (on roadmap)
 `Beef.Events.ServiceBus` | `CoreEx.Azure` (publishing only)
 `Beef.Grpc` | None (consider [Dapr sidecar](https://docs.dapr.io/developing-applications/integrations/grpc-integration/))
-- | -
+-|-
 `Beef.CodeGen.Core` | `Beef.CodeGen.Core` upgraded (leverages `OnRamp`)
 `Beef.Database.Core` | `Beef.Database.SqlServer` includes `Beef.Database.Core` (leverages `DbEx`)
-`Beef.Test.NUnit` | `UnitTestEx`, [`Beef.Test.NUnit`](../tools/Beef.Test.NUnit/README.md) (backwards compatibility)
+`Beef.Test.NUnit` | `UnitTestEx`, [`Beef.Test.NUnit`](../tools/Beef.Test.NUnit/README.md) (backwards compatibility only)
 `Beef.Template.Solution` | `Beef.Template.Solution`
 
 <br/>

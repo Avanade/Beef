@@ -80,11 +80,11 @@ public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Da
         {{set-value 'HasResultCode' true}}return Result.Go().CacheGetOrAddAsync(_cache, {{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}, () => _data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}}))
         {{/ifeq}}
         {{#ifeq Type 'Delete'}}
-        {{set-value 'HasResultCode' true}}return Result.Go(_cache.Remove<{{Parent.Name}}>({{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}}))
+        {{set-value 'HasResultCode' true}}return Result.Go().CacheRemove<{{Parent.Name}}>(_cache, {{#ifne ValueLessParameters.Count 1}}new CompositeKey({{/ifne}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}{{#ifne ValueLessParameters.Count 1}}){{/ifne}})
         {{/ifeq}}
       {{/if}}
       {{#unless IsGetWithCache}}
-        {{#if HasResultCode}}             .ThenAsAsync(_ => {{else}}return Result.GoAsync({{/if}}_data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}})){{#unless DataSvcExtensions}}{{#unless DataSvcWillEventPublish}}{{#if SupportsCaching}}{{#ifeq Type 'Delete'}};{{/ifeq}}{{else}};{{/if}}{{/unless}}{{/unless}}
+        {{#if HasResultCode}}             .Then{{#ifne Type 'Delete'}}As{{/ifne}}Async({{#ifeq Type 'Delete'}}(){{else}}_{{/ifeq}} => {{else}}return Result.GoAsync({{/if}}_data.{{Name}}Async({{#each DataParameters}}{{#if IsValueArg}}value{{else}}{{ArgumentName}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, cancellationToken{{/if}})){{#unless DataSvcExtensions}}{{#unless DataSvcWillEventPublish}}{{#if SupportsCaching}}{{#ifeq Type 'Delete'}};{{/ifeq}}{{else}};{{/if}}{{/unless}}{{/unless}}
       {{/unless}}
       {{#if DataSvcExtensions}}
                      .ThenAsync({{#if HasReturnValue}}r{{else}}(){{/if}} => {{PrivateName}}OnAfterAsync?.Invoke({{#if HasReturnValue}}r{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}{{#ifne ValueLessDataParamaters 0}}, {{else}}{{#if HasReturnValue}}, {{/if}}{{/ifne}}cancellationToken{{/if}}) ?? Result.SuccessTask){{#unless DataSvcWillEventPublish}}{{#if SupportsCaching}}{{#ifeq Type 'Delete' 'Get'}};{{/ifeq}}{{else}};{{/if}}{{/unless}}
@@ -128,7 +128,7 @@ public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Da
     {{#if WithResult}}
       {{#if SupportsCaching}}
         {{#ifne Type 'Delete' 'Get'}}
-                     .Then(r => _cache.SetValue(r));
+                     .CacheSet(_cache);
         {{/ifne}}
       {{/if}}
     {{else}}

@@ -26,20 +26,20 @@ public partial class PerformanceReviewData : IPerformanceReviewData
         => _ef.GetWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
 
     /// <inheritdoc/>
-    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
-        => _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
-
-    /// <inheritdoc/>
-    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
-        => _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
-
-    /// <inheritdoc/>
     public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value)
         => _ef.UpdateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
 
     /// <inheritdoc/>
     public Task<Result> DeleteAsync(Guid id)
         => _ef.DeleteWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(id);
+
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging)
+        => _ef.Query<PerformanceReview, EfModel.PerformanceReview>(q => _getByEmployeeIdOnQuery?.Invoke(q, employeeId) ?? q).WithPaging(paging).SelectResultWithResultAsync<PerformanceReviewCollectionResult, PerformanceReviewCollection>();
+
+    /// <inheritdoc/>
+    public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value)
+        => _ef.CreateWithResultAsync<PerformanceReview, EfModel.PerformanceReview>(value);
 
     /// <summary>
     /// Provides the <see cref="PerformanceReview"/> to Entity Framework <see cref="EfModel.PerformanceReview"/> mapping.

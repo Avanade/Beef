@@ -150,7 +150,7 @@ The aforementioned services registration code of interest is as follows.
 })
 .AddAzureServiceBusOrchestratedSubscriber((_, o) =>
 {
-    o.EventDataDeserializationErrorHandling = ErrorHandling.ThrowSubscriberException;
+    o.EventDataDeserializationErrorHandling = ErrorHandling.Handle;
 })
 .AddTypedHttpClient<OktaHttpClient>("OktaApi");
 ```
@@ -342,14 +342,14 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
         ValueValidator = _employeeValidator;
     }
 
-    public override ErrorHandling SecurityHandling => ErrorHandling.TransientRetry;
+    public override ErrorHandling SecurityHandling => ErrorHandling.Retry;
 
     public override ErrorHandling NotFoundHandling => ErrorHandling.CompleteWithWarning;
 
     public override Task<Result> ReceiveAsync(EventData<Employee> @event, EventSubscriberArgs args, CancellationToken cancellationToken) 
         => Result.GoAsync(_okta.GetUserAsync(@event.Value.Id, @event.Value.Email!))
-            .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
-            .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
+                 .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
+                 .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
 }
 ```
 
