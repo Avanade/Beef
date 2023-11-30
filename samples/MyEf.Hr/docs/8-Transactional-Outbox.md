@@ -1,4 +1,4 @@
-# Step 7 - Transactional Outbox
+# Step 8 - Transactional Outbox
 
 To support the [transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) there is the need to have a backing event queue within the database where the event data is persisted transactionally. This will ensure that the events and corresponding data being manipulated are persisted as a single unit of work; before an attempt is made to publish (send) the events to an underlying messaging subsystem. This will guarantee that there will be _zero_ event loss, and that the events will be stored in the sequence in which they are enqueued (honoring order).
 
@@ -138,6 +138,12 @@ To perform a localized test perform a POST to the `/employees/00000001-0000-0000
 
 <br/>
 
-## Conclusion
+## Verify
 
-At this stage we now have our events being persisted to the Transactional Outbox ready for sending to the final messaging subsystem. Next we need to perform the dequeue and [Service Bus Publish](./Service-Bus-Publish.md).
+At this stage we now have our events being persisted to the Transactional Outbox ready for sending to the final messaging subsystem.
+
+<br/>
+
+## Next Step
+
+Next we need to perform the dequeue and [Service Bus Publish](./9-Service-Bus-Publish.md).

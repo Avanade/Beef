@@ -1,4 +1,4 @@
-﻿# Step 6 - Employee Performance Review
+﻿# Step 7 - Employee Performance Review
 
 This will walk through the process of creating and testing the employee performance review capability.
 
@@ -6,7 +6,7 @@ This will walk through the process of creating and testing the employee performa
 
 ## Functional requirement
 
-In simple terms an employee performance review can occur at any time during an employee's employment. It captures the basic information, when, the reviewer, the outcome and related notes.
+In simple terms, an employee performance review can occur at any time during an employee's employment. It captures the basic information: when, the reviewer, the outcome and related notes.
 
 <br/>
 
@@ -18,13 +18,13 @@ A new `PerformanceReview` table and related Entity Framework (EF) model will be 
 
 ### Create Performance Review table
 
-First step, as was previously the case, is to create the `PerformanceReview` table migration script. Execute the following to create the migration script for the `MyEf.Hr.Database` project.
+First step, as was previously the case, is to create the `PerformanceReview` table migration script. Execute the following within the `MyEf.Hr.Database` directory to create the migration script for the project.
 
 ```
 dotnet run script create Hr PerformanceReview
 ```
 
-Open the newly created migration script and replace its contents with the following.
+Open the newly created migration script within `MyEf.Hr.Database/Migrations` and replace its contents with the following.
 
 ``` sql
 -- Create table: [Hr].[PerformanceReview]
@@ -52,7 +52,7 @@ COMMIT TRANSACTION
 
 ### Create Reference Data table
 
-To support the above a `Hr.PerformanceOutcome` reference data table is also required. Execute the following to create the migration script. No further changes will be needed.
+To support the above a `Hr.PerformanceOutcome` reference data table is also required. Execute the following within the `MyEf.Hr.Database` directory to create the migration script. No further changes will be needed.
 
 ```
 dotnet run script refdata Hr PerformanceOutcome
@@ -62,7 +62,7 @@ dotnet run script refdata Hr PerformanceOutcome
 
 ### Reference Data data
 
-Now that the Reference Data table exists it will need to be populated. Append the following YAML to the existing `RefData.yaml` file.
+Now that the Reference Data table exists it will need to be populated. Append the following YAML to the existing `MyEf.Hr.Database/Data/RefData.yaml` file.
 
 ``` yaml
   - $PerformanceOutcome:
@@ -75,13 +75,13 @@ Now that the Reference Data table exists it will need to be populated. Append th
 
 ### Entity Framework model
 
-For the performance review, Entity Framework will be used exclusively to support the full CRUD capabilities. Append the following after the other reference data tables within the `database.beef-5.yaml`.
+For the performance review, Entity Framework will be used exclusively to support the full CRUD capabilities. Append the following after the other reference data tables within `MyEf.Hr.Database/database.beef-5.yaml`.
 
 ``` yaml
 - name: PerformanceOutcome
 ```
 
-Add the additional relationship to the `Employee` table by replacing existing configuration.
+Add the additional relationship to the `Employee` table by replacing existing table configuration.
 
 ``` yaml
   # References the Employee and related tables to implement the EF Model and infer the underlying schema.
@@ -107,7 +107,7 @@ Finally add the `PerformanceReview` table to the end of the file to create the r
 
 Once the configuration has been completed then the database can be created/updated, the code-generation performed, and the corresponding reference data loaded into the corresponding tables.
 
-At the command line execute the following command to perform. The log output will describe all actions that were performed.
+At the command line execute the following command within the `MyEf.Hr.Database` directory to perform these updates. The log output will describe all actions that were performed.
 
 ```
 dotnet run all
@@ -123,7 +123,7 @@ The reference data API for the `PerformanceOutcome` needs to be added. Append th
 - { name: PerformanceOutcome, entityFrameworkModel: EfModel.PerformanceOutcome }
 ```
 
-Once the reference data has been configured the code-generation can be performed. Use the following command line to generate.
+Once the reference data has been configured the code-generation can be performed. Use the following command line within the `MyEf.Hr.CodeGen` directory to generate.
 
 ```
 dotnet run refdata
@@ -181,7 +181,7 @@ The `PerformanceReview` entity and operations configuration is required as follo
   }
 ```
 
-Once configured the code-generation can be performed. Use the following command line to generate.
+Once configured the code-generation can be performed. Use the following command line within the `MyEf.Hr.CodeGen` directory to generate.
 
 ```
 dotnet run entity
@@ -191,9 +191,9 @@ dotnet run entity
 
 ### Data access logic
 
-The generated `PerformanceReviewData.cs` logic will need to be extended to support the filtering for the `GetByEmployeeId` operation. This logic must be implemented by the developer in a non-generated `partial` class. A new `PerformanceReviewData.cs` must be created within `MyEf.Hr.Business/Data`.
+The generated `PerformanceReviewData.cs` logic will need to be extended to support the filtering for the `GetByEmployeeId` operation. This logic must be implemented by the developer in a non-generated `partial` class. Create a new `PerformanceReviewData.cs` class within `MyEf.Hr.Business/Data`.
 
-To implement the filtering the extension delegate named `_getByEmployeeIdOnQuery` is implemented. The following represents the implementation. 
+To implement the filtering, the extension delegate named `_getByEmployeeIdOnQuery` is implemented. Implement the class as follows:
 
 ``` csharp
 namespace MyEf.Hr.Business.Data;
@@ -211,7 +211,7 @@ public partial class PerformanceReviewData
 
 ### Validation
 
-Within the `MyEf.Hr.Business/Validation` folder create `PerformanceReviewValidator.cs` and implement as follows.
+Within the `MyEf.Hr.Business/Validation` folder create `PerformanceReviewValidator.cs` and implement as follows:
 
 ``` csharp
 namespace MyEf.Hr.Business.Validation;
@@ -285,7 +285,7 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
 
 ## End-to-End testing
 
-For the purposes of this sample, copy the contents of [`PerformanceReviewTest.cs`](../MyEf.Hr.Test/Apis/PerformanceReviewTest.cs) (`MyEf.Hr.Test/Apis` folder) and [`PerformanceReviewValidatorTest.cs`](../MyEf.Hr.Test/Validators/PerformanceReviewValidatorTest.cs) (`MyEf.Hr.Test/Validators` folder).
+For the purposes of this sample, copy the file and contents of [`PerformanceReviewTest.cs`](../MyEf.Hr.Test/Apis/PerformanceReviewTest.cs) (`MyEf.Hr.Test/Apis` folder) and [`PerformanceReviewValidatorTest.cs`](../MyEf.Hr.Test/Validators/PerformanceReviewValidatorTest.cs) (`MyEf.Hr.Test/Validators` folder) into local project.
 
 For the end-to-end testing to function the performance review related data must first be populated into the database; append the following into the existing `Data.yaml` (`MyEf.Hr.Test/Data`).
 
@@ -300,8 +300,40 @@ Review and execute the tests and ensure they all pass as expected.
 
 <br/>
 
-## Conclusion
+## Verify
 
 At this stage we now have added and tested the performance review capabilities. All the desired functional requirements have now been implemented.
 
-Next we will consider the addition of [Event-driven architecture](./../README.md#Event-driven-architecture-implementation) capabilities.
+To verify, build the solution and ensure no compilation errors.
+
+Within test explorer, run the PerformanceReviewTest and PerformanceReviewValidatorTest set of tests and confirm they all pass.
+
+The following tests were newly added and should pass:
+
+```
+A110_Get
+A110_Get_NotFound
+A210_GetByEmployeeId_NotFound
+A220_GetByEmployeeId
+A220_GetByEmployeeId_Last
+B110_Create
+C110_Update_NotFound
+C120_Update_Concurrency
+C130_Update
+E110_Delete
+A110_Validate_Initial
+A120_Validate_BadData
+A130_Validate_BeforeStarting
+A140_Validate_AfterTermination
+A150_Validate_EmployeeNotFound
+A160_Validate_EmployeeImmutable
+A170_Validate_CreateOK
+A180_Validate_UpdateOK
+```
+
+<br/>
+
+## Next Step
+
+Next we will consider the addition of [Event-driven architecture](./../README.md#Event-driven-architecture-implementation) capabilities, starting by implementing
+the [Transactional Outbox](./8-Transactional-Outbox.md)
