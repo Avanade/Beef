@@ -133,16 +133,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{4EE60769
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5BA9A863-C057-46D5-8139-6353ACCCAA0A}"
 	ProjectSection(SolutionItems) = preProject
-		samples\MyEf.Hr\docs\Employee-Api.md = samples\MyEf.Hr\docs\Employee-Api.md
-		samples\MyEf.Hr\docs\Employee-DB.md = samples\MyEf.Hr\docs\Employee-DB.md
-		samples\MyEf.Hr\docs\Employee-Search.md = samples\MyEf.Hr\docs\Employee-Search.md
-		samples\MyEf.Hr\docs\Employee-Terminate.md = samples\MyEf.Hr\docs\Employee-Terminate.md
-		samples\MyEf.Hr\docs\Employee-Test.md = samples\MyEf.Hr\docs\Employee-Test.md
+		samples\MyEf.Hr\docs\1-Solution-Skeleton.md = samples\MyEf.Hr\docs\1-Solution-Skeleton.md
+		samples\MyEf.Hr\docs\10-Service-Bus-Subscribe.md = samples\MyEf.Hr\docs\10-Service-Bus-Subscribe.md
+		samples\MyEf.Hr\docs\2-Employee-DB.md = samples\MyEf.Hr\docs\2-Employee-DB.md
+		samples\MyEf.Hr\docs\3-Employee-Api.md = samples\MyEf.Hr\docs\3-Employee-Api.md
+		samples\MyEf.Hr\docs\4-Employee-Test.md = samples\MyEf.Hr\docs\4-Employee-Test.md
+		samples\MyEf.Hr\docs\5-Employee-Search.md = samples\MyEf.Hr\docs\5-Employee-Search.md
+		samples\MyEf.Hr\docs\6-Employee-Terminate.md = samples\MyEf.Hr\docs\6-Employee-Terminate.md
+		samples\MyEf.Hr\docs\7-Performance-Review.md = samples\MyEf.Hr\docs\7-Performance-Review.md
+		samples\MyEf.Hr\docs\8-Transactional-Outbox.md = samples\MyEf.Hr\docs\8-Transactional-Outbox.md
+		samples\MyEf.Hr\docs\9-Service-Bus-Publish.md = samples\MyEf.Hr\docs\9-Service-Bus-Publish.md
 		samples\MyEf.Hr\docs\Event-Driven-Architecture.png = samples\MyEf.Hr\docs\Event-Driven-Architecture.png
-		samples\MyEf.Hr\docs\Performance-Review.md = samples\MyEf.Hr\docs\Performance-Review.md
-		samples\MyEf.Hr\docs\Service-Bus-Publish.md = samples\MyEf.Hr\docs\Service-Bus-Publish.md
-		samples\MyEf.Hr\docs\Service-Bus-Subscribe.md = samples\MyEf.Hr\docs\Service-Bus-Subscribe.md
-		samples\MyEf.Hr\docs\Transactional-Outbox.md = samples\MyEf.Hr\docs\Transactional-Outbox.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{FDBFD331-A9EB-42BF-B501-8398A04955A7}"
