@@ -1,4 +1,6 @@
-﻿using CoreEx;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using CoreEx;
 using System;
 using UnitTestEx.NUnit;
 

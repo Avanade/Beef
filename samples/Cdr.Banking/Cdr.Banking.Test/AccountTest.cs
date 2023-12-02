@@ -27,7 +27,7 @@ namespace Cdr.Banking.Test
         [Test]
         public void B110_GetAccounts_User1()
         {
-            var v = Agent<AccountAgent, AccountCollectionResult>()
+            var v = this.Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
@@ -223,7 +223,7 @@ namespace Cdr.Banking.Test
         [Test]
         public void D110_GetBalance_Found()
         {
-            var v = Agent<AccountAgent, Balance?>()
+            var v = this.Agent<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetBalanceAsync("12345678")).Value;
 

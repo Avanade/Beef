@@ -42,7 +42,7 @@ public class EmployeeValidatorTest
     [Test]
     public void A110_Validate_Initial()
     {
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -53,7 +53,7 @@ public class EmployeeValidatorTest
                 "Birthday is required.",
                 "Start Date is required.",
                 "Phone No is required.")
-            .Run<EmployeeValidator, Employee>(new Employee());
+            .Validation().With<EmployeeValidator, Employee>(new Employee());
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class EmployeeValidatorTest
             PhoneNo = "(425) 333 4444"
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -80,7 +80,7 @@ public class EmployeeValidatorTest
                 "Gender is invalid.",
                 "Birthday is invalid as the Employee must be at least 18 years of age.",
                 "Start Date must be greater than or equal to January 1, 1999.")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class EmployeeValidatorTest
         var e = CreateValidEmployee();
         e.Address = new Address();
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -97,7 +97,7 @@ public class EmployeeValidatorTest
                 "City is required.",
                 "State is required.",
                 "Post Code is required.")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -112,13 +112,13 @@ public class EmployeeValidatorTest
             PostCode = "XXXXXXXXXX"
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
                 "State is invalid.",
                 "Post Code is invalid.")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -133,11 +133,11 @@ public class EmployeeValidatorTest
             PostCode = "98052"
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectSuccess()
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class EmployeeValidatorTest
         var e = CreateValidEmployee();
         e.EmergencyContacts = new EmergencyContactCollection { new EmergencyContact() };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -154,7 +154,7 @@ public class EmployeeValidatorTest
                 "Last Name is required.",
                 "Phone No is required.",
                 "Relationship is required.")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -172,11 +172,11 @@ public class EmployeeValidatorTest
             }
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Relationship is invalid.")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -196,11 +196,11 @@ public class EmployeeValidatorTest
             });
         }
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Emergency Contacts must not exceed 5 item(s).")
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation().With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -212,13 +212,12 @@ public class EmployeeValidatorTest
         var eds = new Mock<IEmployeeDataSvc>();
         eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { Termination = new TerminationDetail { Date = DateTime.UtcNow } });
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.ValidationException>("Once an Employee has been Terminated the data can no longer be updated.")
-            .OperationType(CoreEx.OperationType.Update)
-            .Run<EmployeeValidator, Employee>(e);
+            .Validation(OperationType.Update).With<EmployeeValidator, Employee>(e);
     }
 
     [Test]
@@ -227,12 +226,12 @@ public class EmployeeValidatorTest
         var eds = new Mock<IEmployeeDataSvc>();
         eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.NotFoundException>()
-            .Run(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
+            .Validation().With(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
     }
 
     [Test]
@@ -241,11 +240,11 @@ public class EmployeeValidatorTest
         var eds = new Mock<IEmployeeDataSvc>();
         eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { StartDate = DateTime.UtcNow.AddDays(-1) });
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.ValidationException>("An employee cannot be deleted after they have started their employment.")
-            .Run(() => EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()).Result);
+            .Validation().With(() => EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()).Result);
     }
 }

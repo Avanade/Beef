@@ -1,4 +1,5 @@
-﻿using My.Hr.Business.Entities;
+﻿using Azure;
+using My.Hr.Business.Entities;
 
 namespace My.Hr.Test.Validators;
 
@@ -36,7 +37,7 @@ public class PerformanceReviewValidatorTest
     [Test]
     public void A110_Validate_Initial()
     {
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -44,7 +45,7 @@ public class PerformanceReviewValidatorTest
                 "Date is required.",
                 "Outcome is required.",
                 "Reviewer is required.")
-            .Run<PerformanceReviewValidator, PerformanceReview>(new PerformanceReview());
+            .Validation().With<PerformanceReviewValidator, PerformanceReview>(new PerformanceReview());
     }
 
     [Test]
@@ -59,7 +60,7 @@ public class PerformanceReviewValidatorTest
             Notes = new string('X', 5000)
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors(
@@ -68,7 +69,7 @@ public class PerformanceReviewValidatorTest
                 "Employee is not found; a valid value is required.",
                 "Reviewer must not exceed 256 characters in length.",
                 "Notes must not exceed 4000 characters in length.")
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation().With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -83,11 +84,11 @@ public class PerformanceReviewValidatorTest
             Notes = "Thumbs up!"
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Date must not be prior to the Employee starting.")
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation().With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -102,11 +103,11 @@ public class PerformanceReviewValidatorTest
             Notes = "Thumbs up!"
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
             .ExpectErrors("Date must not be after the Employee has terminated.")
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation().With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -123,12 +124,11 @@ public class PerformanceReviewValidatorTest
         };
 
         // Need to set the OperationType to Update to exercise logic.
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
-            .OperationType(OperationType.Update)
             .ExpectErrorType(CoreEx.Abstractions.ErrorType.NotFoundError)
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation(OperationType.Update).With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -145,12 +145,11 @@ public class PerformanceReviewValidatorTest
         };
 
         // Need to set the OperationType to Update to exercise logic.
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
-            .OperationType(OperationType.Update)
             .ExpectErrors("Employee is not allowed to change; please reset value.")
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation(OperationType.Update).With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -166,11 +165,10 @@ public class PerformanceReviewValidatorTest
         };
 
         // Need to set the OperationType to Create to exercise logic.
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
-            .OperationType(OperationType.Create)
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation(OperationType.Create).With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 
     [Test]
@@ -187,10 +185,9 @@ public class PerformanceReviewValidatorTest
         };
 
         // Need to set the OperationType to Update to exercise logic.
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         test.ConfigureServices(_testSetup!)
-            .OperationType(OperationType.Update)
-            .Run<PerformanceReviewValidator, PerformanceReview>(pr);
+            .Validation(OperationType.Update).With<PerformanceReviewValidator, PerformanceReview>(pr);
     }
 }

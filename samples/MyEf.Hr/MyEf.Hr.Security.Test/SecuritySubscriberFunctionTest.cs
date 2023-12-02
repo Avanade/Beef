@@ -8,7 +8,7 @@ public class SecuritySubscriberFunctionTest
     {
         using var test = FunctionTester.Create<Startup>();
         var actions = test.CreateServiceBusMessageActions();
-        var message = test.CreateServiceBusMessage<string>(null!);
+        var message = test.CreateServiceBusMessageFromValue<string>(null!);
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .Run(f => f.RunAsync(message, actions, default))

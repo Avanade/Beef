@@ -1,17 +1,13 @@
 ﻿using Beef.Demo.Api;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
-using Beef.Test.NUnit;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using UnitTestEx.NUnit;
+using UnitTestEx;
 using UnitTestEx.Expectations;
+using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
@@ -23,7 +19,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
+            ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer().ToUnitTestEx());
             ApiTester.UseExpectedEvents();
             Assert.IsTrue(ApiTester.SetUp.SetUp());
 

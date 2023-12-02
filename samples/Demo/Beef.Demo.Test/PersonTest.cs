@@ -85,7 +85,7 @@ namespace Beef.Demo.Test
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
-                .ExpectMessages(
+                .ExpectErrors(
                     "First Name must not exceed 50 characters in length.",
                     "Last Name must not exceed 50 characters in length.",
                     "Gender is invalid.",
@@ -100,7 +100,7 @@ namespace Beef.Demo.Test
             AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
-                .ExpectMessages(
+                .ExpectErrors(
                     "End Date must be greater than or equal to Start Date.",
                     "Start Date must be less than or equal to today.")
                 .Run(a => a.UpdateDetailAsync(new PersonDetail()
@@ -120,7 +120,7 @@ namespace Beef.Demo.Test
             AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
-                .ExpectMessages("History contains duplicates; Name 'Google' specified more than once.")
+                .ExpectErrors("History contains duplicates; Name 'Google' specified more than once.")
                 .Run(a => a.UpdateDetailAsync(new PersonDetail() { FirstName = "Barry", LastName = "Smith", Birthday = DateTime.Now.AddDays(-5000), Gender = "M", EyeColor = "BROWN",
                     History = new WorkHistoryCollection { new WorkHistory { Name = "Google", StartDate = new DateTime(1990, 12, 31) },
                     new WorkHistory { Name = "Google", StartDate = new DateTime(1992, 12, 31) } } }, 1.ToGuid()));
@@ -132,7 +132,7 @@ namespace Beef.Demo.Test
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
-                .ExpectMessages(
+                .ExpectErrors(
                     "Gender is invalid.",
                     "Description must not exceed 10 characters in length.")
                 .Run(a => a.CreateAsync(new Person
@@ -527,7 +527,7 @@ namespace Beef.Demo.Test
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
-                .ExpectMessages("Gender is invalid.")
+                .ExpectErrors("Gender is invalid.")
                 .Run(a => a.CreateAsync(p));
         }
 
@@ -1216,6 +1216,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectETag()
                 .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
                 .Run(a => a.GetNoArgsAsync());
         }
@@ -1254,7 +1255,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
-                .ExpectMessages(
+                .ExpectErrors(
                      "Addresses must not exceed 2 item(s).",
                      "Street is required.")
                 .Run(a => a.ParamCollAsync(new AddressCollection { new Address { Street = "Aaa", City = "Bbb" }, new Address { Street = "Ccc", City = "Ddd" }, new Address { City = "Xxx" } }));
@@ -1265,7 +1266,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
-                .ExpectMessages("Addresses contains duplicates; Street 'Aaa' specified more than once.")
+                .ExpectErrors("Addresses contains duplicates; Street 'Aaa' specified more than once.")
                 .Run(a => a.ParamCollAsync(new AddressCollection { new Address { Street = "Aaa", City = "Bbb" }, new Address { Street = "Aaa", City = "Ddd" }}));
         }
 

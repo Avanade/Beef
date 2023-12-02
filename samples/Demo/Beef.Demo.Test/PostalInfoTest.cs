@@ -83,7 +83,7 @@ namespace Beef.Demo.Test
             agentTester.Test<PostalInfoAgent, PostalInfo>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetPostCodesAsync("US", "WA", "Redmond"))
-                .AssertFromJsonResource("B140_GetPostCodes_MockedHttpClient_Found_Response.json");
+                .AssertJsonFromResource("B140_GetPostCodes_MockedHttpClient_Found_Response.json");
         }
 
         [Test, TestSetUp]
@@ -102,7 +102,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectValue(_ => v)
                 .Run(a => a.CreatePostCodesAsync(v, "US", "WA", "Bananas"))
-                .AssertFromJsonResource("B140_GetPostCodes_MockedHttpClient_Found_Response.json")
+                .AssertJsonFromResource("B140_GetPostCodes_MockedHttpClient_Found_Response.json")
                 .AssertETagHeader("\"MyTestETag\"");
 
             // Check that the etag flows all the way through.

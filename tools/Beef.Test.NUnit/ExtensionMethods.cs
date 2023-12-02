@@ -1,5 +1,5 @@
-﻿using CoreEx;
-using CoreEx.Entities;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
 using CoreEx.Http;
 using CoreEx.Json;
 using Moq;
@@ -9,8 +9,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using UnitTestEx;
-using UnitTestEx.Expectations;
 
 namespace Beef.Test.NUnit
 {
@@ -19,20 +17,6 @@ namespace Beef.Test.NUnit
     /// </summary>
     public static class ExtensionMethods
     {
-        /// <summary>
-        /// Expect a <see cref="ValidationException"/> was thrown during execution with the specified <see cref="MessageType.Error"/> messages.
-        /// </summary>
-        /// <typeparam name="TSelf">The tester <see cref="Type"/>.</typeparam>
-        /// <param name="tester">The <see cref="IHttpResponseExpectations{TSelf}"/>.</param>
-        /// <param name="messages">The expected <see cref="MessageType.Error"/> message texts.</param>
-        /// <returns>The <typeparamref name="TSelf"/> instance to support fluent-style method-chaining.</returns>
-        /// <remarks>Provided to support backwards compatibility to earlier <i>Beef</i> versions. It is <b>recommended</b> that usage is upgraded to use <see cref="UnitTestEx.Expectations.ExpectationsExtensions.ExpectErrors{TSelf}(IExceptionSuccessExpectations{TSelf}, string[])"/> as this will eventually be deprecated.</remarks>
-        public static TSelf ExpectMessages<TSelf>(this IExceptionSuccessExpectations<TSelf> tester, params string[] messages) where TSelf : IExceptionSuccessExpectations<TSelf>
-        { 
-            tester.ExceptionSuccessExpectations.SetExpectErrors(messages);
-            return (TSelf)tester;
-        }
-
         /// <summary>
         /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="HttpResult"/> with the specified <paramref name="statusCode"/> (defaults to <see cref="HttpStatusCode.OK"/>).
         /// </summary>

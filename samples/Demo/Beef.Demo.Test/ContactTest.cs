@@ -24,7 +24,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent, Contact>()
+            var r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -32,7 +32,7 @@ namespace Beef.Demo.Test
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = test.Agent<ContactAgent, Contact>()
+            r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -46,18 +46,18 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var v = test.Agent<ContactAgent, Contact>()
+            var v = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value!;
 
             v.Communications.Remove("fax");
             v.Communications.Add("mobile", new ContactComm { Value = "4258762983" });
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch, "{\"communications\":{\"mobile\":{\"value\":\"4258762983\"},\"fax\":null}}", 1.ToGuid()));
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(v)
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -68,11 +68,11 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrors("Communication Type is invalid.")
                 .Run(a => a.PatchAsync(CoreEx.Http.HttpPatchOption.MergePatch, "{\"communications\":{\"xyz\":{\"value\":\"4258762983\"},\"fax\":null}}", 1.ToGuid()));
@@ -83,11 +83,11 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            test.Agent<ContactAgent, Contact>()
+            test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrors(
                     "Value is required.",
@@ -100,7 +100,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent, Contact>()
+            var r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(2.ToGuid()));
         }
@@ -110,7 +110,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent, Contact>()
+            var r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.UpdateAsync(new Contact { Id = 2.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" }, 2.ToGuid()));
         }
@@ -120,7 +120,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent, Contact>()
+            var r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" }, "Communications")
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -137,7 +137,7 @@ namespace Beef.Demo.Test
             var v = r.Value;
             v.LastName += "X";
 
-            r = test.Agent<ContactAgent, Contact>()
+            r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
@@ -167,14 +167,14 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent, ContactCollectionResult>()
+            var r = test.Agent().With<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = test.Agent<ContactAgent, ContactCollectionResult>()
+            r = test.Agent().With<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
@@ -185,12 +185,12 @@ namespace Beef.Demo.Test
             v.LastName += "X";
 
             // Update and ensure that the etag has changed as a result.
-            var r2 = test.Agent<ContactAgent, Contact>()
+            var r2 = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, v.Id));
 
-            r = test.Agent<ContactAgent, ContactCollectionResult>()
+            r = test.Agent().With<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
@@ -203,15 +203,15 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            test.Agent<ContactAgent>()
+            test.Agent().With<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(1.ToGuid()));
 
-            var r = test.Agent<ContactAgent, Contact>()
+            var r = test.Agent().With<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            test.Agent<ContactAgent>()
+            test.Agent().With<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(1.ToGuid()));
 
@@ -232,7 +232,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent>()
+            var r = test.Agent().With<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.InternalServerError)
                 .Run(a => a.RaiseEventAsync(true));
 
@@ -247,7 +247,7 @@ namespace Beef.Demo.Test
         {
             using var test = ApiTester.Create<Startup>();
 
-            var r = test.Agent<ContactAgent>()
+            var r = test.Agent().With<ContactAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.RaiseEventAsync(false));
 

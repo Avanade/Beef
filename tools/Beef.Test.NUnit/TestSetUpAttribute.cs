@@ -18,26 +18,18 @@ namespace Beef.Test.NUnit
     /// <remarks>Provided to support backwards compatibility to earlier <i>Beef</i> versions. It is <b>recommended</b> that usage is upgraded to the new as this will eventually be deprecated.
     /// <para>As the attribute is executed by the <i>NUnit</i> runtime outside of the context of the method itself only the <see cref="TestSetUp.Default"/> is able to be referenced. This, and the challenge of achieving consistency between
     /// <i>MSTest</i>, <i>NUnit</i> and <i>Xunit</i> is why this feature is being deprecated.</para></remarks>
+    /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUserName"/>).</param>
     [DebuggerStepThrough]
     [AttributeUsage(AttributeTargets.Method)]
-    public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
+    public class TestSetUpAttribute(string? username = null) : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
         private static readonly AsyncLocal<string> _username = new();
-        private readonly string _testUsername;
+        private readonly string _testUsername = username ?? TestSetUp.Default.DefaultUserName;
 
         /// <summary>
         /// Gets the username.
         /// </summary>
-        internal static string Username => _username.Value ?? TestSetUp.Default.DefaultUserName; 
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a <paramref name="username"/>.
-        /// </summary>
-        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUserName"/>).</param>
-        public TestSetUpAttribute(string? username = null)
-        {
-            _testUsername = username ?? TestSetUp.Default.DefaultUserName;
-        }
+        internal static string Username => _username.Value ?? TestSetUp.Default.DefaultUserName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a <paramref name="userIdentifier"/>.
@@ -59,20 +51,12 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// The test command for the <see cref="TestSetUpAttribute"/>.
         /// </summary>
+        /// <param name="innerCommand">The inner <see cref="TestCommand"/>.</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUserName"/>).</param>
         [DebuggerStepThrough()]
-        internal class ExecutionContextCommand : DelegatingTestCommand
+        internal class ExecutionContextCommand(TestCommand innerCommand, string? username) : DelegatingTestCommand(innerCommand)
         {
-            private readonly string _testUsername;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ExecutionContextCommand"/> class.
-            /// </summary>
-            /// <param name="innerCommand">The inner <see cref="TestCommand"/>.</param>
-            /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUserName"/>).</param>
-            public ExecutionContextCommand(TestCommand innerCommand, string? username) : base(innerCommand)
-            {
-                _testUsername = username ?? TestSetUp.Default.DefaultUserName;
-            }
+            private readonly string _testUsername = username ?? TestSetUp.Default.DefaultUserName;
 
             /// <summary>
             /// Executes the test, saving a <see cref="TestResult"/> in the supplied <see cref="TestExecutionContext"/>.

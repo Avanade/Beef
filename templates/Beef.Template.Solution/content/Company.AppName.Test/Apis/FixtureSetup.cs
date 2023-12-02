@@ -7,8 +7,8 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.Default.ExpectedEventsEnabled = true;
-        TestSetUp.Default.ExpectNoEvents = true;
+        TestSetUp.Default.EnableExpectedEvents();
+        TestSetUp.Default.ExpectNoEvents();
 
         TestSetUp.Default.RegisterAutoSetUp(async (count, _, ct) =>
         {
@@ -28,8 +28,8 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.Default.ExpectedEventsEnabled = true;
-        TestSetUp.Default.ExpectNoEvents = true;
+        TestSetUp.Default.EnableExpectedEvents();
+        TestSetUp.Default.ExpectNoEvents();
 
         TestSetUp.Default.RegisterSetUp(async (count, _, ct) =>
         {
@@ -69,8 +69,8 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.Default.ExpectedEventsEnabled = true;
-        TestSetUp.Default.ExpectNoEvents = true;
+        TestSetUp.Default.EnableExpectedEvents();
+        TestSetUp.Default.ExpectNoEvents();
     }
 #endif
 }

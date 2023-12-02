@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <Product>Beef.Database.MySql</Product>
     <Description>Business Entity Execution Framework (Beef) MySQL Database tool.</Description>
     <PackageTags>beef database sql mysql dbup migration schema dbex</PackageTags>
@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx.Database.MySql" Version="3.4.1" />
+    <PackageReference Include="CoreEx.Database.MySql" Version="3.6.0" />
     <PackageReference Include="DbEx.MySql" Version="2.3.12" />
   </ItemGroup>
 
