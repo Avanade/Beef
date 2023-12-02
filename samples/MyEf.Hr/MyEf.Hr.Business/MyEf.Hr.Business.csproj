@@ -5,10 +5,10 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.4.1" />
-    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.4.1" />
-    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.4.1" />
-    <PackageReference Include="CoreEx.Validation" Version="3.4.1" />
+    <PackageReference Include="CoreEx" Version="3.6.0" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.6.0" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.6.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.6.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
   </ItemGroup>
   <ItemGroup>

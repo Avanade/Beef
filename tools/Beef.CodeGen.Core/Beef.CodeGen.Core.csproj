@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <RootNamespace>Beef.CodeGen</RootNamespace>
     <Product>Beef.CodeGen.Core</Product>
     <Description>Business Entity Execution Framework (Beef) Code Generator tool.</Description>

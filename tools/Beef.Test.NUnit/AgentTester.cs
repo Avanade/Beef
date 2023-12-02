@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using UnitTestEx.NUnit;
 using UnitTestEx.NUnit.Internal;

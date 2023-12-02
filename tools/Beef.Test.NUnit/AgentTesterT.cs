@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.TestHost;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using CoreEx;
+using Microsoft.AspNetCore.TestHost;
 using System;
 using System.Net.Http;
+using UnitTestEx;
 using UnitTestEx.NUnit.Internal;
 
 namespace Beef.Test.NUnit
@@ -34,7 +38,8 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="UnitTestEx.AspNetCore.AgentTester{TAgent}"/>.</returns>
         public UnitTestEx.AspNetCore.AgentTester<TAgent> Test<TAgent>(string? userName = null) where TAgent : CoreEx.Http.TypedHttpClientBase
         {
-            var at = _parent.Agent<TAgent>();
+            var at = _parent.Agent().With<TAgent>();
+            userName ??= (ExecutionContext.HasCurrent ? ExecutionContext.Current.UserName : null);
             if (userName != null)
                 at.WithUser(userName);
 
@@ -49,7 +54,7 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="UnitTestEx.AspNetCore.AgentTester{TAgent}"/>.</returns>
         public UnitTestEx.AspNetCore.AgentTester<TAgent> Test<TAgent>(object? userIdentifier) where TAgent : CoreEx.Http.TypedHttpClientBase
         {
-            var at = _parent.Agent<TAgent>();
+            var at = _parent.Agent().With<TAgent>();
             if (userIdentifier != null)
                 at.WithUser(userIdentifier);
 
@@ -65,7 +70,8 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="UnitTestEx.AspNetCore.AgentTester{TAgent, TValue}"/>.</returns>
         public UnitTestEx.AspNetCore.AgentTester<TAgent, TResponse> Test<TAgent, TResponse>(string? userName = null) where TAgent : CoreEx.Http.TypedHttpClientBase
         {
-            var at = _parent.Agent<TAgent, TResponse>();
+            var at = _parent.Agent().With<TAgent, TResponse>();
+            userName ??= (ExecutionContext.HasCurrent ? ExecutionContext.Current.UserName : null);
             if (userName != null)
                 at.WithUser(userName);
 
@@ -81,7 +87,7 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="UnitTestEx.AspNetCore.AgentTester{TAgent, TValue}"/>.</returns>
         public UnitTestEx.AspNetCore.AgentTester<TAgent, TResponse> Test<TAgent, TResponse>(object? userIdentifier) where TAgent : CoreEx.Http.TypedHttpClientBase
         {
-            var at = _parent.Agent<TAgent, TResponse>();
+            var at = _parent.Agent().With<TAgent, TResponse>();
             if (userIdentifier != null)
                 at.WithUser(userIdentifier);
 

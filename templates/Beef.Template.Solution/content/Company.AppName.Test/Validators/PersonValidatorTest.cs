@@ -31,7 +31,7 @@ public class PersonValidatorTest
     [Test]
     public async Task A110_Validation_Empty()
     {
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         await test
             .ConfigureServices(_testSetup!)
@@ -40,7 +40,7 @@ public class PersonValidatorTest
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.")
-            .RunAsync<PersonValidator, Person>(new Person());
+            .Validation().WithAsync<PersonValidator, Person>(new Person());
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class PersonValidatorTest
             Birthday = DateTime.UtcNow.AddDays(1)
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         await test
             .ConfigureServices(_testSetup!)
@@ -63,7 +63,7 @@ public class PersonValidatorTest
                 "Last Name must not exceed 100 characters in length.",
                 "Gender is invalid.",
                 "Birthday must be less than or equal to Today.")
-            .RunAsync<PersonValidator, Person>(p);
+            .Validation().WithAsync<PersonValidator, Person>(p);
     }
 
     [Test]
@@ -77,11 +77,11 @@ public class PersonValidatorTest
             Birthday = DateTime.UtcNow.AddYears(-18)
         };
 
-        using var test = ValidationTester.Create();
+        using var test = GenericTester.Create();
 
         await test
             .ConfigureServices(_testSetup!)
             .ExpectSuccess()
-            .RunAsync<PersonValidator, Person>(p);
+            .Validation().WithAsync<PersonValidator, Person>(p);
     }
 }

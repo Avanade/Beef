@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v5.7.0
+- *Enhancement:* `UnitTestEx` as of `v4.0.0` removed all dependencies to `CoreEx`; the equivalent functionality has been included in new `CoreEx.UnitTest` and `CoreEx.UnitTest.NUnit` (`v3.6.0`) packages. Replace existing `UnitTestEx.NUnit` package with the corresponding `CoreEx.UnitTesting.NUnit` package.
+  - Unfortunately, this change has resulted in a number of breaking changes that will require manual remediation to existing unit tests; see the `UnitTestEx` [change log](https://github.com/Avanade/UnitTestEx/blob/main/CHANGELOG.md#v400) and `CoreEx` [change log](https://github.com/Avanade/CoreEx/blob/main/CHANGELOG.md#v360) for details and instructions to remediate.
+  - Upgraded `CoreEx` (`v3.6.0`) to include all related fixes and improvements.
+  - Upgraded `UnitTestEx` (`v4.0.0`) to include all related fixes and improvements 
+- *Enhancement:* Added `net7.0` and `net8.0` support.
+
 ## v5.6.9
 - *Fixed:* The `yaml` sub-command generated code updated to leverage the new `Entity.Behavior`, being `behavior: cgupd`, where CRUD capabilities are requested.
 

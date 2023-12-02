@@ -6,11 +6,7 @@ namespace MyEf.Hr.Test.Apis;
 public class ReferenceDataTest : UsingApiTester<Startup>
 {
     [OneTimeSetUp]
-    public void OneTimeSetUp()
-    {
-        TestSetUp.Default.SetUp();
-        ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-    }
+    public void OneTimeSetUp() => TestSetUp.Default.SetUp();
 
     [Test]
     public void A110_GendersAll()

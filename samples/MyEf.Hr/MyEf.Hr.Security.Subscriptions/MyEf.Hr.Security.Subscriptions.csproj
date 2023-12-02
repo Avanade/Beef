@@ -16,8 +16,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.Azure" Version="3.4.1" />
-    <PackageReference Include="CoreEx.Validation" Version="3.4.1" />
+    <PackageReference Include="CoreEx.Azure" Version="3.6.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.6.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.13.2" />

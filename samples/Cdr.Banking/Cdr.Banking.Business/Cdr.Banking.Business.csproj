@@ -11,7 +11,7 @@
     <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.Cosmos" Version="3.4.1" />
-    <PackageReference Include="CoreEx.Validation" Version="3.4.1" />
+    <PackageReference Include="CoreEx.Cosmos" Version="3.6.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.6.0" />
   </ItemGroup>
 </Project>

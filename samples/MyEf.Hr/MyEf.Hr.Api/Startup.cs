@@ -4,7 +4,6 @@ using CoreEx.Azure.Storage;
 using CoreEx.Database;
 using CoreEx.Events;
 using CoreEx.Hosting;
-using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.EntityFrameworkCore;
 using OpenTelemetry.Trace;
 using Az = Azure.Messaging.ServiceBus;
@@ -83,7 +82,6 @@ namespace MyEf.Hr.Api
 
             // Add Azure monitor open telemetry.
             services.AddOpenTelemetry().UseAzureMonitor();
-            services.Configure<AspNetCoreInstrumentationOptions>(options => options.RecordException = true);
             services.Configure<EntityFrameworkInstrumentationOptions>(options => options.SetDbStatementForText = true);
             services.ConfigureOpenTelemetryTracerProvider((sp, builder) => builder.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 

@@ -6,8 +6,8 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.Default.ExpectedEventsEnabled = true;
-        TestSetUp.Default.ExpectNoEvents = true;
+        TestSetUp.Default.EnableExpectedEvents();
+        TestSetUp.Default.ExpectNoEvents();
 
         TestSetUp.Default.RegisterAutoSetUp(async (count, _, ct) =>
         {
