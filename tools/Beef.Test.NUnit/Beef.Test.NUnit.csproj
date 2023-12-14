@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.6.0" />
+    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.6.3" />
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />
