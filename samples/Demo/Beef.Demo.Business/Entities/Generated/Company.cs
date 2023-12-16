@@ -18,7 +18,7 @@ public partial class Company : ReferenceDataBaseEx<Guid, Company>
     /// </summary>
     public string? ExternalCode
     {
-        get => GetMapping<string?>(nameof(ExternalCode));
+        get => GetMapping<string>(nameof(ExternalCode));
         set { var __externalCode = ExternalCode; SetValue(ref __externalCode, value); SetMapping(nameof(ExternalCode), __externalCode!); }
     }
 

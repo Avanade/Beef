@@ -36,7 +36,7 @@ public partial class Gender : ReferenceDataBaseEx<Guid, Gender>
     [JsonIgnore]
     public string? TripCode
     {
-        get => GetMapping<string?>(nameof(TripCode));
+        get => GetMapping<string>(nameof(TripCode));
         set { var __tripCode = TripCode; SetValue(ref __tripCode, value); SetMapping(nameof(TripCode), __tripCode!); }
     }
 

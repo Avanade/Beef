@@ -255,6 +255,7 @@ Property | Description
 **`odataModel`** | The corresponding OData model name (required where `AutoImplement` is `OData`).
 **`odataCollectionName`** | The name of the underlying OData collection where `AutoImplement` is `OData`.<br/>&dagger; The underlying `Simple.OData.Client` will attempt to infer.
 `odataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
+`httpAgentCustomMapper` | Indicates that a custom HTTP Agent `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
 
 <br/>
 

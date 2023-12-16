@@ -711,6 +711,11 @@
           "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
           "description": "Prepended to 'Operation.HttpAgentCode' where specified to enable standardized functionality."
         },
+        "httpAgentCustomMapper": {
+          "type": "boolean",
+          "title": "Indicates that a custom HTTP Agent 'Mapper' will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a 'Mapper' will be generated."
+        },
         "httpAgentMapperBase": {
           "type": "string",
           "title": "The HTTP Agent data-layer name that should be used for base mappings."
