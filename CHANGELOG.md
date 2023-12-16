@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.7.2
+- *Fixed:* The `Entity.HttpAgentCustomMapper` property has been added to the schema for correctly include within code-generation.
+- *Fixed:* Upgraded `CoreEx` (`v3.7.0`) to include all related fixes and improvements.
+
 ## v5.7.1
 - *Fixed:* All related package dependencies updated to latest.
 

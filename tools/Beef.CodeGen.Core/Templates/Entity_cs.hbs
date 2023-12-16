@@ -181,7 +181,7 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     {{#if RefDataMapping}}
     public {{{PropertyType}}} {{Name}}
     {
-        get => GetMapping<{{{PropertyType}}}>(nameof({{Name}}));
+        get => GetMapping<{{{Type}}}>(nameof({{Name}}));
         set { var _{{PropertyPrivateName}} = {{Name}}; SetValue(ref _{{PropertyPrivateName}}, value); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
     }
     {{else}}

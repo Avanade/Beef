@@ -631,6 +631,14 @@ entities:
         public string? HttpAgentCode { get; set; }
 
         /// <summary>
+        /// Indicates that a custom HTTP Agent <c>Mapper</c> will be used; i.e. not generated.
+        /// </summary>
+        [JsonProperty("httpAgentCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [CodeGenProperty("OData", Title = "Indicates that a custom HTTP Agent `Mapper` will be used; i.e. not generated.",
+            Description = "Otherwise, by default, a `Mapper` will be generated.")]
+        public bool? HttpAgentCustomMapper { get; set; }
+
+        /// <summary>
         /// Gets or sets the `HttpAgent` data-layer name that should be used for base mappings.
         /// </summary>
         [JsonProperty("httpAgentMapperBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
