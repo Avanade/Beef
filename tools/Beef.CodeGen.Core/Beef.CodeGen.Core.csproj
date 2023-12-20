@@ -21,8 +21,13 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="ExtendedHelp.txt" />
     <None Remove="Templates\EntityIWebApiAgent_cs.hbs" />
     <None Remove="Templates\ReferenceDataIWebApiAgent_cs.hbs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="ExtendedHelp.txt" />
   </ItemGroup>
 
   <ItemGroup>

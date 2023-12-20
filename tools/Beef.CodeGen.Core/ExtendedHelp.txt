@@ -1,0 +1,7 @@
+
+Extended commands and argument(s):
+  clean   Cleans (removes) all related directories named 'Generated'.
+          - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
+
+  count   Counts and reports the number of files and lines (All and Generated) within all related directories.
+          - Use --param exclude=name[,name] to exclude named directory(s) from the count.

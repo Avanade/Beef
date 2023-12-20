@@ -38,6 +38,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Cleans (removes) all child 'Generated' directories.
         /// </summary>
-        Clean = 2048
+        Clean = 2048,
+
+        /// <summary>
+        /// Counts the files and lines of code for child directories distinguising between 'Generated' and non-generated.
+        /// </summary>
+        Count = 4096
     }
 }
