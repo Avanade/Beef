@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using CoreEx.Abstractions;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
@@ -19,6 +21,8 @@ namespace Beef.CodeGen
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
     public class CodeGenConsole : OnRamp.Console.CodeGenConsole
     {
+        private static readonly string[] _countExtensions = [".cs", ".json", ".jsn", ".yaml", ".yml", ".xml", ".sql"];
+
         private string _entityScript = "EntityWebApiCoreAgent.yaml";
         private string _refDataScript = "RefDataCoreCrud.yaml";
         private string _dataModelScript = "DataModelOnly.yaml";
@@ -192,6 +196,9 @@ namespace Beef.CodeGen
         protected override void OnBeforeExecute(CommandLineApplication app)
         {
             _cmdArg = app.Argument<CommandType>("command", "Execution command type.", false).IsRequired();
+
+            using var sr = Resource.GetStreamReader<CodeGenConsole>("ExtendedHelp.txt");
+            app.ExtendedHelpText = sr.ReadToEnd();
         }
 
         /// <inheritdoc/>
@@ -255,7 +262,10 @@ namespace Beef.CodeGen
                 stats.Add(await ExecuteCodeGenerationAsync(_dataModelScript, CodeGenFileManager.GetConfigFilename(exedir, CommandType.DataModel, company, appName), count++).ConfigureAwait(false));
 
             if (cmd.HasFlag(CommandType.Clean))
-                ExecuteCleanAsync();
+                ExecuteClean();
+
+            if (cmd.HasFlag(CommandType.Count))
+                ExecuteCount();
 
             if (count > 1)
             {
@@ -310,41 +320,254 @@ namespace Beef.CodeGen
         /// <summary>
         /// Executes the clean.
         /// </summary>
-        private void ExecuteCleanAsync()
+        private void ExecuteClean()
         {
             if (Args.OutputDirectory == null)
                 return;
 
+            var exclude = Args.GetParameter<string?>("exclude")?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries) ?? [];
+
             Args.Logger?.LogInformation("{Content}", $"Cleaning: {Args.OutputDirectory.FullName}");
+            Args.Logger?.LogInformation("{Content}", $"Exclude:  {string.Join(", ", exclude)}");
             Args.Logger?.LogInformation("{Content}", string.Empty);
-            Args.Logger?.LogInformation("{Content}", "The following 'Generated' directories were cleaned/deleted:");
-            int fileCount = 0;
-            bool dirDeleted = false;
+
+
+            // Use the count logic to detemine all paths with specified exclusions.
             var sw = Stopwatch.StartNew();
+            var dcs = new DirectoryCountStatistics(Args.OutputDirectory, exclude);
+            CountDirectoryAndItsChildren(dcs);
+            dcs?.Clean(Args.Logger!);
 
-            var list = Args.OutputDirectory.EnumerateDirectories("Generated", SearchOption.AllDirectories)
-                .Where(x => !x.FullName.Contains(Path.Combine("obj", "debug"), StringComparison.OrdinalIgnoreCase) && !x.FullName.Contains(Path.Combine("obj", "release"), StringComparison.OrdinalIgnoreCase) 
-                   && !x.FullName.Contains(Path.Combine("bin", "debug"), StringComparison.OrdinalIgnoreCase) && !x.FullName.Contains(Path.Combine("bin", "release"), StringComparison.OrdinalIgnoreCase));
+            sw.Stop();
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms, Files: {dcs?.GeneratedTotalFileCount ?? 0}]");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+        }
 
-            if (list != null)
+        /// <summary>
+        /// Executes the count.
+        /// </summary>
+        private void ExecuteCount()
+        {
+            if (Args.OutputDirectory == null)
+                return;
+
+            var exclude = Args.GetParameter<string?>("exclude")?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+            Args.Logger?.LogInformation("{Content}", $"Counting: {Args.OutputDirectory.FullName}");
+            Args.Logger?.LogInformation("{Content}", $"Include:  {string.Join(", ", _countExtensions)}");
+            Args.Logger?.LogInformation("{Content}", $"Exclude:  {string.Join(", ", exclude)}");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+
+            var sw = Stopwatch.StartNew();
+            var dcs = new DirectoryCountStatistics(Args.OutputDirectory, exclude);
+            CountDirectoryAndItsChildren(dcs);
+
+            var columnLength = Math.Max(dcs.TotalLineCount.ToString().Length, 5);
+            dcs.Write(Args.Logger!, columnLength, 0);
+
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms]");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+        }
+
+        /// <summary>
+        /// Count the directory and its children (recursive).
+        /// </summary>
+        private static void CountDirectoryAndItsChildren(DirectoryCountStatistics dcs)
+        {
+            foreach (var di in dcs.Directory.EnumerateDirectories())
             {
-                int count;
-                foreach (var di in list.Where(x => x.Exists))
+                if (di.Name.Equals("obj", StringComparison.InvariantCultureIgnoreCase) || di.Name.Equals("bin", StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
+                if (dcs.Exclude.Any(x => di.Name.Contains(x, StringComparison.InvariantCultureIgnoreCase)))
+                    continue;
+
+                CountDirectoryAndItsChildren(dcs.AddChildDirectory(di));
+            }
+
+            foreach (var fi in dcs.Directory.EnumerateFiles())
+            {
+                if (!_countExtensions.Contains(fi.Extension, StringComparer.OrdinalIgnoreCase))
+                   continue;
+
+                using var sr = fi.OpenText();
+                while (sr.ReadLine() is not null)
                 {
-                    dirDeleted = true;
-                    fileCount += count = di.GetFiles().Length;
-                    Args.Logger?.LogWarning("  {Directory} [{FileCount} files]", di.FullName, count);
-                    di.Delete(true);
+                    dcs.IncrementLineCount();
+                }
+
+                dcs.IncrementFileCount();
+            }
+        }
+
+        /// <summary>
+        /// Provides <see cref="DirectoryInfo"/> count statistics.
+        /// </summary>
+        internal class DirectoryCountStatistics
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DirectoryCountStatistics"/> class.
+            /// </summary>
+            public DirectoryCountStatistics(DirectoryInfo directory, string[] exclude)
+            {
+                Directory = directory;
+                if (directory.Name == "Generated")
+                    IsGenerated = true;
+
+                Exclude = exclude ?? [];
+            }
+
+            /// <summary>
+            /// Gets the <see cref="DirectoryInfo"/>.
+            /// </summary>
+            public DirectoryInfo Directory { get; }
+
+            /// <summary>
+            /// Gets the directory/path names to exclude.
+            /// </summary>
+            public string[] Exclude { get; private set; }
+
+            /// <summary>
+            /// Gets the file count.
+            /// </summary>
+            public int FileCount { get; private set; }
+
+            /// <summary>
+            /// Gets the total file count including children.
+            /// </summary>
+            public int TotalFileCount => FileCount + Children.Sum(x => x.TotalFileCount);
+
+            /// <summary>
+            /// Gets the generated file count.
+            /// </summary>
+            public int GeneratedFileCount { get; private set; }
+
+            /// <summary>
+            /// Gets the total generated file count including children.
+            /// </summary>
+            public int GeneratedTotalFileCount => GeneratedFileCount + Children.Sum(x => x.GeneratedTotalFileCount);
+
+            /// <summary>
+            /// Gets the line count;
+            /// </summary>
+            public int LineCount { get; private set; }
+
+            /// <summary>
+            /// Gets the total line count including children.
+            /// </summary>
+            public int TotalLineCount => LineCount + Children.Sum(x => x.TotalLineCount);
+
+            /// <summary>
+            /// Gets the generated line count.
+            /// </summary>
+            public int GeneratedLineCount { get; private set; }
+
+            /// <summary>
+            /// Gets the total line count including children.
+            /// </summary>
+            public int GeneratedTotalLineCount => GeneratedLineCount + Children.Sum(x => x.GeneratedTotalLineCount);
+
+            /// <summary>
+            /// Indicates whether the contents of the directory are generated.
+            /// </summary>
+            public bool IsGenerated { get; private set; }
+
+            /// <summary>
+            /// Gets the child <see cref="DirectoryCountStatistics"/> instances.
+            /// </summary>
+            public List<DirectoryCountStatistics> Children { get; } = [];
+
+            /// <summary>
+            /// Increments the file count.
+            /// </summary>
+            public void IncrementFileCount()
+            {
+                FileCount++;
+                if (IsGenerated)
+                    GeneratedFileCount++;
+            }
+
+            /// <summary>
+            /// Increments the line count.
+            /// </summary>
+            public void IncrementLineCount()
+            {
+                LineCount++;
+                if (IsGenerated)
+                    GeneratedLineCount++;
+            }
+
+            /// <summary>
+            /// Adds a child <see cref="DirectoryCountStatistics"/> instance.
+            /// </summary>
+            public DirectoryCountStatistics AddChildDirectory(DirectoryInfo di)
+            {
+                var dcs = new DirectoryCountStatistics(di, Exclude);
+                if (IsGenerated)
+                    dcs.IsGenerated = true;
+
+                Children.Add(dcs);
+                return dcs;
+            }
+
+            /// <summary>
+            /// Write the count statistics.
+            /// </summary>
+            /// <param name="logger">The <see cref="ILogger"/>.</param>
+            /// <param name="columnLength">The maximum column length.</param>
+            /// <param name="indent">The indent size to show hierarchy.</param>
+            public void Write(ILogger logger, int columnLength, int indent = 0)
+            {
+                if (indent == 0)
+                {
+                    var hdrAll = string.Format("{0, " + columnLength + "}", "All");
+                    var hdrGen = string.Format("{0, " + (columnLength + 5) + "}", "Generated");
+                    var hdrfiles = string.Format("{0, " + columnLength + "}", "Files");
+                    var hdrlines = string.Format("{0, " + columnLength + "}", "Lines");
+
+                    logger.LogInformation("{Content}", $"{hdrAll} | {hdrAll} | {hdrGen} | {hdrGen} | Path/");
+                    logger.LogInformation("{Content}", $"{hdrfiles} | {hdrlines} | {hdrfiles} Perc | {hdrlines} Perc | Directory");
+                    logger.LogInformation("{Content}", new string('-', 75));
+                }
+
+                var totfiles = string.Format("{0, " + columnLength + "}", TotalFileCount);
+                var totlines = string.Format("{0, " + columnLength + "}", TotalLineCount);
+                var totgenFiles = string.Format("{0, " + columnLength + "}", GeneratedTotalFileCount);
+                var totgenFilesPerc = string.Format("{0, " + 3 + "}", GeneratedTotalFileCount == 0 ? 0 : Math.Round((double)GeneratedTotalFileCount / (double)TotalFileCount * 100.0, 0));
+                var totgenLines = string.Format("{0, " + columnLength + "}", GeneratedTotalLineCount);
+                var totgenLinesPerc = string.Format("{0, " + 3 + "}", GeneratedTotalLineCount == 0 ? 0 : Math.Round((double)GeneratedTotalLineCount / (double)TotalLineCount * 100.0, 0));
+
+                logger.LogInformation("{Content}", $"{totfiles}   {totlines}   {totgenFiles} {totgenFilesPerc}%   {totgenLines} {totgenLinesPerc}%   {new string(' ', indent * 2)}{Directory.FullName}");
+                    
+                foreach (var dcs in Children)
+                {
+                    if (dcs.TotalFileCount > 0)
+                        dcs.Write(logger, columnLength, indent + 1);
                 }
             }
 
-            sw.Stop();
-            if (!dirDeleted)
-                Args.Logger?.LogInformation("{Content}", "  ** No directories found.");
+            /// <summary>
+            /// Cleans (deletes) all <see cref="IsGenerated"/> directories.
+            /// </summary>
+            /// <param name="logger">The <see cref="ILogger"/></param>
+            public void Clean(ILogger logger)
+            {
+                // Where generated then delete.
+                if (IsGenerated)
+                {
+                    logger.LogWarning("  Deleted: {Directory} [{FileCount} files]", Directory.FullName, TotalFileCount);
+                    Directory.Delete(true);
+                    return;
+                }
 
-            Args.Logger?.LogInformation("{Content}", string.Empty);
-            Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms, Files: {fileCount}]");
-            Args.Logger?.LogInformation("{Content}", string.Empty);
+                // Where not generated then clean children.
+                foreach (var dcs in Children)
+                {
+                    dcs.Clean(logger);
+                }
+            }
         }
     }
 }

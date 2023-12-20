@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.7.3
+- *Fixed:* The `clean` code-generation command supports new path exclusion capabilities; see `dotnet run -- --help` for details.
+- *Fixed:* The `count` code-generation command has been added to report the total number of files and lines for all and generated code.
+
 ## v5.7.2
 - *Fixed:* The `Entity.HttpAgentCustomMapper` property has been added to the schema for correctly include within code-generation.
 - *Fixed:* Upgraded `CoreEx` (`v3.7.0`) to include all related fixes and improvements.
