@@ -37,94 +37,39 @@ namespace Beef.Demo.Common.Agents
         public ReferenceDataAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ReferenceDataAgent> logger) 
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Country"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.CountryCollection>("api/v1/demo/ref/countries", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.USState"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.USStateCollection>("api/v1/demo/ref/usStates", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Status"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.StatusCollection>> StatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.StatusCollection>("api/v1/demo/ref/statuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<RefDataNamespace.CommunicationTypeCollection>("api/v1/demo/ref/communicationTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
-        /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <param name="names">The optional list of reference data names.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
+        /// <inheritdoc/>
         public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
         {
             var ro = requestOptions ?? new HttpRequestOptions();

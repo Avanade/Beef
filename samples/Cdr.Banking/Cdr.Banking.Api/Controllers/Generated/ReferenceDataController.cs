@@ -97,10 +97,10 @@ public partial class ReferenceDataController : ControllerBase
     /// <summary>
     /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
     /// </summary>
-    /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+    /// <returns>A <see cref="ReferenceDataMultiDictionary"/>.</returns>
     [HttpGet()]
     [Route("api/v1/ref")]
-    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiItem>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiDictionary>), (int)HttpStatusCode.OK)]
     [ApiExplorerSettings(IgnoreApi = true)]
     public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
 }
