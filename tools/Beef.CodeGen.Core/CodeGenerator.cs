@@ -44,7 +44,7 @@ namespace Beef.CodeGen
                     list.Add(("ReferenceData.GetNamed", cgc.RefDataWebApiRoute!, "GET", "OK", cgc.WebApiAuthorize));
                     foreach (var e in cgc.Root!.RefDataEntities!)
                     {
-                        list.Add(($"ReferenceData.{e.Name}GetAll", e.WebApiRoutePrefix!, "GET", "OK", e.WebApiAuthorize));
+                        list.Add(($"ReferenceData.{e.Name}GetAll", e.WebApiRoutePrefix!, "GET", "OK", e.WebApiAuthorize ?? "<NoAuth>"));
                     }
 
                     LogEndpoints(script, list);

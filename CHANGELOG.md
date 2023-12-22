@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.7.4
+- *Fixed:*  Upgraded `CoreEx` (`v3.7.2`) to include all related fixes and improvements; updated reference data code-generation template and samples as a result.
+
 ## v5.7.3
 - *Fixed:* The `clean` code-generation command supports new path exclusion capabilities; see `dotnet run -- --help` for details.
 - *Fixed:* The `count` code-generation command has been added to report the total number of files and lines for all and generated code.

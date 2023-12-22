@@ -42,25 +42,12 @@ namespace {{Root.NamespaceCommon}}.Agents
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
 {{#each RefDataEntities}}
-        /// <summary>
-        /// Gets all of the {{see-comments RefDataQualifiedEntityName}} items that match the filter arguments.
-        /// </summary>
-        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
+        /// <inheritdoc/>
         public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
             GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
 {{/each}}
-        /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <param name="names">The optional list of reference data names.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
+        /// <inheritdoc/>
         public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
         {
             var ro = requestOptions ?? new HttpRequestOptions();

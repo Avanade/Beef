@@ -159,8 +159,8 @@ namespace Beef.Demo.Test
         {
             var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }))
-                .AssertJson("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]");
+                .Run(a => a.GetNamedAsync(Array.Empty<string>(), new CoreEx.Http.HttpRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=gender.code,gender.text,powersource.code,powersource.text,eyecolor.code,eyecolor.text" }))
+                .AssertJson("{\"gender\":[{\"code\":\"M\",\"text\":\"Male\"},{\"code\":\"F\",\"text\":\"Female\"}],\"powerSource\":[{\"code\":\"E\",\"text\":\"Electrical\"},{\"code\":\"F\",\"text\":\"Fusion\"}],\"eyeColor\":[{\"code\":\"BLUE\",\"text\":\"Blue\"},{\"code\":\"BROWN\",\"text\":\"Brown\"},{\"code\":\"GREEN\",\"text\":\"Green\"}]}");
         }
 
         [Test, Parallelizable]
