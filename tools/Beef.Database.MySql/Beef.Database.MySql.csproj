@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="CoreEx.Database.MySql" Version="3.7.2" />
-    <PackageReference Include="DbEx.MySql" Version="2.3.14" />
+    <PackageReference Include="DbEx.MySql" Version="2.3.15" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v5.8.0
+- *Fixed:* Upgraded `CoreEx` (`v3.8.0`) to include all related fixes and improvements; `WebApi` class supports returning value of `IActionResult` as-is.
+- *Enhancement:* Updated code-generation to support `IActionResult` return type for `WebApi` operations. The following `operation` YAML properties enable:
+  - New `webApiProduces: [ 'text/plain' ]` where the value is a `Produces` content type array (supports multiple) to override the default; for example `[Produces("text/plain")]`.
+  - New `webApiProducesResponseType: none` indicates that the resulting generated code does _not_ include the response type; for example `[ProducesResponseType((int)HttpStatusCode.OK)]`.
+
 ## v5.7.4
 - *Fixed:*  Upgraded `CoreEx` (`v3.7.2`) to include all related fixes and improvements; updated reference data code-generation template and samples as a result.
 

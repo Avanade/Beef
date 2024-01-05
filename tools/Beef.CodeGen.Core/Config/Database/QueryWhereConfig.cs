@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Newtonsoft.Json;
 using OnRamp.Config;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
@@ -9,7 +9,6 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the stored procedure where statement configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("QueryWhere", Title = "'QueryWhere' object (database-driven)",
         Description = "The `QueryWhere` object defines an additional where `Statement` to be added.")]
     [CodeGenCategory("Key", Title = "Provides the **key** configuration.")]
@@ -20,7 +19,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the where TSQL statement.
         /// </summary>
-        [JsonProperty("statement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("statement")]
         [CodeGenProperty("Key", Title = "The where TSQL statement.", IsMandatory = true, IsImportant = true)]
         public string? Statement { get; set; }
 

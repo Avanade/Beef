@@ -2,12 +2,12 @@
 
 using CoreEx;
 using CoreEx.Entities;
-using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -43,14 +43,14 @@ parameters: [
         /// <summary>
         /// Gets or sets the unique parameter name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         [CodeGenProperty("Key", Title = "The unique parameter name.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding text for use in comments.
         /// </summary>
-        [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
             Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
         public string? Text { get; set; }
@@ -58,7 +58,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the .NET <see cref="Type"/>.
         /// </summary>
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("type")]
         [CodeGenProperty("Key", Title = "The .NET `Type`.", IsImportant = true,
             Description = "Defaults to `string`. To reference a Reference Data `Type` always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`) or shortcut `^` (e.g. `^Gender`). This will ensure that the appropriate Reference Data " +
             "`using` statement is used. _Shortcut:_ Where the `Type` starts with (prefix) `RefDataNamespace.` or `^`, and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string.`")]
@@ -67,14 +67,14 @@ parameters: [
         /// <summary>
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
-        [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("nullable")]
         [CodeGenProperty("Key", Title = "Indicates whether the .NET Type should be declared as nullable; e.g. `int?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`. Where the .NET Type is not considered as an intrinsic type then will default to `true`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
         /// Gets or sets the C# code to default the value.
         /// </summary>
-        [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("default")]
         [CodeGenProperty("Key", Title = "The C# code to default the value.",
             Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
         public string? Default { get; set; }
@@ -82,7 +82,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the overriding private name.
         /// </summary>
-        [JsonProperty("privateName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("privateName")]
         [CodeGenProperty("Key", Title = "The overriding private name.",
             Description = "Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.")]
         public string? PrivateName { get; set; }
@@ -90,7 +90,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the overriding argument name.
         /// </summary>
-        [JsonProperty("argumentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("argumentName")]
         [CodeGenProperty("Key", Title = "The overriding argument name.",
             Description = "Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.")]
         public string? ArgumentName { get; set; }
@@ -102,7 +102,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the `Property.Name` within the parent `Entity` to copy (set) the configuration/characteristics from where not already defined.
         /// </summary>
-        [JsonProperty("property", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("property")]
         [CodeGenProperty("Property", Title = "The `Property.Name` within the parent `Entity` to copy (set) the configuration/characteristics from where not already defined.")]
         public string? Property { get; set; }
 
@@ -113,7 +113,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).
         /// </summary>
-        [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataType")]
         [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
             Description = "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.")]
         public string? RefDataType { get; set; }
@@ -121,7 +121,7 @@ parameters: [
         /// <summary>
         /// Indicates that the Reference Data property is to be a serializable list (ReferenceDataSidList). 
         /// </summary>
-        [JsonProperty("refDataList", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataList")]
         [CodeGenProperty("RefData", Title = "Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`).",
             Description = "This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.")]
         public bool? RefDataList { get; set; }
@@ -133,21 +133,21 @@ parameters: [
         /// <summary>
         /// Gets or sets the name of the .NET `Type` that will perform the validation.
         /// </summary>
-        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("validator")]
         [CodeGenProperty("Manager", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true)]
         public string? Validator { get; set; }
 
         /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
         /// </summary>
-        [JsonProperty("validatorCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("validatorCode")]
         [CodeGenProperty("Manager", Title = "The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).")]
         public string? ValidatorCode { get; set; }
 
         /// <summary>
         /// Gets or sets the `Validation` framework. 
         /// </summary>
-        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("validationFramework")]
         [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
             Description = "Defaults to `Operation.ValidationFramework`.")]
         public string? ValidationFramework { get; set; }
@@ -155,14 +155,14 @@ parameters: [
         /// <summary>
         /// Indicates whether a <see cref="ValidationException"/> should be thrown when the parameter value has its default value (null, zero, etc).
         /// </summary>
-        [JsonProperty("isMandatory", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isMandatory")]
         [CodeGenProperty("Manager", Title = "Indicates whether a `ValidationException` should be thrown when the parameter value has its default value (null, zero, etc).")]
         public bool? IsMandatory { get; set; }
 
         /// <summary>
         /// Gets or sets the option that determines the layers in which the parameter is passed.
         /// </summary>
-        [JsonProperty("layerPassing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("layerPassing")]
         [CodeGenProperty("Manager", Title = "The option that determines the layers in which the parameter is passed.", Options = new string[] { "All", "ToManagerSet", "ToManagerCollSet" },
             Description = "Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, " +
             "`ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. " +
@@ -176,7 +176,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the data `Converter` class name where specific data conversion is required.
         /// </summary>
-        [JsonProperty("dataConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataConverter")]
         [CodeGenProperty("Data", Title = "The data `Converter` class name where specific data conversion is required.",
             Description = "A `Converter` is used to convert a data source value to/from a .NET `Type` where no standard data conversion can be applied. Where this value is suffixed by `<T>` or `{T}` this will automatically set `Type`.")]
         public string? DataConverter { get; set; }
@@ -188,7 +188,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
         /// </summary>
-        [JsonProperty("webApiFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiFrom")]
         [CodeGenProperty("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = new string[] { "FromQuery", "FromBody", "FromRoute", "FromEntityProperties" },
             Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
         public string? WebApiFrom { get; set; }
@@ -196,7 +196,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the overriding text for use in comments.
         /// </summary>
-        [JsonProperty("webApiText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiText")]
         [CodeGenProperty("WebApi", Title = "The overriding text for use in the Web API comments.",
             Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
         public string? WebApiText { get; set; }
@@ -208,7 +208,7 @@ parameters: [
         /// <summary>
         /// Gets or sets the underlying gRPC data type.
         /// </summary>
-        [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("grpcType")]
         [CodeGenProperty("gRPC", Title = "The underlying gRPC data type; will be inferred where not specified.")]
         public string? GrpcType { get; set; }
 

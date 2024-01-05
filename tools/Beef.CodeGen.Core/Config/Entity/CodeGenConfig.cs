@@ -2,12 +2,12 @@
 
 using CoreEx.Entities.Extended;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
@@ -48,7 +48,7 @@ entities:
         /// <summary>
         /// Indicates whether to use Results.
         /// </summary>
-        [JsonProperty("withResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("withResult")]
         [CodeGenProperty("DotNet", Title = "Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).",
             Description = "Defaults to `true`. This can be overridden within the `Entity`(s) and/or `Operation`(s).")]
         public bool? WithResult { get; set; }
@@ -56,7 +56,7 @@ entities:
         /// <summary>
         /// Indicates whether to use preprocessor directives in the generated output.
         /// </summary>
-        [JsonProperty("preprocessorDirectives", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("preprocessorDirectives")]
         [CodeGenProperty("DotNet", Title = "Indicates whether to use preprocessor directives in the generated output.")]
         public bool? PreprocessorDirectives { get; set; }
 
@@ -67,7 +67,7 @@ entities:
         /// <summary>
         /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement).
         /// </summary>
-        [JsonProperty("refDataNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataNamespace")]
         [CodeGenProperty("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement).", IsImportant = true,
             Description = "Defaults to `Company` + `.` (literal) + AppName + `.Business.Entities` (literal).")]
         public string? RefDataNamespace { get; set; }
@@ -75,7 +75,7 @@ entities:
         /// <summary>
         /// Gets or sets the namespace for the Reference Data common entities (adds as a c# <c>using</c> statement).
         /// </summary>
-        [JsonProperty("refDataCommonNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataCommonNamespace")]
         [CodeGenProperty("RefData", Title = "The namespace for the Reference Data common entities (adds as a c# `using` statement).", IsImportant = true,
             Description = "Defaults to `Company` + `.` (literal) + AppName + `.Common.Entities` (literal).")]
         public string? RefDataCommonNamespace { get; set; }
@@ -83,7 +83,7 @@ entities:
         /// <summary>
         /// Indicates whether a corresponding <i>text</i> property is added by default when generating a Reference Data `Property` for an `Entity`.
         /// </summary>
-        [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataText")]
         [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` for an `Entity`.", IsImportant = true,
             Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`). This can be further configured on the `Entity` and for each `Property`.")]
         public bool? RefDataText { get; set; }
@@ -91,7 +91,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
-        [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataType")]
         [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier. Results in all underlying entities becoming Reference Data.")]
         public string? RefDataType { get; set; }
@@ -99,14 +99,14 @@ entities:
         /// <summary>
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
-        [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataWebApiRoute")]
         [CodeGenProperty("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching. The `WebApiRoutePrefix` will be prepended where specified.", IsImportant = true)]
         public string? RefDataWebApiRoute { get; set; }
 
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `ReferenceDataData` constructor.
         /// </summary>
-        [JsonProperty("refDataDataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataDataCtorParams")]
         [CodeGenPropertyCollection("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `ReferenceDataData` constructor.",
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
@@ -119,7 +119,7 @@ entities:
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
-        [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("jsonSerializer")]
         [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
             Description = "Defaults to `SystemText`. This can be overridden within the `Entity`(s).")]
         public string? JsonSerializer { get; set; }
@@ -127,7 +127,7 @@ entities:
         /// <summary>
         /// Gets or sets the default JSON name for the ETag property.
         /// </summary>
-        [JsonProperty("etagJsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("etagJsonName")]
         [CodeGenProperty("Entity", Title = "The default JSON name for the `ETag` property.", Options = new string[] { "etag", "eTag", "_etag", "_eTag", "ETag", "ETAG" },
             Description = "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.")]
         public string? ETagJsonName { get; set; }
@@ -135,7 +135,7 @@ entities:
         /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Entity</c> code.
         /// </summary>
-        [JsonProperty("usingNamespace1", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("usingNamespace1")]
         [CodeGenProperty("Entity", Title = "The additional Namespace using statement to be added to the generated `Entity` code.",
             Description = "Typically used where referening a `Type` from a Namespace that is not generated by default.")]
         public string? UsingNamespace1 { get; set; }
@@ -143,7 +143,7 @@ entities:
         /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Entity</c> code.
         /// </summary>
-        [JsonProperty("usingNamespace2", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("usingNamespace2")]
         [CodeGenProperty("Entity", Title = "The additional Namespace using statement to be added to the generated `Entity` code.",
             Description = "Typically used where referening a `Type` from a Namespace that is not generated by default.")]
         public string? UsingNamespace2 { get; set; }
@@ -151,7 +151,7 @@ entities:
         /// <summary>
         /// Gets or sets the additional Namespace using statement to the added to the generated <c>Entity</c> code.
         /// </summary>
-        [JsonProperty("usingNamespace3", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("usingNamespace3")]
         [CodeGenProperty("Entity", Title = "The additional Namespace using statement to be added to the generated `Entity` code.",
             Description = "Typically used where referening a `Type` from a Namespace that is not generated by default.")]
         public string? UsingNamespace3 { get; set; }
@@ -163,7 +163,7 @@ entities:
         /// <summary>
         /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
-        [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiAuthorize")]
         [CodeGenProperty("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
             Description = "This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
@@ -171,7 +171,7 @@ entities:
         /// <summary>
         /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.
         /// </summary>
-        [JsonProperty("webApiAutoLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiAutoLocation")]
         [CodeGenProperty("WebApi", Title = "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
             Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This can be overridden within the `Entity`(s).")]
         public bool? WebApiAutoLocation { get; set; }
@@ -179,7 +179,7 @@ entities:
         /// <summary>
         /// Gets or sets the <c>RoutePrefixAtttribute</c> for the corresponding entity Web API controller.
         /// </summary>
-        [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiRoutePrefix")]
         [CodeGenProperty("WebApi", Title = "The base (prefix) `URI` prepended to all `Operation.WebApiRoute` values.", IsImportant = true)]
         public string? WebApiRoutePrefix { get; set; }
 
@@ -190,7 +190,7 @@ entities:
         /// <summary>
         /// Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.
         /// </summary>
-        [JsonProperty("managerCleanUp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("managerCleanUp")]
         [CodeGenProperty("Manager", Title = "Indicates whether a `Cleaner.Cleanup` is performed for the operation parameters within the Manager-layer.",
             Description = "This can be overridden within the `Entity`(s) and `Operation`(s).")]
         public bool? ManagerCleanUp { get; set; }
@@ -198,7 +198,7 @@ entities:
         /// <summary>
         /// Gets or sets the `Validation` framework. 
         /// </summary>
-        [JsonProperty("validationFramework", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("validationFramework")]
         [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
             Description = "Defaults to `CoreEx` (literal). This can be overridden within the `Entity`(s), `Operation`(s) and `Parameter`(s).")]
         public string? ValidationFramework { get; set; }
@@ -210,7 +210,7 @@ entities:
         /// <summary>
         /// Gets or sets the data source auto-implementation option. 
         /// </summary>
-        [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("autoImplement")]
         [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
             Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.")]
@@ -219,7 +219,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET database interface name used where `Operation.AutoImplement` is `Database`.
         /// </summary>
-        [JsonProperty("databaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseName")]
         [CodeGenProperty("Database", Title = "The .NET database interface name (used where `Operation.AutoImplement` is `Database`).", IsImportant = true,
             Description = "Defaults to `IDatabase`. This can be overridden within the `Entity`(s).")]
         public string? DatabaseName { get; set; }
@@ -227,7 +227,7 @@ entities:
         /// <summary>
         /// Gets or sets the default database schema name.
         /// </summary>
-        [JsonProperty("databaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseSchema")]
         [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true,
             Description = "Defaults to `dbo`.")]
         public string? DatabaseSchema { get; set; }
@@ -235,7 +235,7 @@ entities:
         /// <summary>
         /// Gets or sets the database provider.
         /// </summary>
-        [JsonProperty("databaseProvider", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseProvider")]
         [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = new string[] { "SqlServer", "MySQL" },
             Description = "Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.")]
         public string? DatabaseProvider { get; set; }
@@ -243,7 +243,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.
         /// </summary>
-        [JsonProperty("entityFrameworkName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityFrameworkName")]
         [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.",
             Description = "Defaults to `IEfDb`. This can be overridden within the `Entity`(s).")]
         public string? EntityFrameworkName { get; set; }
@@ -251,7 +251,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET Cosmos interface name used where `Operation.AutoImplement` is `Cosmos`.
         /// </summary>
-        [JsonProperty("cosmosName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosName")]
         [CodeGenProperty("Cosmos", Title = "The .NET Entity Framework interface name used where `Operation.AutoImplement` is `Cosmos`.", IsImportant = true,
             Description = "Defaults to `ICosmosDb`. This can be overridden within the `Entity`(s).")]
         public string? CosmosName { get; set; }
@@ -259,7 +259,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET OData interface name used where `Operation.AutoImplement` is `OData`.
         /// </summary>
-        [JsonProperty("odataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataName")]
         [CodeGenProperty("OData", Title = "The .NET OData interface name used where `Operation.AutoImplement` is `OData`.", IsImportant = true,
             Description = "Defaults to `IOData`. This can be overridden within the `Entity`(s).")]
         public string? ODataName { get; set; }
@@ -267,7 +267,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
-        [JsonProperty("httpAgentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("httpAgentName")]
         [CodeGenProperty("HttpAgent", Title = "The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
             Description = "Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).")]
         public string? HttpAgentName { get; set; }
@@ -275,7 +275,7 @@ entities:
         /// <summary>
         /// Gets or sets the default ETag to/from RowVersion Mapping Converter used.
         /// </summary>
-        [JsonProperty("etagDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("etagDefaultMapperConverter")]
         [CodeGenProperty("Data", Title = "The default ETag to/from RowVersion column Mapping Converter used where `Operation.AutoImplement` is `Database` or `EntityFramework`.", IsImportant = true,
             Description = "Defaults to `StringToBase64Converter`.")]
         public string? ETagDefaultMapperConverter { get; set; }
@@ -283,7 +283,7 @@ entities:
         /// <summary>
         /// Gets or sets the default Reference Data property Converter used by the generated Mapper(s) where not specifically defined.
         /// </summary>
-        [JsonProperty("refDataDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataDefaultMapperConverter")]
         [CodeGenProperty("Data", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", 
             Options = new string[] { 
                 "ReferenceDataCodeConverter", "ReferenceDataCodeConverter{T}", "ReferenceDataCodeConverter<T>",
@@ -302,7 +302,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data code data name
         /// </summary>
-        [JsonProperty("refDataCodeDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataCodeDataName")]
         [CodeGenProperty("RefData", Title = "The Reference Data `Code` data name.",
             Description = "Defaults to `Code` (literal).")]
         public string? RefDataCodeDataName { get; set; }
@@ -310,7 +310,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data text data name.
         /// </summary>
-        [JsonProperty("refDataTextDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataTextDataName")]
         [CodeGenProperty("RefData", Title = "The Reference Data `Text` data name.",
             Description = "Defaults to `Text` (literal).")]
         public string? RefDataTextDataName { get; set; }
@@ -318,7 +318,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data is active name.
         /// </summary>
-        [JsonProperty("refDataIsActiveDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataIsActiveDataName")]
         [CodeGenProperty("RefData", Title = "The Reference Data `IsActive` data name.",
             Description = "Defaults to `IsActive` (literal).")]
         public string? RefDataIsActiveDataName { get; set; }
@@ -326,7 +326,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data sort order data name.
         /// </summary>
-        [JsonProperty("refDataSortOrderDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataSortOrderDataName")]
         [CodeGenProperty("RefData", Title = "The Reference Data `SortOrder` data name.",
             Description = "Defaults to `SortOrder` (literal).")]
         public string? RefDataSortOrderDataName { get; set; }
@@ -334,7 +334,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data is ETag name.
         /// </summary>
-        [JsonProperty("refDataETagDataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataETagDataName")]
         [CodeGenProperty("RefData", Title = "The Reference Data `ETag` data name.",
             Description = "Defaults to `RowVersion` (literal).")]
         public string? RefDataETagDataName { get; set; } = "*";
@@ -346,7 +346,7 @@ entities:
         /// <summary>
         /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
-        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventPublish")]
         [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
             Description = "Defaults to `DataSvc`. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventPublish { get; set; }
@@ -354,7 +354,7 @@ entities:
         /// <summary>
         /// Gets or sets the URI root for the event source by prepending to all event source URIs.
         /// </summary>
-        [JsonProperty("eventSourceRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSourceRoot")]
         [CodeGenProperty("Events", Title = "The URI root for the event source by prepending to all event source URIs.",
             Description = "The event source is only updated where an `EventSourceKind` is not `None`. This can be extended within the `Entity`(s).")]
         public string? EventSourceRoot { get; set; }
@@ -362,7 +362,7 @@ entities:
         /// <summary>
         /// Gets or sets the URI kind for the event source URIs.
         /// </summary>
-        [JsonProperty("eventSourceKind", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSourceKind")]
         [CodeGenProperty("Events", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
             Description = "Defaults to `None` (being the event source is not updated).")]
         public string? EventSourceKind { get; set; }
@@ -370,7 +370,7 @@ entities:
         /// <summary>
         /// Gets or sets the root for the event Subject name by prepending to all event subject names.
         /// </summary>
-        [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSubjectRoot")]
         [CodeGenProperty("Events", Title = "The root for the event Subject name by prepending to all event subject names.", IsImportant = true,
             Description = "Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventSubjectRoot { get; set; }
@@ -378,7 +378,7 @@ entities:
         /// <summary>
         /// Gets or sets the subject path separator.
         /// </summary>
-        [JsonProperty("eventSubjectSeparator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSubjectSeparator")]
         [CodeGenProperty("Event", Title = "The subject path separator.",
             Description = "Defaults to `.`. Used only where the subject is automatically inferred.")]
         public string? EventSubjectSeparator { get; set; }
@@ -386,7 +386,7 @@ entities:
         /// <summary>
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
-        [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventActionFormat")]
         [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
@@ -394,7 +394,7 @@ entities:
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
-        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventTransaction")]
         [CodeGenProperty("Event", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
             Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
                 "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
@@ -408,7 +408,7 @@ entities:
         /// <summary>
         /// Indicates whether gRPC support (more specifically service-side) is required.
         /// </summary>
-        [JsonProperty("grpc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("grpc")]
         [CodeGenProperty("gRPC", Title = "Indicates whether gRPC support (more specifically service-side) is required.", IsImportant = true,
             Description = "gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically.")]
         public bool? Grpc { get; set; }
@@ -420,7 +420,7 @@ entities:
         /// <summary>
         /// Gets or sets the base path (directory) prefix for the artefacts.
         /// </summary>
-        [JsonProperty("pathBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("pathBase")]
         [CodeGenProperty("Path", Title = "The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
             Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
         public string? PathBase { get; set; }
@@ -428,7 +428,7 @@ entities:
         /// <summary>
         /// Gets or sets the path (directory) for the Common-related artefacts.
         /// </summary>
-        [JsonProperty("pathCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("pathCommon")]
         [CodeGenProperty("Path", Title = "The path (directory) for the Database-related artefacts.",
             Description = "Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`.")]
         public string? PathCommon { get; set; }
@@ -436,7 +436,7 @@ entities:
         /// <summary>
         /// Gets or sets the path (directory) for the Business-related (.NET) artefacts.
         /// </summary>
-        [JsonProperty("pathBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("pathBusiness")]
         [CodeGenProperty("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? PathBusiness { get; set; }
@@ -444,7 +444,7 @@ entities:
         /// <summary>
         /// Gets or sets the path (directory) for the API-related (.NET) artefacts.
         /// </summary>
-        [JsonProperty("pathApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("pathApi")]
         [CodeGenProperty("Path", Title = "The path (directory) for the API-related (.NET) artefacts.",
             Description = "Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
         public string? PathApi { get; set; }
@@ -456,7 +456,7 @@ entities:
         /// <summary>
         /// Gets or sets the base Namespace (root) for the .NET artefacts.
         /// </summary>
-        [JsonProperty("namespaceBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("namespaceBase")]
         [CodeGenProperty("Namespace", Title = "The base Namespace (root) for the .NET artefacts.",
             Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
         public string? NamespaceBase { get; set; }
@@ -464,7 +464,7 @@ entities:
         /// <summary>
         /// Gets or sets the Namespace (root) for the Common-related .NET artefacts.
         /// </summary>
-        [JsonProperty("namespaceCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("namespaceCommon")]
         [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Common-related .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.")]
         public string? NamespaceCommon { get; set; }
@@ -472,7 +472,7 @@ entities:
         /// <summary>
         /// Gets or sets the Namespace (root) for the Business-related .NET artefacts.
         /// </summary>
-        [JsonProperty("namespaceBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("namespaceBusiness")]
         [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Business-related .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? NamespaceBusiness { get; set; }
@@ -480,7 +480,7 @@ entities:
         /// <summary>
         /// Gets or sets the Namespace (root) for the Api-related .NET artefacts.
         /// </summary>
-        [JsonProperty("namespaceApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("namespaceApi")]
         [CodeGenProperty("Namespace", Title = "The Namespace (root) for the Api-related .NET artefacts.",
             Description = "Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
         public string? NamespaceApi { get; set; }
@@ -490,7 +490,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding <see cref="EntityConfig"/> collection.
         /// </summary>
-        [JsonProperty("entities", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entities")]
         [CodeGenPropertyCollection("Collections", Title = "The corresponding `Entity` collection.", IsImportant = true,
             Markdown = "An `Entity` object provides the primary configuration for an entity, its properties and operations.")]
         public List<EntityConfig>? Entities { get; set; }
