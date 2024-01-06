@@ -40,6 +40,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Person, Task>? _createWithEfOnAfterAsync;
     private Func<Person, Task>? _updateWithEfOnAfterAsync;
     private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
+    private Func<FileContentResult, Guid, Task>? _getDocumentationOnAfterAsync;
 
     #endregion
 
@@ -269,6 +270,14 @@ public partial class PersonDataSvc : IPersonDataSvc
         await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
         _events.PublishValueEvent(new Person { Id = id }, new Uri($"/person/{id}", UriKind.Relative), $"Demo.Person.{id}", "Delete");
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <inheritdoc/>
+    public async Task<FileContentResult> GetDocumentationAsync(Guid id)
+    {
+        var r = await _data.GetDocumentationAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getDocumentationOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return r;
+    }
 }
 
 #pragma warning restore

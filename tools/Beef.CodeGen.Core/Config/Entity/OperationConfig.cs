@@ -95,7 +95,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("primaryKey")]
         [CodeGenProperty("Key", Title = "Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.", IsImportant = true,
-            Description = "This simplifies the specification of these properties versus having to declare each specifically.")]
+            Description = "This simplifies the specification of these properties as parameters versus having to declare each specifically. Each of the parameters will also be set to be mandatory.")]
         public bool? PrimaryKey { get; set; }
 
         /// <summary>
@@ -509,6 +509,21 @@ operations: [
             Description = "Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
         public string? WebApiUpdateOperation { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value(s) for the optional [Produces()] attribute for the operation within the Web Api Controller.
+        /// </summary>
+        [JsonPropertyName("webApiProduces")]
+        [CodeGenPropertyCollection("WebApi", Title = "The value(s) for the optional `[Produces()]` attribute for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.")]
+        public List<string>? WebApiProduces { get; set; }
+
+        /// <summary>
+        /// Gets or sets the [ProducesResponseType()] attribute typeof definition.
+        /// </summary>
+        [JsonPropertyName("webApiProducesResponseType")]
+        [CodeGenProperty("WebApi", Title = "The `[ProducesResponseType()]` attribute `typeof` for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.",
+            Description = "Defaults to the _Common_ type. A value of `None`, `none` or `` will ensure no type is emitted.")]
+        public string? WebApiProducesResponseType { get; set; }
+
         #endregion
 
         #region Auth
@@ -788,6 +803,11 @@ operations: [
         public string OperationReturnType => CompareValue(ReturnTypeNullable, true) ? ReturnType + "?" : ReturnType!;
 
         /// <summary>
+        /// Indicates whether the <see cref="WebApiProducesResponseType"/> is none.
+        /// </summary>
+        public bool IsWebApiProducesResponseTypeNone => CompareValue(WebApiProducesResponseType, "None") || CompareValue(WebApiProducesResponseType, "none") || CompareValue(WebApiProducesResponseType, "");
+
+        /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/>.
         /// </summary>
         public string OperationTaskReturnType => HasReturnValue ? $"Task<{(IsTrue(WithResult) ? "Result<" : "")}{OperationReturnType}{(IsTrue(WithResult) ? ">" : "")}>" : $"Task{(IsTrue(WithResult) ? "<Result>" : "")}";
@@ -795,7 +815,7 @@ operations: [
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
         /// </summary>
-        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<HttpResult<{OperationReturnType}>>" : "Task<HttpResult>";
+        public string AgentOperationTaskReturnType => HasReturnValue && !IsWebApiProducesResponseTypeNone ? $"Task<HttpResult<{OperationReturnType}>>" : "Task<HttpResult>";
 
         /// <summary>
         /// Gets the controller operation method call/invoke statement.
@@ -964,6 +984,11 @@ operations: [
         /// Indicates whether the result will need to change the type as a result of the operation.
         /// </summary>
         public bool HasResultTypeChange => (HasValue && HasReturnValue && ValueType != ReturnType) || (HasValue && !HasReturnValue) || (!HasValue && HasReturnValue);
+
+        /// <summary>
+        /// Gets the WebApiProduces generated content.
+        /// </summary>
+        public string? WebApiProducesContentType => WebApiProduces is not null && WebApiProduces.Count > 0 ? string.Join(", ", WebApiProduces.Select(x => $"\"{x}\"")) : null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -1231,7 +1256,7 @@ operations: [
                     if (Parameters.Any(x => x.Name == pc.Name))
                         continue;
 
-                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type) || (Type == "Update" && CompareValue(WithResult, true)), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
+                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = true, LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
             }
 
@@ -1530,21 +1555,24 @@ operations: [
             var sb = new StringBuilder(WebApiMethod![4..]);
             sb.Append("Async");
 
-            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
-                sb.Append('<');
-
-            if (ValueType != null && WebApiMethod != "HttpPatch")
+            if (!IsWebApiProducesResponseTypeNone)
             {
-                sb.Append(ValueType);
+                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                    sb.Append('<');
+
+                if (ValueType != null && WebApiMethod != "HttpPatch")
+                {
+                    sb.Append(ValueType);
+                    if (HasReturnValue)
+                        sb.Append(", ");
+                }
+
                 if (HasReturnValue)
-                    sb.Append(", ");
+                    sb.Append(OperationReturnType);
+
+                if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
+                    sb.Append('>');
             }
-
-            if (HasReturnValue)
-                sb.Append(OperationReturnType);
-
-            if (HasReturnValue || (ValueType != null && WebApiMethod != "HttpPatch"))
-                sb.Append('>');
 
             return sb.ToString();
         }

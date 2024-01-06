@@ -1,4 +1,6 @@
-﻿namespace Beef.Demo.Business.Data
+﻿using System.Text;
+
+namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
@@ -145,5 +147,10 @@
         //        d2s.ForMember(s => s.Address, o => o.MapFrom(d => d));
         //    }
         //}
+
+        private static Task<FileContentResult?> GetDocumentationOnImplementationAsync(Guid id)
+        {
+            return Task.FromResult<FileContentResult?>(new FileContentResult(Encoding.ASCII.GetBytes($"Documentation for '{id}'."), "text/plain"));
+        }
     }
 }

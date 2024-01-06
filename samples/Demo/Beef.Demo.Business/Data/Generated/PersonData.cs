@@ -218,6 +218,9 @@ public partial class PersonData : IPersonData
         await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
     }, new InvokerArgs { ExceptionHandler = _deleteWithEfOnException });
 
+    /// <inheritdoc/>
+    public Task<FileContentResult> GetDocumentationAsync(Guid id) => GetDocumentationOnImplementationAsync(id);
+
     /// <summary>
     /// Provides the <see cref="Person"/> property and database column mapping.
     /// </summary>

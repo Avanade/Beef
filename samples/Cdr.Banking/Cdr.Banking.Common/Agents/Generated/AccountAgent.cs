@@ -44,5 +44,9 @@ namespace Cdr.Banking.Common.Agents
         /// <inheritdoc/>
         public Task<HttpResult<Balance?>> GetBalanceAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<Balance?>("api/v1/banking/accounts/{accountId}/balance", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult> GetStatementAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync("api/v1/banking/accounts/{accountId}/statement", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
     }
 }

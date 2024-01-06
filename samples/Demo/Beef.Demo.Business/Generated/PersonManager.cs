@@ -147,6 +147,11 @@ public partial class PersonManager : IPersonManager
     private Func<Guid, Task>? _deleteWithEfOnBeforeAsync;
     private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
 
+    private Func<Guid, Task>? _getDocumentationOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _getDocumentationOnValidate;
+    private Func<Guid, Task>? _getDocumentationOnBeforeAsync;
+    private Func<FileContentResult, Guid, Task>? _getDocumentationOnAfterAsync;
+
     #endregion
 
     /// <summary>
@@ -225,6 +230,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
             .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
             .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
@@ -242,6 +248,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
             .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
             .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
@@ -394,6 +401,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
             .Add(value.Validate().Mandatory().Entity().With<PersonDetailValidator>())
             .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
@@ -496,6 +504,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
             .Additional(mv => _invokeApiViaAgentOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -560,6 +569,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
             .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
             .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
@@ -584,6 +594,22 @@ public partial class PersonManager : IPersonManager
         await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
         await Invoker.InvokeAsync(_deleteWithEfOnAfterAsync?.Invoke(id)).ConfigureAwait(false);
     }, InvokerArgs.Delete);
+
+    /// <inheritdoc/>
+    public Task<FileContentResult> GetDocumentationAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
+    {
+        Cleaner.CleanUp(id);
+        await Invoker.InvokeAsync(_getDocumentationOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Additional(mv => _getDocumentationOnValidate?.Invoke(mv, id))
+            .ValidateAsync(true).ConfigureAwait(false);
+
+        await Invoker.InvokeAsync(_getDocumentationOnBeforeAsync?.Invoke(id)).ConfigureAwait(false);
+        var r = await _dataService.GetDocumentationAsync(id).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_getDocumentationOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
+        return Cleaner.Clean(r);
+    }, InvokerArgs.Unspecified);
 }
 
 #pragma warning restore

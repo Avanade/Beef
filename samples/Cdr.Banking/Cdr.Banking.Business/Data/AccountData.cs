@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos.Linq;
+using System.Text;
 
 namespace Cdr.Banking.Business.Data;
 
@@ -48,4 +49,11 @@ public partial class AccountData
                 return bal.Adjust(b => b.Id = a.Id);
             });
     }
+
+    /// <summary>
+    /// Gets the statement (file) for the specified account.
+    /// </summary>
+    private Task<Result<FileContentResult?>> GetStatementOnImplementationAsync(string? accountId)
+        => Result.GoAsync(GetDetailAsync(accountId))
+            .WhenAs(d => d is not null, d => new FileContentResult(Encoding.UTF8.GetBytes($"Statement for Account '{d.AccountNumber}'."), "text/plain") { FileDownloadName = $"{accountId}.statement.txt" });
 }

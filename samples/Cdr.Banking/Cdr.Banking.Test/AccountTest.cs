@@ -259,5 +259,20 @@ namespace Cdr.Banking.Test
         }
 
         #endregion
+
+        #region GetStatement
+
+        [Test]
+        public void E110_GetStatement_Found()
+        {
+            Agent<AccountAgent>()
+                .WithUser("jenny")
+                .Run(a => a.GetStatementAsync("23456789"))
+                .AssertOK()
+                .AssertContentTypePlainText()
+                .AssertContent("Statement for Account '23456789'.");
+        }
+
+        #endregion
     }
 }

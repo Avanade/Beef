@@ -41,4 +41,11 @@ public partial class AccountManager : IAccountManager
         return Result.Go().Requires(accountId)
                      .ThenAsAsync(() => _dataService.GetBalanceAsync(accountId));
     }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
+    public Task<Result<FileContentResult?>> GetStatementAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go().Requires(accountId)
+                     .ThenAsAsync(() => _dataService.GetStatementAsync(accountId));
+    }, InvokerArgs.Unspecified);
 }

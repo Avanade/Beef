@@ -52,7 +52,15 @@ entities:
       # Route requires accountId; e.g. api/v1/banking/accounts/{accountId}/balance
       # Data access logic cannot be auto-implemented.
       # 
-      { name: GetBalance, text: 'Get {{Account}} {{Balance}}', type: Get, returnType: Balance, webApiRoute: '{accountId}/balance', primaryKey: true, autoImplement: None }
+      { name: GetBalance, text: 'Get {{Account}} {{Balance}}', type: Get, returnType: Balance, webApiRoute: '{accountId}/balance', primaryKey: true, autoImplement: None },
+      # Operation to get an Account statement _file_.
+      # Operation is 'Custom' to specifically override and manually implement data.
+      # ReturnType of FileContentResult (standard ASP.NET) is an IActionResult which will be returned as-is.
+      # PrimaryKey="true" indicates that all properties marked as PrimaryKey are to be used for parameters (avoids having to explicitly define again).
+      # WebApiProducesResponseType="none" indicates that the [ProducesResponseType()] attribute should not include the response type (also ensures that the Agent code does not include response type).
+      # WebApiProduces enables specification of the [Produces()] attribute and corresponding value(s) array.
+      #
+      { name: GetStatement, text: 'Get {{Account}} statement (file)', type: Custom, primaryKey: true, returnType: FileContentResult?, webApiMethod: HttpGet, webApiRoute: '{accountId}/statement', webApiProducesResponseType: none, webApiProduces: [ text/plain ] }
     ]
   }
 
