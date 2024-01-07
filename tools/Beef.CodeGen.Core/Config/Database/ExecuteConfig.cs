@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Newtonsoft.Json;
 using OnRamp.Config;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
@@ -9,7 +9,6 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the stored procedure additional statement configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Execute", Title = "'Execute' object (database-driven)", 
         Description = "The _Execute_ object enables additional TSQL statements to be embedded within the stored procedure.",
         ExampleMarkdown = @"A YAML example is as follows:
@@ -42,14 +41,14 @@ tables:
         /// <summary>
         /// Gets or sets the additional TSQL statement.
         /// </summary>
-        [JsonProperty("statement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("statement")]
         [CodeGenProperty("Key", Title = "The additional TSQL statement.", IsMandatory = true, IsImportant = true)]
         public string? Statement { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the statement in relation to the underlying primary stored procedure statement.
         /// </summary>
-        [JsonProperty("location", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("location")]
         [CodeGenProperty("Key", Title = "The location of the statement in relation to the underlying primary stored procedure statement.", IsImportant = true, Options = new string[] { "Before", "After" },
             Description = "Defaults to `After`.")]
         public string? Location { get; set; }

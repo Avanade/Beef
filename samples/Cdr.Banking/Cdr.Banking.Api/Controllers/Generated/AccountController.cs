@@ -61,4 +61,16 @@ public partial class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetBalance(string? accountId)
         => _webApi.GetWithResultAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));
+
+    /// <summary>
+    /// Get <see cref="Account"/> statement (file).
+    /// </summary>
+    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    [HttpGet("api/v1/banking/accounts/{accountId}/statement")]
+    [Produces("text/plain")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetStatement(string? accountId)
+        => _webApi.GetWithResultAsync<FileContentResult?>(Request, p => _manager.GetStatementAsync(accountId), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 }

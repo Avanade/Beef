@@ -176,6 +176,13 @@ public partial interface IPersonData
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     Task DeleteWithEfAsync(Guid id);
+
+    /// <summary>
+    /// Get Documentation.
+    /// </summary>
+    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    Task<FileContentResult> GetDocumentationAsync(Guid id);
 }
 
 #pragma warning restore

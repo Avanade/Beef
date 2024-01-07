@@ -74,7 +74,7 @@ public partial class RobotManager : IRobotManager
     /// <inheritdoc/>
     public Task<Result> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go()
+        return Result.Go().Requires(id)
                      .ThenAsync(() => RaisePowerSourceChangeOnImplementationAsync(id, powerSource));
     }, InvokerArgs.Unspecified);
 }

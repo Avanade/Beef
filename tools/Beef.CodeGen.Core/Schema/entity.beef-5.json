@@ -4,13 +4,13 @@
   "definitions": {
     "CodeGeneration": {
       "type": "object",
-      "title": "'CodeGeneration' object (entity-driven)",
-      "description": "The 'CodeGeneration' object defines global properties that are used to drive the underlying entity-driven code generation.",
+      "title": "\u0027CodeGeneration\u0027 object (entity-driven)",
+      "description": "The \u0060CodeGeneration\u0060 object defines global properties that are used to drive the underlying entity-driven code generation.",
       "properties": {
         "withResult": {
           "type": "boolean",
-          "title": "Indicates whether to use 'CoreEx.Results' (aka Railway-oriented programming).",
-          "description": "Defaults to 'true'. This can be overridden within the 'Entity'(s) and/or 'Operation'(s)."
+          "title": "Indicates whether to use \u0060CoreEx.Results\u0060 (aka Railway-oriented programming).",
+          "description": "Defaults to \u0060true\u0060. This can be overridden within the \u0060Entity\u0060(s) and/or \u0060Operation\u0060(s)."
         },
         "preprocessorDirectives": {
           "type": "boolean",
@@ -18,18 +18,18 @@
         },
         "refDataNamespace": {
           "type": "string",
-          "title": "The namespace for the Reference Data entities (adds as a c# 'using' statement).",
-          "description": "Defaults to 'Company' + '.' (literal) + AppName + '.Business.Entities' (literal)."
+          "title": "The namespace for the Reference Data entities (adds as a c# \u0060using\u0060 statement).",
+          "description": "Defaults to \u0060Company\u0060 \u002B \u0060.\u0060 (literal) \u002B AppName \u002B \u0060.Business.Entities\u0060 (literal)."
         },
         "refDataCommonNamespace": {
           "type": "string",
-          "title": "The namespace for the Reference Data common entities (adds as a c# 'using' statement).",
-          "description": "Defaults to 'Company' + '.' (literal) + AppName + '.Common.Entities' (literal)."
+          "title": "The namespace for the Reference Data common entities (adds as a c# \u0060using\u0060 statement).",
+          "description": "Defaults to \u0060Company\u0060 \u002B \u0060.\u0060 (literal) \u002B AppName \u002B \u0060.Common.Entities\u0060 (literal)."
         },
         "refDataText": {
           "type": "boolean",
-          "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data 'Property' for an 'Entity'.",
-          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true'). This can be further configured on the 'Entity' and for each 'Property'."
+          "title": "Indicates whether a corresponding \u0060Text\u0060 property is added when generating a Reference Data \u0060Property\u0060 for an \u0060Entity\u0060.",
+          "description": "This is used where serializing within the Web API \u0060Controller\u0060 and the \u0060ExecutionContext.IsRefDataTextSerializationEnabled\u0060 is set to \u0060true\u0060 (which is automatically set where the url contains \u0060$text=true\u0060). This can be further configured on the \u0060Entity\u0060 and for each \u0060Property\u0060."
         },
         "refDataType": {
           "type": "string",
@@ -44,12 +44,12 @@
         },
         "refDataWebApiRoute": {
           "type": "string",
-          "title": "The 'RouteAtttribute' for the Reference Data Web API controller required for named pre-fetching. The 'WebApiRoutePrefix' will be prepended where specified."
+          "title": "The \u0060RouteAtttribute\u0060 for the Reference Data Web API controller required for named pre-fetching. The \u0060WebApiRoutePrefix\u0060 will be prepended where specified."
         },
         "refDataDataCtorParams": {
           "type": "array",
-          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'ReferenceDataData' constructor.",
-          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060ReferenceDataData\u0060 constructor.",
+          "description": "Each constructor parameter should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IConfiguration^Config\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. Where the \u0060Type\u0060 matches an already inferred value it will be ignored.",
           "items": {
             "type": "string"
           }
@@ -57,7 +57,7 @@
         "jsonSerializer": {
           "type": "string",
           "title": "The JSON Serializer to use for JSON property attribution.",
-          "description": "Defaults to 'SystemText'. This can be overridden within the 'Entity'(s).",
+          "description": "Defaults to \u0060SystemText\u0060. This can be overridden within the \u0060Entity\u0060(s).",
           "enum": [
             "SystemText",
             "Newtonsoft"
@@ -65,8 +65,8 @@
         },
         "etagJsonName": {
           "type": "string",
-          "title": "The default JSON name for the 'ETag' property.",
-          "description": "Defaults to 'etag'. Note that the 'JsonName' can be set individually per property where required.",
+          "title": "The default JSON name for the \u0060ETag\u0060 property.",
+          "description": "Defaults to \u0060etag\u0060. Note that the \u0060JsonName\u0060 can be set individually per property where required.",
           "enum": [
             "etag",
             "eTag",
@@ -78,42 +78,42 @@
         },
         "usingNamespace1": {
           "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Entity' code.",
-          "description": "Typically used where referening a 'Type' from a Namespace that is not generated by default."
+          "title": "The additional Namespace using statement to be added to the generated \u0060Entity\u0060 code.",
+          "description": "Typically used where referening a \u0060Type\u0060 from a Namespace that is not generated by default."
         },
         "usingNamespace2": {
           "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Entity' code.",
-          "description": "Typically used where referening a 'Type' from a Namespace that is not generated by default."
+          "title": "The additional Namespace using statement to be added to the generated \u0060Entity\u0060 code.",
+          "description": "Typically used where referening a \u0060Type\u0060 from a Namespace that is not generated by default."
         },
         "usingNamespace3": {
           "type": "string",
-          "title": "The additional Namespace using statement to be added to the generated 'Entity' code.",
-          "description": "Typically used where referening a 'Type' from a Namespace that is not generated by default."
+          "title": "The additional Namespace using statement to be added to the generated \u0060Entity\u0060 code.",
+          "description": "Typically used where referening a \u0060Type\u0060 from a Namespace that is not generated by default."
         },
         "webApiAuthorize": {
           "type": "string",
-          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either 'Authorize' or 'AllowAnonymous'.",
-          "description": "This can be overridden within the 'Entity'(s) and/or their corresponding 'Operation'(s)."
+          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either \u0060Authorize\u0060 or \u0060AllowAnonymous\u0060.",
+          "description": "This can be overridden within the \u0060Entity\u0060(s) and/or their corresponding \u0060Operation\u0060(s)."
         },
         "webApiAutoLocation": {
           "type": "boolean",
-          "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
-          "description": "This will automatically set the 'Operation.WebApiLocation' for an 'Operation' named 'Create' where there is a corresponding named 'Get'. This can be overridden within the 'Entity'(s)."
+          "title": "Indicates whether the HTTP Response Location Header route (\u0060Operation.WebApiLocation\u0060) is automatically inferred.",
+          "description": "This will automatically set the \u0060Operation.WebApiLocation\u0060 for an \u0060Operation\u0060 named \u0060Create\u0060 where there is a corresponding named \u0060Get\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "webApiRoutePrefix": {
           "type": "string",
-          "title": "The base (prefix) 'URI' prepended to all 'Operation.WebApiRoute' values."
+          "title": "The base (prefix) \u0060URI\u0060 prepended to all \u0060Operation.WebApiRoute\u0060 values."
         },
         "managerCleanUp": {
           "type": "boolean",
-          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
-          "description": "This can be overridden within the 'Entity'(s) and 'Operation'(s)."
+          "title": "Indicates whether a \u0060Cleaner.Cleanup\u0060 is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the \u0060Entity\u0060(s) and \u0060Operation\u0060(s)."
         },
         "validationFramework": {
           "type": "string",
-          "title": "The 'Validation' framework to use for the entity-based validation.",
-          "description": "Defaults to 'CoreEx' (literal). This can be overridden within the 'Entity'(s), 'Operation'(s) and 'Parameter'(s).",
+          "title": "The \u0060Validation\u0060 framework to use for the entity-based validation.",
+          "description": "Defaults to \u0060CoreEx\u0060 (literal). This can be overridden within the \u0060Entity\u0060(s), \u0060Operation\u0060(s) and \u0060Parameter\u0060(s).",
           "enum": [
             "CoreEx",
             "FluentValidation"
@@ -122,7 +122,7 @@
         "autoImplement": {
           "type": "string",
           "title": "The data source auto-implementation option.",
-          "description": "Defaults to 'None'. Indicates that the implementation for the underlying 'Operations' will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). Additionally, the 'AutoImplement' can be further specified/overridden per 'Operation'.",
+          "description": "Defaults to \u0060None\u0060. Indicates that the implementation for the underlying \u0060Operations\u0060 will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). Additionally, the \u0060AutoImplement\u0060 can be further specified/overridden per \u0060Operation\u0060.",
           "enum": [
             "Database",
             "EntityFramework",
@@ -134,18 +134,18 @@
         },
         "databaseName": {
           "type": "string",
-          "title": "The .NET database interface name (used where 'Operation.AutoImplement' is 'Database').",
-          "description": "Defaults to 'IDatabase'. This can be overridden within the 'Entity'(s)."
+          "title": "The .NET database interface name (used where \u0060Operation.AutoImplement\u0060 is \u0060Database\u0060).",
+          "description": "Defaults to \u0060IDatabase\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "databaseSchema": {
           "type": "string",
           "title": "The default database schema name.",
-          "description": "Defaults to 'dbo'."
+          "description": "Defaults to \u0060dbo\u0060."
         },
         "databaseProvider": {
           "type": "string",
           "title": "The default database schema name.",
-          "description": "Defaults to 'SqlServer'. Enables specific database provider functionality/formatting/etc. where applicable.",
+          "description": "Defaults to \u0060SqlServer\u0060. Enables specific database provider functionality/formatting/etc. where applicable.",
           "enum": [
             "SqlServer",
             "MySQL"
@@ -153,98 +153,98 @@
         },
         "entityFrameworkName": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where 'Operation.AutoImplement' is 'EntityFramework'.",
-          "description": "Defaults to 'IEfDb'. This can be overridden within the 'Entity'(s)."
+          "title": "The .NET Entity Framework interface name used where \u0060Operation.AutoImplement\u0060 is \u0060EntityFramework\u0060.",
+          "description": "Defaults to \u0060IEfDb\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "cosmosName": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where 'Operation.AutoImplement' is 'Cosmos'.",
-          "description": "Defaults to 'ICosmosDb'. This can be overridden within the 'Entity'(s)."
+          "title": "The .NET Entity Framework interface name used where \u0060Operation.AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "Defaults to \u0060ICosmosDb\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "odataName": {
           "type": "string",
-          "title": "The .NET OData interface name used where 'Operation.AutoImplement' is 'OData'.",
-          "description": "Defaults to 'IOData'. This can be overridden within the 'Entity'(s)."
+          "title": "The .NET OData interface name used where \u0060Operation.AutoImplement\u0060 is \u0060OData\u0060.",
+          "description": "Defaults to \u0060IOData\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "httpAgentName": {
           "type": "string",
-          "title": "The default .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "Defaults to 'IHttpAgent'. This can be overridden within the 'Entity'(s)."
+          "title": "The default .NET HTTP Agent interface name used where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "Defaults to \u0060IHttpAgent\u0060. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "etagDefaultMapperConverter": {
           "type": "string",
-          "title": "The default ETag to/from RowVersion column Mapping Converter used where 'Operation.AutoImplement' is 'Database' or 'EntityFramework'.",
-          "description": "Defaults to 'StringToBase64Converter'."
+          "title": "The default ETag to/from RowVersion column Mapping Converter used where \u0060Operation.AutoImplement\u0060 is \u0060Database\u0060 or \u0060EntityFramework\u0060.",
+          "description": "Defaults to \u0060StringToBase64Converter\u0060."
         },
         "refDataDefaultMapperConverter": {
           "type": "string",
-          "title": "The default Reference Data property 'Converter' used by the generated 'Mapper'(s) where not specifically defined.",
-          "description": "Defaults to 'ReferenceDataCodeConverter<T>'. Where this value is suffixed by '<T>' or '{T}' this will automatically be set to the 'Type'.",
+          "title": "The default Reference Data property \u0060Converter\u0060 used by the generated \u0060Mapper\u0060(s) where not specifically defined.",
+          "description": "Defaults to \u0060ReferenceDataCodeConverter\u003CT\u003E\u0060. Where this value is suffixed by \u0060\u003CT\u003E\u0060 or \u0060{T}\u0060 this will automatically be set to the \u0060Type\u0060.",
           "enum": [
             "ReferenceDataCodeConverter",
             "ReferenceDataCodeConverter{T}",
-            "ReferenceDataCodeConverter<T>",
+            "ReferenceDataCodeConverter\u003CT\u003E",
             "ReferenceDataIdConverter{T, int}",
-            "ReferenceDataIdConverter<T, int>",
+            "ReferenceDataIdConverter\u003CT, int\u003E",
             "ReferenceDataIdConverter{T, int?}",
-            "ReferenceDataIdConverter<T, int?>",
+            "ReferenceDataIdConverter\u003CT, int?\u003E",
             "ReferenceDataIdConverter{T, long}",
-            "ReferenceDataIdConverter<T, long>",
+            "ReferenceDataIdConverter\u003CT, long\u003E",
             "ReferenceDataIdConverter{T, long?}",
-            "ReferenceDataIdConverter<T, long?>",
+            "ReferenceDataIdConverter\u003CT, long?\u003E",
             "ReferenceDataIdConverter{T, Guid}",
-            "ReferenceDataIdConverter<T, Guid>",
+            "ReferenceDataIdConverter\u003CT, Guid\u003E",
             "ReferenceDataIdConverter{T, Guid?}",
-            "ReferenceDataIdConverter<T, Guid?>",
+            "ReferenceDataIdConverter\u003CT, Guid?\u003E",
             "ReferenceDataInt32IdConverter",
             "ReferenceDataInt32IdConverter{T}",
-            "ReferenceDataInt32IdConverter<T>",
+            "ReferenceDataInt32IdConverter\u003CT\u003E",
             "ReferenceDataNullableInt32IdConverter",
             "ReferenceDataNullableInt32IdConverter{T}",
-            "ReferenceDataNullableInt32IdConverter<T>",
+            "ReferenceDataNullableInt32IdConverter\u003CT\u003E",
             "ReferenceDataInt64IdConverter",
             "ReferenceDataInt64IdConverter{T}",
-            "ReferenceDataInt64IdConverter<T>",
+            "ReferenceDataInt64IdConverter\u003CT\u003E",
             "ReferenceDataNullableInt64IdConverter",
             "ReferenceDataNullableInt64IdConverter{T}",
-            "ReferenceDataNullableInt64IdConverter<T>",
+            "ReferenceDataNullableInt64IdConverter\u003CT\u003E",
             "ReferenceDataGuidIdConverter",
             "ReferenceDataGuidIdConverter{T}",
-            "ReferenceDataGuidIdConverter<T>",
+            "ReferenceDataGuidIdConverter\u003CT\u003E",
             "ReferenceDataNullableGuidIdConverter",
             "ReferenceDataNullableGuidIdConverter{T}",
-            "ReferenceDataNullableGuidIdConverter<T>"
+            "ReferenceDataNullableGuidIdConverter\u003CT\u003E"
           ]
         },
         "refDataCodeDataName": {
           "type": "string",
-          "title": "The Reference Data 'Code' data name.",
-          "description": "Defaults to 'Code' (literal)."
+          "title": "The Reference Data \u0060Code\u0060 data name.",
+          "description": "Defaults to \u0060Code\u0060 (literal)."
         },
         "refDataTextDataName": {
           "type": "string",
-          "title": "The Reference Data 'Text' data name.",
-          "description": "Defaults to 'Text' (literal)."
+          "title": "The Reference Data \u0060Text\u0060 data name.",
+          "description": "Defaults to \u0060Text\u0060 (literal)."
         },
         "refDataIsActiveDataName": {
           "type": "string",
-          "title": "The Reference Data 'IsActive' data name.",
-          "description": "Defaults to 'IsActive' (literal)."
+          "title": "The Reference Data \u0060IsActive\u0060 data name.",
+          "description": "Defaults to \u0060IsActive\u0060 (literal)."
         },
         "refDataSortOrderDataName": {
           "type": "string",
-          "title": "The Reference Data 'SortOrder' data name.",
-          "description": "Defaults to 'SortOrder' (literal)."
+          "title": "The Reference Data \u0060SortOrder\u0060 data name.",
+          "description": "Defaults to \u0060SortOrder\u0060 (literal)."
         },
         "refDataETagDataName": {
           "type": "string",
-          "title": "The Reference Data 'ETag' data name.",
-          "description": "Defaults to 'RowVersion' (literal)."
+          "title": "The Reference Data \u0060ETag\u0060 data name.",
+          "description": "Defaults to \u0060RowVersion\u0060 (literal)."
         },
         "eventPublish": {
           "type": "string",
-          "title": "The layer to add logic to publish an event for a 'Create', 'Update' or 'Delete' operation.",
-          "description": "Defaults to 'DataSvc'. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the 'Entity'(s).",
+          "title": "The layer to add logic to publish an event for a \u0060Create\u0060, \u0060Update\u0060 or \u0060Delete\u0060 operation.",
+          "description": "Defaults to \u0060DataSvc\u0060. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the \u0060Entity\u0060(s).",
           "enum": [
             "None",
             "DataSvc",
@@ -254,12 +254,12 @@
         "eventSourceRoot": {
           "type": "string",
           "title": "The URI root for the event source by prepending to all event source URIs.",
-          "description": "The event source is only updated where an 'EventSourceKind' is not 'None'. This can be extended within the 'Entity'(s)."
+          "description": "The event source is only updated where an \u0060EventSourceKind\u0060 is not \u0060None\u0060. This can be extended within the \u0060Entity\u0060(s)."
         },
         "eventSourceKind": {
           "type": "string",
           "title": "The URI kind for the event source URIs.",
-          "description": "Defaults to 'None' (being the event source is not updated).",
+          "description": "Defaults to \u0060None\u0060 (being the event source is not updated).",
           "enum": [
             "None",
             "Absolute",
@@ -270,17 +270,17 @@
         "eventSubjectRoot": {
           "type": "string",
           "title": "The root for the event Subject name by prepending to all event subject names.",
-          "description": "Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the 'Entity'(s)."
+          "description": "Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "eventSubjectSeparator": {
           "type": "string",
           "title": "The subject path separator.",
-          "description": "Defaults to '.'. Used only where the subject is automatically inferred."
+          "description": "Defaults to \u0060.\u0060. Used only where the subject is automatically inferred."
         },
         "eventActionFormat": {
           "type": "string",
           "title": "The formatting for the Action when an Event is published.",
-          "description": "Defaults to 'None' (no formatting required, i.e. as-is)'.",
+          "description": "Defaults to \u0060None\u0060 (no formatting required, i.e. as-is)\u0060.",
           "enum": [
             "None",
             "PastTense"
@@ -288,57 +288,57 @@
         },
         "eventTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'DataSvc'-layer whereever generating event publishing logic.",
-          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an 'EventPublish' error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to 'false'. This essentially defaults the 'Entity.EventTransaction' where not otherwise specified. This should only be used where 'EventPublish' is 'DataSvc' and a transactionally-aware data source is being used."
+          "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated at the \u0060DataSvc\u0060-layer whereever generating event publishing logic.",
+          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an \u0060EventPublish\u0060 error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to \u0060false\u0060. This essentially defaults the \u0060Entity.EventTransaction\u0060 where not otherwise specified. This should only be used where \u0060EventPublish\u0060 is \u0060DataSvc\u0060 and a transactionally-aware data source is being used."
         },
         "grpc": {
           "type": "boolean",
           "title": "Indicates whether gRPC support (more specifically service-side) is required.",
-          "description": "gRPC support is an explicit opt-in model. Must be set to 'true' for any of the subordinate gRPC capabilities to be code-generated. Will require each 'Entity', and corresponding 'Property' and 'Operation' to be opted-in specifically."
+          "description": "gRPC support is an explicit opt-in model. Must be set to \u0060true\u0060 for any of the subordinate gRPC capabilities to be code-generated. Will require each \u0060Entity\u0060, and corresponding \u0060Property\u0060 and \u0060Operation\u0060 to be opted-in specifically."
         },
         "pathBase": {
           "type": "string",
-          "title": "The base path (directory) prefix for the artefacts; other 'Path*' properties append to this value when they are not specifically overridden.",
-          "description": "Defaults to 'Company' (runtime parameter) + '.' + 'AppName' (runtime parameter). For example 'Beef.Demo'."
+          "title": "The base path (directory) prefix for the artefacts; other \u0060Path*\u0060 properties append to this value when they are not specifically overridden.",
+          "description": "Defaults to \u0060Company\u0060 (runtime parameter) \u002B \u0060.\u0060 \u002B \u0060AppName\u0060 (runtime parameter). For example \u0060Beef.Demo\u0060."
         },
         "pathCommon": {
           "type": "string",
           "title": "The path (directory) for the Database-related artefacts.",
-          "description": "Defaults to 'PathBase' + '.Common' (literal). For example 'Beef.Demo.Common'."
+          "description": "Defaults to \u0060PathBase\u0060 \u002B \u0060.Common\u0060 (literal). For example \u0060Beef.Demo.Common\u0060."
         },
         "pathBusiness": {
           "type": "string",
           "title": "The path (directory) for the Business-related (.NET) artefacts.",
-          "description": "Defaults to 'PathBase' + '.Business' (literal). For example 'Beef.Demo.Business'."
+          "description": "Defaults to \u0060PathBase\u0060 \u002B \u0060.Business\u0060 (literal). For example \u0060Beef.Demo.Business\u0060."
         },
         "pathApi": {
           "type": "string",
           "title": "The path (directory) for the API-related (.NET) artefacts.",
-          "description": "Defaults to 'PathBase' + '.' + 'ApiName' (runtime parameter). For example 'Beef.Demo.Api'."
+          "description": "Defaults to \u0060PathBase\u0060 \u002B \u0060.\u0060 \u002B \u0060ApiName\u0060 (runtime parameter). For example \u0060Beef.Demo.Api\u0060."
         },
         "namespaceBase": {
           "type": "string",
           "title": "The base Namespace (root) for the .NET artefacts.",
-          "description": "Defaults to 'Company' (runtime parameter) + '.' + 'AppName' (runtime parameter). For example 'Beef.Demo'."
+          "description": "Defaults to \u0060Company\u0060 (runtime parameter) \u002B \u0060.\u0060 \u002B \u0060AppName\u0060 (runtime parameter). For example \u0060Beef.Demo\u0060."
         },
         "namespaceCommon": {
           "type": "string",
           "title": "The Namespace (root) for the Common-related .NET artefacts.",
-          "description": "Defaults to 'NamespaceBase' + '.Common' (literal). For example 'Beef.Demo.Common'."
+          "description": "Defaults to \u0060NamespaceBase\u0060 \u002B \u0060.Common\u0060 (literal). For example \u0060Beef.Demo.Common\u0060."
         },
         "namespaceBusiness": {
           "type": "string",
           "title": "The Namespace (root) for the Business-related .NET artefacts.",
-          "description": "Defaults to 'NamespaceBase' + '.Business' (literal). For example 'Beef.Demo.Business'."
+          "description": "Defaults to \u0060NamespaceBase\u0060 \u002B \u0060.Business\u0060 (literal). For example \u0060Beef.Demo.Business\u0060."
         },
         "namespaceApi": {
           "type": "string",
           "title": "The Namespace (root) for the Api-related .NET artefacts.",
-          "description": "Defaults to 'NamespaceBase' + '.' + 'ApiName' (runtime parameter). For example 'Beef.Demo.Api'."
+          "description": "Defaults to \u0060NamespaceBase\u0060 \u002B \u0060.\u0060 \u002B \u0060ApiName\u0060 (runtime parameter). For example \u0060Beef.Demo.Api\u0060."
         },
         "entities": {
           "type": "array",
-          "title": "The corresponding 'Entity' collection.",
+          "title": "The corresponding \u0060Entity\u0060 collection.",
           "items": {
             "$ref": "#/definitions/Entity"
           }
@@ -347,8 +347,8 @@
     },
     "Entity": {
       "type": "object",
-      "title": "'Entity' object (entity-driven)",
-      "description": "The 'Entity' is used as the primary configuration for driving the entity-driven code generation.",
+      "title": "\u0027Entity\u0027 object (entity-driven)",
+      "description": "The \u0060Entity\u0060 is used as the primary configuration for driving the entity-driven code generation.",
       "properties": {
         "name": {
           "type": "string",
@@ -357,7 +357,7 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: 'Represents the {Text} entity.'. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: \u0060Represents the {Text} entity.\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
         },
         "fileName": {
           "type": "string",
@@ -367,17 +367,17 @@
         "privateName": {
           "type": "string",
           "title": "The overriding private name.",
-          "description": "Overrides the 'Name' to be used for private fields. By default reformatted from 'Name'; e.g. 'FirstName' as '_firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for private fields. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060_firstName\u0060."
         },
         "argumentName": {
           "type": "string",
           "title": "The overriding argument name.",
-          "description": "Overrides the 'Name' to be used for argument parameters. By default reformatted from 'Name'; e.g. 'FirstName' as 'firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for argument parameters. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060firstName\u0060."
         },
         "constType": {
           "type": "string",
           "title": "The Const .NET Type option.",
-          "description": "The .NET Type to be used for the 'const' values. Defaults to 'string'.",
+          "description": "The .NET Type to be used for the \u0060const\u0060 values. Defaults to \u0060string\u0060.",
           "enum": [
             "int",
             "long",
@@ -387,13 +387,13 @@
         },
         "isInitialOverride": {
           "type": "boolean",
-          "title": "Indicates whether to override the 'IInitial.IsInitial' property.",
-          "description": "Set to either 'true' or 'false' to override as specified; otherwise, 'null' to check each property. Defaults to 'null'."
+          "title": "Indicates whether to override the \u0060IInitial.IsInitial\u0060 property.",
+          "description": "Set to either \u0060true\u0060 or \u0060false\u0060 to override as specified; otherwise, \u0060null\u0060 to check each property. Defaults to \u0060null\u0060."
         },
         "withResult": {
           "type": "boolean",
-          "title": "Indicates whether to use 'CoreEx.Results' (aka Railway-oriented programming).",
-          "description": "Defaults to 'CodeGeneration.WithResult'. This can be overridden within the Operation'(s)."
+          "title": "Indicates whether to use \u0060CoreEx.Results\u0060 (aka Railway-oriented programming).",
+          "description": "Defaults to \u0060CodeGeneration.WithResult\u0060. This can be overridden within the Operation\u0060(s)."
         },
         "refDataType": {
           "type": "string",
@@ -408,13 +408,13 @@
         },
         "refDataText": {
           "type": "boolean",
-          "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data 'Property' overriding the 'CodeGeneration.RefDataText' selection.",
-          "description": "This is used where serializing within the Web API'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true'). Defaults from 'CodeGeneration.RefDataText'."
+          "title": "Indicates whether a corresponding \u0060Text\u0060 property is added when generating a Reference Data \u0060Property\u0060 overriding the \u0060CodeGeneration.RefDataText\u0060 selection.",
+          "description": "This is used where serializing within the Web API\u0060Controller\u0060 and the \u0060ExecutionContext.IsRefDataTextSerializationEnabled\u0060 is set to \u0060true\u0060 (which is automatically set where the url contains \u0060$text=true\u0060). Defaults from \u0060CodeGeneration.RefDataText\u0060."
         },
         "refDataSortOrder": {
           "type": "string",
           "title": "The Reference Data sort order option.",
-          "description": "Specifies the default sort order for the underlying Reference Data collection. Defaults to 'SortOrder'.",
+          "description": "Specifies the default sort order for the underlying Reference Data collection. Defaults to \u0060SortOrder\u0060.",
           "enum": [
             "SortOrder",
             "Id",
@@ -425,7 +425,7 @@
         "inherits": {
           "type": "string",
           "title": "The base class that the entity inherits from.",
-          "description": "Defaults to 'EntityBase' for a standard entity. For Reference Data it will default to 'ReferenceDataBaseEx<xxx>' depending on the corresponding 'RefDataType' value. See 'OmitEntityBase' if the desired outcome is to not inherit from any of the aforementioned base classes."
+          "description": "Defaults to \u0060EntityBase\u0060 for a standard entity. For Reference Data it will default to \u0060ReferenceDataBaseEx\u003Cxxx\u003E\u0060 depending on the corresponding \u0060RefDataType\u0060 value. See \u0060OmitEntityBase\u0060 if the desired outcome is to not inherit from any of the aforementioned base classes."
         },
         "implements": {
           "type": "string",
@@ -434,7 +434,7 @@
         "implementsAutoInfer": {
           "type": "boolean",
           "title": "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
-          "description": "Will attempt to infer the following: 'IIdentifier<Guid>', 'IIdentifier<int>', 'IIdentifier<long>', 'IIdentifier<string>', 'IETag' and 'IChangeLog'. Defaults to 'true'."
+          "description": "Will attempt to infer the following: \u0060IIdentifier\u003CGuid\u003E\u0060, \u0060IIdentifier\u003Cint\u003E\u0060, \u0060IIdentifier\u003Clong\u003E\u0060, \u0060IIdentifier\u003Cstring\u003E\u0060, \u0060IETag\u0060 and \u0060IChangeLog\u0060. Defaults to \u0060true\u0060."
         },
         "abstract": {
           "type": "boolean",
@@ -442,22 +442,22 @@
         },
         "genericWithT": {
           "type": "boolean",
-          "title": "Indicates whether the class should be defined as a generic with a single parameter 'T'."
+          "title": "Indicates whether the class should be defined as a generic with a single parameter \u0060T\u0060."
         },
         "namespace": {
           "type": "string",
           "title": "The entity namespace to be appended.",
-          "description": "Appended to the end of the standard structure as follows: '{Company}.{AppName}.Business.Entities.{Namespace}'."
+          "description": "Appended to the end of the standard structure as follows: \u0060{Company}.{AppName}.Business.Entities.{Namespace}\u0060."
         },
         "omitEntityBase": {
           "type": "boolean",
-          "title": "Indicates that the entity should not inherit from 'EntityBase'.",
-          "description": "As such any of the 'EntityBase' related capabilites are not supported (are omitted from generation). The intention for this is more for the generation of simple internal entities."
+          "title": "Indicates that the entity should not inherit from \u0060EntityBase\u0060.",
+          "description": "As such any of the \u0060EntityBase\u0060 related capabilites are not supported (are omitted from generation). The intention for this is more for the generation of simple internal entities."
         },
         "jsonSerializer": {
           "type": "string",
           "title": "The JSON Serializer to use for JSON property attribution.",
-          "description": "Defaults to the 'CodeGeneration.JsonSerializer' configuration property where specified; otherwise, 'SystemText'.",
+          "description": "Defaults to the \u0060CodeGeneration.JsonSerializer\u0060 configuration property where specified; otherwise, \u0060SystemText\u0060.",
           "enum": [
             "SystemText",
             "Newtonsoft"
@@ -478,7 +478,7 @@
         },
         "collectionType": {
           "type": "string",
-          "title": "The entity collection type used where 'CollectionInherits' is not specified.",
+          "title": "The entity collection type used where \u0060CollectionInherits\u0060 is not specified.",
           "enum": [
             "Standard",
             "Keyed",
@@ -487,51 +487,51 @@
         },
         "collectionInherits": {
           "type": "string",
-          "title": "The base class that a 'Collection' inherits from.",
-          "description": "Defaults to 'EntityBaseCollection' or 'EntityBaseKeyedCollection' depending on 'CollectionKeyed'. For Reference Data it will default to 'ReferenceDataCollectionBase'."
+          "title": "The base class that a \u0060Collection\u0060 inherits from.",
+          "description": "Defaults to \u0060EntityBaseCollection\u0060 or \u0060EntityBaseKeyedCollection\u0060 depending on \u0060CollectionKeyed\u0060. For Reference Data it will default to \u0060ReferenceDataCollectionBase\u0060."
         },
         "collectionResultInherits": {
           "type": "string",
-          "title": "The base class that a 'CollectionResult' inherits from.",
-          "description": "Defaults to 'EntityCollectionResult'."
+          "title": "The base class that a \u0060CollectionResult\u0060 inherits from.",
+          "description": "Defaults to \u0060EntityCollectionResult\u0060."
         },
         "behavior": {
           "type": "string",
-          "title": "Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete). Additionally, GetByArgs ('B') and GetAll ('A') operations that will be automatically generated where not otherwise explicitly specified.",
-          "description": "Value may only specifiy one or more of the 'CGRUDBA' characters (in any order) to define the automatically generated behavior (operations); for example: 'CRUPD' or 'CRUP' or 'rba' (case insensitive). This is shorthand for setting one or more of the following properties: 'Get', 'GetByArgs', 'GetAll', 'Create', 'Update', 'Patch' and 'Delete'. Where one of these properties is set to either 'true' or 'false' this will take precedence over the value set for 'Behavior'."
+          "title": "Defines the key CRUD-style behavior (operation types), being \u0027C\u0027reate, \u0027G\u0027et (or \u0027R\u0027ead), \u0027U\u0027pdate, \u0027P\u0027atch and \u0027D\u0027elete). Additionally, GetByArgs (\u0027B\u0027) and GetAll (\u0027A\u0027) operations that will be automatically generated where not otherwise explicitly specified.",
+          "description": "Value may only specifiy one or more of the \u0060CGRUDBA\u0060 characters (in any order) to define the automatically generated behavior (operations); for example: \u0060CRUPD\u0060 or \u0060CRUP\u0060 or \u0060rba\u0060 (case insensitive). This is shorthand for setting one or more of the following properties: \u0060Get\u0060, \u0060GetByArgs\u0060, \u0060GetAll\u0060, \u0027Create\u0027, \u0060Update\u0060, \u0060Patch\u0060 and \u0060Delete\u0060. Where one of these properties is set to either \u0060true\u0060 or \u0060false\u0060 this will take precedence over the value set for \u0060Behavior\u0060."
         },
         "get": {
           "type": "boolean",
-          "title": "Indicates that a 'Get' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060Get\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "getByArgs": {
           "type": "boolean",
-          "title": "Indicates that a 'GetByArgs' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060GetByArgs\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "getAll": {
           "type": "boolean",
-          "title": "Indicates that a 'GetAll' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060GetAll\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "create": {
           "type": "boolean",
-          "title": "Indicates that a 'Create' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060Create\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "update": {
           "type": "boolean",
-          "title": "Indicates that a 'Update' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060Update\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "patch": {
           "type": "boolean",
-          "title": "Indicates that a 'Patch' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060Patch\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "delete": {
           "type": "boolean",
-          "title": "Indicates that a 'Delete' operation will be automatically generated where not otherwise explicitly specified."
+          "title": "Indicates that a \u0060Delete\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "autoImplement": {
           "type": "string",
           "title": "The data source auto-implementation option.",
-          "description": "Defaults to 'CodeGeneration.AutoImplement' (where 'RefDataType' or 'EntityFrameworkModel' or 'CosmosModel' or 'HttpAgent' is not null; otherwise, 'None'. Indicates that the implementation for the underlying 'Operations' will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). Additionally, the 'AutoImplement' can be further specified/overridden per 'Operation'.",
+          "description": "Defaults to \u0060CodeGeneration.AutoImplement\u0060 (where \u0060RefDataType\u0060 or \u0060EntityFrameworkModel\u0060 or \u0060CosmosModel\u0060 or \u0060HttpAgent\u0060 is not null; otherwise, \u0060None\u0060. Indicates that the implementation for the underlying \u0060Operations\u0060 will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). Additionally, the \u0060AutoImplement\u0060 can be further specified/overridden per \u0060Operation\u0060.",
           "enum": [
             "Database",
             "EntityFramework",
@@ -543,8 +543,8 @@
         },
         "dataCtor": {
           "type": "string",
-          "title": "The access modifier for the generated 'Data' constructor.",
-          "description": "Defaults to 'Public'.",
+          "title": "The access modifier for the generated \u0060Data\u0060 constructor.",
+          "description": "Defaults to \u0060Public\u0060.",
           "enum": [
             "Public",
             "Private",
@@ -553,84 +553,84 @@
         },
         "dataCtorParams": {
           "type": "array",
-          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'Data' constructor.",
-          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060Data\u0060 constructor.",
+          "description": "Each constructor parameter should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IConfiguration^Config\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. Where the \u0060Type\u0060 matches an already inferred value it will be ignored.",
           "items": {
             "type": "string"
           }
         },
         "dataExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'Data' extensions logic should be generated.",
-          "description": "This can be overridden using 'Operation.DataExtensions'."
+          "title": "Indicates whether the \u0060Data\u0060 extensions logic should be generated.",
+          "description": "This can be overridden using \u0060Operation.DataExtensions\u0060."
         },
         "refDataIdDataName": {
           "type": "string",
-          "title": "The Reference Data 'Id' data name.",
-          "description": "Defaults to 'Name' + 'Id' (literal)."
+          "title": "The Reference Data \u0060Id\u0060 data name.",
+          "description": "Defaults to \u0060Name\u0060 \u002B \u0060Id\u0060 (literal)."
         },
         "refDataCodeDataName": {
           "type": "string",
-          "title": "The Reference Data 'Code' data name.",
-          "description": "Defaults to 'Code' (literal)."
+          "title": "The Reference Data \u0060Code\u0060 data name.",
+          "description": "Defaults to \u0060Code\u0060 (literal)."
         },
         "refDataTextDataName": {
           "type": "string",
-          "title": "The Reference Data 'Text' data name.",
-          "description": "Defaults to 'Text' (literal)."
+          "title": "The Reference Data \u0060Text\u0060 data name.",
+          "description": "Defaults to \u0060Text\u0060 (literal)."
         },
         "refDataIsActiveDataName": {
           "type": "string",
-          "title": "The Reference Data 'IsActive' data name.",
-          "description": "Defaults to 'IsActive' (literal)."
+          "title": "The Reference Data \u0060IsActive\u0060 data name.",
+          "description": "Defaults to \u0060IsActive\u0060 (literal)."
         },
         "refDataSortOrderDataName": {
           "type": "string",
-          "title": "The Reference Data 'SortOrder' data name.",
-          "description": "Defaults to 'SortOrder' (literal)."
+          "title": "The Reference Data \u0060SortOrder\u0060 data name.",
+          "description": "Defaults to \u0060SortOrder\u0060 (literal)."
         },
         "refDataETagDataName": {
           "type": "string",
-          "title": "The Reference Data 'ETag' data name.",
-          "description": "Defaults to 'RowVersion' (literal)."
+          "title": "The Reference Data \u0060ETag\u0060 data name.",
+          "description": "Defaults to \u0060RowVersion\u0060 (literal)."
         },
         "refDataStoredProcedureName": {
           "type": "string",
           "title": "The Reference Data database stored procedure name.",
-          "description": "Defaults to 'sp' (literal) + 'Name' + 'GetAll' (literal)."
+          "description": "Defaults to \u0060sp\u0060 (literal) \u002B \u0060Name\u0060 \u002B \u0060GetAll\u0060 (literal)."
         },
         "databaseName": {
           "type": "string",
-          "title": "The .NET database interface name (used where 'AutoImplement' is 'Database').",
-          "description": "Defaults to the 'CodeGeneration.DatabaseName' configuration property (its default value is 'IDatabase')."
+          "title": "The .NET database interface name (used where \u0060AutoImplement\u0060 is \u0060Database\u0060).",
+          "description": "Defaults to the \u0060CodeGeneration.DatabaseName\u0060 configuration property (its default value is \u0060IDatabase\u0060)."
         },
         "databaseSchema": {
           "type": "string",
-          "title": "The database schema name (used where 'AutoImplement' is 'Database').",
-          "description": "Defaults to 'dbo'."
+          "title": "The database schema name (used where \u0060AutoImplement\u0060 is \u0060Database\u0060).",
+          "description": "Defaults to \u0060dbo\u0060."
         },
         "databaseMapperInheritsFrom": {
           "type": "string",
-          "title": "The name of the 'Mapper' that the generated Database 'Mapper' inherits from."
+          "title": "The name of the \u0060Mapper\u0060 that the generated Database \u0060Mapper\u0060 inherits from."
         },
         "databaseCustomerMapper": {
           "type": "boolean",
-          "title": "Indicates that a custom Database 'Mapper' will be used; i.e. not generated.",
-          "description": "Otherwise, by default, a 'Mapper' will be generated."
+          "title": "Indicates that a custom Database \u0060Mapper\u0060 will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
         "entityFrameworkName": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where 'AutoImplement' is 'EntityFramework'.",
-          "description": "Defaults to 'CodeGeneration.EntityFrameworkName'."
+          "title": "The .NET Entity Framework interface name used where \u0060AutoImplement\u0060 is \u0060EntityFramework\u0060.",
+          "description": "Defaults to \u0060CodeGeneration.EntityFrameworkName\u0060."
         },
         "entityFrameworkModel": {
           "type": "string",
-          "title": "The corresponding Entity Framework model name (required where 'AutoImplement' is 'EntityFramework')."
+          "title": "The corresponding Entity Framework model name (required where \u0060AutoImplement\u0060 is \u0060EntityFramework\u0060)."
         },
         "entityFrameworkCustomMapper": {
           "type": "boolean",
-          "title": "Indicates that a custom Entity Framework 'Mapper' will be used; i.e. not generated.",
-          "description": "Otherwise, by default, a 'Mapper' will be generated."
+          "title": "Indicates that a custom Entity Framework \u0060Mapper\u0060 will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
         "entityFrameworkMapperBase": {
           "type": "string",
@@ -638,30 +638,30 @@
         },
         "cosmosName": {
           "type": "string",
-          "title": "The .NET Cosmos interface name used where 'AutoImplement' is 'Cosmos'.",
-          "description": "Defaults to the 'CodeGeneration.CosmosName' configuration property (its default value is 'ICosmosDb')."
+          "title": "The .NET Cosmos interface name used where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "Defaults to the \u0060CodeGeneration.CosmosName\u0060 configuration property (its default value is \u0060ICosmosDb\u0060)."
         },
         "cosmosModel": {
           "type": "string",
-          "title": "The corresponding Cosmos model name (required where 'AutoImplement' is 'Cosmos')."
+          "title": "The corresponding Cosmos model name (required where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060)."
         },
         "cosmosContainerId": {
           "type": "string",
-          "title": "The Cosmos 'ContainerId' required where 'AutoImplement' is 'Cosmos'."
+          "title": "The Cosmos \u0060ContainerId\u0060 required where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060."
         },
         "cosmosPartitionKey": {
           "type": "string",
-          "title": "The C# code to be used for setting the optional Cosmos 'PartitionKey' where 'AutoImplement' is 'Cosmos'.",
-          "description": "The value 'PartitionKey.None' can be specified. Literals will need to be quoted."
+          "title": "The C# code to be used for setting the optional Cosmos \u0060PartitionKey\u0060 where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "The value \u0060PartitionKey.None\u0060 can be specified. Literals will need to be quoted."
         },
         "cosmosValueContainer": {
           "type": "boolean",
-          "title": "Indicates whether the 'CosmosDbValueContainer' is to be used; otherwise, 'CosmosDbContainer'."
+          "title": "Indicates whether the \u0060CosmosDbValueContainer\u0060 is to be used; otherwise, \u0060CosmosDbContainer\u0060."
         },
         "cosmosCustomMapper": {
           "type": "boolean",
-          "title": "Indicates that a custom Cosmos 'Mapper' will be used; i.e. not generated.",
-          "description": "Otherwise, by default, a 'Mapper' will be generated."
+          "title": "Indicates that a custom Cosmos \u0060Mapper\u0060 will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
         "cosmosMapperBase": {
           "type": "string",
@@ -669,52 +669,52 @@
         },
         "odataName": {
           "type": "string",
-          "title": "The .NET OData interface name used where 'AutoImplement' is 'OData'.",
-          "description": "Defaults to the 'CodeGeneration.ODataName' configuration property (its default value is 'IOData')."
+          "title": "The .NET OData interface name used where \u0060AutoImplement\u0060 is \u0060OData\u0060.",
+          "description": "Defaults to the \u0060CodeGeneration.ODataName\u0060 configuration property (its default value is \u0060IOData\u0060)."
         },
         "odataModel": {
           "type": "string",
-          "title": "The corresponding OData model name (required where 'AutoImplement' is 'OData')."
+          "title": "The corresponding OData model name (required where \u0060AutoImplement\u0060 is \u0060OData\u0060)."
         },
         "odataCollectionName": {
           "type": "string",
-          "title": "The name of the underlying OData collection where 'AutoImplement' is 'OData'.",
-          "description": "The underlying 'Simple.OData.Client' will attempt to infer."
+          "title": "The name of the underlying OData collection where \u0060AutoImplement\u0060 is \u0060OData\u0060.",
+          "description": "The underlying \u0060Simple.OData.Client\u0060 will attempt to infer."
         },
         "odataCustomMapper": {
           "type": "boolean",
-          "title": "Indicates that a custom OData 'Mapper' will be used; i.e. not generated.",
-          "description": "Otherwise, by default, a 'Mapper' will be generated."
+          "title": "Indicates that a custom OData \u0060Mapper\u0060 will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
         "httpAgentName": {
           "type": "string",
-          "title": "The .NET HTTP Agent interface name used where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "Defaults to 'CodeGeneration.HttpAgentName' configuration property (its default value is 'IHttpAgent')."
+          "title": "The .NET HTTP Agent interface name used where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "Defaults to \u0060CodeGeneration.HttpAgentName\u0060 configuration property (its default value is \u0060IHttpAgent\u0060)."
         },
         "httpAgentRoutePrefix": {
           "type": "string",
-          "title": "The base HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "This is the base (prefix) 'URI' for the HTTP Agent endpoint and can be further extended when defining the underlying 'Operation'(s)."
+          "title": "The base HTTP Agent API route where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "This is the base (prefix) \u0060URI\u0060 for the HTTP Agent endpoint and can be further extended when defining the underlying \u0060Operation\u0060(s)."
         },
         "httpAgentModel": {
           "type": "string",
-          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
-          "description": "This can be overridden within the 'Operation'(s)."
+          "title": "The corresponding HTTP Agent model name (required where \u0060AutoImplement\u0060 is \u0060HttpAgent\u0060).",
+          "description": "This can be overridden within the \u0060Operation\u0060(s)."
         },
         "httpAgentReturnModel": {
           "type": "string",
-          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
-          "description": "This can be overridden within the 'Operation'(s)."
+          "title": "The corresponding HTTP Agent model name (required where \u0060AutoImplement\u0060 is \u0060HttpAgent\u0060).",
+          "description": "This can be overridden within the \u0060Operation\u0060(s)."
         },
         "httpAgentCode": {
           "type": "string",
-          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "Prepended to 'Operation.HttpAgentCode' where specified to enable standardized functionality."
+          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "Prepended to \u0060Operation.HttpAgentCode\u0060 where specified to enable standardized functionality."
         },
         "httpAgentCustomMapper": {
           "type": "boolean",
-          "title": "Indicates that a custom HTTP Agent 'Mapper' will be used; i.e. not generated.",
-          "description": "Otherwise, by default, a 'Mapper' will be generated."
+          "title": "Indicates that a custom HTTP Agent \u0060Mapper\u0060 will be used; i.e. not generated.",
+          "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
         "httpAgentMapperBase": {
           "type": "string",
@@ -722,13 +722,13 @@
         },
         "dataSvcCaching": {
           "type": "boolean",
-          "title": "Indicates whether request-based 'IRequestCache' caching is to be performed at the 'DataSvc' layer to improve performance (i.e. reduce chattiness).",
-          "description": "Defaults to 'true'."
+          "title": "Indicates whether request-based \u0060IRequestCache\u0060 caching is to be performed at the \u0060DataSvc\u0060 layer to improve performance (i.e. reduce chattiness).",
+          "description": "Defaults to \u0060true\u0060."
         },
         "dataSvcCtor": {
           "type": "string",
-          "title": "The access modifier for the generated 'DataSvc' constructor.",
-          "description": "Defaults to 'Public'.",
+          "title": "The access modifier for the generated \u0060DataSvc\u0060 constructor.",
+          "description": "Defaults to \u0060Public\u0060.",
           "enum": [
             "Public",
             "Private",
@@ -737,21 +737,21 @@
         },
         "dataSvcCtorParams": {
           "type": "array",
-          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'DataSvc' constructor.",
-          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060DataSvc\u0060 constructor.",
+          "description": "Each constructor parameter should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IConfiguration^Config\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. Where the \u0060Type\u0060 matches an already inferred value it will be ignored.",
           "items": {
             "type": "string"
           }
         },
         "dataSvcExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'DataSvc' extensions logic should be generated.",
-          "description": "This can be overridden using 'Operation.DataSvcExtensions'."
+          "title": "Indicates whether the \u0060DataSvc\u0060 extensions logic should be generated.",
+          "description": "This can be overridden using \u0060Operation.DataSvcExtensions\u0060."
         },
         "eventPublish": {
           "type": "string",
-          "title": "The layer to add logic to publish an event for a 'Create', 'Update' or 'Delete' operation.",
-          "description": "Defaults to the 'CodeGeneration.EventPublish' configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the 'Operation'(s).",
+          "title": "The layer to add logic to publish an event for a \u0060Create\u0060, \u0060Update\u0060 or \u0060Delete\u0060 operation.",
+          "description": "Defaults to the \u0060CodeGeneration.EventPublish\u0060 configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the \u0060Operation\u0060(s).",
           "enum": [
             "None",
             "DataSvc",
@@ -761,17 +761,17 @@
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
-          "description": "Defaults to 'Name' (as lowercase) appended with the '/{$key}' placeholder. Note: when used in code-generation the 'CodeGeneration.EventSourceRoot' will be prepended where specified. To include the entity id/key include a '{$key}' placeholder ('Create', 'Update' or 'Delete' operation only); for example: 'person/{$key}'. This can be overridden for the 'Operation'."
+          "description": "Defaults to \u0060Name\u0060 (as lowercase) appended with the \u0060/{$key}\u0060 placeholder. Note: when used in code-generation the \u0060CodeGeneration.EventSourceRoot\u0060 will be prepended where specified. To include the entity id/key include a \u0060{$key}\u0060 placeholder (\u0060Create\u0060, \u0060Update\u0060 or \u0060Delete\u0060 operation only); for example: \u0060person/{$key}\u0060. This can be overridden for the \u0060Operation\u0060."
         },
         "eventTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated whereever generating event publishing logic.",
-          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an 'EventPublish' error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to 'CodeGeneration.EventTransaction'. This essentially defaults the 'Operation.DataSvcTransaction' where not otherwise specified. This should only be used where a transactionally-aware data source is being used."
+          "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated whereever generating event publishing logic.",
+          "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an \u0060EventPublish\u0060 error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to \u0060CodeGeneration.EventTransaction\u0060. This essentially defaults the \u0060Operation.DataSvcTransaction\u0060 where not otherwise specified. This should only be used where a transactionally-aware data source is being used."
         },
         "managerCtor": {
           "type": "string",
-          "title": "The access modifier for the generated 'Manager' constructor.",
-          "description": "Defaults to 'Public'.",
+          "title": "The access modifier for the generated \u0060Manager\u0060 constructor.",
+          "description": "Defaults to \u0060Public\u0060.",
           "enum": [
             "Public",
             "Private",
@@ -780,35 +780,35 @@
         },
         "managerCtorParams": {
           "type": "array",
-          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'Manager' constructor.",
-          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060Manager\u0060 constructor.",
+          "description": "Each constructor parameter should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IConfiguration^Config\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. Where the \u0060Type\u0060 matches an already inferred value it will be ignored.",
           "items": {
             "type": "string"
           }
         },
         "managerExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'Manager' extensions logic should be generated.",
-          "description": "This can be overridden using 'Operation.ManagerExtensions'."
+          "title": "Indicates whether the \u0060Manager\u0060 extensions logic should be generated.",
+          "description": "This can be overridden using \u0060Operation.ManagerExtensions\u0060."
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
-          "description": "Only used for defaulting the 'Create' and 'Update' operation types ('Operation.Type') where not specified explicitly."
+          "title": "The name of the .NET implementing \u0060Type\u0060 or interface \u0060Type\u0060 that will perform the validation.",
+          "description": "Only used for defaulting the \u0060Create\u0060 and \u0060Update\u0060 operation types (\u0060Operation.Type\u0060) where not specified explicitly."
         },
         "identifierGenerator": {
           "type": "boolean",
-          "title": "Indicates whether the 'IIdentifierGenerator' should be used to generate the 'Id' property where the operation types ('Operation.Type') is 'Create'."
+          "title": "Indicates whether the \u0060IIdentifierGenerator\u0060 should be used to generate the \u0060Id\u0060 property where the operation types (\u0060Operation.Type\u0060) is \u0060Create\u0060."
         },
         "managerCleanUp": {
           "type": "boolean",
-          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
-          "description": "This can be overridden within the 'CodeGeneration' and 'Operation'(s)."
+          "title": "Indicates whether a \u0060Cleaner.Cleanup\u0060 is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the \u0060CodeGeneration\u0060 and \u0060Operation\u0060(s)."
         },
         "validationFramework": {
           "type": "string",
-          "title": "The 'Validation' framework to use for the entity-based validation.",
-          "description": "Defaults to 'CodeGeneration.ValidationFramework'. This can be overridden within the 'Operation'(s) and 'Parameter'(s).",
+          "title": "The \u0060Validation\u0060 framework to use for the entity-based validation.",
+          "description": "Defaults to \u0060CodeGeneration.ValidationFramework\u0060. This can be overridden within the \u0060Operation\u0060(s) and \u0060Parameter\u0060(s).",
           "enum": [
             "CoreEx",
             "FluentValidation"
@@ -816,18 +816,18 @@
         },
         "webApiRoutePrefix": {
           "type": "string",
-          "title": "The 'RoutePrefixAtttribute' for the corresponding entity Web API controller.",
-          "description": "This is the base (prefix) 'URI' for the entity and can be further extended when defining the underlying 'Operation'(s). The 'CodeGeneration.WebApiRoutePrefix' will be prepended where specified. Where not specified will automatically default to the pluralized 'Name' (as lowercase)."
+          "title": "The \u0060RoutePrefixAtttribute\u0060 for the corresponding entity Web API controller.",
+          "description": "This is the base (prefix) \u0060URI\u0060 for the entity and can be further extended when defining the underlying \u0060Operation\u0060(s). The \u0060CodeGeneration.WebApiRoutePrefix\u0060 will be prepended where specified. Where not specified will automatically default to the pluralized \u0060Name\u0060 (as lowercase)."
         },
         "webApiAuthorize": {
           "type": "string",
-          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either 'Authorize' or 'AllowAnonymous'.",
-          "description": "Defaults to the 'CodeGeneration.WebApiAuthorize' configuration property (inherits) where not specified; can be overridden at the 'Operation' level also."
+          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either \u0060Authorize\u0060 or \u0060AllowAnonymous\u0060.",
+          "description": "Defaults to the \u0060CodeGeneration.WebApiAuthorize\u0060 configuration property (inherits) where not specified; can be overridden at the \u0060Operation\u0060 level also."
         },
         "webApiCtor": {
           "type": "string",
-          "title": "The access modifier for the generated Web API 'Controller' constructor.",
-          "description": "Defaults to 'Public'.",
+          "title": "The access modifier for the generated Web API \u0060Controller\u0060 constructor.",
+          "description": "Defaults to \u0060Public\u0060.",
           "enum": [
             "Public",
             "Private",
@@ -836,49 +836,49 @@
         },
         "webApiCtorParams": {
           "type": "array",
-          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated 'WebApi' constructor.",
-          "description": "Each constructor parameter should be formatted as 'Type' + '^' + 'Name'; e.g. 'IConfiguration^Config'. Where the 'Name' portion is not specified it will be inferred. Where the 'Type' matches an already inferred value it will be ignored.",
+          "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060WebApi\u0060 constructor.",
+          "description": "Each constructor parameter should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IConfiguration^Config\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. Where the \u0060Type\u0060 matches an already inferred value it will be ignored.",
           "items": {
             "type": "string"
           }
         },
         "webApiAutoLocation": {
           "type": "boolean",
-          "title": "Indicates whether the HTTP Response Location Header route ('Operation.WebApiLocation') is automatically inferred.",
-          "description": "This will automatically set the 'Operation.WebApiLocation' for an 'Operation' named 'Create' where there is a corresponding named 'Get'. This is defaulted from the 'CodeGen.WebApiAutoLocation'."
+          "title": "Indicates whether the HTTP Response Location Header route (\u0060Operation.WebApiLocation\u0060) is automatically inferred.",
+          "description": "This will automatically set the \u0060Operation.WebApiLocation\u0060 for an \u0060Operation\u0060 named \u0060Create\u0060 where there is a corresponding named \u0060Get\u0060. This is defaulted from the \u0060CodeGen.WebApiAutoLocation\u0060."
         },
         "webApiConcurrency": {
           "type": "boolean",
           "title": "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
-          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the 'Operation.Type' is 'Update' or 'Patch', the request ETag will be matched against the response for a corresponding 'Get' operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the 'Get' must be the same as that returned from the corresponding 'Create', 'Update' and 'Patch' (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. This defaults the 'Operation.WebApiConcurrency'."
+          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the \u0060Operation.Type\u0060 is \u0060Update\u0060 or \u0060Patch\u0060, the request ETag will be matched against the response for a corresponding \u0060Get\u0060 operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the \u0060Get\u0060 must be the same as that returned from the corresponding \u0060Create\u0060, \u0060Update\u0060 and \u0060Patch\u0060 (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. This defaults the \u0060Operation.WebApiConcurrency\u0060."
         },
         "webApiGetOperation": {
           "type": "string",
-          "title": "The corresponding 'Get' method name (in the 'XxxManager') where the 'Operation.Type' is 'Update' and 'SimulateConcurrency' is 'true'.",
-          "description": "Defaults to 'Get'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."
+          "title": "The corresponding \u0060Get\u0060 method name (in the \u0060XxxManager\u0060) where the \u0060Operation.Type\u0060 is \u0060Update\u0060 and \u0060SimulateConcurrency\u0060 is \u0060true\u0060.",
+          "description": "Defaults to \u0060Get\u0060. Specify either just the method name (e.g. \u0060OperationName\u0060) or, interface and method name (e.g. \u0060IXxxManager.OperationName\u0060) to be invoked where in a different \u0060YyyManager.OperationName\u0060."
         },
         "dataModel": {
           "type": "boolean",
-          "title": "Indicates whether a data 'model' version of the entity should also be generated (output to '.\\Business\\Data\\Model').",
-          "description": "The model will be generated with 'OmitEntityBase = true'. Any reference data properties will be defined using their 'RefDataType' intrinsic 'Type' versus their corresponding (actual) reference data 'Type'."
+          "title": "Indicates whether a data \u0060model\u0060 version of the entity should also be generated (output to \u0060.\\Business\\Data\\Model\u0060).",
+          "description": "The model will be generated with \u0060OmitEntityBase = true\u0060. Any reference data properties will be defined using their \u0060RefDataType\u0060 intrinsic \u0060Type\u0060 versus their corresponding (actual) reference data \u0060Type\u0060."
         },
         "excludeEntity": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'Entity' class ('Xxx.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060Entity\u0060 class (\u0060Xxx.cs\u0060)."
         },
         "excludeAll": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of all 'Operation' related artefacts; excluding the 'Entity' class.",
-          "description": "Is a shorthand means for setting all of the other 'Exclude*' properties (with the exception of 'ExcludeEntity') to exclude."
+          "title": "Indicates whether to exclude the generation of all \u0060Operation\u0060 related artefacts; excluding the \u0060Entity\u0060 class.",
+          "description": "Is a shorthand means for setting all of the other \u0060Exclude*\u0060 properties (with the exception of \u0060ExcludeEntity\u0060) to exclude."
         },
         "excludeIData": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'Data' interface ('IXxxData.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060Data\u0060 interface (\u0060IXxxData.cs\u0060)."
         },
         "excludeData": {
           "type": "string",
-          "title": "The option to exclude the generation of the 'Data' class ('XxxData.cs').",
-          "description": "Defaults to 'Include' indicating _not_ to exlude. A value of 'Exclude' indicates to exclude all output; alternatively, 'RequiresMapper' indicates to at least output the corresponding 'Mapper' class.",
+          "title": "The option to exclude the generation of the \u0060Data\u0060 class (\u0060XxxData.cs\u0060).",
+          "description": "Defaults to \u0060Include\u0060 indicating _not_ to exlude. A value of \u0060Exclude\u0060 indicates to exclude all output; alternatively, \u0060RequiresMapper\u0060 indicates to at least output the corresponding \u0060Mapper\u0060 class.",
           "enum": [
             "Include",
             "Exclude",
@@ -887,59 +887,59 @@
         },
         "excludeIDataSvc": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'DataSvc' interface ('IXxxDataSvc.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060DataSvc\u0060 interface (\u0060IXxxDataSvc.cs\u0060)."
         },
         "excludeDataSvc": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'DataSvc' class ('XxxDataSvc.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060DataSvc\u0060 class (\u0060XxxDataSvc.cs\u0060)."
         },
         "excludeIManager": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'Manager' interface ('IXxxManager.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060Manager\u0060 interface (\u0060IXxxManager.cs\u0060)."
         },
         "excludeManager": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the 'Manager' class ('XxxManager.cs')."
+          "title": "Indicates whether to exclude the generation of the \u0060Manager\u0060 class (\u0060XxxManager.cs\u0060)."
         },
         "excludeWebApi": {
           "type": "boolean",
-          "title": "The option to exclude the generation of the WebAPI 'Controller' class ('XxxController.cs')."
+          "title": "The option to exclude the generation of the WebAPI \u0060Controller\u0060 class (\u0060XxxController.cs\u0060)."
         },
         "excludeWebApiAgent": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the WebAPI consuming 'Agent' class ('XxxAgent.cs')."
+          "title": "Indicates whether to exclude the generation of the WebAPI consuming \u0060Agent\u0060 class (\u0060XxxAgent.cs\u0060)."
         },
         "excludeGrpcAgent": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the gRPC consuming 'Agent' class ('XxxAgent.cs')."
+          "title": "Indicates whether to exclude the generation of the gRPC consuming \u0060Agent\u0060 class (\u0060XxxAgent.cs\u0060)."
         },
         "authRole": {
           "type": "string",
-          "title": "The role (permission) used by the 'ExecutionContext.IsInRole(role)' for each 'Operation'.",
-          "description": "Used where not overridden specifically for an 'Operation'; i.e. acts as the default."
+          "title": "The role (permission) used by the \u0060ExecutionContext.IsInRole(role)\u0060 for each \u0060Operation\u0060.",
+          "description": "Used where not overridden specifically for an \u0060Operation\u0060; i.e. acts as the default."
         },
         "grpc": {
           "type": "boolean",
           "title": "Indicates whether gRPC support (more specifically service-side) is required for the Entity.",
-          "description": "gRPC support is an explicit opt-in model (see 'CodeGeneration.Grpc' configuration); therefore, each corresponding 'Property' and 'Operation' will also need to be opted-in specifically."
+          "description": "gRPC support is an explicit opt-in model (see \u0060CodeGeneration.Grpc\u0060 configuration); therefore, each corresponding \u0060Property\u0060 and \u0060Operation\u0060 will also need to be opted-in specifically."
         },
         "properties": {
           "type": "array",
-          "title": "The corresponding 'Property' collection.",
+          "title": "The corresponding \u0060Property\u0060 collection.",
           "items": {
             "$ref": "#/definitions/Property"
           }
         },
         "operations": {
           "type": "array",
-          "title": "The corresponding 'Operation' collection.",
+          "title": "The corresponding \u0060Operation\u0060 collection.",
           "items": {
             "$ref": "#/definitions/Operation"
           }
         },
         "consts": {
           "type": "array",
-          "title": "The corresponding 'Consts' collection.",
+          "title": "The corresponding \u0060Consts\u0060 collection.",
           "items": {
             "$ref": "#/definitions/Const"
           }
@@ -951,8 +951,8 @@
     },
     "Property": {
       "type": "object",
-      "title": "'Property' object (entity-driven)",
-      "description": "The 'Property' object defines an 'Entity' property and its charateristics.",
+      "title": "\u0027Property\u0027 object (entity-driven)",
+      "description": "The \u0060Property\u0060 object defines an \u0060Entity\u0060 property and its charateristics.",
       "properties": {
         "name": {
           "type": "string",
@@ -961,21 +961,21 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the 'Text' will be the 'Name' reformatted as sentence casing. Depending on whether the 'Type' is 'bool', will appear in one of the two generated sentences. Where not 'bool' it will be: Gets or sets a value indicating whether {text}.'. Otherwise, it will be: Gets or sets the {text}.'. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
         },
         "modelText": {
           "type": "string",
           "title": "The overriding model text for use in comments.",
-          "description": "By default the 'ModelText' will be the 'Name' reformatted as sentence casing. Depending on whether the 'Type' is 'bool', will appear in one of the two generated sentences. Where not 'bool' it will be: Gets or sets a value indicating whether {text}.'. Otherwise, it will be: Gets or sets the {text}.'. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "By default the \u0060ModelText\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
         },
         "type": {
           "type": "string",
-          "title": "The .NET 'Type'.",
-          "description": "Defaults to 'string'. To reference a Reference Data 'Type' always prefix with 'RefDataNamespace' (e.g. 'RefDataNamespace.Gender') or shortcut '^' (e.g. '^Gender'). This will ensure that the appropriate Reference Data 'using' statement is used. _Shortcut:_ Where the 'Type' starts with (prefix) 'RefDataNamespace.' or '^', and the correspondong 'RefDataType' attribute is not specified it will automatically default the 'RefDataType' to 'string.'"
+          "title": "The .NET \u0060Type\u0060.",
+          "description": "Defaults to \u0060string\u0060. To reference a Reference Data \u0060Type\u0060 always prefix with \u0060RefDataNamespace\u0060 (e.g. \u0060RefDataNamespace.Gender\u0060) or shortcut \u0060^\u0060 (e.g. \u0060^Gender\u0060). This will ensure that the appropriate Reference Data \u0060using\u0060 statement is used. _Shortcut:_ Where the \u0060Type\u0060 starts with (prefix) \u0060RefDataNamespace.\u0060 or \u0060^\u0060, and the correspondong \u0060RefDataType\u0060 attribute is not specified it will automatically default the \u0060RefDataType\u0060 to \u0060string.\u0060"
         },
         "nullable": {
           "type": "boolean",
-          "title": "Indicates whether the .NET 'Type' should be declared as nullable; e.g. 'string?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'."
+          "title": "Indicates whether the .NET \u0060Type\u0060 should be declared as nullable; e.g. \u0060string?\u0060. Will be inferred where the \u0060Type\u0060 is denoted as nullable; i.e. suffixed by a \u0060?\u0060."
         },
         "inherited": {
           "type": "boolean",
@@ -984,12 +984,12 @@
         "privateName": {
           "type": "string",
           "title": "The overriding private name.",
-          "description": "Overrides the 'Name' to be used for private fields. By default reformatted from 'Name'; e.g. 'FirstName' as '_firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for private fields. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060_firstName\u0060."
         },
         "argumentName": {
           "type": "string",
           "title": "The overriding argument name.",
-          "description": "Overrides the 'Name' to be used for argument parameters. By default reformatted from 'Name'; e.g. 'FirstName' as 'firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for argument parameters. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060firstName\u0060."
         },
         "primaryKey": {
           "type": "boolean",
@@ -998,8 +998,8 @@
         },
         "isEntity": {
           "type": "boolean",
-          "title": "Indicates that the property 'Type' is another generated entity / collection and therefore specific capabilities can be assumed (e.g. 'CopyFrom' and 'Clone').",
-          "description": "Will be inferred (default to 'true') where the 'Type' is 'ChangeLog' or the 'Type' is found as another 'Entity' within the code-generation configuration file."
+          "title": "Indicates that the property \u0060Type\u0060 is another generated entity / collection and therefore specific capabilities can be assumed (e.g. \u0060CopyFrom\u0060 and \u0060Clone\u0060).",
+          "description": "Will be inferred (default to \u0060true\u0060) where the \u0060Type\u0060 is \u0060ChangeLog\u0060 or the \u0060Type\u0060 is found as another \u0060Entity\u0060 within the code-generation configuration file."
         },
         "immutable": {
           "type": "boolean",
@@ -1007,8 +1007,8 @@
         },
         "dateTimeTransform": {
           "type": "string",
-          "title": "The 'DateTime' transformation to be performed on 'Set' and 'CleanUp'.",
-          "description": "Defaults to 'UseDefault'. This is only applied where the 'Type' is 'DateTime'.",
+          "title": "The \u0060DateTime\u0060 transformation to be performed on \u0060Set\u0060 and \u0060CleanUp\u0060.",
+          "description": "Defaults to \u0060UseDefault\u0060. This is only applied where the \u0060Type\u0060 is \u0060DateTime\u0060.",
           "enum": [
             "UseDefault",
             "None",
@@ -1020,8 +1020,8 @@
         },
         "stringTrim": {
           "type": "string",
-          "title": "The 'string' trimming of white space characters to be performed on 'Set' and 'CleanUp'.",
-          "description": "Defaults to 'UseDefault'. This is only applied where the 'Type' is 'string'.",
+          "title": "The \u0060string\u0060 trimming of white space characters to be performed on \u0060Set\u0060 and \u0060CleanUp\u0060.",
+          "description": "Defaults to \u0060UseDefault\u0060. This is only applied where the \u0060Type\u0060 is \u0060string\u0060.",
           "enum": [
             "UseDefault",
             "None",
@@ -1032,8 +1032,8 @@
         },
         "stringTransform": {
           "type": "string",
-          "title": "The 'string' transformation to be performed on 'Set' and 'CleanUp'.",
-          "description": "Defaults to 'UseDefault'. This is only applied where the 'Type' is 'string'.",
+          "title": "The \u0060string\u0060 transformation to be performed on \u0060Set\u0060 and \u0060CleanUp\u0060.",
+          "description": "Defaults to \u0060UseDefault\u0060. This is only applied where the \u0060Type\u0060 is \u0060string\u0060.",
           "enum": [
             "UseDefault",
             "None",
@@ -1043,8 +1043,8 @@
         },
         "stringCasing": {
           "type": "string",
-          "title": "The 'string' casing to be performed on 'Set' and 'CleanUp'.",
-          "description": "Defaults to 'UseDefault'. This is only applied where the 'Type' is 'string'.",
+          "title": "The \u0060string\u0060 casing to be performed on \u0060Set\u0060 and \u0060CleanUp\u0060.",
+          "description": "Defaults to \u0060UseDefault\u0060. This is only applied where the \u0060Type\u0060 is \u0060string\u0060.",
           "enum": [
             "UseDefault",
             "None",
@@ -1055,27 +1055,27 @@
         },
         "autoCreate": {
           "type": "boolean",
-          "title": "Indicates whether an instance of the 'Type' is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation)."
+          "title": "Indicates whether an instance of the \u0060Type\u0060 is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation)."
         },
         "default": {
           "type": "string",
           "title": "The C# code to default the value.",
-          "description": "Where the 'Type' is 'string' then the specified default value will need to be delimited. Any valid value assignment C# code can be used."
+          "description": "Where the \u0060Type\u0060 is \u0060string\u0060 then the specified default value will need to be delimited. Any valid value assignment C# code can be used."
         },
         "partitionKey": {
           "type": "boolean",
           "title": "Indicates whether the property is considered part of the Partition Key.",
-          "description": "This will implement 'IPartitionKey' for the generated entity."
+          "description": "This will implement \u0060IPartitionKey\u0060 for the generated entity."
         },
         "internalOnly": {
           "type": "boolean",
           "title": "Indicates whether the property is for internal use only; declared in Business entities only.",
-          "description": "In this instance the 'Property' will be excluded from the 'Common' entity declaration and 'Business' JSON serialization."
+          "description": "In this instance the \u0060Property\u0060 will be excluded from the \u0060Common\u0060 entity declaration and \u0060Business\u0060 JSON serialization."
         },
         "refDataType": {
           "type": "string",
           "title": "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).",
-          "description": "Defaults to 'string' (being the 'ReferenceDataBase.Code') where not specified and the corresponding 'Type' starts with (prefix) 'RefDataNamespace.' or '^'. Note: an 'Id' of type 'string' is currently not supported; the use of the 'Code' is the recommended approach.",
+          "description": "Defaults to \u0060string\u0060 (being the \u0060ReferenceDataBase.Code\u0060) where not specified and the corresponding \u0060Type\u0060 starts with (prefix) \u0060RefDataNamespace.\u0060 or \u0060^\u0060. Note: an \u0060Id\u0060 of type \u0060string\u0060 is currently not supported; the use of the \u0060Code\u0060 is the recommended approach.",
           "enum": [
             "string",
             "int",
@@ -1084,13 +1084,13 @@
         },
         "refDataList": {
           "type": "boolean",
-          "title": "Indicates that the Reference Data property is to be a serializable list ('ReferenceDataSidList').",
-          "description": "This is required to enable a list of Reference Data values (as per 'RefDataType') to be passed as an argument for example."
+          "title": "Indicates that the Reference Data property is to be a serializable list (\u0060ReferenceDataSidList\u0060).",
+          "description": "This is required to enable a list of Reference Data values (as per \u0060RefDataType\u0060) to be passed as an argument for example."
         },
         "refDataText": {
           "type": "string",
-          "title": "Indicates whether a corresponding 'Text' property is added when generating a Reference Data property, overriding the 'Entity.RefDataText' selection.",
-          "description": "This is used where serializing within the Web API 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (which is automatically set where the url contains '$text=true').'Optional' indicates when 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' then a value is output, 'Always' indicates that the value is _always_ output, and 'Never' indicates that feature is turned off.",
+          "title": "Indicates whether a corresponding \u0060Text\u0060 property is added when generating a Reference Data property, overriding the \u0060Entity.RefDataText\u0060 selection.",
+          "description": "This is used where serializing within the Web API \u0060Controller\u0060 and the \u0060ExecutionContext.IsRefDataTextSerializationEnabled\u0060 is set to \u0060true\u0060 (which is automatically set where the url contains \u0060$text=true\u0060).\u0060Optional\u0060 indicates when \u0060ExecutionContext.IsRefDataTextSerializationEnabled\u0060 is set to \u0060true\u0060 then a value is output, \u0060Always\u0060 indicates that the value is _always_ output, and \u0060Never\u0060 indicates that feature is turned off.",
           "enum": [
             "Optional",
             "Always",
@@ -1099,7 +1099,7 @@
         },
         "refDataTextName": {
           "type": "string",
-          "title": "The corresponding reference data 'Text' property name; defaults to 'Name' + 'Text'."
+          "title": "The corresponding reference data \u0060Text\u0060 property name; defaults to \u0060Name\u0060 \u002B \u0027Text\u0027."
         },
         "refDataMapping": {
           "type": "boolean",
@@ -1109,12 +1109,12 @@
         "jsonName": {
           "type": "string",
           "title": "The JSON property name.",
-          "description": "Defaults to 'ArgumentName' where not specified (i.e. camelCase); however, where the property is 'ETag' it will default to the 'Config.ETagJsonName'."
+          "description": "Defaults to \u0060ArgumentName\u0060 where not specified (i.e. camelCase); however, where the property is \u0060ETag\u0060 it will default to the \u0060Config.ETagJsonName\u0060."
         },
         "jsonDataModelName": {
           "type": "string",
-          "title": "The JSON property name for the corresponding data model (see 'Entity.DataModel').",
-          "description": "Defaults to 'JsonName' where not specified."
+          "title": "The JSON property name for the corresponding data model (see \u0060Entity.DataModel\u0060).",
+          "description": "Defaults to \u0060JsonName\u0060 where not specified."
         },
         "serializationIgnore": {
           "type": "boolean",
@@ -1138,26 +1138,26 @@
         "dataName": {
           "type": "string",
           "title": "The data name where Entity.AutoImplement is selected.",
-          "description": "Defaults to the property 'Name'. Represents the column name for a 'Database', or the correspinding property name for the other options."
+          "description": "Defaults to the property \u0060Name\u0060. Represents the column name for a \u0060Database\u0060, or the correspinding property name for the other options."
         },
         "dataConverter": {
           "type": "string",
-          "title": "The data 'Converter' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where no standard data conversion can be applied. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'Type'."
+          "title": "The data \u0060Converter\u0060 class name where \u0060Entity.AutoImplement\u0060 is selected.",
+          "description": "A \u0060Converter\u0060 is used to convert a data source value to/from a .NET \u0060Type\u0060 where no standard data conversion can be applied. Where this value is suffixed by \u0060\u003CT\u003E\u0060 or \u0060{T}\u0060 this will automatically set \u0060Type\u0060."
         },
         "dataMapperIgnore": {
           "type": "boolean",
-          "title": "Indicates whether the property should be ignored (excluded) from the 'Data'-layer / data 'Mapper' generated output.",
+          "title": "Indicates whether the property should be ignored (excluded) from the \u0060Data\u0060-layer / data \u0060Mapper\u0060 generated output.",
           "description": "All properties are included by default."
         },
         "dataAutoGenerated": {
           "type": "boolean",
-          "title": "Indicates whether the 'PrimaryKey' property value is automatically generated by the data source on 'Create'."
+          "title": "Indicates whether the \u0060PrimaryKey\u0060 property value is automatically generated by the data source on \u0060Create\u0060."
         },
         "dataOperationTypes": {
           "type": "string",
-          "title": "The operations types ('ExecutionContext.OperationType') selection to enable inclusion and exclusion of property mapping.",
-          "description": "Defaults to 'Any'.",
+          "title": "The operations types (\u0060ExecutionContext.OperationType\u0060) selection to enable inclusion and exclusion of property mapping.",
+          "description": "Defaults to \u0060Any\u0060.",
           "enum": [
             "Any",
             "AnyExceptCreate",
@@ -1171,22 +1171,22 @@
         },
         "databaseMapper": {
           "type": "string",
-          "title": "The database property 'Mapper' class name where 'Entity.AutoImplement' is selected.",
-          "description": "A 'Mapper' is used to map a data source value to/from a .NET complex 'Type' (i.e. class with one or more properties)."
+          "title": "The database property \u0060Mapper\u0060 class name where \u0060Entity.AutoImplement\u0060 is selected.",
+          "description": "A \u0060Mapper\u0060 is used to map a data source value to/from a .NET complex \u0060Type\u0060 (i.e. class with one or more properties)."
         },
         "databaseIgnore": {
           "type": "boolean",
-          "title": "Indicates whether the property should be ignored (excluded) from the database 'Mapper' generated output."
+          "title": "Indicates whether the property should be ignored (excluded) from the database \u0060Mapper\u0060 generated output."
         },
         "databaseDbType": {
           "type": "string",
-          "title": "The database 'DbType' override (versus inferring from the corresponding .NET Type).",
-          "description": "Overrides the inferred database type; i.e. can specify 'Date' or 'DateTime2', for .NET Type 'System.DateTime'."
+          "title": "The database \u0060DbType\u0060 override (versus inferring from the corresponding .NET Type).",
+          "description": "Overrides the inferred database type; i.e. can specify \u0060Date\u0060 or \u0060DateTime2\u0060, for .NET Type \u0060System.DateTime\u0060."
         },
         "entityFrameworkMapper": {
           "type": "string",
-          "title": "The Entity Framework 'Mapper' approach for the property.",
-          "description": "Defaults to 'Set'.",
+          "title": "The Entity Framework \u0060Mapper\u0060 approach for the property.",
+          "description": "Defaults to \u0060Set\u0060.",
           "enum": [
             "Set",
             "Ignore",
@@ -1196,8 +1196,8 @@
         },
         "cosmosMapper": {
           "type": "string",
-          "title": "The Cosmos 'Mapper' approach for the property.",
-          "description": "Defaults to 'Set'.",
+          "title": "The Cosmos \u0060Mapper\u0060 approach for the property.",
+          "description": "Defaults to \u0060Set\u0060.",
           "enum": [
             "Set",
             "Ignore",
@@ -1207,8 +1207,8 @@
         },
         "odataMapper": {
           "type": "string",
-          "title": "The OData 'Mapper' approach for the property.",
-          "description": "Defaults to 'Map' which indicates the property will be explicitly mapped. A value of 'Ignore' will explicitly 'Ignore', whilst a value of 'Skip' will skip code-generated mapping altogether.",
+          "title": "The OData \u0060Mapper\u0060 approach for the property.",
+          "description": "Defaults to \u0060Map\u0060 which indicates the property will be explicitly mapped. A value of \u0060Ignore\u0060 will explicitly \u0060Ignore\u0060, whilst a value of \u0060Skip\u0060 will skip code-generated mapping altogether.",
           "enum": [
             "Map",
             "Ignore",
@@ -1217,8 +1217,8 @@
         },
         "httpAgentMapper": {
           "type": "string",
-          "title": "The HttpAgent 'Mapper' approach for the property.",
-          "description": "Defaults to 'Set'.",
+          "title": "The HttpAgent \u0060Mapper\u0060 approach for the property.",
+          "description": "Defaults to \u0060Set\u0060.",
           "enum": [
             "Set",
             "Ignore",
@@ -1229,7 +1229,7 @@
         "displayName": {
           "type": "string",
           "title": "The display name used in the likes of error messages for the property.",
-          "description": "Defaults to the 'Name' as sentence case."
+          "description": "Defaults to the \u0060Name\u0060 as sentence case."
         },
         "annotation1": {
           "type": "string",
@@ -1258,8 +1258,8 @@
     },
     "Operation": {
       "type": "object",
-      "title": "'CodeGeneration' object (entity-driven)",
-      "description": "The code generation for an 'Operation' is primarily driven by the 'Type' property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.",
+      "title": "\u0027CodeGeneration\u0027 object (entity-driven)",
+      "description": "The code generation for an \u0060Operation\u0060 is primarily driven by the \u0060Type\u0060 property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.",
       "properties": {
         "name": {
           "type": "string",
@@ -1268,7 +1268,7 @@
         "type": {
           "type": "string",
           "title": "The type of operation that is to be code-generated.",
-          "description": "Defaults to 'Custom'.",
+          "description": "Defaults to \u0060Custom\u0060.",
           "enum": [
             "Get",
             "GetColl",
@@ -1282,51 +1282,51 @@
         "text": {
           "type": "string",
           "title": "The text for use in comments.",
-          "description": "The 'Text' will be defaulted for all the 'Operation.Type' options with the exception of 'Custom'. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "The \u0060Text\u0060 will be defaulted for all the \u0060Operation.Type\u0060 options with the exception of \u0060Custom\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
         },
         "primaryKey": {
           "type": "boolean",
-          "title": "Indicates whether the properties marked as a primary key ('Property.PrimaryKey') are to be used as the parameters.",
-          "description": "This simplifies the specification of these properties versus having to declare each specifically."
+          "title": "Indicates whether the properties marked as a primary key (\u0060Property.PrimaryKey\u0060) are to be used as the parameters.",
+          "description": "This simplifies the specification of these properties as parameters versus having to declare each specifically. Each of the parameters will also be set to be mandatory."
         },
         "paging": {
           "type": "boolean",
-          "title": "Indicates whether a 'PagingArgs' argument is to be added to the operation to enable (standardized) paging related logic."
+          "title": "Indicates whether a \u0060PagingArgs\u0060 argument is to be added to the operation to enable (standardized) paging related logic."
         },
         "valueType": {
           "type": "string",
-          "title": "The .NET value parameter 'Type' for the operation.",
-          "description": "Defaults to the parent 'Entity.Name' where the 'Operation.Type' options are 'Create' or 'Update'."
+          "title": "The .NET value parameter \u0060Type\u0060 for the operation.",
+          "description": "Defaults to the parent \u0060Entity.Name\u0060 where the \u0060Operation.Type\u0060 options are \u0060Create\u0060 or \u0060Update\u0060."
         },
         "returnType": {
           "type": "string",
-          "title": "The .NET return 'Type' for the operation.",
-          "description": "Defaults to the parent 'Entity.Name' where the 'Operation.Type' options are 'Get', 'GetColl', 'Create' or 'Update'; otherwise, defaults to 'void'."
+          "title": "The .NET return \u0060Type\u0060 for the operation.",
+          "description": "Defaults to the parent \u0060Entity.Name\u0060 where the \u0060Operation.Type\u0060 options are \u0060Get\u0060, \u0060GetColl\u0060, \u0060Create\u0060 or \u0060Update\u0060; otherwise, defaults to \u0060void\u0060."
         },
         "returnTypeNullable": {
           "type": "boolean",
-          "title": "Indicates whether the 'ReturnType' is nullable for the operation.",
-          "description": "This is only applicable for an 'Operation.Type' of 'Custom'. Will be inferred where the 'ReturnType' is denoted as nullable; i.e. suffixed by a '?'."
+          "title": "Indicates whether the \u0060ReturnType\u0060 is nullable for the operation.",
+          "description": "This is only applicable for an \u0060Operation.Type\u0060 of \u0060Custom\u0060. Will be inferred where the \u0060ReturnType\u0060 is denoted as nullable; i.e. suffixed by a \u0060?\u0060."
         },
         "returnText": {
           "type": "string",
-          "title": "The text for use in comments to describe the 'ReturnType'.",
-          "description": "A default will be created where not specified. To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. {{Xxx}})."
+          "title": "The text for use in comments to describe the \u0060ReturnType\u0060.",
+          "description": "A default will be created where not specified. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
         },
         "privateName": {
           "type": "string",
           "title": "The overriding private name.",
-          "description": "Overrides the 'Name' to be used for private usage. By default reformatted from 'Name'; e.g. 'GetByArgs' as '_getByArgs'."
+          "description": "Overrides the \u0060Name\u0060 to be used for private usage. By default reformatted from \u0060Name\u0060; e.g. \u0060GetByArgs\u0060 as \u0060_getByArgs\u0060."
         },
         "withResult": {
           "type": "boolean",
-          "title": "Indicates whether to use 'CoreEx.Results' (aka Railway-oriented programming).",
-          "description": "Defaults to 'Entity.WilhResult'."
+          "title": "Indicates whether to use \u0060CoreEx.Results\u0060 (aka Railway-oriented programming).",
+          "description": "Defaults to \u0060Entity.WilhResult\u0060."
         },
         "autoImplement": {
           "type": "string",
-          "title": "The operation override for the 'Entity.AutoImplement'.",
-          "description": "Defaults to 'Entity.AutoImplement'. The corresponding 'Entity.AutoImplement' must be defined for this to be enacted. Auto-implementation is applicable for all 'Operation.Type' options with the exception of 'Custom'.",
+          "title": "The operation override for the \u0060Entity.AutoImplement\u0060.",
+          "description": "Defaults to \u0060Entity.AutoImplement\u0060. The corresponding \u0060Entity.AutoImplement\u0060 must be defined for this to be enacted. Auto-implementation is applicable for all \u0060Operation.Type\u0060 options with the exception of \u0060Custom\u0060.",
           "enum": [
             "Database",
             "EntityFramework",
@@ -1338,63 +1338,63 @@
         },
         "dataEntityMapper": {
           "type": "string",
-          "title": "The override for the data entity 'Mapper'.",
-          "description": "Used where the default generated 'Mapper' is not applicable."
+          "title": "The override for the data entity \u0060Mapper\u0060.",
+          "description": "Used where the default generated \u0060Mapper\u0060 is not applicable."
         },
         "dataExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'Data' extensions logic should be generated.",
-          "description": "Defaults to 'Entity.DataExtensions'."
+          "title": "Indicates whether the \u0060Data\u0060 extensions logic should be generated.",
+          "description": "Defaults to \u0060Entity.DataExtensions\u0060."
         },
         "dataInvoker": {
           "type": "boolean",
-          "title": "Indicates whether a 'DataInvoker' should orchestrate the 'Data'-layer.",
-          "description": "Where 'Dataransaction' or 'EventPublish' is 'Data' then orchestration will default to 'true'."
+          "title": "Indicates whether a \u0060DataInvoker\u0060 should orchestrate the \u0060Data\u0060-layer.",
+          "description": "Where \u0060Dataransaction\u0060 or \u0060EventPublish\u0060 is \u0060Data\u0060 then orchestration will default to \u0060true\u0060."
         },
         "dataTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'Data'-layer.",
-          "description": "Where using an 'EventOutbox' this is ignored as it is implied through its usage."
+          "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated at the \u0060Data\u0060-layer.",
+          "description": "Where using an \u0060EventOutbox\u0060 this is ignored as it is implied through its usage."
         },
         "databaseStoredProc": {
           "type": "string",
-          "title": "The database stored procedure name used where 'Operation.AutoImplement' is 'Database'.",
-          "description": "Defaults to 'sp' + 'Entity.Name' + 'Operation.Name'; e.g. 'spPersonCreate'."
+          "title": "The database stored procedure name used where \u0060Operation.AutoImplement\u0060 is \u0060Database\u0060.",
+          "description": "Defaults to \u0060sp\u0060 \u002B \u0060Entity.Name\u0060 \u002B \u0060Operation.Name\u0060; e.g. \u0060spPersonCreate\u0060."
         },
         "entityFrameworkModel": {
           "type": "string",
-          "title": "The corresponding Entity Framework model name (required where 'AutoImplement' is 'EntityFramework').",
-          "description": "Overrides the 'Entity.EntityFrameworkModel'."
+          "title": "The corresponding Entity Framework model name (required where \u0060AutoImplement\u0060 is \u0060EntityFramework\u0060).",
+          "description": "Overrides the \u0060Entity.EntityFrameworkModel\u0060."
         },
         "cosmosModel": {
           "type": "string",
-          "title": "The corresponding Cosmos model name (required where 'AutoImplement' is 'Cosmos').",
-          "description": "Overrides the 'Entity.CosmosModel'."
+          "title": "The corresponding Cosmos model name (required where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060).",
+          "description": "Overrides the \u0060Entity.CosmosModel\u0060."
         },
         "cosmosContainerId": {
           "type": "string",
-          "title": "The Cosmos 'ContainerId' override used where 'Operation.AutoImplement' is 'Cosmos'.",
-          "description": "Overrides the 'Entity.CosmosContainerId'."
+          "title": "The Cosmos \u0060ContainerId\u0060 override used where \u0060Operation.AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "Overrides the \u0060Entity.CosmosContainerId\u0060."
         },
         "cosmosPartitionKey": {
           "type": "string",
-          "title": "The C# code override to be used for setting the optional Cosmos 'PartitionKey' used where 'Operation.AutoImplement' is 'Cosmos'.",
-          "description": "Overrides the 'Entity.CosmosPartitionKey'."
+          "title": "The C# code override to be used for setting the optional Cosmos \u0060PartitionKey\u0060 used where \u0060Operation.AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "Overrides the \u0060Entity.CosmosPartitionKey\u0060."
         },
         "odataCollectionName": {
           "type": "string",
-          "title": "The override name of the underlying OData collection where 'Operation.AutoImplement' is 'OData'.",
-          "description": "Overriddes the 'Entity.ODataCollectionName'; otherwise, the underlying 'Simple.OData.Client' will attempt to infer."
+          "title": "The override name of the underlying OData collection where \u0060Operation.AutoImplement\u0060 is \u0060OData\u0060.",
+          "description": "Overriddes the \u0060Entity.ODataCollectionName\u0060; otherwise, the underlying \u0060Simple.OData.Client\u0060 will attempt to infer."
         },
         "httpAgentRoute": {
           "type": "string",
-          "title": "The HTTP Agent API route where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "This is appended to the 'Entity.HttpAgentRoutePrefix'."
+          "title": "The HTTP Agent API route where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "This is appended to the \u0060Entity.HttpAgentRoutePrefix\u0060."
         },
         "httpAgentMethod": {
           "type": "string",
           "title": "The HTTP Agent Method for the operation.",
-          "description": "Defaults to 'Operation.WebApiMethod'.",
+          "description": "Defaults to \u0060Operation.WebApiMethod\u0060.",
           "enum": [
             "HttpGet",
             "HttpPost",
@@ -1405,41 +1405,41 @@
         },
         "httpAgentModel": {
           "type": "string",
-          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
-          "description": "This can be overridden within the 'Operation'(s)."
+          "title": "The corresponding HTTP Agent model name (required where \u0060AutoImplement\u0060 is \u0060HttpAgent\u0060).",
+          "description": "This can be overridden within the \u0060Operation\u0060(s)."
         },
         "httpAgentReturnModel": {
           "type": "string",
-          "title": "The corresponding HTTP Agent model name (required where 'AutoImplement' is 'HttpAgent').",
-          "description": "Defaults to 'Operation.HttpAgentModel' where the 'Operation.ReturnType' is equal to 'Entity.Name' (same type). This can be overridden within the 'Operation'(s)."
+          "title": "The corresponding HTTP Agent model name (required where \u0060AutoImplement\u0060 is \u0060HttpAgent\u0060).",
+          "description": "Defaults to \u0060Operation.HttpAgentModel\u0060 where the \u0060Operation.ReturnType\u0060 is equal to \u0060Entity.Name\u0060 (same type). This can be overridden within the \u0060Operation\u0060(s)."
         },
         "httpAgentCode": {
           "type": "string",
-          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where 'Operation.AutoImplement' is 'HttpAgent'.",
-          "description": "Appended to 'Entity.HttpAgentCode' where specified to extend."
+          "title": "The fluent-style method-chaining C# HTTP Agent API code to include where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "Appended to \u0060Entity.HttpAgentCode\u0060 where specified to extend."
         },
         "managerCustom": {
           "type": "boolean",
-          "title": "Indicates whether the 'Manager' logic is a custom implementation; i.e. no auto-'DataSvc' invocation logic is to be generated."
+          "title": "Indicates whether the \u0060Manager\u0060 logic is a custom implementation; i.e. no auto-\u0060DataSvc\u0060 invocation logic is to be generated."
         },
         "managerTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'Manager'-layer."
+          "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated at the \u0060Manager\u0060-layer."
         },
         "managerExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'Manager' extensions logic should be generated.",
-          "description": "Defaults to 'Entity.ManagerExtensions'."
+          "title": "Indicates whether the \u0060Manager\u0060 extensions logic should be generated.",
+          "description": "Defaults to \u0060Entity.ManagerExtensions\u0060."
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET implementing 'Type' or interface 'Type' that will perform the validation.",
-          "description": "Defaults to the 'Entity.Validator' where not specified explicitly (where 'Operation.Type' options 'Create' or 'Update')."
+          "title": "The name of the .NET implementing \u0060Type\u0060 or interface \u0060Type\u0060 that will perform the validation.",
+          "description": "Defaults to the \u0060Entity.Validator\u0060 where not specified explicitly (where \u0060Operation.Type\u0060 options \u0060Create\u0060 or \u0060Update\u0060)."
         },
         "validationFramework": {
           "type": "string",
-          "title": "The 'Validation' framework to use for the entity-based validation.",
-          "description": "Defaults to 'Entity.ValidationFramework'. This can be overridden within the 'Parameter'(s).",
+          "title": "The \u0060Validation\u0060 framework to use for the entity-based validation.",
+          "description": "Defaults to \u0060Entity.ValidationFramework\u0060. This can be overridden within the \u0060Parameter\u0060(s).",
           "enum": [
             "CoreEx",
             "FluentValidation"
@@ -1447,8 +1447,8 @@
         },
         "managerOperationType": {
           "type": "string",
-          "title": "The 'ExecutionContext.OperationType' (CRUD denotation) defined at the 'Manager'-layer.",
-          "description": "The default will be inferred from the 'Operation.Type'; however, where the 'Operation.Type' is 'Custom' it will default to 'Unspecified'.",
+          "title": "The \u0060ExecutionContext.OperationType\u0060 (CRUD denotation) defined at the \u0060Manager\u0060-layer.",
+          "description": "The default will be inferred from the \u0060Operation.Type\u0060; however, where the \u0060Operation.Type\u0060 is \u0060Custom\u0060 it will default to \u0060Unspecified\u0060.",
           "enum": [
             "Create",
             "Read",
@@ -1459,31 +1459,31 @@
         },
         "managerCleanUp": {
           "type": "boolean",
-          "title": "Indicates whether a 'Cleaner.Cleanup' is performed for the operation parameters within the Manager-layer.",
-          "description": "This can be overridden within the 'CodeGeneration' and 'Entity'."
+          "title": "Indicates whether a \u0060Cleaner.Cleanup\u0060 is performed for the operation parameters within the Manager-layer.",
+          "description": "This can be overridden within the \u0060CodeGeneration\u0060 and \u0060Entity\u0060."
         },
         "dataSvcCustom": {
           "type": "boolean",
-          "title": "Indicates whether the 'DataSvc' logic is a custom implementation; i.e. no auto-'DataSvc' invocation logic is to be generated."
+          "title": "Indicates whether the \u0060DataSvc\u0060 logic is a custom implementation; i.e. no auto-\u0060DataSvc\u0060 invocation logic is to be generated."
         },
         "dataSvcTransaction": {
           "type": "boolean",
-          "title": "Indicates whether a 'System.TransactionScope' should be created and orchestrated at the 'DataSvc'-layer."
+          "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated at the \u0060DataSvc\u0060-layer."
         },
         "dataSvcInvoker": {
           "type": "boolean",
-          "title": "Indicates whether a 'DataSvcInvoker' should orchestrate the 'DataSvc'-layer.",
-          "description": "Where 'DataSvcTransaction' or 'EventPublish' is 'DataSvc' then orchestration will default to 'true'."
+          "title": "Indicates whether a \u0060DataSvcInvoker\u0060 should orchestrate the \u0060DataSvc\u0060-layer.",
+          "description": "Where \u0060DataSvcTransaction\u0060 or \u0060EventPublish\u0060 is \u0060DataSvc\u0060 then orchestration will default to \u0060true\u0060."
         },
         "dataSvcExtensions": {
           "type": "boolean",
-          "title": "Indicates whether the 'DataSvc' extensions logic should be generated.",
-          "description": "Defaults to 'Entity.ManagerExtensions'."
+          "title": "Indicates whether the \u0060DataSvc\u0060 extensions logic should be generated.",
+          "description": "Defaults to \u0060Entity.ManagerExtensions\u0060."
         },
         "eventPublish": {
           "type": "string",
-          "title": "The layer to add logic to publish an event for a 'Create', 'Update' or 'Delete' operation.",
-          "description": "Defaults to the 'Entity.EventPublish' configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.",
+          "title": "The layer to add logic to publish an event for a \u0060Create\u0060, \u0060Update\u0060 or \u0060Delete\u0060 operation.",
+          "description": "Defaults to the \u0060Entity.EventPublish\u0060 configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.",
           "enum": [
             "None",
             "DataSvc",
@@ -1493,27 +1493,27 @@
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
-          "description": "Defaults to 'Entity.EventSource'. Note: when used in code-generation the 'CodeGeneration.EventSourceRoot' will be prepended where specified. To include the entity id/key include a '{$key}' placeholder ('Create', 'Update' or 'Delete' operation only); for example: 'person/{$key}'. Otherwise, specify the C# string interpolation expression; for example: 'person/{r.Id}'."
+          "description": "Defaults to \u0060Entity.EventSource\u0060. Note: when used in code-generation the \u0060CodeGeneration.EventSourceRoot\u0060 will be prepended where specified. To include the entity id/key include a \u0060{$key}\u0060 placeholder (\u0060Create\u0060, \u0060Update\u0060 or \u0060Delete\u0060 operation only); for example: \u0060person/{$key}\u0060. Otherwise, specify the C# string interpolation expression; for example: \u0060person/{r.Id}\u0060."
         },
         "eventSubject": {
           "type": "string",
           "title": "The event subject template and corresponding event action pair (separated by a colon).",
-          "description": "The event subject template defaults to '{AppName}.{Entity.Name}', plus each of the unique key placeholders comma separated; e.g. 'Domain.Entity.{id1},{id2}' (depending on whether 'Entity.EventSubjectFormat' is 'NameAndKey' or 'NameOnly'). The event action defaults to 'WebApiOperationType' or 'Operation.Type' where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. 'Demo.Person.{id}:Create;Demo.Other.{id}:Update'."
+          "description": "The event subject template defaults to \u0060{AppName}.{Entity.Name}\u0060, plus each of the unique key placeholders comma separated; e.g. \u0060Domain.Entity.{id1},{id2}\u0060 (depending on whether \u0060Entity.EventSubjectFormat\u0060 is \u0060NameAndKey\u0060 or \u0060NameOnly\u0060). The event action defaults to \u0060WebApiOperationType\u0060 or \u0060Operation.Type\u0060 where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. \u0060Demo.Person.{id}:Create;Demo.Other.{id}:Update\u0060."
         },
         "webApiRoute": {
           "type": "string",
-          "title": "The Web API 'RouteAtttribute' to be appended to the 'Entity.WebApiRoutePrefix'.",
-          "description": "Where the value is specified with a leading '!' character this indicates that the 'Entity.WebApiRoutePrefix' should not be used, and the value should be used as-is (with the '!' removed)."
+          "title": "The Web API \u0060RouteAtttribute\u0060 to be appended to the \u0060Entity.WebApiRoutePrefix\u0060.",
+          "description": "Where the value is specified with a leading \u0060!\u0060 character this indicates that the \u0060Entity.WebApiRoutePrefix\u0060 should not be used, and the value should be used as-is (with the \u0060!\u0060 removed)."
         },
         "webApiAuthorize": {
           "type": "string",
-          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either 'Authorize' or 'AllowAnonymous'.",
+          "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either \u0060Authorize\u0060 or \u0060AllowAnonymous\u0060.",
           "description": "Where not specified no attribute output will occur; it will then inherit as supported by .NET."
         },
         "webApiMethod": {
           "type": "string",
           "title": "The HTTP Method for the operation.",
-          "description": "The value defaults as follows: 'HttpGet' for 'Operation.Type' value 'Get' or 'GetColl', 'HttpPost' for 'Operation.Type' value 'Create' or 'Custom', 'HttpPut' for 'Operation.Type' value 'Update', and 'HttpDelete' for 'Operation.Type' value 'Delete'. An 'Operation.Type' value 'Patch' can not be specified and will always default to 'HttpPatch'.",
+          "description": "The value defaults as follows: \u0060HttpGet\u0060 for \u0060Operation.Type\u0060 value \u0060Get\u0060 or \u0060GetColl\u0060, \u0060HttpPost\u0060 for \u0060Operation.Type\u0060 value \u0060Create\u0060 or \u0060Custom\u0060, \u0060HttpPut\u0060 for \u0060Operation.Type\u0060 value \u0060Update\u0060, and \u0060HttpDelete\u0060 for \u0060Operation.Type\u0060 value \u0060Delete\u0060. An \u0060Operation.Type\u0060 value \u0060Patch\u0060 can not be specified and will always default to \u0060HttpPatch\u0060.",
           "enum": [
             "HttpGet",
             "HttpPost",
@@ -1523,8 +1523,8 @@
         },
         "webApiStatus": {
           "type": "string",
-          "title": "The primary HTTP Status Code that will be returned for the operation where there is a non-'null' return value.",
-          "description": "The value defaults as follows: 'OK' for 'Operation.Type' value 'Get', 'GetColl', 'Update', 'Delete' or 'Custom', 'Created' for 'Operation.Type' value 'Create'.",
+          "title": "The primary HTTP Status Code that will be returned for the operation where there is a non-\u0060null\u0060 return value.",
+          "description": "The value defaults as follows: \u0060OK\u0060 for \u0060Operation.Type\u0060 value \u0060Get\u0060, \u0060GetColl\u0060, \u0060Update\u0060, \u0060Delete\u0060 or \u0060Custom\u0060, \u0060Created\u0060 for \u0060Operation.Type\u0060 value \u0060Create\u0060.",
           "enum": [
             "OK",
             "Accepted",
@@ -1535,8 +1535,8 @@
         },
         "webApiAlternateStatus": {
           "type": "string",
-          "title": "The primary HTTP Status Code that will be returned for the operation where there is a 'null' return value.",
-          "description": "The value defaults as follows: 'NotFound' for 'Operation.Type' value 'Get' and 'NoContent' for 'Operation.Type' value 'GetColl'; otherwise, 'null'.",
+          "title": "The primary HTTP Status Code that will be returned for the operation where there is a \u0060null\u0060 return value.",
+          "description": "The value defaults as follows: \u0060NotFound\u0060 for \u0060Operation.Type\u0060 value \u0060Get\u0060 and \u0060NoContent\u0060 for \u0060Operation.Type\u0060 value \u0060GetColl\u0060; otherwise, \u0060null\u0060.",
           "enum": [
             "OK",
             "Accepted",
@@ -1548,80 +1548,92 @@
         "webApiLocation": {
           "type": "string",
           "title": "The HTTP Response Location Header route.",
-          "description": "This uses similar formatting to the 'WebApiRoute'. The response value is accessed using 'r.' notation to access underlying properties; for example '{r.Id}' or 'person/{r.Id}'. The 'Entity.WebApiRoutePrefix' will be prepended automatically; however, to disable set the first character to '!', e.g. '!person/{r.Id}'. The URI can be inferred from another 'Operation' by using a lookup '^'; for example '^Get' indicates to infer from the named 'Get' operation (where only '^' is specified this is shorthand for '^Get' as this is the most common value). The Location URI will ensure the first character is a '/' so it acts a 'relative URL absolute path'."
+          "description": "This uses similar formatting to the \u0060WebApiRoute\u0060. The response value is accessed using \u0060r.\u0060 notation to access underlying properties; for example \u0060{r.Id}\u0060 or \u0060person/{r.Id}\u0060. The \u0060Entity.WebApiRoutePrefix\u0060 will be prepended automatically; however, to disable set the first character to \u0060!\u0060, e.g. \u0060!person/{r.Id}\u0060. The URI can be inferred from another \u0060Operation\u0060 by using a lookup \u0060^\u0060; for example \u0060^Get\u0060 indicates to infer from the named \u0060Get\u0060 operation (where only \u0060^\u0060 is specified this is shorthand for \u0060^Get\u0060 as this is the most common value). The Location URI will ensure the first character is a \u0060/\u0060 so it acts a \u0027relative URL absolute path\u0027."
         },
         "webApiConcurrency": {
           "type": "boolean",
           "title": "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
-          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the 'Operation.Type' is 'Update' or 'Patch', the request ETag will be matched against the response for a corresponding 'Get' operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the 'Get' must be the same as that returned from the corresponding 'Create', 'Update' and 'Patch' (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. Defaults to 'Entity.WebApiConcurrency'."
+          "description": "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the \u0060Operation.Type\u0060 is \u0060Update\u0060 or \u0060Patch\u0060, the request ETag will be matched against the response for a corresponding \u0060Get\u0060 operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the \u0060Get\u0060 must be the same as that returned from the corresponding \u0060Create\u0060, \u0060Update\u0060 and \u0060Patch\u0060 (where applicable) as the generated ETag is a SHA256 hash of the resulting JSON. Defaults to \u0060Entity.WebApiConcurrency\u0060."
         },
         "webApiGetOperation": {
           "type": "string",
-          "title": "The corresponding 'Get' method name (in the 'XxxManager') where the 'Operation.Type' is 'Update' and 'SimulateConcurrency' is 'true'.",
-          "description": "Defaults to 'Get'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."
+          "title": "The corresponding \u0060Get\u0060 method name (in the \u0060XxxManager\u0060) where the \u0060Operation.Type\u0060 is \u0060Update\u0060 and \u0060SimulateConcurrency\u0060 is \u0060true\u0060.",
+          "description": "Defaults to \u0060Get\u0060. Specify either just the method name (e.g. \u0060OperationName\u0060) or, interface and method name (e.g. \u0060IXxxManager.OperationName\u0060) to be invoked where in a different \u0060YyyManager.OperationName\u0060."
         },
         "webApiUpdateOperation": {
           "type": "string",
-          "title": "The corresponding 'Update' method name (in the 'XxxManager') where the 'Operation.Type' is 'Patch'.",
-          "description": "Defaults to 'Update'. Specify either just the method name (e.g. 'OperationName') or, interface and method name (e.g. 'IXxxManager.OperationName') to be invoked where in a different 'YyyManager.OperationName'."
+          "title": "The corresponding \u0060Update\u0060 method name (in the \u0060XxxManager\u0060) where the \u0060Operation.Type\u0060 is \u0060Patch\u0060.",
+          "description": "Defaults to \u0060Update\u0060. Specify either just the method name (e.g. \u0060OperationName\u0060) or, interface and method name (e.g. \u0060IXxxManager.OperationName\u0060) to be invoked where in a different \u0060YyyManager.OperationName\u0060."
+        },
+        "webApiProduces": {
+          "type": "array",
+          "title": "The value(s) for the optional \u0060[Produces()]\u0060 attribute for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "webApiProducesResponseType": {
+          "type": "string",
+          "title": "The \u0060[ProducesResponseType()]\u0060 attribute \u0060typeof\u0060 for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.",
+          "description": "Defaults to the _Common_ type. A value of \u0060None\u0060, \u0060none\u0060 or \u0060\u0060 will ensure no type is emitted."
         },
         "authPermission": {
           "type": "string",
-          "title": "The permission used by the 'ExecutionContext.IsAuthorized(AuthPermission)' to determine whether the user is authorized."
+          "title": "The permission used by the \u0060ExecutionContext.IsAuthorized(AuthPermission)\u0060 to determine whether the user is authorized."
         },
         "authRole": {
           "type": "string",
-          "title": "The permission used by the 'ExecutionContext.IsInRole(AuthRole)' to determine whether the user is authorized."
+          "title": "The permission used by the \u0060ExecutionContext.IsInRole(AuthRole)\u0060 to determine whether the user is authorized."
         },
         "excludeAll": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of all 'Operation' related output.",
-          "description": "Is a shorthand means for setting all of the other 'Exclude*' properties to 'true'."
+          "title": "Indicates whether to exclude the generation of all \u0060Operation\u0060 related output.",
+          "description": "Is a shorthand means for setting all of the other \u0060Exclude*\u0060 properties to \u0060true\u0060."
         },
         "excludeIData": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'Data' interface ('IXxxData.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060Data\u0060 interface (\u0060IXxxData.cs\u0060) output."
         },
         "excludeData": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'Data' class ('XxxData.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060Data\u0060 class (\u0060XxxData.cs\u0060) output."
         },
         "excludeIDataSvc": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'DataSvc' interface ('IXxxDataSvc.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060DataSvc\u0060 interface (\u0060IXxxDataSvc.cs\u0060) output."
         },
         "excludeDataSvc": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'DataSvc' class ('XxxDataSvc.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060DataSvc\u0060 class (\u0060XxxDataSvc.cs\u0060) output."
         },
         "excludeIManager": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'Manager' interface ('IXxxManager.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060Manager\u0060 interface (\u0060IXxxManager.cs\u0060) output."
         },
         "excludeManager": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the 'Manager' class ('XxxManager.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the \u0060Manager\u0060 class (\u0060XxxManager.cs\u0060) output."
         },
         "excludeWebApi": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the WebAPI 'Controller' class ('XxxController.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the WebAPI \u0060Controller\u0060 class (\u0060XxxController.cs\u0060) output."
         },
         "excludeWebApiAgent": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the WebAPI consuming 'Agent' class ('XxxAgent.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the WebAPI consuming \u0060Agent\u0060 class (\u0060XxxAgent.cs\u0060) output."
         },
         "excludeGrpcAgent": {
           "type": "boolean",
-          "title": "Indicates whether to exclude the generation of the operation within the gRPC consuming 'Agent' class ('XxxAgent.cs') output."
+          "title": "Indicates whether to exclude the generation of the operation within the gRPC consuming \u0060Agent\u0060 class (\u0060XxxAgent.cs\u0060) output."
         },
         "grpc": {
           "type": "boolean",
           "title": "Indicates whether gRPC support (more specifically service-side) is required for the Operation.",
-          "description": "gRPC support is an explicit opt-in model (see 'CodeGeneration.Grpc' configuration); therefore, each corresponding 'Entity', 'Property' and 'Operation' will also need to be opted-in specifically."
+          "description": "gRPC support is an explicit opt-in model (see \u0060CodeGeneration.Grpc\u0060 configuration); therefore, each corresponding \u0060Entity\u0060, \u0060Property\u0060 and \u0060Operation\u0060 will also need to be opted-in specifically."
         },
         "parameters": {
           "type": "array",
-          "title": "The corresponding 'Parameter' collection.",
+          "title": "The corresponding \u0060Parameter\u0060 collection.",
           "items": {
             "$ref": "#/definitions/Parameter"
           }
@@ -1633,8 +1645,8 @@
     },
     "Parameter": {
       "type": "object",
-      "title": "'Parameter' object (entity-driven)",
-      "description": "The 'Parameter' object defines an 'Operation' parameter and its charateristics.",
+      "title": "\u0027Parameter\u0027 object (entity-driven)",
+      "description": "The \u0060Parameter\u0060 object defines an \u0060Operation\u0060 parameter and its charateristics.",
       "properties": {
         "name": {
           "type": "string",
@@ -1643,40 +1655,40 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the 'Text' will be the 'Name' reformatted as sentence casing."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing."
         },
         "type": {
           "type": "string",
-          "title": "The .NET 'Type'.",
-          "description": "Defaults to 'string'. To reference a Reference Data 'Type' always prefix with 'RefDataNamespace' (e.g. 'RefDataNamespace.Gender') or shortcut '^' (e.g. '^Gender'). This will ensure that the appropriate Reference Data 'using' statement is used. _Shortcut:_ Where the 'Type' starts with (prefix) 'RefDataNamespace.' or '^', and the correspondong 'RefDataType' attribute is not specified it will automatically default the 'RefDataType' to 'string.'"
+          "title": "The .NET \u0060Type\u0060.",
+          "description": "Defaults to \u0060string\u0060. To reference a Reference Data \u0060Type\u0060 always prefix with \u0060RefDataNamespace\u0060 (e.g. \u0060RefDataNamespace.Gender\u0060) or shortcut \u0060^\u0060 (e.g. \u0060^Gender\u0060). This will ensure that the appropriate Reference Data \u0060using\u0060 statement is used. _Shortcut:_ Where the \u0060Type\u0060 starts with (prefix) \u0060RefDataNamespace.\u0060 or \u0060^\u0060, and the correspondong \u0060RefDataType\u0060 attribute is not specified it will automatically default the \u0060RefDataType\u0060 to \u0060string.\u0060"
         },
         "nullable": {
           "type": "boolean",
-          "title": "Indicates whether the .NET Type should be declared as nullable; e.g. 'int?'. Will be inferred where the 'Type' is denoted as nullable; i.e. suffixed by a '?'. Where the .NET Type is not considered as an intrinsic type then will default to 'true'."
+          "title": "Indicates whether the .NET Type should be declared as nullable; e.g. \u0060int?\u0060. Will be inferred where the \u0060Type\u0060 is denoted as nullable; i.e. suffixed by a \u0060?\u0060. Where the .NET Type is not considered as an intrinsic type then will default to \u0060true\u0060."
         },
         "default": {
           "type": "string",
           "title": "The C# code to default the value.",
-          "description": "Where the 'Type' is 'string' then the specified default value will need to be delimited. Any valid value assignment C# code can be used."
+          "description": "Where the \u0060Type\u0060 is \u0060string\u0060 then the specified default value will need to be delimited. Any valid value assignment C# code can be used."
         },
         "privateName": {
           "type": "string",
           "title": "The overriding private name.",
-          "description": "Overrides the 'Name' to be used for private fields. By default reformatted from 'Name'; e.g. 'FirstName' as '_firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for private fields. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060_firstName\u0060."
         },
         "argumentName": {
           "type": "string",
           "title": "The overriding argument name.",
-          "description": "Overrides the 'Name' to be used for argument parameters. By default reformatted from 'Name'; e.g. 'FirstName' as 'firstName'."
+          "description": "Overrides the \u0060Name\u0060 to be used for argument parameters. By default reformatted from \u0060Name\u0060; e.g. \u0060FirstName\u0060 as \u0060firstName\u0060."
         },
         "property": {
           "type": "string",
-          "title": "The 'Property.Name' within the parent 'Entity' to copy (set) the configuration/characteristics from where not already defined."
+          "title": "The \u0060Property.Name\u0060 within the parent \u0060Entity\u0060 to copy (set) the configuration/characteristics from where not already defined."
         },
         "refDataType": {
           "type": "string",
           "title": "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).",
-          "description": "Defaults to 'string' where not specified and the corresponding 'Type' starts with (prefix) 'RefDataNamespace.'.",
+          "description": "Defaults to \u0060string\u0060 where not specified and the corresponding \u0060Type\u0060 starts with (prefix) \u0060RefDataNamespace.\u0060.",
           "enum": [
             "string",
             "int",
@@ -1685,21 +1697,21 @@
         },
         "refDataList": {
           "type": "boolean",
-          "title": "Indicates that the Reference Data property is to be a serializable list ('ReferenceDataSidList').",
-          "description": "This is required to enable a list of Reference Data values (as per 'RefDataType') to be passed as an argument for example."
+          "title": "Indicates that the Reference Data property is to be a serializable list (\u0060ReferenceDataSidList\u0060).",
+          "description": "This is required to enable a list of Reference Data values (as per \u0060RefDataType\u0060) to be passed as an argument for example."
         },
         "validator": {
           "type": "string",
-          "title": "The name of the .NET 'Type' that will perform the validation."
+          "title": "The name of the .NET \u0060Type\u0060 that will perform the validation."
         },
         "validatorCode": {
           "type": "string",
-          "title": "The fluent-style method-chaining C# validator code to append to 'IsMandatory' and 'Validator' (where specified)."
+          "title": "The fluent-style method-chaining C# validator code to append to \u0060IsMandatory\u0060 and \u0060Validator\u0060 (where specified)."
         },
         "validationFramework": {
           "type": "string",
-          "title": "The 'Validation' framework to use for the entity-based validation.",
-          "description": "Defaults to 'Operation.ValidationFramework'.",
+          "title": "The \u0060Validation\u0060 framework to use for the entity-based validation.",
+          "description": "Defaults to \u0060Operation.ValidationFramework\u0060.",
           "enum": [
             "CoreEx",
             "FluentValidation"
@@ -1707,12 +1719,12 @@
         },
         "isMandatory": {
           "type": "boolean",
-          "title": "Indicates whether a 'ValidationException' should be thrown when the parameter value has its default value (null, zero, etc)."
+          "title": "Indicates whether a \u0060ValidationException\u0060 should be thrown when the parameter value has its default value (null, zero, etc)."
         },
         "layerPassing": {
           "type": "string",
           "title": "The option that determines the layers in which the parameter is passed.",
-          "description": "Defaults to 'All'. To further describe, 'All' passes the parameter through all layeys, 'ToManagerSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' parameter, 'ToManagerCollSet' only passes the parameter to the 'Manager' layer and overrides the same named property within the corresponding 'value' collection parameter. Where using the 'PrimaryKey' option to automatically set 'Parameters', and the 'Operation.Type' is 'Create' or 'Update' it will default to 'ToManagerSet'.",
+          "description": "Defaults to \u0060All\u0060. To further describe, \u0060All\u0060 passes the parameter through all layeys, \u0060ToManagerSet\u0060 only passes the parameter to the \u0060Manager\u0060 layer and overrides the same named property within the corresponding \u0060value\u0060 parameter, \u0060ToManagerCollSet\u0060 only passes the parameter to the \u0060Manager\u0060 layer and overrides the same named property within the corresponding \u0060value\u0060 collection parameter. Where using the \u0060PrimaryKey\u0060 option to automatically set \u0060Parameters\u0060, and the \u0060Operation.Type\u0060 is \u0060Create\u0060 or \u0060Update\u0060 it will default to \u0060ToManagerSet\u0060.",
           "enum": [
             "All",
             "ToManagerSet",
@@ -1721,13 +1733,13 @@
         },
         "dataConverter": {
           "type": "string",
-          "title": "The data 'Converter' class name where specific data conversion is required.",
-          "description": "A 'Converter' is used to convert a data source value to/from a .NET 'Type' where no standard data conversion can be applied. Where this value is suffixed by '<T>' or '{T}' this will automatically set 'Type'."
+          "title": "The data \u0060Converter\u0060 class name where specific data conversion is required.",
+          "description": "A \u0060Converter\u0060 is used to convert a data source value to/from a .NET \u0060Type\u0060 where no standard data conversion can be applied. Where this value is suffixed by \u0060\u003CT\u003E\u0060 or \u0060{T}\u0060 this will automatically set \u0060Type\u0060."
         },
         "webApiFrom": {
           "type": "string",
           "title": "The option for how the parameter will be delcared within the Web API Controller.",
-          "description": "Defaults to 'FromQuery'; unless the parameter 'Type' has also been defined as an 'Entity' within the code-gen config file then it will default to 'FromEntityProperties'. Specifies that the parameter will be declared with corresponding 'FromQueryAttribute', 'FromBodyAttribute' or 'FromRouteAttribute' for the Web API method. The 'FromEntityProperties' will declare all properties of the 'Entity' as query parameters.",
+          "description": "Defaults to \u0060FromQuery\u0060; unless the parameter \u0060Type\u0060 has also been defined as an \u0060Entity\u0060 within the code-gen config file then it will default to \u0060FromEntityProperties\u0060. Specifies that the parameter will be declared with corresponding \u0060FromQueryAttribute\u0060, \u0060FromBodyAttribute\u0060 or \u0060FromRouteAttribute\u0060 for the Web API method. The \u0060FromEntityProperties\u0060 will declare all properties of the \u0060Entity\u0060 as query parameters.",
           "enum": [
             "FromQuery",
             "FromBody",
@@ -1738,7 +1750,7 @@
         "webApiText": {
           "type": "string",
           "title": "The overriding text for use in the Web API comments.",
-          "description": "By default the 'Text' will be the 'Name' reformatted as sentence casing."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing."
         },
         "grpcType": {
           "type": "string",
@@ -1751,8 +1763,8 @@
     },
     "Const": {
       "type": "object",
-      "title": "'Const' object (entity-driven)",
-      "description": "The 'Const' object is used to define a .NET (C#) constant value for an 'Entity'.",
+      "title": "\u0027Const\u0027 object (entity-driven)",
+      "description": "The \u0060Const\u0060 object is used to define a .NET (C#) constant value for an \u0060Entity\u0060.",
       "properties": {
         "name": {
           "type": "string",
@@ -1766,7 +1778,7 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the 'Text' will be the 'Name' reformatted as sentence casing. It will be formatted as: 'Represents a {text} constant value.' To create a '<see cref=\"XXX\"/>' within use moustache shorthand (e.g. '{{Xxx}}')."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. It will be formatted as: \u0060Represents a {text} constant value.\u0060 To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. \u0060{{Xxx}}\u0060)."
         }
       },
       "required": [

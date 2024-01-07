@@ -30,4 +30,11 @@ public partial interface IAccountManager
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>The selected <see cref="Balance"/> where found.</returns>
     Task<Result<Balance?>> GetBalanceAsync(string? accountId);
+
+    /// <summary>
+    /// Get <see cref="Account"/> statement (file).
+    /// </summary>
+    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    Task<Result<FileContentResult?>> GetStatementAsync(string? accountId);
 }

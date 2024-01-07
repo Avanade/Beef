@@ -30,4 +30,7 @@ public partial class AccountDataSvc : IAccountDataSvc
 
     /// <inheritdoc/>
     public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetBalanceAsync(accountId));
+
+    /// <inheritdoc/>
+    public Task<Result<FileContentResult?>> GetStatementAsync(string? accountId) => _data.GetStatementAsync(accountId);
 }

@@ -47,7 +47,11 @@ public partial class ContactManager : IContactManager
     public Task<Contact> UpdateAsync(Contact value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         value.Required().Id = id;
-        await value.Validate().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
+        await MultiValidator.Create()
+            .Add(id.Validate().Mandatory())
+            .Add(value.Validate().Mandatory().Entity().With<ContactValidator>())
+            .ValidateAsync(true).ConfigureAwait(false);
+
         return await _dataService.UpdateAsync(value).ConfigureAwait(false);
     }, InvokerArgs.Update);
 

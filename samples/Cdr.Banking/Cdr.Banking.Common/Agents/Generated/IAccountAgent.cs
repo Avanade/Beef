@@ -49,5 +49,14 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         Task<HttpResult<Balance?>> GetBalanceAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get <see cref="Account"/> statement (file).
+        /// </summary>
+        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> GetStatementAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 }

@@ -1,4 +1,4 @@
-﻿webapiRoutePrefix: ref
+﻿webApiRoutePrefix: ref
 //#if (implement_database)
 autoImplement: Database 
 refDataType: Guid

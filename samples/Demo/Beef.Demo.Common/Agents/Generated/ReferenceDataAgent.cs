@@ -38,36 +38,36 @@ namespace Beef.Demo.Common.Agents
             : base(client, jsonSerializer, executionContext, settings, logger) { }
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.CountryCollection>("api/v1/demo/ref/countries", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.CountryCollection>("api/v1/demo/ref/countries", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.USStateCollection>("api/v1/demo/ref/usStates", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.USStateCollection>("api/v1/demo/ref/usStates", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.StatusCollection>> StatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.StatusCollection>("api/v1/demo/ref/statuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.StatusCollection>> StatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.StatusCollection>("api/v1/demo/ref/statuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
-        public Task<HttpResult<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<RefDataNamespace.CommunicationTypeCollection>("api/v1/demo/ref/communicationTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<RefDataNamespace.CommunicationTypeCollection>> CommunicationTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<RefDataNamespace.CommunicationTypeCollection>("api/v1/demo/ref/communicationTypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
         /// <inheritdoc/>
         public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

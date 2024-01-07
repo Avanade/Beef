@@ -32,6 +32,9 @@ public partial class AccountData : IAccountData
     /// <inheritdoc/>
     public Task<Result<Balance?>> GetBalanceAsync(string? accountId) => GetBalanceOnImplementationAsync(accountId);
 
+    /// <inheritdoc/>
+    public Task<Result<FileContentResult?>> GetStatementAsync(string? accountId) => GetStatementOnImplementationAsync(accountId);
+
     /// <summary>
     /// Provides the <see cref="Account"/> to Entity Framework <see cref="Model.Account"/> mapping.
     /// </summary>

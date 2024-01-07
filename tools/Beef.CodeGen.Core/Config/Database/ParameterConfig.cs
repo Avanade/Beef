@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using DbEx.DbSchema;
-using Newtonsoft.Json;
 using OnRamp;
 using OnRamp.Config;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
@@ -14,7 +14,6 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the stored procedure parameter configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Parameter", Title = "'Parameter' object (database-driven)", 
         Description = "The `Parameter` is used to define a stored procedure parameter and its charateristics. These are in addition to those that are automatically inferred (added) by the selected `StoredProcedure.Type`.",
         ExampleMarkdown = @"A YAML example is as follows:
@@ -53,14 +52,14 @@ tables:
         /// <summary>
         /// Gets or sets the parameter name (without the `@` prefix).
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         [CodeGenProperty("Key", Title = "The parameter name (without the `@` prefix).", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding column name; used to infer characteristics.
         /// </summary>
-        [JsonProperty("column", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("column")]
         [CodeGenProperty("Key", Title = "The corresponding column name; used to infer characteristics.",
             Description = "Defaults to `Name`.")]
         public string? Column { get; set; }
@@ -68,14 +67,14 @@ tables:
         /// <summary>
         /// Gets or sets the SQL type definition (overrides inherited Column definition) including length/precision/scale.
         /// </summary>
-        [JsonProperty("sqlType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("sqlType")]
         [CodeGenProperty("Key", Title = "The SQL type definition (overrides inherited Column definition) including length/precision/scale.")]
         public string? SqlType { get; set; }
 
         /// <summary>
         /// Indicates whether the parameter is nullable.
         /// </summary>
-        [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("nullable")]
         [CodeGenProperty("Key", Title = "Indicates whether the parameter is nullable.",
             Description = "Note that when the parameter value is `NULL` it will not be included in the query.")]
         public bool? Nullable { get; set; }
@@ -83,21 +82,21 @@ tables:
         /// <summary>
         /// Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.
         /// </summary>
-        [JsonProperty("treatColumnNullAs", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("treatColumnNullAs")]
         [CodeGenProperty("Key", Title = "Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.")]
         public bool? TreatColumnNullAs { get; set; }
 
         /// <summary>
         /// Indicates whether the parameter is a collection (one or more values to be included `IN` the query).
         /// </summary>
-        [JsonProperty("collection", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collection")]
         [CodeGenProperty("Key", Title = "Indicates whether the parameter is a collection (one or more values to be included `IN` the query).")]
         public bool? Collection { get; set; }
 
         /// <summary>
         /// Gets or sets the where clause equality operator.
         /// </summary>
-        [JsonProperty("operator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("operator")]
         [CodeGenProperty("Key", Title = "The where clause equality operator", IsImportant = true, Options = new string[] { "EQ", "NE", "LT", "LE", "GT", "GE", "LIKE" },
             Description = "Defaults to `EQ`.")]
         public string? Operator { get; set; }
@@ -154,10 +153,7 @@ tables:
 
             SqlType = DefaultWhereNull(SqlType, () =>
             {
-                var c = Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn;
-                if (c == null)
-                    throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
-
+                var c = (Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn) ?? throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
                 var sb = new StringBuilder();
                 if (CompareValue(Collection, true))
                 {

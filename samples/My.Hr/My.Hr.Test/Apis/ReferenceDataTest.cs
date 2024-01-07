@@ -36,6 +36,6 @@ public class ReferenceDataTest : UsingApiTester<Startup>
         Agent<ReferenceDataAgent>()
             .Run(a => a.GetNamedAsync(new string[] { "Gender" }))
             .AssertOK()
-            .AssertJsonFromResource("RefDataGetNamed_Response.json", "items.id", "items.etag");
+            .AssertJsonFromResource("RefDataGetNamed_Response.json", "gender.id", "gender.etag", "gender.entitykey");
     }
 }

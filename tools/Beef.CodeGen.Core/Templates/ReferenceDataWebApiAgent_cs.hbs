@@ -43,8 +43,8 @@ namespace {{Root.NamespaceCommon}}.Agents
 
 {{#each RefDataEntities}}
         /// <inheritdoc/>
-        public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default) =>
-            GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
 {{/each}}
         /// <inheritdoc/>

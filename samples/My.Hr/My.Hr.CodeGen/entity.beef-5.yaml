@@ -95,7 +95,7 @@ entities:
       # - EventSubject is overridden so that the action component will be Terminated.
       # - AutoImplement is None as this will be implemented by the developer.
       # - An additional Id parameter is passed; in this instance we do not use the PrimaryKey as we require the value to be passed down all the layers.
-      { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
+      { name: Terminate, text: 'Terminates an existing {{Employee}}', type: Update, primaryKey: true, valueType: TerminationDetail, validator: TerminationDetailValidator, webApiRoute: '{id}/terminate', webApiMethod: HttpPost, eventSubject: 'Hr.Employee:Terminated', autoImplement: None,
         parameters: [
           { name: Id, type: Guid, text: '{{Employee}} identifier' }
         ]

@@ -21,6 +21,7 @@ global using CoreEx.RefData.Extended;
 global using CoreEx.Results;
 global using CoreEx.Validation;
 global using CoreEx.Validation.Rules;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Data.SqlClient;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;

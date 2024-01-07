@@ -365,6 +365,18 @@ public partial class PersonController : ControllerBase
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     public Task<IActionResult> PatchWithEf(Guid id)
         => _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
+
+    /// <summary>
+    /// Get Documentation.
+    /// </summary>
+    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    [HttpGet("api/v1/persons/{id}/documentation")]
+    [Produces("text/plain")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetDocumentation(Guid id)
+        => _webApi.GetAsync<FileContentResult>(Request, p => _manager.GetDocumentationAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 }
 
 #pragma warning restore

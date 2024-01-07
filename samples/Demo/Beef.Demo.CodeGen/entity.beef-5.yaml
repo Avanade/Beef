@@ -93,7 +93,11 @@ entities:
         parameters: [
           { name: Id, text: '{{Person}} identifier', type: Guid, isMandatory: true }
         ]},
-      { name: PatchWithEf, type: Patch, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework }
+      { name: PatchWithEf, type: Patch, validator: PersonValidator, primaryKey: true, webApiRoute: 'ef/{id}', autoImplement: EntityFramework },
+      { name: GetDocumentation, type: Custom, returnType: FileContentResult, webApiMethod: HttpGet, webApiRoute: '{id}/documentation', webApiProduces: [ text/plain ], webApiProducesResponseType: none,
+        parameters: [
+          { name: Id, text: '{{Person}} identifier', type: Guid, isMandatory: true }
+        ]}
     ]
   }
 

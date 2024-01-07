@@ -74,7 +74,10 @@ public partial class {{Name}}Controller : ControllerBase
   {{#if HasValue}}
     [AcceptsBody(typeof(Common.Entities.{{ValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
   {{/if}}
-    [ProducesResponseType({{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
+  {{#if WebApiProducesContentType}}
+    [Produces({{WebApiProducesContentType}})]
+  {{/if}}
+    [ProducesResponseType({{#if WebApiProducesResponseType}}{{#if IsWebApiProducesResponseTypeNone}}{{else}}typeof({{WebApiProducesResponseType}}), {{/if}}{{else}}{{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}{{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
   {{#if HasReturnValue}}
     {{#ifne WebApiAlternateStatus 'null'}}
     [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]
