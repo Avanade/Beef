@@ -48,9 +48,9 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByEmployeeIdAsync(4.ToGuid())).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(0, v.Items.Count);
+        Assert.That(v, Is.Not.Null);
+        Assert.That(v.Items, Is.Not.Null);
+        Assert.That(v.Items.Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -60,10 +60,10 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByEmployeeIdAsync(2.ToGuid())).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Work quality low.", "Work quality below standard." }, v.Items.Select(x => x.Notes).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.That(v.Items, Is.Not.Null);
+        Assert.That(v.Items, Has.Count.EqualTo(2));
+        Assert.That(v.Items.Select(x => x.Notes).ToArray(), Is.EqualTo(new string[] { "Work quality low.", "Work quality below standard." }));
     }
 
     [Test]
@@ -73,10 +73,10 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByEmployeeIdAsync(2.ToGuid(), PagingArgs.CreateSkipAndTake(0, 1))).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(1, v.Items.Count);
-        Assert.AreEqual(new string[] { "Work quality low." }, v.Items.Select(x => x.Notes).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.That(v.Items, Is.Not.Null);
+        Assert.That(v.Items, Has.Count.EqualTo(1));
+        Assert.That(v.Items.Select(x => x.Notes).ToArray(), Is.EqualTo(new string[] { "Work quality low." }));
     }
 
     #endregion
@@ -104,7 +104,7 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .ExpectEvent("myef.hr.performancereview", "created")
             .Run(a => a.CreateAsync(v, 3.ToGuid())).Value!;
 
-        Assert.AreEqual(3.ToGuid(), v.EmployeeId);
+        Assert.That(v.EmployeeId, Is.EqualTo(3.ToGuid()));
 
         // Check the value was created properly.
         Agent<PerformanceReviewAgent, PerformanceReview?>()

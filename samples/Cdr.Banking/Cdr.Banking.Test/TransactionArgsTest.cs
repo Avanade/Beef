@@ -19,12 +19,15 @@ namespace Cdr.Banking.Test
             var ta = new TransactionArgs();
             var r = await GenericTester.Create().Validation().WithAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
 
-            Assert.IsFalse(r!.Result.HasErrors);
-            Assert.AreEqual(DateTime.UtcNow.Date.AddDays(-90), ta.FromDate!.Value.Date);
-            Assert.IsNull(ta.ToDate);
-            Assert.IsNull(ta.MinAmount);
-            Assert.IsNull(ta.MaxAmount);
-            Assert.IsNull(ta.Text);
+            Assert.Multiple(() =>
+            {
+                Assert.That(r!.Result.HasErrors, Is.False);
+                Assert.That(ta.FromDate!.Value.Date, Is.EqualTo(DateTime.UtcNow.Date.AddDays(-90)));
+                Assert.That(ta.ToDate, Is.Null);
+                Assert.That(ta.MinAmount, Is.Null);
+                Assert.That(ta.MaxAmount, Is.Null);
+                Assert.That(ta.Text, Is.Null);
+            });
         }
 
         [Test]
@@ -33,12 +36,15 @@ namespace Cdr.Banking.Test
             var ta = new TransactionArgs { ToDate = new DateTime(2020, 03, 01) };
             var r = await GenericTester.Create().Validation().WithAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
 
-            Assert.IsFalse(r!.Result.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01).AddDays(-90), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
-            Assert.IsNull(ta.MinAmount);
-            Assert.IsNull(ta.MaxAmount);
-            Assert.IsNull(ta.Text);
+            Assert.Multiple(() =>
+            {
+                Assert.That(r!.Result.HasErrors, Is.False);
+                Assert.That(ta.FromDate, Is.EqualTo(new DateTime(2020, 03, 01).AddDays(-90)));
+                Assert.That(ta.ToDate, Is.EqualTo(new DateTime(2020, 03, 01)));
+                Assert.That(ta.MinAmount, Is.Null);
+                Assert.That(ta.MaxAmount, Is.Null);
+                Assert.That(ta.Text, Is.Null);
+            });
         }
 
         [Test]
@@ -47,12 +53,15 @@ namespace Cdr.Banking.Test
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 03, 01), MinAmount = 100m, MaxAmount = 100m, Text = "Best Buy" };
             var r = await GenericTester.Create().Validation().WithAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
 
-            Assert.IsFalse(r!.Result.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
-            Assert.AreEqual(100m, ta.MinAmount);
-            Assert.AreEqual(100m, ta.MaxAmount);
-            Assert.AreEqual("Best Buy", ta.Text);
+            Assert.Multiple(() =>
+            {
+                Assert.That(r!.Result.HasErrors, Is.False);
+                Assert.That(ta.FromDate, Is.EqualTo(new DateTime(2020, 03, 01)));
+                Assert.That(ta.ToDate, Is.EqualTo(new DateTime(2020, 03, 01)));
+                Assert.That(ta.MinAmount, Is.EqualTo(100m));
+                Assert.That(ta.MaxAmount, Is.EqualTo(100m));
+                Assert.That(ta.Text, Is.EqualTo("Best Buy"));
+            });
         }
 
         [Test]
@@ -61,12 +70,15 @@ namespace Cdr.Banking.Test
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 04, 01), MinAmount = 100m, MaxAmount = 120m, Text = "Best Buy" };
             var r = await GenericTester.Create().Validation().WithAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
 
-            Assert.IsFalse(r!.Result.HasErrors);
-            Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
-            Assert.AreEqual(new DateTime(2020, 04, 01), ta.ToDate);
-            Assert.AreEqual(100m, ta.MinAmount);
-            Assert.AreEqual(120m, ta.MaxAmount);
-            Assert.AreEqual("Best Buy", ta.Text);
+            Assert.Multiple(() =>
+            {
+                Assert.That(r!.Result.HasErrors, Is.False);
+                Assert.That(ta.FromDate, Is.EqualTo(new DateTime(2020, 03, 01)));
+                Assert.That(ta.ToDate, Is.EqualTo(new DateTime(2020, 04, 01)));
+                Assert.That(ta.MinAmount, Is.EqualTo(100m));
+                Assert.That(ta.MaxAmount, Is.EqualTo(120m));
+                Assert.That(ta.Text, Is.EqualTo("Best Buy"));
+            });
         }
 
         [Test]

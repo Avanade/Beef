@@ -106,7 +106,7 @@ namespace Beef.Demo.Test
                 .AssertETagHeader("\"MyTestETag\"");
 
             // Check that the etag flows all the way through.
-            Assert.AreEqual("\"MyTestETag\"", res.Response.Headers.ETag.Tag);
+            Assert.That(res.Response.Headers.ETag.Tag, Is.EqualTo("\"MyTestETag\""));
         }
 
         [Test, TestSetUp]

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.9.0
+- *Fixed:* Upgraded `CoreEx` (`v3.9.0`) to include all related fixes and improvements; including dependent `UnitTestEx`.
+- *Enhancement:* Updated the `dotnet new beef` template to default to `net8.0`.
+
 ## v5.8.0
 - *Fixed:* Upgraded `CoreEx` (`v3.8.0`) to include all related fixes and improvements; `WebApi` class supports returning value of `IActionResult` as-is.
 - *Enhancement:* Updated code-generation to support `IActionResult` return type for `WebApi` operations. The following `operation` YAML properties enable:

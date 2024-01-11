@@ -17,7 +17,7 @@ namespace Beef.Demo.Test
     public class ContactTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
+        public void OneTimeSetUp() => Assert.That(TestSetUp.Default.SetUp(), Is.True);
 
         [Test]
         public void A110_Get()
@@ -29,7 +29,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
             var etag = r.Response.Headers?.ETag?.Tag;
 
             r = test.Agent().With<ContactAgent, Contact>()
@@ -37,8 +37,8 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending", Communications = new ContactCommCollection { { "home", new ContactComm { Value = "411671953", IsPreferred = true } }, { "fax", new ContactComm { Value = "411123789" } } } })
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
-            Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.EqualTo(etag));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert", Status = "P", StatusDescription = "Pending" }, "Communications")
                 .Run(a => a.GetAsync(1.ToGuid()));
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
             var etag = r.Response.Headers?.ETag?.Tag;
 
             using var scope = test.Services.CreateScope();
@@ -142,24 +142,29 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => v)
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
-            Assert.AreNotEqual(etag, r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.EqualTo(etag));
 
             // Make sure the event is sent according to the outbox.
             using var scope2 = test.Services.CreateScope();
             db = scope2.ServiceProvider.GetRequiredService<IDatabase>();
-            Assert.AreEqual(new int[] { 1 }, db.SqlStatement("SELECT * FROM [Outbox].[EventOutbox]").SelectQueryAsync(dr =>
+            Assert.That(db.SqlStatement("SELECT * FROM [Outbox].[EventOutbox]").SelectQueryAsync(dr =>
             {
-                Assert.IsNotNull(dr.GetValue<DateTime?>("DequeuedDate"));
+                Assert.That(dr.GetValue<DateTime?>("DequeuedDate"), Is.Not.Null);
                 return 1;
-            }).GetAwaiter().GetResult());
+            }).GetAwaiter().GetResult(), Is.EqualTo(new int[] { 1 }));
 
-            Assert.AreEqual(new int[] { 1 }, db.SqlStatement("SELECT * FROM [Outbox].[EventOutboxData]").SelectQueryAsync(dr =>
+            v = null;
+
+            Assert.That(db.SqlStatement("SELECT * FROM [Outbox].[EventOutboxData]").SelectQueryAsync(dr =>
             {
-                Assert.AreEqual("Demo.Contact.00000001-0000-0000-0000-000000000000", dr.GetValue<string>("Subject"));
-                Assert.AreEqual("Update", dr.GetValue<string>("Action"));
+                Assert.Multiple(() =>
+                {
+                    Assert.That(dr.GetValue<string>("Subject"), Is.EqualTo("Demo.Contact.00000001-0000-0000-0000-000000000000"));
+                    Assert.That(dr.GetValue<string>("Action"), Is.EqualTo("Update"));
+                });
                 return 1;
-            }).GetAwaiter().GetResult());
+            }).GetAwaiter().GetResult(), Is.EqualTo(new int[] { 1 }));
         }
 
         [Test]
@@ -171,15 +176,15 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
             var etag = r.Response.Headers?.ETag?.Tag;
 
             r = test.Agent().With<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
-            Assert.NotNull(r.Response.Headers?.ETag?.Tag);
-            Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.Not.Null);
+            Assert.That(r.Response.Headers?.ETag?.Tag, Is.EqualTo(etag));
 
             var v = r.Value.Items[0];
             v.LastName += "X";
@@ -194,8 +199,8 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
-            Assert.NotNull(r2.Response.Headers?.ETag?.Tag);
-            Assert.AreNotEqual(etag, r2.Response.Headers?.ETag?.Tag);
+            Assert.That(r2.Response.Headers?.ETag?.Tag, Is.Not.Null);
+            Assert.That(r2.Response.Headers?.ETag?.Tag, Is.Not.EqualTo(etag));
         }
 
         [Test]
@@ -220,11 +225,11 @@ namespace Beef.Demo.Test
 
             // Assert that there is only 1 single delete event.
             var count = db.SqlStatement($"SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Demo.Contact.{1.ToGuid()}' and [Action] = 'Delete'").ScalarAsync<int>().GetAwaiter().GetResult();
-            Assert.AreEqual(1, count);
+            Assert.That(count, Is.EqualTo(1));
 
             // Make sure that the contact was logically deleted; not physically.
             count = db.SqlStatement($"SELECT COUNT(*) FROM [Demo].[Contact] WHERE [ContactId] = '{1.ToGuid()}' and [IsDeleted] = '1'").ScalarAsync<int>().GetAwaiter().GetResult();
-            Assert.AreEqual(1, count);
+            Assert.That(count, Is.EqualTo(1));
         }
 
         [Test]
@@ -239,7 +244,7 @@ namespace Beef.Demo.Test
             using var scope = test.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
             var count = db.SqlStatement("SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
-            Assert.AreEqual(0, count);
+            Assert.That(count, Is.EqualTo(0));
         }
 
         [Test]
@@ -254,7 +259,7 @@ namespace Beef.Demo.Test
             using var scope = test.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<IDatabase>();
             var count = db.SqlStatement("SELECT COUNT(*) FROM [Outbox].[EventOutboxData] WHERE [Subject] = 'Contact' and [Action] = 'Made'").ScalarAsync<int>().GetAwaiter().GetResult();
-            Assert.AreEqual(1, count);
+            Assert.That(count, Is.EqualTo(1));
         }
     }
 }

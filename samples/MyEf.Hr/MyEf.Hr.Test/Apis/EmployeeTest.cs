@@ -69,7 +69,7 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag })).Value!;
 
-        Assert.NotNull(v);
+        Assert.That(v, Is.Not.Null);
 
         Agent<EmployeeAgent, Employee?>()
             .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -83,8 +83,8 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions { IncludeText = true})).Value!;
 
-        Assert.NotNull(v);
-        Assert.AreEqual("Female", v.GenderText);
+        Assert.That(v, Is.Not.Null);
+        Assert.That(v.GenderText, Is.EqualTo("Female"));
     }
 
     [Test]
@@ -107,10 +107,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(null)).Value;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(3, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Jones", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(3));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smithers" }));
+        });
     }
 
     [Test]
@@ -121,10 +124,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { IsIncludeTerminated = true }, PagingArgs.CreateSkipAndTake(1,2)));
 
         var v = r.Value;
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith" }));
+        });
 
         // Query again with etag and ensure not modified.
         Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
@@ -139,10 +145,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { FirstName = "*a*" })).Value;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Smithers" }));
+        });
     }
 
     [Test]
@@ -152,10 +161,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*" })).Value;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(1, v.Items.Count);
-        Assert.AreEqual(new string[] { "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(1));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smithers" }));
+        });
     }
 
     [Test]
@@ -165,10 +177,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", IsIncludeTerminated = true })).Value;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Smith", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+        });
     }
 
     [Test]
@@ -178,10 +193,13 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } })).Value;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v!.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Jones" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null);
+            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+        });
     }
 
     [Test]
@@ -209,11 +227,14 @@ public class EmployeeTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }));
 
-        Assert.IsNotNull(r.Value);
-        Assert.IsNotNull(r.Value!.Items);
-        Assert.AreEqual(2, r.Value.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Jones" }, r.Value.Items.Select(x => x.LastName).ToArray());
-        Assert.AreEqual(new string[] { "Female", "Female" }, r.Value.Items.Select(x => x.GenderText).ToArray());
+        Assert.That(r.Value, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(r.Value!.Items, Is.Not.Null);
+            Assert.That(r.Value.Items, Has.Count.EqualTo(2));
+            Assert.That(r.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+            Assert.That(r.Value.Items.Select(x => x.GenderText).ToArray(), Is.EqualTo(new string[] { "Female", "Female" }));
+        });
     }
 
     [Test]

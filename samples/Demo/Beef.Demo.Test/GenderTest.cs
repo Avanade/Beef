@@ -21,7 +21,7 @@ namespace Beef.Demo.Test
         {
             ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer().ToUnitTestEx());
             ApiTester.UseExpectedEvents();
-            Assert.IsTrue(ApiTester.SetUp.SetUp());
+            Assert.That(ApiTester.SetUp.SetUp(), Is.True);
 
             _genders = Agent<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)

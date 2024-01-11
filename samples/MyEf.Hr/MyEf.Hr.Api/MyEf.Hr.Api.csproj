@@ -6,8 +6,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.8.1" />
-    <PackageReference Include="CoreEx.Azure" Version="3.8.1" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.9.0" />
+    <PackageReference Include="CoreEx.Azure" Version="3.9.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />

@@ -7,7 +7,7 @@ public class SecuritySubscriberFunctionTest
     public void InvalidMessage_DeadLetter()
     {
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWebJobsServiceBusMessageActions();
         var message = test.CreateServiceBusMessageFromValue<string>(null!);
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
@@ -21,7 +21,7 @@ public class SecuritySubscriberFunctionTest
     public void NotSubscribed_CompleteSilent()
     {
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWebJobsServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(new EventData { Subject = "myef.hr.employee", Action = "updated", Source = new Uri("test", UriKind.Relative) });
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()

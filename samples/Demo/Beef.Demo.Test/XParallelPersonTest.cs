@@ -46,7 +46,7 @@ namespace Beef.Demo.Test
             var r = Agent<PersonAgent, Person>()
                 .Run(a => a.UpdateAsync(pr, 1.ToGuid())).Response;
 
-            Assert.NotNull(r);
+            Assert.That(r, Is.Not.Null);
             if (r.IsSuccessStatusCode) // i.e. HttpStatusCode.OK
                 return;
 

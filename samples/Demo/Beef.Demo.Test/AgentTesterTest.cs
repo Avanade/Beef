@@ -15,14 +15,17 @@ namespace Beef.Demo.Test
     public class AgentTesterTest : UsingAgentTesterServer<Startup>
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => Assert.IsTrue(ApiTester.SetUp.SetUp());
+        public void OneTimeSetUp() => Assert.That(ApiTester.SetUp.SetUp(), Is.True);
 
         [Test, TestSetUp("USER_NAME")]
         public void A010_UserDefault()
         {
-            // Make sure the user is set up from the TestSetUp attribute.
-            Assert.IsTrue(ExecutionContext.HasCurrent);
-            Assert.AreEqual("USER_NAME", ExecutionContext.Current.UserName);
+            Assert.Multiple(() =>
+            {
+                // Make sure the user is set up from the TestSetUp attribute.
+                Assert.That(ExecutionContext.HasCurrent, Is.True);
+                Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("USER_NAME"));
+            });
 
             // Execute test without passing in a user.
             AgentTester.Test<PersonAgent, Person>()
@@ -31,22 +34,31 @@ namespace Beef.Demo.Test
                 .IgnoreETag()
                 .Run(a =>
                     {
-                        Assert.IsTrue(ExecutionContext.HasCurrent);
-                        Assert.AreEqual("USER_NAME", ExecutionContext.Current.UserName);
+                        Assert.Multiple(() =>
+                        {
+                            Assert.That(ExecutionContext.HasCurrent, Is.True);
+                            Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("USER_NAME"));
+                        });
                         return a.GetAsync(1.ToGuid());
                     });
 
-            // Mare sure the user has not changed.
-            Assert.IsTrue(ExecutionContext.HasCurrent);
-            Assert.AreEqual("USER_NAME", ExecutionContext.Current.UserName);
+            Assert.Multiple(() =>
+            {
+                // Mare sure the user has not changed.
+                Assert.That(ExecutionContext.HasCurrent, Is.True);
+                Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("USER_NAME"));
+            });
         }
 
         [Test, TestSetUp("USER_NAME")]
         public void A020_UserOverride()
         {
-            // Make sure the user is set up from the TestSetUp attribute.
-            Assert.IsTrue(ExecutionContext.HasCurrent);
-            Assert.AreEqual("USER_NAME", ExecutionContext.Current.UserName);
+            Assert.Multiple(() =>
+            {
+                // Make sure the user is set up from the TestSetUp attribute.
+                Assert.That(ExecutionContext.HasCurrent, Is.True);
+                Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("USER_NAME"));
+            });
 
             // Execute test overriding the user.
             AgentTester.Test<PersonAgent, Person>("ANOTHER_USER")
@@ -55,14 +67,20 @@ namespace Beef.Demo.Test
                 .IgnoreETag()
                 .Run(a =>
                 {
-                    Assert.IsTrue(ExecutionContext.HasCurrent);
-                    Assert.AreEqual("ANOTHER_USER", ExecutionContext.Current.UserName);
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(ExecutionContext.HasCurrent, Is.True);
+                        Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("ANOTHER_USER"));
+                    });
                     return a.GetAsync(1.ToGuid());
                 });
 
-            // Make sure that the user has changed back.
-            Assert.IsTrue(ExecutionContext.HasCurrent);
-            Assert.AreEqual("USER_NAME", ExecutionContext.Current.UserName);
+            Assert.Multiple(() =>
+            {
+                // Make sure that the user has changed back.
+                Assert.That(ExecutionContext.HasCurrent, Is.True);
+                Assert.That(ExecutionContext.Current.UserName, Is.EqualTo("USER_NAME"));
+            });
         }
     }
 }
