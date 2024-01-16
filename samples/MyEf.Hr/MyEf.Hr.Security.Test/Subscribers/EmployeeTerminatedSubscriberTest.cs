@@ -8,7 +8,7 @@ public class EmployeeTerminatedSubscriberTest
     {
         using var test = FunctionTester.Create<Startup>();
         var message = test.CreateServiceBusMessage(new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = null! });
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .Run(f => f.RunAsync(message, actions, default))
@@ -22,7 +22,7 @@ public class EmployeeTerminatedSubscriberTest
     {
         using var test = FunctionTester.Create<Startup>();
         var message = test.CreateServiceBusMessage(new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee() });
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
 
         test.ServiceBusTrigger<SecuritySubscriberFunction>()
             .ExpectLogContains("A data validation error occurred")
@@ -40,7 +40,7 @@ public class EmployeeTerminatedSubscriberTest
         mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.WithJson("[]", HttpStatusCode.OK);
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
@@ -62,7 +62,7 @@ public class EmployeeTerminatedSubscriberTest
         mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.WithJson("[{},{}]", HttpStatusCode.OK);
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
@@ -84,7 +84,7 @@ public class EmployeeTerminatedSubscriberTest
         mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.With(HttpStatusCode.Forbidden);
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateWebJobsServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
@@ -111,7 +111,7 @@ public class EmployeeTerminatedSubscriberTest
         });
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateWebJobsServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
@@ -134,7 +134,7 @@ public class EmployeeTerminatedSubscriberTest
         mc.Request(HttpMethod.Post, "/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/deactivate?sendEmail=true").Respond.With(HttpStatusCode.OK);
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateWebJobsServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 
@@ -155,7 +155,7 @@ public class EmployeeTerminatedSubscriberTest
         mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.WithJson(new [] { new { id = "00ub0oNGTSWTBKOLGLNR", status = "DEACTIVATED" } });
 
         using var test = FunctionTester.Create<Startup>();
-        var actions = test.CreateWebJobsServiceBusMessageActions();
+        var actions = test.CreateWorkerServiceBusMessageActions();
         var message = test.CreateServiceBusMessage(
             new EventData<Employee> { Subject = "myef.hr.employee", Action = "terminated", Source = new Uri("test", UriKind.Relative), Value = new Employee { Id = 1.ToGuid(), Email = "bob@email.com", Termination = new() } });
 

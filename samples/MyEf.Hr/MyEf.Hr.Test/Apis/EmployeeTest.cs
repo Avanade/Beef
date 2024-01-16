@@ -57,7 +57,7 @@ public class EmployeeTest : UsingApiTester<Startup>
                 StartDate = new DateTime(2001, 01, 22),
                 PhoneNo = "(428) 893 2793",
                 Address = new Address { Street1 = "8365 851 PL NE", City = "Redmond", State = "WA", PostCode = "98052" },
-                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { Id = 401.ToGuid(), FirstName = "Michael", LastName = "Manners", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
+                EmergencyContacts = [new EmergencyContact { Id = 401.ToGuid(), FirstName = "Michael", LastName = "Manners", PhoneNo = "(234) 297 9834", Relationship = "FRD" }]
             })
             .Run(a => a.GetAsync(4.ToGuid()));
     }
@@ -110,8 +110,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(3));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(3));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smithers" }));
         });
     }
@@ -127,8 +126,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith" }));
         });
 
@@ -148,8 +146,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Smithers" }));
         });
     }
@@ -164,8 +161,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(1));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(1));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smithers" }));
         });
     }
@@ -180,8 +176,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
         });
     }
@@ -191,13 +186,12 @@ public class EmployeeTest : UsingApiTester<Startup>
     {
         var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } })).Value;
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["F"] })).Value;
 
         Assert.That(v, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(v!.Items, Is.Not.Null);
-            Assert.That(v.Items, Has.Count.EqualTo(2));
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
             Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
         });
     }
@@ -207,7 +201,7 @@ public class EmployeeTest : UsingApiTester<Startup>
     {
         Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", Genders = new List<string?> { "F" } }))
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { LastName = "s*", FirstName = "b*", Genders = ["F"] }))
             .AssertJson("[]");
     }
 
@@ -216,7 +210,7 @@ public class EmployeeTest : UsingApiTester<Startup>
     {
         var r = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions().Include("firstname", "lastname")))
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["F"] }, requestOptions: new HttpRequestOptions().Include("firstname", "lastname")))
             .AssertJson("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]");
     }
 
@@ -225,13 +219,12 @@ public class EmployeeTest : UsingApiTester<Startup>
     {
         var r = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }));
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["F"] }, requestOptions: new HttpRequestOptions { IncludeText = true }));
 
         Assert.That(r.Value, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(r.Value!.Items, Is.Not.Null);
-            Assert.That(r.Value.Items, Has.Count.EqualTo(2));
+            Assert.That(r.Value.Items, Is.Not.Null.And.Count.EqualTo(2));
             Assert.That(r.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
             Assert.That(r.Value.Items.Select(x => x.GenderText).ToArray(), Is.EqualTo(new string[] { "Female", "Female" }));
         });
@@ -243,7 +236,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.BadRequest)
             .ExpectErrors("Genders contains one or more invalid items.")
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "Q" } }));
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["Q"] }));
     }
 
     #endregion
@@ -263,7 +256,7 @@ public class EmployeeTest : UsingApiTester<Startup>
             StartDate = Cleaner.Clean(DateTime.Today, DateTimeTransform.DateOnly),
             PhoneNo = "(456) 789 0123",
             Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", State = "WA", PostCode = "98101" },
-            EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
+            EmergencyContacts = [new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" }]
         };
 
         // Create value.

@@ -21,7 +21,7 @@ public class ReferenceDataTest : UsingApiTester<Startup>
     public void A120_GendersFilter()
     {
         Agent<ReferenceDataAgent, GenderCollection>()
-            .Run(a => a.GenderGetAllAsync(new ReferenceDataFilter { Codes = new string[] { "F" } }))
+            .Run(a => a.GenderGetAllAsync(new ReferenceDataFilter { Codes = ["F"] }))
             .AssertOK()
             .AssertJsonFromResource("RefDataGendersFilter_Response.json", "id", "etag");
     }
@@ -30,8 +30,8 @@ public class ReferenceDataTest : UsingApiTester<Startup>
     public void A130_GetNamed()
     {
         Agent<ReferenceDataAgent>()
-            .Run(a => a.GetNamedAsync(new string[] { "Gender" }))
+            .Run(a => a.GetNamedAsync(["Gender"]))
             .AssertOK()
-            .AssertJsonFromResource("RefDataGetNamed_Response.json", "gender.id", "gender.etag", "gender.entitykey");
+            .AssertJsonFromResource("RefDataGetNamed_Response.json", "gender.id", "gender.etag");
     }
 }

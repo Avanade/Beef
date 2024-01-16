@@ -49,8 +49,7 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .Run(a => a.GetByEmployeeIdAsync(4.ToGuid())).Value!;
 
         Assert.That(v, Is.Not.Null);
-        Assert.That(v.Items, Is.Not.Null);
-        Assert.That(v.Items.Count, Is.EqualTo(0));
+        Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(0));
     }
 
     [Test]
@@ -61,8 +60,7 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .Run(a => a.GetByEmployeeIdAsync(2.ToGuid())).Value!;
 
         Assert.That(v, Is.Not.Null);
-        Assert.That(v.Items, Is.Not.Null);
-        Assert.That(v.Items, Has.Count.EqualTo(2));
+        Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
         Assert.That(v.Items.Select(x => x.Notes).ToArray(), Is.EqualTo(new string[] { "Work quality low.", "Work quality below standard." }));
     }
 
@@ -74,8 +72,7 @@ public class PerformanceReviewTest : UsingApiTester<Startup>
             .Run(a => a.GetByEmployeeIdAsync(2.ToGuid(), PagingArgs.CreateSkipAndTake(0, 1))).Value!;
 
         Assert.That(v, Is.Not.Null);
-        Assert.That(v.Items, Is.Not.Null);
-        Assert.That(v.Items, Has.Count.EqualTo(1));
+        Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(1));
         Assert.That(v.Items.Select(x => x.Notes).ToArray(), Is.EqualTo(new string[] { "Work quality low." }));
     }
 

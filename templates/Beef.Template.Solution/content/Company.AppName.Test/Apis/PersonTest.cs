@@ -7,7 +7,7 @@ public class PersonTest : UsingApiTester<Startup>
 {
 #if (!implement_httpagent)
     [OneTimeSetUp]
-    public void OneTimeSetUp() => Assert.IsTrue(TestSetUp.Default.SetUp());
+    public void OneTimeSetUp() => Assert.That(TestSetUp.Default.SetUp(), Is.True);
 #endif
 
     #region Get
@@ -85,7 +85,7 @@ public class PersonTest : UsingApiTester<Startup>
             .Run(a => a.GetAsync(1, new HttpRequestOptions { ETag = TestSetUp.Default.ConcurrencyErrorETag })).Value!;
 #endif
 
-        Assert.NotNull(v);
+        Assert.That(v, Is.Not.Null);
 
         Agent<PersonAgent, Person?>()
             .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -108,10 +108,12 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(null)).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(4, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(4));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+        });
     }
 
     [Test]
@@ -121,10 +123,12 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(null, PagingArgs.CreateSkipAndTake(1, 2))).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Jones", "Smith" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith" }));
+        });
     }
 
     [Test]
@@ -134,10 +138,12 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new PersonArgs { FirstName = "*a*" })).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(3, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Smith", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(3));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Smith", "Smithers" }));
+        });
     }
 
     [Test]
@@ -147,10 +153,12 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*" })).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Smith", "Smithers" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+        });
     }
 
     [Test]
@@ -158,12 +166,14 @@ public class PersonTest : UsingApiTester<Startup>
     {
         var v = Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string?> { "F" } })).Value!;
+            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = ["F"] })).Value!;
 
-        Assert.IsNotNull(v);
-        Assert.IsNotNull(v.Items);
-        Assert.AreEqual(2, v.Items.Count);
-        Assert.AreEqual(new string[] { "Browne", "Jones" }, v.Items.Select(x => x.LastName).ToArray());
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+        });
     }
 
     [Test]
@@ -171,7 +181,7 @@ public class PersonTest : UsingApiTester<Startup>
     {
         Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", Genders = new List<string?> { "F" } }))
+            .Run(a => a.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", Genders = ["F"] }))
             .AssertJson("[]");
     }
 
@@ -180,7 +190,7 @@ public class PersonTest : UsingApiTester<Startup>
     {
         Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions().Include("firstname", "lastname")))
+            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = ["F"] }, requestOptions: new HttpRequestOptions().Include("firstname", "lastname")))
             .AssertJson("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]");
     }
 
@@ -189,7 +199,7 @@ public class PersonTest : UsingApiTester<Startup>
     {
         var r = Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = new List<string?> { "F" } }, requestOptions: new HttpRequestOptions { IncludeText = true }))
+            .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = ["F"] }, requestOptions: new HttpRequestOptions { IncludeText = true }))
             .AssertJsonFromResource("A280_GetByArgs_RefDataText-Response.json", "etag", "changeLog");
     }
 

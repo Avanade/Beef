@@ -2,7 +2,9 @@
 
 At a high-level this represents the subscribing of events/messages from Azure Service Bus to meet the stated requirements of when an Employee is _terminated_ that the Employee's User Account will be automatically _deactivated_ within OKTA.
 
-This article contains an end-to-end walkthrough to build the requisite Azure Function.
+This article contains an end-to-end walkthrough to build the requisite Azure Function. 
+
+> _Note:_ as of `Beef` (`v5.9.0`), and corresponding `CoreEx` ([`v3.9.0`](https://github.com/Avanade/CoreEx/blob/main/CHANGELOG.md#v390)), [isolated](https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide) Azure Function support was added. This documentation and example have been updated accordingly.
 
 <br/>
 
@@ -37,7 +39,7 @@ Class | Description
 
 ## Service Bus subscribing
 
-The [`CoreEx.Azure.ServiceBus`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Azure/ServiceBus) capabilities will be leveraged to manage the underlying processing once triggered. This has the advantage of enabling standardized, consistent, and tested, functionality to further industrailize event/messaging subscription services.
+The [`CoreEx.Azure.ServiceBus`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Azure/ServiceBus) capabilities will be leveraged to manage the underlying processing once triggered. This has the advantage of enabling standardized, consistent, and tested, functionality to further industrialize event/messaging subscription services.
 
 There are two Azure Service Bus subscribing capabilities that both inherit from the aforementioned `EventSubscriberBase`. These each also leverage the [`ServiceBusSubscriberInvoker`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Azure/ServiceBus/ServiceBusSubscriberInvoker.cs) that ensures consistency of logging, exception handling, associated [`ServiceBusMessageActions`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebus.servicebusmessageactions) management to perform the corresponding `CompleteMessageAsync` or `DeadLetterMessageAsync`, and finally message bubbling to enable retries where the error is considered transient in nature.
 
@@ -60,11 +62,14 @@ This sample has used a basic queue for simplicity.
 
 ## Create Azure Function project
 
-From Visual Studio, add a new Project named `MyEf.Hr.Security.Subscriptions` (within the existing `MyEf.Hr` solution) leveraging the _Azure Functions_ project template. On the additional information page of the wizard, enter the following, then _Create_ for the new `SecuritySubscriberFunction` function.
+From Visual Studio, add a new Project named `MyEf.Hr.Security.Subscriptions` (within the existing `MyEf.Hr` solution) leveraging the _Azure Functions_ project template. 
+
+On the additional information page of the wizard, enter the following, then _Create_ for the new `SecuritySubscriberFunction` function.
 
 Property | Value
 -|-
-Functions worker | `.NET 6.0 (Long Term Support)`
+Functions worker | `.NET 8.0 Isolated (Long Term Support)`
+Function | `Service Bus Queue Trigger`
 Connection string setting name | `ServiceBusConnectionString`
 Queue name | `%ServiceBusQueueName%`
 
@@ -76,10 +81,8 @@ Then complete the following house cleaning tasks within the newly created projec
 
 Update project dependencies as follows.
 
-1. Update the `Microsoft.Azure.WebJobs.Extensions.ServiceBus` NuGet package dependency to latest `5.x.x` version.
-2. Add the `Microsoft.Azure.Functions.Extensions` NuGet package as a dependency to enable Dependency Injection (DI). 
-3. Add the `CoreEx.Azure` and `CoreEx.Validation` NuGet packages as dependencies.
-4. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
+1. Add the `CoreEx.Azure` and `CoreEx.Validation` NuGet packages as dependencies.
+2. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
 
 <br/>
 
@@ -87,36 +90,24 @@ Update project dependencies as follows.
 
 Open the `host.json` file and replace with the contents from [`host.json`](../MyEf.Hr.Security.Subscriptions/host.json). 
 
-The [configuration](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus) within will ensure that _only_ a _single_ message can be processed at a time, and that there is also _no_ automatic completion of messages.
+The bindings configuration [documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus) will assist with understanding and further configuring.
 
 <br/>
 
 ### Local settings
 
-Open the `local.settings.json` file and replace `Values` JSON with the following.
+Open the `local.settings.json` file and replace `Values` JSON with the following; including your actual connection string secret.
 
 ``` json
 {
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "ServiceBusConnectionString": "get-your-secret-and-paste-here",
     "ServiceBusQueueName": "event-stream"
   }
 }
-```
-
-<br/>
-
-### Project JSON
-
-Open the `MyEf.Hr.Security.Subscriptions` project XML file and add the following within the `<PropertyGroup>` XML element. This is needed to resolve an issue related to the usage of `System.Memory.Data v6.0.0`.
-
-``` xml
-<!-- Following needed as per: https://github.com/Azure/azure-functions-core-tools/issues/2872 -->
-<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
-<Nullable>enable</Nullable>
 ```
 
 <br/>
@@ -127,9 +118,15 @@ Create a new `GlobalUsings.cs` file, then copy in the contents from [`GlobalUsin
 
 <br/>
 
+### Program host
+
+Open the `Program.cs` file and replace with the contents from [`Program.cs`](../MyEf.Hr.Security.Subscriptions/Program.cs). This is essentially the same as the default; however, a `Startup` class is now referenced using `ConfigureHostStartup`. This is a `CoreEx.Hosting` extension method that will enable the requisite [Dependency Injection](#Dependency_injection) to also be used within unit testing.
+
+<br/>
+
 ### Dependency injection
 
-[Dependency Injection](https://learn.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection) needs to be added to the Project as this is not enabled by default. To enable, create a new `Startup.cs` file, then copy in the contents from [`Startup`](../MyEf.Hr.Security.Subscriptions/Startup.cs) replacing existing. For the most part the required `CoreEx` services are being registered.
+Dependency Injection needs to be added, which is also accessible from unit tests. To enable, create a new `Startup.cs` file, then copy in the contents from [`Startup`](../MyEf.Hr.Security.Subscriptions/Startup.cs). For the most part the required `CoreEx` services are being registered.
 
 The Service Bus subscribing requires the following additional services registered.
 
@@ -161,23 +158,22 @@ The aforementioned services registration code of interest is as follows.
 
 This represents the Azure Service Bus trigger subscription entry point; i.e. what is the registered function logic to be executed by the Azure Function runtime fabric. This requires the use of Dependency Injection to access the registered `ServiceBusOrchestratedSubscriber` to orchestrate the underlying subscribers. 
 
-The function method signature must include the [ServiceBusTrigger](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebustriggerattribute) attribute to specify the queue or topic/subscription related properties, sessions support, as well as the Service Bus connection string name. Finally, for the `ServiceBusOrchestratedSubscriber` to function correctly the `ServiceBusReceivedMessage` and `ServiceBusMessageActions` parameters must be specified and passed into the `ServiceBusOrchestratedSubscriber.ReceiveAsync`. Note: do _not_ under any circumstances use `AutoCompleteMessages` as completion is managed internally.
+The function method signature must include the [ServiceBusTrigger](https://learn.microsoft.com/en-us/dotnet/api/microsoft.azure.webjobs.servicebustriggerattribute) attribute to specify the queue or topic/subscription related properties, sessions support, as well as the Service Bus connection string name. Finally, for the `ServiceBusOrchestratedSubscriber` to function correctly the `ServiceBusReceivedMessage` and `ServiceBusMessageActions` parameters must be specified and passed into the `ServiceBusOrchestratedSubscriber.ReceiveAsync`. 
+
+> Note: do **not** under any circumstances use `AutoCompleteMessages` as completion is managed internally.
 
 Rename the `Function1.cs` to `SecuritySubscriberFunction.cs` where this did not occur correctly. Copy and replace the contents from the following.
 
 ``` csharp
 namespace MyEf.Hr.Security.Subscriptions;
 
-public class SecuritySubscriberFunction
+public class SecuritySubscriberFunction(ServiceBusOrchestratedSubscriber subscriber)
 {
-    private readonly ServiceBusOrchestratedSubscriber _subscriber;
+    private readonly ServiceBusOrchestratedSubscriber _subscriber = subscriber.ThrowIfNull();
 
-    public SecuritySubscriberFunction(ServiceBusOrchestratedSubscriber subscriber) => _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
-
-    [Singleton(Mode = SingletonMode.Function)]
-    [FunctionName(nameof(SecuritySubscriberFunction))]
+    [Function(nameof(SecuritySubscriberFunction))]
     public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions, CancellationToken cancellationToken)
-        => _subscriber.ReceiveAsync(message, messageActions, cancellationToken);
+        => _subscriber.ReceiveAsync(message, messageActions, null, cancellationToken);
 }
 ```
 
@@ -348,8 +344,8 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
     public override Task<Result> ReceiveAsync(EventData<Employee> @event, EventSubscriberArgs args, CancellationToken cancellationToken) 
         => Result.GoAsync(_okta.GetUserAsync(@event.Value.Id, @event.Value.Email!))
-                 .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
-                 .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
+             .When(user => !user.IsDeactivatable, user => _logger.LogWarning("Employee {EmployeeId} with email {Email} has User status of {UserStatus} and is therefore unable to be deactivated.", @event.Value.Id, @event.Value.Email, user.Status))
+             .WhenAsAsync(user => user.IsDeactivatable, user => _okta.DeactivateUserAsync(user.Id!));
 }
 ```
 
@@ -359,7 +355,7 @@ public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
 
 There is generally no specific provision for the unit testing of Azure Functions, and related Azure Service Bus trigger, as it requires a dependent messaging subsystem, being Azure Service Bus. Also, at time of writing, there is not a standard means of hosting the Azure Function in process to verify in a unit testing context; especially where the likes of Dependency Injection (DI) is being leveraged.
 
-However, given the complexity of logic that typically resides within there should be _strong_ desire to verfiy via unit tests. To enable Avanade has created _UnitTestEx_ which supports the unit testing of [Service Bus-trigger Azure Functions](https://github.com/Avanade/unittestex#service-bus-trigger-azure-function). This capability assumes that Dependency Injection (DI) is being leveraged, and will create the underlying host and enable a `ServiceBusReceivedMessage` to be sent simulating the Azure Function runtime capability.
+However, given the complexity of logic that typically resides within there should be a _strong_ desire to verfiy via unit tests. To enable Avanade has created _UnitTestEx_ which supports the unit testing of [Service Bus-trigger Azure Functions](https://github.com/Avanade/unittestex#service-bus-trigger-azure-function). This capability assumes that Dependency Injection (DI) is being leveraged, and will create the underlying host and enable a `ServiceBusReceivedMessage` to be sent simulating the Azure Function runtime capability.
 
 As the implemented subscriber is invoking OKTA, _UnitTestEx_ also easily enables the [mocking of HTTP requests/responses](https://github.com/Avanade/unittestex#http-client-mocking) to verify both success and failure scenarios.
 
@@ -453,4 +449,4 @@ The new _Security_ domain that performs a [Service Bus Subscribe](./Service-Bus-
 
 ## Next Step
 
-Next we will [wrap up](./../README.md#Conclusion) the sample - we are done!    
+Next we will [wrap up](./../README.md#Conclusion) the sample - we are done - BOOM!    

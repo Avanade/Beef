@@ -4,6 +4,7 @@ using DbEx;
 using OnRamp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Beef.Database
@@ -48,6 +49,9 @@ namespace Beef.Database
         /// </summary>
         /// <remarks>This depends on the underlying database provider as to whether there are <i>Beef</i> schema objects to use.</remarks>
         public bool BeefSchema { get; set; }
+
+        /// <inheritdoc/>
+        List<Assembly> ICodeGeneratorArgs.Assemblies => Assemblies.Select(x => x.Assembly).ToList();
 
         /// <summary>
         /// Indicates whether to use the standard <i>Beef</i> schema objects.
@@ -113,8 +117,8 @@ namespace Beef.Database
             ExpectNoChanges = args.ExpectNoChanges;
             IsSimulation = args.IsSimulation;
 
-            Assemblies.Clear();
-            Assemblies.AddRange(args.Assemblies);
+            ClearAssemblies();
+            AddAssembly(args.Assemblies.ToArray());
 
             Parameters.Clear();
             if (args.Parameters != null)

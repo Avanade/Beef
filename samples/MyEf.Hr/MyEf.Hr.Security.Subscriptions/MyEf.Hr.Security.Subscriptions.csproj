@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <ImplicitUsings>true</ImplicitUsings>
+    <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
-    <!-- Following needed as per: https://github.com/Azure/azure-functions-core-tools/issues/2872 -->
-    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
@@ -18,10 +17,11 @@
   <ItemGroup>
     <PackageReference Include="CoreEx.Azure" Version="3.9.0" />
     <PackageReference Include="CoreEx.Validation" Version="3.9.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.1" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.15.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.16.4" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.13.5" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyEf.Hr.Common\MyEf.Hr.Common.csproj" />

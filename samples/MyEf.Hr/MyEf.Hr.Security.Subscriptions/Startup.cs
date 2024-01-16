@@ -1,16 +1,20 @@
-﻿[assembly: FunctionsStartup(typeof(MyEf.Hr.Security.Subscriptions.Startup))]
+﻿namespace MyEf.Hr.Security.Subscriptions;
 
-namespace MyEf.Hr.Security.Subscriptions;
-
-public class Startup : FunctionsStartup
+/// <summary>
+/// The <see cref="HostStartup"/> to enable testable dependency injection.
+/// </summary>
+public class Startup : HostStartup
 {
-    public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder) => builder.ConfigurationBuilder
-        .AddJsonFile(Path.Combine(builder.GetContext().ApplicationRootPath ?? "", "appsettings.json"), optional: true)
-        .AddEnvironmentVariables("Hr_");
-
-    public override void Configure(IFunctionsHostBuilder builder)
+    /// <inheritdoc/>
+    public override void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder config)
     {
-        builder.Services
+        config.AddEnvironmentVariables("MyEf_Hr_");
+    }
+
+    /// <inheritdoc/>
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        services
             .AddSettings<SecuritySettings>()
             .AddExecutionContext()
             .AddJsonSerializer()
