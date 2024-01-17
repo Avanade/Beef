@@ -19,7 +19,7 @@ namespace Cdr.Banking.Test
         public void OneTimeSetUp()
         {
             ApiTester.UseUser("jessica");
-            Assert.IsTrue(TestSetUp.Default.SetUp());
+            Assert.That(TestSetUp.Default.SetUp(), Is.True);
         }
 
         #region GetAccounts
@@ -31,10 +31,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(3, v.Items.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890", "45678901" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(3));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890", "45678901" }));
         }
 
         [Test]
@@ -45,10 +48,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(1, v.Items.Count);
-            Assert.AreEqual(new string[] { "23456789" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "23456789" }));
         }
 
         [Test]
@@ -59,9 +65,12 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(0, v.Items.Count);
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Is.Empty);
+            });
         }
 
         [Test]
@@ -80,10 +89,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { OpenStatus = "OPEN" })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
         }
 
 
@@ -94,10 +106,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { ProductCategory = "CRED_AND_CHRG_CARDS" })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(1, v.Items.Count);
-            Assert.AreEqual(new string[] { "34567890" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "34567890" }));
         }
 
         [Test]
@@ -107,10 +122,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = true })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
         }
 
         [Test]
@@ -120,10 +138,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = false })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(1, v.Items.Count);
-            Assert.AreEqual(new string[] { "45678901" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "45678901" }));
         }
 
         [Test]
@@ -133,10 +154,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(1, 2))).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "12345678", "34567890" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
         }
 
         [Test]
@@ -146,10 +170,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(2, 2))).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(1, v.Items.Count);
-            Assert.AreEqual(new string[] { "45678901" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "45678901" }));
         }
 
         [Test]
@@ -159,9 +186,12 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(3, 2))).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(0, v.Items.Count);
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Is.Empty);
+            });
         }
 
         #endregion
@@ -227,7 +257,7 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetBalanceAsync("12345678")).Value;
 
-            Assert.IsNotNull(v);
+            Assert.That(v, Is.Not.Null);
         }
 
         [Test]

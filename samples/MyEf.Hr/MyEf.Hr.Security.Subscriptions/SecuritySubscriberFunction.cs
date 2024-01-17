@@ -1,13 +1,10 @@
 namespace MyEf.Hr.Security.Subscriptions;
 
-public class SecuritySubscriberFunction
+public class SecuritySubscriberFunction(ServiceBusOrchestratedSubscriber subscriber)
 {
-    private readonly ServiceBusOrchestratedSubscriber _subscriber;
+    private readonly ServiceBusOrchestratedSubscriber _subscriber = subscriber.ThrowIfNull();
 
-    public SecuritySubscriberFunction(ServiceBusOrchestratedSubscriber subscriber) => _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
-
-    [Singleton(Mode = SingletonMode.Function)]
-    [FunctionName(nameof(SecuritySubscriberFunction))]
+    [Function(nameof(SecuritySubscriberFunction))]
     public Task RunAsync([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message, ServiceBusMessageActions messageActions, CancellationToken cancellationToken)
         => _subscriber.ReceiveAsync(message, messageActions, null, cancellationToken);
 }

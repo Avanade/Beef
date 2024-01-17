@@ -28,7 +28,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Assert.IsTrue(ApiTester.SetUp.SetUp());
+            Assert.That(ApiTester.SetUp.SetUp(), Is.True);
             ApiTester.UseExpectedEvents();
         }
 
@@ -187,7 +187,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
-            Assert.NotNull(p);
+            Assert.That(p, Is.Not.Null);
 
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -298,9 +298,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
-            // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check all 4 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(4));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+            });
         }
 
         [Test, TestSetUp]
@@ -310,9 +313,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync(PagingArgs.CreateSkipAndTake(1, 2)));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Jones", "Smith", }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith", }));
+            });
         }
 
         [Test, TestSetUp]
@@ -325,10 +331,13 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync(pa, ro));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Jones", "Smith", }, pcr.Value.Items.Select(x => x.LastName).ToArray());
-            Assert.IsFalse(pcr.Value.Items.Any(x => x.Id != Guid.Empty));
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith", }));
+                Assert.That(pcr.Value.Items.Any(x => x.Id != Guid.Empty), Is.False);
+            });
         }
 
         [Test, TestSetUp]
@@ -338,9 +347,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAll2Async());
 
-            // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check all 4 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(4));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+            });
         }
 
         #endregion
@@ -360,9 +372,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(null) : a.GetByArgsAsync(null));
 
-            // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check all 4 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(4));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+            });
         }
 
         [Test, TestSetUp]
@@ -379,9 +394,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
-            // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check all 4 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(4));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+            });
         }
 
         [Test, TestSetUp]
@@ -398,9 +416,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
-            // Check 2 are returned in the sorted order.
-            Assert.AreEqual(2, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Smith", "Smithers" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check 2 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+            });
         }
 
         [Test, TestSetUp]
@@ -417,9 +438,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
-            // Check 1 is returned in the sorted order.
-            Assert.AreEqual(1, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Browne" }, pcr.Value.Items.Select(x => x.LastName).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check 1 is returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(1));
+                Assert.That(pcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne" }));
+            });
         }
 
         [Test, TestSetUp]
@@ -430,12 +454,14 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetDetailByArgsAsync(args, PagingArgs.CreateSkipAndTake(0, 2, true)));
 
-            Assert.AreEqual(2, pdcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "Smith", "Smithers" }, pdcr.Value.Items.Select(x => x.LastName).ToArray());
-            Assert.AreEqual(2, pdcr.Value.Items[0].History.Count);
-            Assert.AreEqual(2, pdcr.Value.Items[1].History.Count);
-
-            Assert.AreEqual(2, pdcr.Value.Paging.TotalCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(pdcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(pdcr.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+                Assert.That(pdcr.Value.Items[0].History, Has.Count.EqualTo(2));
+                Assert.That(pdcr.Value.Items[1].History, Has.Count.EqualTo(2));
+                Assert.That(pdcr.Value.Paging.TotalCount, Is.EqualTo(2));
+            });
         }
 
         [Test, TestSetUp]
@@ -695,7 +721,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
 
-            Assert.NotNull(p.Address);
+            Assert.That(p.Address, Is.Not.Null);
 
             // Remove the address and update again.
             p.Address = null;
@@ -715,7 +741,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
 
-            Assert.Null(p.Address);
+            Assert.That(p.Address, Is.Null);
         }
 
         [Test, TestSetUp]
@@ -879,7 +905,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
 
-            Assert.NotNull(p.Address);
+            Assert.That(p.Address, Is.Not.Null);
 
             // Remove the address and update again.
             p.Address = null;
@@ -899,7 +925,7 @@ namespace Beef.Demo.Test
                 .ExpectValue((t) => p)
                 .Run(a => a.GetWithEfAsync(p.Id)).Value;
 
-            Assert.Null(p.Address);
+            Assert.That(p.Address, Is.Null);
         }
 
         #endregion
@@ -1083,21 +1109,24 @@ namespace Beef.Demo.Test
                 .ExpectEvents()
                 .Run(a => a.PatchDetailAsync(HttpPatchOption.MergePatch, jt, 4.ToGuid(), new HttpRequestOptions { ETag = p.ETag })).Value;
 
-            Assert.IsNotNull(p);
-            Assert.IsNotNull(p.History);
-            Assert.AreEqual(3, p.History.Count);
+            Assert.That(p, Is.Not.Null);
+            Assert.That(p.History, Is.Not.Null);
+            Assert.That(p.History, Has.Count.EqualTo(3));
 
-            Assert.AreEqual("Google", p.History[0].Name);
-            Assert.AreEqual(new DateTime(2018, 04, 30), p.History[0].StartDate);
-            Assert.IsNull(p.History[0].EndDate);
+            Assert.Multiple(() =>
+            {
+                Assert.That(p.History[0].Name, Is.EqualTo("Google"));
+                Assert.That(p.History[0].StartDate, Is.EqualTo(new DateTime(2018, 04, 30)));
+                Assert.That(p.History[0].EndDate, Is.Null);
 
-            Assert.AreEqual("Amazon", p.History[1].Name);
-            Assert.AreEqual(new DateTime(2016, 04, 16), p.History[1].StartDate);
-            Assert.AreEqual(new DateTime(2018, 04, 16), p.History[1].EndDate);
+                Assert.That(p.History[1].Name, Is.EqualTo("Amazon"));
+                Assert.That(p.History[1].StartDate, Is.EqualTo(new DateTime(2016, 04, 16)));
+                Assert.That(p.History[1].EndDate, Is.EqualTo(new DateTime(2018, 04, 16)));
 
-            Assert.AreEqual("Microsoft", p.History[2].Name);
-            Assert.AreEqual(new DateTime(2015, 05, 23), p.History[2].StartDate);
-            Assert.AreEqual(new DateTime(2016, 04, 06), p.History[2].EndDate);
+                Assert.That(p.History[2].Name, Is.EqualTo("Microsoft"));
+                Assert.That(p.History[2].StartDate, Is.EqualTo(new DateTime(2015, 05, 23)));
+                Assert.That(p.History[2].EndDate, Is.EqualTo(new DateTime(2016, 04, 06)));
+            });
         }
 
         [Test, TestSetUp]
@@ -1169,7 +1198,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.AddAsync(new Person { FirstName = "Gary" }));
 
             // Make sure the content (body) is as expected.
-            Assert.AreEqual("{\"firstName\":\"Gary\"}", res.Response.RequestMessage.Content.ReadAsStringAsync().Result);
+            Assert.That(res.Response.RequestMessage.Content.ReadAsStringAsync().Result, Is.EqualTo("{\"firstName\":\"Gary\"}"));
         }
 
         [Test, TestSetUp]
@@ -1246,8 +1275,8 @@ namespace Beef.Demo.Test
                     .ExpectEvents()
                     .Run(a => a.EventPublishNoSendAsync(new Person { FirstName = "John", LastName = "Doe", Gender = "M", Birthday = new DateTime(200, 01, 01) })));
 
-            Assert.IsNotNull(ex);
-            Assert.AreEqual("Expected Event Publish/Send mismatch; there are one or more published events that have not been sent.", ex.Message);
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Expected Event Publish/Send mismatch; there are one or more published events that have not been sent."));
         }
 
         [Test, TestSetUp]

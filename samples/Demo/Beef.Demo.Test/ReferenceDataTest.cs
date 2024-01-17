@@ -24,7 +24,7 @@ namespace Beef.Demo.Test
         public async Task OneTimeSetUp()
         {
             ApiTester.UseJsonSerializer(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer());
-            Assert.IsTrue(TestSetUp.Default.SetUp());
+            Assert.That(TestSetUp.Default.SetUp(), Is.True);
             await RobotTest.CosmosOneTimeSetUp(ApiTester.Services.GetService<DemoCosmosDb>()).ConfigureAwait(false);
         }
 
@@ -35,8 +35,11 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetNamedAsync(new string[] { nameof(Country), nameof(USState), nameof(Gender), nameof(EyeColor), nameof(PowerSource), nameof(Company), nameof(Status) }));
 
-            Assert.NotNull(r.GetContent());
-            Assert.AreEqual(7, JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count());
+            Assert.Multiple(() =>
+            {
+                Assert.That(r.GetContent(), Is.Not.Null);
+                Assert.That(JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count(), Is.EqualTo(7));
+            });
         }
 
         [Test, Parallelizable]
@@ -46,10 +49,13 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetNamedAsync(new string[] { nameof(Gender), nameof(Company) }));
 
-            Assert.NotNull(r.GetContent());
-
-            Assert.IsTrue(r.Response.Headers.TryGetValues("ETag", out var etags));
-            Assert.AreEqual(1, etags.Count());
+            IEnumerable<string> etags = null;
+            Assert.Multiple(() =>
+            {
+                Assert.That(r.GetContent(), Is.Not.Null);
+                Assert.That(r.Response.Headers.TryGetValues("ETag", out etags), Is.True);
+                Assert.That(etags.Count(), Is.EqualTo(1));
+            });
 
             r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -66,13 +72,16 @@ namespace Beef.Demo.Test
             var r = Agent<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetNamedAsync(new string[] { nameof(Gender), nameof(Company) }, new CoreEx.Http.HttpRequestOptions { ETag = "ABC" }));
+            Assert.Multiple(() =>
+            {
                 //.RunOverride(() => new ReferenceDataAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), x =>
                 //{
                 //    x.Headers.Add("If-None-Match", new string[] { "\"ABC\"", "\"DEF\"" });
                 //})).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
 
-            Assert.NotNull(r.GetContent());
-            Assert.AreEqual(2, JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count());
+                Assert.That(r.GetContent(), Is.Not.Null);
+                Assert.That(JObject.Parse("{ \"content\":" + r.GetContent() + "}")["content"].Children().Count(), Is.EqualTo(2));
+            });
         }
 
         [Test, Parallelizable]
@@ -82,8 +91,8 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GenderGetAllAsync()).Value;
 
-            Assert.IsNotNull(rd);
-            Assert.Greater(rd.Count, 0);
+            Assert.That(rd, Is.Not.Null);
+            Assert.That(rd, Is.Not.Empty);
         }
 
         [Test, Parallelizable]
@@ -94,8 +103,8 @@ namespace Beef.Demo.Test
                 .Run(a => a.GenderGetAllAsync());
 
             r.Response.Headers.TryGetValues("ETag", out var vals);
-            Assert.IsNotNull(vals);
-            Assert.AreEqual(1, vals.Count());
+            Assert.That(vals, Is.Not.Null);
+            Assert.That(vals.Count(), Is.EqualTo(1));
 
             Agent<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -117,9 +126,9 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "E", null, "n" } }));
 
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(r.Value);
-            Assert.AreEqual(2, r.Value.Count);
+            Assert.That(r, Is.Not.Null);
+            Assert.That(r.Value, Is.Not.Null);
+            Assert.That(r.Value, Has.Count.EqualTo(2));
         }
 
         [Test, Parallelizable]
@@ -129,9 +138,9 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Text = "el*" }));
 
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(r.Value);
-            Assert.AreEqual(1, r.Value.Count);
+            Assert.That(r, Is.Not.Null);
+            Assert.That(r.Value, Is.Not.Null);
+            Assert.That(r.Value, Has.Count.EqualTo(1));
         }
 
         [Test, Parallelizable]
@@ -141,17 +150,17 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "o" } }));
 
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(r.Value);
-            Assert.AreEqual(0, r.Value.Count);
+            Assert.That(r, Is.Not.Null);
+            Assert.That(r.Value, Is.Not.Null);
+            Assert.That(r.Value, Is.Empty);
 
             r = Agent<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PowerSourceGetAllAsync(new ReferenceDataFilter { Codes = new List<string> { "o" } }, new CoreEx.Http.HttpRequestOptions { IncludeInactive = true }));
 
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(r.Value);
-            Assert.AreEqual(1, r.Value.Count);
+            Assert.That(r, Is.Not.Null);
+            Assert.That(r.Value, Is.Not.Null);
+            Assert.That(r.Value, Has.Count.EqualTo(1));
         }
 
         [Test, Parallelizable]

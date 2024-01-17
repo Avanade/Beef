@@ -18,7 +18,7 @@ namespace Cdr.Banking.Test
         public void OneTimeSetUp()
         {
             ApiTester.UseUser("jessica");
-            Assert.IsTrue(TestSetUp.Default.SetUp());
+            Assert.That(TestSetUp.Default.SetUp(), Is.True);
         }
 
         [Test]
@@ -28,10 +28,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(3, v.Items.Count);
-            Assert.AreEqual(new string[] { "X0007", "X0003", "X0001" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(3));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "X0007", "X0003", "X0001" }));
         }
 
         [Test]
@@ -41,10 +44,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), ToDate = new DateTime(2019, 07, 01) })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "X0003", "X0001" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "X0003", "X0001" }));
         }
 
         [Test]
@@ -54,10 +60,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MinAmount = 0 })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(1, v.Items.Count);
-            Assert.AreEqual(new string[] { "X0003" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "X0003" }));
         }
 
         [Test]
@@ -67,10 +76,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MaxAmount = 0 })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "X0007", "X0001" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "X0007", "X0001" }));
         }
 
         [Test]
@@ -81,10 +93,13 @@ namespace Cdr.Banking.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("23456789", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), Text = "usb" })).Value;
 
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(v!.Items);
-            Assert.AreEqual(2, v.Items.Count);
-            Assert.AreEqual(new string[] { "X0006", "X0002" }, v.Items.Select(x => x.Id).ToArray());
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "X0006", "X0002" }));
         }
 
         [Test]

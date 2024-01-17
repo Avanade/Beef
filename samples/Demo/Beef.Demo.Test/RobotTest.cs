@@ -32,7 +32,7 @@ namespace Beef.Demo.Test
             await CosmosOneTimeSetUp(ApiTester.Services.GetService<DemoCosmosDb>());
         }
 
-        public static async Task CosmosOneTimeSetUp(DemoCosmosDb cosmosDb)
+        internal static async Task CosmosOneTimeSetUp(DemoCosmosDb cosmosDb)
         {
             await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id).ConfigureAwait(false);
 
@@ -98,7 +98,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
-            Assert.NotNull(v);
+            Assert.That(v, Is.Not.Null);
 
             Agent<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
@@ -124,9 +124,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs()));
 
-            // Check all 4 are returned in the sorted order.
-            Assert.AreEqual(4, rcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456", "A45768", "B45768" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check all 4 are returned in the sorted order.
+                Assert.That(rcr?.Value?.Items?.Count, Is.EqualTo(4));
+                Assert.That(rcr.Value.Items.Select(x => x.SerialNo).ToArray(), Is.EqualTo(new string[] { "123456", "223456", "A45768", "B45768" }));
+            });
         }
 
         [Test]
@@ -136,9 +139,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs(), PagingArgs.CreateSkipAndTake(1, 2)));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, pcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "223456", "A45768", }, pcr.Value.Items.Select(x => x.SerialNo).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(pcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(pcr.Value.Items.Select(x => x.SerialNo).ToArray(), Is.EqualTo(new string[] { "223456", "A45768", }));
+            });
         }
 
         [Test]
@@ -148,9 +154,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs { ModelNo = "T1000" }));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(rcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(rcr.Value.Items.Select(x => x.SerialNo).ToArray(), Is.EqualTo(new string[] { "123456", "223456" }));
+            });
         }
 
         [Test]
@@ -160,9 +169,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs { SerialNo = "*68" }));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "A45768", "B45768" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(rcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(rcr.Value.Items.Select(x => x.SerialNo).ToArray(), Is.EqualTo(new string[] { "A45768", "B45768" }));
+            });
         }
 
         [Test]
@@ -172,9 +184,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(new RobotArgs { PowerSources = new List<string> { "F", "N" } }));
 
-            // Check only 2 are returned in the sorted order.
-            Assert.AreEqual(2, rcr?.Value?.Items?.Count);
-            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Items.Select(x => x.SerialNo).ToArray());
+            Assert.Multiple(() =>
+            {
+                // Check only 2 are returned in the sorted order.
+                Assert.That(rcr?.Value?.Items?.Count, Is.EqualTo(2));
+                Assert.That(rcr.Value.Items.Select(x => x.SerialNo).ToArray(), Is.EqualTo(new string[] { "123456", "223456" }));
+            });
         }
 
         [Test]
@@ -185,7 +200,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetByArgsAsync(new RobotArgs { ModelNo = "ABC", SerialNo = "K*", PowerSources = new List<string> { "F", "N" } }));
 
             // Check nothing is returned..
-            Assert.AreEqual(0, rcr?.Value?.Items?.Count);
+            Assert.That(rcr?.Value?.Items?.Count, Is.EqualTo(0));
         }
 
         #endregion
