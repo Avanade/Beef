@@ -60,11 +60,7 @@ Comment out the regions `GetByArgs` and `Terminate` as these capabilities have n
 
 This is more of a pure unit test; in that all data repository access is mocked out. This allows for faster execution without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
 
-
-
-Underneath the `Apis` folder, create a new class called `EmployeeValidatorTest.cs`. For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
-
-
+Underneath the `Validators` folder, create a new class called `EmployeeValidatorTest.cs`. For the purposes of this sample, copy and paste the contents from [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) into the new `Validators/EmployeeValidatorTest.cs`.
 
 </br>
 
