@@ -6,6 +6,14 @@ This will walk through the process of creating the required end-to-end intra-dom
 
 <br/>
 
+## Intra-domain vs. inter-domain testing 
+
+Within a DDD context, Intra-domain means within (isolated to) the domain itself, excluding any external domain-based dependencies. Versus, inter-domain, where domains directly interact with each other. In summary, Intra- is about tight-coupling, and Inter- is about loose-coupling.
+
+So, the intent, is to verify the domain logic in isolation, without any external dependencies. This is achieved by mocking out the external dependencies, and then verifying the domain logic is functioning as expected.
+
+<br/>
+
 ## Project structure
 
 When the `MyEf.Hr.Test` solution is created during the solution skeleton generation, the project structure is as detailed below.
@@ -53,6 +61,42 @@ Hr:
 Underneath the Apis folder, create a new class called `EmployeeTest.cs`. For the purposes of this sample, copy the contents of the sample [`EmployeeTest.cs`](../MyEf.Hr.Test/Apis/EmployeeTest.cs) and replace the contents of the new class.
 
 Comment out the regions `GetByArgs` and `Terminate` as these capabilities have not been implemented yet.
+
+<br/>
+
+### Test composition
+
+The API testing leverages the generated [`EmployeeAgent`](../MyEf.Hr.Common/Agents/Generated/EmployeeAgent.cs) to invoke the APIs leveraging HTTP, being the request and response. This is intended to verify that the API surface, underlying serialization, dependency injection, etc. are all functioning as expected, as well as then verifying the specific business and data logic. The [`FixtureSetup`](../MyEf.Hr.Test/Apis/FixtureSetup.cs) class contains the key logic to set up the database, and is invoked (`TestSetUp.Default.SetUp`) by each test, during the `OneTimeSetUp`.
+
+An example test is as follows:
+
+``` csharp
+[Test]
+public void A120_Get_Found_NoAddress()
+{
+    Agent<EmployeeAgent, Employee?>()           // Creates an instance of the EmployeeAgent to invoke the API.
+        .ExpectStatusCode(HttpStatusCode.OK)    // Expects the HTTP status code to be OK; which will be automatically asserted.
+        .IgnoreChangeLog()                      // Ignores the ChangeLog property, as this is not relevant for this test.
+        .IgnoreETag()                           // Ignores the ETag property, as this is not relevant for this test.
+        .ExpectValue(_ => new Employee          // Expects the response value to match the specified value; which will be automatically asserted.
+        {
+            Id = 1.ToGuid(),
+            Email = "w.jones@org.com",
+            FirstName = "Wendy",
+            LastName = "Jones",
+            Gender = "F",
+            Birthday = new DateTime(1985, 03, 18),
+            StartDate = new DateTime(2000, 12, 11),
+            PhoneNo = "(425) 612 8113"
+        })
+        .Run(a => a.GetAsync(1.ToGuid()));      // Executes the EmployeeAgent.GetAsync method using the supplied instance with underlying test HttpClient:
+                                                // - Agent will make the HTTP request to the API, setting URL, headers, body, etc.;
+                                                // - The response will be asserted, and deserialized into the specified type where applicable;
+                                                // - Additional assertions can be made on the response.
+}
+```
+
+The example `EmployeeTest.cs` demonstrates the throughness of the testing, and the ease of which it can be achieved. 
 
 </br>
 
