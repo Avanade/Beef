@@ -68,6 +68,17 @@ Comment out the regions `GetByArgs` and `Terminate` as these capabilities have n
 
 The API testing leverages the generated [`EmployeeAgent`](../MyEf.Hr.Common/Agents/Generated/EmployeeAgent.cs) to invoke the APIs leveraging HTTP, being the request and response. This is intended to verify that the API surface, underlying serialization, dependency injection, etc. are all functioning as expected, as well as then verifying the specific business and data logic. The [`FixtureSetup`](../MyEf.Hr.Test/Apis/FixtureSetup.cs) class contains the key logic to set up the database, and is invoked (`TestSetUp.Default.SetUp`) by each test, during the `OneTimeSetUp`.
 
+The `UnitTestEx` testing supports the following conventions when creating tests:
+- `Expect` - the expect named methods are _expectations_, which are essentially assertions that will be automatically asserted at conclusion of the `Run`.
+- `Ignore` - the ignore named methods are _ignores_, which are essentially properties that will be ignored when comparing the response value to the specified value.
+- `Assert` - the assert named methods are traditional _assertions_ that are executed immediately after the `Run` method is executed.
+
+Additional assertions can be made on the execution _result_ using the testing framework of choice, such as NUnit, xUnit, etc.
+
+</br>
+
+### Example test
+
 An example test is as follows:
 
 ``` csharp
@@ -96,7 +107,7 @@ public void A120_Get_Found_NoAddress()
 }
 ```
 
-The example `EmployeeTest.cs` demonstrates the throughness of the testing, and the ease of which it can be achieved. 
+The example `EmployeeTest.cs` demonstrates the thoroughness of the testing, and the ease of which it can be achieved. 
 
 </br>
 
@@ -105,6 +116,60 @@ The example `EmployeeTest.cs` demonstrates the throughness of the testing, and t
 This is more of a pure unit test; in that all data repository access is mocked out. This allows for faster execution without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
 
 Underneath the `Validators` folder, create a new class called `EmployeeValidatorTest.cs`. For the purposes of this sample, copy and paste the contents from [`EmployeeValidatorTest.cs`](../MyEf.Hr.Test/Validators/EmployeeValidatorTest.cs) into the new `Validators/EmployeeValidatorTest.cs`.
+
+<br/>
+
+### Test composition
+
+The validator testing simalarly leverages `UnitTestEx` and conventions. The primary being the `ExpectErrors` or `AssertErrors` where a validation error(s) is expected; otherwise, a `ExpectSuccess` or `AssertSuccess` should be used to assert that the validation was successful and no errors were found.
+
+<br>
+
+### Example test 
+
+An example test expecting errors is as follows:
+
+``` csharp
+[Test]
+public void A130_Validate_Address_Empty()
+{
+    var e = CreateValidEmployee();
+    e.Address = new Address();
+
+    using var test = GenericTester.Create();                  // Creates an instance of the GenericTester to invoke the validator.
+
+    test.ConfigureServices(_testSetup!)                       // Configures the services required for the validator.
+        .ExpectErrors(                                        // Expects the validation to fail with the specified errors (order is not important).
+            "Street1 is required.",
+            "City is required.",
+            "State is required.",
+            "Post Code is required.")
+        .Validation().With<EmployeeValidator, Employee>(e);   // Executes the specified validator using the specified value.
+}
+```
+
+An example test asserting success is as follows:
+
+``` csharp
+[Test]
+public void A150_Validate_Address_OK()
+{
+    var e = CreateValidEmployee();
+    e.Address = new Address
+    {
+        Street1 = "8365 Rode Road",
+        City = "Redmond",
+        State = "WA",
+        PostCode = "98052"
+    };
+
+    using var test = GenericTester.Create();                  // Creates an instance of the GenericTester to invoke the validator.
+
+    test.ConfigureServices(_testSetup!)                       // Configures the services required for the validator.
+        .ExpectSuccess()                                      // Expects the validation to succeed.
+        .Validation().With<EmployeeValidator, Employee>(e);   // Executes the specified validator using the specified value.
+}
+```
 
 </br>
 
