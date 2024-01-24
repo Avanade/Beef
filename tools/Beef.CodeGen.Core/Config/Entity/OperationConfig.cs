@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 
 namespace Beef.CodeGen.Config.Entity
 {
