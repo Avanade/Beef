@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using YamlDotNet.Core.Tokens;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -25,7 +26,8 @@ namespace Beef.CodeGen.Config.Entity
 - **`Update`** - indicates the updating of an entity.
 - **[`Patch`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Json/Merge/JsonMergePatch.cs)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
 - **`Delete`** - indicates the deleting of an entity.
-- **`Custom`** - indicates a customized operation where parameters and return value are explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer. This is the default where not specified.",
+- **`Custom`** - indicates a customized operation where parameters and return value are explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer. This is the default where not specified.
+- **`CustomManagerOnly`** - indicates `Custom` (as above) and automatically sets `ManagerCustom`, `ExcludeIDataSvc`, `ExcludeDataSvc`, `ExcludeIData`, `ExcludeData` properties to `true` (where not explicitly set).",
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 operations: [
@@ -79,7 +81,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("type")]
         [CodeGenProperty("Key", Title = "The type of operation that is to be code-generated.", IsImportant = true,
-            Description = "Defaults to `Custom`.", Options = new string[] { "Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom" })]
+            Description = "Defaults to `Custom`.", Options = ["Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom", "CustomManagerOnly"])]
         public string? Type { get; set; }
 
         /// <summary>
@@ -996,6 +998,17 @@ operations: [
         protected override async Task PrepareAsync()
         {
             Type = DefaultWhereNull(Type, () => "Custom");
+
+            if (Type == "CustomManagerOnly")
+            {
+                Type = "Custom";
+                ManagerCustom = DefaultWhereNull(ManagerCustom, () => true);
+                ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => true);
+                ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => true);
+                ExcludeIData = DefaultWhereNull(ExcludeIData, () => true);
+                ExcludeData = DefaultWhereNull(ExcludeData, () => true);
+            }
+
             BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Get" => Parent!.EntityName,

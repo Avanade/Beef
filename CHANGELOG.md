@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.9.1
+- *Fixed:* Simplified YAML specification where _only_ a custom manager is required to be implemented. For an `operation` set `type: CustomManagerOnly`, this is a shorthand for `type: Custom, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeIData: true, excludeData: true` (i.e. these other properties will no longer need to be set explicitly).
+
 ## v5.9.0
 - *Fixed:* Upgraded `CoreEx` ([`v3.9.0`](https://github.com/Avanade/CoreEx/blob/main/CHANGELOG.md#v390)) and `DbEx` ([`v2.4.0`](https://github.com/Avanade/DbEx/blob/main/CHANGELOG.md#v240)) to include all related fixes and improvements; including dependent `UnitTestEx` ([`v4.0.1`](https://github.com/Avanade/UnitTestEx/blob/main/CHANGELOG.md#v410)) and related `NUnit` ([`v4.0.1`](https://docs.nunit.org/articles/nunit/release-notes/Nunit4.0-MigrationGuide.html)) upgrades.
 - *Enhancement:* Updated the `dotnet new beef` template to target `net8.0` and updated `NUnit`.
@@ -21,7 +24,7 @@ Represents the **NuGet** versions.
 - *Fixed:* The `count` code-generation command has been added to report the total number of files and lines for all and generated code.
 
 ## v5.7.2
-- *Fixed:* The `Entity.HttpAgentCustomMapper` property has been added to the schema for correctly include within code-generation.
+- *Fixed:* The `Entity.HttpAgentCustomMapper` property has been added to the schema to correctly include within code-generation.
 - *Fixed:* Upgraded `CoreEx` (`v3.7.0`) to include all related fixes and improvements.
 
 ## v5.7.1

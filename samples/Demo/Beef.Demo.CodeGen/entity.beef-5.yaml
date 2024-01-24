@@ -66,6 +66,7 @@ entities:
       },
       { name: DataSvcCustom, type: Custom, text: Validate a DataSvc Custom generation, returnType: int, dataSvcCustom: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
       { name: ManagerCustom, type: Get, text: Validate a Manager Custom generation, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
+      { name: CustomManagerOnly, type: CustomManagerOnly, text: "Validate CustomManagerOnly", webApiMethod: HttpPost, webApiRoute: "cmo" },
       { name: GetNull, type: Custom, returnType: 'Person?', webApiRoute: 'null', webApiMethod: HttpGet, webApiAlternateStatus: NotFound,
         parameters: [
           { name: Name, type: string },

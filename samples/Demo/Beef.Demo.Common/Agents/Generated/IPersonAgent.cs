@@ -204,6 +204,14 @@ namespace Beef.Demo.Common.Agents
         Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Validate CustomManagerOnly.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> CustomManagerOnlyAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>

@@ -439,6 +439,12 @@ public partial class PersonManager : IPersonManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
+    public Task CustomManagerOnlyAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
+    {
+        await CustomManagerOnlyOnImplementationAsync().ConfigureAwait(false);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
     public Task<Person?> GetNullAsync(string? name, List<string>? names) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(name, names);

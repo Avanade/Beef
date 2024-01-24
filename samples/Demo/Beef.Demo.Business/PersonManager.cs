@@ -18,6 +18,8 @@
             return Task.FromResult<Person?>(null);
         }
 
+        private static Task CustomManagerOnlyOnImplementationAsync() => Task.CompletedTask;
+
         private async Task UpdateOnPreValidateAsync(Person value, Guid id)
         {
             var curr = await GetAsync(id).ConfigureAwait(false);
