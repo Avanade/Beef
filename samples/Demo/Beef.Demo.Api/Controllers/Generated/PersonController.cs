@@ -247,6 +247,14 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync(Request, p => _manager.AddAsync(person), statusCode: HttpStatusCode.Created, operationType: CoreEx.OperationType.Unspecified);
 
     /// <summary>
+    /// Validate CustomManagerOnly.
+    /// </summary>
+    [HttpPost("api/v1/persons/cmo")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> CustomManagerOnly()
+        => _webApi.PostAsync(Request, p => _manager.CustomManagerOnlyAsync(), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
+
+    /// <summary>
     /// Get Null.
     /// </summary>
     /// <param name="name">The Name.</param>

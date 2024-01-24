@@ -144,6 +144,11 @@ public partial interface IPersonManager
     Task<Person?> ManagerCustomAsync();
 
     /// <summary>
+    /// Validate CustomManagerOnly.
+    /// </summary>
+    Task CustomManagerOnlyAsync();
+
+    /// <summary>
     /// Get Null.
     /// </summary>
     /// <param name="name">The Name.</param>

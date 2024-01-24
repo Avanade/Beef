@@ -1276,7 +1276,8 @@
             "Update",
             "Patch",
             "Delete",
-            "Custom"
+            "Custom",
+            "CustomManagerOnly"
           ]
         },
         "text": {
